@@ -792,6 +792,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@tempcnt}
+% A count.
+%    \begin{macrocode}
+\newcount\si@tempcnt
+%    \end{macrocode}
+%\end{macro}
 %\begin{macro}{\si@tempbox}
 % A private box.
 %    \begin{macrocode}
@@ -1172,33 +1178,47 @@ This work consists of the file  siunitx.dtx
   \expandafter#2#1\si@loop@end\si@loop@stop
 }
 \newcommand*{\si@loop@over@macro@aux}[2]{%
-  \si@loop@if@end{#2}%
+  \si@loop@end@if{#2}%
   #1{#2}%
   \si@loop@over@macro@aux#1%
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\si@loop@if@end}
-%\begin{macro}{\si@loop@if@end@aux}
+%\begin{macro}{\si@loop@end@if}
+%\begin{macro}{\si@loop@exec@end@if}
+%\begin{macro}{\si@loop@end@if@aux}
 % To actually end the above loop.
 %    \begin{macrocode}
-\newcommand*{\si@loop@if@end}[1]{%
-  \expandafter\ifx\si@loop@if@end@aux#1?\si@nil\si@loop@end\si@loop@end
+\newcommand*{\si@loop@end@if}[1]{%
+  \expandafter\ifx\si@loop@end@if@aux#1?\si@nil\si@loop@end\si@loop@end
     \expandafter\si@loop@exit
   \fi
 }
-\newcommand*{\si@loop@if@end@aux}{}
-\def\si@loop@if@end@aux#1#2\si@nil\si@loop@end{#1}
+\newcommand*{\si@loop@exec@end@if}[2]{%
+  \expandafter\ifx\si@loop@end@if@aux#1?\si@nil\si@loop@end\si@loop@end
+    \expandafter\si@loop@exit@exec
+  \else
+    \expandafter\@gobble
+  \fi
+  {#2}%
+}
+\newcommand*{\si@loop@end@if@aux}{}
+\def\si@loop@end@if@aux#1#2\si@nil\si@loop@end{#1}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %\begin{macro}{\si@loop@exit}
+%\begin{macro}{\si@loop@exit@exec}
 % To stop the looping above.
 %    \begin{macrocode}
 \newcommand*{\si@loop@exit}{}
 \def\si@loop@exit#1\si@loop@stop{}
+\newcommand*{\si@loop@exit@exec}{}
+\def\si@loop@exit@exec#1#2\si@loop@stop{#1}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\begin{macro}{\si@loop@end}
 %\begin{macro}{\si@loop@stop}
@@ -1482,16 +1502,61 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@reverse@macro}
+%\begin{macro}{\si@reverse@cs}
+%\begin{macro}{\si@reverse@tlist}
+%\begin{macro}{\si@reverse@tlist@aux}
+% The tlist macro here is the same as in \LaTeX3, but the macro version
+% is simplified as \module{siunitx} does not expect to find 
+% non-expandable content.
+%    \begin{macrocode}
+\newcommand*{\si@reverse@macro}[1]{%
+ \edef#1{% 
+   \expandafter\si@reverse@tlist\expandafter{#1}% 
+  }%
+}
+\newcommand*{\si@reverse@cs}[1]{%
+ \expandafter\si@reverse@macro\csname #1\endcsname
+}
+\newcommand*{\si@reverse@tlist}[1]{%
+  \si@reverse@tlist@aux{}#1\si@loop@end\si@loop@stop
+}
+\newcommand*{\si@reverse@tlist@aux}[2]{%
+  \si@loop@exec@end@if{#2}{#1}%
+  \si@reverse@tlist@aux{#2#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@whiledo}
 % A simple looping function.
 %    \begin{macrocode}
 \newcommand*{\si@whiledo}[2]{%
-  \def\si@whiledo@aux{#2\si@whiledo{#1}{#2}}%
   \si@num@if@T{#1}{%
     #2\si@whiledo{#1}{#2}
   }%
 }
 %    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@whiledo@empty@F}
+%\begin{macro}{\si@whiledo@empty@T}
+% Similar for storage macros.
+%    \begin{macrocode}
+\newcommand*{\si@whiledo@empty@F}[2]{%
+  \si@empty@if@F#1{%
+    #2\si@whiledo@empty@F#1{#2}%
+  }%
+}
+\newcommand*{\si@whiledo@empty@T}[2]{%
+  \si@empty@if@T#1{%
+    #2\si@whiledo@empty@T#1{#2}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Font detection}
@@ -3220,6 +3285,22 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@num@post@dec}
+%\begin{macro}{\si@num@rnd@int}
+% When carrying out the rounding procedures, a couple of storage
+% areas are needed.
+%    \begin{macrocode}
+\newcommand*{\si@num@post@dec}{}
+\newcommand*{\si@num@post@int}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@num@post@carry@bool}
+% For carrying a ten.
+%    \begin{macrocode}
+\si@bool@new\si@num@post@carry@bool
+%    \end{macrocode}
+%\end{macro}
 %\begin{macro}{\si@num@post@rnd@tens}
 %\begin{macro}{\si@num@post@rnd@count}
 % The rounding system needs various storage areas.
@@ -3478,32 +3559,109 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\si@num@post@rnd@dec}
+%\begin{macro}{\si@num@post@rnd@int}
+% The rounding routines for integers and decimals are similar, but to
+% avoid over complex \cs{expandafter} runs they are kept separate.
+%    \begin{macrocode}
+\newcommand*{\si@num@post@rnd@dec}[1]{%
+  \si@num@if@F{\si@num@post@rnd@count>\@ne}{%
+    \si@tempcnt\expandafter\@car\si@num@post@dec\@nil\relax
+    \si@bool@if@T\si@num@post@carry@bool{%
+      \advance\si@tempcnt\@ne\relax
+    }%
+    \si@bool@false\si@num@post@carry@bool
+    \si@num@if@TF{\si@num@post@rnd@count=\@ne}{%
+      \si@num@if@T{\si@tempcnt>4}{%
+        \si@bool@true\si@num@post@carry@bool
+      }%
+    }{%
+      \si@num@if@T{\si@tempcnt=10}{%
+        \si@bool@true\si@num@post@carry@bool
+        \si@tempcnt\z@\relax
+      }%
+      \si@nameedef{si@num@in@#1@dec}{%
+        \the\si@tempcnt
+        \@nameuse{si@num@in@#1@dec}%
+      }%
+    }%
+  }%
+  \advance\si@num@post@rnd@count\m@ne\relax
+  \edef\si@num@post@dec{\expandafter\@cdr\si@num@post@dec\@nil}%
+}
+\newcommand*{\si@num@post@rnd@int}[1]{%
+  \si@tempcnt\expandafter\@car\si@num@post@int\@nil\relax
+  \edef\si@num@post@int{\expandafter\@cdr\si@num@post@int\@nil}%
+  \si@bool@if@T\si@num@post@carry@bool{%
+    \advance\si@tempcnt\@ne\relax
+  }%
+  \si@bool@false\si@num@post@carry@bool
+  \si@num@if@T{\si@tempcnt=10}{%
+    \si@bool@true\si@num@post@carry@bool
+    \si@tempcnt\z@\relax
+  }%
+  \si@nameedef{si@num@in@#1@int}{%
+    \the\si@tempcnt
+    \@nameuse{si@num@in@#1@int}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@num@post@rnd@init}
+% To set up some rounding bits and pieces.
+%    \begin{macrocode}
+\newcommand*{\si@num@post@rnd@init}[1]{%
+  \si@let@Nc\si@num@post@dec{si@num@in@#1@dec}%
+  \si@let@Nc\si@num@post@int{si@num@in@#1@int}%
+  \si@reverse@macro\si@num@post@dec
+  \si@reverse@macro\si@num@post@int
+  \si@clear@cs{si@num@in@#1@dec}%
+  \si@clear@cs{si@num@in@#1@int}% 
+  \si@bool@false\si@num@post@carry@bool
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\si@num@post@rnd@places}
 %\begin{macro}{\si@num@post@rnd@places@aux@i}
 %\begin{macro}{\si@num@post@rnd@places@aux@ii}
+%\begin{macro}{\si@num@post@rnd@places@aux@iii}
+%\begin{macro}{\si@num@post@rnd@places@aux@iv}
 % When rounding to a number of places, the number of tokens in the
 % decimal parts is counted, as this is always needed. A check is then
 % made on the value of the number: if it is zero then a different 
 % approach is used to that if there is a value.
 %    \begin{macrocode}
 \newcommand*{\si@num@post@rnd@places}[1]{%
+  \si@num@if@TF{\si@num@post@places=\z@}{%
+    \si@clear@cs{si@num@in@#1@dec}%
+    \si@bool@cs@false{si@num@in@#1@dec@bool}%
+  }{%
+    \si@num@post@rnd@places@aux@i{#1}%
+  }%
+}
+\newcommand*{\si@num@post@rnd@places@aux@i}[1]{%
   \si@empty@cs@if@T{si@num@in@#1@dec}{%
     \@namedef{si@num@in@#1@dec}{0}%
   }%
   \si@num@post@rnd@count\si@elt@count@cs{si@num@in@#1@dec}\relax
   \expandafter\expandafter\expandafter\ifnum
     \csname si@num@in@#1@dec\endcsname=\z@\relax
-    \si@num@post@rnd@places@aux@i{#1}%
+    \si@num@post@rnd@count\si@num@post@places\relax
+    \si@clear@cs{si@num@in@#1@dec}%
+    \expandafter\si@num@post@rnd@places@aux@ii
   \else
-    \si@num@post@rnd@places@aux@ii{#1}%
+    \expandafter\si@num@post@rnd@places@aux@iii
   \fi
+  {#1}%
 }
 %    \end{macrocode}
-% Here, a simple sting of zeros is created.
+% For padding a number by adding zero to the end repeatedly. This can
+% happen if the input was zero or if the number is too short.
 %    \begin{macrocode}
-\newcommand*{\si@num@post@rnd@places@aux@i}[1]{%
-  \si@num@post@rnd@count\si@num@post@places\relax
-  \si@clear@cs{si@num@in@#1@dec}%
+\newcommand*{\si@num@post@rnd@places@aux@ii}[1]{%
   \si@whiledo{\si@num@post@rnd@count>\z@}{%
     \si@nameedef{si@num@in@#1@dec}{%
       \@nameuse{si@num@in@#1@dec}%
@@ -3513,52 +3671,43 @@ This work consists of the file  siunitx.dtx
   }%
 }
 %    \end{macrocode}
-% For rounding to a fixed number of places there are two steps. First,
-% the input decimal part is divided by ten sufficient times to remove
-% the necessary digits. \eTeX\ will then do the rounding correctly, and
-% a check is only needed to see if there is a knock-on effect on the 
-% integer part.
+% For rounding to a fixed number of places, the package finds the
+% difference in length between what is present and what is required.
+% If the number is too short, there is some simple padding to do.
 %    \begin{macrocode}
-\newcommand*{\si@num@post@rnd@places@aux@ii}[1]{%
+\newcommand*{\si@num@post@rnd@places@aux@iii}[1]{%
   \advance\si@num@post@rnd@count-\si@num@post@places\relax
-  \def\si@num@post@rnd@tens{ 
-    / ( 1 % )
-  }%
-  \si@num@if@T{\si@num@post@rnd@count<\z@}{%
-    \def\si@num@post@rnd@tens{ 
-      * ( 1 % )
-    }%
+  \si@num@if@TF{\si@num@post@rnd@count<\z@}{%
     \si@num@post@rnd@count-\si@num@post@rnd@count\relax
+    \si@num@post@rnd@places@aux@ii{#1}%
+  }{%
+    \si@num@post@rnd@init{#1}%
+    \si@num@post@rnd@places@aux@iv{#1}%
   }%
-  \si@whiledo{\si@num@post@rnd@count>\z@}{%
-    \edef\si@num@post@rnd@tens{\si@num@post@rnd@tens * 10}%
-    \advance\si@num@post@rnd@count\m@ne\relax
-  }%
-  \edef\si@num@post@rnd@tens{% (
-    \si@num@post@rnd@tens )
-  }%
-  \si@nameedef{si@num@in@#1@dec}{%
-    \number\numexpr
-      \@nameuse{si@num@in@#1@dec}
-      \si@num@post@rnd@tens
-    \relax
-  }% 
-  \si@num@post@rnd@count\si@elt@count@cs{si@num@in@#1@dec}\relax
-  \si@num@if@T{\si@num@post@rnd@count>\si@num@post@places}{%
-    \si@nameedef{si@num@in@#1@dec}{%
-      \expandafter\expandafter\expandafter\@cdr
-        \csname si@num@in@#1@dec\endcsname\@nil
+}
+\newcommand*{\si@num@post@rnd@places@aux@iv}[1]{%
+  \si@empty@if@TF\si@num@post@dec{%
+    \si@whiledo@empty@F\si@num@post@int{%
+      \si@num@post@rnd@int{#1}%
     }%
-    \si@nameedef{si@num@in@#1@int}{%
-      \number\numexpr \@nameuse{si@num@in@#1@int} + 1 \relax
+    \si@bool@if@T\si@num@post@carry@bool{%
+      \si@nameedef{si@num@in@#1@int}{%
+        1%
+        \@nameuse{si@num@in@#1@int}%
+      }%
     }%
+  }{%
+    \si@num@post@rnd@dec{#1}%
+    \si@num@post@rnd@places@aux@iv{#1}%
   }%
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%
+%\end{macro}
+%\end{macro}
+% 
 %\begin{macro}{\si@num@post@zero@fill}
 %\begin{macro}{\si@num@post@zero@fill@aux}
 % Checks for adding zeros to each component are carried out.
