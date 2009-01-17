@@ -568,7 +568,8 @@ This work consists of the file  siunitx.dtx
 % 
 % The package uses a sophisticated parsing system to understand 
 % numbers. This allows \module{siunitx} to carry out a range of
-% formatting, as described later.
+% formatting, as described later. All of the input options take lists of
+% literal tokens, and are summarised in Table~\ref{tab:opt:num:in}.
 %
 %\begin{table}
 %  \centering
@@ -592,6 +593,97 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeOption{numbers/input/digits}
+%\DescribeOption{numbers/input/decimal markers}
+%\DescribeOption{numbers/input/signs}
+%\DescribeOption{numbers/input/exponent markers} 
+% The basic parts of a number are the digits, any sign and a separator
+% between the integer and decimal parts. These are stored in the input
+% options \option{digits}, \option{decimal markers} and \option{signs},
+% respectively. More than one input decimal marker can be used: it will
+% be converted by the package to the appropriate output marker. Numbers
+% which include an exponent part also require a marker for the exponent:
+% this again is taken from the range of tokens in the \option{exponent 
+% markers} option.
+% 
+%\DescribeOption{numbers/input/ignore}
+%\DescribeOption{numbers/input/symbols}
+% As well as ``normal'' digits, the package will interpret symbolic
+% ``numbers'' (such as \cs{pi}) correctly if they are included in the 
+% \option{symbols} list. Tokens given in the \option{ignore} list are
+% totally passed over by \module{siunitx}: they will be removed from the
+% input with no further processing.
+% 
+%\DescribeOption{numbers/input/open uncertainty}
+%\DescribeOption{numbers/input/close uncertainty} 
+% In some fields, it is common to give the uncertainty in a value 
+% in brackets after the main part of the number, for example 
+% ``\num{1.234(5)}''. The opening and closing symbols used for this type
+% of input are set as \option{open uncertainty} and \option{close 
+% uncertainty}.
+%
+%\DescribeOption{numbers/input/complex roots}
+% When using complex numbers in input, the complex root ($\sqrt{-1}$) is
+% indicated by one of the tokens stored in \option{complex roots}.
+%
+%\subsection{Post-processing numbers}
+%
+% Before typesetting numbers, various post-processing steps can be 
+% carried out. These involve adding or removing information from the 
+% number in a systematic way; the options are summarised in 
+% Table~\ref{tab:opt:num:post}.
+%
+%\begin{table}
+%  \centering
+%  \caption{\texttt{numbers/process/} options}
+%  \label{tab:opt:num:post}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      Type &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule
+%      add zero decimal      & Switch  & false \\
+%      add zero integer      & Switch  & false \\
+%      explicit sign         & Literal & +     \\
+%      include explicit sign & Switch  & false \\
+%      retain explicit plus  & Switch  & false \\
+%      retain zero exponent  & Switch  & false \\
+%      round mode            & Choice  & off   \\
+%      round figures         & Number  & 2     \\
+%      round places          & Number  & 2     \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{numbers/process/round mode}
+%\DescribeOption{numbers/process/round figures}
+%\DescribeOption{numbers/process/round places}
+% The \module{siunitx} package can round numerical input to a fixed
+% number of significant figures or decimal places. This is controlled by
+% the \option{round mode} option, which takes the choices \option{off},
+% \option{figures} and \option{places}. When rounding is turned on, the
+% number of figures to use is determined by the \option{round figures}
+% and \option{round places} option: both of these options require a 
+% number.
+% 
+%\DescribeOption{numbers/process/add zero decimal}
+%\DescribeOption{numbers/process/add zero integer}
+% It is possible to give real (floating point) numbers as input omitting
+% the decimal or the integer parts of the number (for example \num{.123} 
+% or \num{123.}). The options \option{add zero decimal} and \option{add 
+% zero integer} allow the package to ``fill in'' the missing zero.
+% 
+%\DescribeOption{numbers/process/explicit sign}
+%\DescribeOption{numbers/process/include explicit sign}
+%\DescribeOption{numbers/process/retain explicit plus}
+% The inclusion of a leading plus sign is usually unnecessary for
+% positive numbers, and so the \option{retain explicit plus} option is
+% available to control whether these are printed. As the same time, it
+% may be useful to force all numbers to have a sign. This behaviour
+% is controlled by the \option{include explicit sign} option, with the
+% sign to use stored by the \option{explicit sign} option.
 %
 %\StopEventually{%
 %  \PrintChanges
@@ -2540,7 +2632,7 @@ This work consists of the file  siunitx.dtx
 % provided for data which needs to be expanded once (\LaTeX3-inspired).
 %    \begin{macrocode}
 \newcommand*{\si@num@in@parse}[1]{%
-  \si@num@in@init
+  \si@num@in@init 
   \si@num@in@rescan{#1}%
   \si@empty@if@TF\si@num@in@arg{%
     \def\si@num@in@error{\m@ne}%
@@ -3377,8 +3469,8 @@ This work consists of the file  siunitx.dtx
   /siunitx/numbers/process,
   round figures/.code = {\si@num@post@rnd@check{figures}{#1}},
   round places/.code  = {\si@num@post@rnd@check{places}{#1}},
-  add zero integer      = false,
   add zero decimal      = false,
+  add zero integer      = false,
   explicit sign         = +,
   include explicit sign = false,
   retain explicit plus  = false,
@@ -4405,7 +4497,7 @@ This work consists of the file  siunitx.dtx
     \si@num@pre@process{#2}%
     \si@bool@if@F\si@num@pre@error@bool{%
       \si@num@in@parse@O{\si@num@pre@arg}%
-      \si@num@post@process
+      \si@num@post@process 
     }%
   \endgroup
 }
