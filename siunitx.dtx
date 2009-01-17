@@ -1153,7 +1153,7 @@ This work consists of the file  siunitx.dtx
 % already using \cs{si@reserved@a}.
 %    \begin{macrocode}
 \newcommand*{\si@expand@tlist}[2]{%
-  \si@clear@macro#1
+  \si@clear@macro#1%
   \def\si@reserved@b##1{%
     \si@add@right@O#1##1%
   }%
@@ -1331,21 +1331,21 @@ This work consists of the file  siunitx.dtx
 % A wrapper around \cs{ifx}.
 %    \begin{macrocode}
 \newcommand*{\si@meaning@eq@if@F}[2]{%
-  \ifx#1#2
+  \ifx#1#2%
     \expandafter\@gobble
   \else
     \expandafter\@firstofone
   \fi
 }
 \newcommand*{\si@meaning@eq@if@T}[2]{%
-  \ifx#1#2
+  \ifx#1#2%
     \expandafter\@firstofone
   \else
     \expandafter\@gobble
   \fi
 }
 \newcommand*{\si@meaning@eq@if@TF}[2]{%
-  \ifx#1#2
+  \ifx#1#2%
     \expandafter\@firstoftwo
   \else
     \expandafter\@secondoftwo
@@ -2632,12 +2632,12 @@ This work consists of the file  siunitx.dtx
 % provided for data which needs to be expanded once (\LaTeX3-inspired).
 %    \begin{macrocode}
 \newcommand*{\si@num@in@parse}[1]{%
-  \si@num@in@init 
+  \si@num@in@init
   \si@num@in@rescan{#1}%
   \si@empty@if@TF\si@num@in@arg{%
     \def\si@num@in@error{\m@ne}%
   }{%
-    \si@num@in@arg@loop
+    \si@num@in@arg@loop 
     \si@num@in@try{\si@num@in@separate}%
     \si@num@in@try{\si@num@in@finalise}%
   }%
@@ -2877,13 +2877,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@num@in@rescan}[1]{%
   \begingroup
-    \si@catcode@symbols
+    \si@catcode@symbols 
     \si@catcode@set{9}{9}%   tab ignored
     \si@catcode@set{32}{9}%  space ignored
     \si@catcode@set{126}{9}% tilde ignored
     \everyeof{\noexpand}%
     \endlinechar\m@ne\relax
-    \si@clear@macro\,
+    \si@clear@macro{\,}%
     \si@num@in@protect@tokens
     \protected@edef\@tempa{\scantokens{#1}}%
   \expandafter\endgroup\expandafter
