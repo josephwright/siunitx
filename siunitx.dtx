@@ -4304,10 +4304,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@group@dec}
+%\begin{macro}{\si@num@out@group@dec@aux}
+% Using the ``keep everything on the stack'' approach, a relatively
+% simple recursion is needed.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@group@dec}[1]{%
+  \def\si@num@out@group@dec@aux##1##2##3##4{%
+    \si@empty@tlist@if@TF{##2}{%
+      \si@num@out@add{#1@dec}{##1}%
+    }{%
+      \si@empty@tlist@if@TF{##3}{%
+        \si@num@out@add{#1@dec}{##1##2}%
+      }{%
+        \si@num@out@add{#1@dec}{##1##2##3}%
+        \si@empty@tlist@if@F{##4}{%
+          \si@num@out@add@maths{#1@dec}{\si@num@out@group@sep}%
+          \si@num@out@group@dec@aux##4%
+        }%
+      }%
+    }%
+  }%
+  \expandafter\expandafter\expandafter\si@num@out@group@dec@aux
+    \csname si@num@in@#1@dec\endcsname{}{}{}%
 }
+\newcommand*{\si@num@out@group@dec@aux}{}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@group@five@if@T}
 %\begin{macro}{\si@num@out@group@five@if@aux@i}
