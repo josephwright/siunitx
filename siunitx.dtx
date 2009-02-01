@@ -352,8 +352,8 @@ This work consists of the file  siunitx.dtx
 % typesetting units and values with control of appearance and with 
 % intelligent processing.
 %\begin{LaTeXdemo}
-%  \num{12345,67890}
-%  \num{1+-2i}
+%  \num{12345,67890} \\
+%  \num{1+-2i}       \\
 %  \num{.3e45}
 %\end{LaTeXdemo} 
 % 
@@ -385,8 +385,8 @@ This work consists of the file  siunitx.dtx
 % marker, if needed: both ``\texttt{.}'' and ``\texttt{,}'' are 
 % recognised as decimal marker.
 %\begin{LaTeXdemo}
-%  \num{123}     \num{1234}   \num{12345}
-%  \num{0.123}   \num{0,1234} \num{.12345}
+%  \num{123}     \num{1234}   \num{12345}  \\
+%  \num{0.123}   \num{0,1234} \num{.12345} \\
 %  \num{3.45d-4} \num{-e10}
 %\end{LaTeXdemo} 
 %
@@ -504,7 +504,7 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{
 %    font/detect/bold = on, 
 %    font/detect/inline bold = maths
-%  }
+%  }%
 %  $\num{1234}$ \\
 %  { \boldmath $\num{1234}$ } \\ 
 %  { \bfseries $\num{1234}$ } \\
@@ -4223,13 +4223,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@add}
+%\begin{macro}{\si@num@out@add@cs}
+%\begin{macro}{\si@num@out@add@cs}
 % Adding to a store.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@add}[2]{%
-  \si@add@right@cs@N{si@num@out@#1}{#2}
+  \si@add@right@cs@N{si@num@out@#1}{#2}%
+}
+\newcommand*{\si@num@out@add@cs}[2]{%
+  \expandafter\si@num@out@add@cs@aux\expandafter
+    {\csname si@num@out@#2\endcsname}{#1}%
+}
+\newcommand*{\si@num@out@add@cs@aux}[2]{%
+  \si@add@right@cs@O{si@num@out@#2}{#1}%
 }
 %    \end{macrocode}
 %\end{macro}   
+%\end{macro}  
+%\end{macro}
 %
 %\begin{macro}{\si@num@out@add@maths}
 %\begin{macro}{\si@num@out@add@maths@aux}
@@ -4276,6 +4287,11 @@ This work consists of the file  siunitx.dtx
       \si@num@out@group@digits@aux@i{#1}{dec}%
       \si@num@out@group@digits@aux@i{#1}{int}%
     }%
+  }%
+  \si@let@cc{si@num@out@#1}{si@num@out@#1@int}%
+  \si@bool@cs@if@T{si@num@in@#1@dec@bool}{%
+    \si@num@out@add@maths{#1}{\si@num@out@decimal}%
+    \si@num@out@add@cs{#1}{#1@dec}%
   }%
 }
 \newcommand*{\si@num@out@group@digits@aux@i}[2]{%
@@ -4397,6 +4413,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@out@process}
 %\begin{macro}{\si@num@out@process@aux@i}
 %\begin{macro}{\si@num@out@process@aux@ii}
+%\begin{macro}{\si@num@out@process@aux@iii}
 % The master control function for formatting output: the usual set up.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@process}{%
@@ -4419,6 +4436,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\si@num@out@uncert}
 % Uncertainty output varies depending on whether there is a need to 
@@ -4433,10 +4451,11 @@ This work consists of the file  siunitx.dtx
       \si@num@out@uncert@int{#1}%
     }%
   }{%
-    \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@space}%
     \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@open}%
     \si@num@out@copy{#1@uncert}%
     \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@close}%
+    \si@num@out@add@maths{#1}{\si@num@out@uncert@space}%
+    \si@num@out@add@cs{#1}{#1@uncert}%
   }%
 }
 %    \end{macrocode}
@@ -4466,6 +4485,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@print}
 %    \begin{macrocode}
 \newcommand*{\si@num@print}{%
+  \expandafter\si@print@num\expandafter{\si@num@out@mant}% TEMP
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -4885,7 +4905,7 @@ This work consists of the file  siunitx.dtx
     \si@num@pre@process{#2}%
     \si@bool@if@F\si@num@pre@error@bool{%
       \si@num@in@parse@O{\si@num@pre@arg}%
-      \si@num@post@process 
+      \si@num@post@process
       \si@num@out@process
       \si@num@print
     }%
@@ -4897,6 +4917,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\SI}
 %    \begin{macrocode}
 \si@newcommand{\SI}{3}{%
+  \begingroup
+    \sisetup{#1}%
+  \endgroup
 }
 %    \end{macrocode}
 %\end{macro}
