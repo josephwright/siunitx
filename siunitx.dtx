@@ -2746,8 +2746,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@in@add}
 % For adding a token to one of the storage areas.
 %    \begin{macrocode}
-\newcommand*{\si@num@in@add}[2]{%
-  \expandafter\si@add@right@N\csname si@num@in@#1\endcsname{#2}%
+\newcommand*{\si@num@in@add}[1]{%
+  \si@add@right@cs@N{si@num@in@#1}%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4145,7 +4145,7 @@ This work consists of the file  siunitx.dtx
     \si@tempa
   }%
   \def\si@tempa##1{%
-    \si@add@right@cs@O{si@num@in@#1@uncert@dec}{##1}%
+    \si@add@right@cs@O{si@num@in@#1@uncert@dec}##1
   }%
   \expandafter\si@tempa\expandafter
     {\csname si@num@in@#1@uncert\endcsname}%
@@ -4176,22 +4176,26 @@ This work consists of the file  siunitx.dtx
 % \texttt{num@out} storage areas is that the later can include 
 % formatting such as hard spaces.
 % 
-%\begin{macro}{\si@num@out@uncert@close}
-%\begin{macro}{\si@num@out@complex}
+%\begin{macro}{\si@num@out@bracket@close}
+%\begin{macro}{\si@num@out@bracket@open}
+%\begin{macro}{\si@num@out@complex@root}
 %\begin{macro}{\si@num@out@decimal}
 %\begin{macro}{\si@num@out@exp@base}
 %\begin{macro}{\si@num@out@exp@prod}
 %\begin{macro}{\si@num@out@group@sep}
+%\begin{macro}{\si@num@out@uncert@close}
 %\begin{macro}{\si@num@out@uncert@open}
 %\begin{macro}{\si@num@out@uncert@space}
 % Storage areas for settings.
 %    \begin{macrocode}
-\newcommand*{\si@num@out@uncert@close}{}
-\newcommand*{\si@num@out@complex}{}
+\newcommand*{\si@num@out@bracket@close}{}
+\newcommand*{\si@num@out@bracket@open}{}
+\newcommand*{\si@num@out@complex@root}{}
 \newcommand*{\si@num@out@decimal}{}
 \newcommand*{\si@num@out@exp@base}{}
 \newcommand*{\si@num@out@exp@prod}{}
 \newcommand*{\si@num@out@group@sep}{}
+\newcommand*{\si@num@out@uncert@close}{}
 \newcommand*{\si@num@out@uncert@open}{}
 \newcommand*{\si@num@out@uncert@space}{}
 %    \end{macrocode}
@@ -4202,19 +4206,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro} 
 %
+%\begin{macro}{\si@num@out@bracket@use@bool}
 %\begin{macro}{\si@num@out@group@digits@bool}
 %\begin{macro}{\si@num@out@group@four@bool}
-%\begin{macro}{\si@num@out@uncert@sep@bool}
 %\begin{macro}{\si@num@out@tight@bool}
+%\begin{macro}{\si@num@out@uncert@sep@bool}
 % Switch storage for options.
 %    \begin{macrocode}
+\si@bool@new\si@num@out@bracket@use@bool
 \si@bool@new\si@num@out@group@digits@bool
 \si@bool@new\si@num@out@group@four@bool
-\si@bool@new\si@num@out@uncert@sep@bool
 \si@bool@new\si@num@out@tight@bool
+\si@bool@new\si@num@out@uncert@sep@bool
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -4317,27 +4326,34 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@num@out@result}{}
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}{\si@num@out@bracket@bool}
+% So that a general warning can be used for adding brackets, a single
+% flag is created.
+%    \begin{macrocode}
+\si@bool@new\si@num@out@bracket@bool
+%    \end{macrocode}
+%\end{macro}
 % 
 %    \begin{macrocode}
 \si@keys@family{numbers/output}
 \pgfkeys{
   /siunitx/numbers/output,
+  close bracket/.store in                 = \si@num@out@bracket@close,
   close uncertainty/.store in             = \si@num@out@uncert@close,
-  complex root/.store in                  = \si@num@out@complex,
+  complex root/.store in                  = \si@num@out@complex@root,
   decimal marker/.store in                = \si@num@out@decimal,
   exponent base/.store in                 = \si@num@out@exp@base,
   exponent product/.store in              = \si@num@out@exp@prod,
   group digits/.is siunitx switch         = {num@out@group@digits},
   group four digits/.is siunitx switch    = {num@out@group@four},
   group separator/.store in               = \si@num@out@group@sep,
+  open bracket/.store in                  = \si@num@out@bracket@open,
   open uncertainty/.store in              = \si@num@out@uncert@open, 
   separate uncertainty/.is siunitx switch = {num@out@uncert@sep},
-  spacing/.is choice,
-  spacing/.cd,
-    standard/.code = {\si@bool@false\si@num@out@tight@bool},
-    tight/.code    = {\si@bool@true\si@num@out@tight@bool},
-  /siunitx/numbers/output,
+  tight spacing/.is siunitx switch        = {num@out@tight},
   uncertainty space/.store in             = \si@num@out@uncert@space, %(
+  use brackets/.is siunitx switch         = {num@out@bracket@use},
+  close bracket        = ),% (
   close uncertainty    = ),
   complex root         = i,
   decimal marker       = ., 
@@ -4346,9 +4362,11 @@ This work consists of the file  siunitx.dtx
   group digits         = true,
   group four digits    = false,
   group separator      = {\,},
+  open bracket         = (, %)
   open uncertainty     = (, %)
   separate uncertainty = false,
-  spacing              = standard,
+  tight spacing        = false,
+  use brackets         = true,
   uncertainty space    = {},
 }
 %    \end{macrocode}
@@ -4360,15 +4378,28 @@ This work consists of the file  siunitx.dtx
 % The master control function for formatting output: the usual set up.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@process}{%
+  \si@bool@false\si@num@out@bracket@bool
   \si@num@out@process@aux@i{mant}%
   \si@num@out@process@aux@i{exp}%
 }
 \newcommand*{\si@num@out@process@aux@i}[1]{%
   \si@num@out@process@aux@ii{#1}%
   \si@num@out@process@aux@ii{#1@comp}%
+  \si@empty@cs@if@F{si@num@out@#1@comp}{%
+    \si@num@out@bracket{#1@comp}%
+    \si@num@out@add@maths{#1@comp}{\si@num@out@complex@root}%
+  }%
+  \si@empty@cs@if@TF{si@num@out@#1}{%
+    \si@let@cc{si@num@out@#1}{si@num@out@#1@comp}%
+  }{%
+    \si@empty@cs@if@F{si@num@out@#1@comp}{%
+      \si@num@out@add@C{#1}{#1@comp}%
+    }%
+  }%
 }
 \newcommand*{\si@num@out@process@aux@ii}[1]{%
   \si@bool@cs@if@T{si@num@in@#1@bool}{%
+    \si@num@out@sign{#1}%
     \si@num@out@group@digits{#1}%
     \si@empty@cs@if@F{si@num@in@#1@uncert}{%
       \si@num@out@uncert{#1}%
@@ -4382,18 +4413,18 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@add}
-%\begin{macro}{\si@num@out@add@cs}
-%\begin{macro}{\si@num@out@add@cs}
+%\begin{macro}{\si@num@out@add@C}
+%\begin{macro}{\si@num@out@add@C@aux}
 % Adding to a store.
 %    \begin{macrocode}
-\newcommand*{\si@num@out@add}[2]{%
-  \si@add@right@cs@N{si@num@out@#1}{#2}%
+\newcommand*{\si@num@out@add}[1]{%
+  \si@add@right@cs@N{si@num@out@#1}%
 }
-\newcommand*{\si@num@out@add@cs}[2]{%
-  \expandafter\si@num@out@add@cs@aux\expandafter
+\newcommand*{\si@num@out@add@C}[2]{%
+  \expandafter\si@num@out@add@C@aux\expandafter
     {\csname si@num@out@#2\endcsname}{#1}%
 }
-\newcommand*{\si@num@out@add@cs@aux}[2]{%
+\newcommand*{\si@num@out@add@C@aux}[2]{%
   \si@add@right@cs@O{si@num@out@#2}{#1}%
 }
 %    \end{macrocode}
@@ -4419,15 +4450,53 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\end{macro}
 %
+%\begin{macro}{\si@num@out@bracket}
+%\begin{macro}{\si@num@out@bracket@aux}
+% There are various points at which brackets might be added to
+% avoid ambiguity. The function here adds the appropriate tokens
+% around whatever is in the supplied named store.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@bracket}[1]{%
+  \si@bool@if@T\si@num@out@bracket@bool{%
+    \si@bool@if@T\si@num@out@bracket@use@bool{%
+      \si@num@out@bracket@aux{#1}%
+    }%
+  }%
+}
+\newcommand*{\si@num@out@bracket@aux}[1]{%
+  \si@let@Nc\si@tempa{si@num@out@#1}%
+  \si@let@cN{si@num@out@#1}\si@num@out@bracket@open
+  \si@add@right@cs@O{si@num@out@#1}\si@tempa
+  \si@add@right@cs@O{si@num@out@#1}\si@num@out@bracket@close
+  \si@bool@false\si@num@out@bracket@bool
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@num@out@copy}
 %\begin{macro}{\si@num@out@copy@aux}
-% A shortcut, keeping down the need for \cs{edef}.
+% A short-cut, keeping down the need for \cs{edef}.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@copy}[1]{%
   \expandafter\si@num@out@copy@aux\csname si@num@in@#1\endcsname{#1}%
 }
 \newcommand*{\si@num@out@copy@aux}[2]{%
   \si@add@right@cs@O{si@num@out@#2}{#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@num@out@copy@maths}
+%\begin{macro}{\si@num@out@copy@maths@aux}
+% Similar but adding \cs{ensuremath}.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@copy@maths}[1]{%
+  \expandafter\si@num@out@copy@maths@aux
+    \csname si@num@in@#1\endcsname{#1}%
+}
+\newcommand*{\si@num@out@copy@maths@aux}[2]{%
+  \si@num@out@add@maths{#2}#1
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4446,10 +4515,10 @@ This work consists of the file  siunitx.dtx
       \si@num@out@group@digits@aux@i{#1}{int}%
     }%
   }%
-  \si@let@cc{si@num@out@#1}{si@num@out@#1@int}%
+  \si@num@out@add@C{#1}{#1@int}%
   \si@bool@cs@if@T{si@num@in@#1@dec@bool}{%
     \si@num@out@add@maths{#1}{\si@num@out@decimal}%
-    \si@num@out@add@cs{#1}{#1@dec}%
+    \si@num@out@add@C{#1}{#1@dec}%
   }%
 }
 \newcommand*{\si@num@out@group@digits@aux@i}[2]{%
@@ -4583,25 +4652,43 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@num@out@sign}
+% Some simple sign manipulation: for tight signs, a little shuffling.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@sign}[1]{%
+  \si@bool@if@TF\si@num@out@tight@bool{%
+    \si@let@Nc\si@tempa{si@num@in@#1@sign}%
+    \expandafter\def\expandafter\si@tempa\expandafter
+      {\expandafter{\si@tempa}}%
+    \si@num@out@add@maths{#1@sign}\si@tempa
+  }{%
+    \si@num@out@copy@maths{#1@sign}%
+  }%
+  \si@let@cc{si@num@out@#1}{si@num@out@#1@sign}%
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\si@num@out@uncert}
 % Uncertainty output varies depending on whether there is a need to 
 % separate the error form the number in the output. 
 %    \begin{macrocode}
 \newcommand*{\si@num@out@uncert}[1]{%
   \si@bool@if@TF\si@num@out@uncert@sep@bool{%
+    \si@bool@true\si@num@out@bracket@bool
     \si@num@out@group@digits{#1@uncert}%
     \si@bool@if@TF\si@num@out@tight@bool{%
       \si@num@out@add@maths{#1}{{\pm}}%
     }{%
       \si@num@out@add@maths{#1}{\pm}%
     }%
-    \si@num@out@add@cs{#1}{#1@uncert}%
+    \si@num@out@add@C{#1}{#1@uncert}%
   }{%
     \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@open}%
     \si@num@out@copy{#1@uncert}%
     \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@close}%
     \si@num@out@add@maths{#1}{\si@num@out@uncert@space}%
-    \si@num@out@add@cs{#1}{#1@uncert}%
+    \si@num@out@add@C{#1}{#1@uncert}%
   }%
 }
 %    \end{macrocode}
