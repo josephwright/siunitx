@@ -941,6 +941,36 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\si@add@left@N}
+%\begin{macro}{\si@add@left@O}
+% To add to a macro reliably.
+%    \begin{macrocode}
+\newcommand*{\si@add@left@N}[2]{%
+  \def\si@reserved@a{#2}%
+  \edef#1{%
+    \expandafter\unexpanded\expandafter{\si@reserved@a}%
+    \expandafter\unexpanded\expandafter{#1}%
+  }%
+}
+\newcommand*{\si@add@left@O}[2]{%
+  \expandafter\si@add@left@N\expandafter#1\expandafter{#2}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@add@left@cs@N}
+%\begin{macro}{\si@add@left@cs@O}
+% Some name versions.
+%    \begin{macrocode}
+\newcommand*{\si@add@left@cs@N}[1]{%
+  \expandafter\si@add@left@N\csname #1\endcsname
+}
+\newcommand*{\si@add@left@cs@O}[1]{%
+  \expandafter\si@add@left@O\csname #1\endcsname
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\begin{macro}{\si@add@right@N}
 %\begin{macro}{\si@add@right@O}
 % To add to a macro reliably.
@@ -1701,7 +1731,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@whiledo@num@T}[2]{%
   \si@num@if@T{#1}{%
-    #2\si@whiledo@num@T{#1}{#2}
+    #2\si@whiledo@num@T{#1}{#2}%
   }%
 }
 %    \end{macrocode}
@@ -4145,7 +4175,7 @@ This work consists of the file  siunitx.dtx
     \si@tempa
   }%
   \def\si@tempa##1{%
-    \si@add@right@cs@O{si@num@in@#1@uncert@dec}##1
+    \si@add@right@cs@O{si@num@in@#1@uncert@dec}##1%
   }%
   \expandafter\si@tempa\expandafter
     {\csname si@num@in@#1@uncert\endcsname}%
@@ -4326,12 +4356,29 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@num@out@result}{}
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\si@num@out@bracket@bool}
-% So that a general warning can be used for adding brackets, a single
-% flag is created.
+%\begin{macro}{\si@num@out@mant@parts@bool}
+%\begin{macro}{\si@num@out@mant@comp@parts@bool}
+%\begin{macro}{\si@num@out@exp@parts@bool}
+%\begin{macro}{\si@num@out@exp@comp@parts@bool}
+%  Flags to indicate that the input is in parts which may need brackets.
 %    \begin{macrocode}
-\si@bool@new\si@num@out@bracket@bool
+\si@bool@new\si@num@out@mant@parts@bool
+\si@bool@new\si@num@out@mant@comp@parts@bool
+\si@bool@new\si@num@out@exp@parts@bool
+\si@bool@new\si@num@out@exp@comp@parts@bool
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@num@out@mant@comp@bool}
+%\begin{macro}{\si@num@out@exp@comp@bool}
+%  Also for a number consisting of a real and complex part.
+%    \begin{macrocode}
+\si@bool@new\si@num@out@mant@comp@bool
+\si@bool@new\si@num@out@exp@comp@bool
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 % 
 %    \begin{macrocode}
@@ -4372,44 +4419,17 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %\begin{macro}{\si@num@out@process}
-%\begin{macro}{\si@num@out@process@aux@i}
-%\begin{macro}{\si@num@out@process@aux@ii}
-%\begin{macro}{\si@num@out@process@aux@iii}
 % The master control function for formatting output: the usual set up.
+% The number is put back together in stages.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@process}{%
-  \si@bool@false\si@num@out@bracket@bool
-  \si@num@out@process@aux@i{mant}%
-  \si@num@out@process@aux@i{exp}%
-}
-\newcommand*{\si@num@out@process@aux@i}[1]{%
-  \si@num@out@process@aux@ii{#1}%
-  \si@num@out@process@aux@ii{#1@comp}%
-  \si@empty@cs@if@F{si@num@out@#1@comp}{%
-    \si@num@out@bracket{#1@comp}%
-    \si@num@out@add@maths{#1@comp}{\si@num@out@complex@root}%
-  }%
-  \si@empty@cs@if@TF{si@num@out@#1}{%
-    \si@let@cc{si@num@out@#1}{si@num@out@#1@comp}%
-  }{%
-    \si@empty@cs@if@F{si@num@out@#1@comp}{%
-      \si@num@out@add@C{#1}{#1@comp}%
-    }%
-  }%
-}
-\newcommand*{\si@num@out@process@aux@ii}[1]{%
-  \si@bool@cs@if@T{si@num@in@#1@bool}{%
-    \si@num@out@sign{#1}%
-    \si@num@out@group@digits{#1}%
-    \si@empty@cs@if@F{si@num@in@#1@uncert}{%
-      \si@num@out@uncert{#1}%
-    }%
-  }%
+  \si@num@out@core
+  \si@num@out@complex
+  \si@num@out@exponent
+  \si@num@out@sign{mant}%
+  \si@add@left@O\si@num@out@result\si@num@out@mant@sign
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@add}
@@ -4449,26 +4469,79 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %\end{macro}
+%\begin{macro}{\si@num@out@add@pm}
+% To add \cs{pm}.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@add@pm}[1]{%
+  \si@bool@if@TF\si@num@out@tight@bool{%
+    \si@num@out@add@maths{#1}{{\pm}}%
+  }{%
+    \def\si@tempa{\pm}%
+    \si@num@out@add@maths{#1}{\si@tempa}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
 %
-%\begin{macro}{\si@num@out@bracket}
-%\begin{macro}{\si@num@out@bracket@aux}
+%\begin{macro}{\si@num@out@bracket@comp}
+%\begin{macro}{\si@num@out@bracket@parts}
+%\begin{macro}{\si@num@out@bracket@aux@i}
+%\begin{macro}{\si@num@out@bracket@aux@ii}
 % There are various points at which brackets might be added to
 % avoid ambiguity. The function here adds the appropriate tokens
 % around whatever is in the supplied named store.
 %    \begin{macrocode}
-\newcommand*{\si@num@out@bracket}[1]{%
-  \si@bool@if@T\si@num@out@bracket@bool{%
+\newcommand*{\si@num@out@bracket@comp}[1]{%
+  \si@num@out@brackets@aux@i{#1}{comp}%
+  \si@bool@cs@false{si@num@out@#1@parts@bool}%
+  \si@bool@cs@false{si@num@out@#1@comp@parts@bool}%
+}
+\newcommand*{\si@num@out@bracket@parts}[1]{%
+  \si@num@out@brackets@aux@i{#1}{parts}%
+}
+\newcommand*{\si@num@out@brackets@aux@i}[2]{%
+  \si@empty@cs@if@F{si@num@out@#1}{%
     \si@bool@if@T\si@num@out@bracket@use@bool{%
-      \si@num@out@bracket@aux{#1}%
+      \si@bool@cs@if@T{si@num@out@#1@#2@bool}{%
+        \si@num@out@bracket@aux@ii{#1}%
+        \si@bool@cs@false{si@num@out@#1@#2@bool}%
+      }%
     }%
   }%
 }
-\newcommand*{\si@num@out@bracket@aux}[1]{%
+\newcommand*{\si@num@out@bracket@aux@ii}[1]{%
   \si@let@Nc\si@tempa{si@num@out@#1}%
   \si@let@cN{si@num@out@#1}\si@num@out@bracket@open
   \si@add@right@cs@O{si@num@out@#1}\si@tempa
   \si@add@right@cs@O{si@num@out@#1}\si@num@out@bracket@close
-  \si@bool@false\si@num@out@bracket@bool
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@num@out@complex}
+%\begin{macro}{\si@num@out@complex@aux}
+% The real and complex parts of each number are reassembled, with 
+% brackets if needed.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@complex}{%
+  \si@num@out@complex@aux{mant}%
+  \si@num@out@complex@aux{exp}%
+}
+\newcommand*{\si@num@out@complex@aux}[1]{%
+  \si@num@out@bracket@parts{#1@comp}%
+  \si@bool@cs@if@T{si@num@in@#1@comp@bool}{%
+    \si@num@out@add@maths{#1@comp}{\si@num@out@complex@root}%
+    \si@num@out@bracket@parts{#1}%
+    \si@bool@cs@false{si@num@out@#1@comp@bool}%
+    \si@empty@cs@if@F{si@num@out@#1}{%
+      \si@num@out@add@pm{#1}%
+      \si@bool@cs@true{si@num@out@#1@comp@bool}%
+    }%
+  }%
+  \si@num@out@add@C{#1}{#1@comp}%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4500,6 +4573,59 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@num@out@core}
+%\begin{macro}{\si@num@out@core@aux@i}
+%\begin{macro}{\si@num@out@core@aux@ii}
+% The integer, decimal and any uncertainty parts are put back together.
+% This gives a ``minimal'' unit which cannot need any brackets.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@core}{%
+  \si@num@out@core@aux@i{mant}%
+  \si@num@out@core@aux@i{exp}%
+}
+\newcommand*{\si@num@out@core@aux@i}[1]{%
+  \si@num@out@core@aux@ii{#1}%
+  \si@num@out@core@aux@ii{#1@comp}%  
+}
+\newcommand*{\si@num@out@core@aux@ii}[1]{%
+  \si@bool@cs@false{si@num@out@#1@parts@bool}%
+  \si@bool@cs@if@T{si@num@in@#1@bool}{%
+    \si@num@out@group@digits{#1}%
+    \si@empty@cs@if@F{si@num@in@#1@uncert}{%
+      \si@num@out@uncert{#1}%
+    }%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@num@out@exponent}
+% The exponent system starts by making sure that the mantissa contains
+% brackets if needed. A sign is then added to the exponent part, before
+% creating the full output (including the mantissa sign if needed).
+%    \begin{macrocode}
+\newcommand*{\si@num@out@exponent}{%
+  \si@num@out@add@C{result}{mant}%
+  \si@empty@cs@if@F{si@num@out@mant}{%
+    \si@empty@cs@if@F{si@num@out@exp}{%
+      \si@num@out@add@maths{result}{\si@num@out@exp@prod}%
+      \si@num@out@bracket@comp{mant}%
+      \si@num@out@bracket@parts{mant}%
+      \si@num@out@sign{exp}%
+    }%
+  }%
+  \si@empty@cs@if@F{si@num@out@exp}{%
+    \si@num@out@add@C{result}{exp@base}%
+    \si@num@out@add{result}{^\bgroup}%
+    \si@num@out@add@C{result}{exp}%
+    \si@num@out@add{result}{\egroup}%
+  }%
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@group@digits}
@@ -4653,6 +4779,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@sign}
+%\begin{macro}{\si@num@out@sign@aux}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@sign}[1]{%
@@ -4664,9 +4791,17 @@ This work consists of the file  siunitx.dtx
   }{%
     \si@num@out@copy@maths{#1@sign}%
   }%
-  \si@let@cc{si@num@out@#1}{si@num@out@#1@sign}%
+  \si@num@out@sign@aux@i{#1}%
+}
+\newcommand*{\si@num@out@sign@aux@i}[1]{%
+  \expandafter\si@num@out@sign@aux@ii
+    \csname si@num@out@#1@sign\endcsname{si@num@out@#1}%
+}
+\newcommand*{\si@num@out@sign@aux@ii}[2]{%
+  \si@add@left@cs@O{#2}{#1}%
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@uncert}
@@ -4675,13 +4810,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@num@out@uncert}[1]{%
   \si@bool@if@TF\si@num@out@uncert@sep@bool{%
-    \si@bool@true\si@num@out@bracket@bool
+    \si@bool@cs@true{si@num@out@#1@parts@bool}%
     \si@num@out@group@digits{#1@uncert}%
-    \si@bool@if@TF\si@num@out@tight@bool{%
-      \si@num@out@add@maths{#1}{{\pm}}%
-    }{%
-      \si@num@out@add@maths{#1}{\pm}%
-    }%
+    \si@num@out@add@pm{#1}%
     \si@num@out@add@C{#1}{#1@uncert}%
   }{%
     \si@num@out@add@maths{#1@uncert}{\si@num@out@uncert@open}%
@@ -4702,7 +4833,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@print}
 %    \begin{macrocode}
 \newcommand*{\si@num@print}{%
-  \expandafter\si@print@num\expandafter{\si@num@out@mant}% TEMP
+  \si@print@num{\si@num@out@result}% TEMP
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -4715,8 +4846,7 @@ This work consists of the file  siunitx.dtx
 % quick shuffle with the \cs{NC@list} macro. The \module{siunitx} 
 % columns have to be listed first, as otherwise the optional 
 % arguments do not work correctly. So they are added ``by hand'' to 
-% the appropriate macro.\footnote{\cs{NC@list} is a toks, not a macro, 
-% hence the nature of the method used here.}
+% the appropriate macro.\footnote{\cs{NC@list} is a toks, not a macro.}
 %    \begin{macrocode}
 \edef\si@tempa{%
   \noexpand\NC@do S%
