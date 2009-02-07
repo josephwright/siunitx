@@ -684,6 +684,45 @@ This work consists of the file  siunitx.dtx
 % may be useful to force all numbers to have a sign. This behaviour
 % is controlled by the \option{include explicit sign} option, with the
 % sign to use stored by the \option{explicit sign} option.
+% 
+%\subsection{Printing numbers}
+%
+% Actually prinitng numbers is controlled by a number of settings,
+% which apply ideas such as differing decimal markers, digit
+% grouping and so on.  All of these options are concerned with the
+% appearance of output, rather than the data it conveys. The options are
+% summarised in Table~\ref{tab:opt:num:out}.
+%
+%\begin{table}
+%  \centering
+%  \caption{\texttt{numbers/output/} options}
+%  \label{tab:opt:num:out}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      Type &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      close bracket        & Literal & )          \\ ^^A (
+%      close uncertainty    & Literal & )          \\
+%      complex root         & Literal & i          \\
+%      decimal marker       & Literal & .          \\ 
+%      exponent base        & Literal & 10         \\
+%      exponent product     & Literal & \cs{times} \\
+%      group digits         & Choice  & on         \\
+%      group four digits    & Choice  & off        \\
+%      group separator      & Literal & \cs{,}     \\
+%      open bracket         & Literal & (          \\ ^^A )
+%      open uncertainty     & Literal & (          \\ ^^A )
+%      separate uncertainty & Choice  & off        \\
+%      tight spacing        & Choice  & off        \\
+%      use brackets         & Choice  & on         \\
+%      uncertainty space    & Literal & \m{none}   \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{numbers/output/???}
 %
 %\StopEventually{%
 %  \PrintChanges
@@ -2699,12 +2738,16 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\si@num@in@mant@bool}
 %\begin{macro}{\si@num@in@mant@dec@bool}
+%\begin{macro}{\si@num@in@mant@uncert@dec@bool}
 %\begin{macro}{\si@num@in@mant@comp@bool}
 %\begin{macro}{\si@num@in@mant@comp@dec@bool}
+%\begin{macro}{\si@num@in@mant@comp@uncert@dec@bool}
 %\begin{macro}{\si@num@in@exp@bool}
 %\begin{macro}{\si@num@in@exp@dec@bool}
+%\begin{macro}{\si@num@in@exp@uncert@dec@bool}
 %\begin{macro}{\si@num@in@exp@comp@bool}
 %\begin{macro}{\si@num@in@exp@comp@dec@bool}
+%\begin{macro}{\si@num@in@exp@comp@uncert@dec@bool}
 % Flags for quick detection of parts; for complex numbers, this is
 % essential as you can just have the complex root ($\mathrm{i}$).
 % The \texttt{@dec} switches are used as the package may need to know 
@@ -2712,13 +2755,21 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \si@bool@new\si@num@in@mant@bool
 \si@bool@new\si@num@in@mant@dec@bool
+\si@bool@new\si@num@in@mant@uncert@dec@bool
 \si@bool@new\si@num@in@mant@comp@bool
 \si@bool@new\si@num@in@mant@comp@dec@bool
+\si@bool@new\si@num@in@mant@comp@uncert@dec@bool
 \si@bool@new\si@num@in@exp@bool
 \si@bool@new\si@num@in@exp@dec@bool
+\si@bool@new\si@num@in@exp@uncert@dec@bool
 \si@bool@new\si@num@in@exp@comp@bool
 \si@bool@new\si@num@in@exp@comp@dec@bool
+\si@bool@new\si@num@in@exp@comp@uncert@dec@bool
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -2930,12 +2981,16 @@ This work consists of the file  siunitx.dtx
   \si@loop@over@macro\si@num@in@init@names\si@num@in@init@aux
   \si@bool@false\si@num@in@mant@bool
   \si@bool@false\si@num@in@mant@dec@bool
+  \si@bool@false\si@num@in@mant@uncert@dec@bool
   \si@bool@false\si@num@in@mant@comp@bool
   \si@bool@false\si@num@in@mant@comp@dec@bool
+  \si@bool@false\si@num@in@mant@comp@uncert@dec@bool
   \si@bool@false\si@num@in@exp@bool
   \si@bool@false\si@num@in@exp@dec@bool
+  \si@bool@false\si@num@in@exp@uncert@dec@bool
   \si@bool@false\si@num@in@exp@comp@bool
   \si@bool@false\si@num@in@exp@comp@dec@bool
+  \si@bool@false\si@num@in@exp@comp@uncert@dec@bool
 }
 \newcommand*{\si@num@in@init@aux}[1]{%
   \si@clear@cs{si@num@in@#1}%
@@ -4423,11 +4478,12 @@ This work consists of the file  siunitx.dtx
 % The number is put back together in stages.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@process}{%
-  \si@num@out@core
+  \si@num@out@init
+  \si@num@out@core 
   \si@num@out@complex
-  \si@num@out@exponent
   \si@num@out@sign{mant}%
-  \si@add@left@O\si@num@out@result\si@num@out@mant@sign
+  \si@num@out@sign{exp}%
+  \si@num@out@exponent
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4492,9 +4548,11 @@ This work consists of the file  siunitx.dtx
 % around whatever is in the supplied named store.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@bracket@comp}[1]{%
+  \si@bool@cs@if@T{si@num@out@#1@comp@bool}{%
+    \si@bool@cs@false{si@num@out@#1@parts@bool}%
+    \si@bool@cs@false{si@num@out@#1@comp@parts@bool}%
+  }%
   \si@num@out@brackets@aux@i{#1}{comp}%
-  \si@bool@cs@false{si@num@out@#1@parts@bool}%
-  \si@bool@cs@false{si@num@out@#1@comp@parts@bool}%
 }
 \newcommand*{\si@num@out@bracket@parts}[1]{%
   \si@num@out@brackets@aux@i{#1}{parts}%
@@ -4510,9 +4568,7 @@ This work consists of the file  siunitx.dtx
   }%
 }
 \newcommand*{\si@num@out@bracket@aux@ii}[1]{%
-  \si@let@Nc\si@tempa{si@num@out@#1}%
-  \si@let@cN{si@num@out@#1}\si@num@out@bracket@open
-  \si@add@right@cs@O{si@num@out@#1}\si@tempa
+  \si@add@left@cs@O{si@num@out@#1}\si@num@out@bracket@open
   \si@add@right@cs@O{si@num@out@#1}\si@num@out@bracket@close
 }
 %    \end{macrocode}
@@ -4535,9 +4591,8 @@ This work consists of the file  siunitx.dtx
   \si@bool@cs@if@T{si@num@in@#1@comp@bool}{%
     \si@num@out@add@maths{#1@comp}{\si@num@out@complex@root}%
     \si@num@out@bracket@parts{#1}%
-    \si@bool@cs@false{si@num@out@#1@comp@bool}%
     \si@empty@cs@if@F{si@num@out@#1}{%
-      \si@num@out@add@pm{#1}%
+      \si@num@out@sign{#1@comp}%
       \si@bool@cs@true{si@num@out@#1@comp@bool}%
     }%
   }%
@@ -4569,7 +4624,7 @@ This work consists of the file  siunitx.dtx
     \csname si@num@in@#1\endcsname{#1}%
 }
 \newcommand*{\si@num@out@copy@maths@aux}[2]{%
-  \si@num@out@add@maths{#2}#1
+  \si@num@out@add@maths{#2}#1%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4590,7 +4645,6 @@ This work consists of the file  siunitx.dtx
   \si@num@out@core@aux@ii{#1@comp}%  
 }
 \newcommand*{\si@num@out@core@aux@ii}[1]{%
-  \si@bool@cs@false{si@num@out@#1@parts@bool}%
   \si@bool@cs@if@T{si@num@in@#1@bool}{%
     \si@num@out@group@digits{#1}%
     \si@empty@cs@if@F{si@num@in@#1@uncert}{%
@@ -4609,13 +4663,22 @@ This work consists of the file  siunitx.dtx
 % creating the full output (including the mantissa sign if needed).
 %    \begin{macrocode}
 \newcommand*{\si@num@out@exponent}{%
+  \si@empty@cs@if@F{si@num@out@mant}{%
+    \si@empty@cs@if@F{si@num@out@exp}{%
+      \si@num@out@bracket@comp{mant}%
+      \si@num@out@bracket@parts{mant}%
+    }%
+  }%
   \si@num@out@add@C{result}{mant}%
   \si@empty@cs@if@F{si@num@out@mant}{%
     \si@empty@cs@if@F{si@num@out@exp}{%
-      \si@num@out@add@maths{result}{\si@num@out@exp@prod}%
-      \si@num@out@bracket@comp{mant}%
-      \si@num@out@bracket@parts{mant}%
-      \si@num@out@sign{exp}%
+      \si@bool@if@TF\si@num@out@tight@bool{%
+        \expandafter\def\expandafter\si@tempa\expandafter
+          {\expandafter{\si@num@out@exp@prod}}%
+        \si@num@out@add@maths{result}\si@tempa
+      }{%
+        \si@num@out@add@maths{result}{\si@num@out@exp@prod}%
+      }%
     }%
   }%
   \si@empty@cs@if@F{si@num@out@exp}{%
@@ -4770,6 +4833,12 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@num@out@init}{%
   \si@loop@over@macro\si@num@in@init@names\si@num@out@init@aux
   \si@clear@macro\si@num@out@result
+  \si@bool@false\si@num@out@mant@parts@bool
+  \si@bool@false\si@num@out@mant@comp@parts@bool
+  \si@bool@false\si@num@out@exp@parts@bool
+  \si@bool@false\si@num@out@exp@comp@parts@bool
+  \si@bool@false\si@num@out@mant@comp@bool
+  \si@bool@false\si@num@out@exp@comp@bool
 }
 \newcommand*{\si@num@out@init@aux}[1]{%
   \si@clear@cs{si@num@out@#1}%
@@ -4833,7 +4902,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@print}
 %    \begin{macrocode}
 \newcommand*{\si@num@print}{%
-  \si@print@num{\si@num@out@result}% TEMP
+  \expandafter\si@print@num\expandafter{\si@num@out@result}% TEMP
 }
 %    \end{macrocode}
 %\end{macro} 
