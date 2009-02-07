@@ -99,7 +99,7 @@ This work consists of the file  siunitx.dtx
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{siunitx}
-  [2009/01/23 v2.0alpha A comprehensive (SI) units package]
+  [2009/02/07 v2.0alpha A comprehensive (SI) units package]
 %</package>
 %<*driver>
 \documentclass[full]{l3doc}
@@ -190,7 +190,8 @@ This work consists of the file  siunitx.dtx
 %    language     = [LaTeX]{TeX},
 %    moretexcs    = {
 %      num,
-%      sisetup
+%      SI,
+%      sisetup,
 %    }
 %  }^^A 
 %}
@@ -256,7 +257,7 @@ This work consists of the file  siunitx.dtx
 %\changes{v1.0}{2008/06/15}{First official release}
 %\changes{v1.1}{2008/09/28}{Package extended to a greater range of unit
 %  types}
-%\changes{v2.0}{2008/12/26}{Complete re-write of package to add many new
+%\changes{v2.0}{2008/02/07}{Complete re-write of package to add many new
 %  features}
 %
 %\begin{abstract}
@@ -428,8 +429,14 @@ This work consists of the file  siunitx.dtx
 %  \item[\texttt{Choice}] Takes a limited number of choices, which 
 %    are described separately for each key. 
 %  \item[\texttt{Literal}] A key which uses the value(s) given directly,
-%    either to check input (for example the \texttt{numbers/input} keys)
+%    either to check input (for example the \option{numbers/input} keys)
 %    or in output.
+%  \item[\texttt{Maths}] Similar to a \texttt{literal} option, but the
+%    input is always used in maths mode, irrespective of other 
+%    \module{siunitx} settings. Thus to text-mode only input must be
+%    placed inside the argument of a \cs{text} macro.
+%  \item[\texttt{Macro}] Requires a macro, which may need a single 
+%    argument.
 %  \item[\texttt{Style}] A key which contains a number of other keys to
 %    set. Only the key name should be given: no value is required. This
 %    type of key is user-definable, as described in 
@@ -445,7 +452,8 @@ This work consists of the file  siunitx.dtx
 % In all cases, UK and US English spellings are available for both 
 % option names and for settings. Thus \option{centre} and 
 % \option{center} can be used for alignment options, and \option{maths}
-% or \option{math} is valid in the names of font options.
+% or \option{math} is valid in the names of font options. In the rest of
+% this document, UK English spelling is used.
 %
 %\subsection{Detecting fonts}
 %
@@ -496,6 +504,20 @@ This work consists of the file  siunitx.dtx
 % The two style options \option{all} and \option{none} can be used to 
 % turn on or off all of the detection functions in one go. These are
 % style options, and so need no value.
+%\begin{LaTeXdemo}
+%  \sisetup{font/detect/none}%
+%  $\num{1234}$ \\
+%  \num{1234} \\
+%  \emph{\num{1234}} \\
+%  \textbf{\num{1234}} \\
+%  \textbf{$\num{1234}$} \\
+%  \sisetup{font/detect/all}%
+%  $\num{1234}$ \\
+%  \num{1234} \\
+%  \emph{\num{1234}} \\
+%  \textbf{\num{1234}} \\
+%  \textbf{$\num{1234}$} \\\
+%\end{LaTeXdemo} 
 %
 %\DescribeOption{font/detect/inline bold}
 % Bold detection is influenced by the value of \option{inline bold},
@@ -540,7 +562,9 @@ This work consists of the file  siunitx.dtx
 %\subsection{Output font families}
 %
 % The relationship between font family detected and font family used
-% for output is not fixed.
+% for output is not fixed. The font detected by the package in the 
+% surrounding material does not have to match that used for output.
+% This is controlled by the \option{font/output} options.
 %
 %\begin{table}
 %  \centering
@@ -565,6 +589,56 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeOption{mode}
+% The \option{mode} option determines whether \module{siunitx} uses
+% maths or text mode when printing output. The choices are 
+% \option{maths}, \option{math} and \option{text}. When using maths
+% mode, text is printed using a maths font whereas in text mode a
+% text font is used.  The extent to which this is visually obvious
+% depends on the fonts in use in the document. This manual uses old
+% style (lower-case) figures in text mode to highlight the differences.
+% This option has no effect if the \option{font/detect/mode} switch is
+% \option{on}.
+%
+%\DescribeOption{maths rm}
+%\DescribeOption{text rm}
+% If font family detection is inactive, \module{siunitx} uses the font
+% family stored in either \option{maths rm} or \option{text rm} for
+% output. The choice of \option{maths} or \option{text} depends on the
+% \option{mode} setting.
+%\DescribeOption{maths sf}
+%\DescribeOption{maths tt}
+%\DescribeOption{text sf}
+%\DescribeOption{text tt}
+% If font family detection is active, \module{siunitx} may be using a
+% sans serif or monospaced font for output. In maths mode, these are
+% stored in \option{maths sf} and \option{maths tt}, and for text mode
+% in \option{text sf} and \option{text tt}. Notice that the detected
+% and output font families can differ.
+%\begin{LaTeXdemo}
+%  \sisetup{font/detect/family = yes}%
+%  \num{1234} \\
+%  { \sffamily \num{1234} } \\
+%  \SI{99}{\metre} \\
+%  \sisetup{font/maths rm = \mathtt}%
+%  \SI{99}{\metre} 
+%\end{LaTeXdemo}
+% This can be used to good effect to change all output from 
+% \module{siunitx} without needing to detect the font.  For example, 
+% when creating \module{beamer} presentations the settings
+%\begin{LaTeXdemo}[code only]
+%  \sisetup{
+%    font/maths rm = \mathsf,
+%    font/text rm  = \sffamily
+%}
+%\end{LaTeXdemo}
+% given all output in sans serif font without font detection.
+% 
+% Every one of the font options can be given independently for units 
+% and number, with the option paths \option{font/units/} and
+% \option{font/numbers/}, respectively. This allows fine control of
+% output.
 %
 %\subsection{Parsing numbers}
 % 
@@ -795,6 +869,35 @@ This work consists of the file  siunitx.dtx
 %  }
 %  \num{1.234(5)}
 %\end{LaTeXdemo}
+%
+%\DescribeOption{numbers/output/use brackets}
+%\DescribeOption{numbers/output/open bracket}
+%\DescribeOption{numbers/output/close bracket}
+% There are certain combinations of numerical input which can be
+% ambiguous. This can be corrected by adding brackets in the appropriate
+% place, and is controlled by the \option{use brackets} switch.  The 
+% opening and closing brackets used are stored \option{open bracket} and
+% \option{close bracket}, respectively.
+%\begin{LaTeXdemo}
+%  \num{1+2i e10} \\
+%  \num[numbers/output/use brackets = false]{1+2i e10} \\
+%  \sisetup{
+%    numbers/output,
+%    open bracket  = \{,
+%    close bracket = \},
+%  }
+%  \num{1+2i e10}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{numbers/output/tight spacing}
+% Under some circumstances is may be desirable to ``squeeze'' the output
+% spacing.  This is turned on using the \option{tight spacing} switch,
+% which compresses spacing where possible.
+%\begin{LaTeXdemo}
+%  \num{1\pm2i e3} \\
+%  \num[numbers/output/tight spacing = true]{1\pm2i e3} \\
+%\end{LaTeXdemo}
+% 
 %
 %\StopEventually{^^A
 %  \PrintChanges
@@ -4508,7 +4611,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-% 
+% The usual keys are created for output (appearance-only) settings.
 %    \begin{macrocode}
 \si@keys@family{numbers/output}
 \pgfkeys{
@@ -5406,9 +5509,10 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\SI}
 %    \begin{macrocode}
-\si@newcommand{\SI}{3}{%
+\si@newcommand{\SI}{3}{% TEMP
   \begingroup
     \sisetup{#1}%
+    \num{#2}%
   \endgroup
 }
 %    \end{macrocode}
