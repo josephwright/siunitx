@@ -705,26 +705,41 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      close bracket        & Literal & )          \\ ^^A (
 %      close uncertainty    & Literal & )          \\
-%      complex root         & Literal & i          \\
-%      decimal marker       & Literal & .          \\ 
+%      complex root         & Maths   & i          \\
+%      decimal marker       & Maths   & .          \\ 
 %      exponent base        & Literal & 10         \\
-%      exponent product     & Literal & \cs{times} \\
+%      exponent product     & Maths   & \cs{times} \\
 %      group digits         & Choice  & on         \\
 %      group four digits    & Choice  & off        \\
-%      group separator      & Literal & \cs{,}     \\
+%      group separator      & Maths   & \cs{,}     \\
 %      open bracket         & Literal & (          \\ ^^A )
 %      open uncertainty     & Literal & (          \\ ^^A )
 %      separate uncertainty & Choice  & off        \\
 %      tight spacing        & Choice  & off        \\
 %      use brackets         & Choice  & on         \\
-%      uncertainty space    & Literal & \m{none}   \\
+%      uncertainty space    & Maths   & \m{none}   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{numbers/output/???}
+%\DescribeOption{numbers/output/group digits}
+%\DescribeOption{numbers/output/group four digits}
+%\DescribeOption{numbers/output/group separator}
+% Grouping digits into blocks of three is a common method to increase
+% the ease of reading of numbers.  The \option{group digits} choice
+% turns this behaviour on and off, with grouping for numbers of exactly
+% four digits controlled by the \option{group four digits} choice. Note
+% that the later only applies if \option{group digits} is turned on.
+% The separator used between groups of digits is stored by the 
+% \option{group separator} option.  This takes literal input and is
+% used in maths mode: for a text-mode full space use |\text{~}|.
+%\begin{LaTeXdemo}
+%  \num{12345} \num[numbers/output/group digits = off]{12345}    \\
+%  \num{1234}  \num[numbers/output/group four digits = on]{1234} \\
+%  \num{12345} \num[numbers/output/group separator = {,}]{12345} \\
+%\end{LaTeXdemo} 
 %
-%\StopEventually{%
+%\StopEventually{^^A
 %  \PrintChanges
 %  \PrintIndex
 %}
@@ -4698,6 +4713,8 @@ This work consists of the file  siunitx.dtx
 % of course if grouping has been requested.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@group@digits}[1]{%
+  \si@num@out@copy{#1@dec}%
+  \si@num@out@copy{#1@int}%
   \si@bool@if@T\si@num@out@group@digits@bool{%
     \si@bool@if@F\si@num@in@symbols@bool{%
       \si@num@out@group@digits@aux@i{#1}{dec}%
@@ -4712,7 +4729,6 @@ This work consists of the file  siunitx.dtx
 }
 \newcommand*{\si@num@out@group@digits@aux@i}[2]{%
   \si@empty@cs@if@F{si@num@in@#1@#2}{%
-    \si@num@out@copy{#1@#2}%
     \si@bool@if@TF\si@num@out@group@four@bool{%
       \si@num@out@group@digits@aux@ii{#1}{#2}%
     }{%
