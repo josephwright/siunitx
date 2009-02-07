@@ -203,7 +203,7 @@ This work consists of the file  siunitx.dtx
 %      SelectCharTable=\lst@ReplaceInput{\^\^I}{\lst@ProcessTabulator}
 %    }^^A
 %    \leavevmode 
-%    \input{\jobname.tmp}^^A
+%      \input{\jobname.tmp}^^A
 %  \endgroup
 %  \MakePercentIgnore
 %}
@@ -217,7 +217,9 @@ This work consists of the file  siunitx.dtx
 %  \begin{center}
 %    \ifdim\wd\LaTeXdemo@box>0.48\linewidth\relax
 %      \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
-%      \LaTeXdemo@input
+%        \begin{minipage}{\linewidth}
+%          \LaTeXdemo@input
+%        \end{minipage}
 %    \else
 %      \begin{minipage}{0.48\linewidth}
 %        \LaTeXdemo@input
@@ -734,10 +736,65 @@ This work consists of the file  siunitx.dtx
 % \option{group separator} option.  This takes literal input and is
 % used in maths mode: for a text-mode full space use |\text{~}|.
 %\begin{LaTeXdemo}
-%  \num{12345} \num[numbers/output/group digits = off]{12345}    \\
-%  \num{1234}  \num[numbers/output/group four digits = on]{1234} \\
-%  \num{12345} \num[numbers/output/group separator = {,}]{12345} \\
+%  \num{12345} \\
+%  \num[numbers/output/group digits = off]{12345} \\
+%  \num{1234} \\
+%  \num[numbers/output/group four digits = on]{1234} \\
+%  \num{12345} \\
+%  \num[numbers/output/group separator = {,}]{12345} \\
+%  \num[numbers/output/group separator = \text{~}]{12345} 
 %\end{LaTeXdemo} 
+%
+%\DescribeOption{numbers/output/complex root}
+%\DescribeOption{numbers/output/decimal marker}
+% The decimal marker used in output is set using the \option{decimal 
+% marker} option. This can differ from the input marker, as can the root
+% of $\sqrt{-1}$, which is stored in the \option{complex root} option.
+% The later is always in maths mode, but notice that \module{siunitx}
+% uses \cs{mathrm} by default.  Thus an italic $i$ is obtained by
+% forcing \cs{mathnormal}.
+%\begin{LaTeXdemo}
+%  \num{1.23} \\
+%  \num[numbers/output/decimal marker = {,}]{1.23} \\
+%  \num{1+2i} \\
+%  \num[numbers/output/complex root = \mathnormal{i}]{1+2i}
+%\end{LaTeXdemo} 
+%
+%\DescribeOption{numbers/output/exponent base}
+%\DescribeOption{numbers/output/exponent product}
+% When exponents are present in the input, the options \option{exponent
+% base} and \option{exponent product} set the obvious parts of the 
+% output.  Notice that the base is in the current mode, but the product
+% sign is always in maths mode.
+%\begin{LaTeXdemo}
+%  \num[numbers/output/exponent product = \times]{1e2} \\
+%  \num[numbers/output/exponent product = \cdot]{1e2} \\
+%  \num[numbers/output/exponent base = 2]{1e2}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{numbers/output/separate uncertainty}
+%\DescribeOption{numbers/output/uncertainty space}
+%\DescribeOption{numbers/output/open uncertainty}
+%\DescribeOption{numbers/output/close uncertainty}
+% When input is given including an uncertatinty in a value, it can be 
+% printed either with the uncertainty in brackets or as a separate 
+% number. This behaviour is controlled by the \option{separate 
+% uncertainty} choice. If the uncertainty is given in brackets, a space
+% may be added between the main value and the uncertainty: this is 
+% stored using the \option{uncertainty space} option. The opening and
+% closing brackets used are stored \option{open uncertainty} and
+% \option{close uncertainty}, respectively.
+%\begin{LaTeXdemo}
+%  \num{1.234(5)} \\
+%  \num[numbers/output/separate uncertainty = on]{1.234(5)} \\
+%  \sisetup{
+%    numbers/output,
+%    open uncertainty  = [,
+%    close uncertainty = ],
+%    uncertainty space = {\,}
+%  }
+%  \num{1.234(5)}
+%\end{LaTeXdemo}
 %
 %\StopEventually{^^A
 %  \PrintChanges
@@ -4216,6 +4273,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@num@post@uncert@dec}[1]{%
   \si@empty@cs@if@F{si@num@in@#1@uncert}{%
+    \si@bool@cs@true{si@num@in@#1@uncert@dec@bool}%
     \si@num@post@dec@cnt\si@elt@count@cs{si@num@in@#1@dec}\relax
     \si@num@post@uncert@cnt\si@elt@count@cs{si@num@in@#1@uncert}\relax
     \si@num@if@TF{\si@num@post@uncert@cnt>\si@num@post@dec@cnt}{%
