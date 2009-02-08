@@ -242,13 +242,14 @@ This work consists of the file  siunitx.dtx
 %\providecommand*{\module}{\textsf}
 %\providecommand*{\option}{\texttt}
 %
-%\title{%
-%  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{%
-%    This file describes version \fileversion, last revised \filedate.%
-%  }%
+%\title{^^A
+%  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{^^A
+%    This file describes version \fileversion, last revised 
+%    \filedate.^^A
+%  }^^A
 %}
-%\author{%
-%  Joseph Wright\thanks{E-mail: joseph.wright@morningstar2.co.uk}%
+%\author{^^A
+%  Joseph Wright\thanks{E-mail: joseph.wright@morningstar2.co.uk}^^A
 %}
 %\date{Released \filedate}
 %
@@ -388,9 +389,14 @@ This work consists of the file  siunitx.dtx
 % marker, if needed: both ``\texttt{.}'' and ``\texttt{,}'' are 
 % recognised as decimal marker.
 %\begin{LaTeXdemo}
-%  \num{123}     \num{1234}   \num{12345}  \\
-%  \num{0.123}   \num{0,1234} \num{.12345} \\
-%  \num{3.45d-4} \num{-e10}
+%  \num{123}     \\
+%  \num{1234}    \\
+%  \num{12345}   \\
+%  \num{0.123}   \\
+%  \num{0,1234}  \\
+%  \num{.12345}  \\
+%  \num{3.45d-4} \\
+%  \num{-e10}
 %\end{LaTeXdemo} 
 %
 %\section{The key--value control system}
@@ -590,7 +596,7 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{mode}
+%\DescribeOption{font/mode}
 % The \option{mode} option determines whether \module{siunitx} uses
 % maths or text mode when printing output. The choices are 
 % \option{maths}, \option{math} and \option{text}. When using maths
@@ -601,23 +607,23 @@ This work consists of the file  siunitx.dtx
 % This option has no effect if the \option{font/detect/mode} switch is
 % \option{on}.
 %
-%\DescribeOption{maths rm}
-%\DescribeOption{text rm}
+%\DescribeOption{font/maths rm}
+%\DescribeOption{font/text rm}
 % If font family detection is inactive, \module{siunitx} uses the font
 % family stored in either \option{maths rm} or \option{text rm} for
 % output. The choice of \option{maths} or \option{text} depends on the
 % \option{mode} setting.
-%\DescribeOption{maths sf}
-%\DescribeOption{maths tt}
-%\DescribeOption{text sf}
-%\DescribeOption{text tt}
+%\DescribeOption{font/maths sf}
+%\DescribeOption{font/maths tt}
+%\DescribeOption{font/text sf}
+%\DescribeOption{font/text tt}
 % If font family detection is active, \module{siunitx} may be using a
 % sans serif or monospaced font for output. In maths mode, these are
 % stored in \option{maths sf} and \option{maths tt}, and for text mode
 % in \option{text sf} and \option{text tt}. Notice that the detected
 % and output font families can differ.
 %\begin{LaTeXdemo}
-%  \sisetup{font/detect/family = yes}%
+%  \sisetup{font/detect/family}%
 %  \num{1234} \\
 %  { \sffamily \num{1234} } \\
 %  \SI{99}{\metre} \\
@@ -631,7 +637,7 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{
 %    font/maths rm = \mathsf,
 %    font/text rm  = \sffamily
-%}
+%  }
 %\end{LaTeXdemo}
 % given all output in sans serif font without font detection.
 % 
@@ -743,6 +749,22 @@ This work consists of the file  siunitx.dtx
 % number of figures to use is determined by the \option{round figures}
 % and \option{round places} option: both of these options require a 
 % number.
+%\begin{LaTeXdemo}
+%  \num{1.23456} \\
+%  \num{14.23} \\
+%  \sisetup{
+%    numbers/process/round mode   = places,
+%    numbers/process/round places = 3
+%  }%
+%  \num{1.23456} \\
+%  \num{14.23} \\
+%  \sisetup{
+%    numbers/process/round mode    = figures,
+%    numbers/process/round figures = 3
+%  }%
+%  \num{1.23456} \\
+%  \num{14.23} 
+%\end{LaTeXdemo} 
 % 
 %\DescribeOption{numbers/process/add zero decimal}
 %\DescribeOption{numbers/process/add zero integer}
@@ -750,6 +772,16 @@ This work consists of the file  siunitx.dtx
 % the decimal or the integer parts of the number (for example \num{.123} 
 % or \num{123.}). The options \option{add zero decimal} and \option{add 
 % zero integer} allow the package to ``fill in'' the missing zero.
+%\begin{LaTeXdemo}
+%  \num{123.} \\
+%  \num{.456} \\
+%  \sisetup{
+%    numbers/process/add zero decimal = no,
+%    numbers/process/add zero integer = no,
+%  }%
+%  \num{123.} \\
+%  \num{.456} 
+%\end{LaTeXdemo}
 % 
 %\DescribeOption{numbers/process/explicit sign}
 %\DescribeOption{numbers/process/include explicit sign}
@@ -760,6 +792,23 @@ This work consists of the file  siunitx.dtx
 % may be useful to force all numbers to have a sign. This behaviour
 % is controlled by the \option{include explicit sign} option, with the
 % sign to use stored by the \option{explicit sign} option.
+%\begin{LaTeXdemo}
+%  \num{+345} \\
+%  \num[numbers/process/retain explicit plus]{+345} \\
+%  \num[
+%    numbers/process/explicit sign = -,
+%    numbers/process/include explicit sign,
+%  ]{345} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{numbers/process/retain zero exponent}
+% The retention of a zero exponent (\num[numbers/process/retain zero 
+% exponent]{e0}) is controlled by the \option{retain zero exponent} 
+% option.
+%\begin{LaTeXdemo}
+%  \num{444e0} \\
+%  \num[numbers/process/retain zero exponent = yes]{444e0} 
+%\end{LaTeXdemo}
 % 
 %\subsection{Printing numbers}
 %
@@ -924,7 +973,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 % There are also a number of packages that are incompatible with
-% \textsf{siunitx}. These are all checked for next.
+% \module{siunitx}. These are all checked for next.
 %    \begin{macrocode}
 \begingroup
   \@for\@tempa:=SIunits,sistyle,siunits,SIstyle,unitsdef,fancyunits\do{%
@@ -1593,7 +1642,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\si@loop@end}
 %\begin{macro}{\si@loop@stop}
-% The markers for the above
+% The markers for the above.
 %    \begin{macrocode}
 \newcommand*{\si@loop@end}{\si@loop@end}
 \newcommand*{\si@loop@stop}{\si@loop@stop}
@@ -2603,9 +2652,9 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{numbers/input}
 \pgfkeys{
   /siunitx/numbers/input,
-  product/.store in          = \si@num@pre@product,
-  quotient/.store in         = \si@num@pre@quotient,
-  protect tokens/.store in   = \si@num@pre@tokens,
+  product/.store in        = \si@num@pre@product,
+  quotient/.store in       = \si@num@pre@quotient,
+  protect tokens/.store in = \si@num@pre@tokens,
   product          = x,
   quotient         = /,
   protect tokens   = \mp\pi\pm
@@ -2665,10 +2714,10 @@ This work consists of the file  siunitx.dtx
 % The usual storage clearing.
 %    \begin{macrocode}
 \newcommand*{\si@num@pre@init}{%
-  \def\si@num@pre@arg{}%
-  \def\si@num@pre@arg@den{}%
-  \def\si@num@pre@arg@held{}%
-  \def\si@num@pre@arg@num{}%
+  \si@clear@macro\si@num@pre@arg
+  \si@clear@macro\si@num@pre@arg@den
+  \si@clear@macro\si@num@pre@arg@held
+  \si@clear@macro\si@num@pre@arg@num
   \si@bool@false\si@num@pre@error@bool
 }
 %    \end{macrocode}
@@ -4613,6 +4662,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@num@out@mant@bool}
+% A flag is needed so that a sign in the mantissa with no value
+% is correctly detected.
+%    \begin{macrocode}
+\si@bool@new\si@num@out@mant@bool
+%    \end{macrocode}
+%\end{macro}
+%
+%
 % The usual keys are created for output (appearance-only) settings.
 %    \begin{macrocode}
 \si@keys@family{numbers/output}
@@ -4659,6 +4717,9 @@ This work consists of the file  siunitx.dtx
   \si@num@out@init
   \si@num@out@core 
   \si@num@out@complex
+  \si@empty@if@F\si@num@out@mant{%
+    \si@bool@true\si@num@out@mant@bool
+  }%
   \si@num@out@sign{mant}%
   \si@num@out@sign{exp}%
   \si@num@out@exponent
@@ -4841,14 +4902,14 @@ This work consists of the file  siunitx.dtx
 % creating the full output (including the mantissa sign if needed).
 %    \begin{macrocode}
 \newcommand*{\si@num@out@exponent}{%
-  \si@empty@cs@if@F{si@num@out@mant}{%
+  \si@bool@if@T\si@num@out@mant@bool{%
     \si@empty@cs@if@F{si@num@out@exp}{%
       \si@num@out@bracket@comp{mant}%
       \si@num@out@bracket@parts{mant}%
     }%
   }%
   \si@num@out@add@C{result}{mant}%
-  \si@empty@cs@if@F{si@num@out@mant}{%
+  \si@bool@if@T\si@num@out@mant@bool{%
     \si@empty@cs@if@F{si@num@out@exp}{%
       \si@bool@if@TF\si@num@out@tight@bool{%
         \expandafter\def\expandafter\si@tempa\expandafter
@@ -5018,6 +5079,7 @@ This work consists of the file  siunitx.dtx
   \si@bool@false\si@num@out@exp@comp@parts@bool
   \si@bool@false\si@num@out@mant@comp@bool
   \si@bool@false\si@num@out@exp@comp@bool
+  \si@bool@false\si@num@out@mant@bool
 }
 \newcommand*{\si@num@out@init@aux}[1]{%
   \si@clear@cs{si@num@out@#1}%
@@ -5184,7 +5246,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@tab@collect@begin}[2][]{%
   \begingroup
-    \pgfqkeys{/siunitx}{#1}%
+    \sisetup{#1}%
     \def\si@tab@collect@body{}%
     \@nameuse{si@tab@collect@begin@#2}%
     \si@tab@collect@get
