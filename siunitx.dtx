@@ -125,43 +125,6 @@ This work consists of the file  siunitx.dtx
 %\GetFileInfo{\jobname.sty}
 %
 %\makeatletter
-%^^A To index options
-%\newcommand*{\DescribeOption}{^^A
-%  \leavevmode
-%  \@bsphack
-%  \begingroup
-%    \MakePrivateLetters
-%    \Describe@Option
-%}
-%\newcommand*{\Describe@Option}[1]{^^A
-%  \endgroup
-%  \marginpar{^^A
-%    \raggedleft
-%    \PrintDescribeEnv{#1}^^A
-%  }^^A
-%  \SpecialOptionIndex{#1}^^A
-%  \@esphack
-%  \ignorespaces
-%}
-%\newcommand*{\SpecialOptionIndex}[1]{^^A
-%  \@bsphack
-%  \begingroup
-%    \HD@target
-%    \let\HDorg@encapchar\encapchar
-%    \edef\encapchar usage{^^A
-%      \HDorg@encapchar hdclindex{\the\c@HD@hypercount}{usage}^^A
-%    }^^A
-%    \index{^^A
-%      #1\actualchar{\protect\ttfamily#1} (option)^^A
-%      \encapchar usage^^A
-%    }^^A
-%    \index{^^A
-%      options:\levelchar#1\actualchar{\protect\ttfamily#1}^^A
-%      \encapchar usage^^A
-%    }^^A
-%  \endgroup
-%  \@esphack
-%}
 %
 %^^A For creating examples with nice highlighting of code, and so
 %^^A on; based on the system used in the listings source (lstsample).
@@ -5748,7 +5711,18 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si@unit@in@literal@if@TF}
 %    \begin{macrocode}
-\newcommand*{\si@num@in@literal@if@TF}[1]{%
+\newcommand*{\si@unit@in@literal@if@TF}[1]{%
+  \edef\si@tempa{\detokenize{#1}}%
+  \begingroup
+    \escapechar\m@ne\relax
+    \edef\@tempa{\string#1}%
+  \expandafter\endgroup
+  \expandafter\def\expandafter\si@tempb\expandafter{\@tempa}%
+  \ifx\si@tempa\si@tempb
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5758,8 +5732,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@unit@out@break@num@bool}
 %\begin{macro}{\si@unit@out@break@unit@bool}
 %    \begin{macrocode}
-\si@bool@new\si@unit@in@break@num@bool
-\si@bool@new\si@unit@in@break@unit@bool
+\si@bool@new\si@unit@out@break@num@bool
+\si@bool@new\si@unit@out@break@unit@bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -5768,8 +5742,8 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{units/output}
 \pgfkeys{
   /siunitx/units/output,
-  allow inter-unit breaks/.is siunitx switch  = {unit@in@break@unit},
-  allow unit-number breaks/.is siunitx switch = {unit@in@break@num},
+  allow inter-unit breaks/.is siunitx switch  = {unit@out@break@unit},
+  allow unit-number breaks/.is siunitx switch = {unit@out@break@num},
   allow inter-unit breaks  = false,
   allow unit-number breaks = false
 }
