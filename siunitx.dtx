@@ -91,10 +91,8 @@ This work consists of the file  siunitx.dtx
   \file{README.txt}{\from{\jobname.dtx}{readme}}
 }
 \endgroup
-\immediate
-  \write18{makeindex -s gind.ist -o \jobname.ind \jobname.idx}
-\immediate
-  \write18{makeindex -s gglo.ist -o \jobname.gls \jobname.glo}
+\immediate\write18{makeindex -s gglo.ist -o siunitx.gls siunitx.glo}
+\immediate\write18{makeindex -s l3doc.ist -o siunitx.ind siunitx.idx}
 %</internal>
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
@@ -1048,7 +1046,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@key@error}
-%\begin{macro}{\si@key@error@aux}
+%\begin{macro}[aux]{\si@key@error@aux}
 % The basic structure for keys is created, and standardised errors
 % are defined. 
 %    \begin{macrocode}
@@ -1181,11 +1179,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\si@reserved@toks}
+%\begin{macro}{\si@reserved@a@toks}
+%\begin{macro}{\si@reserved@b@toks}
 % Also a toks.
 %    \begin{macrocode}
-\newtoks\si@reserved@toks
+\newtoks\si@reserved@a@toks
+\newtoks\si@reserved@b@toks
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@add@left@n}
@@ -1349,18 +1350,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\si@dowhile@bool@T}
-% A simple looping function.
-%    \begin{macrocode}
-\newcommand*{\si@dowhile@bool@T}[2]{%
-  #2%
-  \si@bool@if@T#1{%
-    \si@dowhile@bool@T#1{#2}%
-  }%
-}
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\si@clist@add@n}
 %\begin{macro}{\si@clist@add@o}
 % A few things are generated as comma-lists.
@@ -1382,6 +1371,35 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@clist@concat}
+% To combine two comma lists into a new one.
+%    \begin{macrocode}
+\newcommand*{\si@clist@concat}[3]{%
+  \si@reserved@a@toks\expandafter{#2}%
+  \si@reserved@b@toks\expandafter{#3}%
+  \edef#1{%
+    \the\si@reserved@a@toks
+    \si@empty@toks@if@F\si@reserved@a@toks{%
+      \si@empty@toks@if@F\si@reserved@b@toks{,}%
+    }%
+    \the\si@reserved@b@toks
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@dowhile@bool@T}
+% A simple looping function.
+%    \begin{macrocode}
+\newcommand*{\si@dowhile@bool@T}[2]{%
+  #2%
+  \si@bool@if@T#1{%
+    \si@dowhile@bool@T#1{#2}%
+  }%
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@empty@cs@if@F}
@@ -1452,8 +1470,28 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@empty@toks@if@F}
+%\begin{macro}{\si@empty@toks@if@T}
+%\begin{macro}{\si@empty@toks@if@TF}
+% For testing token registers: somewhat simplified from the \LaTeX3 
+% version.
+%    \begin{macrocode}
+\newcommand*{\si@empty@toks@if@F}[1]{%
+ \expandafter\si@empty@tlist@if@F\expandafter{\the#1}%
+}
+\newcommand*{\si@empty@toks@if@T}[1]{%
+ \expandafter\si@empty@tlist@if@T\expandafter{\the#1}%
+}
+\newcommand*{\si@empty@toks@if@TF}[1]{%
+ \expandafter\si@empty@tlist@if@TF\expandafter{\the#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@elt@count}
-%\begin{macro}{\si@elt@count@aux}
+%\begin{macro}[aux]{\si@elt@count@aux}
 % To count the number of tokens in a macro quickly.
 %    \begin{macrocode}
 \newcommand*{\si@elt@count}[1]{%
@@ -1594,7 +1632,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\si@loop@over@macro}
-%\begin{macro}{\si@loop@over@macro@aux}
+%\begin{macro}[aux]{\si@loop@over@macro@aux}
 % To loop over ever token inside a storage macro, expansion tricks
 % from \LaTeX3 keep things more reliable.
 %    \begin{macrocode}
@@ -1612,7 +1650,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\si@loop@end@if}
 %\begin{macro}{\si@loop@exec@end@if}
-%\begin{macro}{\si@loop@end@if@aux}
+%\begin{macro}[aux]{\si@loop@end@if@aux}
 % To actually end the above loop.
 %    \begin{macrocode}
 \newcommand*{\si@loop@end@if}[1]{%
@@ -1655,7 +1693,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@loop@over@three}
-%\begin{macro}{\si@loop@over@three@aux}
+%\begin{macro}[aux]{\si@loop@over@three@aux}
 %\begin{macro}{\si@loop@over@three@cs}
 % A special loop macro which uses three items at a time.
 %    \begin{macrocode}
@@ -1778,22 +1816,45 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@newcommand}
+%\begin{macro}{\si@newcommand@aux@i}
+%\begin{macro}{\si@newcommand@aux@ii}
+%%\begin{macro}{\si@newcommand@aux@iii}
 % To create new commands which are \cs{protected} but which take 
-% optional arguments, an adaptation from the \LaTeX\ kernel. Points to 
-% note: (1) the new command is never \cs{long}, so no star is needed; 
-% (2) the first argument of the new command is always optional; (3) 
-% \cs{si@newcommand} \emph{requires} a number of arguments as its first 
-% (mandatory) argument.
+% optional arguments, as also done in \pkg{biblatex}.
 %    \begin{macrocode}
-\newcommand*{\si@newcommand}[3]{%
-  \@ifdefinable{#1}{%
+\newcommand*{\si@newcommand}{%
+  \@ifstar{%
+    \let\l@ngrel@x\protected
+    \si@newcommand@aux@i
+  }{%
+    \def\l@ngrel@x{\protected\long}%
+    \si@newcommand@aux@i
+  }%
+}
+\newcommand*{\si@newcommand@aux@i}[1]{%
+  \@testopt{\si@newcommand@aux@ii#1}0%
+}
+\newcommand*{\si@newcommand@aux@ii}{}
+\def\si@newcommand@aux@ii#1[#2]{%
+  \@ifnextchar[{%
+    \si@newcommand@aux@iii#1[#2]%
+  }{%
+    \@argdef#1[#2]%
+  }%]
+}
+\newcommand*{\si@newcommand@aux@iii}{}
+\def\si@newcommand@aux@iii#1[#2][#3]#4{%
+  \@ifdefinable#1{%
     \expandafter\protected\expandafter\def\expandafter#1\expandafter{%
-      \expandafter\@testopt\csname\string#1\endcsname{}%
+      \expandafter\@testopt\csname\string#1\endcsname{#3}%
     }%
-    \expandafter\@yargdef\csname\string#1\endcsname\tw@{#2}{#3}%
+    \expandafter\@yargdef\csname\string#1\endcsname\tw@{#2}{#4}%
   }%
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@nil}
@@ -1811,10 +1872,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@no@value@if@FT}
 %\begin{macro}{\si@no@value@if@T}
 %\begin{macro}{\si@no@value@if@TF}
-%\begin{macro}{\si@no@value@if@aux@i}
-%\begin{macro}{\si@no@value@if@aux@ii}
-%\begin{macro}{\si@no@value@if@aux@iii}
-%\begin{macro}{\si@no@value@if@aux@iv}
+%\begin{macro}[aux]{\si@no@value@if@aux@i}
+%\begin{macro}[aux]{\si@no@value@if@aux@ii}
+%\begin{macro}[aux]{\si@no@value@if@aux@iii}
+%\begin{macro}[aux]{\si@no@value@if@aux@iv}
 % Empty value tests: a bit complicated. See \textsf{l3basics} for an
 % explanation of how this works (very clever).
 %    \begin{macrocode}
@@ -1917,12 +1978,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@replace@all@in}
-%\begin{macro}{\si@replace@all@in@aux}
+%\begin{macro}[aux]{\si@replace@all@in@aux}
 %\begin{macro}{\si@replace@all@in@cs}
 % For searching and replacing.
 %    \begin{macrocode}
 \newcommand*{\si@replace@all@in}[3]{%
-  \si@reserved@toks{}%
+  \si@reserved@a@toks{}%
   \def\si@tempa##1#2##2\si@stop{%
     \si@no@value@if@TF{##2}{%
       \si@replace@all@in@aux{##1}%
@@ -1933,11 +1994,11 @@ This work consists of the file  siunitx.dtx
   }%
   \@firstofone{\expandafter\si@tempa\expandafter\@empty}%
   #1#2\si@no@value\si@stop
-  \edef#1{\the\si@reserved@toks}%
+  \edef#1{\the\si@reserved@a@toks}%
 }
 \newcommand*{\si@replace@all@in@aux}[1]{%
-  \si@reserved@toks\expandafter\expandafter\expandafter{%
-    \expandafter\the\expandafter\si@reserved@toks#1%
+  \si@reserved@a@toks\expandafter\expandafter\expandafter{%
+    \expandafter\the\expandafter\si@reserved@a@toks#1%
   }%
 }
 \newcommand*{\si@replace@all@in@cs}[1]{%
@@ -1951,7 +2012,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@reverse@macro}
 %\begin{macro}{\si@reverse@cs}
 %\begin{macro}{\si@reverse@tlist}
-%\begin{macro}{\si@reverse@tlist@aux}
+%\begin{macro}[aux]{\si@reverse@tlist@aux}
 % The tlist macro here is the same as in \LaTeX3, but the macro version
 % is simplified as \pkg{siunitx} does not expect to find 
 % non-expandable content.
@@ -2729,7 +2790,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@pre@protect@tokens}
-%\begin{macro}{\si@num@pre@protect@tokens@aux}
+%\begin{macro}[aux]{\si@num@pre@protect@tokens@aux}
 % Under some circumstances (for example when loading \pkg{breqn}) 
 % some tokens do not behave safely under \cs{protected@edef}. To get
 % round this, they are redefined here.
@@ -2745,7 +2806,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@pre@sep@prod}
-%\begin{macro}{\si@num@pre@sep@prod@aux}
+%\begin{macro}[aux]{\si@num@pre@sep@prod@aux}
 % Rather than search through the entire argument, we use the 
 % delimited-argument trick.  No error checks here as there can be an
 % arbitrary number of products (\emph{quel dommage}).
@@ -2778,7 +2839,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@pre@sep@quot}
-%\begin{macro}{\si@num@pre@sep@quot@aux}
+%\begin{macro}[aux]{\si@num@pre@sep@quot@aux}
 % For the quotient, only one token can appear in each part. So there
 % is an error check.
 %    \begin{macrocode}
@@ -3064,7 +3125,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\si@num@in@arg@loop}
-%\begin{macro}{\si@num@in@arg@loop@aux}
+%\begin{macro}[aux]{\si@num@in@arg@loop@aux}
 % The entire argument is looped over.  Three tasks take place here, to 
 % keep down the number of loops.  First, a check is made that the input
 % token is valid. The input stream is re-written to remove ignored 
@@ -3184,7 +3245,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@in@finalise@tidy}
-%\begin{macro}{\si@num@in@finalise@tidy@aux}
+%\begin{macro}[aux]{\si@num@in@finalise@tidy@aux}
 % There are some minor bits of tidying up to do now. Two issues need to
 % be handled, both concerned with zero.
 %    \begin{macrocode}
@@ -3202,7 +3263,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@in@init}
-%\begin{macro}{\si@num@in@init@aux}
+%\begin{macro}[aux]{\si@num@in@init@aux}
 %\begin{macro}{\si@num@in@init@names}
 % The various storage areas are all cleared \emph{en masse}.
 %    \begin{macrocode}
@@ -3321,7 +3382,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@in@separate}
-%\begin{macro}{\si@num@in@separate@aux}
+%\begin{macro}[aux]{\si@num@in@separate@aux}
 % The main separator macro divides the input into the various parts.
 % As everything is done for the mantissa and the exponent, an auxiliary
 % function is used to keep the code shorter.
@@ -3344,10 +3405,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@in@sep@comp}
-%\begin{macro}{\si@num@in@sep@comp@aux@i}
-%\begin{macro}{\si@num@in@sep@comp@aux@ii}
-%\begin{macro}{\si@num@in@sep@comp@aux@iii}
-%\begin{macro}{\si@num@in@sep@comp@aux@iiv}
+%\begin{macro}[aux]{\si@num@in@sep@comp@aux@i}
+%\begin{macro}[aux]{\si@num@in@sep@comp@aux@ii}
+%\begin{macro}[aux]{\si@num@in@sep@comp@aux@iii}
+%\begin{macro}[aux]{\si@num@in@sep@comp@aux@iiv}
 % Finding a valid complex number is a two stage process.  The first part
 % is to look for a complex root at the end of the number.  If one is 
 % found, look for a sign dividing the real and imaginary parts.  If 
@@ -3462,8 +3523,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\si@num@in@sep@dec}
 %\begin{macro}{\si@num@in@sep@dec@comp}
-%\begin{macro}{\si@num@in@sep@dec@aux@i}
-%\begin{macro}{\si@num@in@sep@dec@aux@ii}
+%\begin{macro}[aux]{\si@num@in@sep@dec@aux@i}
+%\begin{macro}[aux]{\si@num@in@sep@dec@aux@ii}
 % The real and complex parts need a slightly different lead-off test
 % here.
 %    \begin{macrocode}
@@ -3521,7 +3582,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@in@sep@exp}
-%\begin{macro}{\si@num@in@sep@exp@aux}
+%\begin{macro}[aux]{\si@num@in@sep@exp@aux}
 % The separation here follows the same path as the integer--decimal
 % part, except that the macro names are known and so the temporary
 % variables are not needed.
@@ -3550,7 +3611,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@in@sep@sign}
-%\begin{macro}{\si@num@in@sep@sign@aux}
+%\begin{macro}[aux]{\si@num@in@sep@sign@aux}
 % Separating signs first converts ``\texttt{+-}'' to \cs{pm} and 
 % ``\texttt{-+}'' to \cs{mp} before looking for a single-token sign.  
 % This is done using the fact that only the very first token needs to be
@@ -3577,12 +3638,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@in@sep@uncert}
-%\begin{macro}{\si@num@in@sep@uncert@aux@i}
-%\begin{macro}{\si@num@in@sep@uncert@aux@ii}
-%\begin{macro}{\si@num@in@sep@uncert@aux@iii}
-%\begin{macro}{\si@num@in@sep@uncert@aux@iv}
-%\begin{macro}{\si@num@in@sep@uncert@aux@v}
-%\begin{macro}{\si@num@in@sep@uncert@aux@vi}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@i}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@ii}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@iii}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@iv}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@v}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@aux@vi}
 % Finding any uncertainty depends on whether there is a decimal
 % part.
 %    \begin{macrocode}
@@ -3712,7 +3773,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@in@sep@uncert@check@int}
-%\begin{macro}{\si@num@in@sep@uncert@check@int@aux}
+%\begin{macro}[aux]{\si@num@in@sep@uncert@check@int@aux}
 % For a number containing a decimal part, there is a need to check that
 % the integer part does not contain any error.
 %    \begin{macrocode}
@@ -3756,8 +3817,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@in@zero@sign}
-%\begin{macro}{\si@num@in@zero@sign@aux@i}
-%\begin{macro}{\si@num@in@zero@sign@aux@ii}
+%\begin{macro}[aux]{\si@num@in@zero@sign@aux@i}
+%\begin{macro}[aux]{\si@num@in@zero@sign@aux@ii}
 % The number zero does not take a sign. The test is complicated by some 
 % issues. First, the check for complex numbers needs to ensure that it
 % only fires if there is no real part.
@@ -3966,7 +4027,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@add@sign}
-%\begin{macro}{\si@num@post@add@sign@aux}
+%\begin{macro}[aux]{\si@num@post@add@sign@aux}
 % Adding a sign to an existing number needs a couple of tests and
 % saves code with an auxiliary function.
 %    \begin{macrocode}
@@ -4019,7 +4080,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@plus}
-%\begin{macro}{\si@num@post@plus@aux}
+%\begin{macro}[aux]{\si@num@post@plus@aux}
 % Holding onto a plus works very much in the same way as adding a sign:
 % some quick tests and an assignment.
 %    \begin{macrocode}
@@ -4060,7 +4121,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@round}
-%\begin{macro}{\si@num@post@round@aux}
+%\begin{macro}[aux]{\si@num@post@round@aux}
 % The lead-off for rounding is the same for decimal places and 
 % significant figures.
 %    \begin{macrocode}
@@ -4112,9 +4173,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@rnd@figures}
-%\begin{macro}{\si@num@post@rnd@figures@aux@i}
-%\begin{macro}{\si@num@post@rnd@figures@aux@ii}
-%\begin{macro}{\si@num@post@rnd@figures@aux@iii}
+%\begin{macro}[aux]{\si@num@post@rnd@figures@aux@i}
+%\begin{macro}[aux]{\si@num@post@rnd@figures@aux@ii}
+%\begin{macro}[aux]{\si@num@post@rnd@figures@aux@iii}
 % Rather than count figures to start with, a completely different 
 % approach is used here.
 %    \begin{macrocode}
@@ -4266,9 +4327,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@rnd@places}
-%\begin{macro}{\si@num@post@rnd@places@aux@i}
-%\begin{macro}{\si@num@post@rnd@places@aux@ii}
-%\begin{macro}{\si@num@post@rnd@places@aux@iii}
+%\begin{macro}[aux]{\si@num@post@rnd@places@aux@i}
+%\begin{macro}[aux]{\si@num@post@rnd@places@aux@ii}
+%\begin{macro}[aux]{\si@num@post@rnd@places@aux@iii}
 % When rounding to a number of places, the number of tokens in the
 % decimal parts is counted, as this is always needed. A check is then
 % made on the value of the number: if it is zero then a different 
@@ -4370,7 +4431,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 % 
 %\begin{macro}{\si@num@post@zero@fill}
-%\begin{macro}{\si@num@post@zero@fill@aux}
+%\begin{macro}[aux]{\si@num@post@zero@fill@aux}
 % Checks for adding zeros to each component are carried out.
 %    \begin{macrocode}
 \newcommand*{\si@num@post@zero@fill}{%
@@ -4399,8 +4460,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@post@uncert}
-%\begin{macro}{\si@num@post@uncert@aux@i}
-%\begin{macro}{\si@num@post@uncert@aux@ii}
+%\begin{macro}[aux]{\si@num@post@uncert@aux@i}
+%\begin{macro}[aux]{\si@num@post@uncert@aux@ii}
 % There may be a need to expand uncertainties into a decimal and integer
 % part. This is done here so that the core \texttt{in} code is faster.
 %    \begin{macrocode}
@@ -4424,8 +4485,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@post@uncert@dec}
-%\begin{macro}{\si@num@post@uncert@dec@aux@i}
-%\begin{macro}{\si@num@post@uncert@dec@aux@ii}
+%\begin{macro}[aux]{\si@num@post@uncert@dec@aux@i}
+%\begin{macro}[aux]{\si@num@post@uncert@dec@aux@ii}
 % To deal with an error in the decimal part, care needs to be taken to
 % correctly pad with zeros and also to allow for the possibility that
 % the error crosses the decimal--integer boundary.
@@ -4734,7 +4795,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si@num@out@add}
 %\begin{macro}{\si@num@out@add@C}
-%\begin{macro}{\si@num@out@add@C@aux}
+%\begin{macro}[aux]{\si@num@out@add@C@aux}
 % Adding to a store.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@add}[1]{%
@@ -4752,7 +4813,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}  
 %\end{macro}
 %\begin{macro}{\si@num@out@add@maths}
-%\begin{macro}{\si@num@out@add@maths@aux}
+%\begin{macro}[aux]{\si@num@out@add@maths@aux}
 % To add something which requires maths mode to an output macro by name.
 % Done this way, the output ends up with the literal text stored (makes
 % debugging easier). A quick reversal of the input makes expansion 
@@ -4785,8 +4846,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si@num@out@bracket@comp}
 %\begin{macro}{\si@num@out@bracket@parts}
-%\begin{macro}{\si@num@out@bracket@aux@i}
-%\begin{macro}{\si@num@out@bracket@aux@ii}
+%\begin{macro}[aux]{\si@num@out@bracket@aux@i}
+%\begin{macro}[aux]{\si@num@out@bracket@aux@ii}
 % There are various points at which brackets might be added to
 % avoid ambiguity. The function here adds the appropriate tokens
 % around whatever is in the supplied named store.
@@ -4822,7 +4883,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@complex}
-%\begin{macro}{\si@num@out@complex@aux}
+%\begin{macro}[aux]{\si@num@out@complex@aux}
 % The real and complex parts of each number are reassembled, with 
 % brackets if needed.
 %    \begin{macrocode}
@@ -4847,7 +4908,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@copy}
-%\begin{macro}{\si@num@out@copy@aux}
+%\begin{macro}[aux]{\si@num@out@copy@aux}
 % A short-cut, keeping down the need for \cs{edef}.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@copy}[1]{%
@@ -4860,7 +4921,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@copy@maths}
-%\begin{macro}{\si@num@out@copy@maths@aux}
+%\begin{macro}[aux]{\si@num@out@copy@maths@aux}
 % Similar but adding \cs{ensuremath}.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@copy@maths}[1]{%
@@ -4875,8 +4936,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@core}
-%\begin{macro}{\si@num@out@core@aux@i}
-%\begin{macro}{\si@num@out@core@aux@ii}
+%\begin{macro}[aux]{\si@num@out@core@aux@i}
+%\begin{macro}[aux]{\si@num@out@core@aux@ii}
 % The integer, decimal and any uncertainty parts are put back together.
 % This gives a ``minimal'' unit which cannot need any brackets.
 %    \begin{macrocode}
@@ -4936,8 +4997,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@group@digits}
-%\begin{macro}{\si@num@out@group@digits@aux@i}
-%\begin{macro}{\si@num@out@group@digits@aux@ii}
+%\begin{macro}[aux]{\si@num@out@group@digits@aux@i}
+%\begin{macro}[aux]{\si@num@out@group@digits@aux@ii}
 % Grouping digits only happens if there are no symbols in the input, and
 % of course if grouping has been requested.
 %    \begin{macrocode}
@@ -4981,7 +5042,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@group@dec}
-%\begin{macro}{\si@num@out@group@dec@aux}
+%\begin{macro}[aux]{\si@num@out@group@dec@aux}
 % Using the ``keep everything on the stack'' approach, a relatively
 % simple recursion is needed.
 %    \begin{macrocode}
@@ -5009,7 +5070,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@group@five@if@T}
-%\begin{macro}{\si@num@out@group@five@if@aux@i}
+%\begin{macro}[aux]{\si@num@out@group@five@if@aux@i}
 % A check to see if there are five tokens in the input: this will always
 % be a name. The \cs{edef} in the auxiliary function here mops up the
 % \cs{@empty}s needed for the delimited argument.
@@ -5027,9 +5088,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@num@out@group@int}
-%\begin{macro}{\si@num@out@group@int@aux@i}
-%\begin{macro}{\si@num@out@group@int@aux@ii}
-%\begin{macro}{\si@num@out@group@int@aux@iii}
+%\begin{macro}[aux]{\si@num@out@group@int@aux@i}
+%\begin{macro}[aux]{\si@num@out@group@int@aux@ii}
+%\begin{macro}[aux]{\si@num@out@group@int@aux@iii}
 % By keeping everything on the stack, recursion can occur quite 
 % efficiently here. The rather odd order is needed because
 % \cs{si@num@out@group@int@aux@iii} needs |#1| to be available.
@@ -5072,7 +5133,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@init}
-%\begin{macro}{\si@num@out@init@aux}
+%\begin{macro}[aux]{\si@num@out@init@aux}
 % Clear out the storage for printing.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@init}{%
@@ -5094,7 +5155,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@sign}
-%\begin{macro}{\si@num@out@sign@aux}
+%\begin{macro}[aux]{\si@num@out@sign@aux}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@sign}[1]{%
@@ -5306,8 +5367,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@tab@collect@expand}
-%\begin{macro}{\si@tab@collect@expand@aux@i}
-%\begin{macro}{\si@tab@collect@expand@aux@ii}
+%\begin{macro}[aux]{\si@tab@collect@expand@aux@i}
+%\begin{macro}[aux]{\si@tab@collect@expand@aux@ii}
 % The idea here is to expand content if possible.  There are a few 
 % things to note. Only macros which are not \cs{long} or \cs{protected}
 % are expanded. There is the possibility that the macro may need the
@@ -5347,7 +5408,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@tab@collect@get}
-%\begin{macro}{\si@tab@collect@get@aux}
+%\begin{macro}[aux]{\si@tab@collect@get@aux}
 % The token collection system first has to check that the next argument
 % does not start with an opening-brace character.  If it does, the 
 % testing is skipped and the braced token is stored.  Otherwise, a check
@@ -5419,7 +5480,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@tab@collect@unbraced}
-%\begin{macro}{\si@tab@collect@unbraced@aux}
+%\begin{macro}[aux]{\si@tab@collect@unbraced@aux}
 % A few macros are simply passed through to be executed; this is mainly
 % so that the table actually works.
 %    \begin{macrocode}
@@ -5557,12 +5618,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
+%\begin{macro}{\si@unit@def@clist}
 %\begin{macro}{\si@unit@def@prefix@clist}
 %\begin{macro}{\si@unit@def@power@clist}
 %\begin{macro}{\si@unit@def@qual@clist}
 %\begin{macro}{\si@unit@def@unit@clist}
-% Comma lists for each of the different parts of a unit.
+% Lists of each type of definition, and a master list.
 %    \begin{macrocode}
+\newcommand*{\si@unit@def@clist}{}
 \newcommand*{\si@unit@def@prefix@clist}{}
 \newcommand*{\si@unit@def@power@clist}{}
 \newcommand*{\si@unit@def@qual@clist}{}
@@ -5572,49 +5635,33 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-% 
-%\begin{macro}{\si@unit@def@body@bool}
-%\begin{macro}{\si@unit@def@opt@bool}
-%\begin{macro}{\si@unit@def@overwrite@bool}
-%\begin{macro}{\si@unit@def@xspace@bool}
-% The options need to be stored.
-%    \begin{macrocode}
-\si@bool@new\si@unit@def@body@bool
-\si@bool@new\si@unit@def@opt@bool
-\si@bool@new\si@unit@def@overwrite@bool
-\si@bool@new\si@unit@def@xspace@bool
-%    \end{macrocode}
-%\end{macro} 
 %\end{macro}
-%\end{macro}
-%\end{macro} 
-% 
-% There are a few options which alter how units are defined.
+%
+%\begin{macro}{\si@unit@def@clist@add}
+% To add each name to the appropriate list.
 %    \begin{macrocode}
-\si@keys@family{units/creation}
-\pgfkeys{
-  /siunitx/units/creation,
-  allow in body/.is siunitx switch           = {unit@def@body},
-  allow optional argument/.is siunitx switch = {unit@def@opt},
-  overwrite macros/.is siunitx switch        = {unit@def@overwrite},
-  use xspace/.is siunitx switch              = {unit@def@xspace},
-  allow in body           = false,
-  allow optional argument = false,
-  overwrite macros        = false,
-  use xspace              = false
-}
-%    \end{macrocode}
-% 
-%\begin{macro}{\si@unit@def@add@list}
-% Adds the current name to the appropriate list.
-%    \begin{macrocode}
-\newcommand*{\si@unit@def@add@list}[1]{%
+\newcommand*{\si@unit@def@clist@add}[1]{%
   \expandafter\si@clist@add@o\csname si@unit@def@#1@clist\endcsname
     {\si@unit@def@current}%
 }
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\si@unit@def@clist@combine}
+% At the beginning of the document, the various lists can be combined.
+%    \begin{macrocode}
+\newcommand*{\si@unit@def@clist@combine}{%
+  \si@clist@concat\si@unit@def@clist\si@unit@def@power@clist
+    \si@unit@def@prefix@clist
+  \si@clist@concat\si@unit@def@clist\si@unit@def@clist
+    \si@unit@def@qual@clist
+  \si@clist@concat\si@unit@def@clist\si@unit@def@clist
+    \si@unit@def@unit@clist
+}
+\AtBeginDocument{\si@unit@def@clist@combine}
+%    \end{macrocode}
+%\end{macro}
+% 
 %\begin{macro}{\si@unit@def@get@current}
 % To store the current macro name without the slash; there are a few
 % methods that work for this, of course.
@@ -5635,21 +5682,36 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@general}[3]{%
   \si@unit@def@get@current{#2}%
-  \si@unit@def@add@list{#1}%
+  \si@unit@def@clist@add{#1}%
   \@namedef{si@unit@direct@\si@unit@def@current}{#3}%
 }
 %    \end{macrocode}
 %\end{macro} 
 %
 %\begin{macro}{\si@unit@def@power}
+%\begin{macro}{\si@unit@def@power@post}
+%\begin{macro}{\si@unit@def@power@pre}
+% For powers, the only option is that they are given after the unit 
+% rather than before. To handle this, there are two separate functions,
+% which set a flag appropriately. No check (\cs{si@bool@new@cs}) here
+% as this might or might not be the case.
 %    \begin{macrocode}
-\newcommand*{\si@unit@def@power}[3]{%
-  \si@unit@def@general{power}{#1}{#3}%
-  \@namedef{si@unit@options@\si@unit@def@current}{#2}%
+\newcommand*{\si@unit@def@power}[2]{%
+  \si@unit@def@general{power}{#1}{#2}%
   \@namedef{si@unit@processed@\si@unit@def@current}{%
   }%
 }
+\newcommand*{\si@unit@def@power@post}[2]{%
+  \si@unit@def@power{#1}{\textsuperscript{#2}}%
+  \si@bool@cs@true{si@unit@power@\si@unit@def@current @post@bool}%
+}
+\newcommand*{\si@unit@def@power@pre}[2]{%
+  \si@unit@def@power{#1}{#2}%
+  \si@bool@cs@false{si@unit@power@\si@unit@def@current @post@bool}%
+}
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\begin{macro}{\si@unit@def@prefix}
 %    \begin{macrocode}
@@ -5664,7 +5726,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@unit@def@qual}
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@qual}[2]{%
-  \si@unit@def@general{qual}{#1}{#2}%
+  \si@unit@def@general{qual}{#1}{~(#2)}%
   \@namedef{si@unit@processed@\si@unit@def@current}{%
   }%
 }
@@ -5686,6 +5748,58 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro} 
+%
+%\section{Creating body unit macros}
+%
+% The user might have asked for the unit macros to be available in the
+% document body. If so, then these are created at the start of the 
+% document body.
+% 
+%\begin{macro}{\si@unit@create@body@bool}
+%\begin{macro}{\si@unit@create@opt@bool}
+%\begin{macro}{\si@unit@create@overwrite@bool}
+%\begin{macro}{\si@unit@create@xspace@bool}
+% The options need to be stored.
+%    \begin{macrocode}
+\si@bool@new\si@unit@create@body@bool
+\si@bool@new\si@unit@create@opt@bool
+\si@bool@new\si@unit@create@overwrite@bool
+\si@bool@new\si@unit@create@xspace@bool
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+% 
+% There are a few options which control this behaviour.
+%    \begin{macrocode}
+\si@keys@family{units/creation}
+\pgfkeys{
+  /siunitx/units/creation,
+  allow in body/.is siunitx switch           = {unit@create@body},
+  allow optional argument/.is siunitx switch = {unit@create@opt},
+  overwrite macros/.is siunitx switch        = {unit@create@overwrite},
+  use xspace/.is siunitx switch              = {unit@create@xspace},
+  allow in body           = false,
+  allow optional argument = false,
+  overwrite macros        = false,
+  use xspace              = false
+}
+%    \end{macrocode}
+% 
+%\begin{macro}{\si@unit@def@create}
+% The master control macro which occurs at the start of the document.
+%    \begin{macrocode}
+\newcommand*{\si@unit@create@body}{%
+  \si@bool@if@T\si@unit@create@body@bool{%
+    \si@bool@if@T\si@unit@create@overwrite@bool{%
+    }{%
+    }%
+  }%
+}
+\AtBeginDocument{\si@unit@create@body}
+%    \end{macrocode}
+%\end{macro}
 %
 %\subsection{Unit processing}
 %
@@ -5710,6 +5824,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@unit@in@literal@if@TF}
+% A test to see if (by \pkg{siunitx} standards) a token is literal. This
+% essentially means that any macros will give a \texttt{false} outcome, 
+% which is really all that is being asked for.
 %    \begin{macrocode}
 \newcommand*{\si@unit@in@literal@if@TF}[1]{%
   \edef\si@tempa{\detokenize{#1}}%
@@ -5762,8 +5879,12 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\DeclareSIUnit}
 % For creating units and associated functions.
 %    \begin{macrocode}
-\newcommand*{\DeclareSIPower}[3][]{%
-  \si@unit@def@power{#2}{#1}{#3}%
+\newcommand*{\DeclareSIPower}{%
+  \@ifstar{%
+    \si@unit@def@power@post
+  }{%
+    \si@unit@def@power@pre
+  }%
 }
 \newcommand*{\DeclareSIPrefix}[3]{%
   \si@unit@def@prefix{#1}{#2}{#3}%
@@ -5806,7 +5927,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\num}
 %    \begin{macrocode}
-\si@newcommand{\num}{2}{%
+\si@newcommand*{\num}[2][]{%
   \begingroup
     \sisetup{#1}%
     \si@num@pre@process{#2}%
@@ -5823,7 +5944,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\SI}
 %    \begin{macrocode}
-\si@newcommand{\SI}{3}{% TEMP
+\si@newcommand*{\SI}[3][]{% TEMP
   \begingroup
     \sisetup{#1}%
     \num{#2}%
@@ -5834,7 +5955,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si}
 %    \begin{macrocode}
-\si@newcommand{\si}{2}{% TEMP
+\si@newcommand*{\si}[2][]{% TEMP
   \begingroup
     \sisetup{#1}%
   \endgroup
@@ -5868,6 +5989,21 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\square}
+%\begin{macro}{\squared}
+%\begin{macro}{\cubic}
+%\begin{macro}{\cubed}
+% The basic powers are also defined.
+%    \begin{macrocode}
+\DeclareSIPower{\square}{2}
+\DeclareSIPower*{\squared}{2}
+\DeclareSIPower{\cubic}{3}
+\DeclareSIPower*{\cubed}{3}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %\end{macro}
