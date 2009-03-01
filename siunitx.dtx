@@ -1170,23 +1170,20 @@ This work consists of the file  siunitx.dtx
 % by \LaTeX3: looping in particular is more reliable and efficient using
 % this system. 
 % 
-%\begin{macro}{\si@reseved@a}
-%\begin{macro}{\si@reseved@b}
+%\begin{macro}{\si@reserveda}
+%\begin{macro}{\si@reservedb}
 % Just for the utilities.
 %    \begin{macrocode}
-\newcommand*{\si@reserved@a}{}
-\newcommand*{\si@reserved@b}{}
+\newcommand*{\si@reserveda}{}
+\newcommand*{\si@reservedb}{}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\si@reserved@a@toks}
-%\begin{macro}{\si@reserved@b@toks}
+%\begin{macro}{\si@reserved@toks}
 % Also a toks.
 %    \begin{macrocode}
-\newtoks\si@reserved@a@toks
-\newtoks\si@reserved@b@toks
+\newtoks\si@reserved@toks
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@add@left@n}
@@ -1194,9 +1191,9 @@ This work consists of the file  siunitx.dtx
 % To add to a macro reliably.
 %    \begin{macrocode}
 \newcommand*{\si@add@left@n}[2]{%
-  \def\si@reserved@a{#2}%
+  \def\si@reserveda{#2}%
   \edef#1{%
-    \expandafter\unexpanded\expandafter{\si@reserved@a}%
+    \expandafter\unexpanded\expandafter{\si@reserveda}%
     \expandafter\unexpanded\expandafter{#1}%
   }%
 }
@@ -1224,10 +1221,10 @@ This work consists of the file  siunitx.dtx
 % To add to a macro reliably.
 %    \begin{macrocode}
 \newcommand*{\si@add@right@n}[2]{%
-  \def\si@reserved@a{#2}%
+  \def\si@reserveda{#2}%
   \edef#1{%
     \expandafter\unexpanded\expandafter{#1}%
-    \expandafter\unexpanded\expandafter{\si@reserved@a}%
+    \expandafter\unexpanded\expandafter{\si@reserveda}%
   }%
 }
 \newcommand*{\si@add@right@o}[2]{%
@@ -1348,46 +1345,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\si@clist@add@n}
-%\begin{macro}{\si@clist@add@o}
-% A few things are generated as comma-lists.
-%    \begin{macrocode}
-\newcommand*{\si@clist@add@n}[2]{%
-  \si@empty@if@TF#1{%
-    \def#1{#2}%
-  }{%
-    \si@add@right@n#1{,#2}%
-  }%
-}
-\newcommand*{\si@clist@add@o}[2]{%
-  \si@empty@if@TF#1{%
-    \si@add@right@o#1{#2}%
-  }{%
-    \si@add@right@n#1{,}%
-    \si@add@right@o#1{#2}%
-  }%
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\si@clist@concat}
-% To combine two comma lists into a new one.
-%    \begin{macrocode}
-\newcommand*{\si@clist@concat}[3]{%
-  \si@reserved@a@toks\expandafter{#2}%
-  \si@reserved@b@toks\expandafter{#3}%
-  \edef#1{%
-    \the\si@reserved@a@toks
-    \si@empty@toks@if@F\si@reserved@a@toks{%
-      \si@empty@toks@if@F\si@reserved@b@toks{,}%
-    }%
-    \the\si@reserved@b@toks
-  }%
-}
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@dowhile@bool@T}
@@ -1513,15 +1470,15 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@expand@tlist}
 %\begin{macro}{\si@expand@tlist@cs}
 % Constructs a list of tokens by expanding each token in |#1| once.
-% Here, \cs{si@reserved@b} is used as the \cs{si@add@right@o} macro is
-% already using \cs{si@reserved@a}.
+% Here, \cs{si@reservedb} is used as the \cs{si@add@right@o} macro is
+% already using \cs{si@reserveda}.
 %    \begin{macrocode}
 \newcommand*{\si@expand@tlist}[2]{%
   \si@clear@macro#1%
-  \def\si@reserved@b##1{%
+  \def\si@reservedb##1{%
     \si@add@right@o#1{##1}%
   }%
-  \si@loop@over@macro@aux\si@reserved@b#2\si@loop@end\si@loop@stop
+  \si@loop@over@macro@aux\si@reservedb#2\si@loop@end\si@loop@stop
 }
 \newcommand*{\si@expand@tlist@cs}[1]{%
   \expandafter\si@expand@tlist\csname #1\endcsname
@@ -1536,22 +1493,22 @@ This work consists of the file  siunitx.dtx
 % To test if a character is in a given variable.
 %    \begin{macrocode}
 \newcommand*{\si@in@if@F}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@T{##2}%
   }%
-  \expandafter\si@reserved@a#1#2\si@no@value\si@stop
+  \expandafter\si@reserveda#1#2\si@no@value\si@stop
 }
 \newcommand*{\si@in@if@T}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@F{##2}%
   }%
-  \expandafter\si@reserved@a#1#2\si@no@value\si@stop
+  \expandafter\si@reserveda#1#2\si@no@value\si@stop
 }
 \newcommand*{\si@in@if@TF}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@FT{##2}%
   }%
-  \expandafter\si@reserved@a#1#2\si@no@value\si@stop
+  \expandafter\si@reserveda#1#2\si@no@value\si@stop
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1563,22 +1520,22 @@ This work consists of the file  siunitx.dtx
 % The same for lists of tokens.
 %    \begin{macrocode}
 \newcommand*{\si@in@tlist@if@F}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@T{##2}%
   }%
-  \si@reserved@a#1#2\si@no@value\si@stop
+  \si@reserveda#1#2\si@no@value\si@stop
 }
 \newcommand*{\si@in@tlist@if@T}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@F{##2}%
   }%
-  \si@reserved@a#1#2\si@no@value\si@stop
+  \si@reserveda#1#2\si@no@value\si@stop
 }
 \newcommand*{\si@in@tlist@if@TF}[2]{%
-  \def\si@reserved@a##1#2##2\si@stop{%
+  \def\si@reserveda##1#2##2\si@stop{%
     \si@no@value@if@FT{##2}%
   }%
-  \si@reserved@a#1#2\si@no@value\si@stop
+  \si@reserveda#1#2\si@no@value\si@stop
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1816,9 +1773,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@newcommand}
-%\begin{macro}{\si@newcommand@aux@i}
-%\begin{macro}{\si@newcommand@aux@ii}
-%%\begin{macro}{\si@newcommand@aux@iii}
+%\begin{macro}[aux]{\si@newcommand@aux@i}
+%\begin{macro}[aux]{\si@newcommand@aux@ii}
+%\begin{macro}[aux]{\si@newcommand@aux@iii}
 % To create new commands which are \cs{protected} but which take 
 % optional arguments, as also done in \pkg{biblatex}.
 %    \begin{macrocode}
@@ -1983,7 +1940,7 @@ This work consists of the file  siunitx.dtx
 % For searching and replacing.
 %    \begin{macrocode}
 \newcommand*{\si@replace@all@in}[3]{%
-  \si@reserved@a@toks{}%
+  \si@reserved@toks{}%
   \def\si@tempa##1#2##2\si@stop{%
     \si@no@value@if@TF{##2}{%
       \si@replace@all@in@aux{##1}%
@@ -1994,11 +1951,11 @@ This work consists of the file  siunitx.dtx
   }%
   \@firstofone{\expandafter\si@tempa\expandafter\@empty}%
   #1#2\si@no@value\si@stop
-  \edef#1{\the\si@reserved@a@toks}%
+  \edef#1{\the\si@reserved@toks}%
 }
 \newcommand*{\si@replace@all@in@aux}[1]{%
-  \si@reserved@a@toks\expandafter\expandafter\expandafter{%
-    \expandafter\the\expandafter\si@reserved@a@toks#1%
+  \si@reserved@toks\expandafter\expandafter\expandafter{%
+    \expandafter\the\expandafter\si@reserved@toks#1%
   }%
 }
 \newcommand*{\si@replace@all@in@cs}[1]{%
@@ -5610,26 +5567,19 @@ This work consists of the file  siunitx.dtx
 % up the user name-space with a lot of short macro names, the 
 % standard method only makes these available inside the unit-processing
 % functions (\cs{SI}, \cs{si} and the \texttt{S} column).
-% 
-%\begin{macro}{\si@unit@def@current}
-% Temporary storage.
-%    \begin{macrocode}
-\newcommand*{\si@unit@def@current}{}
-%    \end{macrocode}
-%\end{macro} 
 %
-%\begin{macro}{\si@unit@def@clist}
-%\begin{macro}{\si@unit@def@prefix@clist}
-%\begin{macro}{\si@unit@def@power@clist}
-%\begin{macro}{\si@unit@def@qual@clist}
-%\begin{macro}{\si@unit@def@unit@clist}
+%\begin{macro}{\si@unit@def@list}
+%\begin{macro}{\si@unit@def@prefix@list}
+%\begin{macro}{\si@unit@def@power@list}
+%\begin{macro}{\si@unit@def@qual@list}
+%\begin{macro}{\si@unit@def@unit@list}
 % Lists of each type of definition, and a master list.
 %    \begin{macrocode}
-\newcommand*{\si@unit@def@clist}{}
-\newcommand*{\si@unit@def@prefix@clist}{}
-\newcommand*{\si@unit@def@power@clist}{}
-\newcommand*{\si@unit@def@qual@clist}{}
-\newcommand*{\si@unit@def@unit@clist}{}
+\newcommand*{\si@unit@def@list}{}
+\newcommand*{\si@unit@def@prefix@list}{}
+\newcommand*{\si@unit@def@power@list}{}
+\newcommand*{\si@unit@def@qual@list}{}
+\newcommand*{\si@unit@def@unit@list}{}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -5637,114 +5587,67 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\si@unit@def@clist@add}
-% To add each name to the appropriate list.
-%    \begin{macrocode}
-\newcommand*{\si@unit@def@clist@add}[1]{%
-  \expandafter\si@clist@add@o\csname si@unit@def@#1@clist\endcsname
-    {\si@unit@def@current}%
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\si@unit@def@clist@combine}
+%\begin{macro}{\si@unit@def@list@combine}
 % At the beginning of the document, the various lists can be combined.
+% This means that the conversion of internal to working names inside
+% the package macros only needs to loop over a single token list.
 %    \begin{macrocode}
-\newcommand*{\si@unit@def@clist@combine}{%
-  \si@clist@concat\si@unit@def@clist\si@unit@def@power@clist
-    \si@unit@def@prefix@clist
-  \si@clist@concat\si@unit@def@clist\si@unit@def@clist
-    \si@unit@def@qual@clist
-  \si@clist@concat\si@unit@def@clist\si@unit@def@clist
-    \si@unit@def@unit@clist
+\newcommand*{\si@unit@def@list@combine}{%
+  \si@expand@tlist\si@unit@def@list{%
+    \si@unit@def@power@list
+    \si@unit@def@prefix@list
+    \si@unit@def@qual@list
+    \si@unit@def@unit@list
+  }%
 }
-\AtBeginDocument{\si@unit@def@clist@combine}
+\AtBeginDocument{\si@unit@def@list@combine}
 %    \end{macrocode}
 %\end{macro}
-% 
-%\begin{macro}{\si@unit@def@get@current}
-% To store the current macro name without the slash; there are a few
-% methods that work for this, of course.
-%    \begin{macrocode}
-\newcommand*{\si@unit@def@get@current}[1]{%
-  \begingroup
-    \escapechar\m@ne
-    \edef\@tempa{\string#1}%
-  \expandafter\endgroup
-  \expandafter\def\expandafter\si@unit@def@current\expandafter{\@tempa}%
-}
-%    \end{macrocode}
-%\end{macro} 
-%
-%\begin{macro}{\si@unit@def@general}
-% Many of the creation steps are the same for units, prefixes, 
-% qualifiers and powers.
-%    \begin{macrocode}
-\newcommand*{\si@unit@def@general}[3]{%
-  \si@unit@def@get@current{#2}%
-  \si@unit@def@clist@add{#1}%
-  \@namedef{si@unit@direct@\si@unit@def@current}{#3}%
-}
-%    \end{macrocode}
-%\end{macro} 
 %
 %\begin{macro}{\si@unit@def@power}
 %\begin{macro}{\si@unit@def@power@post}
-%\begin{macro}{\si@unit@def@power@pre}
-% For powers, the only option is that they are given after the unit 
-% rather than before. To handle this, there are two separate functions,
-% which set a flag appropriately. No check (\cs{si@bool@new@cs}) here
-% as this might or might not be the case.
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@power}[2]{%
-  \si@unit@def@general{power}{#1}{#2}%
-  \@namedef{si@unit@processed@\si@unit@def@current}{%
-  }%
+  \si@add@right@n\si@unit@def@power@list{#1}%
+  \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
-  \si@unit@def@power{#1}{\textsuperscript{#2}}%
-  \si@bool@cs@true{si@unit@power@\si@unit@def@current @post@bool}%
-}
-\newcommand*{\si@unit@def@power@pre}[2]{%
   \si@unit@def@power{#1}{#2}%
-  \si@bool@cs@false{si@unit@power@\si@unit@def@current @post@bool}%
+  \@namedef{si@unit@literal@\string#1}{\textsuperscript{#2}}%
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@unit@def@prefix}
+%\begin{macro}{\si@unit@def@prefix@binary}
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@prefix}[3]{%
-  \si@unit@def@general{prefix}{#1}{#2}%
-  \@namedef{si@unit@processed@\si@unit@def@current}{%
-  }%
+  \si@add@right@n\si@unit@def@prefix@list{#1}%
+  \@namedef{si@unit@literal@\string#1}{#2}%
+}
+\newcommand*{\si@unit@def@prefix@binary}[1]{%
+  \si@unit@def@prefix{#1}%
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@unit@def@qual}
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@qual}[2]{%
-  \si@unit@def@general{qual}{#1}{~(#2)}%
-  \@namedef{si@unit@processed@\si@unit@def@current}{%
-  }%
+  \si@add@right@n\si@unit@def@qual@list{#1}%
+  \@namedef{si@unit@literal@\string#1}{\text{ }(#2)}%
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@unit@def@unit}
-% The internal unit-defining macro, which creates three macros.  The 
-% \texttt{direct} version is used when needing to print without the full
-% \pkg{siunitx} processing. The \texttt{options} macro stores any 
-% options given, and the \texttt{processed} one is used when doing full
-% unit processing.
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@unit}[3]{%
-  \si@unit@def@general{unit}{#1}{#3}%
-  \@namedef{si@unit@options@\si@unit@def@current}{#2}%
-  \@namedef{si@unit@processed@\si@unit@def@current}{%
-  }%
+  \si@add@right@n\si@unit@def@unit@list{#1}%
+  \@namedef{si@unit@options@\string#1}{#2}%
+  \@namedef{si@unit@literal@\string#1}{#3}%
+
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -5792,12 +5695,17 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@create@body}{%
   \si@bool@if@T\si@unit@create@body@bool{%
-    \si@bool@if@T\si@unit@create@overwrite@bool{%
-    }{%
-    }%
+    \si@unit@create@macros
   }%
 }
 \AtBeginDocument{\si@unit@create@body}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@create@macros}
+%    \begin{macrocode}
+\newcommand*{\si@unit@create@macros}{%
+}
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5877,23 +5785,29 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\DeclareSIPrefix}
 %\begin{macro}{\DeclareSIQualifier}
 %\begin{macro}{\DeclareSIUnit}
-% For creating units and associated functions.
+% For creating units and associated functions: only \cs{DeclarSIUnit}
+% takes arguments here as the optional and mandatory ones are 
+% re-ordered.
 %    \begin{macrocode}
 \newcommand*{\DeclareSIPower}{%
   \@ifstar{%
     \si@unit@def@power@post
   }{%
-    \si@unit@def@power@pre
+    \si@unit@def@power
   }%
 }
-\newcommand*{\DeclareSIPrefix}[3]{%
-  \si@unit@def@prefix{#1}{#2}{#3}%
+\newcommand*{\DeclareSIPrefix}{%
+  \@ifstar{%
+    \si@unit@def@prefix@binary
+  }{%
+    \si@unit@def@prefix
+  }%
 }
-\newcommand*{\DeclareSIQualifier}[2]{%
-  \si@unit@def@qual{#1}{#2}%
+\newcommand*{\DeclareSIQualifier}{%
+  \si@unit@def@qual
 }
-\newcommand*{\DeclareSIUnit}[3][]{%
-  \si@unit@def@unit{#2}{#1}{#3}%
+\newcommand*{\DeclareSIUnit}[2][]{%
+  \si@unit@def@unit{#2}{#1}%
 }
 %    \end{macrocode}
 %\end{macro} 
