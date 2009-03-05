@@ -2568,8 +2568,15 @@ This work consists of the file  siunitx.dtx
       \si@font@det@set
     }%
     \def\si@print@type{#1}%
+    \si@bool@if@F\si@font@det@mode@bool{%
+      \si@bool@cs@if@TF{si@font@#1@textmode@bool}{%
+        \si@bool@true\si@font@set@text@bool
+      }{%
+        \si@bool@false\si@font@set@text@bool
+      }%
+    }%
     \si@print@codes
-    \text{\si@print@set{#2}}%
+    \text{\si@print@print{#2}}%
   \endgroup
   \check@mathfonts
 }
@@ -2643,12 +2650,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %    
-%\begin{macro}{\si@print@set}
+%\begin{macro}{\si@print@print}
 % The various font changes are set up, then the correct printing
 % function is called.  The \cs{scantokens} primitive is here as this
 % avoids needing to re-\cs{edef} anything.
 %    \begin{macrocode}
-\newcommand*{\si@print@set}[1]{%
+\newcommand*{\si@print@print}[1]{%
   \si@font@set@bold
   \si@font@set@italic
   \@nameuse{si@font@\si@print@type @text@\si@font@set@family}%
@@ -5915,8 +5922,8 @@ This work consists of the file  siunitx.dtx
   \begingroup
     \si@catcode@set{38}{13}% &
     \si@catcode@set{126}{13}% ~
-    \def.{\si@unit@out@unit@sep}%
-    \def&{\si@unit@out@unit@space}%
+    \let.\si@unit@out@unit@sep@breakable
+    \let&\si@unit@out@unit@space@breakable
     \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
     \si@print@unit@o{\si@unit@out@literal}%
   \endgroup
@@ -5945,6 +5952,31 @@ This work consists of the file  siunitx.dtx
   \si@replace@all@in#1{~}{&}%
 }
 \si@catcode@set{38}{4}% &
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@out@unit@sep@breakable}
+%\begin{macro}{\si@unit@out@unit@space@breakable}
+% The inter-unit separator (or space) may need to be breakable. This is
+% achieved here.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@unit@sep@breakable}{%
+  \si@bool@if@TF\si@unit@out@break@unit@bool{%
+    \allobreak
+  }{%
+    \nobreak
+  }%
+  \si@unit@out@unit@sep
+}
+\newcommand*{\si@unit@out@unit@space@breakable}{%
+  \si@bool@if@TF\si@unit@out@break@unit@bool{%
+    \allobreak
+  }{%
+    \nobreak
+  }%
+  \si@unit@out@unit@space
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
