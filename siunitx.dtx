@@ -112,6 +112,7 @@ This work consists of the file  siunitx.dtx
 \CodelineIndex
 \RecordChanges
 \usepackage{\jobname}
+\AtBeginDocument{\AlsoImplementation}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -1000,14 +1001,32 @@ This work consists of the file  siunitx.dtx
 }
 \let\si@catcode@set\si@catcode@store
 \si@catcode@symbols
+\si@catcode@set{38}{4}% &
 \si@catcode@set{45}{12}% -
 \si@catcode@set{94}{7}% ^
 \si@catcode@set{95}{8}% _
 \si@catcode@set{126}{13}% ~
-\renewcommand*{\si@catcode@set}[2]{\catcode#1 #2\relax}
+\renewcommand*{\si@catcode@set}[2]{%
+  \catcode#1 #2\relax
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@lccode@restore}
+%\begin{macro}{\si@lccode@set}
+% Something similar for lower-case codes, but there are less to worry
+% about.
+%    \begin{macrocode}
+\newcommand*{\si@lccode@restore}{}
+\edef\si@lccode@restore{%
+  \lccode38 \the\lccode38\relax % &
+}
+\newcommand*{\si@lccode@set}[2]{%
+  \lccode#1 #2\relax
+}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
@@ -1133,7 +1152,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@tempcnt}
-% A count.
+% A counter.
 %    \begin{macrocode}
 \newcount\si@tempcnt
 %    \end{macrocode}
@@ -1142,6 +1161,12 @@ This work consists of the file  siunitx.dtx
 % A private box.
 %    \begin{macrocode}
 \newsavebox\si@tempbox
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@temp@toks}
+% And a token registry.
+%    \begin{macrocode}
+\newtoks\si@temp@toks
 %    \end{macrocode}
 %\end{macro}
 %
@@ -2528,7 +2553,9 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\si@print}
 %\begin{macro}{\si@print@num}
+%\begin{macro}{\si@print@num@o}
 %\begin{macro}{\si@print@unit}
+%\begin{macro}{\si@print@unit@o}
 % The main printing function does everything inside a group, as 
 % there are category code and definition changes to make. First, there
 % is a check to see if the fonts have already been set. If not, it's
@@ -2549,10 +2576,18 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@print@num}{%
   \si@print{num}%
 }
+\newcommand*{\si@print@num@o}[1]{%
+  \expandafter\si@print@num\expandafter{#1}%
+}
 \newcommand*{\si@print@unit}{%
   \si@print{unit}%
 }
+\newcommand*{\si@print@unit@o}[1]{%      
+  \expandafter\si@print@unit\expandafter{#1}%
+}
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5166,7 +5201,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@print}
 %    \begin{macrocode}
 \newcommand*{\si@num@print}{%
-  \expandafter\si@print@num\expandafter{\si@num@out@result}% TEMP
+  \si@print@num@o{\si@num@out@result}% TEMP
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -5573,9 +5608,14 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@unit@def@power@list}
 %\begin{macro}{\si@unit@def@qual@list}
 %\begin{macro}{\si@unit@def@unit@list}
-% Lists of each type of definition, and a master list.
+% Lists of each type of definition, and a master list. The master list
+% always contains the two special functions \cs{per} and \cs{tothe}.
 %    \begin{macrocode}
-\newcommand*{\si@unit@def@list}{}
+\newcommand*{\si@unit@def@list}{%
+  \per
+  \raiseto
+  \tothe
+}
 \newcommand*{\si@unit@def@prefix@list}{}
 \newcommand*{\si@unit@def@power@list}{}
 \newcommand*{\si@unit@def@qual@list}{}
@@ -5594,6 +5634,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@list@combine}{%
   \si@expand@tlist\si@unit@def@list{%
+    \si@unit@def@list
     \si@unit@def@power@list
     \si@unit@def@prefix@list
     \si@unit@def@qual@list
@@ -5610,6 +5651,7 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@power}[2]{%
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
+  \@namedef{si@unit@power@\string#1}{#2}%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
   \si@unit@def@power{#1}{#2}%
@@ -5624,6 +5666,8 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@prefix}[3]{%
   \si@add@right@n\si@unit@def@prefix@list{#1}%
   \@namedef{si@unit@literal@\string#1}{#2}%
+  \@namedef{si@unit@symbol@\string#1}{#2}%
+  \@namedef{si@unit@power@\string#1}{#3}%
 }
 \newcommand*{\si@unit@def@prefix@binary}[1]{%
   \si@unit@def@prefix{#1}%
@@ -5637,6 +5681,7 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@qual}[2]{%
   \si@add@right@n\si@unit@def@qual@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\text{ }(#2)}%
+  \@namedef{si@unit@symbol@\string#1}{#2}%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5647,7 +5692,7 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@unit@list{#1}%
   \@namedef{si@unit@options@\string#1}{#2}%
   \@namedef{si@unit@literal@\string#1}{#3}%
-
+  \@namedef{si@unit@symbol@\string#1}{#3}%
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -5709,6 +5754,37 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\subsection{Special definitions}
+%
+% A few unit-like macros need to be defined by hand as they do not fit
+% into a general category.
+%
+%\begin{macro}{\si@unit@macro@\per}
+%    \begin{macrocode}
+\@namedef{si@unit@literal@\string\per}{/}
+\@namedef{si@unit@macro@\string\per}{%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@macro@\raiseto}
+%\begin{macro}{\si@unit@macro@\tothe}
+%    \begin{macrocode}
+\@namedef{si@unit@literal@\string\raiseto}#1#2{
+  #2\textsuperscript{#1}%
+}
+\@namedef{si@unit@macro@\string\raiseto}#1{%
+}
+\@namedef{si@unit@literal@\string\tothe}#1{%
+  \textsuperscript{#1}%
+}
+\@namedef{si@unit@macro@\string\tothe}#1{%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+% A couple of unit functions need definitions
+%
 %\subsection{Unit processing}
 %
 % The unit processor has to convert the input (which may be all macros
@@ -5719,37 +5795,68 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@unit@in@parse}
 %    \begin{macrocode}
 \newcommand*{\si@unit@in@parse}[1]{%
-  \si@unit@in@init
+  \si@unit@in@process@if@TF{#1}{%
+    \si@unit@in@init
+  }{%
+    \si@unit@in@literal{#1}%
+  }%
 }
 %    \end{macrocode}
 %\end{macro} 
 %
 %\begin{macro}{\si@unit@in@init}
+%\begin{macro}[aux]{\si@unit@in@init@aux}
+% Initialisation starts by making all of the unit macros active.
 %    \begin{macrocode}
 \newcommand*{\si@unit@in@init}{%
+  \si@loop@over@macro\si@unit@def@list\si@unit@in@init@aux
+}
+\newcommand*{\si@unit@in@init@aux}[1]{%
+  \si@let@Nc#1{si@unit@macro@\string#1}%
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
 %
-%\begin{macro}{\si@unit@in@literal@if@TF}
-% A test to see if (by \pkg{siunitx} standards) a token is literal. This
-% essentially means that any macros will give a \texttt{false} outcome, 
-% which is really all that is being asked for.
+%\begin{macro}{\si@unit@in@literal}
+%\begin{macro}[aux]{\si@unit@in@literal@aux}
+% If the unit given contains anything which is not a unit macro, then
+% any unit macros that are there simply dump literal meanings.
 %    \begin{macrocode}
-\newcommand*{\si@unit@in@literal@if@TF}[1]{%
-  \edef\si@tempa{\detokenize{#1}}%
-  \begingroup
-    \escapechar\m@ne\relax
-    \edef\@tempa{\string#1}%
-  \expandafter\endgroup
-  \expandafter\def\expandafter\si@tempb\expandafter{\@tempa}%
-  \ifx\si@tempa\si@tempb
-    \expandafter\@firstoftwo
-  \else
-    \expandafter\@secondoftwo
-  \fi
+\newcommand*{\si@unit@in@literal}[1]{%
+  \si@loop@over@macro\si@unit@def@list\si@unit@in@literal@aux
+  \si@unit@out@literal@print{#1}%
+}
+\newcommand*{\si@unit@in@literal@aux}[1]{%
+  \si@let@Nc#1{si@unit@literal@\string#1}%
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@in@process@if@TF}
+%\begin{macro}[aux]{\si@unit@in@process@aux}
+% A test is needed to see if the input only contains unit macros. This 
+% is done by altering category codes and then re-scanning the input. All
+% of the unit macros are \cs{let} to \cs{@empty}, and the \cs{tothe}
+% macro is set to gobble one argument, so that only other macros can 
+% give anything left in \cs{si@tempa}.
+%    \begin{macrocode}
+\newcommand*{\si@unit@in@process@if@TF}[1]{%
+  \begingroup
+    \si@loop@over@macro\si@unit@def@list\si@unit@in@process@aux
+    \let\raiseto\@gobble
+    \let\tothe\@gobble
+    \protected@edef\@tempa{#1}%
+  \expandafter\endgroup
+  \expandafter\def\expandafter\si@tempa\expandafter{\@tempa}%
+  \si@empty@if@TF\si@tempa
+}
+\newcommand*{\si@unit@in@process@aux}[1]{%
+  \si@clear@macro#1%
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Macro unit output}
@@ -5762,6 +5869,22 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@unit@out@unit@sep}
+%\begin{macro}{\si@unit@out@unit@space}
+% Storage for various options.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@unit@sep}{}
+\newcommand*{\si@unit@out@unit@space}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@out@literal}
+% A storage area used for literal printing.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@literal}{}
+%    \end{macrocode}
+%\end{macro}
 % 
 %    \begin{macrocode}
 \si@keys@family{units/output}
@@ -5769,10 +5892,62 @@ This work consists of the file  siunitx.dtx
   /siunitx/units/output,
   allow inter-unit breaks/.is siunitx switch  = {unit@out@break@unit},
   allow unit-number breaks/.is siunitx switch = {unit@out@break@num},
+  unit separator/.store in                    = \si@unit@out@unit@sep,
+  unit space/.store in                        = \si@unit@out@unit@space,
   allow inter-unit breaks  = false,
-  allow unit-number breaks = false
+  allow unit-number breaks = false,
+  unit separator           = {\,},
+  unit space               = ~
 }
 %    \end{macrocode}
+%    
+%\begin{macro}{\si@unit@out@literal@print}
+% When printing literal units, there is a little work to do sorting out
+% |~| and |.| characters at the outer level. Once that is done, the
+% standard printing routine can take over.
+%    \begin{macrocode}
+\si@catcode@set{46}{13}% .
+\si@catcode@set{38}{13}% &
+\newcommand*{\si@unit@out@literal@print}[1]{%
+  \def\si@unit@out@literal{#1}%
+  \si@unit@out@replace@fullstops\si@unit@out@literal
+  \si@unit@out@replace@tildes\si@unit@out@literal
+  \begingroup
+    \si@catcode@set{38}{13}% &
+    \si@catcode@set{126}{13}% ~
+    \def.{\si@unit@out@unit@sep}%
+    \def&{\si@unit@out@unit@space}%
+    \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
+    \si@print@unit@o{\si@unit@out@literal}%
+  \endgroup
+}
+\si@catcode@set{46}{12}% .
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@out@replace@fullstops}
+%\begin{macro}{\si@unit@out@replace@tildes}
+% Two replacement jobs are needed. In the case of fullstops, things are
+% quite obvious. Non-grouped fullstops are made active, so that they can 
+% be replaced by the appropriate macro. For tildes, things are slightly 
+% different. They will be active anyway (under normal circumstances), 
+% but the behaviour of the non-grouped ones should be different from any
+% within groups. So the outer level ones are replaced with an active |&|.
+%    \begin{macrocode}
+\si@lccode@set{38}{46}% & -> .
+\lowercase{%
+  \newcommand*{\si@unit@out@replace@fullstops}[1]{%
+    \si@replace@all@in#1{.}{&}%
+  }
+}
+\si@lccode@set{38}{0}% & -> &
+\newcommand*{\si@unit@out@replace@tildes}[1]{%
+  \si@replace@all@in#1{~}{&}%
+}
+\si@catcode@set{38}{4}% &
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %    
 %\subsection{Design-level macros}
 %
@@ -5928,6 +6103,7 @@ This work consists of the file  siunitx.dtx
 % All done: any odd category codes can be restored.   
 %    \begin{macrocode}
 \si@catcode@restore
+\si@lccode@restore
 %</package>
 %    \end{macrocode}    
 %
