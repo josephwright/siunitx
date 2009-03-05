@@ -1113,7 +1113,6 @@ This work consists of the file  siunitx.dtx
       \si@key@path/no/.code    = {\si@bool@cs@false{si@#1@bool}},
       \si@key@path/on/.code    = {\si@bool@cs@true{si@#1@bool}},
       \si@key@path/off/.code   = {\si@bool@cs@false{si@#1@bool}},
-      \si@key@path/true/.default
     }%
   }
 }
@@ -1750,6 +1749,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si@mode@maths@display@if@T}
 %\begin{macro}{\si@mode@maths@inline@if@T}
+%\begin{macro}{\si@mode@maths@if@TF}
 %\begin{macro}{\si@mode@text@if@T}
 % \LaTeX\ wrappers on some \TeX\ tests, slightly altered to help with 
 % the logical flow.
@@ -1776,6 +1776,13 @@ This work consists of the file  siunitx.dtx
     \expandafter\@gobble
   \fi
 }
+\newcommand*{\si@mode@maths@if@TF}{%
+  \ifmmode
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+}
 \newcommand*{\si@mode@text@if@T}{%
   \ifmmode
     \expandafter\@gobble
@@ -1784,6 +1791,7 @@ This work consists of the file  siunitx.dtx
   \fi
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -2559,15 +2567,14 @@ This work consists of the file  siunitx.dtx
 % The main printing function does everything inside a group, as 
 % there are category code and definition changes to make. First, there
 % is a check to see if the fonts have already been set. If not, it's
-% done now.  Things are then placed inside \cs{text} and passed through
-% to the next part of the system.
+% done now.  Things are then placed in text mode and sent on.
 %    \begin{macrocode}
 \newcommand*{\si@print}[2]{%
   \begingroup
+    \def\si@print@type{#1}%
     \si@bool@if@F\si@font@set@bool{%
       \si@font@det@set
     }%
-    \def\si@print@type{#1}%
     \si@bool@if@F\si@font@det@mode@bool{%
       \si@bool@cs@if@TF{si@font@#1@textmode@bool}{%
         \si@bool@true\si@font@set@text@bool
@@ -2612,7 +2619,6 @@ This work consists of the file  siunitx.dtx
   \si@catcode@symbols
   \si@catcode@set{94}{13}% ^
   \si@catcode@set{95}{13}% _
-  \endlinechar\m@ne\relax
   \everyeof{\noexpand}%
   \si@bool@if@TF\si@font@set@text@bool{%
     \si@catcode@set{45}{13}% -
@@ -3370,7 +3376,6 @@ This work consists of the file  siunitx.dtx
     \si@catcode@set{32}{9}%  space ignored
     \si@catcode@set{126}{9}% tilde ignored
     \everyeof{\noexpand}%
-    \endlinechar\m@ne\relax
     \si@clear@macro{\,}%
     \si@num@in@protect@tokens
     \protected@edef\@tempa{\scantokens{#1}}%
@@ -5897,6 +5902,34 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{units/output}
 \pgfkeys{
   /siunitx/units/output,
+  allow breaks/.is choice,
+  allow breaks/.default = on,
+  allow breaks/.cd,
+    true/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = true,
+      /siunitx/units/output/allow unit-number breaks = true,
+    },
+    false/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = false,
+      /siunitx/units/output/allow unit-number breaks = false,
+    },
+    yes/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = true,
+      /siunitx/units/output/allow unit-number breaks = true,
+    },
+    no/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = false,
+      /siunitx/units/output/allow unit-number breaks = false,
+    },
+    on/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = true,
+      /siunitx/units/output/allow unit-number breaks = true,
+    },
+    off/.style  = {
+      /siunitx/units/output/allow inter-unit breaks  = false,
+      /siunitx/units/output/allow unit-number breaks = false,
+    },
+  /siunitx/units/output/.cd,
   allow inter-unit breaks/.is siunitx switch  = {unit@out@break@unit},
   allow unit-number breaks/.is siunitx switch = {unit@out@break@num},
   unit separator/.store in                    = \si@unit@out@unit@sep,
@@ -5926,6 +5959,7 @@ This work consists of the file  siunitx.dtx
     \let&\si@unit@out@unit@space@breakable
     \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
     \si@print@unit@o{\si@unit@out@literal}%
+    \show\si@unit@out@literal
   \endgroup
 }
 \si@catcode@set{46}{12}% .
@@ -5962,20 +5996,20 @@ This work consists of the file  siunitx.dtx
 % achieved here.
 %    \begin{macrocode}
 \newcommand*{\si@unit@out@unit@sep@breakable}{%
-  \si@bool@if@TF\si@unit@out@break@unit@bool{%
-    \allobreak
-  }{%
-    \nobreak
+  \ensuremath{%
+    \si@bool@if@T\si@unit@out@break@unit@bool{%
+      \allowbreak
+    }%
+    \si@unit@out@unit@sep
   }%
-  \si@unit@out@unit@sep
 }
 \newcommand*{\si@unit@out@unit@space@breakable}{%
-  \si@bool@if@TF\si@unit@out@break@unit@bool{%
-    \allobreak
-  }{%
-    \nobreak
+  \ensuremath{%
+    \si@bool@if@T\si@unit@out@break@unit@bool{%
+      \allowbreak
+    }%
+    \si@unit@out@unit@space
   }%
-  \si@unit@out@unit@space
 }
 %    \end{macrocode}
 %\end{macro}
