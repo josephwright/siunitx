@@ -2675,13 +2675,17 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %    
 %\begin{macro}{\si@print@minus}
+%\begin{macro}{\si@print@minus@symbol}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}.
 %    \begin{macrocode}
-\newcommand*{\si@print@minus}{}
-\DeclareTextSymbolDefault{\si@print@minus}{TS1}
-\DeclareTextSymbol{\si@print@minus}{TS1}{61}
+\newcommand*{\si@print@minus}{%
+  \text{\si@print@minus@symbol}%
+}
+\DeclareTextSymbolDefault{\si@print@minus@symbol}{TS1}
+\DeclareTextSymbol{\si@print@minus@symbol}{TS1}{61}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si@print@sb}
@@ -5936,8 +5940,8 @@ This work consists of the file  siunitx.dtx
   unit space/.store in                        = \si@unit@out@unit@space,
   allow inter-unit breaks  = false,
   allow unit-number breaks = false,
-  unit separator           = {\,},
-  unit space               = ~
+  unit separator           = \,,
+  unit space               = \,
 }
 %    \end{macrocode}
 %    
@@ -5955,8 +5959,8 @@ This work consists of the file  siunitx.dtx
   \begingroup
     \si@catcode@set{38}{13}% &
     \si@catcode@set{126}{13}% ~
-    \let.\si@unit@out@unit@sep@breakable
-    \let&\si@unit@out@unit@space@breakable
+    \let.\si@unit@out@unit@sep
+    \let&\si@unit@out@unit@space
     \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
     \si@print@unit@o{\si@unit@out@literal}%
     \show\si@unit@out@literal
@@ -5990,31 +5994,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\si@unit@out@unit@sep@breakable}
-%\begin{macro}{\si@unit@out@unit@space@breakable}
-% The inter-unit separator (or space) may need to be breakable. This is
-% achieved here.
-%    \begin{macrocode}
-\newcommand*{\si@unit@out@unit@sep@breakable}{%
-  \ensuremath{%
-    \si@bool@if@T\si@unit@out@break@unit@bool{%
-      \allowbreak
-    }%
-    \si@unit@out@unit@sep
-  }%
-}
-\newcommand*{\si@unit@out@unit@space@breakable}{%
-  \ensuremath{%
-    \si@bool@if@T\si@unit@out@break@unit@bool{%
-      \allowbreak
-    }%
-    \si@unit@out@unit@space
-  }%
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%    
 %\subsection{Design-level macros}
 %
 % The macros for creating units and so on are in ``design'' name-space.
