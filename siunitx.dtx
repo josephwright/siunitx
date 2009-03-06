@@ -97,7 +97,7 @@ This work consists of the file  siunitx.dtx
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{siunitx}
-  [2009/02/22 v2.0alpha A comprehensive (SI) units package]
+  [2009/03/06 v2.0alpha A comprehensive (SI) units package]
 %</package>
 %<*driver>
 \documentclass[full]{l3doc}
@@ -112,7 +112,6 @@ This work consists of the file  siunitx.dtx
 \CodelineIndex
 \RecordChanges
 \usepackage{\jobname}
-\AtBeginDocument{\AlsoImplementation}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -220,7 +219,9 @@ This work consists of the file  siunitx.dtx
 %\changes{v1.0}{2008/06/15}{First official release}
 %\changes{v1.1}{2008/09/28}{Package extended to a greater range of unit
 %  types}
-%\changes{v2.0}{2008/02/07}{Complete re-write of package to add many new
+%\changes{v1.2}{2009/01/22}{Correct handling for ranges of numbers 
+%  added}
+%\changes{v2.0}{2008/03/06}{Complete re-write of package to add many new
 %  features}
 %
 %\begin{abstract}
@@ -1749,8 +1750,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\si@mode@maths@display@if@T}
 %\begin{macro}{\si@mode@maths@inline@if@T}
+%\begin{macro}{\si@mode@maths@if@F}
 %\begin{macro}{\si@mode@maths@if@TF}
-%\begin{macro}{\si@mode@text@if@T}
 % \LaTeX\ wrappers on some \TeX\ tests, slightly altered to help with 
 % the logical flow.
 %    \begin{macrocode}
@@ -1776,18 +1777,18 @@ This work consists of the file  siunitx.dtx
     \expandafter\@gobble
   \fi
 }
+\newcommand*{\si@mode@maths@if@F}{%
+  \ifmmode
+    \expandafter\@gobble
+  \else
+    \expandafter\@firstofone
+  \fi
+}
 \newcommand*{\si@mode@maths@if@TF}{%
   \ifmmode
     \expandafter\@firstoftwo
   \else
     \expandafter\@secondoftwo
-  \fi
-}
-\newcommand*{\si@mode@text@if@T}{%
-  \ifmmode
-    \expandafter\@gobble
-  \else
-    \expandafter\@firstofone
   \fi
 }
 %    \end{macrocode}
@@ -2296,7 +2297,7 @@ This work consists of the file  siunitx.dtx
       \si@font@det@bold@text
     }%
   }%
-  \si@mode@text@if@T{%
+  \si@mode@maths@if@F{%
     \si@font@det@bold@text
   }%
 }
@@ -5624,14 +5625,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@unit@def@power@list}
 %\begin{macro}{\si@unit@def@qual@list}
 %\begin{macro}{\si@unit@def@unit@list}
-% Lists of each type of definition, and a master list. The master list
-% always contains the two special functions \cs{per} and \cs{tothe}.
+% Lists of each type of definition, and a master list.
 %    \begin{macrocode}
-\newcommand*{\si@unit@def@list}{%
-  \per
-  \raiseto
-  \tothe
-}
+\newcommand*{\si@unit@def@list}{}
 \newcommand*{\si@unit@def@prefix@list}{}
 \newcommand*{\si@unit@def@power@list}{}
 \newcommand*{\si@unit@def@qual@list}{}
@@ -5650,11 +5646,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@list@combine}{%
   \si@expand@tlist\si@unit@def@list{%
-    \si@unit@def@list
     \si@unit@def@power@list
     \si@unit@def@prefix@list
     \si@unit@def@qual@list
     \si@unit@def@unit@list
+  }%
+  \si@add@right@n\si@unit@def@list{%
+    \per
+    \raiseto
+    \tothe
   }%
 }
 \AtBeginDocument{\si@unit@def@list@combine}
@@ -5713,7 +5713,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%\section{Creating body unit macros}
+%\subsection{Creating body unit macros}
 %
 % The user might have asked for the unit macros to be available in the
 % document body. If so, then these are created at the start of the 
@@ -5963,7 +5963,6 @@ This work consists of the file  siunitx.dtx
     \let&\si@unit@out@unit@space
     \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
     \si@print@unit@o{\si@unit@out@literal}%
-    \show\si@unit@out@literal
   \endgroup
 }
 \si@catcode@set{46}{12}% .
@@ -5990,6 +5989,243 @@ This work consists of the file  siunitx.dtx
   \si@replace@all@in#1{~}{&}%
 }
 \si@catcode@set{38}{4}% &
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Symbols}
+%
+% Not all units use letters alone for their symbol. This raises two 
+% problems. First, the symbols need to work in maths and in text mode.
+% Second, the user needs to be able to adjust each symbol.
+% 
+%\begin{macro}{\si@symbol@redefine@bool}
+% A flag for redefining symbols.
+%    \begin{macrocode}
+\si@bool@new\si@symbol@redefine@bool
+%    \end{macrocode}
+%\end{macro} 
+ 
+% There is one option which apply to symbols in general.
+%    \begin{macrocode}
+\si@keys@family{symbols}
+\pgfkeys{
+  /siunitx/symbols,
+  redefine symbols/.is siunitx switch = {symbol@redefine},
+  redefine symbols = false
+}
+%    \end{macrocode}
+%    
+%\begin{macro}{\si@symbols@redefine}
+% The redefinition of symbols has to do a number of checks to ensure
+% that there are no clashes.
+%    \begin{macrocode}
+\newcommand*{\si@symbol@redefine}{%
+  \si@bool@if@T\si@symbol@redefine@bool{%
+    \@ifpackageloaded{textcomp}{%
+      \sisetup{
+        symbols/maths/degree = \text{\textdegree},
+        symbols/text/degree  = \textdegree
+      }%
+      \@ifpackageloaded{mathptmx}{}{%
+        \sisetup{
+          symbols/text/micro = \textmu,
+          symbols/text/ohm   = \textomega
+        }%
+      }%
+      \def\si@tempa{OT1}%
+      \si@meaning@eq@if@T\si@tempa\encodingdefault{%
+        \sisetup{
+          symbols/maths/angstrom = \text{\capitalring{A}},
+          symbols/text/angstrom  = \capitalring{A}
+        }%
+      }%
+    }{}%
+    \@ifpackageloaded{upgreek}{%
+      \sisetup{
+        symbols/maths/ohm = \Upomega
+      }
+    }{}%
+  }%
+}
+\AtBeginDocument{\si@symbol@redefine}
+%    \end{macrocode}
+%\end{macro}
+% 
+%\begin{macro}{\si@symbol@maths@angstrom}
+%\begin{macro}{\si@symbol@maths@arcminute}
+%\begin{macro}{\si@symbol@maths@arcsecond}
+%\begin{macro}{\si@symbol@maths@celsius}
+%\begin{macro}{\si@symbol@maths@degree}
+%\begin{macro}{\si@symbol@maths@micro}
+%\begin{macro}{\si@symbol@maths@ohm}
+% The storage macros are created for symbols: first for maths mode.
+%    \begin{macrocode}
+\newcommand*{\si@symbol@maths@angstrom}{}
+\newcommand*{\si@symbol@maths@arcminute}{}
+\newcommand*{\si@symbol@maths@arcsecond}{}
+\newcommand*{\si@symbol@maths@celsius}{}
+\newcommand*{\si@symbol@maths@degree}{}
+\newcommand*{\si@symbol@maths@micro}{}
+\newcommand*{\si@symbol@maths@ohm}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%%\begin{macro}{\si@symbol@text@angstrom}
+%\begin{macro}{\si@symbol@text@arcminute}
+%\begin{macro}{\si@symbol@text@arcsecond}
+%\begin{macro}{\si@symbol@text@celsius}
+%\begin{macro}{\si@symbol@text@degree}
+%\begin{macro}{\si@symbol@text@micro}
+%\begin{macro}{\si@symbol@text@ohm}
+% Then for text mode.
+%    \begin{macrocode}
+\newcommand*{\si@symbol@text@angstrom}{}
+\newcommand*{\si@symbol@text@arcminute}{}
+\newcommand*{\si@symbol@text@arcsecond}{}
+\newcommand*{\si@symbol@text@celsius}{}
+\newcommand*{\si@symbol@text@degree}{}
+\newcommand*{\si@symbol@text@micro}{}
+\newcommand*{\si@symbol@text@ohm}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+% The symbol storage macros are created separately for maths and text
+% mode, although this is all pretty similar. The default definitions use
+% what is generally available, except for those for micro, where 
+% Computer Modern does not have the appropriate symbol at all. For the 
+% maths mode omega option, the |\text{\ensuremath{...}}| construction
+% deals with the case where \cs{mathnormal} has the wrong symbol.
+%    \begin{macrocode}
+\si@keys@family{symbols/maths}
+\pgfkeys{
+  /siunitx/symbols/maths,
+  angstrom/.store in  = \si@symbol@maths@angstrom,
+  arcminute/.store in = \si@symbol@maths@arcminute,
+  arcsecond/.store in = \si@symbol@maths@arcsecond,
+  celsius/.store in   = \si@symbol@maths@celsius,
+  degree/.store in    = \si@symbol@maths@degree,
+  micro/.store in     = \si@symbol@maths@micro,
+  ohm/.store in       = \si@symbol@maths@ohm,
+  angstrom  = \text{\AA},
+  arcminute = {}^{\prime},
+  arcsecond = {}^{\prime\prime},
+  celsius   = {}^{\circ}\kern-\scriptspace C,
+  degree    = {}^{\circ},
+  micro     = \si@symbol@maths@mu,
+  ohm       = \text{\ensuremath{\Omega}}
+}
+\si@keys@family{symbols/math}
+\pgfkeys{
+  /siunitx/symbols/math,
+  angstrom/.store in  = \si@symbol@maths@angstrom,
+  arcminute/.store in = \si@symbol@maths@arcminute,
+  arcsecond/.store in = \si@symbol@maths@arcsecond,
+  celsius/.store in   = \si@symbol@maths@celsius,
+  degree/.store in    = \si@symbol@maths@degree,
+  micro/.store in     = \si@symbol@maths@micro,
+  ohm/.store in       = \si@symbol@maths@ohm,
+}
+\si@keys@family{symbols/text}
+\pgfkeys{
+  /siunitx/symbols/text,
+  angstrom/.store in  = \si@symbol@text@angstrom,
+  arcminute/.store in = \si@symbol@text@arcminute,
+  arcsecond/.store in = \si@symbol@text@arcsecond,
+  celsius/.store in   = \si@symbol@text@celsius,
+  degree/.store in    = \si@symbol@text@degree,
+  micro/.store in     = \si@symbol@text@micro,
+  ohm/.store in       = \si@symbol@text@ohm,
+  angstrom  = \AA,
+  arcminute = \ensuremath{{}^{\prime}},
+  arcsecond = \ensuremath{{}^{\prime\prime}},
+  celsius   = \ensuremath{{}^{\circ}}\kern-\scriptspace C,
+  degree    = \ensuremath{{}^{\circ}},
+  micro     = \si@symbol@text@mu,
+  ohm       = \ensuremath{\Omega}
+}
+%    \end{macrocode}
+%
+%\begin{macro}{\si@symbol@new}
+% For creating the outer symbol macro.
+%    \begin{macrocode}
+\newcommand*{\si@symbol@new}[1]{%
+  \expandafter\si@newcommand\expandafter*\expandafter{%
+    \csname si@symbol@#1\endcsname
+  }{%
+    \si@mode@maths@if@TF{%
+      \@nameuse{si@symbol@maths@#1}%
+    }{%
+      \@nameuse{si@symbol@text@#1}%
+    }%
+  }%
+}
+%    \end{macrocode}
+%\end{macro} 
+%\begin{macro}{\si@symbol@angstrom}
+%\begin{macro}{\si@symbol@arcminute}
+%\begin{macro}{\si@symbol@arcsecond}
+%\begin{macro}{\si@symbol@celsius}
+%\begin{macro}{\si@symbol@degree}
+%\begin{macro}{\si@symbol@micro}
+%\begin{macro}{\si@symbol@ohm}
+% The wrapper macros are created.
+%    \begin{macrocode}
+\si@symbol@new{angstrom}
+\si@symbol@new{arcminute}
+\si@symbol@new{arcsecond}
+\si@symbol@new{celsius}
+\si@symbol@new{degree}
+\si@symbol@new{micro}
+\si@symbol@new{ohm}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@symbol@text@mu}
+% The lack of an upright mu has to be sorted out by hand: text mode is
+% relatively easy as there is no limit on the number of fonts.
+%    \begin{macrocode}
+\DeclareFontEncoding{TS1}{}{}
+\DeclareFontSubstitution{TS1}{cmr}{m}{n}
+\DeclareTextSymbol{\si@symbol@text@mu}{TS1}{181}
+\DeclareTextSymbolDefault{\si@symbol@text@mu}{TS1}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@symbol@check@upgreek}
+%\begin{macro}{\si@symbol@maths@mu}
+% For maths mode, there is more work to do. The definition here is 
+% taken from the \pkg{upgreek} package, but is only implemented if
+% the later is not loaded.
+%    \begin{macrocode}
+\newcommand*{\si@symbol@check@upgreek}{%
+  \@ifpackageloaded{upgreek}{%
+    \let\si@symbol@maths@mu\upmu
+  }{%
+    \DeclareFontFamily{OML}{eur}{\skewchar\font127}%
+    \DeclareFontShape{OML}{eur}{m}{n}%
+      {<-6> eurm5 <6-8> eurm7 <8-> eurm10}{}%
+    \DeclareSymbolFont{si@symbol}{OML}{eur}{m}{n}%
+    \DeclareMathSymbol{\si@symbol@maths@mu}{\mathord}{si@symbol}{22}%
+  }%
+}
+\AtBeginDocument{\si@symbol@check@upgreek}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -6097,7 +6333,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\subsection{Core physical units}
+%\subsection{Physical units}
 %
 %\begin{macro}{\kilogram}
 %\begin{macro}{\metre}
@@ -6110,7 +6346,7 @@ This work consists of the file  siunitx.dtx
 % The basic SI units are always defined, including both variants for
 % metre.
 %    \begin{macrocode}
-\DeclareSIUnit{\kilogram}{kg}
+\DeclareSIUnit{\kilogram}{\kilo\gram}
 \DeclareSIUnit{\metre}{m}
 \DeclareSIUnit{\meter}{\metre}
 \DeclareSIUnit{\mole}{mol}
@@ -6127,6 +6363,218 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\gram}
+% The gram is an odd unit as it is needed for the base unit kilogram.
+%    \begin{macrocode}
+\DeclareSIUnit{\gram}{g}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\yocto}
+%\begin{macro}{\zepto}
+%\begin{macro}{\atto}
+%\begin{macro}{\femto}
+%\begin{macro}{\pico}
+%\begin{macro}{\nano}
+%\begin{macro}{\micro}
+%\begin{macro}{\milli}
+%\begin{macro}{\centi}
+%\begin{macro}{\deci}
+% The various SI multiple prefixes are defined here: first the small 
+% ones. 
+%    \begin{macrocode}
+\DeclareSIPrefix{\yocto}{y}{-24}
+\DeclareSIPrefix{\zepto}{z}{-21}
+\DeclareSIPrefix{\atto}{a}{-18}
+\DeclareSIPrefix{\femto}{f}{-15}
+\DeclareSIPrefix{\pico}{p}{-12}
+\DeclareSIPrefix{\nano}{n}{-9}
+\DeclareSIPrefix{\micro}{\si@symbol@micro}{-6}
+\DeclareSIPrefix{\milli}{m}{-3}
+\DeclareSIPrefix{\centi}{c}{-2}
+\DeclareSIPrefix{\deci}{d}{-1}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\deca}
+%\begin{macro}{\deka}
+%\begin{macro}{\hecto}
+%\begin{macro}{\kilo}
+%\begin{macro}{\mega}
+%\begin{macro}{\giga}
+%\begin{macro}{\tera}
+%\begin{macro}{\peta}
+%\begin{macro}{\exa}
+%\begin{macro}{\zetta}
+%\begin{macro}{\yotta}
+% Now the large ones.
+%    \begin{macrocode}
+\DeclareSIPrefix{\deca}{da}{1}
+\DeclareSIPrefix{\deka}{da}{1}
+\DeclareSIPrefix{\hecto}{h}{2}
+\DeclareSIPrefix{\kilo}{k}{3}
+\DeclareSIPrefix{\mega}{M}{6}
+\DeclareSIPrefix{\giga}{G}{9}
+\DeclareSIPrefix{\tera}{T}{12}
+\DeclareSIPrefix{\peta}{P}{15}
+\DeclareSIPrefix{\exa}{E}{18}
+\DeclareSIPrefix{\zetta}{Z}{21}
+\DeclareSIPrefix{\yotta}{Y}{24}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\becquerel}
+%\begin{macro}{\celsius}
+%\begin{macro}{\coulomb}
+%\begin{macro}{\farad}
+%\begin{macro}{\gray}
+%\begin{macro}{\hertz}
+%\begin{macro}{\henry}
+%\begin{macro}{\joule}
+%\begin{macro}{\katal}
+%\begin{macro}{\lumen}
+%\begin{macro}{\lux}
+%\begin{macro}{\newton}
+%\begin{macro}{\ohm}
+%\begin{macro}{\pascal}
+%\begin{macro}{\radian}
+%\begin{macro}{\siemens}
+%\begin{macro}{\sievert}
+%\begin{macro}{\steradian}
+%\begin{macro}{\tesla}
+%\begin{macro}{\volt}
+%\begin{macro}{\watt}
+%\begin{macro}{\weber}
+% A number of derived units with defined names and symbols.
+%    \begin{macrocode}
+\DeclareSIUnit{\becquerel}{Bq}
+\DeclareSIUnit{\celsius}{\si@symbol@celsius}
+\DeclareSIUnit{\coulomb}{C}
+\DeclareSIUnit{\farad}{F}
+\DeclareSIUnit{\gray}{Gy}
+\DeclareSIUnit{\hertz}{Hz}
+\DeclareSIUnit{\henry}{H}
+\DeclareSIUnit{\joule}{J}
+\DeclareSIUnit{\katal}{kat}
+\DeclareSIUnit{\lumen}{lm}
+\DeclareSIUnit{\lux}{lx}
+\DeclareSIUnit{\newton}{N}
+\DeclareSIUnit{\ohm}{\si@symbol@ohm}
+\DeclareSIUnit{\pascal}{Pa}
+\DeclareSIUnit{\radian}{rad}
+\DeclareSIUnit{\siemens}{S}
+\DeclareSIUnit{\sievert}{Sv}
+\DeclareSIUnit{\steradian}{sr}
+\DeclareSIUnit{\tesla}{T}
+\DeclareSIUnit{\volt}{V}
+\DeclareSIUnit{\watt}{W}
+\DeclareSIUnit{\weber}{Wb}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\arcmin}
+%\begin{macro}{\arcminute}
+%\begin{macro}{\arcsec}
+%\begin{macro}{\arcsecond}
+%\begin{macro}{\bel}
+%\begin{macro}{\day}
+%\begin{macro}{\degree}
+%\begin{macro}{\hour}
+%\begin{macro}{\litre}
+%\begin{macro}{\liter}
+%\begin{macro}{\minute}
+%\begin{macro}{\neper}
+%\begin{macro}{\percent}
+%\begin{macro}{\tonne}
+% There are then some day-to-day units which are accepted for use
+% with SI, but are not part of the official specification.
+%    \begin{macrocode}
+\DeclareSIUnit[valuesep=none]{\arcmin}{\arcminute} % TEMP
+\DeclareSIUnit[valuesep=none]{\arcminute}{\si@symbol@arcminute} % TEMP
+\DeclareSIUnit[valuesep=none]{\arcsec}{\arcsecond} % TEMP
+\DeclareSIUnit[valuesep=none]{\arcsecond}{\si@symbol@arcsecond} % TEMP
+\DeclareSIUnit{\bel}{B}
+\DeclareSIUnit{\day}{d}
+\DeclareSIUnit[valuesep=none]{\degree}{\si@symbol@degree} % TEMP
+\DeclareSIUnit{\hour}{h}
+\DeclareSIUnit{\litre}{l}
+\DeclareSIUnit{\liter}{L}
+\DeclareSIUnit{\minute}{min}
+\DeclareSIUnit{\neper}{Np}
+\DeclareSIUnit{\percent}{\char37}
+\DeclareSIUnit{\tonne}{t}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}  
+%
+%\begin{macro}{\electronvolt}
+%\begin{macro}{\atomicmass}
+%\begin{macro}{\atomicmassunit}
+%\begin{macro}{\dalton}
+% A few units based on physical measurements exist.  
+%    \begin{macrocode}
+\DeclareSIUnit{\electronvolt}{eV}
+\DeclareSIUnit{\atomicmass}{\atomicmassunit}
+\DeclareSIUnit{\atomicmassunit}{u}
+\DeclareSIUnit{\dalton}{Da}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\square}
 %\begin{macro}{\squared}
 %\begin{macro}{\cubic}
@@ -6145,7 +6593,7 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Finalisation}
 %
-% All done: any odd category codes can be restored.   
+% All done: any odd codes can be restored.   
 %    \begin{macrocode}
 \si@catcode@restore
 \si@lccode@restore
