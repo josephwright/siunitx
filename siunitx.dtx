@@ -150,9 +150,11 @@ This work consists of the file  siunitx.dtx
 %    keywordstyle = \color{blue},
 %    language     = [LaTeX]{TeX},
 %    moretexcs    = {
+%      mathnormal,
 %      num,
 %      SI,
 %      sisetup,
+%      text,
 %    }
 %  }^^A 
 %}
@@ -827,7 +829,7 @@ This work consists of the file  siunitx.dtx
 %  \num{1234} \\
 %  \num[numbers/output/group four digits = on]{1234} \\
 %  \num{12345} \\
-%  \num[numbers/output/group separator = {,}]{12345} \\
+%  \num[numbers/output/group separator = {{{,}}}]{12345} \\
 %  \num[numbers/output/group separator = \text{~}]{12345} 
 %\end{LaTeXdemo} 
 %
@@ -837,13 +839,12 @@ This work consists of the file  siunitx.dtx
 % marker} option. This can differ from the input marker, as can the root
 % of $\sqrt{-1}$, which is stored in the \option{complex root} option.
 % The later is always in maths mode, but notice that \pkg{siunitx}
-% uses \cs{mathrm} by default.  Thus an italic $i$ is obtained by
-% forcing \cs{mathnormal}.
+% uses \cs{mathrm} by default.  To force standard \TeX\ maths output to
+% give $i$, the construction |\text{\ensuremath{i}}| can be used.
 %\begin{LaTeXdemo}
 %  \num{1.23} \\
-%  \num[numbers/output/decimal marker = {,}]{1.23} \\
-%  \num{1+2i} \\
-%  \num[numbers/output/complex root = \mathnormal{i}]{1+2i}
+%  \num[numbers/output/decimal marker = {{{,}}}]{1.23} \\
+%  \num[numbers/output/complex root = \text{\ensuremath{i}}]{1+2i}
 %\end{LaTeXdemo} 
 %
 %\DescribeOption{numbers/output/exponent base}
@@ -910,6 +911,36 @@ This work consists of the file  siunitx.dtx
 %  \num[numbers/output/tight spacing = true]{1\pm2i e3} \\
 %\end{LaTeXdemo}
 % 
+%\section{Usage tips and known issues} 
+% 
+%\subsection{Ensuring text or maths output}
+%
+% The macros \cs{ensuremath} and \cs{text} should be used to ensure that
+% a particular item is always printed in the desired mode. Some 
+% mathematical output does not work well in \cs{mathrm} (the standard
+% font used by \pkg{siunitx} for printing). The easiest way to solve
+% this is to use the construction |\text{\ensuremath{...}}|, which will
+% print the material in the standard mathematics font without affecting
+% the rest of the output.
+%\begin{LaTeXdemo}
+%  \num[numbers/output/complex root = i]{1+2i} \\
+%  \num[numbers/output/complex root = \ensuremath{i}]{1+2i} \\
+%  \num[numbers/output/complex root = \text{\ensuremath{i}}]{1+2i}
+%\end{LaTeXdemo}  
+% In some circumstances, forcing \cs{mathnormal} may suffice, but this
+% deals less well with non-Latin characters.
+% 
+%\subsection{Using a comma as a separator}
+%
+% The use of a comma as a group separator or decimal marker is common in
+% many parts of the world. This is easily achieved in \pkg{siunitx}, but 
+% does require three sets of braces in the option to give the normal
+% spacing.
+%\begin{LaTeXdemo}
+%  \num[numbers/output/decimal marker = {,}]{1.23} \\     % Wrong
+%  \num[numbers/output/decimal marker = {{,}}]{1.23} \\   % Wrong
+%  \num[numbers/output/decimal marker = {{{,}}}]{1.23} \\ % Correct
+%\end{LaTeXdemo} 
 %
 %\StopEventually{^^A
 %  \PrintChanges
