@@ -524,7 +524,7 @@ This work consists of the file  siunitx.dtx
 %    font/detect/all,
 %    font/detect/display maths = true
 %  }
-%  \[ x = \SI{1.2e3}{\kg\kelvin\candela} \]
+%  \[ x = \SI{1.2e3}{\kilogram\kelvin\candela} \]
 %  More text
 %  \sisetup{font/detect/display maths = false}
 %  \[ y = \SI{3}{\metre\second\mole} \]
@@ -1898,7 +1898,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\si@no@value@if@aux@ii}
 %\begin{macro}[aux]{\si@no@value@if@aux@iii}
 %\begin{macro}[aux]{\si@no@value@if@aux@iv}
-% Empty value tests: a bit complicated. See \textsf{l3basics} for an
+% Empty value tests: a bit complicated. See \pkg{l3basics} for an
 % explanation of how this works (very clever).
 %    \begin{macrocode}
 \newcommand*{\si@no@value}{\si@no@value}
@@ -2587,7 +2587,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@print@type}
 % The type of output (\texttt{num} or \texttt{unit}) is always needed.
 %    \begin{macrocode}
-\newcommand*{\si@print@type}{unit}
+\newcommand*{\si@print@type}{}
 %    \end{macrocode}
 %\end{macro}
 % 
@@ -5909,12 +5909,9 @@ This work consists of the file  siunitx.dtx
 %\subsection{Macro unit output}
 %
 %\begin{macro}{\si@unit@out@break@num@bool}
-%\begin{macro}{\si@unit@out@break@unit@bool}
 %    \begin{macrocode}
 \si@bool@new\si@unit@out@break@num@bool
-\si@bool@new\si@unit@out@break@unit@bool
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\begin{macro}{\si@unit@out@unit@sep}
 %\begin{macro}{\si@unit@out@unit@space}
@@ -5937,42 +5934,12 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{units/output}
 \pgfkeys{
   /siunitx/units/output,
-  allow breaks/.is choice,
-  allow breaks/.default = on,
-  allow breaks/.cd,
-    true/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = true,
-      /siunitx/units/output/allow unit-number breaks = true,
-    },
-    false/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = false,
-      /siunitx/units/output/allow unit-number breaks = false,
-    },
-    yes/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = true,
-      /siunitx/units/output/allow unit-number breaks = true,
-    },
-    no/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = false,
-      /siunitx/units/output/allow unit-number breaks = false,
-    },
-    on/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = true,
-      /siunitx/units/output/allow unit-number breaks = true,
-    },
-    off/.style  = {
-      /siunitx/units/output/allow inter-unit breaks  = false,
-      /siunitx/units/output/allow unit-number breaks = false,
-    },
-  /siunitx/units/output/.cd,
-  allow inter-unit breaks/.is siunitx switch  = {unit@out@break@unit},
   allow unit-number breaks/.is siunitx switch = {unit@out@break@num},
-  unit separator/.store in                    = \si@unit@out@unit@sep,
-  unit space/.store in                        = \si@unit@out@unit@space,
-  allow inter-unit breaks  = false,
+  inter-unit separator/.store in              = \si@unit@out@unit@sep,
+  inter-unit space/.store in                  = \si@unit@out@unit@space,
   allow unit-number breaks = false,
-  unit separator           = \,,
-  unit space               = \,
+  inter-unit separator     = \,,
+  inter-unit space         = \,
 }
 %    \end{macrocode}
 %    
@@ -6349,6 +6316,7 @@ This work consists of the file  siunitx.dtx
   \begingroup
     \sisetup{#1}%
     \num{#2}%
+    \si@unit@in@parse{#3}%
   \endgroup
 }
 %    \end{macrocode}
@@ -6359,6 +6327,7 @@ This work consists of the file  siunitx.dtx
 \si@newcommand*{\si}[2][]{% TEMP
   \begingroup
     \sisetup{#1}%
+    \si@unit@in@parse{#2}%
   \endgroup
 }
 %    \end{macrocode}
@@ -6412,7 +6381,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\milli}
 %\begin{macro}{\centi}
 %\begin{macro}{\deci}
-% The various SI multiple prefixes are defined here: first the small 
+% The various SI multiple prefixes are defined here: first the small
 % ones. 
 %    \begin{macrocode}
 \DeclareSIPrefix{\yocto}{y}{-24}
