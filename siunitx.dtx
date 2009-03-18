@@ -37,7 +37,10 @@ numprint packages
 %</readme>
 %<*internal>
 \fi
-\begingroup
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
 %</internal>
 %<*install>
 \input docstrip.tex
@@ -90,7 +93,11 @@ This work consists of the file  siunitx.dtx
 \generate{
   \file{README.txt}{\from{\jobname.dtx}{readme}}
 }
-\endgroup
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
 \immediate\write18{makeindex -s gglo.ist -o siunitx.gls siunitx.glo}
 \immediate\write18{makeindex -s l3doc.ist -o siunitx.ind siunitx.idx}
 %</internal>
@@ -5647,9 +5654,9 @@ This work consists of the file  siunitx.dtx
 %\subsection{Creating unit macros}
 %
 % Unit macros and related support are created here. To avoid cluttering
-% up the user name-space with a lot of short macro names, the 
-% standard method only makes these available inside the unit-processing
-% functions (\cs{SI}, \cs{si} and the \texttt{S} column).
+% up the user name-space with a lot of short macro names, the standard
+% method only makes these available inside the unit-processing functions
+% (\cs{SI}, \cs{si} and the \texttt{S} column).
 %
 %\begin{macro}{\si@unit@def@list}
 %\begin{macro}{\si@unit@def@prefix@list}
@@ -5699,6 +5706,8 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
   \@namedef{si@unit@power@\string#1}{#2}%
+  \@namedef{si@unit@macro@\string#1}{%
+  }%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
   \si@unit@def@power{#1}{#2}%
@@ -5714,7 +5723,8 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@prefix@list{#1}%
   \@namedef{si@unit@literal@\string#1}{#2}%
   \@namedef{si@unit@symbol@\string#1}{#2}%
-  \@namedef{si@unit@power@\string#1}{#3}%
+  \@namedef{si@unit@macro@\string#1}{%
+  }%
 }
 \newcommand*{\si@unit@def@prefix@binary}[1]{%
   \si@unit@def@prefix{#1}%
@@ -5729,6 +5739,8 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@qual@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\text{ }(#2)}%
   \@namedef{si@unit@symbol@\string#1}{#2}%
+  \@namedef{si@unit@macro@\string#1}{%
+  }%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5740,6 +5752,8 @@ This work consists of the file  siunitx.dtx
   \@namedef{si@unit@options@\string#1}{#2}%
   \@namedef{si@unit@literal@\string#1}{#3}%
   \@namedef{si@unit@symbol@\string#1}{#3}%
+  \@namedef{si@unit@macro@\string#1}{%
+  }%
 }
 %    \end{macrocode}
 %\end{macro} 
