@@ -104,7 +104,7 @@ This work consists of the file  siunitx.dtx
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{siunitx}
-  [2009/03/06 v2.0alpha A comprehensive (SI) units package]
+  [2009/03/19 v2.0alpha A comprehensive (SI) units package]
 %</package>
 %<*driver>
 \documentclass[full]{l3doc}
@@ -5886,55 +5886,23 @@ This work consists of the file  siunitx.dtx
 %
 % A couple of unit functions need definitions
 %
-%\subsection{Unit processing}
+%\subsection{Initial unit processing}
 %
 % The unit processor has to convert the input (which may be all macros
-% or may contain literal input) into formatted text for output. As with 
-% the number processor, this is done separately from the printing 
-% routine.
+% or may contain literal input) into formatted text for output.  The 
+% input part of the process is used to sort out parsed or literal units.
 % 
 %\begin{macro}{\si@unit@in@parse}
 %    \begin{macrocode}
 \newcommand*{\si@unit@in@parse}[1]{%
   \si@unit@in@process@if@TF{#1}{%
-    \si@unit@in@init
-    #1%
+    \si@unit@parse@unit{#1}%
   }{%
-    \si@unit@in@literal{#1}%
+    \si@unit@out@literal{#1}%
   }%
 }
 %    \end{macrocode}
 %\end{macro} 
-%
-%\begin{macro}{\si@unit@in@init}
-%\begin{macro}[aux]{\si@unit@in@init@aux}
-% Initialisation starts by making all of the unit macros active.
-%    \begin{macrocode}
-\newcommand*{\si@unit@in@init}{%
-  \si@loop@over@macro\si@unit@def@list\si@unit@in@init@aux
-}
-\newcommand*{\si@unit@in@init@aux}[1]{%
-  \si@let@Nc#1{si@unit@macro@\string#1}%
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\si@unit@in@literal}
-%\begin{macro}[aux]{\si@unit@in@literal@aux}
-% If the unit given contains anything which is not a unit macro, then
-% any unit macros that are there simply dump literal meanings.
-%    \begin{macrocode}
-\newcommand*{\si@unit@in@literal}[1]{%
-  \si@loop@over@macro\si@unit@def@list\si@unit@in@literal@aux
-  \si@unit@out@literal@print{#1}%
-}
-\newcommand*{\si@unit@in@literal@aux}[1]{%
-  \si@let@Nc#1{si@unit@literal@\string#1}%
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\si@unit@in@process@if@TF}
 %\begin{macro}[aux]{\si@unit@in@process@aux}
@@ -5961,49 +5929,80 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\si@unit@in@store}
-%    \begin{macrocode}
-\newcommand*{\si@unit@in@store}[2]{%
-}
-%    \end{macrocode}
-%\end{macro}
+%\subsection{Parsing macro units}
 %
-%\subsection{Macro unit output}
-%
-%\begin{macro}{\si@unit@out@break@num@bool}
-%    \begin{macrocode}
-\si@bool@new\si@unit@out@break@num@bool
-%    \end{macrocode}
-%\end{macro}
+% For macro-based units, the macros are converted into literal text,
+% which is then passed on for printing.
+% 
 %\begin{macro}{\si@unit@out@unit@sep}
 %\begin{macro}{\si@unit@out@unit@space}
-% Storage for various options.
+% Storage for various options: these are needing for the parsing 
+% routine.
 %    \begin{macrocode}
 \newcommand*{\si@unit@out@unit@sep}{}
 \newcommand*{\si@unit@out@unit@space}{}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\si@unit@out@literal}
-% A storage area used for literal printing.
-%    \begin{macrocode}
-\newcommand*{\si@unit@out@literal}{}
-%    \end{macrocode}
-%\end{macro}
 % 
+% The unit options are set up.
 %    \begin{macrocode}
 \si@keys@family{units/output}
 \pgfkeys{
   /siunitx/units/output,
-  allow unit-number breaks/.is siunitx switch = {unit@out@break@num},
   inter-unit separator/.store in              = \si@unit@out@unit@sep,
   inter-unit space/.store in                  = \si@unit@out@unit@space,
-  allow unit-number breaks = false,
   inter-unit separator     = \,,
   inter-unit space         = \,
 }
 %    \end{macrocode}
+% 
+%\begin{macro}{\si@unit@parse@unit}
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@unit}[1]{%
+  \si@unit@parse@init
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@init}
+%\begin{macro}[aux]{\si@unit@parse@init@aux}
+% Initialisation starts by making all of the unit macros active.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@init}{%
+  \si@loop@over@macro\si@unit@def@list\si@unit@parse@init@aux
+}
+\newcommand*{\si@unit@parse@init@aux}[1]{%
+  \si@let@Nc#1{si@unit@macro@\string#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Macro unit output}
+%
+%\begin{macro}{\si@unit@out@literal@unit}
+% A storage area used for literal printing.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@literal@unit}{}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@out@literal}
+%\begin{macro}[aux]{\si@unit@out@literal@aux}
+% If the unit given contains anything which is not a unit macro, then
+% any unit macros that are there simply dump literal meanings.
+%    \begin{macrocode}
+\newcommand*{\si@unit@iout@literal}[1]{%
+  \si@loop@over@macro\si@unit@def@list\si@unit@out@literal@aux
+  \si@unit@out@literal@print{#1}%
+}
+\newcommand*{\si@unit@out@literal@aux}[1]{%
+  \si@let@Nc#1{si@unit@literal@\string#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %    
 %\begin{macro}{\si@unit@out@literal@print}
 % When printing literal units, there is a little work to do sorting out
@@ -6013,16 +6012,16 @@ This work consists of the file  siunitx.dtx
 \si@catcode@set{46}{13}% .
 \si@catcode@set{38}{13}% &
 \newcommand*{\si@unit@out@literal@print}[1]{%
-  \def\si@unit@out@literal{#1}%
-  \si@unit@out@replace@fullstops\si@unit@out@literal
-  \si@unit@out@replace@tildes\si@unit@out@literal
+  \def\si@unit@out@literal@unit{#1}%
+  \si@unit@out@replace@fullstops\si@unit@out@literal@unit
+  \si@unit@out@replace@tildes\si@unit@out@literal@unit
   \begingroup
     \si@catcode@set{38}{13}% &
     \si@catcode@set{126}{13}% ~
     \let.\si@unit@out@unit@sep
     \let&\si@unit@out@unit@space
-    \protected@edef\si@unit@out@literal{\si@unit@out@literal}%
-    \si@print@unit@o{\si@unit@out@literal}%
+    \protected@edef\si@unit@out@literal@unit{\si@unit@out@literal@unit}%
+    \si@print@unit@o{\si@unit@out@literal@unit}%
   \endgroup
 }
 \si@catcode@set{46}{12}% .
