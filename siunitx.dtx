@@ -1410,6 +1410,37 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@csname@if@F}
+%\begin{macro}{\si@csname@if@T}
+%\begin{macro}{\si@csname@if@TF}
+% Something to make \cs{ifcsname} less weird.
+%    \begin{macrocode}
+\newcommand*{\si@csname@if@F}[1]{%
+  \ifcsname #1\endcsname
+    \expandafter\@gobble
+  \else
+    \expandafter\@firstofone
+  \fi
+}
+\newcommand*{\si@csname@if@T}[1]{%
+  \ifcsname #1\endcsname
+    \expandafter\@firstofone
+  \else
+    \expandafter\@gobble
+  \fi
+}
+\newcommand*{\si@csname@if@TF}[1]{%
+  \ifcsname #1\endcsname
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@dowhile@bool@T}
 % A simple looping function.
 %    \begin{macrocode}
@@ -1421,6 +1452,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%
 %
 %\begin{macro}{\si@empty@cs@if@F}
 %\begin{macro}{\si@empty@cs@if@T}
@@ -5705,8 +5737,8 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@power}[2]{%
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
-  \@namedef{si@unit@power@\string#1}{#2}%
   \@namedef{si@unit@macro@\string#1}{%
+    \si@unit@in@store{power}{#2}%
   }%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
@@ -5722,8 +5754,8 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@prefix}[3]{%
   \si@add@right@n\si@unit@def@prefix@list{#1}%
   \@namedef{si@unit@literal@\string#1}{#2}%
-  \@namedef{si@unit@symbol@\string#1}{#2}%
   \@namedef{si@unit@macro@\string#1}{%
+    \si@unit@in@store{prefix}{#2}%
   }%
 }
 \newcommand*{\si@unit@def@prefix@binary}[1]{%
@@ -5738,21 +5770,29 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@qual}[2]{%
   \si@add@right@n\si@unit@def@qual@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\text{ }(#2)}%
-  \@namedef{si@unit@symbol@\string#1}{#2}%
   \@namedef{si@unit@macro@\string#1}{%
+    \si@unit@in@store{qual}{#2}%
   }%
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@unit@def@unit}
+% Creating units requires various things to be stored.  This is done
+% with several storage bins to keep the code clear.  For the 
+% \texttt{macro} definition, the test occurs at use so that there is no
+% problem with the creation order for units.
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@unit}[3]{%
   \si@add@right@n\si@unit@def@unit@list{#1}%
   \@namedef{si@unit@options@\string#1}{#2}%
   \@namedef{si@unit@literal@\string#1}{#3}%
-  \@namedef{si@unit@symbol@\string#1}{#3}%
   \@namedef{si@unit@macro@\string#1}{%
+    \si@csname@if@TF{si@unit@macro@\expandafter\string\@car#3\@nil}{%
+      #3%
+    }{%
+      \si@unit@in@store{unit}{#3}%
+    }%
   }%
 }
 %    \end{macrocode}
@@ -5858,6 +5898,7 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@in@parse}[1]{%
   \si@unit@in@process@if@TF{#1}{%
     \si@unit@in@init
+    #1%
   }{%
     \si@unit@in@literal{#1}%
   }%
@@ -5918,6 +5959,13 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@in@store}
+%    \begin{macrocode}
+\newcommand*{\si@unit@in@store}[2]{%
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Macro unit output}
