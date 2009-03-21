@@ -1410,6 +1410,16 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@count@incr@cs}
+% Increase a counter by name: \LaTeX3 does this more carefully but that
+% should not be needed here.
+%    \begin{macrocode}
+\newcommand*{\si@count@incr@cs}[1]{%
+  \advance\@nameuse{#1}\@ne\relax
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\si@csname@if@F}
 %\begin{macro}{\si@csname@if@T}
 %\begin{macro}{\si@csname@if@TF}
@@ -4834,8 +4844,8 @@ This work consists of the file  siunitx.dtx
   open uncertainty/.store in              = \si@num@out@uncert@open, 
   separate uncertainty/.is siunitx switch = {num@out@uncert@sep},
   tight spacing/.is siunitx switch        = {num@out@tight},
-  uncertainty space/.store in             = \si@num@out@uncert@space, %(
-  use brackets/.is siunitx switch         = {num@out@bracket@use},
+  uncertainty space/.store in             = \si@num@out@uncert@space, 
+  use brackets/.is siunitx switch         = {num@out@bracket@use}, %(
   close bracket        = ),% (
   close uncertainty    = ),
   complex root         = i,
@@ -5294,7 +5304,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\subsection{Setting up tables}
-% 
+%
+%\begin{macro}{\si@tab@rewrite@check@cellspace}
+% There is a slight problem with the \pkg{cellspace} package: it also
+% uses \texttt{S} for a column type  Here, \texttt{S} seems to make
+% more sense for \pkg{siunitx}, with \texttt{C} used for 
+% \pkg{cellspace}. To enable this to work well, the column
+% rewriting code happens \cs{AtBeginDocument}. The \texttt{S} column
+%  is deleted from \cs{NC@list} so that no warning appears.
+%    \begin{macrocode}
+\newcommand*{\si@tab@rewrite@check@cellspace}{%
+  \@ifpackageloaded{cellspace}{%
+    \si@log@info{Changing cellspace column letter to C}%
+    \newcolumntype{C}[1]{>{\bcolumn##1\@nil}##1<{\ecolumn}}%
+    \def\si@tempa##1\NC@do S##2\si@stop{%
+      \NC@list{##1##2}%
+    }%
+    \expandafter\si@tempa\the\NC@list\si@stop
+    \let\NC@find@S\@undefined
+  }{}%
+}
+\AtBeginDocument{\si@tab@rewrite@check@cellspace}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@tab@rewrite@create}
+%\begin{macro}{\si@tab@rewrite@init}
 % The \texttt{s} and \texttt{S} column types are both created using
 % the \pkg{array} package, but with the internal macros redefined
 % to work with optional argument. First, there is a need to do a 
@@ -5303,25 +5338,10 @@ This work consists of the file  siunitx.dtx
 % arguments do not work correctly. So they are added ``by hand'' to 
 % the appropriate macro.\footnote{\cs{NC@list} is a toks, not a macro.}
 %    \begin{macrocode}
-\edef\si@tempa{%
-  \noexpand\NC@do S%
-  \noexpand\NC@do s%
-  \the\NC@list
-}
-\newcolumntype{S}{}
-\newcolumntype{s}{}
-\NC@list\expandafter{\si@tempa}
-%    \end{macrocode}
-%\begin{macro}{\si@tab@rewrite@create}
-%\begin{macro}{\si@tab@rewrite@init}
-% There is now a slight problem with the \pkg{cellspace} package:
-% it also uses \texttt{S} for a column type  Here, \texttt{S} seems to
-% make more sense for \pkg{siunitx}, with \texttt{C} used for 
-% module{cellspace}. To enable this to work well, the column
-% rewriting code happens \cs{AtBeginDocument}. Note that \pkg{array}
-% uses \cs{@temptokena} to store the list of primitive columns.
-%    \begin{macrocode}
 \newcommand*{\si@tab@rewrite@create}[1]{%
+  \edef\si@tempa{\noexpand\NC@do #1\the\NC@list}%
+  \newcolumntype{#1}{}%
+  \NC@list\expandafter{\si@tempa}%
   \expandafter\renewcommand\expandafter*\expandafter{%
     \csname NC@rewrite@#1\endcsname
   }[1][]{%
@@ -5336,17 +5356,13 @@ This work consists of the file  siunitx.dtx
   }%
 }
 \AtBeginDocument{%
-  \si@tab@rewrite@create{s}%
   \si@tab@rewrite@create{S}%
-  \@ifpackageloaded{cellspace}{%
-    \newcolumntype{C}[1]{%
-      >{\bcolumn #1\@nil}#1<{\ecolumn}%
-    }%
-  }{}%
+  \si@tab@rewrite@create{s}%
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+
 %
 %\subsection{Collecting tokens in tables}
 %
@@ -5738,12 +5754,16 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
   \@namedef{si@unit@macro@\string#1}{%
-    \si@unit@in@store{power}{#2}%
+    \si@unit@parse@power@dim #2pt\relax
   }%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
-  \si@unit@def@power{#1}{#2}%
+  \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\textsuperscript{#2}}%
+  \@namedef{si@unit@macro@\string#1}{%
+    \si@unit@parse@power@dim #2pt\relax
+    \si@unit@parse@store{power}{#2}%
+  }%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5755,7 +5775,7 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@prefix@list{#1}%
   \@namedef{si@unit@literal@\string#1}{#2}%
   \@namedef{si@unit@macro@\string#1}{%
-    \si@unit@in@store{prefix}{#2}%
+    \si@unit@parse@store{prefix}{#2}%
   }%
 }
 \newcommand*{\si@unit@def@prefix@binary}[1]{%
@@ -5771,7 +5791,7 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@qual@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\text{ }(#2)}%
   \@namedef{si@unit@macro@\string#1}{%
-    \si@unit@in@store{qual}{#2}%
+    \si@unit@parse@store{qual}{#2}%
   }%
 }
 %    \end{macrocode}
@@ -5791,7 +5811,7 @@ This work consists of the file  siunitx.dtx
     \si@csname@if@TF{si@unit@macro@\expandafter\string\@car#3\@nil}{%
       #3%
     }{%
-      \si@unit@in@store{unit}{#3}%
+      \si@unit@parse@store{unit}{#3}%
     }%
   }%
 }
@@ -5864,6 +5884,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \@namedef{si@unit@literal@\string\per}{/}
 \@namedef{si@unit@macro@\string\per}{%
+  \si@bool@true\si@unit@parse@reciprocal@bool
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5934,26 +5955,119 @@ This work consists of the file  siunitx.dtx
 % For macro-based units, the macros are converted into literal text,
 % which is then passed on for printing.
 % 
-%\begin{macro}{\si@unit@out@unit@sep}
-%\begin{macro}{\si@unit@out@unit@space}
-% Storage for various options: these are needing for the parsing 
-% routine.
+%\begin{macro}{\si@unit@parse@block@cnt}
+%\begin{macro}{\si@unit@parse@block@den@cnt}
+% For ambiguity testing a track is needed of the number of blocks
+% added to each storage area. A block consists of a unit plus one or
+% more other elements.
 %    \begin{macrocode}
-\newcommand*{\si@unit@out@unit@sep}{}
-\newcommand*{\si@unit@out@unit@space}{}
+\newcount\si@unit@parse@block@cnt
+\newcount\si@unit@parse@block@den@cnt
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro} 
+%\begin{macro}{\si@unit@parse@block}
+%\begin{macro}{\si@unit@parse@block@den}
+% Storage for the current block.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@block}{}
+\newcommand*{\si@unit@parse@block@den}{}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro} 
+%\begin{macro}{\si@unit@parse@power@dim}
+% Powers are stored as a dimension so that they can be non-integer.
+%    \begin{macrocode}
+\newdimen\si@unit@parse@power@dim
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@queue}
+%\begin{macro}{\si@unit@parse@queue@den}
+% Storage for the main list and any denominator.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@queue}{}
+\newcommand*{\si@unit@parse@queue@den}{}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
+%\begin{macro}{\si@unit@parse@sep}
+% The inter-block separator is held ``pre-built'' here.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@sep}{}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@reciprocal@bool}
+% A flag for reciprocals.
+%    \begin{macrocode}
+\si@bool@new\si@unit@parse@reciprocal@bool
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@sticky@bool}
+% The \cs{per} macro can be ``sticky''.
+%    \begin{macrocode}
+\si@bool@new\si@unit@parse@sticky@bool
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@type@last}
+%\begin{macro}{\si@unit@parse@type@last@den}
+% The last item added to each queue needs to be tracked.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@type@last}{}
+\newcommand*{\si@unit@parse@type@last@den}{}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@unit@parse@type@prefix}
+%\begin{macro}{\si@unit@parse@type@power}
+%\begin{macro}{\si@unit@parse@type@qual}
+%\begin{macro}{\si@unit@parse@type@unit}
+% The various possible queue items are given names.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@type@prefix}{prefix}
+\newcommand*{\si@unit@parse@type@power}{power}
+\newcommand*{\si@unit@parse@type@qual}{qual}
+\newcommand*{\si@unit@parse@type@unit}{unit}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@fraction@bool}
+% A flag for conversion to a fraction.
+%    \begin{macrocode}
+\si@bool@new\si@unit@parse@fraction@bool
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@qual@format}
+% The format for qualifiers has to be stored.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@qual@format}{}
+%    \end{macrocode}
+%\end{macro}
 % 
-% The unit options are set up.
+% The unit options needed whilst parsing are set up.
 %    \begin{macrocode}
 \si@keys@family{units/output}
 \pgfkeys{
   /siunitx/units/output,
-  inter-unit separator/.store in              = \si@unit@out@unit@sep,
-  inter-unit space/.store in                  = \si@unit@out@unit@space,
-  inter-unit separator     = \,,
-  inter-unit space         = \,
+  print as fraction/.is siunitx switch = {unit@parse@fraction},
+  qualifier format/.is choice,
+  qualifier format/.cd,
+    brackets/.code  = {%
+      \def\si@unit@parse@qual@format##1{(##1)}%
+    },
+    space/.code     = {%
+      \def\si@unit@parse@qual@format##1{\text{ }##1}%
+    },
+    subscript/.code = {%
+      \def\si@unit@parse@qual@format##1{_{##1}}%
+    },
+  /siunitx/units/output,
+  sticky per/.is siunitx switch         = {unit@parse@sticky},
+  print as fraction = false,
+  qualifier format  = subscript,
+  sticky per        = false,
 }
 %    \end{macrocode}
 % 
@@ -5961,22 +6075,247 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@unit}[1]{%
   \si@unit@parse@init
+  #1%
+  \si@unit@parse@block@new{STOP}%
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@block@new}
+% Creating a new block means moving the data from the current block to
+% the queue, adding a space at the start of the current block and then
+% adding data to the new block. A check is needed so that the first 
+% block does not gain a space.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@block@new}[1]{%
+  \si@unit@parse@block@trans
+%  \si@bool@if@F\si@unit@parse@sticky@bool{%
+%    \si@bool@false\si@unit@parse@reciprocal@bool
+%  }%
+  \@namedef{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@block@trans}
+%\begin{macro}[aux]{\si@unit@parse@block@add@aux}
+% Some functions for transferring content from the current block to the
+% queue. An inter-block separator is added only if there is something 
+% for it to follow.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@block@trans}{%
+  \si@empty@cs@if@F{si@unit@parse@queue\si@unit@parse@queue@use}{%
+    \si@add@right@cs@o{si@unit@parse@queue\si@unit@parse@queue@use}{%
+      \si@unit@parse@sep
+    }%
+  }%
+  \expandafter\si@unit@parse@block@add@aux\expandafter{%
+    \csname si@unit@parse@block\si@unit@parse@queue@use\endcsname
+  }%
+}
+\newcommand*{\si@unit@parse@block@add@aux}[1]{%
+  \si@add@right@cs@o{si@unit@parse@queue\si@unit@parse@queue@use}{#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@bracket}
+% For adding brackets around a storage area.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@bracket}[1]{%
+  \si@bool@if@T\si@unit@out@bracket@use@bool{%
+    \si@add@left@cs@o{si@unit@parse@#1}\si@unit@out@bracket@open
+    \si@add@right@cs@o{si@unit@parse@#1}\si@unit@out@bracket@close
+  }%
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@unit@parse@init}
 %\begin{macro}[aux]{\si@unit@parse@init@aux}
-% Initialisation starts by making all of the unit macros active.
+% Initialisation starts by making all of the unit macros active. The 
+% ``last'' addition to the queue is set to be a space, so that no space
+% is added at the very front.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@init}{%
   \si@loop@over@macro\si@unit@def@list\si@unit@parse@init@aux
+  \si@clear@macro\si@unit@parse@current
+  \si@clear@macro\si@unit@parse@current@den
+  \si@unit@parse@power@dim\z@\relax
+  \si@clear@macro\si@unit@parse@queue
+  \si@clear@macro\si@unit@parse@queue@den
+  \def\si@unit@parse@type@last{start}%
+  \def\si@unit@parse@type@last@den{start}%
+  \expandafter\def\expandafter\si@unit@parse@sep\expandafter{%
+    \expandafter\ensuremath\expandafter{\si@unit@out@unit@sep}%
+  }%
+  \si@unit@parse@block@cnt\z@\relax
+  \si@unit@parse@block@den@cnt\z@\relax
+  \si@bool@false\si@unit@parse@reciprocal@bool
 }
 \newcommand*{\si@unit@parse@init@aux}[1]{%
   \si@let@Nc#1{si@unit@macro@\string#1}%
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@last@if@F}
+%\begin{macro}{\si@unit@parse@last@if@T}
+%\begin{macro}{\si@unit@parse@last@if@TF}
+% Checks on the last addition are queue-dependent.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@last@if@F}[1]{%
+  \si@meaning@eq@cs@if@F
+    {si@unit@parse@type@last\si@unit@parse@queue@use}%
+    {si@unit@parse@type@#1}%
+}
+\newcommand*{\si@unit@parse@last@if@T}[1]{%
+  \si@meaning@eq@cs@if@T
+    {si@unit@parse@type@last\si@unit@parse@queue@use}%
+    {si@unit@parse@type@#1}%
+}
+\newcommand*{\si@unit@parse@last@if@TF}[1]{%
+  \si@meaning@eq@cs@if@TF
+    {si@unit@parse@type@last\si@unit@parse@queue@use}%
+    {si@unit@parse@type@#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@queue@use}
+% Which queue is in use needs to be available: the main queue variables 
+% have no ending, whereas the denominator ones do.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@queue@use}{%
+  \si@bool@if@T\si@unit@parse@fraction@bool{%
+    \si@bool@if@T\si@unit@parse@reciprocal@bool{@den}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\si@unit@parse@store}
+% The outer storage macro does nothing: the steps needed are left to the
+% dedicated procedures. 
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store}[2]{%
+  \@nameuse{si@unit@parse@store@#1}{#2}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@add@n}
+%\begin{macro}{\si@unit@parse@store@add@o}
+% A general addition function.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@add@n}[1]{%
+  \si@add@right@cs@n{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
+}
+\newcommand*{\si@unit@parse@store@add@o}[1]{%
+  \si@add@right@cs@o{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@power}
+%\begin{macro}[aux]{\si@unit@parse@store@power@aux@i}
+%\begin{macro}[aux]{\si@unit@parse@store@power@aux@ii}
+%\begin{macro}[aux]{\si@unit@parse@store@power@inv}
+% Powers can follow qualifiers or units. If a qualifier comes first, 
+% there may be a need to add brackets. For the actual addition, a 
+% check is made for inversion and also for the power 1. The later check
+% uses the fact that \cs{si@unit@parse@power@dim} always contains the 
+% power, although it is not always added from the stored version for
+% speed reasons.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@power}[1]{%
+  \si@unit@parse@last@if@T{qual}{%
+    \si@unit@parse@bracket{block\si@unit@parse@queue@use}%
+    \si@unit@parse@store@power@aux@i{#1}%
+  }%
+  \si@unit@parse@last@if@T{unit}{%
+    \si@unit@parse@store@power@aux@i{#1}%
+  }%
+}
+\newcommand*{\si@unit@parse@store@power@aux@i}[1]{%
+  \si@bool@if@TF\si@unit@parse@reciprocal@bool{%
+    \si@bool@if@TF\si@unit@parse@fraction@bool{%
+      \si@unit@parse@store@power@aux@ii{#1}%
+    }{%
+      \si@unit@parse@store@power@inv
+      \edef\si@tempa{\strip@pt\si@unit@parse@power@dim}%
+      \expandafter\si@unit@parse@store@power@aux@ii\expandafter
+        {\si@tempa}%
+    }%
+  }{%%
+    \si@unit@parse@store@power@aux@ii{#1}%
+  }%
+  \si@unit@parse@store@type{power}%
+}
+\newcommand*{\si@unit@parse@store@power@aux@ii}[1]{%
+  \ifdim\si@unit@parse@power@dim=\p@\relax
+  \else
+    \si@unit@parse@store@add@n{^{#1}}%
+  \fi
+}
+\newcommand*{\si@unit@parse@store@power@inv}{%
+  \si@unit@parse@power@dim\dimexpr -\the\si@unit@parse@power@dim
+    \relax
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@prefix}
+% Unless the last addition was another prefix, all that has to happen 
+% here is to start a new block.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@prefix}[1]{%
+  \si@unit@parse@last@if@F{prefix}{%
+    \si@unit@parse@block@new{#1}%
+    \si@unit@parse@store@type{prefix}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@qual}
+% Qualifiers can only be added after units.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@qual}[1]{%
+  \si@unit@parse@last@if@T{unit}{%
+    \si@unit@parse@store@add@o{\si@unit@parse@qual@format{#1}}%
+    \si@unit@parse@store@type{qual}%
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@type}
+% All of the type changes are the same.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@type}[1]{%
+  \si@let@cc{si@unit@parse@type@last\si@unit@parse@queue@use}%
+    {si@unit@parse@type@#1}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@store@unit}
+% When storing units, following anything other than a prefix means 
+% starting a new block. A track is also kept of how many units have been
+% added to the queue as this may be needed later.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@store@unit}[1]{%
+  \si@unit@parse@last@if@TF{prefix}{%
+    \si@unit@parse@store@add@n{#1}%
+  }{%
+    \si@unit@parse@block@new{#1}%
+  }%
+  \si@unit@parse@store@type{unit}%
+  \si@count@incr@cs{si@unit@parse@block\si@unit@parse@queue@use @cnt}%
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Macro unit output}
@@ -5987,6 +6326,48 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@out@literal@unit}{}
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\si@unit@out@bracket@close}
+%\begin{macro}{\si@unit@out@bracket@open}
+% For dealing with ambiguous output.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@bracket@close}{}
+\newcommand*{\si@unit@out@bracket@open}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@unit@out@bracket@use@bool}
+% A flag for using brackets.
+%    \begin{macrocode}
+\si@bool@new\si@unit@out@bracket@use@bool
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\si@unit@out@unit@sep}
+%\begin{macro}{\si@unit@out@unit@space}
+% Storage for various options.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@unit@sep}{}
+\newcommand*{\si@unit@out@unit@space}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+% 
+% The unit options are set up.
+%    \begin{macrocode}
+\pgfkeys{
+  /siunitx/units/output,
+  close bracket/.store in         = \si@unit@out@bracket@close,
+  inter-unit separator/.store in  = \si@unit@out@unit@sep,
+  inter-unit space/.store in      = \si@unit@out@unit@space,
+  open bracket/.store in          = \si@unit@out@bracket@open,
+  use brackets/.is siunitx switch = {unit@out@bracket@use}, %(
+  close bracket        = ),
+  inter-unit separator = \,,
+  inter-unit space     = \,, 
+  open bracket         = (, %)
+  use brackets         = true
+}
+%    \end{macrocode}
 %
 %\begin{macro}{\si@unit@out@literal}
 %\begin{macro}[aux]{\si@unit@out@literal@aux}
@@ -6378,6 +6759,7 @@ This work consists of the file  siunitx.dtx
     \sisetup{#1}%
     \num{#2}%
     \si@unit@in@parse{#3}%
+    \show\si@unit@parse@queue
   \endgroup
 }
 %    \end{macrocode}
