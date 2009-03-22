@@ -1606,21 +1606,21 @@ This work consists of the file  siunitx.dtx
 % To read and apply the \LaTeX3-style switches.
 %    \begin{macrocode}
 \newcommand*{\si@bool@if@F}[1]{%
-  \if#1\relax
+  \if#1%
     \expandafter\@gobble
   \else
     \expandafter\@firstofone
   \fi
 }
 \newcommand*{\si@bool@if@T}[1]{%
-  \if#1\relax
+  \if#1%
     \expandafter\@firstofone
   \else
     \expandafter\@gobble
   \fi
 }
 \newcommand*{\si@bool@if@TF}[1]{%
-  \if#1\relax
+  \if#1%
     \expandafter\@firstoftwo
   \else
     \expandafter\@secondoftwo
@@ -6151,17 +6151,22 @@ This work consists of the file  siunitx.dtx
 % sent to the \cs{SI} macro.
 %    \begin{macrocode}
 \newcommand*{\si@unit@create@optional}[1]{%
-  \si@newcommand*{#1}[1][]{%
-    \si@bool@if@T\si@unit@create@prespace@bool{%
-      \si@empty@tlist@if@T{##1}{%
-        \ensuremath{\si@unit@out@unit@sep}%
+  \ifdefined#1\else
+    \edef\si@tempa{%
+      \unexpanded{\si@newcommand*{#1}[1][]}{%
+        \si@bool@if@T\si@unit@create@prespace@bool{%
+          \unexpanded{\si@empty@tlist@if@T{##1}}{%
+            \unexpanded{\ensuremath{\si@unit@out@unit@sep}}%
+          }%
+        }%
+        \unexpanded{\SI{##1}{#1}}%
+        \si@bool@if@T\si@unit@create@xspace@bool{%
+          \noexpand\xspace
+        }%
       }%
     }%
-    \SI{##1}{#1}%
-    \si@bool@if@T\si@unit@create@xspace@bool{%
-      \xspace
-    }%
-  }%
+    \expandafter\si@tempa
+  \fi
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6170,15 +6175,20 @@ This work consists of the file  siunitx.dtx
 % Life is very easy if there is no optional argument.
 %    \begin{macrocode}
 \newcommand*{\si@unit@create@plain}[1]{%
-  \si@newcommand*{#1}{%
-    \si@bool@if@T\si@unit@create@prespace@bool{%
-      \ensuremath{\si@unit@out@unit@sep}%
+  \ifdefined#1\else
+    \edef\si@tempa{%
+      \unexpanded{\si@newcommand*{#1}}{%
+        \si@bool@if@T\si@unit@create@prespace@bool{%
+          \unexpanded{\ensuremath{\si@unit@out@unit@sep}}%
+        }%
+        \unexpanded{\si{#1}}%
+        \si@bool@if@T\si@unit@create@xspace@bool{%
+          \noexpand\xspace
+        }%
+      }%
     }%
-    \si{#1}%
-    \si@bool@if@T\si@unit@create@xspace@bool{%
-      \xspace
-    }%
-  }%
+    \expandafter\si@tempa
+  \fi
 }
 %    \end{macrocode}
 %\end{macro}
