@@ -157,8 +157,13 @@ This work consists of the file  siunitx.dtx
 %    keywordstyle = \color{blue},
 %    language     = [LaTeX]{TeX},
 %    moretexcs    = {
+%      DeclareSIPrefix,
+%      DeclareSIPower,
+%      DeclareSIQualifier,
+%      DeclareSIUnit,
 %      mathnormal,
 %      num,
+%      si,
 %      SI,
 %      sisetup,
 %      text,
@@ -230,7 +235,7 @@ This work consists of the file  siunitx.dtx
 %  types}
 %\changes{v1.2}{2009/01/22}{Correct handling for ranges of numbers 
 %  added}
-%\changes{v2.0}{2008/03/06}{Complete re-write of package to add many new
+%\changes{v2.0}{2008/03/22}{Complete re-write of package to add many new
 %  features}
 %
 %\begin{abstract}
@@ -370,6 +375,114 @@ This work consists of the file  siunitx.dtx
 %  \num{3.45d-4} \\
 %  \num{-e10}
 %\end{LaTeXdemo} 
+%
+%\subsection{Units: as arguments}
+%
+%\DescribeMacro{\si}
+% The symbol for a unit can be typeset using the \cs{si} macro: this 
+% provides full control over output format for the unit. Like the
+% \cs{num} macro, \cs{si} takes  one optional and one mandatory 
+% argument: \cs{si}\oarg{options}\marg{unit}. The unit formatting system
+% can accept two types of input. When \meta{unit} contains one or more
+% literal items, the output is processed in the same manner as with the
+% \pkg{sistyle} package. Sub- and superscripts can be input without 
+% concern over maths mode, and the tokens \texttt{.} and |~| are 
+% converted into an inter-unit separator and inter-unit space, 
+% respectively.\footnote{The standard package settings use the same
+% value for both of these: \cs{,}.}
+%\begin{LaTeXdemo}
+%  \si{kg.m/s^2} \\
+%  \si{kg.m/s^2} \\
+%  \si{g_{polymer}~mol_{cat}.s^{-1}}
+%\end{LaTeXdemo}
+% The second operation mode for the \cs{si} macro is an ``interpretted''
+% system, Here, each unit, SI multiple prefix and power is given a macro 
+% name.  These are entered in a method very similar to the reading of the 
+% unit name in English.
+%\begin{LaTeXdemo}
+%  \si{\kilo\gram\metre\per\square\second} \\
+%  \si{\gram\per\cubic\centi\metre}        \\
+%  \si{\henry\second}                      
+%\end{LaTeXdemo}
+% On its own, this is less convenient than the direct method, although
+% it does use meaning rather than appearance for input. However, the
+% the package allows you to define new unit macros; a large number of
+% pre-defined abbreviations are also supplied.  More importantly, by
+% defining macros for units, instead of literal values, new
+% functionality is made available.  Units may be re-defined to give
+% different output, and handling of reciprocal values can be altered.
+%
+%\DescribeMacro{\SI}
+% Very often, numbers and values are given together. Mathematically, 
+% these form a single entity, and should be separated by a non-breaking
+% space. The \cs{SI} macro combines the functionality of \cs{num} and
+% \cs{si}, and makes this both possible and easy. The \cs{SI} macro takes 
+% two mandatory arguments, in addition to the optional set up argument, 
+% and a second optional argument:
+% \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}. The
+% \meta{number} and \meta{unit} arguments work exactly like those for 
+% the \cs{num} and \cs{si} macros, respectively. \meta{preunit} is a unit 
+% to be typeset \emph{before} the numerical value (most likely to be a 
+% currency).
+%\begin{LaTeXdemo}
+%  \SI[font/mode=text]{1.23}{J.mol^{-1}.K^{-1}} \\
+%  \SI{.23e7}{\candela}                          \\
+%  %\SI[per=slash]{1.99}[\pounds]{\per\kilogram}  \\
+%  \SI{70}{\metre\per\second}                    \\
+%  %\SI[per=frac,fraction=nice]{1,345}{\ampere\per\mole}
+%\end{LaTeXdemo}
+%
+%\subsection{Units: free-standing}
+%
+%\section{The unit macros}
+%
+%\subsection{Creating new macros}
+%
+%\DescribeMacro{\DeclareSIUnit}
+% New units are produced using the \cs{DeclareSIUnit} macro.  This takes
+% two mandatory arguments, as well as one optional one:
+% \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}. 
+% \meta{symbol} can contain literal values, other units, multiple
+% prefixes, powers and \cs{per}, although literal text should not be
+% intermixed with unit macros. The \meta{options} argument can be
+% any suitable options, and applies the specific unit macro only. The 
+% (first) optional argument to \cs{SI} and \cs{si} can be used to 
+% override the settings for the unit.
+%\begin{LaTeXdemo}
+%  \SI{3.1415}{\degree}\\
+%  %\DeclareSIUnit[valuesep=none]{\oddunit}{XXX}
+%  %\SI{12345}{\oddunit}
+%  %\SI[valuesep=thick]{67890}{\oddunit}
+%\end{LaTeXdemo}
+% 
+%\DescribeMacro{\DeclareSIPrefix}
+%\DescribeMacro{\DeclareSIPrefix*}
+% The standard SI powers of ten are defined by the package, and are
+% described above.  However, the user can define new prefixes with
+% \cs{DeclareSIPrefix}.  This has syntax 
+% \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}. A
+% starred-version is also available for creating binary prefixes, with
+% the same syntax (\meta{powers-ten} being replaced by 
+% \meta{powers-two}). For example, \cs{kilo} and \cs{kibi} are defined:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIPrefix{\kilo}{k}{3}
+%  \DeclareSIPrefix*{\kibi}{Ki}{10}
+%\end{LaTeXdemo}
+%
+%\DescribeMacro{\DeclareSIPower}
+%\DescribeMacro{\DeclareSIPower*}
+% Descriptions for powers are created using \cs{DeclareSIPower}, with
+% syntax \cs{DeclareSIPower}\marg{power}\marg{num}. This creates a
+% power macro to appear before the unit it applies to. A starred version
+% of the macro creates powers to appear after the unit.
+%\begin{LaTeXdemo}
+%  %\DeclareSIPower{\quartic}{4}
+%  %\DeclareSIPower*{\totheforth}{4}\\
+%  %\si{\kilogram\totheforth}\\
+%  %\si{\quartic\metre}
+%\end{LaTeXdemo}
+%
+%\DescribeMacro{\DeclareSIQualifier}
 %
 %\section{The key--value control system}
 %
@@ -557,10 +670,10 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      maths rm & Macro  & \cs{mathrm} \\
-%      maths sf & Macro  & \cs{mathsf} \\ 
-%      maths tt & Macro  & \cs{mathtt} \\
-%      mode     & Choice & maths       \\
+%      maths rm & Macro  & \cs{mathrm}   \\
+%      maths sf & Macro  & \cs{mathsf}   \\ 
+%      maths tt & Macro  & \cs{mathtt}   \\
+%      mode     & Choice & maths         \\
 %      text rm  & Macro  & \cs{rmfamily} \\
 %      text sf  & Macro  & \cs{sffamily} \\ 
 %      text tt  & Macro  & \cs{ttfamily} \\
@@ -784,7 +897,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\subsection{Printing numbers}
 %
-% Actually prinitng numbers is controlled by a number of settings,
+% Actually printing numbers is controlled by a number of settings,
 % which apply ideas such as differing decimal markers, digit
 % grouping and so on.  All of these options are concerned with the
 % appearance of output, rather than the data it conveys. The options are
@@ -6306,7 +6419,7 @@ This work consists of the file  siunitx.dtx
   }%
 }
 %    \end{macrocode}
-% An easy inverse function .
+% An easy inverse function.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@store@power@inv}{%
   \si@unit@parse@power@current@dim
@@ -6423,7 +6536,7 @@ This work consists of the file  siunitx.dtx
 % If the unit given contains anything which is not a unit macro, then
 % any unit macros that are there simply dump literal meanings.
 %    \begin{macrocode}
-\newcommand*{\si@unit@iout@literal}[1]{%
+\newcommand*{\si@unit@out@literal}[1]{%
   \si@loop@over@macro\si@unit@def@list\si@unit@out@literal@aux
   \si@unit@out@literal@print{#1}%
 }
