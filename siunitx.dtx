@@ -6027,6 +6027,8 @@ This work consists of the file  siunitx.dtx
 % into a general category.
 %
 %\begin{macro}{\si@unit@macro@\per}
+% The \cs{per} macro does not generate any direct output but does
+% set up the appropriate flags.
 %    \begin{macrocode}
 \@namedef{si@unit@literal@\string\per}{/}
 \@namedef{si@unit@macro@\string\per}{%
@@ -6037,16 +6039,21 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\si@unit@macro@\raiseto}
 %\begin{macro}{\si@unit@macro@\tothe}
+% \cs{raiseto} and \cs{tothe} work like other powers but with a flexible
+% value.
 %    \begin{macrocode}
 \@namedef{si@unit@literal@\string\raiseto}#1#2{
   #2\textsuperscript{#1}%
 }
 \@namedef{si@unit@macro@\string\raiseto}#1{%
+  \def\si@unit@parse@power@last{#1}%
 }
 \@namedef{si@unit@literal@\string\tothe}#1{%
   \textsuperscript{#1}%
 }
 \@namedef{si@unit@macro@\string\tothe}#1{%
+  \def\si@unit@parse@power@current{#1}%
+  \si@unit@parse@store{power}{null}%
 }
 %    \end{macrocode}
 %\end{macro}
