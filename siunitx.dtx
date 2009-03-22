@@ -5900,14 +5900,14 @@ This work consists of the file  siunitx.dtx
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}##1{##1\textsuperscript{#2}}%
   \@namedef{si@unit@macro@\string#1}{%
-    \si@unit@parse@power@last@dim #2pt\relax
+    \def\si@unit@parse@power@last{#2}%
   }%
 }
 \newcommand*{\si@unit@def@power@post}[2]{%
   \si@add@right@n\si@unit@def@power@list{#1}%
   \@namedef{si@unit@literal@\string#1}{\textsuperscript{#2}}%
   \@namedef{si@unit@macro@\string#1}{%
-    \si@unit@parse@power@current@dim #2pt\relax
+    \def\si@unit@parse@power@current{#2}%
     \si@unit@parse@store{power}{null}%
   }%
 }
@@ -6031,7 +6031,7 @@ This work consists of the file  siunitx.dtx
 \@namedef{si@unit@literal@\string\per}{/}
 \@namedef{si@unit@macro@\string\per}{%
   \si@bool@true\si@unit@parse@per@last@bool
-  \si@unit@parse@power@last@dim\p@\relax
+  \def\si@unit@parse@power@last{1}%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6122,12 +6122,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %\end{macro} 
-%\begin{macro}{\si@unit@parse@power@current@dim}
-%\begin{macro}{\si@unit@parse@power@last@dim}
-% Powers are stored as a dimension so that they can be non-integer.
+%\begin{macro}{\si@unit@parse@power@current}
+%\begin{macro}{\si@unit@parse@power@last}
+% Powers are stored.
 %    \begin{macrocode}
-\newdimen\si@unit@parse@power@current@dim
-\newdimen\si@unit@parse@power@last@dim
+\newcommand*{\si@unit@parse@power@current}{}
+\newcommand*{\si@unit@parse@power@last}{}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -6243,7 +6243,7 @@ This work consists of the file  siunitx.dtx
 % block does not gain a space.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@block@new}[1]{%
-  \si@dim@if@F{\si@unit@parse@power@current@dim=\z@}{%
+  \si@empty@if@F\si@unit@parse@power@current{%
     \si@unit@parse@store@power{null}%
   }%
   \si@unit@parse@block@trans
@@ -6251,8 +6251,8 @@ This work consists of the file  siunitx.dtx
   \si@bool@if@F\si@unit@parse@sticky@bool{%
     \si@bool@false\si@unit@parse@per@last@bool
   }%
-  \si@unit@parse@power@current@dim\si@unit@parse@power@last@dim\relax
-  \si@unit@parse@power@last@dim\z@\relax
+  \let\si@unit@parse@power@current\si@unit@parse@power@last
+  \si@clear@macro\si@unit@parse@power@last@dim
   \@namedef{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
 }
 %    \end{macrocode}
@@ -6302,8 +6302,8 @@ This work consists of the file  siunitx.dtx
   \si@loop@over@macro\si@unit@def@list\si@unit@parse@init@aux
   \si@clear@macro\si@unit@parse@current
   \si@clear@macro\si@unit@parse@current@den
-  \si@unit@parse@power@current@dim\z@\relax
-  \si@unit@parse@power@last@dim\z@\relax
+  \si@clear@macro\si@unit@parse@power@current
+  \si@clear@macro\si@unit@parse@power@last
   \si@clear@macro\si@unit@parse@queue
   \si@clear@macro\si@unit@parse@queue@den
   \def\si@unit@parse@type@last{start}%
@@ -6389,7 +6389,7 @@ This work consists of the file  siunitx.dtx
 % there may be a need to add brackets. The power has to be turned over
 % if there is a reciprocal. The argument here is only needed as the 
 % calling function supplies one: the key is the value in
-% \cs{si@unit@parse@power@current@dim}.
+% \cs{si@unit@parse@power@current}.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@store@power}[1]{%
   \si@unit@parse@last@if@T{qual}{%
@@ -6399,8 +6399,8 @@ This work consists of the file  siunitx.dtx
   \si@unit@parse@last@if@T{unit}{%
     \si@unit@parse@store@power@aux
   }%
-  \si@unit@parse@power@last@dim\z@\relax
-  \si@unit@parse@power@current@dim\z@\relax
+  \si@clear@macro\si@unit@parse@power@last
+  \si@clear@macro\si@unit@parse@power@current
 }
 %    \end{macrocode}
 % The auxiliary function checks for inversion then recovers the
@@ -6413,18 +6413,24 @@ This work consists of the file  siunitx.dtx
       \si@unit@parse@store@power@inv
     }%
   }%
-  \edef\si@tempa{\strip@pt\si@unit@parse@power@current@dim}%
-  \si@dim@if@F{\si@unit@parse@power@current@dim=\p@}{%
-    \si@unit@parse@store@add@o{\expandafter^\expandafter{\si@tempa}}%
+  \def\si@tempa{1}%
+  \si@meaning@eq@if@F\si@unit@parse@power@current\si@tempa{%
+    \si@unit@parse@store@add@o{%
+      \expandafter^\expandafter{\si@unit@parse@power@current}%
+    }%
   }%
 }
 %    \end{macrocode}
-% An easy inverse function.
+% A quick inverse function which does not use \TeX\ numbers.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@store@power@inv}{%
-  \si@unit@parse@power@current@dim
-    -\the\si@unit@parse@power@current@dim
-  \relax
+  \si@in@if@TF\si@unit@parse@power@current{-}{%
+    \def\si@tempa##1-##2\si@stop{%
+      \def\si@unit@parse@power@current{##2}%
+    }%
+  }{%
+    \si@add@left@n\si@unit@parse@power@current{-}%
+  }%
 }
 %    \end{macrocode}
 %\end{macro}
