@@ -6389,6 +6389,15 @@ This work consists of the file  siunitx.dtx
 % For macro-based units, the macros are converted into literal text,
 % which is then passed on for printing.
 % 
+%\begin{macro}{\si@unit@parse@block}
+%\begin{macro}{\si@unit@parse@block@den}
+% Storage for the current block.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@block}{}
+\newcommand*{\si@unit@parse@block@den}{}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
 %\begin{macro}{\si@unit@parse@block@cnt}
 %\begin{macro}{\si@unit@parse@block@den@cnt}
 % For ambiguity testing a track is needed of the number of blocks
@@ -6399,16 +6408,17 @@ This work consists of the file  siunitx.dtx
 \newcount\si@unit@parse@block@den@cnt
 %    \end{macrocode}
 %\end{macro} 
-%\end{macro} 
-%\begin{macro}{\si@unit@parse@block}
-%\begin{macro}{\si@unit@parse@block@den}
-% Storage for the current block.
+%\end{macro}  
+%\begin{macro}{\si@unit@parse@per@current@bool}
+%\begin{macro}{\si@unit@parse@per@last@bool}
+% The use of \cs{per} needs two flags as conceptually the \cs{per} for
+% block ``B'' is given during block ``A''.
 %    \begin{macrocode}
-\newcommand*{\si@unit@parse@block}{}
-\newcommand*{\si@unit@parse@block@den}{}
+\si@bool@new\si@unit@parse@per@current@bool
+\si@bool@new\si@unit@parse@per@last@bool
 %    \end{macrocode}
-%\end{macro} 
-%\end{macro} 
+%\end{macro}
+%\end{macro}
 %\begin{macro}{\si@unit@parse@power@current}
 %\begin{macro}{\si@unit@parse@power@last}
 % Powers are stored.
@@ -6417,6 +6427,12 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@parse@power@last}{}
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\begin{macro}{\si@unit@parse@qual@sub@bool}
+% For warning that qualifiers are subscripted.
+%    \begin{macrocode}
+\si@bool@new\si@unit@parse@qual@sub@bool
+%    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\si@unit@parse@queue}
 %\begin{macro}{\si@unit@parse@queue@den}
@@ -6432,16 +6448,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@sep}{}
 %    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\si@unit@parse@per@current@bool}
-%\begin{macro}{\si@unit@parse@per@last@bool}
-% The use of \cs{per} needs two flags as conceptually the \cs{per} for
-% block ``B'' is given during block ``A''.
-%    \begin{macrocode}
-\si@bool@new\si@unit@parse@per@current@bool
-\si@bool@new\si@unit@parse@per@last@bool
-%    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\begin{macro}{\si@unit@parse@sticky@bool}
 % The \cs{per} macro can be ``sticky''.
@@ -6497,12 +6503,15 @@ This work consists of the file  siunitx.dtx
   qualifier format/.cd,
     brackets/.code  = {%
       \def\si@unit@parse@qual@format##1{(##1)}%
+      \si@bool@false\si@unit@parse@qual@sub@bool
     },
     space/.code     = {%
       \def\si@unit@parse@qual@format##1{\text{ }##1}%
+      \si@bool@false\si@unit@parse@qual@sub@bool
     },
     subscript/.code = {%
       \def\si@unit@parse@qual@format##1{_{##1}}%
+      \si@bool@true\si@unit@parse@qual@sub@bool
     },
   /siunitx/units/output,
   sticky per/.is siunitx switch         = {unit@parse@sticky},
@@ -6680,7 +6689,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@store@power}[1]{%
   \si@unit@parse@last@if@T{qual}{%
-    \si@unit@parse@bracket{block\si@unit@parse@queue@use}%
+    \si@bool@if@F\si@unit@parse@qual@sub@bool{%
+      \si@unit@parse@bracket{block\si@unit@parse@queue@use}%
+    }%
     \si@unit@parse@store@power@aux
   }%
   \si@unit@parse@last@if@T{unit}{%
