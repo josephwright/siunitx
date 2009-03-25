@@ -3019,6 +3019,7 @@ This work consists of the file  siunitx.dtx
   \si@catcode@set{94}{13}% ^
   \si@catcode@set{95}{13}% _
   \everyeof{\noexpand}%
+  \endlinechar\m@ne\relax
   \si@bool@if@TF\si@font@set@text@bool{%
     \si@catcode@set{45}{13}% -
     \let-\si@print@minus
@@ -7189,15 +7190,30 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\SI}
-% For \cs{SI}, the internals of the \cs{num} macro are also used. There
-% may then be a need to add a space between the number and value.
+%\begin{macro}{\si@unit@internal@i}
+% The main \cs{SI} macro has to do a bit of shuffling so that internally
+% there are exactly four arguments. This is done in two steps, first
+% collecting the first optional and mandatory arguments, then the 
+% second set before handing off to the business end.
 %    \begin{macrocode}
-\si@newcommand*{\SI}[3][]{% TEMP
+\si@newcommand*{\SI}[2][]{%
   \begingroup
+    \def\si@tempa{{#1}{#2}}%
+    \si@unit@internal@i
+}
+\newcommand*{\si@unit@internal@i}[2][]{%
+    \expandafter\si@unit@internal@ii\si@tempa{#1}{#2}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@unit@internal@ii}
+%    \begin{macrocode}
+\newcommand*{\si@unit@internal@ii}[4]{% TEMP
     \sisetup{#1}%
     \si@num@internal{#2}%
-    \si@empty@tlist@if@F{#2}{%
-      \si@empty@tlist@if@F{#3}{%
+    \si@bool@if@F\si@num@in@error@bool{%
+      \si@empty@tlist@if@F{#4}{%
         \ensuremath{%
           \si@bool@if@TF\si@unit@out@break@bool{%
             \allowbreak
@@ -7208,7 +7224,7 @@ This work consists of the file  siunitx.dtx
         }%
       }%
     }%
-    \si@unit@in@parse{#3}%
+    \si@unit@in@parse{#4}%
   \endgroup
 }
 %    \end{macrocode}
