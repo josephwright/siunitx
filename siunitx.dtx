@@ -1135,6 +1135,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
+%      allow literal units      & Switch  & true      \\
 %      allow number-unit breaks & Switch  & false     \\
 %      close bracket            & Literal & )         \\
 %      inter-unit separator     & Literal & \cs{,}    \\
@@ -1147,6 +1148,12 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeOption{units/output/allow literal units}
+% Some users may prefer to completely disable the use of literal input
+% in units, for example to enforce consistency. This can be
+% accomplished by setting the \option{allow literal units} switch. With 
+% this option enabled, only macro-based units can be used in a document.
 %
 %\DescribeOption{units/output/inter-unit separator}
 %\DescribeOption{units/output/number-unit separator}
@@ -3009,7 +3016,8 @@ This work consists of the file  siunitx.dtx
 % The various active characters for printing are set up and everything
 % is made safe for output. The definitions need the correct category
 % codes to apply for the \cs{let}, otherwise the dreaded 
-% \cs{inaccessible} appears.
+% \cs{inaccessible} appears. The \cs{endlinechar} change is needed here
+% otherwise an extra space ends up in the output.
 %    \begin{macrocode}
 \si@catcode@set{45}{13}% -
 \si@catcode@set{94}{13}% ^
@@ -6311,12 +6319,22 @@ This work consists of the file  siunitx.dtx
 % input part of the process is used to sort out parsed or literal units.
 % 
 %\begin{macro}{\si@unit@in@parse}
+% The master function does a very simple checks then hands off.
 %    \begin{macrocode}
 \newcommand*{\si@unit@in@parse}[1]{%
-  \si@unit@in@process@if@TF{#1}{%
-    \si@unit@parse@unit{#1}%
-  }{%
-    \si@unit@out@literal{#1}%
+  \si@empty@tlist@if@F{#1}{%
+    \si@unit@in@process@if@TF{#1}{%
+      \si@unit@parse@unit{#1}%
+    }{%
+      \si@bool@if@TF\si@unit@out@lit@allow@bool{%
+        \si@unit@out@literal{#1}%
+      }{%
+        \si@log@error{Literal units disabled}{%
+          You gave the literal input `#1' for a unit\MessageBreak
+          but literal unit output is disabled.
+        }%
+      }%
+    }%
   }%
 }
 %    \end{macrocode}
@@ -6761,16 +6779,19 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\si@unit@out@break@bool}
+%\begin{macro}{\si@unit@out@lit@allow@bool}
 %\begin{macro}{\si@unit@out@num@sep}
 %\begin{macro}{\si@unit@out@unit@sep}
 %\begin{macro}{\si@unit@out@unit@space}
 % Storage for various options.
 %    \begin{macrocode}
 \si@bool@new\si@unit@out@break@bool
+\si@bool@new\si@unit@out@lit@allow@bool
 \newcommand*{\si@unit@out@num@sep}{}
 \newcommand*{\si@unit@out@unit@sep}{}
 \newcommand*{\si@unit@out@unit@space}{}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6780,13 +6801,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \pgfkeys{
   /siunitx/units/output,
+  allow literal units/.is siunitx switch = {unit@out@lit@allow},
   allow number-unit breaks/.is siunitx switch = {unit@out@break},
-  close bracket/.store in         = \si@unit@out@bracket@close,
-  inter-unit separator/.store in  = \si@unit@out@unit@sep,
-  inter-unit space/.store in      = \si@unit@out@unit@space,
-  number-unit separator/.store in = \si@unit@out@num@sep,
-  open bracket/.store in          = \si@unit@out@bracket@open,
-  use brackets/.is siunitx switch = {unit@out@bracket@use}, %(
+  close bracket/.store in                = \si@unit@out@bracket@close,
+  inter-unit separator/.store in         = \si@unit@out@unit@sep,
+  inter-unit space/.store in             = \si@unit@out@unit@space,
+  number-unit separator/.store in        = \si@unit@out@num@sep,
+  open bracket/.store in                 = \si@unit@out@bracket@open,
+  use brackets/.is siunitx switch        = {unit@out@bracket@use}, %(
+  allow literal units   = true,
   allow number-unit breaks = false,
   close bracket         = ),
   inter-unit separator  = \,,
@@ -7202,7 +7225,7 @@ This work consists of the file  siunitx.dtx
     \si@unit@internal@i
 }
 \newcommand*{\si@unit@internal@i}[2][]{%
-    \expandafter\si@unit@internal@ii\si@tempa{#1}{#2}%
+  \expandafter\si@unit@internal@ii\si@tempa{#1}{#2}%
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7211,6 +7234,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@internal@ii}[4]{% TEMP
     \sisetup{#1}%
+    \si@unit@in@parse{#3}%
     \si@num@internal{#2}%
     \si@bool@if@F\si@num@in@error@bool{%
       \si@empty@tlist@if@F{#4}{%
