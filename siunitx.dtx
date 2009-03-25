@@ -1120,6 +1120,72 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Using units}
 %
+% Part of the power of \pkg{siunitx} is the ability to alter the output
+% format for units without changing the input. The behaviour of units
+% is therefore controlled by a number of options which alter either the
+% processing of units or the output directly.
+%
+%\begin{table}
+%  \centering
+%  \caption{\texttt{units/output} options}
+%  \label{tab:opt:num:out}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      allow number-unit breaks & Switch  & false     \\
+%      close bracket            & Literal & )         \\
+%      inter-unit separator     & Literal & \cs{,}    \\
+%      inter-unit space         & Literal & \cs{,}    \\
+%      open bracket             & Literal & (         \\ ^^A )
+%      print as fraction        & Switch  & false     \\
+%      qualifier format         & Choice  & subscript \\
+%      sticky per               & Switch  & false     \\
+%      use brackets             & Switch  & true      \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{units/output/inter-unit separator}
+%\DescribeOption{units/output/number-unit separator}
+% The separation between units, and between a number and the units 
+% following it, can be adjusted. The options \option{inter-unit
+% separator} and \option{number-unit separator} are used to store an
+% appropriate spacing or separator value. The separators are always
+% printed in maths mode: a full text space is therefore given as
+% |\text{ }|.
+%
+%\DescribeOption{units/output/use brackets}
+%\DescribeOption{units/output/open bracket}
+%\DescribeOption{units/output/close bracket}
+% As with numerical output, there are some occasions when units can
+% potentially be ambiguous. This can be corrected by adding brackets in 
+% the appropriate place, and is controlled by the \option{use brackets} 
+% switch.  The opening and closing brackets used are stored \option{open 
+% bracket} and \option{close bracket}, respectively.
+%\begin{LaTeXdemo}
+%  \sisetup{units/output/qualifier format = space}%
+%  \SI{1.234}{\gram\product\cubed\per\mole} \\
+%  \SI[units/output/use brackets = false]
+%    {1.234}{\gram\product\cubed\per\mole} \\
+%  \SI[units/output/open bracket = \{,
+%      units/output/close bracket = \}]
+%    {1.234}{\gram\product\cubed\per\mole}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{units/output/qualifier format}
+% Unit qualifiers can appear in a number of output formats. The package
+% expects a choice from the list \option{subscript}, \option{space}
+% and \option{brackets}. These work as might be expected.
+%\begin{LaTeXdemo}
+%  \si[units/output/qualifier format = subscript]{\gram\product} \\
+%  \si[units/output/qualifier format = space]{\gram\product} \\
+%  \si[units/output/qualifier format = brackets]{\gram\product} 
+%\end{LaTeXdemo}
+%
+%
 %\subsection{Symbols}
 %
 % Most units use letters as the symbol for the unit, and these are all
@@ -5121,15 +5187,17 @@ This work consists of the file  siunitx.dtx
 % The number is put back together in stages.
 %    \begin{macrocode}
 \newcommand*{\si@num@out@process}{%
-  \si@num@out@init
-  \si@num@out@core 
-  \si@num@out@complex
-  \si@empty@if@F\si@num@out@mant{%
-    \si@bool@true\si@num@out@mant@bool
+  \si@bool@if@F\si@num@in@error{%
+    \si@num@out@init
+    \si@num@out@core 
+    \si@num@out@complex
+    \si@empty@if@F\si@num@out@mant{%
+      \si@bool@true\si@num@out@mant@bool
+    }%
+    \si@num@out@sign{mant}%
+    \si@num@out@sign{exp}%
+    \si@num@out@exponent
   }%
-  \si@num@out@sign{mant}%
-  \si@num@out@sign{exp}%
-  \si@num@out@exponent
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6698,13 +6766,19 @@ This work consists of the file  siunitx.dtx
 \si@bool@new\si@unit@out@bracket@use@bool
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}{\si@unit@out@break@bool}
+%\begin{macro}{\si@unit@out@num@sep}
 %\begin{macro}{\si@unit@out@unit@sep}
 %\begin{macro}{\si@unit@out@unit@space}
 % Storage for various options.
 %    \begin{macrocode}
+\si@bool@new\si@unit@out@break@bool
+\newcommand*{\si@unit@out@num@sep}{}
 \newcommand*{\si@unit@out@unit@sep}{}
 \newcommand*{\si@unit@out@unit@space}{}
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 % 
@@ -6712,16 +6786,20 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \pgfkeys{
   /siunitx/units/output,
+  allow number-unit breaks/.is siunitx switch = {unit@out@break},
   close bracket/.store in         = \si@unit@out@bracket@close,
   inter-unit separator/.store in  = \si@unit@out@unit@sep,
   inter-unit space/.store in      = \si@unit@out@unit@space,
+  number-unit separator/.store in = \si@unit@out@num@sep,
   open bracket/.store in          = \si@unit@out@bracket@open,
   use brackets/.is siunitx switch = {unit@out@bracket@use}, %(
-  close bracket        = ),
-  inter-unit separator = \,,
-  inter-unit space     = \,, 
-  open bracket         = (, %)
-  use brackets         = true
+  allow number-unit breaks = false,
+  close bracket         = ),
+  inter-unit separator  = \,,
+  inter-unit space      = \,, 
+  number-unit separator = \,,
+  open bracket          = (, %
+  use brackets          = true
 }
 %    \end{macrocode}
 %
@@ -7084,36 +7162,58 @@ This work consists of the file  siunitx.dtx
 % The set up macro simply moves to the correct path and executes 
 % whatever has been passed.
 %    \begin{macrocode}
-\newcommand*{\sisetup}{}
-\protected\def\sisetup#1{%
+\si@newcommand*{\sisetup}[1]{%
   \pgfqkeys{/siunitx}{#1}%
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\num}
+%\begin{macro}{\si@num@internal}
+% The \cs{num} macro is quite simple: read the number, check it is 
+% correct then print it. As the internal part is re-used by \cs{SI}, it
+% is made into a separate short macro.
 %    \begin{macrocode}
 \si@newcommand*{\num}[2][]{%
   \begingroup
     \sisetup{#1}%
-    \si@num@pre@process{#2}%
-    \si@bool@if@F\si@num@pre@error@bool{%
-      \si@num@in@parse@o{\si@num@pre@arg}%
-      \si@num@post@process
-      \si@num@out@process
-      \si@num@print
-    }%
+    \si@num@internal{#2}%
   \endgroup
+}
+\newcommand*{\si@num@internal}[1]{%
+  \si@num@pre@process{#1}%
+  \si@bool@if@F\si@num@pre@error@bool{%
+    \si@num@in@parse@o{\si@num@pre@arg}%
+    \si@num@post@process
+    \si@num@out@process
+    \si@num@print
+  }%
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\SI}
+% For \cs{SI}, the internals of the \cs{num} macro are also used. There
+% may then be a need to add a space between the number and value.
 %    \begin{macrocode}
 \si@newcommand*{\SI}[3][]{% TEMP
   \begingroup
     \sisetup{#1}%
-    \num{#2}%
+    \si@num@internal{#2}%
+    \si@bool@if@F\si@num@in@error
+    \si@empty@tlist@if@F{#2}{%
+      \si@empty@tlist@if@F{#3}{%
+        \ensuremath{%
+          \si@bool@if@TF\si@unit@out@break@bool{%
+            \allowbreak
+          }{%
+            \nobreak
+          }%
+          \si@unit@out@num@sep
+        }%
+      }%
+    }%
     \si@unit@in@parse{#3}%
   \endgroup
 }
@@ -7121,8 +7221,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si}
+% The \cs{si} macro can be much less complex than \cs{SI}. Only two 
+% steps are needed: applying local settings and parsing the unit.
 %    \begin{macrocode}
-\si@newcommand*{\si}[2][]{% TEMP
+\si@newcommand*{\si}[2][]{%
   \begingroup
     \sisetup{#1}%
     \si@unit@in@parse{#2}%
