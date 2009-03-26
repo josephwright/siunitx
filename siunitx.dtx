@@ -121,6 +121,7 @@ This work consists of the file  siunitx.dtx
 \usepackage{\jobname}
 \DeclareSIQualifier{\product}{prod}
 \DeclareSIQualifier{\catalyst}{cat}
+\DeclareSIUnit[units/output/number-value separator={}]{\oddunit}{XXX}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -412,6 +413,8 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \si{\kilo\gram\metre\per\square\second} \\
 %  \si{\gram\per\cubic\centi\metre}        \\
+%  \si{\square\volt\cubic\lumen\per\farad} \\
+%  \si{\metre\squared\per\gray\cubic\lux}  \\
 %  \si{\henry\second}                      
 %\end{LaTeXdemo}
 % On its own, this is less convenient than the direct method, although
@@ -534,10 +537,14 @@ This work consists of the file  siunitx.dtx
 % any suitable options, and applies the specific unit macro only. The 
 % (first) optional argument to \cs{SI} and \cs{si} can be used to 
 % override the settings for the unit.
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIUnit[units/output/number-unit separator={}]
+%    {\oddunit}{XXX}
+%\end{LaTeXdemo}
 %\begin{LaTeXdemo}
-%  \SI{3.1415}{\degree}\\
+%  \SI{3.1415}{\degree} \\
 %  %\DeclareSIUnit[valuesep=none]{\oddunit}{XXX}
-%  %\SI{12345}{\oddunit}
+%  \SI{12345}{\oddunit}
 %  %\SI[valuesep=thick]{67890}{\oddunit}
 %\end{LaTeXdemo}
 % 
@@ -1234,6 +1241,19 @@ This work consists of the file  siunitx.dtx
 % in units, for example to enforce consistency. This can be
 % accomplished by setting the \opt{allow literal units} switch. With 
 % this option enabled, only macro-based units can be used in a document.
+% 
+%\DescribeOption{units/output/sticky per}
+% By default, \cs{per} applies only to the next unit
+% given.\footnote{This is the standard method of reading units in
+% English: for example, \si{\joule\per\mole\per\kelvin} is pronounced
+% ``joules per mole per kelvin''.}  By setting the \opt{sticky per}
+% flag, this behaviour is changed so that \cs{per} applies to all
+% subsequent units.
+%\begin{LaTeXdemo}
+%  \si{\pascal\per\gray\henry} \\
+%  \si[units/output/sticky per]
+%    {\pascal\per\gray\henry}
+%\end{LaTeXdemo}
 %
 %\DescribeOption{units/output/inter-unit separator}
 %\DescribeOption{units/output/number-unit separator}
