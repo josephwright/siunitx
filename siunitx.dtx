@@ -213,11 +213,20 @@ This work consists of the file  siunitx.dtx
 %  \LaTeXdemo@common
 %}{^^A
 %}
-%\makeatother
 %
-%^^A Commands for this document
+%^^A Some short cuts for the tables
+%
+%\newcommand*{\DescribeUnit}[1]{^^A
+%  \expandafter\SpecialUsageIndex\csname #1\endcsname ^^A
+%  #1 &
+%  \cs{#1} &
+%  \expandafter\si\expandafter{\csname #1\endcsname}
+%}
+%
 %\providecommand*{\pkg}{\textsf}
-%\providecommand*{\option}{\texttt}
+%\providecommand*{\opt}{\texttt}
+%
+%\makeatother
 %
 %\title{^^A
 %  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{^^A
@@ -427,15 +436,85 @@ This work consists of the file  siunitx.dtx
 % currency).
 %\begin{LaTeXdemo}
 %  \SI[font/mode=text]{1.23}{J.mol^{-1}.K^{-1}} \\
-%  \SI{.23e7}{\candela}                          \\
-%  %\SI[per=slash]{1.99}[\pounds]{\per\kilogram}  \\
-%  \SI{70}{\metre\per\second}                    \\
+%  \SI{.23e7}{\candela}                         \\
+%  %\SI[per=slash]{1.99}[\$]{\per\kilogram}     \\
+%  \SI{70}{\metre\per\second}                   \\
 %  %\SI[per=frac,fraction=nice]{1,345}{\ampere\per\mole}
 %\end{LaTeXdemo}
 %
 %\subsection{Units: free-standing}
 %
 %\section{The unit macros}
+%
+% The package always defines the basic set of SI units with macro names.
+% This includes the base SI units, the derived units with special names
+% and the prefixes. A small number of powers are also given pre-defined
+% names.
+% 
+%\DescribeMacro{\meter} 
+% The seven base SI units are always defined 
+% (Table~\ref{tab:unit:base}). In addition, the macro \cs{meter} is
+% available as an alias for \cs{metre}, for users of US spellings.
+%\begin{table}
+%  \caption{The seven base SI units}
+%  \label{tab:unit:base}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit} &
+%      \multicolumn{1}{c}{Macro} &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{ampere}   \\
+%      \DescribeUnit{candela}  \\
+%      \DescribeUnit{kelvin}   \\
+%      \DescribeUnit{kilogram} \\ 
+%      \DescribeUnit{metre}    \\
+%      \DescribeUnit{mole}     \\
+%      \DescribeUnit{second}   \\ 
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\begin{table}
+%  \caption{The derived SI units with defined names}
+%  \label{tab:unit:der}
+%  \centering
+%  \begin{tabular}{llllll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{becquerel} &
+%      \DescribeUnit{newton}    \\
+%      \DescribeUnit{celsius}   &
+%      \DescribeUnit{ohm}       \\
+%      \DescribeUnit{coulomb}   &
+%      \DescribeUnit{pascal}    \\
+%      \DescribeUnit{farad}     &
+%      \DescribeUnit{radian}    \\
+%      \DescribeUnit{gray}      &
+%      \DescribeUnit{siemens}   \\
+%      \DescribeUnit{hertz}     &
+%      \DescribeUnit{sievert}   \\
+%      \DescribeUnit{henry}     &
+%      \DescribeUnit{steradian} \\
+%      \DescribeUnit{joule}     &
+%      \DescribeUnit{tesla}     \\
+%      \DescribeUnit{katal}     &
+%      \DescribeUnit{volt}      \\
+%      \DescribeUnit{lumen}     &
+%      \DescribeUnit{watt}      \\
+%      \DescribeUnit{lux}       &
+%      \DescribeUnit{weber}     \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
 %
 %\subsection{Creating new macros}
 %
@@ -541,7 +620,7 @@ This work consists of the file  siunitx.dtx
 %  \item[\texttt{Choice}] Takes a limited number of choices, which 
 %    are described separately for each key. 
 %  \item[\texttt{Literal}] A key which uses the value(s) given directly,
-%    either to check input (for example the \option{numbers/input} keys)
+%    either to check input (for example the \opt{numbers/input} keys)
 %    or in output.
 %  \item[\texttt{Maths}] Similar to a \texttt{literal} option, but the
 %    input is always used in maths mode, irrespective of other 
@@ -562,9 +641,9 @@ This work consists of the file  siunitx.dtx
 % keys should be used.
 % 
 % In all cases, UK and US English spellings are available for both 
-% option names and for settings. Thus \option{centre} and 
-% \option{center} can be used for alignment options, and \option{maths}
-% or \option{math} is valid in the names of font options. In the rest of
+% option names and for settings. Thus \opt{centre} and 
+% \opt{center} can be used for alignment options, and \opt{maths}
+% or \opt{math} is valid in the names of font options. In the rest of
 % this document, UK English spelling is used.
 %
 %\subsection{Detecting fonts}
@@ -603,17 +682,17 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{font/detect/family}
 %\DescribeOption{font/detect/italic}
 %\DescribeOption{font/detect/mode}
-% The four basic options \option{bold} and \option{italic} set detection
+% The four basic options \opt{bold} and \opt{italic} set detection
 % of the prevailing bold and italic states, respectively. The italic
 % state is only checked if the surrounding material is not in maths mode
 % (as maths text is always italic). Detecting the current family (roman,
-% sans serif or monospaced) is controlled by the \option{family} 
+% sans serif or monospaced) is controlled by the \opt{family} 
 % setting, while the current mode (text or maths) is detected using the
-% \option{mode} switch. 
+% \opt{mode} switch. 
 % 
 %\DescribeOption{font/detect/all}
 %\DescribeOption{font/detect/none}
-% The two style options \option{all} and \option{none} can be used to 
+% The two style options \opt{all} and \opt{none} can be used to 
 % turn on or off all of the detection functions in one go. These are
 % style options, and so need no value.
 %\begin{LaTeXdemo}
@@ -632,8 +711,8 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo} 
 %
 %\DescribeOption{font/detect/inline bold}
-% Bold detection is influenced by the value of \option{inline bold},
-% which takes values \option{text} and \option{maths}.  The package
+% Bold detection is influenced by the value of \opt{inline bold},
+% which takes values \opt{text} and \opt{maths}.  The package
 % can detect the local value of bold for either the surrounding text,
 % or the surrounding inline (|$|\ldots|$|) maths.
 %\begin{LaTeXdemo}
@@ -653,10 +732,10 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{font/detect/display maths}
 % The font detection system can treat displayed mathematical content
-% in two ways.  This is controlled by the \option{display} option.
-% When set \option{on}, display mathematics is treated independently 
+% in two ways.  This is controlled by the \opt{display} option.
+% When set \opt{on}, display mathematics is treated independently 
 % from the body of the document.  Thus the local \emph{maths} font is 
-% checked for matching.  In contrast, when set \option{off}, display 
+% checked for matching.  In contrast, when set \opt{off}, display 
 % material is treated with the current running text font.
 %\begin{LaTeXdemo}
 %  \sffamily
@@ -676,7 +755,7 @@ This work consists of the file  siunitx.dtx
 % The relationship between font family detected and font family used
 % for output is not fixed. The font detected by the package in the 
 % surrounding material does not have to match that used for output.
-% This is controlled by the \option{font/output} options.
+% This is controlled by the \opt{font/output} options.
 %
 %\begin{table}
 %  \centering
@@ -703,30 +782,30 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %
 %\DescribeOption{font/mode}
-% The \option{mode} option determines whether \pkg{siunitx} uses
+% The \opt{mode} option determines whether \pkg{siunitx} uses
 % maths or text mode when printing output. The choices are 
-% \option{maths}, \option{math} and \option{text}. When using maths
+% \opt{maths}, \opt{math} and \opt{text}. When using maths
 % mode, text is printed using a maths font whereas in text mode a
 % text font is used.  The extent to which this is visually obvious
 % depends on the fonts in use in the document. This manual uses old
 % style (lower-case) figures in text mode to highlight the differences.
-% This option has no effect if the \option{font/detect/mode} switch is
-% \option{on}.
+% This option has no effect if the \opt{font/detect/mode} switch is
+% \opt{on}.
 %
 %\DescribeOption{font/maths rm}
 %\DescribeOption{font/text rm}
 % If font family detection is inactive, \pkg{siunitx} uses the font
-% family stored in either \option{maths rm} or \option{text rm} for
-% output. The choice of \option{maths} or \option{text} depends on the
-% \option{mode} setting.
+% family stored in either \opt{maths rm} or \opt{text rm} for
+% output. The choice of \opt{maths} or \opt{text} depends on the
+% \opt{mode} setting.
 %\DescribeOption{font/maths sf}
 %\DescribeOption{font/maths tt}
 %\DescribeOption{font/text sf}
 %\DescribeOption{font/text tt}
 % If font family detection is active, \pkg{siunitx} may be using a
 % sans serif or monospaced font for output. In maths mode, these are
-% stored in \option{maths sf} and \option{maths tt}, and for text mode
-% in \option{text sf} and \option{text tt}. Notice that the detected
+% stored in \opt{maths sf} and \opt{maths tt}, and for text mode
+% in \opt{text sf} and \opt{text tt}. Notice that the detected
 % and output font families can differ.
 %\begin{LaTeXdemo}
 %  \sisetup{font/detect/family}%
@@ -748,8 +827,8 @@ This work consists of the file  siunitx.dtx
 % given all output in sans serif font without font detection.
 % 
 % Every one of the font options can be given independently for units 
-% and number, with the option paths \option{font/units/} and
-% \option{font/numbers/}, respectively. This allows fine control of
+% and number, with the option paths \opt{font/units/} and
+% \opt{font/numbers/}, respectively. This allows fine control of
 % output.
 %
 %\subsection{Parsing numbers}
@@ -788,18 +867,18 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/input/exponent markers} 
 % The basic parts of a number are the digits, any sign and a separator
 % between the integer and decimal parts. These are stored in the input
-% options \option{digits}, \option{decimal markers} and \option{signs},
+% options \opt{digits}, \opt{decimal markers} and \opt{signs},
 % respectively. More than one input decimal marker can be used: it will
 % be converted by the package to the appropriate output marker. Numbers
 % which include an exponent part also require a marker for the exponent:
-% this again is taken from the range of tokens in the \option{exponent 
+% this again is taken from the range of tokens in the \opt{exponent 
 % markers} option.
 % 
 %\DescribeOption{numbers/input/ignore}
 %\DescribeOption{numbers/input/symbols}
 % As well as ``normal'' digits, the package will interpret symbolic
 % ``numbers'' (such as \cs{pi}) correctly if they are included in the 
-% \option{symbols} list. Tokens given in the \option{ignore} list are
+% \opt{symbols} list. Tokens given in the \opt{ignore} list are
 % totally passed over by \pkg{siunitx}: they will be removed from the
 % input with no further processing.
 % 
@@ -808,12 +887,12 @@ This work consists of the file  siunitx.dtx
 % In some fields, it is common to give the uncertainty in a value 
 % in brackets after the main part of the number, for example 
 % ``\num{1.234(5)}''. The opening and closing symbols used for this type
-% of input are set as \option{open uncertainty} and \option{close 
+% of input are set as \opt{open uncertainty} and \opt{close 
 % uncertainty}.
 %
 %\DescribeOption{numbers/input/complex roots}
 % When using complex numbers in input, the complex root ($\sqrt{-1}$) is
-% indicated by one of the tokens stored in \option{complex roots}.
+% indicated by one of the tokens stored in \opt{complex roots}.
 %
 %\subsection{Post-processing numbers}
 %
@@ -850,10 +929,10 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/process/round places}
 % The \pkg{siunitx} package can round numerical input to a fixed
 % number of significant figures or decimal places. This is controlled by
-% the \option{round mode} option, which takes the choices \option{off},
-% \option{figures} and \option{places}. When rounding is turned on, the
-% number of figures to use is determined by the \option{round figures}
-% and \option{round places} option: both of these options require a 
+% the \opt{round mode} option, which takes the choices \opt{off},
+% \opt{figures} and \opt{places}. When rounding is turned on, the
+% number of figures to use is determined by the \opt{round figures}
+% and \opt{round places} option: both of these options require a 
 % number.
 %\begin{LaTeXdemo}
 %  \num{1.23456} \\
@@ -876,7 +955,7 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/process/add zero integer}
 % It is possible to give real (floating point) numbers as input omitting
 % the decimal or the integer parts of the number (for example \num{.123} 
-% or \num{123.}). The options \option{add zero decimal} and \option{add 
+% or \num{123.}). The options \opt{add zero decimal} and \opt{add 
 % zero integer} allow the package to ``fill in'' the missing zero.
 %\begin{LaTeXdemo}
 %  \num{123.} \\
@@ -893,11 +972,11 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/process/include explicit sign}
 %\DescribeOption{numbers/process/retain explicit plus}
 % The inclusion of a leading plus sign is usually unnecessary for
-% positive numbers, and so the \option{retain explicit plus} option is
+% positive numbers, and so the \opt{retain explicit plus} option is
 % available to control whether these are printed. As the same time, it
 % may be useful to force all numbers to have a sign. This behaviour
-% is controlled by the \option{include explicit sign} option, with the
-% sign to use stored by the \option{explicit sign} option.
+% is controlled by the \opt{include explicit sign} option, with the
+% sign to use stored by the \opt{explicit sign} option.
 %\begin{LaTeXdemo}
 %  \num{+345} \\
 %  \num[numbers/process/retain explicit plus]{+345} \\
@@ -909,7 +988,7 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{numbers/process/retain zero exponent}
 % The retention of a zero exponent (\num[numbers/process/retain zero 
-% exponent]{e0}) is controlled by the \option{retain zero exponent} 
+% exponent]{e0}) is controlled by the \opt{retain zero exponent} 
 % option.
 %\begin{LaTeXdemo}
 %  \num{444e0} \\
@@ -957,12 +1036,12 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/output/group four digits}
 %\DescribeOption{numbers/output/group separator}
 % Grouping digits into blocks of three is a common method to increase
-% the ease of reading of numbers.  The \option{group digits} choice
+% the ease of reading of numbers.  The \opt{group digits} choice
 % turns this behaviour on and off, with grouping for numbers of exactly
-% four digits controlled by the \option{group four digits} choice. Note
-% that the later only applies if \option{group digits} is turned on.
+% four digits controlled by the \opt{group four digits} choice. Note
+% that the later only applies if \opt{group digits} is turned on.
 % The separator used between groups of digits is stored by the 
-% \option{group separator} option.  This takes literal input and is
+% \opt{group separator} option.  This takes literal input and is
 % used in maths mode: for a text-mode full space use |\text{~}|.
 %\begin{LaTeXdemo}
 %  \num{12345} \\
@@ -976,9 +1055,9 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{numbers/output/complex root}
 %\DescribeOption{numbers/output/decimal marker}
-% The decimal marker used in output is set using the \option{decimal 
+% The decimal marker used in output is set using the \opt{decimal 
 % marker} option. This can differ from the input marker, as can the root
-% of $\sqrt{-1}$, which is stored in the \option{complex root} option.
+% of $\sqrt{-1}$, which is stored in the \opt{complex root} option.
 % The later is always in maths mode, but notice that \pkg{siunitx}
 % uses \cs{mathrm} by default.  To force standard \TeX\ maths output to
 % give $i$, the construction |\text{\ensuremath{i}}| can be used.
@@ -990,8 +1069,8 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{numbers/output/exponent base}
 %\DescribeOption{numbers/output/exponent product}
-% When exponents are present in the input, the options \option{exponent
-% base} and \option{exponent product} set the obvious parts of the 
+% When exponents are present in the input, the options \opt{exponent
+% base} and \opt{exponent product} set the obvious parts of the 
 % output.  Notice that the base is in the current mode, but the product
 % sign is always in maths mode.
 %\begin{LaTeXdemo}
@@ -1006,12 +1085,12 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/output/close uncertainty}
 % When input is given including an uncertatinty in a value, it can be 
 % printed either with the uncertainty in brackets or as a separate 
-% number. This behaviour is controlled by the \option{separate 
+% number. This behaviour is controlled by the \opt{separate 
 % uncertainty} choice. If the uncertainty is given in brackets, a space
 % may be added between the main value and the uncertainty: this is 
-% stored using the \option{uncertainty space} option. The opening and
-% closing brackets used are stored \option{open uncertainty} and
-% \option{close uncertainty}, respectively.
+% stored using the \opt{uncertainty space} option. The opening and
+% closing brackets used are stored \opt{open uncertainty} and
+% \opt{close uncertainty}, respectively.
 %\begin{LaTeXdemo}
 %  \num{1.234(5)} \\
 %  \num[numbers/output/separate uncertainty = on]{1.234(5)} \\
@@ -1029,9 +1108,9 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{numbers/output/close bracket}
 % There are certain combinations of numerical input which can be
 % ambiguous. This can be corrected by adding brackets in the appropriate
-% place, and is controlled by the \option{use brackets} switch.  The 
-% opening and closing brackets used are stored \option{open bracket} and
-% \option{close bracket}, respectively.
+% place, and is controlled by the \opt{use brackets} switch.  The 
+% opening and closing brackets used are stored \opt{open bracket} and
+% \opt{close bracket}, respectively.
 %\begin{LaTeXdemo}
 %  \num{1+2i e10} \\
 %  \num[numbers/output/use brackets = false]{1+2i e10} \\
@@ -1045,7 +1124,7 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{numbers/output/tight spacing}
 % Under some circumstances is may be desirable to ``squeeze'' the output
-% spacing.  This is turned on using the \option{tight spacing} switch,
+% spacing.  This is turned on using the \opt{tight spacing} switch,
 % which compresses spacing where possible.
 %\begin{LaTeXdemo}
 %  \num{1\pm2i e3} \\
@@ -1082,11 +1161,11 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{units/creation/allow in body}
 %\DescribeOption{units/creation/overwrite macros}
-% The \option{allow in body} option controls whether the unit macros 
+% The \opt{allow in body} option controls whether the unit macros 
 % exist outside of the \cs{si} and \cs{SI} arguments. When this option
-% is \option{true}, \pkg{siunitx} creates the macros for general use.
+% is \opt{true}, \pkg{siunitx} creates the macros for general use.
 % The standard method to achieve this does not overwrite any existing
-% macros: this behaviour can be altered using the \option{overwrite
+% macros: this behaviour can be altered using the \opt{overwrite
 % macros} switch.
 %
 %\DescribeOption{units/creation/add leading space}
@@ -1095,7 +1174,7 @@ This work consists of the file  siunitx.dtx
 % When ``free standing'' unit macros are created, their behaviour can
 % be adjusted by a number of options. These are mainly intended for
 % emulating the input syntax of older packages. The option 
-% \option{allow optional argument} gives the same behaviour for the
+% \opt{allow optional argument} gives the same behaviour for the
 % inputs
 %\begin{LaTeXdemo}[code only]
 %  \SI{10}{\metre}
@@ -1104,15 +1183,15 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}[code only]
 %  \metre[10].
 %\end{LaTeXdemo}
-% The \option{add leading space} and \option{use xspace} options control
+% The \opt{add leading space} and \opt{use xspace} options control
 % the behaviour at the ``ends'' of the unit macros. Activating 
-% \option{add leading space} inserts the number--unit space before the
+% \opt{add leading space} inserts the number--unit space before the
 % unit is printed. This is suitable for the input syntax
 %\begin{LaTeXdemo}[code only]
 %  30\metre
 %\end{LaTeXdemo}
 % but does mean that the unit macros are incorrectly spaced in running
-% text.  On the other hand, the \option{use xspace} option attempts to
+% text.  On the other hand, the \opt{use xspace} option attempts to
 % correctly space input such as
 %\begin{LaTeXdemo}[code only]
 %  \metre is the symbol for metres.
@@ -1153,25 +1232,25 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{units/output/allow literal units}
 % Some users may prefer to completely disable the use of literal input
 % in units, for example to enforce consistency. This can be
-% accomplished by setting the \option{allow literal units} switch. With 
+% accomplished by setting the \opt{allow literal units} switch. With 
 % this option enabled, only macro-based units can be used in a document.
 %
 %\DescribeOption{units/output/inter-unit separator}
 %\DescribeOption{units/output/number-unit separator}
 % The separation between units, and between a number and the units 
-% following it, can be adjusted. The options \option{inter-unit
-% separator} and \option{number-unit separator} are used to store an
+% following it, can be adjusted. The options \opt{inter-unit
+% separator} and \opt{number-unit separator} are used to store an
 % appropriate spacing or separator value. The separators are always
 % printed in maths mode: a full text space is therefore given as
 % |\text{ }|.
 %\DescribeOption{units/output/inter-unit space}
 % When using literal unit input, the |~| symbol is converted into an
 % inter-unit space which can be different from that specified in
-% \option{inter-unit separator}.
+% \opt{inter-unit separator}.
 % 
 %\DescribeOption{units/output/allow unit-number breaks}
 % The standard method for printing units with a value prevents a break
-% occurring between the two parts. The \option{allow unit-number breaks}
+% occurring between the two parts. The \opt{allow unit-number breaks}
 % can be used to turn on breaking in this context, for example when 
 % using narrow columns.
 %\begin{LaTeXdemo}
@@ -1187,9 +1266,9 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{units/output/close bracket}
 % As with numerical output, there are some occasions when units can
 % potentially be ambiguous. This can be corrected by adding brackets in 
-% the appropriate place, and is controlled by the \option{use brackets} 
-% switch.  The opening and closing brackets used are stored \option{open 
-% bracket} and \option{close bracket}, respectively.
+% the appropriate place, and is controlled by the \opt{use brackets} 
+% switch.  The opening and closing brackets used are stored \opt{open 
+% bracket} and \opt{close bracket}, respectively.
 %\begin{LaTeXdemo}
 %  \sisetup{units/output/qualifier format = space}%
 %  \SI{1.234}{\gram\product\cubed\per\mole} \\
@@ -1202,8 +1281,8 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{units/output/qualifier format}
 % Unit qualifiers can appear in a number of output formats. The package
-% expects a choice from the list \option{subscript}, \option{space}
-% and \option{brackets}. These work as might be expected.
+% expects a choice from the list \opt{subscript}, \opt{space}
+% and \opt{brackets}. These work as might be expected.
 %\begin{LaTeXdemo}
 %  \si[units/output/qualifier format = subscript]{\gram\product} \\
 %  \si[units/output/qualifier format = space]{\gram\product} \\
@@ -1232,9 +1311,9 @@ This work consists of the file  siunitx.dtx
 % The package provides one general option for the handling of symbols.
 % If the packages \pkg{textcomp} or \pkg{upgreek} are loaded, symbols 
 % can be taken from these for units, rather than using the
-% \pkg{siunitx} default values. The switch \option{redefine symbols} 
+% \pkg{siunitx} default values. The switch \opt{redefine symbols} 
 % can be used to turn this behaviour on or off: the standard setting
-% is \option{true}.
+% is \opt{true}.
 % 
 % The individual symbols used for a number of units are available as
 % package options in paths \texttt{symbols/maths} and 
@@ -1243,7 +1322,7 @@ This work consists of the file  siunitx.dtx
 % complex, as there is in some cases a need to create low-level symbol
 % macros. In many cases, the maths and text variations are created from
 % the same underlying macro using \cs{text} or \cs{ensuremath}. For
-% example, the standard definitions for \option{angstrom} are:
+% example, the standard definitions for \opt{angstrom} are:
 %\begin{LaTeXdemo}[code only]
 %  \sisetup{
 %    symbols/maths/angstrom = \text{\AA},
@@ -5646,7 +5725,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\si@num@print}
 %    \begin{macrocode}
 \newcommand*{\si@num@print}{%
-  \si@print@num@o{\si@num@out@result}% TEMP
+  \si@print@num@o{\si@num@out@result}% \opt
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -7086,7 +7165,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@symbol@new}[1]{%
   \expandafter\si@newcommand\expandafter*\expandafter{%
-    \csname si@symbol@#1\endcsname
+    \csname siunitxsymbol#1\endcsname
   }{%
     \si@mode@maths@if@TF{%
       \@nameuse{si@symbol@maths@#1}%
@@ -7357,7 +7436,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPrefix{\femto}{f}{-15}
 \DeclareSIPrefix{\pico}{p}{-12}
 \DeclareSIPrefix{\nano}{n}{-9}
-\DeclareSIPrefix{\micro}{\si@symbol@micro}{-6}
+\DeclareSIPrefix{\micro}{\siunitxsymbolmicro}{-6}
 \DeclareSIPrefix{\milli}{m}{-3}
 \DeclareSIPrefix{\centi}{c}{-2}
 \DeclareSIPrefix{\deci}{d}{-1}
@@ -7434,7 +7513,7 @@ This work consists of the file  siunitx.dtx
 % A number of derived units with defined names and symbols.
 %    \begin{macrocode}
 \DeclareSIUnit{\becquerel}{Bq}
-\DeclareSIUnit{\celsius}{\si@symbol@celsius}
+\DeclareSIUnit{\celsius}{\siunitxsymbolcelsius}
 \DeclareSIUnit{\coulomb}{C}
 \DeclareSIUnit{\farad}{F}
 \DeclareSIUnit{\gray}{Gy}
@@ -7445,7 +7524,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit{\lumen}{lm}
 \DeclareSIUnit{\lux}{lx}
 \DeclareSIUnit{\newton}{N}
-\DeclareSIUnit{\ohm}{\si@symbol@ohm}
+\DeclareSIUnit{\ohm}{\siunitxsymbolohm}
 \DeclareSIUnit{\pascal}{Pa}
 \DeclareSIUnit{\radian}{rad}
 \DeclareSIUnit{\siemens}{S}
@@ -7496,13 +7575,18 @@ This work consists of the file  siunitx.dtx
 % There are then some day-to-day units which are accepted for use
 % with SI, but are not part of the official specification.
 %    \begin{macrocode}
-\DeclareSIUnit[valuesep=none]{\arcmin}{\arcminute} % TEMP
-\DeclareSIUnit[valuesep=none]{\arcminute}{\si@symbol@arcminute} % TEMP
-\DeclareSIUnit[valuesep=none]{\arcsec}{\arcsecond} % TEMP
-\DeclareSIUnit[valuesep=none]{\arcsecond}{\si@symbol@arcsecond} % TEMP
+\DeclareSIUnit[units/output/number-unit separator={}]
+  {\arcmin}{\arcminute} 
+\DeclareSIUnit[units/output/number-unit separator={}]
+  {\arcminute}{\siunitxsymbolarcminute}
+\DeclareSIUnit[units/output/number-unit separator={}]
+  {\arcsec}{\arcsecond}
+\DeclareSIUnit[units/output/number-unit separator={}]
+  {\arcsecond}{\siunitxsymbolarcsecond}
 \DeclareSIUnit{\bel}{B}
 \DeclareSIUnit{\day}{d}
-\DeclareSIUnit[valuesep=none]{\degree}{\si@symbol@degree} % TEMP
+\DeclareSIUnit[units/output/number-unit separator={}]
+  {\degree}{\siunitxsymboldegree} % TEMP
 \DeclareSIUnit{\hour}{h}
 \DeclareSIUnit{\litre}{l}
 \DeclareSIUnit{\liter}{L}
