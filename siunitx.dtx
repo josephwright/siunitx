@@ -121,7 +121,6 @@ This work consists of the file  siunitx.dtx
 \usepackage{\jobname}
 \DeclareSIQualifier{\product}{prod}
 \DeclareSIQualifier{\catalyst}{cat}
-\DeclareSIUnit[units/output/number-value separator={}]{\oddunit}{XXX}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -536,16 +535,20 @@ This work consists of the file  siunitx.dtx
 % intermixed with unit macros. The \m{options} argument can be
 % any suitable options, and applies the specific unit macro only. The 
 % (first) optional argument to \cs{SI} and \cs{si} can be used to 
-% override the settings for the unit.
-%\begin{LaTeXdemo}[code only]
-%  \DeclareSIUnit[units/output/number-unit separator={}]
-%    {\oddunit}{XXX}
-%\end{LaTeXdemo}
+% override the settings for the unit. A typical example is the 
+% \cs{degree} unit.
 %\begin{LaTeXdemo}
 %  \SI{3.1415}{\degree} \\
-%  %\DeclareSIUnit[valuesep=none]{\oddunit}{XXX}
-%  \SI{12345}{\oddunit}
-%  %\SI[valuesep=thick]{67890}{\oddunit}
+%\end{LaTeXdemo} 
+% This is declared in the package as:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIUnit[units/output/number-unit separator={}]
+%    {\degree}{\SIUnitSymbolDegree}
+%\end{LaTeXdemo}
+% The spacing can still be altered at point of use:
+%\begin{LaTeXdemo}
+%  \SI{67890}{\degree} \\
+%  \SI[units/output/number-unit separator = \;]{67890}{\degree}
 %\end{LaTeXdemo}
 % 
 %\DescribeMacro{\DeclareSIPrefix}
@@ -6282,7 +6285,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@def@unit}[3]{%
   \si@add@right@n\si@unit@def@unit@list{#1}%
-  \@namedef{si@unit@options@\string#1}{#2}%
+  \si@empty@tlist@if@TF{#2}{%
+    \si@let@cN{si@unit@options@\string#1}\@undefined
+  }{%
+    \@namedef{si@unit@options@\string#1}{#2}%
+  }%
   \@namedef{si@unit@literal@\string#1}{#3}%
   \@namedef{si@unit@macro@\string#1}{%
     \si@csname@if@TF{si@unit@macro@\expandafter\string\@car#3\@nil}{%
@@ -6653,6 +6660,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@unit}[1]{%
   \si@unit@parse@init
+  \si@unit@parse@options{#1}%
+  \si@unit@out@sep@print
   #1%
   \si@unit@parse@store@unit{stop}%
   \si@print@unit@o{\si@unit@parse@queue}% TEMP
@@ -6774,6 +6783,26 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\si@unit@parse@options}
+% Any unit-specific options are loaded, followed by re-applying any
+% options given for this particular macro.  All a bit complicated, as 
+% there is probably more than one token in the input.
+%    \begin{macrocode}
+\newcommand*{\si@unit@parse@options}[1]{%
+  \ifcsname si@unit@options@\expandafter\string\@car#1\@nil\endcsname
+    \edef\si@tempa{%
+      \expandafter\expandafter\expandafter\unexpanded\expandafter
+        \expandafter\expandafter{%
+        \csname si@unit@options@\expandafter\string\@car#1\@nil\endcsname
+      },%
+      \expandafter\unexpanded\expandafter{\si@unit@internal@opts}%
+    }%
+    \expandafter\sisetup\expandafter{\si@tempa}%
+  \fi
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@unit@parse@queue@use}
@@ -7045,6 +7074,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@unit@out@sep@print}
+% The number--unit separator is printed as part of the output routine.
+% So that it can be altered by units ``on the fly'', it is packaged up
+% here as a macro.
+%    \begin{macrocode}
+\newcommand*{\si@unit@out@sep@print}{%
+  \ensuremath{%
+    \si@bool@if@TF\si@unit@out@break@bool{%
+      \allowbreak
+    }{%
+      \nobreak
+    }%
+    \si@unit@out@num@sep
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -7217,9 +7264,9 @@ This work consists of the file  siunitx.dtx
     \csname SIUnitSymbol#1\endcsname
   }{%
     \si@mode@maths@if@TF{%
-      \@nameuse{si@symbol@maths@#1}%
+      \lowercase{\@nameuse{si@symbol@maths@#1}}%
     }{%
-      \@nameuse{si@symbol@text@#1}%
+      \lowercase{\@nameuse{si@symbol@text@#1}}%
     }%
   }%
 }
@@ -7392,27 +7439,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\si@unit@internal@ii}
+%\begin{macro}{\si@unit@internal@opts}
 %    \begin{macrocode}
 \newcommand*{\si@unit@internal@ii}[4]{% TEMP
     \sisetup{#1}%
+    \def\si@unit@internal@opts{#1}%
     \si@unit@in@parse{#3}%
     \si@num@internal{#2}%
     \si@bool@if@F\si@num@in@error@bool{%
-      \si@empty@tlist@if@F{#4}{%
-        \ensuremath{%
-          \si@bool@if@TF\si@unit@out@break@bool{%
-            \allowbreak
-          }{%
-            \nobreak
-          }%
-          \si@unit@out@num@sep
-        }%
+      \si@empty@tlist@if@T{#4}{%
+        \let\si@unit@out@sep@print\relax
       }%
     }%
     \si@unit@in@parse{#4}%
   \endgroup
 }
+\newcommand*{\si@unit@internal@opts}{}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si}
