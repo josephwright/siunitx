@@ -1182,7 +1182,6 @@ This work consists of the file  siunitx.dtx
 %  \end{minipage}
 %\end{LaTeXdemo}
 % 
-% 
 %\DescribeOption{units/output/use brackets}
 %\DescribeOption{units/output/open bracket}
 %\DescribeOption{units/output/close bracket}
@@ -1210,7 +1209,15 @@ This work consists of the file  siunitx.dtx
 %  \si[units/output/qualifier format = space]{\gram\product} \\
 %  \si[units/output/qualifier format = brackets]{\gram\product} 
 %\end{LaTeXdemo}
-%
+% When the qualifier is given as a subscript, no brackets will be
+% added if a power is given for the same unit.  For other formats,
+% brackets are added.
+%\begin{LaTeXdemo}
+%  \si[units/output/qualifier format = subscript]
+%    {\gram\product\squared} \\
+%  \si[units/output/qualifier format = space]
+%    {\gram\product\squared}
+%\end{LaTeXdemo}
 %
 %\subsection{Symbols}
 %
@@ -6296,7 +6303,6 @@ This work consists of the file  siunitx.dtx
 % A few unit-like macros need to be defined by hand as they do not fit
 % into a general category.
 %
-%\begin{macro}{\si@unit@macro@\per}
 % The \cs{per} macro does not generate any direct output but does
 % set up the appropriate flags.
 %    \begin{macrocode}
@@ -6306,9 +6312,6 @@ This work consists of the file  siunitx.dtx
   \def\si@unit@parse@power@last{1}%
 }
 %    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\si@unit@macro@\raiseto}
-%\begin{macro}{\si@unit@macro@\tothe}
 % \cs{raiseto} and \cs{tothe} work like other powers but with a flexible
 % value.
 %    \begin{macrocode}
@@ -6326,10 +6329,6 @@ This work consists of the file  siunitx.dtx
   \si@unit@parse@store{power}{null}%
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-% A couple of unit functions need definitions
 %
 %\subsection{Initial unit processing}
 %
@@ -6548,7 +6547,11 @@ This work consists of the file  siunitx.dtx
     \si@bool@false\si@unit@parse@per@last@bool
   }%
   \let\si@unit@parse@power@current\si@unit@parse@power@last
-  \si@clear@macro\si@unit@parse@power@last@dim
+  \si@bool@if@F\si@unit@parse@sticky@bool{%
+    \si@bool@if@F\si@unit@parse@per@last@bool{%
+      \def\si@unit@parse@power@last{1}%
+    }%
+  }%
   \@namedef{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
 }
 %    \end{macrocode}
