@@ -218,7 +218,7 @@ This work consists of the file  siunitx.dtx
 %^^A Some short cuts for the tables
 %
 %\newcommand*{\DescribeUnit}[1]{^^A
-%  \expandafter\SpecialUsageIndex\csname #1\endcsname ^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
 %  #1 &
 %  \cs{#1} &
 %  \expandafter\si\expandafter{\csname #1\endcsname}
@@ -1338,10 +1338,10 @@ This work consists of the file  siunitx.dtx
 % The individual symbols used for a number of units are available as
 % package options in paths \texttt{symbols/maths} and 
 % \texttt{symbols/text}. The option names are summarised in 
-% Table~\ref{tab:opt:symbols}. The standard value for these are somewhat
-% complex, as there is in some cases a need to create low-level symbol
-% macros. In many cases, the maths and text variations are created from
-% the same underlying macro using \cs{text} or \cs{ensuremath}. For
+% Table~\ref{tab:opt:symbols}. The standard values can be somewhat 
+% involved, and the interested reader is directed to the code for full
+% details.  In many cases, the maths and text variations are created 
+% from the same underlying macro using \cs{text} or \cs{ensuremath}. For
 % example, the standard definitions for \opt{angstrom} are:
 %\begin{LaTeXdemo}[code only]
 %  \sisetup{
@@ -1358,6 +1358,20 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Option name} & 
 %      \multicolumn{1}{c}{Type} \\
 %    \midrule ^^A (
+%      \SpecialOptionIndex{symbols/maths/angstrom}^^A
+%      \SpecialOptionIndex{symbols/text/angstrom}^^A
+%      \SpecialOptionIndex{symbols/maths/arcminute}^^A
+%      \SpecialOptionIndex{symbols/text/arcminute}^^A
+%      \SpecialOptionIndex{symbols/maths/arcsecond}^^A
+%      \SpecialOptionIndex{symbols/text/arcsecond}^^A
+%      \SpecialOptionIndex{symbols/maths/celsius}^^A
+%      \SpecialOptionIndex{symbols/text/celsius}^^A
+%      \SpecialOptionIndex{symbols/maths/degree}^^A
+%      \SpecialOptionIndex{symbols/text/degree}^^A
+%      \SpecialOptionIndex{symbols/maths/micro}^^A
+%      \SpecialOptionIndex{symbols/text/micro}^^A
+%      \SpecialOptionIndex{symbols/maths/ohm}^^A
+%      \SpecialOptionIndex{symbols/text/ohm}^^A
 %      angstrom  & Literal \\ 
 %      arcminute & Literal \\
 %      arcsecond & Literal \\
@@ -1368,6 +1382,20 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeMacro{\SIUnitSymbolAngstrom}
+%\DescribeMacro{\SIUnitSymbolArcminute}
+%\DescribeMacro{\SIUnitSymbolArcsecond}
+%\DescribeMacro{\SIUnitSymbolCelsius}
+%\DescribeMacro{\SIUnitSymbolDegree}
+%\DescribeMacro{\SIUnitSymbolMicro}
+%\DescribeMacro{\SIUnitSymbolOhm}
+% The maths and text symbols defined above are wrapped up into mode
+% independent functions with user names.  These are then used in the
+% definitions of the appropriate units.  For example, the angstrom
+% symbol can be accessed using the macro \cs{SIUnitSymbolAngstrom}.
+% Notice that these names capitalise the unit name (to make reading 
+% the macro name easier!).
 % 
 %\section{Usage tips and known issues} 
 % 
@@ -7186,7 +7214,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@symbol@new}[1]{%
   \expandafter\si@newcommand\expandafter*\expandafter{%
-    \csname siunitxsymbol#1\endcsname
+    \csname SIUnitSymbol#1\endcsname
   }{%
     \si@mode@maths@if@TF{%
       \@nameuse{si@symbol@maths@#1}%
@@ -7197,22 +7225,22 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro} 
-%\begin{macro}{\si@symbol@angstrom}
-%\begin{macro}{\si@symbol@arcminute}
-%\begin{macro}{\si@symbol@arcsecond}
-%\begin{macro}{\si@symbol@celsius}
-%\begin{macro}{\si@symbol@degree}
-%\begin{macro}{\si@symbol@micro}
-%\begin{macro}{\si@symbol@ohm}
+%\begin{macro}{\SIUnitSymbolAngstrom}
+%\begin{macro}{\SIUnitSymbolArcminute}
+%\begin{macro}{\SIUnitSymbolArcsecond}
+%\begin{macro}{\SIUnitSymbolCelsius}
+%\begin{macro}{\SIUnitSymbolDegree}
+%\begin{macro}{\SIUnitSymbolMicro}
+%\begin{macro}{\SIUnitSymbolOhm}
 % The wrapper macros are created.
 %    \begin{macrocode}
-\si@symbol@new{angstrom}
-\si@symbol@new{arcminute}
-\si@symbol@new{arcsecond}
-\si@symbol@new{celsius}
-\si@symbol@new{degree}
-\si@symbol@new{micro}
-\si@symbol@new{ohm}
+\si@symbol@new{Angstrom}
+\si@symbol@new{Arcminute}
+\si@symbol@new{Arcsecond}
+\si@symbol@new{Celsius}
+\si@symbol@new{Degree}
+\si@symbol@new{Micro}
+\si@symbol@new{Ohm}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7457,7 +7485,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPrefix{\femto}{f}{-15}
 \DeclareSIPrefix{\pico}{p}{-12}
 \DeclareSIPrefix{\nano}{n}{-9}
-\DeclareSIPrefix{\micro}{\siunitxsymbolmicro}{-6}
+\DeclareSIPrefix{\micro}{\SIUnitSymbolMicro}{-6}
 \DeclareSIPrefix{\milli}{m}{-3}
 \DeclareSIPrefix{\centi}{c}{-2}
 \DeclareSIPrefix{\deci}{d}{-1}
@@ -7534,7 +7562,7 @@ This work consists of the file  siunitx.dtx
 % A number of derived units with defined names and symbols.
 %    \begin{macrocode}
 \DeclareSIUnit{\becquerel}{Bq}
-\DeclareSIUnit{\celsius}{\siunitxsymbolcelsius}
+\DeclareSIUnit{\celsius}{\SIUnitSymbolCelsius}
 \DeclareSIUnit{\coulomb}{C}
 \DeclareSIUnit{\farad}{F}
 \DeclareSIUnit{\gray}{Gy}
@@ -7545,7 +7573,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit{\lumen}{lm}
 \DeclareSIUnit{\lux}{lx}
 \DeclareSIUnit{\newton}{N}
-\DeclareSIUnit{\ohm}{\siunitxsymbolohm}
+\DeclareSIUnit{\ohm}{\SIUnitSymbolOhm}
 \DeclareSIUnit{\pascal}{Pa}
 \DeclareSIUnit{\radian}{rad}
 \DeclareSIUnit{\siemens}{S}
@@ -7599,15 +7627,15 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit[units/output/number-unit separator={}]
   {\arcmin}{\arcminute} 
 \DeclareSIUnit[units/output/number-unit separator={}]
-  {\arcminute}{\siunitxsymbolarcminute}
+  {\arcminute}{\SIUnitSymbolArcminute}
 \DeclareSIUnit[units/output/number-unit separator={}]
   {\arcsec}{\arcsecond}
 \DeclareSIUnit[units/output/number-unit separator={}]
-  {\arcsecond}{\siunitxsymbolarcsecond}
+  {\arcsecond}{\SIUnitSymbolArcsecond}
 \DeclareSIUnit{\bel}{B}
 \DeclareSIUnit{\day}{d}
 \DeclareSIUnit[units/output/number-unit separator={}]
-  {\degree}{\siunitxsymboldegree} % TEMP
+  {\degree}{\SIUnitSymbolDegree}
 \DeclareSIUnit{\hour}{h}
 \DeclareSIUnit{\litre}{l}
 \DeclareSIUnit{\liter}{L}
