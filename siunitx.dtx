@@ -6600,11 +6600,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % 
 %\begin{macro}{\si@unit@parse@unit}
+% Parsing units is quite easy, the only trick being to add an extra
+% ``unit'' at the end to deal with the remaining powers.
 %    \begin{macrocode}
 \newcommand*{\si@unit@parse@unit}[1]{%
   \si@unit@parse@init
   #1%
-  \si@unit@parse@block@new{stop}%
+  \si@unit@parse@store@unit{stop}%
   \si@print@unit@o{\si@unit@parse@queue}% TEMP
 }
 %    \end{macrocode}
@@ -6622,14 +6624,14 @@ This work consists of the file  siunitx.dtx
   }%
   \si@unit@parse@block@trans
   \let\si@unit@parse@per@current@bool\si@unit@parse@per@last@bool
-  \si@bool@if@F\si@unit@parse@sticky@bool{%
-    \si@bool@false\si@unit@parse@per@last@bool
-  }%
   \let\si@unit@parse@power@current\si@unit@parse@power@last
-  \si@bool@if@F\si@unit@parse@sticky@bool{%
-    \si@bool@if@F\si@unit@parse@per@last@bool{%
+  \si@clear@macro\si@unit@parse@power@last
+  \si@bool@if@TF\si@unit@parse@sticky@bool{%
+    \si@bool@if@T\si@unit@parse@per@last@bool{%
       \def\si@unit@parse@power@last{1}%
     }%
+  }{%
+    \si@bool@false\si@unit@parse@per@last@bool
   }%
   \@namedef{si@unit@parse@block\si@unit@parse@queue@use}{#1}%
 }
@@ -6779,7 +6781,6 @@ This work consists of the file  siunitx.dtx
   \si@unit@parse@last@if@T{unit}{%
     \si@unit@parse@store@power@aux
   }%
-  \si@clear@macro\si@unit@parse@power@last
   \si@clear@macro\si@unit@parse@power@current
 }
 %    \end{macrocode}
