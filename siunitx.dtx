@@ -222,6 +222,15 @@ This work consists of the file  siunitx.dtx
 %  \cs{#1} &
 %  \expandafter\si\expandafter{\csname #1\endcsname}
 %}
+%\newcommand*{\DescribePrefix}[1]{^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
+%  #1 &
+%  \cs{#1} &
+%  \expandafter\csname si@unit@literal@\expandafter\string\csname
+%    #1\endcsname\endcsname &
+%  \num{e\expandafter\csname si@unit@number@\expandafter\string\csname
+%    #1\endcsname\endcsname} 
+%}
 %
 %\providecommand*{\pkg}{\textsf}
 %\providecommand*{\opt}{\texttt}
@@ -620,6 +629,77 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\begin{table}
+%  \caption{The SI prefixes (\opt{load=prefix})}
+%  \label{tab:prefix}
+%  \centering
+%  \begin{tabular}{llclllcl}
+%    \toprule
+%      \multicolumn{1}{c}{Prefix} &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Power} &
+%      \multicolumn{1}{c}{Prefix} &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Power} \\
+%    \midrule
+%      \DescribePrefix{yocto} & 
+%      \DescribePrefix{deca} \\
+%      \DescribePrefix{zepto} &
+%      \DescribePrefix{hecto} \\
+%      \DescribePrefix{atto} &
+%      \DescribePrefix{kilo} \\
+%      \DescribePrefix{femto} &
+%      \DescribePrefix{mega} \\
+%      \DescribePrefix{pico} &
+%      \DescribePrefix{giga} \\
+%      \DescribePrefix{nano} &
+%      \DescribePrefix{tera} \\
+%      \DescribePrefix{micro} &
+%      \DescribePrefix{peta} \\
+%      \DescribePrefix{milli} &
+%      \DescribePrefix{exa} \\
+%      \DescribePrefix{centi} &
+%      \DescribePrefix{zetta} \\
+%      \DescribePrefix{deci} &
+%      \DescribePrefix{yotta} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeMacro{\square}
+%\DescribeMacro{\squared}
+%\DescribeMacro{\cubic}
+%\DescribeMacro{\cubed}
+% A small number of pre-defined powers are provided as macros. 
+% \cs{square} and \cs{cubic} are intended for use before units, with
+% \cs{squared} and \cs{cubed} going after the unit.
+%\begin{LaTeXdemo} 
+%  \si{\square\becquerel} \\
+%  \si{\joule\squared\per\lumen} \\
+%  \si{\cubic\lux\volt\tesla\cubed}
+%\end{LaTeXdemo}
+%\DescribeMacro{\tothe}
+%\DescribeMacro{\raiseto}
+% Generic powers can be inserted on a one-off basis using the \cs{tothe}
+% and \cs{raiseto} macros. These are the only macros for units which
+% take an argument:
+%\begin{LaTeXdemo} 
+%  \si{\henry\tothe{5}} \\
+%  \si{\raiseto{4.5}\radian}
+%\end{LaTeXdemo}
+%\DescribeMacro{\per}
+% Reciprocal powers are indicated using the \cs{per} macro. This applies
+% to the next unit only, unless the \opt{units/output/sticky per} option
+% is turned on.
+%\begin{LaTeXdemo} 
+%  \si{\joule\per\mole\per\kelvin} \\
+%  \si{\joule\per\mole\kelvin} \\
+%  \si{\per\henry\tothe{5}} \\
+%  \si{\per\square\becquerel} \\
+%\end{LaTeXdemo}
 %
 %\subsection{Creating new macros}
 %
@@ -6388,6 +6468,7 @@ This work consists of the file  siunitx.dtx
 \newcommand*{\si@unit@def@prefix}[3]{%
   \si@add@right@n\si@unit@def@prefix@list{#1}%
   \@namedef{si@unit@literal@\string#1}{#2}%
+  \@namedef{si@unit@number@\string#1}{#3}%
   \@namedef{si@unit@macro@\string#1}{%
     \si@unit@parse@store{prefix}{#2}%
   }%
