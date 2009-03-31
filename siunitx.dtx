@@ -6343,10 +6343,26 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\subsection{Printing tables}
-%
-% The second part of creating tables is to print the results.  Here, the
-% various alignment methods are implemented.
+%\subsection{Table alignment settings}
+% 
+%\begin{macro}{\si@tab@align@number}
+%\begin{macro}{\si@tab@align@text}
+%\begin{macro}{\si@tab@align@unit}
+%    \begin{macrocode}
+\newcommand*{\si@tab@align@number}{}
+\newcommand*{\si@tab@align@text}{}
+\newcommand*{\si@tab@align@unit}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@tab@align@dimen}
+% Things are calculated using a dimension, as \cs{numexpr} does not work
+% in \cs{stretch}.
+%    \begin{macrocode}
+\newdimen\si@tab@align@dimen
+%    \end{macrocode}
+%\end{macro}
 % 
 %    \begin{macrocode}
 \si@keys@family{tables}
@@ -6356,12 +6372,12 @@ This work consists of the file  siunitx.dtx
   align uncertainties/.is siunitx switch = {},
   number position/.is choice,
   number position/.cd,
-    center/.code           = {},
-    centre/.code           = {},
+    center/.code           = {\def\si@tab@align@number{0.5}},
+    centre/.code           = {\def\si@tab@align@number{0.5}},
     decimal centred/.code  = {},
     decimal centered/.code = {},
-    left/.code             = {},
-    right/.code            = {},
+    left/.code             = {\def\si@tab@align@number{0}},
+    right/.code            = {\def\si@tab@align@number{1}},
   /siunitx/tables,
   number format/.code = {},
   position/.is choice,
@@ -6389,19 +6405,17 @@ This work consists of the file  siunitx.dtx
   /siunitx/tables,
   text position/.is choice,
   text position/.cd,
-    center/.code = {},
-    centre/.code = {},
-    none/.code   = {},
-    left/.code   = {},
-    right/.code  = {},
+    center/.code = {\def\si@tab@align@text{0.5}},
+    centre/.code = {\def\si@tab@align@text{0.5}},
+    left/.code   = {\def\si@tab@align@text{0}},
+    right/.code  = {\def\si@tab@align@text{1}},
   /siunitx/tables,
   unit position/.is choice,
   unit position/.cd,
-    center/.code = {},
-    centre/.code = {},
-    none/.code   = {},
-    left/.code   = {},
-    right/.code  = {},
+    center/.code = {\def\si@tab@align@unit{0.5}},
+    centre/.code = {\def\si@tab@align@unit{0.5}},
+    left/.code   = {\def\si@tab@align@unit{0}},
+    right/.code  = {\def\si@tab@align@unit{1}},
   /siunitx/tables,
   number position = centre,
   text position   = centre,
@@ -6409,20 +6423,50 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %    
-%\begin{macro}{\si@tab@print@colortbl@check}
-%\begin{macro}{\si@tab@print@colortbl@corr}
+%\begin{macro}{\si@tab@align@colortbl@check}
+%\begin{macro}{\si@tab@align@colortbl@corr}
 % There may need to be a correction for the \pkg{colortbl} package.
 %    \begin{macrocode}
-\newcommand*{\si@tab@print@colortbl@corr}{0}
-\newcommand*{\si@tab@print@colortbl@check}{%
+\newcommand*{\si@tab@align@colortbl@corr}{0}
+\newcommand*{\si@tab@align@colortbl@check}{%
   \@ifpackageloaded{colortbl}{%
-    \renewcommand*{\si@tab@print@colortbl@corr}{0.5}
+    \renewcommand*{\si@tab@align@colortbl@corr}{0.5}
   }{}%
 }
-\AtBeginDocument{\si@tab@print@colortbl@check}
+\AtBeginDocument{\si@tab@align@colortbl@check}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\si@tab@align@pre}
+%\begin{macro}{\si@tab@align@post}
+% The amount of space to add before and after the columns is calculated
+% from the current parameters. A correction may be needed if 
+% \pkg{colortbl} is loaded. Everything is done in a dimension as this 
+% does not work with \cs{numexpr}.
+%    \begin{macrocode}
+\newcommand*{\si@tab@align@pre}[1]{%
+  \expandafter\si@tab@align@dimen
+    \csname si@tab@align@#1\endcsname pt\relax
+  \advance\si@tab@align@dimen-\si@tab@align@colortbl@corr pt\relax
+  \hskip\stretch{\strip@pt\si@tab@align@dimen}%
+  \kern\z@\relax
+  \ignorespaces
+}
+\newcommand*{\si@tab@align@post}[1]{%
+  \unskip
+  \si@tab@align@dimen\p@\relax
+  \expandafter\advance\expandafter\si@tab@align@dimen
+    -\csname si@tab@align@#1\endcsname pt\relax
+  \advance\si@tab@align@dimen-\si@tab@align@colortbl@corr pt\relax
+  \hskip\stretch{\strip@pt\si@tab@align@dimen}%
+  \kern\z@\relax
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Printing tables}
 %
 %\begin{macro}{\si@tab@print@out}
 %\begin{macro}{\si@tab@print@out@s}
@@ -6430,7 +6474,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@tab@print@out}{}
 \newcommand*{\si@tab@print@out@s}{%
+    \si@tab@align@pre{unit}%
     \si@unit@in@parse@o{\si@tab@collect@body}%
+    \si@tab@align@post{unit}%
   \endgroup
 }
 \newcommand*{\si@tab@print@out@S}{%
@@ -7350,11 +7396,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si@unit@out@sep@print}
+%\begin{macro}{\si@unit@out@sep@print@active}
 % The number--unit separator is printed as part of the output routine.
 % So that it can be altered by units ``on the fly'', it is packaged up
 % here as a macro.
 %    \begin{macrocode}
-\newcommand*{\si@unit@out@sep@print}{%
+\newcommand*{\si@unit@out@sep@print}{}
+\let\si@unit@out@sep@print\relax
+\newcommand*{\si@unit@out@sep@print@active}{%
   \ensuremath{%
     \si@bool@if@TF\si@unit@out@break@bool{%
       \allowbreak
@@ -7365,6 +7414,7 @@ This work consists of the file  siunitx.dtx
   }%
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Symbols}
@@ -7722,8 +7772,8 @@ This work consists of the file  siunitx.dtx
     \si@unit@in@parse{#3}%
     \si@num@internal{#2}%
     \si@bool@if@F\si@num@in@error@bool{%
-      \si@empty@tlist@if@T{#4}{%
-        \let\si@unit@out@sep@print\relax
+      \si@empty@tlist@if@F{#4}{%
+        \let\si@unit@out@sep@print\si@unit@out@sep@print@active
       }%
     }%
     \si@unit@in@parse{#4}%
