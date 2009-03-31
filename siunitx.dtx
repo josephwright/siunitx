@@ -6038,7 +6038,8 @@ This work consists of the file  siunitx.dtx
 % quick shuffle with the \cs{NC@list} macro. The \pkg{siunitx} 
 % columns have to be listed first, as otherwise the optional 
 % arguments do not work correctly. So they are added ``by hand'' to 
-% the appropriate macro.\footnote{\cs{NC@list} is a toks, not a macro.}
+% the appropriate macro.\footnote{\cs{NC@list} i
+% s a toks, not a macro.}
 %    \begin{macrocode}
 \newcommand*{\si@tab@rewrite@create}[1]{%
   \edef\si@tempa{\noexpand\NC@do #1\the\NC@list}%
@@ -6054,6 +6055,7 @@ This work consists of the file  siunitx.dtx
       <{\noexpand\si@tab@print@out}%
     }%
     \@temptokena\expandafter{\si@tempa}%
+    \@nameuse{si@tab@column@start@#1}%
     \NC@find
   }%
 }
@@ -6062,6 +6064,34 @@ This work consists of the file  siunitx.dtx
   \si@tab@rewrite@create{s}%
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@tab@column@start@S}
+%\begin{macro}{\si@tab@column@start@s}
+%\begin{macro}{\si@tab@column@start@s@aux@i}
+%\begin{macro}{\si@tab@column@start@s@aux@ii}
+% There is a slight issue with the \texttt{s} column: \TeX\ attempts to
+% expand material in columns \emph{before} using the template to wrap
+% material up (this allows \cs{omit} and \cs{span} to be inside other 
+% macros). The result is that the unit macros have to be defined when
+% the column starts if they are to work correctly. Everything needs to
+% be unexpandable, hence the \cs{protected} definition used.
+%    \begin{macrocode}
+\newcommand*{\si@tab@column@start@S}{}
+\newcommand*{\si@tab@column@start@s}{%
+  \aftergroup\si@tab@column@start@s@aux@i
+}
+\newcommand*{\si@tab@column@start@s@aux@i}{%
+  \si@bool@if@F\si@unit@create@body@bool{%
+    \si@loop@over@macro\si@unit@def@list\si@tab@column@start@s@aux@ii
+  }%
+}
+\newcommand*{\si@tab@column@start@s@aux@ii}[1]{%
+  \protected\def#1{}%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -6386,7 +6416,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \newcommand*{\si@tab@print@out}{}
 \newcommand*{\si@tab@print@out@s}{%
-    \si@tab@collect@body
+    \si{\si@tab@collect@body}%
   \endgroup
 }
 \newcommand*{\si@tab@print@out@S}{%
