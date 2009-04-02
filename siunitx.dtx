@@ -995,19 +995,18 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{font/maths rm}
 %\DescribeOption{font/text rm}
-% If font family detection is inactive, \pkg{siunitx} uses the font
-% family stored in either \opt{maths rm} or \opt{text rm} for
-% output. The choice of \opt{maths} or \opt{text} depends on the
-% \opt{mode} setting.
 %\DescribeOption{font/maths sf}
 %\DescribeOption{font/maths tt}
 %\DescribeOption{font/text sf}
 %\DescribeOption{font/text tt}
-% If font family detection is active, \pkg{siunitx} may be using a
-% sans serif or monospaced font for output. In maths mode, these are
-% stored in \opt{maths sf} and \opt{maths tt}, and for text mode
-% in \opt{text sf} and \opt{text tt}. Notice that the detected
-% and output font families can differ.
+% If font family detection is inactive, \pkg{siunitx} uses the font
+% family stored in either \opt{maths rm} or \opt{text rm} for
+% output. The choice of \opt{maths} or \opt{text} depends on the
+% \opt{mode} setting. If font family detection is active, 
+% \pkg{siunitx} may be using a sans serif or monospaced font for 
+% output. In maths mode, these are stored in \opt{maths sf} and 
+% \opt{maths tt}, and for text mode in \opt{text sf} and \opt{text 
+% tt}. Notice that the detected and output font families can differ.
 %\begin{LaTeXdemo}
 %  \sisetup{font/detect/family}%
 %  \num{1234} \\
@@ -1239,6 +1238,7 @@ This work consists of the file  siunitx.dtx
 %      group digits         & Switch  & true       \\
 %      group four digits    & Switch  & false      \\
 %      group separator      & Maths   & \cs{,}     \\
+%      negative colour      & Literal & \m{none}   \\
 %      open bracket         & Literal & (          \\ ^^A )
 %      open uncertainty     & Literal & (          \\ ^^A )
 %      separate uncertainty & Switch  & false      \\
@@ -1337,6 +1337,15 @@ This work consists of the file  siunitx.dtx
 %    close bracket = \},
 %  }
 %  \num{1+2i e10}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{numbers/output/negative colour}
+% \pkg{siunitx} can detect negative mantissa values and alter print
+% colour accordingly.
+%\begin{LaTeXdemo}
+%  \num{-15673} \\
+%  \num[numbers/output/negative colour = red]
+%    {-15673}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{numbers/output/tight spacing}
@@ -5546,6 +5555,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@num@out@neg@colour}
+% For changing colours with negative numbers.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@neg@colour}{}
+%    \end{macrocode}
+%\end{macro}
 %\begin{macro}{\si@num@out@result}
 % The overall number is stored here, although it might not be used in 
 % this form.
@@ -5600,6 +5615,8 @@ This work consists of the file  siunitx.dtx
   group digits/.is siunitx switch         = {num@out@group@digits},
   group four digits/.is siunitx switch    = {num@out@group@four},
   group separator/.store in               = \si@num@out@group@sep,
+  negative color/.store in                = \si@num@out@neg@colour,
+  negative colour/.store in               = \si@num@out@neg@colour,
   open bracket/.store in                  = \si@num@out@bracket@open,
   open uncertainty/.store in              = \si@num@out@uncert@open, 
   separate uncertainty/.is siunitx switch = {num@out@uncert@sep},
@@ -5615,6 +5632,7 @@ This work consists of the file  siunitx.dtx
   group digits         = true,
   group four digits    = false,
   group separator      = {\,},
+  negative colour      = {},
   open bracket         = (, %)
   open uncertainty     = (, %)
   separate uncertainty = false,
@@ -5637,6 +5655,7 @@ This work consists of the file  siunitx.dtx
   }%
   \si@num@out@sign{mant}%
   \si@num@out@sign{exp}%
+  \si@num@out@sign@colour
   \si@num@out@exponent
 }
 %    \end{macrocode}
@@ -6028,6 +6047,19 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\begin{macro}{\si@num@out@sign@colour}
+% If the mantissa is negative, then any colour for output might change.
+%    \begin{macrocode}
+\newcommand*{\si@num@out@sign@colour}{%
+  \def\si@tempa{-}%
+  \si@meaning@eq@if@T\si@tempa\si@num@in@mant@sign{%
+    \si@empty@if@F\si@num@out@neg@colour{%
+      \let\si@font@num@colour\si@num@out@neg@colour
+    }%
+  }%
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\si@num@out@uncert}
