@@ -159,6 +159,7 @@ This work consists of the file  siunitx.dtx
 %    keywordstyle = \color{blue},
 %    language     = [LaTeX]{TeX},
 %    moretexcs    = {
+%      color,
 %      DeclareSIPrefix,
 %      DeclareSIPower,
 %      DeclareSIQualifier,
@@ -969,13 +970,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      maths rm & Macro  & \cs{mathrm}   \\
-%      maths sf & Macro  & \cs{mathsf}   \\ 
-%      maths tt & Macro  & \cs{mathtt}   \\
-%      mode     & Choice & maths         \\
-%      text rm  & Macro  & \cs{rmfamily} \\
-%      text sf  & Macro  & \cs{sffamily} \\ 
-%      text tt  & Macro  & \cs{ttfamily} \\
+%      colour   & Literal & \m{none}      \\
+%      maths rm & Macro   & \cs{mathrm}   \\
+%      maths sf & Macro   & \cs{mathsf}   \\ 
+%      maths tt & Macro   & \cs{mathtt}   \\
+%      mode     & Choice  & maths         \\
+%      text rm  & Macro   & \cs{rmfamily} \\
+%      text sf  & Macro   & \cs{sffamily} \\ 
+%      text tt  & Macro   & \cs{ttfamily} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1024,6 +1026,22 @@ This work consists of the file  siunitx.dtx
 %  }
 %\end{LaTeXdemo}
 % given all output in sans serif font without font detection.
+% 
+%\DescribeOption{font/colour} 
+% The colour of printed output can be set using the \opt{colour} 
+% option. When no colour is given, printing follows the surrounding 
+% text. In contrast, when a specific colour is given, it is used 
+% irrespective of the surroundings. As there are a number of different
+% colour models available, it is left to to user to load \pkg{color} or
+% a more powerful colour package.
+%\begin{LaTeXdemo}
+%  \color{red}
+%  Some text \\
+%  \SI{4}{\metre\per\sievert} \\
+%  More text \\
+%  \SI[font/colour = blue]{4}{\metre\per\sievert} \\
+%  Still red here!
+%\end{LaTeXdemo}
 % 
 % Every one of the font options can be given independently for units 
 % and number, with the option paths \opt{font/units/} and
@@ -3219,6 +3237,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@font@num@colour}
+%\begin{macro}{\si@font@unit@colour}
+% Space for colours.
+%    \begin{macrocode}
+\newcommand*{\si@font@num@colour}{}
+\newcommand*{\si@font@unit@colour}{}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\begin{macro}{\si@font@unit@textmode@bool}
 %\begin{macro}{\si@font@num@textmode@bool}
 % Two switches for  mode selection.
@@ -3234,7 +3261,15 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{font/units}
 \si@keys@family{font/numbers}
 \pgfkeys{
-  /siunitx/font,   
+  /siunitx/font, 
+  color/.style   = {
+    /siunitx/font/units/colour = #1, 
+    /siunitx/font/numbers/colour = #1
+  },
+  colour/.style   = {
+    /siunitx/font/units/colour = #1, 
+    /siunitx/font/numbers/colour = #1
+  },
   maths rm/.style = {
     /siunitx/font/units/maths rm = #1, 
     /siunitx/font/numbers/maths rm = #1
@@ -3287,38 +3322,43 @@ This work consists of the file  siunitx.dtx
     /siunitx/font/numbers/text tt = #1
   },
   /siunitx/font/units, 
-  maths rm/.store in = {\si@font@unit@maths@rm},
-  maths sf/.store in = {\si@font@unit@maths@sf},
-  maths tt/.store in = {\si@font@unit@maths@tt},
-  maths rm/.store in = {\si@font@unit@maths@rm},
-  maths sf/.store in = {\si@font@unit@maths@sf},
-  maths tt/.store in = {\si@font@unit@maths@tt},
+  color/.store in    = \si@font@unit@colour,
+  colour/.store in   = \si@font@unit@colour,
+  maths rm/.store in = \si@font@unit@maths@rm,
+  maths sf/.store in = \si@font@unit@maths@sf,
+  maths tt/.store in = \si@font@unit@maths@tt,
+  maths rm/.store in = \si@font@unit@maths@rm,
+  maths sf/.store in = \si@font@unit@maths@sf,
+  maths tt/.store in = \si@font@unit@maths@tt,
   mode/.is choice,
   mode/.cd,
     maths/.code = {\si@bool@false\si@font@unit@textmode@bool},
     math/.code  = {\si@bool@false\si@font@unit@textmode@bool},
     text/.code  = {\si@bool@true\si@font@unit@textmode@bool},
   /siunitx/font/units,
-  text rm/.store in  = {\si@font@unit@text@rm},
-  text sf/.store in  = {\si@font@unit@text@sf},
-  text tt/.store in  = {\si@font@unit@text@tt},
+  text rm/.store in  = \si@font@unit@text@rm,
+  text sf/.store in  = \si@font@unit@text@sf,
+  text tt/.store in  = \si@font@unit@text@tt,
   /siunitx/font/numbers, 
-  maths rm/.store in = {\si@font@num@maths@rm},
-  maths sf/.store in = {\si@font@num@maths@sf},
-  maths tt/.store in = {\si@font@num@maths@tt},
-  maths rm/.store in = {\si@font@num@maths@rm},
-  maths sf/.store in = {\si@font@num@maths@sf},
-  maths tt/.store in = {\si@font@num@maths@tt},
+  color/.store in    = \si@font@num@colour,
+  colour/.store in   = \si@font@num@colour,
+  maths rm/.store in = \si@font@num@maths@rm,
+  maths sf/.store in = \si@font@num@maths@sf,
+  maths tt/.store in = \si@font@num@maths@tt,
+  maths rm/.store in = \si@font@num@maths@rm,
+  maths sf/.store in = \si@font@num@maths@sf,
+  maths tt/.store in = \si@font@num@maths@tt,
   mode/.is choice,
   mode/.cd,
     maths/.code = {\si@bool@false\si@font@num@textmode@bool},
     math/.code  = {\si@bool@false\si@font@num@textmode@bool},
     text/.code  = {\si@bool@true\si@font@num@textmode@bool},
   /siunitx/font/numbers,
-  text rm/.store in  = {\si@font@num@text@rm},
-  text sf/.store in  = {\si@font@num@text@sf},
-  text tt/.store in  = {\si@font@num@text@tt},
+  text rm/.store in  = \si@font@num@text@rm,
+  text sf/.store in  = \si@font@num@text@sf,
+  text tt/.store in  = \si@font@num@text@tt,
   /siunitx/font,
+  colour   = {},
   maths rm = \mathrm,
   maths sf = \mathsf,
   maths tt = \mathtt,
@@ -3449,6 +3489,7 @@ This work consists of the file  siunitx.dtx
 % avoids needing to re-\cs{edef} anything.
 %    \begin{macrocode}
 \newcommand*{\si@print@print}[1]{%
+  \si@print@set@colour
   \si@font@set@bold
   \si@font@set@italic
   \@nameuse{si@font@\si@print@type @text@\si@font@set@family}%
@@ -3490,6 +3531,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\si@print@set@colour}
+%\begin{macro}{\si@print@color@check}
+%    \begin{macrocode}
+\newcommand*{\si@print@set@colour}{%
+  \si@empty@cs@if@F{si@font@\si@print@type @colour}{%
+    \color{\@nameuse{si@font@\si@print@type @colour}}%
+  }%
+}
+\newcommand*{\si@print@color@check}{%
+  \@ifpackageloaded{color}{}{%
+    \let\si@print@set@colour\relax
+  }%
+}
+\AtBeginDocument{\si@print@color@check}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Pre-processing numbers}
 %
 % Before the main parsing routine can be called, there is a need to 
@@ -3514,9 +3573,9 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{numbers/input}
 \pgfkeys{
   /siunitx/numbers/input,
-  product/.store in        = {\si@num@pre@product},
-  quotient/.store in       = {\si@num@pre@quotient},
-  protect tokens/.store in = {\si@num@pre@tokens},
+  product/.store in        = \si@num@pre@product,
+  quotient/.store in       = \si@num@pre@quotient,
+  protect tokens/.store in = \si@num@pre@tokens,
   product          = x,
   quotient         = /,
   protect tokens   = \mp\pi\pm
@@ -3714,15 +3773,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \pgfkeys{
   /siunitx/numbers/input,
-  close uncertainty/.store in = {\si@num@in@uncert@close},
-  complex roots/.store in     = {\si@num@in@complex},
-  decimal markers/.store in   = {\si@num@in@decimal},
-  digits/.store in            = {\si@num@in@digits},
-  exponent markers/.store in  = {\si@num@in@exponent},
-  ignore/.store in            = {\si@num@in@ignore},
-  open uncertainty/.store in  = {\si@num@in@uncert@open},
-  signs/.store in             = {\si@num@in@signs},
-  symbols/.store in           = {\si@num@in@symbols}, %(
+  close uncertainty/.store in = \si@num@in@uncert@close,
+  complex roots/.store in     = \si@num@in@complex,
+  decimal markers/.store in   = \si@num@in@decimal,
+  digits/.store in            = \si@num@in@digits,
+  exponent markers/.store in  = \si@num@in@exponent,
+  ignore/.store in            = \si@num@in@ignore,
+  open uncertainty/.store in  = \si@num@in@uncert@open,
+  signs/.store in             = \si@num@in@signs,
+  symbols/.store in           = \si@num@in@symbols, %(
   close uncertainty = ),
   complex roots     = ij,
   decimal markers   = {.,},
@@ -4764,7 +4823,7 @@ This work consists of the file  siunitx.dtx
   /siunitx/numbers/process,
   add zero decimal/.is siunitx switch      = {num@post@zero@dec},
   add zero integer/.is siunitx switch      = {num@post@zero@int},
-  explicit sign/.store in                  = {\si@num@post@sign@token},
+  explicit sign/.store in                  = \si@num@post@sign@token,
   include explicit sign/.is siunitx switch = {num@post@sign},
   retain explicit plus/.is siunitx switch  = {num@post@plus},
   retain zero exponent/.is siunitx switch  = {num@post@zero@exp},
@@ -5532,20 +5591,20 @@ This work consists of the file  siunitx.dtx
 \si@keys@family{numbers/output}
 \pgfkeys{
   /siunitx/numbers/output,
-  close bracket/.store in                 = {\si@num@out@bracket@close},
-  close uncertainty/.store in             = {\si@num@out@uncert@close},
-  complex root/.store in                  = {\si@num@out@complex@root},
-  decimal marker/.store in                = {\si@num@out@decimal},
-  exponent base/.store in                 = {\si@num@out@exp@base},
-  exponent product/.store in              = {\si@num@out@exp@prod},
+  close bracket/.store in                 = \si@num@out@bracket@close,
+  close uncertainty/.store in             = \si@num@out@uncert@close,
+  complex root/.store in                  = \si@num@out@complex@root,
+  decimal marker/.store in                = \si@num@out@decimal,
+  exponent base/.store in                 = \si@num@out@exp@base,
+  exponent product/.store in              = \si@num@out@exp@prod,
   group digits/.is siunitx switch         = {num@out@group@digits},
   group four digits/.is siunitx switch    = {num@out@group@four},
-  group separator/.store in               = {\si@num@out@group@sep},
-  open bracket/.store in                  = {\si@num@out@bracket@open},
-  open uncertainty/.store in              = {\si@num@out@uncert@open}, 
+  group separator/.store in               = \si@num@out@group@sep,
+  open bracket/.store in                  = \si@num@out@bracket@open,
+  open uncertainty/.store in              = \si@num@out@uncert@open, 
   separate uncertainty/.is siunitx switch = {num@out@uncert@sep},
   tight spacing/.is siunitx switch        = {num@out@tight},
-  uncertainty space/.store in             = {\si@num@out@uncert@space}, 
+  uncertainty space/.store in             = \si@num@out@uncert@space, 
   use brackets/.is siunitx switch         = {num@out@bracket@use}, %(
   close bracket        = ),% (
   close uncertainty    = ),
@@ -7334,7 +7393,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\subsection{Macro unit output}
+%\subsection{Final unit output}
 %
 %\begin{macro}{\si@unit@out@literal@unit}
 % A storage area used for literal printing.
@@ -7406,6 +7465,7 @@ This work consists of the file  siunitx.dtx
 % any unit macros that are there simply dump literal meanings.
 %    \begin{macrocode}
 \newcommand*{\si@unit@out@literal}[1]{%
+  \si@unit@out@sep@print
   \si@loop@over@macro\si@unit@def@list\si@unit@out@literal@aux
   \si@unit@out@literal@print{#1}%
 }
