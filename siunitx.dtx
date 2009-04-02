@@ -6356,6 +6356,22 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\si@tab@align@comp@bool}
+%\begin{macro}{\si@tab@align@exp@bool}
+%\begin{macro}{\si@tab@align@marker@bool}
+%\begin{macro}{\si@tab@align@uncert@bool}
+% Some storage for flags.
+%    \begin{macrocode}
+\si@bool@new\si@tab@align@comp@bool
+\si@bool@new\si@tab@align@exp@bool
+\si@bool@new\si@tab@align@marker@bool
+\si@bool@new\si@tab@align@uncert@bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@tab@align@dimen}
 % Things are calculated using a dimension, as \cs{numexpr} does not work
 % in \cs{stretch}.
@@ -6363,13 +6379,15 @@ This work consists of the file  siunitx.dtx
 \newdimen\si@tab@align@dimen
 %    \end{macrocode}
 %\end{macro}
-% 
+%
 %    \begin{macrocode}
 \si@keys@family{tables}
 \pgfkeys{
   /siunitx/tables,
-  align exponents/.is siunitx switch     = {},
-  align uncertainties/.is siunitx switch = {},
+  align complex part/.is siunitx switch    = {tab@align@comp},
+  align decimal markers/.is siunitx switch = {tab@align@marker},
+  align exponents/.is siunitx switch       = {tab@align@exp},
+  align uncertainties/.is siunitx switch   = {tab@align@uncert},
   number position/.is choice,
   number position/.cd,
     center/.code           = {\def\si@tab@align@number{0.5}},
@@ -6417,9 +6435,13 @@ This work consists of the file  siunitx.dtx
     left/.code   = {\def\si@tab@align@unit{0}},
     right/.code  = {\def\si@tab@align@unit{1}},
   /siunitx/tables,
-  number position = centre,
-  text position   = centre,
-  unit position   = centre
+  align complex part    = true,
+  align decimal markers = true,
+  align exponents       = true,
+  align uncertainties   = true,
+  number position       = centre,
+  text position         = centre,
+  unit position         = centre
 }
 %    \end{macrocode}
 %    
@@ -6468,9 +6490,34 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Printing tables}
 %
+%\begin{macro}{\si@tab@print@dec@box}
+%\begin{macro}{\si@tab@print@exp@box}
+%\begin{macro}{\si@tab@print@int@box}
+%\begin{macro}{\si@tab@print@marker@box}
+%\begin{macro}{\si@tab@print@pre@box}
+%\begin{macro}{\si@tab@print@post@box}
+% A number of boxes to get all of the alignment right.
+%    \begin{macrocode}
+\newsavebox\si@tab@print@dec@box
+\newsavebox\si@tab@print@exp@box
+\newsavebox\si@tab@print@int@box
+\newsavebox\si@tab@print@marker@box
+\newsavebox\si@tab@print@pre@box
+\newsavebox\si@tab@print@post@box
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\si@tab@print@out}
 %\begin{macro}{\si@tab@print@out@s}
 %\begin{macro}{\si@tab@print@out@S}
+% The main output macros are mainly hand-off systems. For the \texttt{S}
+% column, the \texttt{before} flag will only be set if no number was 
+% found at all.
 %    \begin{macrocode}
 \newcommand*{\si@tab@print@out}{}
 \newcommand*{\si@tab@print@out@s}{%
@@ -6480,13 +6527,35 @@ This work consists of the file  siunitx.dtx
   \endgroup
 }
 \newcommand*{\si@tab@print@out@S}{%
-    \si@tab@collect@before
-    \si@tab@collect@body
-    \si@tab@collect@after
+    \si@bool@if@TF\si@tab@collect@before@bool{%
+      \si@tab@print@out@S@text
+    }{%
+      \si@tab@print@out@S@number
+    }%
   \endgroup
 }
-%    \end{macrocode}	
+%    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\si@tab@print@out@S@number}
+%\begin{macro}{\si@tab@print@out@S@text}
+% The output for text is simple for the \texttt{S} column. Life is a bit
+% more complicated for numbers.
+%    \begin{macrocode}
+\newcommand*{\si@tab@print@out@S@number}{%
+  \si@tab@align@pre{number}%
+  \si@tab@collect@before
+  \si@tab@collect@body
+  \si@tab@collect@after
+  \si@tab@align@post{number}%
+}
+\newcommand*{\si@tab@print@out@S@text}{%
+  \si@tab@align@pre{text}%
+  \si@tab@collect@before
+  \si@tab@align@post{text}%
+}
+%    \end{macrocode}	
 %\end{macro}
 %\end{macro}
 %
@@ -7500,7 +7569,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%%\begin{macro}{\si@symbol@text@angstrom}
+%\begin{macro}{\si@symbol@text@angstrom}
 %\begin{macro}{\si@symbol@text@arcminute}
 %\begin{macro}{\si@symbol@text@arcsecond}
 %\begin{macro}{\si@symbol@text@celsius}
@@ -7917,17 +7986,6 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\katal}
 %\begin{macro}{\lumen}
 %\begin{macro}{\lux}
-%\begin{macro}{\newton}
-%\begin{macro}{\ohm}
-%\begin{macro}{\pascal}
-%\begin{macro}{\radian}
-%\begin{macro}{\siemens}
-%\begin{macro}{\sievert}
-%\begin{macro}{\steradian}
-%\begin{macro}{\tesla}
-%\begin{macro}{\volt}
-%\begin{macro}{\watt}
-%\begin{macro}{\weber}
 % A number of derived units with defined names and symbols.
 %    \begin{macrocode}
 \DeclareSIUnit{\becquerel}{Bq}
@@ -7941,17 +7999,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit{\katal}{kat}
 \DeclareSIUnit{\lumen}{lm}
 \DeclareSIUnit{\lux}{lx}
-\DeclareSIUnit{\newton}{N}
-\DeclareSIUnit{\ohm}{\SIUnitSymbolOhm}
-\DeclareSIUnit{\pascal}{Pa}
-\DeclareSIUnit{\radian}{rad}
-\DeclareSIUnit{\siemens}{S}
-\DeclareSIUnit{\sievert}{Sv}
-\DeclareSIUnit{\steradian}{sr}
-\DeclareSIUnit{\tesla}{T}
-\DeclareSIUnit{\volt}{V}
-\DeclareSIUnit{\watt}{W}
-\DeclareSIUnit{\weber}{Wb}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7964,6 +8011,31 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\newton}
+%\begin{macro}{\ohm}
+%\begin{macro}{\pascal}
+%\begin{macro}{\radian}
+%\begin{macro}{\siemens}
+%\begin{macro}{\sievert}
+%\begin{macro}{\steradian}
+%\begin{macro}{\tesla}
+%\begin{macro}{\volt}
+%\begin{macro}{\watt}
+%\begin{macro}{\weber}
+% More units.
+%    \begin{macrocode}
+\DeclareSIUnit{\newton}{N}
+\DeclareSIUnit{\ohm}{\SIUnitSymbolOhm}
+\DeclareSIUnit{\pascal}{Pa}
+\DeclareSIUnit{\radian}{rad}
+\DeclareSIUnit{\siemens}{S}
+\DeclareSIUnit{\sievert}{Sv}
+\DeclareSIUnit{\steradian}{sr}
+\DeclareSIUnit{\tesla}{T}
+\DeclareSIUnit{\volt}{V}
+\DeclareSIUnit{\watt}{W}
+\DeclareSIUnit{\weber}{Wb}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %\end{macro}
