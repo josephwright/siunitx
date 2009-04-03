@@ -1235,8 +1235,10 @@ This work consists of the file  siunitx.dtx
 %      decimal marker       & Maths   & .          \\ 
 %      exponent base        & Literal & 10         \\
 %      exponent product     & Maths   & \cs{times} \\
+%      group decimal digits & Switch  & true       \\
 %      group digits         & Switch  & true       \\
 %      group four digits    & Switch  & false      \\
+%      group integer digits & Switch  & true       \\
 %      group separator      & Maths   & \cs{,}     \\
 %      negative colour      & Literal & \m{none}   \\
 %      open bracket         & Literal & (          \\ ^^A )
@@ -1250,6 +1252,8 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %
 %\DescribeOption{numbers/output/group digits}
+%\DescribeOption{numbers/output/group decimal digits}
+%\DescribeOption{numbers/output/group integer digits}
 %\DescribeOption{numbers/output/group four digits}
 %\DescribeOption{numbers/output/group separator}
 % Grouping digits into blocks of three is a common method to increase
@@ -1269,6 +1273,15 @@ This work consists of the file  siunitx.dtx
 %  \num[numbers/output/group separator = {{{,}}}]{12345} \\
 %  \num[numbers/output/group separator = \text{~}]{12345} 
 %\end{LaTeXdemo} 
+% Grouping can be activated separately for the integer and decimal
+% parts of a number using the \opt{group integer digits} and \opt{group
+% decimal digits} options.
+%\begin{LaTeXdemo}
+%  \sisetup{numbers/output/group digits = false}%
+%  \num{12345.67890} \\
+%  \num[numbers/output/group decimal digits]{12345.67890} \\
+%  \num[numbers/output/group integer digits]{12345.67890} \\
+%\end{LaTeXdemo}
 %
 %\DescribeOption{numbers/output/complex root}
 %\DescribeOption{numbers/output/decimal marker}
@@ -5456,18 +5469,21 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{\si@num@out@bracket@use@bool}
-%\begin{macro}{\si@num@out@group@digits@bool}
+%\begin{macro}{\si@num@out@group@digits@dec@bool}
+%\begin{macro}{\si@num@out@group@digits@int@bool}
 %\begin{macro}{\si@num@out@group@four@bool}
 %\begin{macro}{\si@num@out@tight@bool}
 %\begin{macro}{\si@num@out@uncert@sep@bool}
 % Switch storage for options.
 %    \begin{macrocode}
 \si@bool@new\si@num@out@bracket@use@bool
-\si@bool@new\si@num@out@group@digits@bool
+\si@bool@new\si@num@out@group@digits@dec@bool
+\si@bool@new\si@num@out@group@digits@int@bool
 \si@bool@new\si@num@out@group@four@bool
 \si@bool@new\si@num@out@tight@bool
 \si@bool@new\si@num@out@uncert@sep@bool
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5609,7 +5625,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%
 % The usual keys are created for output (appearance-only) settings.
 %    \begin{macrocode}
 \si@keys@family{numbers/output}
@@ -5621,8 +5636,13 @@ This work consists of the file  siunitx.dtx
   decimal marker/.store in                = \si@num@out@decimal,
   exponent base/.store in                 = \si@num@out@exp@base,
   exponent product/.store in              = \si@num@out@exp@prod,
-  group digits/.is siunitx switch         = {num@out@group@digits},
+  group decimal digits/.is siunitx switch = {num@out@group@digits@dec},
+  group digits/.style = {
+    /siunitx/numbers/output/group decimal digits = {#1},
+    /siunitx/numbers/output/group integer digits = {#1}
+  },
   group four digits/.is siunitx switch    = {num@out@group@four},
+  group integer digits/.is siunitx switch = {num@out@group@digits@int},
   group separator/.store in               = \si@num@out@group@sep,
   negative color/.store in                = \si@num@out@neg@colour,
   negative colour/.store in               = \si@num@out@neg@colour,
@@ -5883,11 +5903,9 @@ This work consists of the file  siunitx.dtx
 \newcommand*\si@num@out@group@digits[1]{%
   \si@num@out@copy{#1@dec}%
   \si@num@out@copy{#1@int}%
-  \si@bool@if@T\si@num@out@group@digits@bool{%
-    \si@bool@if@F\si@num@in@symbols@bool{%
-      \si@num@out@group@digits@aux@i{#1}{dec}%
-      \si@num@out@group@digits@aux@i{#1}{int}%
-    }%
+  \si@bool@if@F\si@num@in@symbols@bool{%
+    \si@num@out@group@digits@aux@i{#1}{dec}%
+    \si@num@out@group@digits@aux@i{#1}{int}%
   }%
   \si@num@out@add@C{#1}{#1@int}%
   \si@bool@cs@if@T{si@num@in@#1@dec@bool}{%
@@ -5896,12 +5914,14 @@ This work consists of the file  siunitx.dtx
   }%
 }
 \newcommand*\si@num@out@group@digits@aux@i[2]{%
-  \si@empty@cs@if@F{si@num@in@#1@#2}{%
-    \si@bool@if@TF\si@num@out@group@four@bool{%
-      \si@num@out@group@digits@aux@ii{#1}{#2}%
-    }{%
-      \si@num@out@group@five@if@T{si@num@in@#1@#2}{%
+  \si@bool@cs@if@T{si@num@out@group@digits@#2@bool}{%
+    \si@empty@cs@if@F{si@num@in@#1@#2}{%
+      \si@bool@if@TF\si@num@out@group@four@bool{%
         \si@num@out@group@digits@aux@ii{#1}{#2}%
+      }{%
+        \si@num@out@group@five@if@T{si@num@in@#1@#2}{%
+          \si@num@out@group@digits@aux@ii{#1}{#2}%
+        }%
       }%
     }%
   }%
