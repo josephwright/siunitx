@@ -99,19 +99,21 @@ This work consists of the file  siunitx.dtx
   \expandafter\endgroup
 \fi
 \immediate\write18{makeindex -s gglo.ist -o siunitx.gls siunitx.glo}
-\immediate\write18{makeindex -s l3doc.ist -o siunitx.ind siunitx.idx}
+\immediate\write18{makeindex -s gind.ist -o siunitx.ind siunitx.idx}
 %</internal>
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{siunitx}
-  [2009/03/29 v2.0alpha A comprehensive (SI) units package]
+  [2009/05/19 v2.0alpha A comprehensive (SI) units package]
 %</package>
 %<*driver>
-\documentclass[full]{l3doc}
+\documentclass[a4paper]{ltxdoc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs,caption,lmodern,siunitx}
+\usepackage[final]{listings,microtype}
 \usepackage[osf]{mathpazo}
 \usepackage[scaled=0.95]{helvet}
-\usepackage[final]{listings,microtype}
-\usepackage{booktabs,caption}
+\usepackage[numbered]{hypdoc}
 \renewcommand*{\MakePrivateLetters}{%
   \makeatletter
 }
@@ -132,6 +134,36 @@ This work consists of the file  siunitx.dtx
 %\GetFileInfo{\jobname.sty}
 %
 %\makeatletter
+%
+%^^A \DescribeOption is in l3doc but not ltxdoc
+%\newcommand*{\DescribeOption}{^^A
+%  \leavevmode
+%  \@bsphack
+%  \begingroup
+%    \MakePrivateLetters
+%    \Describe@Option
+%}
+%\newcommand*{\Describe@Option}[1]{^^A
+%    \endgroup
+%  \marginpar{^^A
+%    \raggedleft
+%    \PrintDescribeEnv{#1}^^A
+%  }%
+%  \SpecialOptionIndex{#1}^^A
+%  \@esphack
+%  \ignorespaces
+%}
+%\newcommand*{\SpecialOptionIndex}[1]{^^A
+%  \@bsphack
+%  \index{^^A
+%    #1\actualchar{\protect\ttfamily#1} (option)\encapchar usage^^A
+%  }^^A
+%  \index{^^A
+%    options:\levelchar#1\actualchar{\protect\ttfamily#1}
+%    \encapchar usage^^A
+%  }^^A
+%  \@esphack
+%}
 %
 %^^A For creating examples with nice highlighting of code, and so
 %^^A on; based on the system used in the listings source (lstsample).
@@ -379,7 +411,7 @@ This work consists of the file  siunitx.dtx
 %\DescribeMacro{\num}
 % Numbers are automatically formatted by the \cs{num} macro.  This
 % takes one optional and one mandatory argument:
-% \cs{num}\oarg{options}\marg{number}.  The contents of \m{number}
+% \cs{num}\oarg{options}\marg{number}.  The contents of \meta{number}
 % are automatically formatted.  The formatter removes ``hard'' spaces 
 % (\cs{,} and |~|), automatically identifies exponents (by default 
 % marked using \texttt{e} or \texttt{d}) and adds the appropriate 
@@ -404,7 +436,7 @@ This work consists of the file  siunitx.dtx
 % provides full control over output format for the unit. Like the
 % \cs{num} macro, \cs{si} takes  one optional and one mandatory 
 % argument: \cs{si}\oarg{options}\marg{unit}. The unit formatting system
-% can accept two types of input. When \m{unit} contains one or more
+% can accept two types of input. When \meta{unit} contains one or more
 % literal items, the output is processed in the same manner as with the
 % \pkg{sistyle} package. Sub- and superscripts can be input without 
 % concern over maths mode, and the tokens \texttt{.} and |~| are 
@@ -442,8 +474,8 @@ This work consists of the file  siunitx.dtx
 % two mandatory arguments, in addition to the optional set up argument, 
 % and a second optional argument:
 % \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}. The
-% \m{number} and \m{unit} arguments work exactly like those for 
-% the \cs{num} and \cs{si} macros, respectively. \m{preunit} is a unit 
+% \meta{number} and \meta{unit} arguments work exactly like those for 
+% the \cs{num} and \cs{si} macros, respectively. \meta{preunit} is a unit 
 % to be typeset \emph{before} the numerical value (most likely to be a 
 % currency).
 %\begin{LaTeXdemo}
@@ -720,9 +752,9 @@ This work consists of the file  siunitx.dtx
 % New units are produced using the \cs{DeclareSIUnit} macro.  This takes
 % two mandatory arguments, as well as one optional one:
 % \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}. 
-% \m{symbol} can contain literal values, other units, multiple
+% \meta{symbol} can contain literal values, other units, multiple
 % prefixes, powers and \cs{per}, although literal text should not be
-% intermixed with unit macros. The \m{options} argument can be
+% intermixed with unit macros. The \meta{options} argument can be
 % any suitable options, and applies the specific unit macro only. The 
 % (first) optional argument to \cs{SI} and \cs{si} can be used to 
 % override the settings for the unit. A typical example is the 
@@ -748,8 +780,8 @@ This work consists of the file  siunitx.dtx
 % \cs{DeclareSIPrefix}.  This has syntax 
 % \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}. A
 % starred-version is also available for creating binary prefixes, with
-% the same syntax (\m{powers-ten} being replaced by 
-% \m{powers-two}). For example, \cs{kilo} and \cs{kibi} are defined:
+% the same syntax (\meta{powers-ten} being replaced by 
+% \meta{powers-two}). For example, \cs{kilo} and \cs{kibi} are defined:
 %\begin{LaTeXdemo}[code only]
 %  \DeclareSIPrefix{\kilo}{k}{3}
 %  \DeclareSIPrefix*{\kibi}{Ki}{10}
@@ -866,14 +898,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      all           & Style  & \m{none} \\
+%      all           & Style  & \meta{none} \\
 %      bold          & Switch & false    \\ 
 %      display maths & Switch & false    \\
 %      family        & Switch & false    \\
 %      inline bold   & Choice & text     \\
 %      italic        & Switch & false    \\
 %      mode          & Switch & false    \\
-%      none          & Style  & \m{none} \\ 
+%      none          & Style  & \meta{none} \\ 
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -970,7 +1002,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      colour   & Literal & \m{none}      \\
+%      colour   & Literal & \meta{none}      \\
 %      maths rm & Macro   & \cs{mathrm}   \\
 %      maths sf & Macro   & \cs{mathsf}   \\ 
 %      maths tt & Macro   & \cs{mathtt}   \\
@@ -1069,7 +1101,7 @@ This work consists of the file  siunitx.dtx
 %      decimal markers   & Literal & .,               \\
 %      digits            & Literal & 0123456789       \\
 %      exponent markers  & Literal & dDeE             \\
-%      ignore            & Literal & \m{none}         \\
+%      ignore            & Literal & \meta{none}         \\
 %      open uncertainty  & Literal & (                \\ ^^A ) 
 %      signs             & Literal & +-\cs{pm}\cs{mp} \\
 %      symbols           & Literal & \cs{pi}          \\
@@ -1229,24 +1261,24 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      close bracket        & Literal & )          \\ ^^A (
-%      close uncertainty    & Literal & )          \\
-%      complex root         & Maths   & i          \\
-%      decimal marker       & Maths   & .          \\ 
-%      exponent base        & Literal & 10         \\
-%      exponent product     & Maths   & \cs{times} \\
-%      group decimal digits & Switch  & true       \\
-%      group digits         & Switch  & true       \\
-%      group four digits    & Switch  & false      \\
-%      group integer digits & Switch  & true       \\
-%      group separator      & Maths   & \cs{,}     \\
-%      negative colour      & Literal & \m{none}   \\
-%      open bracket         & Literal & (          \\ ^^A )
-%      open uncertainty     & Literal & (          \\ ^^A )
-%      separate uncertainty & Switch  & false      \\
-%      tight spacing        & Switch  & false      \\
-%      use brackets         & Switch  & true       \\
-%      uncertainty space    & Maths   & \m{none}   \\
+%      close bracket        & Literal & )           \\ ^^A (
+%      close uncertainty    & Literal & )           \\
+%      complex root         & Maths   & i           \\
+%      decimal marker       & Maths   & .           \\ 
+%      exponent base        & Literal & 10          \\
+%      exponent product     & Maths   & \cs{times}  \\
+%      group decimal digits & Switch  & true        \\
+%      group digits         & Switch  & true        \\
+%      group four digits    & Switch  & false       \\
+%      group integer digits & Switch  & true        \\
+%      group separator      & Maths   & \cs{,}      \\
+%      negative colour      & Literal & \meta{none} \\
+%      open bracket         & Literal & (           \\ ^^A )
+%      open uncertainty     & Literal & (           \\ ^^A )
+%      separate uncertainty & Switch  & false       \\
+%      tight spacing        & Switch  & false       \\
+%      use brackets         & Switch  & true        \\
+%      uncertainty space    & Maths   & \meta{none} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
