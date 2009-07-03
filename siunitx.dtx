@@ -554,6 +554,158 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Font macros}
 %
+% With the detection routines in place, the module can apply the result
+% to control the font used for output. This requires a series of font 
+% names to be available. The appropriate storage areas will be selected
+% by name, based on output type (\texttt{unit} or \texttt{value}) and
+% the family selected by the detector.
+% 
+%\begin{macro}{\l_siunitx_number_maths_mode_bool}
+%\begin{macro}{\l_siunitx_unit_maths_mode_bool}
+% Most of the variables are created by the keys system: these are not.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_number_maths_mode_bool
+\bool_new:N \l_siunitx_unit_maths_mode_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_colour_tl}
+%\begin{macro}{\l_siunitx_number_mathrm_tl}
+%\begin{macro}{\l_siunitx_number_mathsf_tl}
+%\begin{macro}{\l_siunitx_number_mathtt_tl}
+%\begin{macro}{\l_siunitx_number_textrm_tl}
+%\begin{macro}{\l_siunitx_number_textsf_tl}
+%\begin{macro}{\l_siunitx_number_texttt_tl}
+% The settings are actually created separately for numbers and units:
+% numbers first.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  number-color .meta:n = { number-colour = #1 },
+  number-colour .set:N = \l_siunitx_number_colour_tl,
+  number-mathrm .set:N = \l_siunitx_number_mathrm_tl,
+  number-mathsf .set:N = \l_siunitx_number_mathsf_tl,
+  number-mathtt .set:N = \l_siunitx_number_mathtt_tl,
+  number-mode .choice:,
+  number-mode / math .code:n = {
+    \bool_set_true:N \l_siunitx_number_maths_mode_bool
+  },
+  number-mode / maths .code:n = {
+    \bool_set_true:N \l_siunitx_number_maths_mode_bool
+  },
+  number-mode / text .code:n = {
+    \bool_set_true:N \l_siunitx_number_maths_mode_bool
+  },
+  number-textrm .set:N = \l_siunitx_number_textrm_tl,
+  number-textsf .set:N = \l_siunitx_number_textsf_tl,
+  number-texttt .set:N = \l_siunitx_number_texttt_tl,
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}  
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%    
+%\begin{macro}{\l_siunitx_unit_colour_tl}
+%\begin{macro}{\l_siunitx_unit_mathrm_tl}
+%\begin{macro}{\l_siunitx_unit_mathsf_tl}
+%\begin{macro}{\l_siunitx_unit_mathtt_tl}
+%\begin{macro}{\l_siunitx_unit_textrm_tl}
+%\begin{macro}{\l_siunitx_unit_textsf_tl}
+%\begin{macro}{\l_siunitx_unit_texttt_tl}
+% Units look exactly the same. 
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  unit-color .meta:n = { unit-colour = #1 },
+  unit-colour .set:N = \l_siunitx_unit_colour_tl,
+  unit-mathrm .set:N = \l_siunitx_unit_mathrm_tl,
+  unit-mathsf .set:N = \l_siunitx_unit_mathsf_tl,
+  unit-mathtt .set:N = \l_siunitx_unit_mathtt_tl,
+  unit-mode .choice:,
+  unit-mode / math .code:n = {
+    \bool_set_true:N \l_siunitx_unit_maths_mode_bool
+  },
+  unit-mode / maths .code:n = {
+    \bool_set_true:N \l_siunitx_unit_maths_mode_bool
+  },
+  unit-mode / text .code:n = {
+    \bool_set_true:N \l_siunitx_unit_maths_mode_bool
+  },
+  unit-textrm .set:N = \l_siunitx_unit_textrm_tl,
+  unit-textsf .set:N = \l_siunitx_unit_textsf_tl,
+  unit-texttt .set:N = \l_siunitx_unit_texttt_tl,
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}  
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+% The general settings are all meta-keys. A few initial values are set
+% here as they are needed for everything to work.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  color .meta:n = {
+    number-color = #1,
+    unit-color   = #1
+  },
+  colour .meta:n = {
+    number-colour = #1,
+    unit-colour   = #1
+  },
+  mathrm .meta:n = {
+    number-mathrm = #1,
+    unit-mathrm   = #1
+  },
+  mathrm .initial:n = \mathrm,
+  mathsf .meta:n = {
+    number-mathsf = #1,
+    unit-mathsf   = #1
+  },
+  mathsf .initial:n = \mathsf,
+  mathtt .meta:n = {
+    number-mathtt = #1,
+    unit-mathtt   = #1
+  },
+  mathtt .initial:n = \mathtt,
+  mode .choice:,
+  mode / math .meta:n = {
+    number-mode = math,
+    unit-mode   = math
+  },
+  mode / maths .meta:n = {
+    number-mode = maths,
+    unit-mode   = maths
+  },
+  mode / text .meta:n = {
+    number-mode = text,
+    unit-mode   = text
+  },
+  textrm .meta:n = {
+    number-textrm = #1,
+    unit-textrm   = #1
+  },
+  textrm .initial:n = \rmfamily,
+  textsf .meta:n = {
+    number-textsf = #1,
+    unit-textsf   = #1
+  },
+  textsf .initial:n = \sffamily,
+  texttt .meta:n = {
+    number-texttt = #1,
+    unit-texttt   = #1
+  },
+  texttt .initial:n = \ttfamily
+}
+%    \end{macrocode}
+%
+%
 %\subsection{Messages}
 %
 %\subsection{Document macros}
