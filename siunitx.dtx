@@ -1,0 +1,578 @@
+% \iffalse meta-comment
+% !TEX program  = pdflatex
+%<*internal>
+\iffalse
+%</internal>
+%<*readme>
+----------------------------------------------------------------
+The siunitx package --- A comprehensive (SI) units package
+Maintained by Joseph Wright
+E-mail: joseph.wright@morningstar2.co.uk
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+Typesetting values with units requires care to ensure that the
+combined mathematical meaning of the value plus unit combination
+is clear.  In particular, the SI units system lays down a
+consistent set of units with rules on how these are to be used.
+However, different countries and publishers have differing
+conventions on the exact appearance of numbers (and units).
+
+The siunitx package provides a set of tools for authors to 
+typeset numbers and units in a consistent way.  The package has
+an extended set of configuration options which make it possible 
+to follow varying typographic conventions with the same input
+syntax.  The package includes automated processing of numbers
+and units, and the ability to control tabular alignment of
+numbers.
+
+A number of LaTeX packages have been developed in the past for
+formatting units: SIunits, sistyle, unitsdef, units, fancyunits 
+and fancynum.  Support for users of all of these packages is 
+available as emulation modules in siunitx.  In addition, siunitx
+can carry out many of the functions of the dcolumn, rccol and 
+numprint packages
+%</readme>
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+---------------------------------------------------------------
+The siunitx package --- A comprehensive (SI) units package
+Maintained by Joseph Wright
+E-mail: joseph.wright@morningstar2.co.uk
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+---------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (C) 2008-2009 by
+  Joseph Wright <joseph.wright@morningstar2.co.uk>
+
+It may be distributed and/or modified under the conditions of
+the LaTeX Project Public License (LPPL), either version 1.3c of
+this license or (at your option) any later version.  The latest
+version of this license is in the file:
+
+   http://www.latex-project.org/lppl.txt
+
+This work is "maintained" (as per LPPL maintenance status) by
+  Joseph Wright.
+
+This work consists of the file  siunitx.dtx
+          and the derived files siunitx.pdf,
+                                siunitx.sty and
+                                siunitx.ins.
+
+\endpostamble
+\usedir{tex/latex/siunitx}
+\generate{
+  \file{\jobname.sty}{\from{\jobname.dtx}{package}}
+}
+%</install>
+%<install>\endbatchfile
+%<*internal>
+\usedir{source/latex/siunitx}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/siunitx}
+\generate{
+  \file{README.txt}{\from{\jobname.dtx}{readme}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+%<*driver|package>
+\RequirePackage{expl3}
+\GetIdInfo$Id$
+  {A comprehensive (SI) units package}
+%</driver|package>
+%<*driver>
+%\fi
+\ProvidesFile{\filename.\filenameext}
+  [\filedate\space v\fileversion\space\filedescription]
+%\iffalse
+\documentclass[full]{l3doc}
+\usepackage{helvet,mathpazo}
+\begin{document}
+  \DocInput{\filename.\filenameext}
+\end{document}
+%</driver>
+% \fi
+% 
+%\title{^^A
+%  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{^^A
+%    This file describes version \fileversion, last revised 
+%    \filedate.^^A
+%  }^^A
+%}
+%\author{^^A
+%  Joseph Wright\thanks{E-mail: joseph.wright@morningstar2.co.uk}^^A
+%}
+%\date{Released \filedate}
+%
+%\maketitle
+%
+%\changes{v1.0}{2008/06/15}{First official release}
+%\changes{v1.1}{2008/09/28}{Package extended to a greater range of unit
+%  types}
+%\changes{v1.2}{2009/01/22}{Correct handling for ranges of numbers 
+%  added}
+%\changes{v2.0}{2009/06/29}{Complete re-write of package to add many new
+%  features}
+%  
+%\begin{abstract}
+% Typesetting values with units requires care to ensure that the
+% combined mathematical meaning of the value plus unit combination is
+% clear.  In particular, the SI units system lays down a consistent
+% set of units with rules on how these are to be used.  However,
+% different countries and publishers have differing conventions on
+% the exact appearance of numbers (and units).
+%
+% The \pkg{siunitx} package provides a set of tools for authors
+% to typeset numbers and units in a consistent way.  The package has an
+% extended set of configuration options which make it possible to 
+% follow varying typographic conventions with the same input syntax.  
+% The package includes automated processing of numbers and units, and
+% the ability to control tabular alignment of numbers.
+%
+% A number of \LaTeX\ packages have been developed in the past for
+% formatting units: \pkg{SIunits}, \pkg{SIstyle}, 
+% \pkg{unitsdef}, \pkg{units}, \pkg{fancyunits} and 
+% \pkg{fancynum}. Support for users of all of these packages is 
+% available as emulation modules in \pkg{siunitx}. In addition, 
+% \pkg{siunitx} can carry out many of the functions of the
+% \pkg{dcolumn}, \pkg{rccol} and \pkg{numprint} packages.
+%\end{abstract}
+%
+%\begin{multicols}{2}
+%  \tableofcontents
+%\end{multicols}
+%
+%\begin{documentation}
+%
+%\end{documentation}
+%
+%\begin{implementation}
+%
+%\section{Implementation}
+%
+% Most of the code here is \LaTeX3, but there are some parts which need
+% to use \LaTeXe functions to work correctly. 
+%
+%\subsection{Preliminaries}
+%
+% The usual preliminaries.  
+%    \begin{macrocode}
+%<*package>
+\ProvidesExplPackage
+  {\filename}{\filedate}{\fileversion}{\filedescription}
+%    \end{macrocode}
+%    
+%\begin{macro}{\siunitx_load_check:}
+%\begin{macro}[aux]{\siunitx_load_check_aux:n}
+% There are also a number of packages that are incompatible with
+% \pkg{siunitx}. These are all checked for next.  Some of the 
+% incompatible packages will not raise an error if loaded after 
+% \pkg{siunitx}.  So a test is made at the beginning of the 
+% document as well. The message for this may be needed immediately, so
+% it is created here not with the other messages.
+%    \begin{macrocode}
+\msg_new:nnnn { siunitx } { incompatible-package } {%
+  Package `#1' incompatible.%
+}{%
+  The #1 package and siunitx are incompatible.\\%
+  Use the `emulate=#1' package option when loading siunitx.%
+}
+\cs_new_nopar:Nn \siunitx_load_check: {
+  \clist_map_function:nN { SIunits, sistyle, siunits, SIstyle }
+    \siunitx_load_check_aux:n
+}
+
+\cs_new_nopar:Nn \siunitx_load_check_aux:n {
+  \group_begin:
+    \@ifpackageloaded {#1} {
+      \msg_error:nnx { siunitx } { incompatible-package } {#1}
+    } {}
+  \group_end:
+}
+\clist_map_function:nN 
+  { SIunits, sistyle, siunits, SIstyle, unitsdef, fancyunits }
+  \siunitx_load_check_aux:n
+\AtBeginDocument { \siunitx_load_check: } 
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+% Now load the support packages.
+%    \begin{macrocode}
+\RequirePackage{ 
+  amstext,
+  array,
+  keys3,
+  xparse
+} 
+%    \end{macrocode}
+%    
+%\begin{macro}{\siunitx_encoding_ts_one:}
+% Some of the \texttt{TS1} encoding is needed to provide symbols in 
+% text mode. If the user has not loaded the encoding themselves, it is
+% done here.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_encoding_ts_one: { 
+  \cs_if_free:cT { T@TS1 } {
+    \DeclareFontEncoding{TS1}{}{}%
+    \DeclareFontSubstitution{TS1}{cmr}{m}{n}%
+  }
+}
+\AtBeginDocument { \siunitx_encoding_ts_one: }
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Font detection}
+%
+% A number of controls and tests are needed to control the font used
+% for output.  The detection routines set up various functions which can
+% then be used inside the \cs{text} macro from the \pkg{amstext}
+% package.  By carrying out the changes outside maths mode, bold can
+% reliably be applied to maths output.
+% 
+%\begin{macro}{\c_siunitx_mathsf_int}
+%\begin{macro}{\c_siunitx_mathtt_int}
+%\begin{macro}{\siunitx_set_maths_fam:n}
+% The detection routine needs some basic data about the sans serif and
+% monospaced fonts in use.  This is collected up at the start of the 
+% document. The families used can change between here and the start of 
+% the document. This is run as a hook onto \cs{document}, rather than
+% using \cs{AtBeginDocument} as it has to come after anything that
+% \pkg{fontspec} does (nasty errors arise otherwise). 
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_set_maths_fam:n {
+  \group_begin:
+    \hbox_set:Nn \l_tmpa_box {
+      \ensuremath {
+        \use:c { math #1 } {
+          \expandafter \global \expandafter \chardef % Sort out!
+            \csname c_siunitx_math #1 _int \endcsname \fam \relax       
+        }
+      }
+    }
+  \group_end:
+}
+\tl_put_right:Nn \document {
+  \siunitx_set_maths_fam:n {sf}
+  \siunitx_set_maths_fam:n {tt}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\c_siunitx_textsf_tl}
+%\begin{macro}{\c_siunitx_texttt_tl}
+%\begin{macro}{\siunitx_font_set_text_fam:n}
+% The text families are done in a somewhat different manner: there are 
+% no issues with \cs{AtBeginDocument}, luckily. The need to define 
+% new macros here arises as \cs{sfdefault} and \cs{ttdefault} are 
+% \cs{long}, whereas \cs{f@family} is not.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_set_text_fam:n {
+  \tl_new:c { c_siunitx_text #1 _tl }
+  \tl_set:cx { c_siunitx_text #1 _tl } { \use:c { #1 default } }
+}
+\AtBeginDocument{
+  \siunitx_set_text_fam:n {sf}
+  \siunitx_set_text_fam:n {tt}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_detect_bold_bool}
+%\begin{macro}{\l_siunitx_detect_display_maths_bool}
+%\begin{macro}{\l_siunitx_detect_family_bool}
+%\begin{macro}{\l_siunitx_detect_inline_bold_bool}
+%\begin{macro}{\l_siunitx_detect_italic_bool}
+%\begin{macro}{\l_siunitx_detect_mode_bool}
+% Font detection is all about creating switches, with just a little
+% gloss for \texttt{detect-all} and \texttt{detect-none}.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  detect-all .choice:,
+  detect-all .default:n = true,
+  detect-all / false .meta:n = {
+    detect-bold   = false,
+    detect-family = false,
+    detect-italic = false,
+    detect-mode   = false
+  },
+  detect-all / true .meta:n = {
+    detect-bold   = true,
+    detect-family = true,
+    detect-italic = true,
+    detect-mode   = true
+  },
+  detect-bold .set_bool:N          = \l_siunitx_detect_bold_bool,
+  detect-display-math .set_bool:N  = 
+    \l_siunitx_detect_display_maths_bool,
+  detect-display-maths .set_bool:N = 
+    \l_siunitx_detect_display_maths_bool,
+  detect-family .set_bool:N        = \l_siunitx_detect_family_bool,
+  detect-inline-bold .choice:,
+  detect-inline-bold .value_required:,
+  detect-inline-bold / math  .set_bool:N = 
+    \l_siunitx_detect_inline_bold_bool,
+  detect-inline-bold / maths .set_bool:N = 
+    \l_siunitx_detect_inline_bold_bool,
+  detect-inline-bold / text .set_bool_inverse:N = 
+    \l_siunitx_detect_inline_bold_bool, 
+  detect-italic .set_bool:N        = \l_siunitx_detect_italic_bool,
+  detect-mode .set_bool:N          = \l_siunitx_detect_mode_bool,
+  detect-none .choice:,
+  detect-none .default:n = true,
+  detect-none / false .meta:n = {
+    detect-bold   = true,
+    detect-family = true,
+    detect-italic = true,
+    detect-mode   = true
+  },
+  detect-none / true .meta:n = {
+    detect-bold   = false,
+    detect-family = false,
+    detect-italic = false,
+    detect-mode   = false
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_font_set_bool}
+%\begin{macro}{\l_siunitx_font_text_mode_bool}
+% The internals of the package need a number of switches to track what
+% is happening.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_font_set_bool
+\bool_new:N \l_siunitx_font_text_mode_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_font_bold_tl}
+%\begin{macro}{\l_siunitx_font_family_tl}
+%\begin{macro}{\l_siunitx_font_italic_tl}
+% Also some token storage.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_font_bold_tl
+\tl_new:N \l_siunitx_font_family_tl
+\tl_new:N \l_siunitx_font_italic_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font:}
+% The main font-setting macro is a control point for the other
+% functions.  Nesting font-control should not happen, so the first
+% test is to ensure this is not happening.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font: {
+  \bool_if:NF \l_siunitx_font_set_bool {
+    \siunitx_detect_font_init:
+    \bool_if:NT \l_siunitx_detect_bold_bool {
+      \siunitx_detect_font_bold:
+    }
+    \bool_if:NT \l_siunitx_detect_family_bool {
+      \siunitx_detect_font_family:
+    }
+    \bool_if:NT \l_siunitx_detect_italic_bool {
+      \siunitx_detect_font_italic:
+    }
+    \bool_if:NT \l_siunitx_detect_mode_bool {
+      \siunitx_detect_font_mode:
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font_init:}
+% Set up the basic macros on the assumption nothing happens.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_init: {
+  \bool_set_true:N \l_siunitx_font_set_bool
+  \tl_set:Nn \l_siunitx_font_bold_tl {
+    \unboldmath 
+    \mdseries
+  }
+  \tl_set:Nn \l_siunitx_font_family_tl { rm }
+  \tl_set:Nn \l_siunitx_font_italic_tl { \upshape }
+  \bool_set_false:N \l_siunitx_font_text_mode_bool
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font_bold:}
+% The bold detection code depends on whether the current text is maths
+% or text, and also the type of maths (if appropriate).  For inline 
+% maths, there is a choice of what test to apply.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_bold: {
+  \mode_if_math:TF {
+    \mode_if_inner:TF {
+      \bool_if:NTF \l_siunitx_detect_inline_bold_bool {
+        \siunitx_detect_font_bold_maths:
+      }{
+        \siunitx_detect_font_bold_text:
+      }
+    }{
+      \bool_if:NTF \l_siunitx_detect_display_maths_bool {
+        \siunitx_detect_font_bold_maths:
+      }{
+        \siunitx_detect_font_bold_text:
+      }
+    }
+  }{
+    \siunitx_detect_font_bold_text:
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_detect_font_bold_maths:}
+%\begin{macro}{\siunitx_detect_font_bold_text:}
+% The tests for bold depend on whether the module is testing text or 
+% maths content.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_bold_maths: {
+  \tl_if_eq:nVT { bold } \math@version {
+    \tl_set:Nn \l_siunitx_font_bold_tl {
+      \boldmath
+      \bfseries
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_detect_font_bold_text: {
+  \tl_if_eq:nxT { b } { \exp_args:NV \tl_head_i:n \f@series } {
+    \tl_set:Nn \l_siunitx_font_bold_tl {
+      \boldmath
+      \bfseries
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font_family:}
+% Family detection usually picks up the surrounding text.  However, for
+% display maths there are two options, and so a second test may be made.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_family: {
+  \siunitx_detect_font_family_text:
+  \bool_if:NT \l_siunitx_detect_display_maths_bool {  
+    \mode_if_math:TF {
+      \mode_if_inner:F {
+        \siunitx_detect_font_family_maths:
+      }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_detect_font_family_maths:}
+%\begin{macro}{\siunitx_detect_font_family_text:}
+% The two detections routines check if the current font is sans serif or
+% monospaced.  The method used depends on whether the current maths or
+% text font is of interest. The maths detection routine re-applies the 
+% default (\texttt{rm}), as the text function is always called and may
+% have changed things.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_family_maths: {
+  \tl_set:Nn \l_siunitx_font_family_tl { rm }
+  \intexp_compare:nT { \int:use:N \fam = \c_siunitx_mathsf_int } {
+    \tl_set:Nn \l_siunitx_font_family_tl { sf }
+  }
+  \intexp_compare:nT { \int:use:N \fam = \c_siunitx_mathtt_int } {
+    \tl_set:Nn \l_siunitx_font_family_tl { tt }
+  }  
+}
+\cs_new_nopar:Nn \siunitx_detect_font_family_text: {
+  \tl_if_eq:NNT \f@family \c_siunitx_textsf_tl {
+    \tl_set:Nn \l_siunitx_font_family_tl { sf }
+  }
+  \tl_if_eq:NNT \f@family \c_siunitx_texttt_tl {
+    \tl_set:Nn \l_siunitx_font_family_tl { tt }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font_italic:}
+% The italic test uses \cs{f@shape} as a handy indicator.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_italic: {
+  \tl_if_eq:nVT { it } \f@shape {
+    \tl_set:Nn \l_siunitx_font_italic_tl { \itshape }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_detect_font_mode:}
+% The mode switch works from the fact that maths-mode output it the
+% standard.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_detect_font_mode: {
+  \mode_if_math:F {
+    \bool_set_true:N \l_siunitx_font_text_mode_bool
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Font macros}
+%
+%\subsection{Messages}
+%
+%\subsection{Document macros}
+%
+% The user document macros are all collected together here for ease: all
+% of them are \cs{protected}.
+% 
+%\begin{macro}{\sisetup}
+% The set up macro simply moves to the correct path and executes 
+% whatever has been passed.
+%    \begin{macrocode}
+\DeclareDocumentCommand \sisetup { m } {
+  \keys_set:nn { siunitx } {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%    
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%
+%\end{implementation}
