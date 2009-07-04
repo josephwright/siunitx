@@ -960,14 +960,24 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_number_pre_arg_tl}
-%\begin{macro}{\l_siunitx_number_pre_next_tl}
+%\begin{macro}{\l_siunitx_number_arg_tl}
+%\begin{macro}{\l_siunitx_number_next_arg_tl}
 % Storage for the pre-parsed material.  The \texttt{arg} variable 
 % contains the current argument, the \texttt{next} variable contains
 % anything held-over for the next round.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_number_pre_arg_tl
-\tl_new:N \l_siunitx_number_pre_next_tl
+\tl_new:N \l_siunitx_number_arg_tl
+\tl_new:N \l_siunitx_number_next_arg_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_denominator_tl}
+%\begin{macro}{\l_siunitx_number_numerator_tl}
+% When searching for quotients, some more storage is needed.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_denominator_tl
+\tl_new:N \l_siunitx_number_numerator_tl
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -982,7 +992,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_protect_tokens:
     \tl_set:Nx \l_tmpa_tl {#1}
   \exp_args:NNNV \group_end:
-  \tl_set:Nn \l_siunitx_number_pre_arg_tl \l_tmpa_tl
+  \tl_set:Nn \l_siunitx_number_arg_tl \l_tmpa_tl
   \siunitx_number_preprocess_product:
   \siunitx_number_preprocess_quotient:
 }
@@ -1009,16 +1019,16 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_preprocess_product_aux:N
 }
 \cs_new:Nn \siunitx_number_preprocess_product_aux:N {
-  \tl_if_in:NnT \l_siunitx_number_pre_arg_tl {#1} {
+  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
     \cs_set:Npn \siunitx_tmpa:w ##1 #1 ##2 \q_stop {
-      \tl_set:Nn \l_siunitx_number_pre_arg_tl {##1}
-      \tl_set:Nn \l_siunitx_number_pre_next_tl {##2}      
+      \tl_set:Nn \l_siunitx_number_arg_tl {##1}
+      \tl_set:Nn \l_siunitx_number_next_arg_tl {##2}      
     }
-    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_pre_arg_tl \q_stop
+    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_arg_tl \q_stop
     \tl_if_empty:NT \l_siunitx_number_pre_arg_tl {
       \siunitx_error:n { starting-product-token }
     }
-    \tl_if_empty:NT \l_siunitx_number_pre_next_tl {
+    \tl_if_empty:NT \l_siunitx_number_next_arg_tl {
       \siunitx_error:n { ending-product-token }
     }
     \tl_map_break:
@@ -1038,12 +1048,12 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_preprocess_quotient_aux:N
 }
 \cs_new:Nn \siunitx_number_preprocess_quotient_aux:N {
-  \tl_if_in:NnT \l_siunitx_number_pre_arg_tl {#1} {
+  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
     \cs_set:Npn \siunitx_tmpa:w ##1 #1 ##2 \q_stop {
       \tl_set:Nn \l_siunitx_number_numerator_tl {##1}
       \tl_set:Nn \l_siunitx_number_denominator_tl {##2}      
     }
-    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_pre_arg_tl \q_stop
+    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_arg_tl \q_stop
     \tl_if_empty:NT \l_siunitx_number_numerator_tl {
       \siunitx_error:n { starting-quotient-token }
     }
@@ -1100,6 +1110,20 @@ This work consists of the file  siunitx.dtx
 %\subsection{Document macros}
 %
 % The user document macros are all collected together here for ease.
+% 
+%\begin{macro}{\num}
+% The \cs{num} macro is quite simple: read the number, check it is 
+% correct then print it. 
+%    \begin{macrocode}
+\DeclareDocumentCommand \num { o m } {
+  \group_begin:
+    \IfNoValueF {#1} {
+      \keys_set:nn { siunitx } {#1}
+    }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\sisetup}
 % The set up macro simply moves to the correct path and executes 
