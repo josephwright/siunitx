@@ -109,9 +109,9 @@ This work consists of the file  siunitx.dtx
   [\filedate\space v\fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{helvet,mathpazo}
+\usepackage{helvet,mathpazo,siunitx}
 \begin{document}
-  \DocInput{\filename.\filenameext}
+  \DocInput{\jobname.dtx}
 \end{document}
 %</driver>
 % \fi
@@ -230,6 +230,36 @@ This work consists of the file  siunitx.dtx
 } 
 %    \end{macrocode}
 %    
+%\begin{macro}{\siunitx_tmpa:w}
+% Scratch items.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_tmpa:w { }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_error_bool}
+%\begin{macro}{\siunitx_error:nxx}
+%\begin{macro}{\siunitx_error:nx}
+%\begin{macro}{\siunitx_error:n}
+% General-purpose functions for throwing errors.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_error_bool
+\cs_new:Nn \siunitx_error:nxx {
+  \bool_set_true:N \l_siunitx_error_bool
+  \msg_error:nnxx { siunitx } {#1} {#2} {#3}
+}
+\cs_new:Nn \siunitx_error:nx {
+  \siunitx_error:nxx {#1} {#2} { }
+}
+\cs_new:Nn \siunitx_error:n {
+  \siunitx_error:nxx {#1} { } { }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%    
 %\begin{macro}{\siunitx_encoding_ts_one:}
 % Some of the \texttt{TS1} encoding is needed to provide symbols in 
 % text mode. If the user has not loaded the encoding themselves, it is
@@ -242,6 +272,15 @@ This work consists of the file  siunitx.dtx
   }
 }
 \AtBeginDocument { \siunitx_encoding_ts_one: }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\g_siunitx_minus_char}
+% To allow the correct symbol to appear in text mode: this is the same
+% as \cs{textminus} from \pkg{textcomp}.
+%    \begin{macrocode}
+\DeclareTextSymbolDefault { \g_siunitx_minus_char } { TS1 }
+\DeclareTextSymbol { \g_siunitx_minus_char }{ TS1 } { 61 }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -284,9 +323,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_font_set_text_fam:n}
 %\begin{macro}{\c_siunitx_textsf_tl}
 %\begin{macro}{\c_siunitx_texttt_tl}
-%\begin{macro}{\siunitx_font_set_text_fam:n}
 % The text families are done in a somewhat different manner: there are 
 % no issues with \cs{AtBeginDocument}, luckily. The need to define 
 % new macros here arises as \cs{sfdefault} and \cs{ttdefault} are 
@@ -369,26 +408,30 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_font_set_bool}
-%\begin{macro}{\l_siunitx_font_text_mode_bool}
+%\begin{macro}{\l_siunitx_font_maths_mode_bool}
 % The internals of the package need a number of switches to track what
 % is happening.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_font_set_bool
-\bool_new:N \l_siunitx_font_text_mode_bool
+\bool_new:N \l_siunitx_font_maths_mode_bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_font_bold_tl}
 %\begin{macro}{\l_siunitx_font_family_tl}
-%\begin{macro}{\l_siunitx_font_italic_tl}
 % Also some token storage.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_font_bold_tl
 \tl_new:N \l_siunitx_font_family_tl
-\tl_new:N \l_siunitx_font_italic_tl
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\siunitx_font_bold:}
+%\begin{macro}{\siunitx_font_italic:}
+% These could be token lists or functions!
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_font_bold: { }
+\cs_new_nopar:Nn \siunitx_font_italic: { }
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
@@ -422,13 +465,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_init: {
   \bool_set_true:N \l_siunitx_font_set_bool
-  \tl_set:Nn \l_siunitx_font_bold_tl {
+  \cs_set:Nn \siunitx_font_bold: {
     \unboldmath 
     \mdseries
   }
+  \cs_set:Nn \siunitx_font_italic: { \upshape }
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \tl_set:Nn \l_siunitx_font_italic_tl { \upshape }
-  \bool_set_false:N \l_siunitx_font_text_mode_bool
+  \bool_set_true:N \l_siunitx_font_maths_mode_bool
 }
 %    \end{macrocode}
 %\end{macro}
@@ -466,7 +509,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_bold_maths: {
   \tl_if_eq:nVT { bold } \math@version {
-    \tl_set:Nn \l_siunitx_font_bold_tl {
+    \cs_set:Nn \siunitx_font_bold: {
       \boldmath
       \bfseries
     }
@@ -474,7 +517,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Nn \siunitx_detect_font_bold_text: {
   \tl_if_eq:nxT { b } { \exp_args:NV \tl_head_i:n \f@series } {
-    \tl_set:Nn \l_siunitx_font_bold_tl {
+    \cs_set:Nn \siunitx_font_bold: {
       \boldmath
       \bfseries
     }
@@ -534,7 +577,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_italic: {
   \tl_if_eq:nVT { it } \f@shape {
-    \tl_set:Nn \l_siunitx_font_italic_tl { \itshape }
+    \cs_set:Nn \siunitx_font_italic: { \itshape }
   }
 }
 %    \end{macrocode}
@@ -546,7 +589,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_mode: {
   \mode_if_math:F {
-    \bool_set_true:N \l_siunitx_font_text_mode_bool
+    \bool_set_false:N \l_siunitx_font_maths_mode_bool
   }
 }
 %    \end{macrocode}
@@ -571,21 +614,33 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_number_colour_tl}
-%\begin{macro}{\l_siunitx_number_mathrm_tl}
-%\begin{macro}{\l_siunitx_number_mathsf_tl}
-%\begin{macro}{\l_siunitx_number_mathtt_tl}
-%\begin{macro}{\l_siunitx_number_textrm_tl}
-%\begin{macro}{\l_siunitx_number_textsf_tl}
-%\begin{macro}{\l_siunitx_number_texttt_tl}
+%\begin{macro}{\siunitx_number_mathrm:}
+%\begin{macro}{\siunitx_number_mathsf:}
+%\begin{macro}{\siunitx_number_mathtt:}
+%\begin{macro}{\siunitx_number_textrm:}
+%\begin{macro}{\siunitx_number_textsf:}
+%\begin{macro}{\siunitx_number_texttt:}
 % The settings are actually created separately for numbers and units:
 % numbers first.
 %    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_mathrm: { }
+\cs_new_nopar:Nn \siunitx_number_mathsf: { }
+\cs_new_nopar:Nn \siunitx_number_mathtt: { }
+\cs_new_nopar:Nn \siunitx_number_textrm: { }
+\cs_new_nopar:Nn \siunitx_number_textsf: { }
+\cs_new_nopar:Nn \siunitx_number_texttt: { }
 \keys_define:nn { siunitx } {
   number-color .meta:n = { number-colour = #1 },
   number-colour .set:N = \l_siunitx_number_colour_tl,
-  number-mathrm .set:N = \l_siunitx_number_mathrm_tl,
-  number-mathsf .set:N = \l_siunitx_number_mathsf_tl,
-  number-mathtt .set:N = \l_siunitx_number_mathtt_tl,
+  number-mathrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathrm: {#1}
+  },
+  number-mathsf .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathsf: {#1}
+  },
+  number-mathtt .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathtt: {#1}
+  },
   number-mode .choice:,
   number-mode / math .code:n = {
     \bool_set_true:N \l_siunitx_number_maths_mode_bool
@@ -596,9 +651,15 @@ This work consists of the file  siunitx.dtx
   number-mode / text .code:n = {
     \bool_set_true:N \l_siunitx_number_maths_mode_bool
   },
-  number-textrm .set:N = \l_siunitx_number_textrm_tl,
-  number-textsf .set:N = \l_siunitx_number_textsf_tl,
-  number-texttt .set:N = \l_siunitx_number_texttt_tl,
+  number-textrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_textrm: {#1}
+  },
+  number-textsf .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_textsf: {#1}
+  },
+  number-texttt .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_texttt: {#1}
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -610,20 +671,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %    
 %\begin{macro}{\l_siunitx_unit_colour_tl}
-%\begin{macro}{\l_siunitx_unit_mathrm_tl}
-%\begin{macro}{\l_siunitx_unit_mathsf_tl}
-%\begin{macro}{\l_siunitx_unit_mathtt_tl}
-%\begin{macro}{\l_siunitx_unit_textrm_tl}
-%\begin{macro}{\l_siunitx_unit_textsf_tl}
-%\begin{macro}{\l_siunitx_unit_texttt_tl}
+%\begin{macro}{\siunitx_unit_mathrm:}
+%\begin{macro}{\siunitx_unit_mathsf:}
+%\begin{macro}{\siunitx_unit_mathtt:}
+%\begin{macro}{\siunitx_unit_textrm:}
+%\begin{macro}{\siunitx_unit_textsf:}
+%\begin{macro}{\siunitx_unit_texttt:}
 % Units look exactly the same. 
 %    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_mathrm: { }
+\cs_new_nopar:Nn \siunitx_unit_mathsf: { }
+\cs_new_nopar:Nn \siunitx_unit_mathtt: { }
+\cs_new_nopar:Nn \siunitx_unit_textrm: { }
+\cs_new_nopar:Nn \siunitx_unit_textsf: { }
+\cs_new_nopar:Nn \siunitx_unit_texttt: { }
 \keys_define:nn { siunitx } {
   unit-color .meta:n = { unit-colour = #1 },
   unit-colour .set:N = \l_siunitx_unit_colour_tl,
-  unit-mathrm .set:N = \l_siunitx_unit_mathrm_tl,
-  unit-mathsf .set:N = \l_siunitx_unit_mathsf_tl,
-  unit-mathtt .set:N = \l_siunitx_unit_mathtt_tl,
+  unit-mathrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathrm: {#1}
+  },
+  unit-mathsf .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathsf: {#1}
+  },
+  unit-mathtt .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathtt: {#1}
+  },
   unit-mode .choice:,
   unit-mode / math .code:n = {
     \bool_set_true:N \l_siunitx_unit_maths_mode_bool
@@ -634,9 +707,15 @@ This work consists of the file  siunitx.dtx
   unit-mode / text .code:n = {
     \bool_set_true:N \l_siunitx_unit_maths_mode_bool
   },
-  unit-textrm .set:N = \l_siunitx_unit_textrm_tl,
-  unit-textsf .set:N = \l_siunitx_unit_textsf_tl,
-  unit-texttt .set:N = \l_siunitx_unit_texttt_tl,
+  unit-textrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_textrm: {#1}
+  },
+  unit-textsf .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_textsf: {#1}
+  },
+  unit-texttt .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_texttt: {#1}
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -704,14 +783,323 @@ This work consists of the file  siunitx.dtx
   texttt .initial:n = \ttfamily
 }
 %    \end{macrocode}
+%    
+%\subsection{Output control}
 %
+% The \pkg{siunitx} output routine uses all of the font information
+% gathered earlier to print the text given in whatever font is required.
+% The low-level stuff is done here, with the calling routines expected
+% to have taken some steps first (this is to allow line breaks in the
+% appropriate places).
+% 
+%\begin{macro}{\l_siunitx_print_arg_tl}
+% The text to print.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_print_arg_tl
+%    \end{macrocode}
+%\end{macro}
+% 
+%\begin{macro}{\l_siunitx_print_type_tl}
+% The type of output (\texttt{num} or \texttt{unit}) is always needed.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_print_type_tl
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_print:nn}
+%\begin{macro}{\siunitx_print:nV}
+% The main printing function does everything inside a group, as 
+% there are category code and definition changes to make. First, set
+% the fonts.  Then move on to printing mode, before moving to actual
+% printing.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_print:nn {
+  \group_begin:
+    \tl_set:Nn \l_siunitx_print_type_tl {#1}
+    \tl_set:Nn \l_siunitx_print_arg_tl {#2}
+    \siunitx_detect_font:
+    \bool_if:NF \l_siunitx_detect_mode_bool {
+      \bool_if:cTF { l_siunitx_ #1 _maths_mode_bool } {
+        \bool_set_true:N \l_siunitx_maths_mode_bool
+      }{
+        \bool_set_false:N \l_siunitx_maths_mode_bool
+      }
+    }
+    \siunitx_print_aux:
+  \group_end:
+}
+\cs_generate_variant:Nn \siunitx_print:nn { nV }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_print_aux:}
+% The various font changes are set up, then the correct printing
+% function is called. Everything is inside \cs{text} as this allows 
+% proper setting of the various mode settings.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_print_aux: {
+  \text {
+    \siunitx_print_colour:
+    \siunitx_font_bold:
+    \siunitx_font_italic:
+    \use:c {
+      siunitx_ \l_siunitx_print_type_tl _ \l_siunitx_font_family_tl :
+    }
+    \bool_if:NTF \l_siunitx_font_maths_mode_bool {
+      \siunitx_print_maths:
+    }{
+      \siunitx_print_text:
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_print_colour:}
+%\begin{macro}{\siunitx_colour_check:}
+% The colour system checks if \pkg{color} is loaded, and only does
+% anything if it is.  This will change when \LaTeX3 proper is available:
+% there will be colour out of the box!
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_print_colour: {
+  \tl_if_empty:cF { l_siunitx_ \l_siunitx_print_type_tl _colour_tl } {
+    \color {
+      \tl_use:c { l_siunitx_ \l_siunitx_print_type_tl _colour_tl }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_colour_check: {
+  \@ifpackageloaded{color}{}{
+    \cs_set_eq:NN \siunitx_print_colour: \scan_stop:
+  }
+}
+\AtBeginDocument { \siunitx_colour_check: }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_print_maths:}
+%\begin{macro}{\siunitx_print_text:}
+% Printing the text means replacing any awkward characters, which is
+% dependent on the output mode. The rest of the package uses |_| and
+% |^| to represent sub- and superscripts, respectively. In this way, 
+% mode decisions can be delayed as long as possible. For text mode 
+% output, there is a need to replace |-| by a text-mode minus. This
+% can be done using the search-and-replace code as at this stage there
+% should be no groups.
+% \cs{tl_replace_all_in:Nnn}.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_lccode:nn { `\& } { `\_ }
+  \char_make_math_subscript:N \&
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_new:Nn \siunitx_print_maths: {
+    \ensuremath { \l_siunitx_print_arg_tl }
+  }
+  \cs_new:Nn \siunitx_print_text: {
+    \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { & } 
+      { \siunitx_print_text_sub:n }
+    \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
+      { \siunitx_print_text_super:n }
+    \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { - } 
+      { \g_siunitx_minus_char }
+    \l_siunitx_print_arg_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_print_text_sub:n}
+%\begin{macro}{\siunitx_print_text_super:n}
+% The appropriate macros for sub- and superscript in text mode ensure
+% the appearance is the same as maths mode. As |_| is a letter, there
+% is the need to do a category-code juggle.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_lccode:nn { `\& } { `\_ }
+  \char_make_math_subscript:N \&
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_new:Nn \siunitx_print_text_sub:n {
+    \ensuremath {
+      & { \text {#1} }
+    }
+  }
+}
+\cs_new:Nn \siunitx_print_text_super:n {
+  \ensuremath {
+    ^ { \text {#1} }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Pre-processing numbers}
+%
+% Before the main parsing routine can be called, there is a need to 
+% pre-process the input. The possibility that the data in can contain
+% more than one number needs to be handled.
+% 
+%\begin{macro}{\l_siunitx_input_product_tl}
+%\begin{macro}{\l_siunitx_input_quotient_tl}
+%\begin{macro}{\l_siunitx_protect_tokens_tl}
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  numbers-input-product  .set:N     = \l_siunitx_input_product_tl,
+  numbers-input-product  .initial:n = { x } ,
+  numbers-input-quotient .set:N     = \l_siunitx_input_quotient_tl,
+  numbers-input-quotient .initial:n = { / },
+  numbers-protect-tokens .set:N     = \l_siunitx_protect_tokens_tl,
+  numbers-protect-tokens .initial:n = { \mp \pi \pm }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_pre_arg_tl}
+%\begin{macro}{\l_siunitx_number_pre_next_tl}
+% Storage for the pre-parsed material.  The \texttt{arg} variable 
+% contains the current argument, the \texttt{next} variable contains
+% anything held-over for the next round.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_pre_arg_tl
+\tl_new:N \l_siunitx_number_pre_next_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_preprocess:n}
+% The pre-processor starts with the obvious: the most likely outcome is
+% that all of the argument is passed through unchanged.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_number_preprocess:n {
+  \siunitx_number_preprocess_init:
+  \group_begin:
+    \siunitx_number_protect_tokens:
+    \tl_set:Nx \l_tmpa_tl {#1}
+  \exp_args:NNNV \group_end:
+  \tl_set:Nn \l_siunitx_number_pre_arg_tl \l_tmpa_tl
+  \siunitx_number_preprocess_product:
+  \siunitx_number_preprocess_quotient:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_preprocess_init:}
+% A little initialisation as normal.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_number_preprocess_init: {
+  \bool_set_false:N \l_siunitx_error_bool
+  \tl_clear:N \l_siunitx_number_pre_arg_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_preprocess_product:}
+%\begin{macro}[aux]{\siunitx_number_preprocess_product_aux:N}
+% Rather than search through the entire argument, we use the 
+% delimited-argument trick.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_preprocess_product: {
+  \tl_map_function:NN \l_siunitx_input_product_tl
+    \siunitx_number_preprocess_product_aux:N
+}
+\cs_new:Nn \siunitx_number_preprocess_product_aux:N {
+  \tl_if_in:NnT \l_siunitx_number_pre_arg_tl {#1} {
+    \cs_set:Npn \siunitx_tmpa:w ##1 #1 ##2 \q_stop {
+      \tl_set:Nn \l_siunitx_number_pre_arg_tl {##1}
+      \tl_set:Nn \l_siunitx_number_pre_next_tl {##2}      
+    }
+    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_pre_arg_tl \q_stop
+    \tl_if_empty:NT \l_siunitx_number_pre_arg_tl {
+      \siunitx_error:n { starting-product-token }
+    }
+    \tl_if_empty:NT \l_siunitx_number_pre_next_tl {
+      \siunitx_error:n { ending-product-token }
+    }
+    \tl_map_break:
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_preprocess_quotient:}
+%\begin{macro}[aux]{\siunitx_number_preprocess_quotient_aux:N}
+% For the quotient, only one token can appear in each part. So there
+% is an additional error check.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_preprocess_quotient: {
+  \tl_map_function:NN \l_siunitx_input_quotient_tl
+    \siunitx_number_preprocess_quotient_aux:N
+}
+\cs_new:Nn \siunitx_number_preprocess_quotient_aux:N {
+  \tl_if_in:NnT \l_siunitx_number_pre_arg_tl {#1} {
+    \cs_set:Npn \siunitx_tmpa:w ##1 #1 ##2 \q_stop {
+      \tl_set:Nn \l_siunitx_number_numerator_tl {##1}
+      \tl_set:Nn \l_siunitx_number_denominator_tl {##2}      
+    }
+    \exp_after:wN \siunitx_tmpa:w \l_siunitx_number_pre_arg_tl \q_stop
+    \tl_if_empty:NT \l_siunitx_number_numerator_tl {
+      \siunitx_error:n { starting-quotient-token }
+    }
+    \tl_if_empty:NT \l_siunitx_number_denominator_tl {
+      \siunitx_error:n { ending-quotient-token }
+    }
+    \tl_if_in:NnT \l_siunitx_number_denominator_tl {#1} {
+      \siunitx_error:n { duplicate-quotient-token }
+    }
+    \tl_map_break:
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_protect_tokens:}
+%\begin{macro}[aux]{\siunitx_number_protect_tokens_aux:N}
+% Under some circumstances (for example when loading \pkg{breqn}) 
+% some tokens do not behave safely under \texttt{x} expansion (at the
+% moment). To get round this, they are redefined here.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_protect_tokens: {
+  \tl_map_function:NN \l_siunitx_protect_tokens_tl
+    \siunitx_number_protect_tokens_aux:N
+}
+\cs_new:Nn \siunitx_number_protect_tokens_aux:N {
+  \cs_set_eq:NN #1 \scan_stop:
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %
 %\subsection{Messages}
 %
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { duplicate-quotient-token } {%
+  Only one quotient token can appear in a single number.%
+}
+\msg_new:nnn { siunitx } { ending-product-token } {%
+  A number cannot end with a product token.%
+}
+\msg_new:nnn { siunitx } { ending-quotient-token } {%
+  A number cannot end with a quotient token.%
+}
+\msg_new:nnn { siunitx } { starting-product-token } {%
+  A number cannot begin with a product token.%
+}
+\msg_new:nnn { siunitx } { starting-quotient-token } {%
+  A number cannot begin with a quotient token.%
+}
+%    \end{macrocode}
+%
 %\subsection{Document macros}
 %
-% The user document macros are all collected together here for ease: all
-% of them are \cs{protected}.
+% The user document macros are all collected together here for ease.
 % 
 %\begin{macro}{\sisetup}
 % The set up macro simply moves to the correct path and executes 
