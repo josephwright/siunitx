@@ -1290,20 +1290,59 @@ This work consists of the file  siunitx.dtx
   }
 }
 \cs_new_nopar:Nn \siunitx_number_in_decimal_complex:n {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
-    \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -complex } 
+      \l_siunitx_tmpa_tl
     \tl_if_empty:NTF \l_siunitx_tmpa_tl {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } { }
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 complex-integer } { }
     }{ 
-      \siunitx_number_in_decimal_aux:n {#1}  
+      \siunitx_number_in_decimal_aux:n { #1 -complex }  
     }
   }
 }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}[aux]{\siunitx_number_in_decimal_aux:n}
+%\begin{macro}[aux]{\siunitx_number_in_decimal_aux:N}
+% The main part of the integer--decimal separator avoids a loop. Only a
+% single token can be given, and this can be used to find the two parts 
+% rapidly.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_decimal_aux:n {
+  \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer } 
+    \l_siunitx_tmpa_tl
+  \cs_set:Nn \siunitx_number_in_decimal_aux:N {
+    \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} {
+      \cs_set:Npn \siunitx_tmpa:w ####1 ##1 ####2 \q_stop {
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } {####1}
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal } {####2}
+      }
+      \exp_after:wN \siunitx_tmpa:w \l_siunitx_tmpa_tl \q_stop
+      \tl_map_break:
+    }
+  }
+  \tl_map_function:NN \l_siunitx_input_decimal_tl 
+    \siunitx_number_in_decimal_aux:N
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+      \l_siunitx_tmpa_tl
+    \tl_map_function:NN \l_siunitx_input_decimal_tl 
+      \siunitx_number_in_decimal_check:N
+  }
+}
+\cs_new:Nn \siunitx_number_in_decimal_aux:N { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_number_in_decimal_check:N}
+% A short function which makes sure that there is only one decimal 
+% marker.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_number_in_decimal_check:N {
+  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} {
+    \siunitx_error:n { duplicate-decimal-token }
+    \tl_map_break:
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1432,6 +1471,7 @@ This work consists of the file  siunitx.dtx
   }
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_number_in_decimal:n {#1}
+    \siunitx_number_in_decimal_complex:n {#1}
   }
   \bool_if:NF \l_siunitx_error_bool {
   }
@@ -1470,6 +1510,11 @@ This work consists of the file  siunitx.dtx
 %\subsection{Messages}
 %
 %    \begin{macrocode}
+\msg_new:nnnn { siunitx } { duplicate-decimal-token } {%
+  Duplicate decimal token.%
+}{%
+  Only one decimal token can appear in a single number.%
+}
 \msg_new:nnnn { siunitx } { duplicate-exponent-token } {%
   Duplicate exponent token found.%
 }{%
