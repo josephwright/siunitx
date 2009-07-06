@@ -1193,15 +1193,19 @@ This work consists of the file  siunitx.dtx
     \cs_set:Nn \siunitx_number_in_complex_aux:N {
       \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} {
         \siunitx_number_in_complex_check:N ##1
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -complex } { }
         \tl_map_break:
       }
     }
     \tl_map_function:NN \l_siunitx_input_complex_tl 
       \siunitx_number_in_complex_aux:N
     \bool_if:NF \l_siunitx_error_bool {
-      \prop_del:Nn \l_siunitx_number_in_prop {#1}
-      \siunitx_number_in_complex_separate:n {#1}
-      \siunitx_number_in_complex_tidy:n {#1}
+      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex } { 
+        \prop_del:Nn \l_siunitx_number_in_prop {#1}
+        \prop_del:Nn \l_siunitx_number_in_prop { #1 -complex }
+        \siunitx_number_in_complex_separate:n {#1}
+        \siunitx_number_in_complex_tidy:n {#1}
+      }
     }
   }
 }
@@ -1271,6 +1275,35 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
     }
   }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_decimal:n}
+% The real and complex parts need a slightly different lead-off test
+% here, as a valid complex number can have no digits at all.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_decimal:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+    \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
+    \siunitx_number_in_decimal_aux:n {#1}
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_in_decimal_complex:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+    \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
+    \tl_if_empty:NTF \l_siunitx_tmpa_tl {
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } { }
+    }{ 
+      \siunitx_number_in_decimal_aux:n {#1}  
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_number_in_decimal_aux:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_decimal_aux:n {
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1398,6 +1431,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_in_complex:n {#1}
   }
   \bool_if:NF \l_siunitx_error_bool {
+    \siunitx_number_in_decimal:n {#1}
   }
   \bool_if:NF \l_siunitx_error_bool {
   }
