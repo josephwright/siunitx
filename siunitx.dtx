@@ -1207,6 +1207,9 @@ This work consists of the file  siunitx.dtx
         \siunitx_number_in_complex_tidy:n {#1}
       }
     }
+    \bool_if:NF \l_siunitx_error_bool {
+      \siunitx_number_in_complex_check:n {#1}
+    }
   }
 }
 \cs_new:Nn \siunitx_number_in_complex_aux:N { }
@@ -1278,6 +1281,41 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}{\siunitx_number_in_complex_check:n}
+%\begin{macro}[aux]{\siunitx_number_in_complex_check_aux:n}
+%\begin{macro}[aux]{\siunitx_number_in_complex_check_aux:N}
+% Finally for complex numbers, make sure there are no stray tokens.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_complex_check:n {
+  \siunitx_number_in_complex_check_aux:n { #1 }
+  \siunitx_number_in_complex_check_aux:n { #1 -complex }
+}
+\cs_new_nopar:Nn \siunitx_number_in_complex_check_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+    \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmp_tl
+    \cs_set:Nn \siunitx_number_in_complex_check_aux:N {
+      \tl_if_in:NnT \l_siunitx_tmp_tl {##1} {
+        \siunitx_error:nx { misplaced-sign } {##1}
+      \tl_map_break:
+      }
+    }
+    \tl_map_function:NN \l_siunitx_input_sign_tl
+      \siunitx_number_in_uncertainty_check_aux:N
+    \cs_set:Nn \siunitx_number_in_complex_check_aux:N {
+      \tl_if_in:NnT \l_siunitx_tmp_tl {##1} {
+        \siunitx_error:nx { misplaced-complex-root } {##1}
+      \tl_map_break:
+      }
+    }
+    \tl_map_function:NN \l_siunitx_input_complex_tl
+      \siunitx_number_in_uncertainty_check_aux:N
+  }
+}
+\cs_new:Nn \siunitx_number_in_complex_check_aux:N { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_number_in_decimal:n}
 % The real and complex parts need a slightly different lead-off test
@@ -1323,21 +1361,26 @@ This work consists of the file  siunitx.dtx
   }
   \tl_map_function:NN \l_siunitx_input_decimal_tl 
     \siunitx_number_in_decimal_aux:N
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } {
-    \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
-      \l_siunitx_tmp_tl
-    \tl_map_function:NN \l_siunitx_input_decimal_tl 
-      \siunitx_number_in_decimal_check:N
-  }
+  \siunitx_number_in_decimal_check:n { #1 -integer }
+  \siunitx_number_in_decimal_check:n { #1 -decimal }
 }
 \cs_new:Nn \siunitx_number_in_decimal_aux:N { }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\begin{macro}[aux]{\siunitx_number_in_decimal_check:n}
 %\begin{macro}[aux]{\siunitx_number_in_decimal_check:N}
 % A short function which makes sure that there is only one decimal 
 % marker.
 %    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_decimal_check:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+    \prop_get:NnN \l_siunitx_number_in_prop {#1} 
+      \l_siunitx_tmp_tl
+    \tl_map_function:NN \l_siunitx_input_decimal_tl 
+      \siunitx_number_in_decimal_check:N
+  }
+}
 \cs_new:Nn \siunitx_number_in_decimal_check:N {
   \tl_if_in:NnT \l_siunitx_tmp_tl {#1} {
     \siunitx_error:n { duplicate-decimal-token }
@@ -1345,6 +1388,7 @@ This work consists of the file  siunitx.dtx
   }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_in_exponent:}
@@ -1563,7 +1607,7 @@ This work consists of the file  siunitx.dtx
     \tl_if_in:NnT \l_siunitx_tmp_tl {##1} {
       \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop {
         \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } {####1}
-        \prop_put:Nnn \l_siunitx_number_in_prop { #1 - uncertainty } 
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -uncertainty } 
           {####2}
       }
       \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
@@ -1583,9 +1627,9 @@ This work consists of the file  siunitx.dtx
 % To make sure no stray tokens are about.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_uncertainty_check:n {
-  \siunitx_number_in_uncertainty_check_aux:n { #1 - integer }
-  \siunitx_number_in_uncertainty_check_aux:n { #1 - decimal }
-  \siunitx_number_in_uncertainty_check_aux:n { #1 - uncertainty }
+  \siunitx_number_in_uncertainty_check_aux:n { #1 -integer }
+  \siunitx_number_in_uncertainty_check_aux:n { #1 -decimal }
+  \siunitx_number_in_uncertainty_check_aux:n { #1 -uncertainty }
 }
 \cs_new_nopar:Nn \siunitx_number_in_uncertainty_check_aux:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
@@ -1654,6 +1698,11 @@ This work consists of the file  siunitx.dtx
 }{%
   The closing uncertainty token `#1' can only come at the end of a 
   number.%
+}
+\msg_new:nnnn { siunitx } { misplaced-sign } {%
+  Misplaced sign token.%
+}{%
+  The sign token `#1' can only come at the beginning of a number.%
 }
 \msg_new:nnnn { siunitx } { misplaced-uncertainty } {%
   Misplaced uncertainty token.%
