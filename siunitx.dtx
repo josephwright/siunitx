@@ -1588,7 +1588,7 @@ This work consists of the file  siunitx.dtx
   }
   \tl_map_function:NN \l_siunitx_input_close_uncert_tl
     \siunitx_number_in_uncertainty_close:N
-  \bool_if:NF \l_siunitx_error_bool {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 - uncertainty } {
     \siunitx_number_in_uncertainty_open:nn {#1} {#2}
   }
 }
@@ -1609,6 +1609,9 @@ This work consists of the file  siunitx.dtx
         \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } {####1}
         \prop_put:Nnn \l_siunitx_number_in_prop { #1 -uncertainty } 
           {####2}
+        \tl_if_empty:nT {####2} {
+          \siunitx_error:n { empty-uncertainty }
+        }
       }
       \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
       \tl_map_break:
@@ -1670,6 +1673,11 @@ This work consists of the file  siunitx.dtx
   Duplicate quotient token.%
 }{%
   Only one quotient token can appear in a single number.%
+}
+\msg_new:nnnn { siunitx } { empty-uncertainty } {%
+  Empty uncertainty given.%
+}{%
+  The number given contains an empty uncertainty.%
 }
 \msg_new:nnnn { siunitx } { ending-product-token } {%
   Misplaced product token.%
