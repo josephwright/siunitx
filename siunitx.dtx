@@ -1338,7 +1338,7 @@ This work consists of the file  siunitx.dtx
     \prop_get:NnN \l_siunitx_number_in_prop { #1 -complex } 
       \l_siunitx_tmp_tl
     \tl_if_empty:NTF \l_siunitx_tmp_tl {
-      \prop_put:Nnn \l_siunitx_number_in_prop { #1 complex-integer } { }
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 -complex-integer } { }
     }{ 
       \siunitx_number_in_decimal_aux:n { #1 -complex }  
     }
@@ -1358,7 +1358,12 @@ This work consists of the file  siunitx.dtx
   \cs_set:Nn \siunitx_number_in_decimal_aux:N {
     \tl_if_in:NnT \l_siunitx_tmp_tl {##1} {
       \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop {
-        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } {####1}
+        \tl_if_empty:nTF {####1} {
+          \prop_del:Nn \l_siunitx_number_in_prop { #1 -integer }
+        }{
+          \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } 
+            {####1}
+        }
         \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal } {####2}
       }
       \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
@@ -1568,6 +1573,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_in_tidy_aux:n {
   \siunitx_number_in_tidy_zeros:n {#1}
   \siunitx_number_in_tidy_zeros:n { #1 -complex }
+  \siunitx_number_in_tidy_sign:n {#1}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1604,6 +1610,62 @@ This work consists of the file  siunitx.dtx
   }
 }
 %    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_in_tidy_sign:n}
+%\begin{macro}[aux]{\siunitx_number_in_tidy_sign_aux_i:n}
+%\begin{macro}[aux]{\siunitx_number_in_tidy_sign_aux_ii:n}
+% The number zero does not take a sign. The test is complicated by some 
+% issues. First, the check for complex numbers needs to ensure that it
+% only fires if there is no real part. The integer part of the problem 
+% is easy: it will just be zero if there is no value.  However, the 
+% decimal part can be an arbitrary number of zeros. 
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_tidy_sign:n {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1} {
+    \siunitx_number_in_tidy_sign_aux_i:n {#1}
+  }{
+    \siunitx_number_in_tidy_sign_aux_i:n { #1 -complex }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_in_tidy_sign_aux_i:n {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -integer } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } 
+      \l_siunitx_tmp_tl 
+    \tl_if_eq:nVTF { 0 } \l_siunitx_tmp_tl {
+      \siunitx_number_in_tidy_sign_aux_ii:n {#1}
+    }{
+      \tl_if_empty:NT \l_siunitx_tmp_tl {
+        \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } {
+          \siunitx_number_in_tidy_sign_aux_ii:n {#1}
+        }
+      }
+    }
+  }{
+    \siunitx_number_in_tidy_sign_aux_ii:n {#1}
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_in_tidy_sign_aux_ii:n {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+      \l_siunitx_tmp_tl
+    \cs_set:Npn \siunitx_tmp:w ##1 {
+      \tl_if_eq:nnF {##1} { 0 } {
+        \tl_clear:N \l_siunitx_tmp_tl
+        \tl_map_break:
+      }
+    }
+    \tl_reverse:N \l_siunitx_tmp_tl
+    \tl_map_function:NN \l_siunitx_tmp_tl \siunitx_tmp:w
+    \tl_if_empty:NF \l_siunitx_tmp_tl {
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
+    }
+  }{
+    \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_in_uncertainty:n}
