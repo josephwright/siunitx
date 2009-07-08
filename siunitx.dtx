@@ -1089,14 +1089,6 @@ This work consists of the file  siunitx.dtx
 \prop_new:N \l_siunitx_number_in_prop
 %    \end{macrocode}
 %\end{macro} 
-% 
-%\begin{macro}{\l_siunitx_number_symbolic_bool}
-% A flag to indicate that part of the input is symbolic rather than
-% numeric (in the \TeX\ sense).
-%    \begin{macrocode}
-\bool_new:N \l_siunitx_number_symbolic_bool
-%    \end{macrocode}
-%\end{macro} 
 %
 %\begin{macro}{\l_siunitx_number_valid_tl}
 % This list of valid tokens is set when parsing a number, so that it is
@@ -1475,7 +1467,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_init: {
   \bool_set_false:N \l_siunitx_error_bool
-  \bool_set_false:N \l_siunitx_number_symbolic_bool
   \prop_clear:N \l_siunitx_number_in_prop
   \group_begin:
     \siunitx_number_in_protect:
@@ -1521,7 +1512,7 @@ This work consists of the file  siunitx.dtx
     \tl_put_right:Nn \l_siunitx_number_arg_tl {#1} 
   }
   \tl_if_in:NnT \l_siunitx_input_symbol_tl {#1} {
-    \bool_set_true:N \l_siunitx_number_symbolic_bool 
+    \prop_put:Nnn \l_siunitx_number_in_prop { symbolic } { true }
   }
 }
 %    \end{macrocode}
