@@ -262,13 +262,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\prop_put:NnV}
-% Needed at various points.
-%    \begin{macrocode}
-\cs_generate_variant:Nn \prop_put:Nnn { NnV }
-%    \end{macrocode}
-%\end{macro}
 %    
 %\begin{macro}{\siunitx_encoding_ts_one:}
 % Some of the \texttt{TS1} encoding is needed to provide symbols in 
@@ -285,13 +278,43 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_minus_char}
+%\begin{macro}{\c_siunitx_minus_tl}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}.
 %    \begin{macrocode}
-\DeclareTextSymbolDefault { \c_siunitx_minus_char } { TS1 }
-\DeclareTextSymbol { \c_siunitx_minus_char }{ TS1 } { 61 }
+\DeclareTextSymbolDefault \c_siunitx_minus_tl { TS1 }
+\DeclareTextSymbol \c_siunitx_minus_tl { TS1 } { 61 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\c_siunitx_mu_text_tl}
+% The lack of an upright mu has to be sorted out.
+%    \begin{macrocode}
+\DeclareTextSymbol \c_siunitx_mu_text_tl { TS1 } { 181 }
+\DeclareTextSymbolDefault \c_siunitx_mu_text_tl { TS1 }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_upgreek_check:}
+%\begin{macro}{\c_siunitx_mu_maths_tl}
+% For maths mode, there is a need for some care as there are a limited
+% number of maths fonts available.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_upgreek_check: { 
+  \@ifpackageloaded { upgreek } {
+    \cs_set_eq:NN \c_siunitx_mu_maths_tl \ipmu
+  }{
+    \DeclareFontFamily { OML } { eur } { \skewchar \font 127 }
+    \DeclareFontShape { OML } { eur } { m } { n } 
+      { <-6> eurm5 <6-8> eurm7 <8-> eurm10 } { }
+    \DeclareSymbolFont { siunitx_symbol } { OML } { eur } { m } { n }
+    \DeclareMathSymbol \c_siunitx_mu_maths_tl \mathord 
+      { siunitx_symbol } { 22 }
+  }
+}
+\AtBeginDocument { \siunitx_upgreek_check: }
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Font detection}
@@ -911,7 +934,7 @@ This work consists of the file  siunitx.dtx
       { \siunitx_print_text_super:n }
     \group_begin:
       \char_make_active:N \-
-      \cs_set:Npn - { \text { \c_siunitx_minus_char } }
+      \cs_set:Npn - { \text { \c_siunitx_minus_tl } }
       \exp_args:NnV \tl_rescan:nn { } \l_siunitx_print_arg_tl
     \group_end:
   }
@@ -1803,6 +1826,181 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Symbols}
+%
+% Not all units use letters alone for their symbol. This raises two 
+% problems. First, the symbols need to work in maths and in text mode.
+% Second, the user needs to be able to adjust each symbol.
+% 
+%\begin{macro}{\l_siunitx_redefine_symbols_bool}
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  redefine-symbols .set_bool:N = \l_siunitx_redefine_symbols_bool,
+  redefine-symbols .initial:n     = { true }
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_redefine_symbols:}
+% The redefinition of symbols has to do a number of checks to ensure
+% that there are no clashes.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_redefine_symbols: {
+  \bool_if:NT \l_siunitx_redefine_symbols_bool {
+    \@ifpackageloaded { textcomp } {
+      \keys_set:nn { siunitx } {
+        maths-degree = \text { \textdegree },
+        text-degree  = \textdegree,
+      }%
+      \@ifpackageloaded { mathptmx } { } {
+        \keys_set:nn { siunitx } {
+          text-micro = \textmu,
+          text-ohm   = \textomega
+        }%
+      }%
+      \tl_if_eq:nVT { OT1 } \encodingdefault { 
+        \keys_set:nn { siunitx } {
+         maths-angstrom = \text { \capitalring { A } },
+         text-angstrom  = \capitalring { A }
+        }
+      }
+    } { }
+    \@ifpackageloaded { upgreek } {
+      \keys_set:nn { siunitx } {
+        maths-ohm = \Upomega
+      }
+    } { }
+  }
+}
+%\AtBeginDocument { \siunitx_redefine_symbols: }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_angstrom_maths_tl}
+%\begin{macro}{\l_siunitx_arcminute_maths_tl}
+%\begin{macro}{\l_siunitx_arcsecond_maths_tl}
+%\begin{macro}{\l_siunitx_celsius_maths_tl}
+%\begin{macro}{\l_siunitx_degree_maths_tl}
+%\begin{macro}{\l_siunitx_micro_maths_tl}
+%\begin{macro}{\l_siunitx_ohm_maths_tl}
+% The symbol storage macros are created separately for maths and text
+% mode, although this is all pretty similar. The default definitions use
+% what is generally available, except for those for micro, where 
+% Computer Modern does not have the appropriate symbol at all. For the 
+% maths mode omega option, the |\text{\ensuremath{...}}| construction
+% deals with the case where \cs{mathnormal} has the wrong symbol.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  math-angstrom   .set:N     = \l_siunitx_angstrom_maths_tl,
+  maths-angstrom  .set:N     = \l_siunitx_angstrom_maths_tl,
+  maths-angstrom  .initial:n = { \text { \AA } },
+  math-arcminute  .set:N     = \l_siunitx_arcminute_maths_tl,
+  maths-arcminute .set:N     = \l_siunitx_arcminute_maths_tl,
+  maths-arcminute .initial:n = { { } ^ { \prime } },
+  math-arcsecond  .set:N     = \l_siunitx_arcsecond_maths_tl,
+  maths-arcsecond .set:N     = \l_siunitx_arcsecond_maths_tl,
+  maths-arcsecond .initial:n = { { } ^ { \prime \prime } },
+  math-celsius    .set:N     = \l_siunitx_celsius_maths_tl,
+  maths-celsius   .set:N     = \l_siunitx_celsius_maths_tl,
+  maths-celsius   .initial:n = { 
+    { } ^ { \circ } \kern - \scriptspace C 
+  },
+  math-degree     .set:N     = \l_siunitx_degree_maths_tl,
+  maths-degree    .set:N     = \l_siunitx_degree_maths_tl,
+  maths-degree    .initial:n = { { } ^ { \circ } },
+  math-micro      .set:N     = \l_siunitx_micro_maths_tl,
+  maths-micro     .set:N     = \l_siunitx_micro_maths_tl,
+  maths-micro     .initial:n = { \c_siunitx_mu_maths_tl },
+  math-ohm        .set:N     = \l_siunitx_ohm_maths_tl,
+  maths-ohm       .set:N     = \l_siunitx_ohm_maths_tl,
+  maths-ohm       .initial:n = { \text { \ensuremath { \Omega } } },
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\l_siunitx_angstrom_text_tl}
+%\begin{macro}{\l_siunitx_arcminute_text_tl}
+%\begin{macro}{\l_siunitx_arcsecond_text_tl}
+%\begin{macro}{\l_siunitx_celsius_text_tl}
+%\begin{macro}{\l_siunitx_degree_text_tl}
+%\begin{macro}{\l_siunitx_micro_text_tl}
+%\begin{macro}{\l_siunitx_ohm_text_tl}
+% Text versions are similar.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  text-angstrom  .set:N     = \l_siunitx_angstrom_text_tl,
+  text-angstrom  .initial:n = { \AA },
+  text-arcminute .set:N     = \l_siunitx_arcminute_text_tl,
+  text-arcminute .initial:n = { \ensuremath { { } ^ { \prime } } },
+  text-arcsecond .set:N     = \l_siunitx_arcsecond_text_tl,
+  text-arcsecond .initial:n = { 
+    \ensuremath { { } ^ { \prime \prime } } 
+  },
+  text-celsius   .set:N     = \l_siunitx_celsius_text_tl,
+  text-celsius   .initial:n = { 
+    \ensuremath { { } ^ { \circ } \kern - \scriptspace C }
+  },
+  text-degree    .set:N     = \l_siunitx_degree_text_tl,
+  text-degree    .initial:n = { \ensuremath { { } ^ { \circ } } },
+  text-micro     .set:N     = \l_siunitx_micro_text_tl,
+  text-micro     .initial:n = { \c_siunitx_mu_text_tl },
+  text-ohm       .set:N     = \l_siunitx_ohm_text_tl,
+  text-ohm       .initial:n = { \ensuremath { \Omega } },
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_symbol_new:n}
+% For creating the outer symbol macro.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_symbol_new:n {
+  \exp_args:Nc \DeclareDocumentCommand { SIUnitSymbol #1 } { } {
+    \mode_if_math:TF {
+      \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } }
+    }{
+      \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _text_tl } }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\SIUnitSymbolAngstrom}
+%\begin{macro}{\SIUnitSymbolArcminute}
+%\begin{macro}{\SIUnitSymbolArcsecond}
+%\begin{macro}{\SIUnitSymbolCelsius}
+%\begin{macro}{\SIUnitSymbolDegree}
+%\begin{macro}{\SIUnitSymbolMicro}
+%\begin{macro}{\SIUnitSymbolOhm}
+% The wrapper macros are created.
+%    \begin{macrocode}
+\siunitx_symbol_new:n { Angstrom }
+\siunitx_symbol_new:n { Arcminute }
+\siunitx_symbol_new:n { Arcsecond }
+\siunitx_symbol_new:n { Celsius }
+\siunitx_symbol_new:n { Degree } 
+\siunitx_symbol_new:n { Micro }
+\siunitx_symbol_new:n { Ohm }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Messages}
 %
 % Lots of messages, all of them together in one block to make life
@@ -1894,19 +2092,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %\subsection{Design-level macros}
-%
-% The macros for creating units and so on are in ``design'' name-space.
-% These are therefore \emph{not} \cs{protected}. Much of this is simple
-% translation to the internal macro names, with perhaps some argument
-% re-arrangement.
 % 
 %\begin{macro}{\DeclareSIPower}
 %\begin{macro}{\DeclareSIPrefix}
 %\begin{macro}{\DeclareSIQualifier}
-%\begin{macro}{\DeclareSIUnit}
-% For creating units and associated functions: only \cs{DeclarSIUnit}
-% takes arguments here as the optional and mandatory ones are 
-% re-ordered.
+%\begin{macro}{\DeclareSIUnit}%
+% The macros for creating units and so on are in design name space.
+% Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
 \DeclareDocumentCommand \DeclareSIPower { s m m } {
 }
@@ -1915,6 +2107,8 @@ This work consists of the file  siunitx.dtx
 \DeclareDocumentCommand \DeclareSIQualifier { s m m m } {
 }
 \DeclareDocumentCommand \DeclareSIUnit { o m m } {
+  \IfNoValueF {#1} {
+  }
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -1939,6 +2133,18 @@ This work consists of the file  siunitx.dtx
 % correct then print it. 
 %    \begin{macrocode}
 \DeclareDocumentCommand \num { o m } {
+  \group_begin:
+    \IfNoValueF {#1} {
+      \keys_set:nn { siunitx } {#1}
+    }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\SI}
+%    \begin{macrocode}
+\DeclareDocumentCommand \SI { o m o m } {
   \group_begin:
     \IfNoValueF {#1} {
       \keys_set:nn { siunitx } {#1}
