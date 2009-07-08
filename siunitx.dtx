@@ -1177,11 +1177,43 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_in_tidy:
     }
     \bool_if:NF \l_siunitx_error_bool {
-    %  \siunitx_number_in_check:
+      \siunitx_number_in_check:
     }
   }
 }
 \cs_generate_variant:Nn \siunitx_number_in_parse:n { V }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_check:}
+%\begin{macro}[aux]{\siunitx_number_in_check_uncertainty:n}
+% Checks for invalid number combinations.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_check: {
+  \siunitx_number_in_check_uncertainty:n { mantissa }
+  \siunitx_number_in_check_uncertainty:n { mantissa-complex }
+  \siunitx_number_in_check_uncertainty:n { exponent }
+  \siunitx_number_in_check_uncertainty:n { exponent-complex }
+  \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } {
+    \prop_if_in:NnF \l_siunitx_number_in_prop { exponent-integer } {
+      \prop_if_in:NnF \l_siunitx_number_in_prop { exponent-decimal } {
+        \prop_if_in:NnF \l_siunitx_number_in_prop { exponent-complex } {
+          \siunitx_error:n { empty-exponent }
+        }
+      }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_in_check_uncertainty:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } {
+    \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer } {
+      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -decimal } {
+        \siunitx_error:n { uncertainty-only }
+      }
+    }
+  }
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -1353,8 +1385,10 @@ This work consists of the file  siunitx.dtx
 % rapidly.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_decimal_aux:n {
-  \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer } 
-    \l_siunitx_tmp_tl
+  \tl_if_empty:NF \l_siunitx_tmp_tl {
+    \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer } 
+      \l_siunitx_tmp_tl
+  }
   \cs_set:Nn \siunitx_number_in_decimal_aux:N {
     \tl_if_in:NnT \l_siunitx_tmp_tl {##1} {
       \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop {
@@ -1418,6 +1452,11 @@ This work consists of the file  siunitx.dtx
       \prop_put:Nnn \l_siunitx_number_in_prop { mantissa } {##1}
       \prop_put:Nnn \l_siunitx_number_in_prop { exponent } {##2}
       \tl_set:Nn \l_siunitx_tmp_tl {##2}
+      \tl_if_empty:nT {##1} {
+        \tl_if_empty:nT {##2} {
+          \siunitx_error:n { empty-number }
+        }
+      }
     }
     \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
     \tl_if_in:NnT \l_siunitx_tmp_tl {#1} {
@@ -1530,6 +1569,7 @@ This work consists of the file  siunitx.dtx
   }
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_number_in_uncertainty:n {#1}
+    \siunitx_number_in_uncertainty:n { #1 -complex }
   }
 }
 %    \end{macrocode}
@@ -1555,7 +1595,9 @@ This work consists of the file  siunitx.dtx
         \prop_put:Nnn \l_siunitx_number_in_prop {#1} { ##1 ##2 }
       }
     }
-    \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
+    \tl_if_empty:NF \l_siunitx_tmp_tl {
+      \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
+    }
   }
 }
 %    \end{macrocode}
@@ -1790,6 +1832,16 @@ This work consists of the file  siunitx.dtx
 }{%
   Only one quotient token can appear in a single number.%
 }
+\msg_new:nnnn { siunitx } { empty-exponent } {%
+  Empty exponent.%
+}{%
+  The exponent contains no number.%
+}
+\msg_new:nnnn { siunitx } { empty-number } {%
+  Empty numerical argument.%
+}{%
+  The given `number' contains no information.%
+}
 \msg_new:nnnn { siunitx } { empty-uncertainty } {%
   Empty uncertainty given.%
 }{%
@@ -1842,6 +1894,11 @@ This work consists of the file  siunitx.dtx
   Misplaced quotient token.%
 }{%
   A number cannot begin with a quotient token.%
+}
+\msg_new:nnnn { siunitx } { uncertainty-only } {%
+  Uncertainty but no number.%
+}{%
+  A number contains an uncertainty part with no main value.%
 }
 %    \end{macrocode}
 %
