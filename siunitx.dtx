@@ -1892,6 +1892,43 @@ This work consists of the file  siunitx.dtx
   A number contains an uncertainty part with no main value.%
 }
 %    \end{macrocode}
+%    
+%\subsection{Design-level macros}
+%
+% The macros for creating units and so on are in ``design'' name-space.
+% These are therefore \emph{not} \cs{protected}. Much of this is simple
+% translation to the internal macro names, with perhaps some argument
+% re-arrangement.
+% 
+%\begin{macro}{\DeclareSIPower}
+%\begin{macro}{\DeclareSIPrefix}
+%\begin{macro}{\DeclareSIQualifier}
+%\begin{macro}{\DeclareSIUnit}
+% For creating units and associated functions: only \cs{DeclarSIUnit}
+% takes arguments here as the optional and mandatory ones are 
+% re-ordered.
+%    \begin{macrocode}
+\DeclareDocumentCommand \DeclareSIPower { s m m } {
+}
+\DeclareDocumentCommand \DeclareSIPrefix { s m m m } {
+}
+\DeclareDocumentCommand \DeclareSIQualifier { s m m m } {
+}
+\DeclareDocumentCommand \DeclareSIUnit { o m m } {
+}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
+%\end{macro}
+%\end{macro}
+% 
+% None of this should be done after the preamble.
+%    \begin{macrocode}
+\@onlypreamble \DeclareSIPower
+\@onlypreamble \DeclareSIPrefix
+\@onlypreamble \DeclareSIQualifier
+\@onlypreamble \DeclareSIUnit
+%    \end{macrocode}
 %
 %\subsection{Document macros}
 %
@@ -1920,6 +1957,319 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%
+%\subsection{Physical units}
+%
+%\begin{macro}{\kilogram}
+%\begin{macro}{\metre}
+%\begin{macro}{\meter}
+%\begin{macro}{\mole}
+%\begin{macro}{\kelvin}
+%\begin{macro}{\candela}
+%\begin{macro}{\second}
+%\begin{macro}{\ampere}
+% The basic SI units are always defined, including both variants for
+% metre.
+%    \begin{macrocode}
+\DeclareSIUnit \kilogram { \kilo \gram }
+\DeclareSIUnit \metre    { m }
+\DeclareSIUnit \meter    { \metre }
+\DeclareSIUnit \mole     { mol }
+\DeclareSIUnit \second   { s }
+\DeclareSIUnit \ampere   { A }
+\DeclareSIUnit \kelvin   { K }
+\DeclareSIUnit \candela  { cd }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\gram}
+% The gram is an odd unit as it is needed for the base unit kilogram.
+%    \begin{macrocode}
+\DeclareSIUnit \gram { g }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\yocto}
+%\begin{macro}{\zepto}
+%\begin{macro}{\atto}
+%\begin{macro}{\femto}
+%\begin{macro}{\pico}
+%\begin{macro}{\nano}
+%\begin{macro}{\micro}
+%\begin{macro}{\milli}
+%\begin{macro}{\centi}
+%\begin{macro}{\deci}
+% The various SI multiple prefixes are defined here: first the small
+% ones. 
+%    \begin{macrocode}
+\DeclareSIPrefix \yocto { y } { -24 }
+\DeclareSIPrefix \zepto { z } { -21 }
+\DeclareSIPrefix \atto  { a } { -18 }
+\DeclareSIPrefix \femto { f } { -15 }
+\DeclareSIPrefix \pico  { p } { -12 }
+\DeclareSIPrefix \nano  { n } { -9 }
+\DeclareSIPrefix \micro { \SIUnitSymbolMicro } { -6 }
+\DeclareSIPrefix \milli { m } { -3 }
+\DeclareSIPrefix \centi { c } { -2 }
+\DeclareSIPrefix \deci  { d } { -1 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\deca}
+%\begin{macro}{\deka}
+%\begin{macro}{\hecto}
+%\begin{macro}{\kilo}
+%\begin{macro}{\mega}
+%\begin{macro}{\giga}
+%\begin{macro}{\tera}
+%\begin{macro}{\peta}
+%\begin{macro}{\exa}
+%\begin{macro}{\zetta}
+%\begin{macro}{\yotta}
+% Now the large ones.
+%    \begin{macrocode}
+\DeclareSIPrefix \deca  { da } { 1 }
+\DeclareSIPrefix \deka  { da } { 1 }
+\DeclareSIPrefix \hecto { h }  { 2 }
+\DeclareSIPrefix \kilo  { k }  { 3 }
+\DeclareSIPrefix \mega  { M }  { 6 }
+\DeclareSIPrefix \giga  { G }  { 9 }
+\DeclareSIPrefix \tera  { T }  { 12 }
+\DeclareSIPrefix \peta  { P }  { 15 }
+\DeclareSIPrefix \exa   { E }  { 18 }
+\DeclareSIPrefix \zetta { Z }  { 21 }
+\DeclareSIPrefix \yotta { Y }  { 24 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\becquerel}
+%\begin{macro}{\celsius}
+%\begin{macro}{\coulomb}
+%\begin{macro}{\farad}
+%\begin{macro}{\gray}
+%\begin{macro}{\hertz}
+%\begin{macro}{\henry}
+%\begin{macro}{\joule}
+%\begin{macro}{\katal}
+%\begin{macro}{\lumen}
+%\begin{macro}{\lux}
+% A number of derived units with defined names and symbols.
+%    \begin{macrocode}
+\DeclareSIUnit \becquerel { Bq }
+\DeclareSIUnit \celsius   { \SIUnitSymbolCelsius }
+\DeclareSIUnit \coulomb   { C }
+\DeclareSIUnit \farad     { F }
+\DeclareSIUnit \gray      { Gy }
+\DeclareSIUnit \hertz     { Hz }
+\DeclareSIUnit \henry     { H }
+\DeclareSIUnit\joule      { J }
+\DeclareSIUnit \katal     { kat }
+\DeclareSIUnit \lumen     { lm }
+\DeclareSIUnit \lux       { lx }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\newton}
+%\begin{macro}{\ohm}
+%\begin{macro}{\pascal}
+%\begin{macro}{\radian}
+%\begin{macro}{\siemens}
+%\begin{macro}{\sievert}
+%\begin{macro}{\steradian}
+%\begin{macro}{\tesla}
+%\begin{macro}{\volt}
+%\begin{macro}{\watt}
+%\begin{macro}{\weber}
+% More units.
+%    \begin{macrocode}
+\DeclareSIUnit \newton    { N }
+\DeclareSIUnit \ohm       { \SIUnitSymbolOhm }
+\DeclareSIUnit \pascal    { Pa }
+\DeclareSIUnit \radian    { rad }
+\DeclareSIUnit \siemens   { S }
+\DeclareSIUnit \sievert   { Sv }
+\DeclareSIUnit \steradian { sr }
+\DeclareSIUnit \tesla     { T }
+\DeclareSIUnit \volt      { V }
+\DeclareSIUnit \watt      { W }
+\DeclareSIUnit \weber     { Wb }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\arcminute}
+%\begin{macro}{\arcsecond}
+%\begin{macro}{\day}
+%\begin{macro}{\degree}
+%\begin{macro}{\hectare}
+%\begin{macro}{\hour}
+%\begin{macro}{\litre}
+%\begin{macro}{\liter}
+%\begin{macro}{\minute}
+%\begin{macro}{\percent}
+%\begin{macro}{\tonne}
+% Non-SI, but accepted for general use.
+%    \begin{macrocode}
+\DeclareSIUnit[units/output/number-unit separator={}]
+  \arcmin { \arcminute } 
+\DeclareSIUnit[units/output/number-unit separator={}]
+  \arcminute { \SIUnitSymbolArcminute }
+\DeclareSIUnit[units/output/number-unit separator={}]
+   \arcsecond { \SIUnitSymbolArcsecond }
+\DeclareSIUnit \day { d }
+\DeclareSIUnit[units/output/number-unit separator={}]
+  \degree { \SIUnitSymbolDegree }
+\DeclareSIUnit \hectare { ha }
+\DeclareSIUnit \hour    { h }
+\DeclareSIUnit \litre   { l }
+\DeclareSIUnit \liter   { L }
+\DeclareSIUnit \minute  { min }
+\DeclareSIUnit \percent { \char37 }
+\DeclareSIUnit \tonne   { t }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\astronomicalunit}
+%\begin{macro}{\atomicmassunit}
+%\begin{macro}{\electronvolt}
+%\begin{macro}{\dalton}
+% A few units based on physical measurements exist.  
+%    \begin{macrocode}
+\DeclareSIUnit \astronomicalunit { ua }
+\DeclareSIUnit \atomicmassunit   { u }
+\DeclareSIUnit \electronvolt     { eV }
+\DeclareSIUnit \dalton           { Da }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\clight}
+%\begin{macro}{\electronmass}
+%\begin{macro}{\planckbar}
+% A set of `natural units'.
+%    \begin{macrocode}
+\DeclareSIUnit \clight       {\text{\ensuremath{c_{0}}}}
+\DeclareSIUnit \electronmass {\text{\ensuremath{m_{\text{e}}}}}
+\DeclareSIUnit \planckbar    {\text{\ensuremath{\hbar}}}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\elementarycharge}
+%\begin{macro}{\bohr}
+%\begin{macro}{\hartree}
+% A set of `atomic units'.
+%    \begin{macrocode}
+\DeclareSIUnit \elementarycharge {\text{\ensuremath{e}}}
+\DeclareSIUnit \bohr             {\text{\ensuremath{a_{0}}}}
+\DeclareSIUnit \hartree          {\text{\ensuremath{E_{\textup{h}}}}}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\angstrom}
+%\begin{macro}{\bar}
+%\begin{macro}{\barn}
+%\begin{macro}{\bel}
+%\begin{macro}{\bel}
+%\begin{macro}{\knot}
+%\begin{macro}{\mmHg}
+%\begin{macro}{\nauticalmile}
+%\begin{macro}{\neper}
+% There are then some day-to-day units which are accepted for use
+% with SI, but are not part of the official specification.
+%    \begin{macrocode}
+\DeclareSIUnit \angstrom     { \SIUnitSymbolAngstrom }
+\DeclareSIUnit \bar          { bar }
+\DeclareSIUnit \barn         { b }
+\DeclareSIUnit \bel          { B }
+\DeclareSIUnit \decibel      { \deci \bel }
+\DeclareSIUnit \knot         { kn }
+\DeclareSIUnit \mmHg         { mmHg }
+\DeclareSIUnit \nauticalmile { M }
+\DeclareSIUnit \neper        { Np }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%
+%\begin{macro}{\square}
+%\begin{macro}{\squared}
+%\begin{macro}{\cubic}
+%\begin{macro}{\cubed}
+% The basic powers are also defined.
+%    \begin{macrocode}
+\DeclareSIPower  \square  { 2 }
+\DeclareSIPower* \squared { 2 }
+\DeclareSIPower  \cubic   { 3 }
+\DeclareSIPower* \cubed   { 3 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+
 %    
 %    \begin{macrocode}
 %</package>
