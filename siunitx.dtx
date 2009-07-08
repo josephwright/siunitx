@@ -1173,6 +1173,12 @@ This work consists of the file  siunitx.dtx
     \bool_if:NF \l_siunitx_error_bool {
       \siunitx_number_in_separate:
     }
+    \bool_if:NF \l_siunitx_error_bool {
+      \siunitx_number_in_tidy:
+    }
+    \bool_if:NF \l_siunitx_error_bool {
+    %  \siunitx_number_in_check:
+    }
   }
 }
 \cs_generate_variant:Nn \siunitx_number_in_parse:n { V }
@@ -1520,8 +1526,6 @@ This work consists of the file  siunitx.dtx
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_number_in_uncertainty:n {#1}
   }
-  \bool_if:NF \l_siunitx_error_bool {
-  }  
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1547,6 +1551,56 @@ This work consists of the file  siunitx.dtx
       }
     }
     \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_tidy:}
+%\begin{macro}[aux]{\siunitx_number_in_tidy_aux:n}
+% There are some minor bits of tidying up to do now. Two issues need to
+% be handled, both concerned with zero.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_tidy: { 
+  \siunitx_number_in_tidy_aux:n { mantissa }
+  \siunitx_number_in_tidy_aux:n { exponent }
+}
+\cs_new_nopar:Nn \siunitx_number_in_tidy_aux:n {
+  \siunitx_number_in_tidy_zeros:n {#1}
+  \siunitx_number_in_tidy_zeros:n { #1 -complex }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_number_in_tidy_zeros:n}
+% Here, any leading zeros are found in the integer part of the number.
+% By constructing the loop in this way, every character in the input 
+% does not have to be tested.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_in_tidy_zeros:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -integer } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } 
+      \l_siunitx_tmp_tl
+    \tl_if_in:NnT \l_siunitx_tmp_tl { 0 } {
+      \cs_set:Npn \siunitx_tmp:w ##1 0 ##2 \q_stop {
+        \tl_if_empty:nTF {##1} {
+          \tl_if_in:nnTF {##2} { 0 } {
+            \siunitx_tmp:w ##2 \q_stop
+          }{
+            \tl_set:Nn \l_siunitx_tmp_tl {##2}
+            \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer }
+              { ##2 }
+          }
+        }{
+          \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer }
+            { ##1 0 ##2 }
+        }
+      }
+      \exp_after:wN \siunitx_tmp:w \l_siunitx_tmp_tl \q_stop
+      \tl_if_empty:NT \l_siunitx_tmp_tl {
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+      }
+    }
   }
 }
 %    \end{macrocode}
