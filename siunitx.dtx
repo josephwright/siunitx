@@ -1826,6 +1826,135 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Post-processing numbers}
+%
+% After finding the basic number in the code above, there may be some
+% manipulation to do. This covers things such as tidying up excess 
+% information and rounding numbers. Nothing is added here that is
+% for `formatting': this is left for the output part of the system.
+% 
+%\begin{macro}{\l_siunitx_process_round_tl}
+% For storing the method used for rounding, if any.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_process_round_tl
+%    \end{macrocode}
+%\end{macro}
+% 
+%\begin{macro}{\l_siunitx_process_sign_bool}
+%\begin{macro}{\l_siunitx_process_decimal_zero_bool}
+%\begin{macro}{\l_siunitx_process_integer_zero_bool}
+%\begin{macro}{\l_siunitx_process_sign_tl}
+%\begin{macro}{\l_siunitx_process_plus_tl}
+%\begin{macro}{\l_siunitx_process_zero_exponent_bool}
+%\begin{macro}{\l_siunitx_process_figures_int}
+%\begin{macro}{\l_siunitx_process_places_int}
+% First, the options are set up.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  add-explicit-sign .set_bool:N = \l_siunitx_process_sign_bool,
+  add-explicit-sign .initial:n  = true, 
+  add-zero-decimal  .set_bool:N = \l_siunitx_process_decimal_zero_bool,
+  add-zero-decimal  .initial:n  = true,
+  add-zero-integer  .set_bool:N = \l_siunitx_process_integer_zero_bool,
+  explicit-sign     .set:N      = \l_siunitx_process_sign_tl,
+  explicit-sign     .initial:n  = { + },
+  retain-plus       .set_bool:N = \l_siunitx_process_plus_tl,
+  retain-zero-exponent .set_bool:N =
+    \l_siunitx_process_zero_exponent_bool,
+  round-mode        .choice: ,
+  round-mode / figures .code:n = {
+    \tl_set:Nn \l_siunitx_process_round_tl { figures }
+  },
+  round-mode / off     .code:n = {
+    \tl_clear:N \l_siunitx_process_round_tl
+  },
+  round-mode / places  .code:n = {
+    \tl_set:Nn \l_siunitx_process_round_tl { places }
+  },
+  round-figures     .set:N      = \l_siunitx_process_figures_int,
+  round-figures     .initial:n  = 2,
+  round-places      .set:N      = \l_siunitx_process_places_int,
+  round-places      .initial:n  = 2
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process:}
+% Post-processing is a series of small tasks.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process: {
+  \siunitx_number_process_sign:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_sign:}
+% Sorting out signs consists of two parts: retaining a plus if necessary
+% and adding an explicit sign.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_sign: {
+  \bool_if:NF \l_siunitx_process_plus_tl {
+    \siunitx_number_process_sign_plus:n { mantissa }
+    \siunitx_number_process_sign_plus:n { exponent }
+  }
+  \bool_if:NT \l_siunitx_process_sign_bool {
+    \siunitx_number_process_sign_add:n { mantissa }
+    \siunitx_number_process_sign_add:n { exponent }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_sign_add:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_sign_add:n {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1}  {
+    \siunitx_number_process_sign_add_aux:n {#1}
+  }{
+    \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex }  {
+      \siunitx_number_process_sign_add_aux:n { #1 -complex }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_sign_add_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } {
+    \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
+      \l_siunitx_process_sign_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_sign_plus:n}
+%\begin{macro}[aux]{\siunitx_number_process_sign_plus_aux:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_sign_plus:n {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1}  {
+    \siunitx_number_process_sign_plus_aux:n {#1}
+  }{
+    \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex }  {
+      \siunitx_number_process_sign_plus_aux:n { #1 -complex }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_sign_plus_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
+      \l_siunitx_tmp_tl
+    \tl_if_eq:nVT { + } \l_siunitx_tmp_tl {
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -2359,15 +2488,13 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\tonne}
 % Non-SI, but accepted for general use.
 %    \begin{macrocode}
-\DeclareSIUnit[units/output/number-unit separator={}]
-  \arcmin { \arcminute } 
-\DeclareSIUnit[units/output/number-unit separator={}]
-  \arcminute { \SIUnitSymbolArcminute }
-\DeclareSIUnit[units/output/number-unit separator={}]
-   \arcsecond { \SIUnitSymbolArcsecond }
+\DeclareSIUnit[number-unit-separator={}] \arcmin { \arcminute } 
+\DeclareSIUnit[number-unit-separator={}] \arcminute 
+  { \SIUnitSymbolArcminute }
+\DeclareSIUnit[number-unit-separator={}] \arcsecond 
+  { \SIUnitSymbolArcsecond }
 \DeclareSIUnit \day { d }
-\DeclareSIUnit[units/output/number-unit separator={}]
-  \degree { \SIUnitSymbolDegree }
+\DeclareSIUnit[number-unit-separator={}] \degree { \SIUnitSymbolDegree }
 \DeclareSIUnit \hectare { ha }
 \DeclareSIUnit \hour    { h }
 \DeclareSIUnit \litre   { l }
