@@ -1845,6 +1845,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_integer_zero_bool}
 %\begin{macro}{\l_siunitx_process_sign_tl}
 %\begin{macro}{\l_siunitx_process_plus_tl}
+%\begin{macro}{\l_siunitx_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
 %\begin{macro}{\l_siunitx_process_figures_int}
 %\begin{macro}{\l_siunitx_process_places_int}
@@ -1856,9 +1857,12 @@ This work consists of the file  siunitx.dtx
   add-zero-decimal  .set_bool:N = \l_siunitx_process_decimal_zero_bool,
   add-zero-decimal  .initial:n  = true,
   add-zero-integer  .set_bool:N = \l_siunitx_process_integer_zero_bool,
+  add-zero-integer  .initial:n  = true,
   explicit-sign     .set:N      = \l_siunitx_process_sign_tl,
   explicit-sign     .initial:n  = { + },
   retain-plus       .set_bool:N = \l_siunitx_process_plus_tl,
+  retain-unity-mantissa .set_bool:N = 
+    \l_siunitx_process_unity_mantissa_bool,
   retain-zero-exponent .set_bool:N =
     \l_siunitx_process_zero_exponent_bool,
   round-mode        .choice: ,
@@ -1885,12 +1889,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_number_process:}
 % Post-processing is a series of small tasks.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process: {
   \siunitx_number_process_sign:
+  \siunitx_number_process_zero_fill:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1952,6 +1958,41 @@ This work consists of the file  siunitx.dtx
   }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_zero_fill:}
+%\begin{macro}[aux]{\siunitx_number_process_zero_fill_aux:n}
+%\begin{macro}[aux]{\siunitx_number_process_zero_fill_aux:nn}
+% Checks for adding zeros to each component are carried out.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_zero_fill: {
+  \siunitx_number_process_zero_fill_aux:n { integer }
+  \siunitx_number_process_zero_fill_aux:n { decimal }
+}
+\cs_new_nopar:Nn \siunitx_number_process_zero_fill_aux:n {
+  \bool_if:cT { l_siunitx_process_ #1 _zero_bool } {
+    \siunitx_number_process_zero_fill_aux:nn { mantissa } {#1}
+    \siunitx_number_process_zero_fill_aux:nn { mantissa-complex } {#1}
+    \siunitx_number_process_zero_fill_aux:nn { exponent } {#1}
+    \siunitx_number_process_zero_fill_aux:nn { exponent-complex } {#1}
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_zero_fill_aux:nn {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 - #2 } {
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } 
+      \l_siunitx_tmp_tl
+    \tl_if_empty:NT \l_siunitx_tmp_tl {
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
+    }
+  }{
+    \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
