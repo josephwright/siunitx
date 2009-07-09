@@ -231,12 +231,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %\begin{macro}{\siunitx_tmp:w}
+%\begin{macro}{\l_siunitx_tmp_bool}
 %\begin{macro}{\l_siunitx_tmp_tl}
 % Scratch items.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_tmp:w { }
+\bool_new:N \l_siunitx_tmp_bool
 \tl_new:N \l_siunitx_tmp_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -1899,8 +1902,60 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_sign:
   \siunitx_number_process_zero_fill:
   \siunitx_number_process_mantissa:
+  \siunitx_number_process_exponent:
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_exponent:}
+%\begin{macro}[aux]{\siunitx_number_process_exponent_aux_i:n}
+%\begin{macro}[aux]{\siunitx_number_process_exponent_aux_ii:n}
+%\begin{macro}[aux]{\siunitx_number_process_exponent_clear:n}
+% To check for a totally zero exponent, the possibility that one or more
+% of the exponent storage areas is zero needs to be considered. This 
+% means a bit of nesting and some slightly opaque clearing functions.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_exponent: {
+  \bool_if:NF \l_siunitx_process_zero_exponent_bool {
+    \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } {
+      \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } {
+        \bool_set_false:N \l_siunitx_tmp_bool
+        \siunitx_number_process_exponent_aux_i:n { }
+        \siunitx_number_process_exponent_aux_i:n { complex- }
+        \bool_if:NF \l_siunitx_tmp_bool {
+          \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+          \siunitx_number_process_exponent_clear:n { }
+          \siunitx_number_process_exponent_clear:n { complex- }
+        }
+      }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_exponent_aux_i:n {
+  \siunitx_number_process_exponent_aux_ii:n { #1 integer }
+  \siunitx_number_process_exponent_aux_ii:n { #1 decimal }
+  \siunitx_number_process_exponent_aux_ii:n { #1 uncertainty }
+}
+\cs_new_nopar:Nn \siunitx_number_process_exponent_aux_ii:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { exponent- #1 } {
+    \prop_get:NnN \l_siunitx_number_in_prop { exponent- #1 }
+      \l_siunitx_tmp_tl
+    \intexpr_compare:nF { \l_siunitx_tmp_tl = \c_zero } {
+      \bool_set_true:N \l_siunitx_tmp_bool
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_exponent_clear:n {
+  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 sign }
+  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 integer }
+  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 decimal }
+  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 uncertainty }
+  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 complex }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_mantissa:}
