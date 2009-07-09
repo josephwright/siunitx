@@ -404,24 +404,22 @@ This work consists of the file  siunitx.dtx
     detect-italic = true,
     detect-mode   = true
   },
-  detect-bold .set_bool:N          = \l_siunitx_detect_bold_bool,
-  detect-display-math .set_bool:N  = 
-    \l_siunitx_detect_display_maths_bool,
-  detect-display-maths .set_bool:N = 
-    \l_siunitx_detect_display_maths_bool,
-  detect-family .set_bool:N        = \l_siunitx_detect_family_bool,
-  detect-inline-bold .choice:,
-  detect-inline-bold .value_required:,
-  detect-inline-bold / math  .set_bool:N = 
+  detect-bold          .bool:N = \l_siunitx_detect_bold_bool,
+  detect-display-math  .bool:N = \l_siunitx_detect_display_maths_bool,
+  detect-display-maths .bool:N = \l_siunitx_detect_display_maths_bool,
+  detect-family        .bool:N = \l_siunitx_detect_family_bool,
+  detect-inline-bold   .choice:,
+  detect-inline-bold   .value_required:,
+  detect-inline-bold / math  .bool:N = 
     \l_siunitx_detect_inline_bold_bool,
-  detect-inline-bold / maths .set_bool:N = 
+  detect-inline-bold / maths .bool:N = 
     \l_siunitx_detect_inline_bold_bool,
-  detect-inline-bold / text .set_bool_inverse:N = 
+  detect-inline-bold / text .bool_inverse:N = 
     \l_siunitx_detect_inline_bold_bool, 
-  detect-italic .set_bool:N        = \l_siunitx_detect_italic_bool,
-  detect-mode .set_bool:N          = \l_siunitx_detect_mode_bool,
-  detect-none .choice:,
-  detect-none .default:n = true,
+  detect-italic        .bool:N = \l_siunitx_detect_italic_bool,
+  detect-mode          .bool:N = \l_siunitx_detect_mode_bool,
+  detect-none          .choice:,
+  detect-none          .default:n = true,
   detect-none / false .meta:n = {
     detect-bold   = true,
     detect-family = true,
@@ -1855,19 +1853,19 @@ This work consists of the file  siunitx.dtx
 % First, the options are set up.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  add-explicit-sign .set_bool:N = \l_siunitx_process_sign_bool,
+  add-explicit-sign .bool:N     = \l_siunitx_process_sign_bool,
   add-explicit-sign .initial:n  = true, 
-  add-zero-decimal  .set_bool:N = \l_siunitx_process_decimal_zero_bool,
+  add-zero-decimal  .bool:N     = \l_siunitx_process_decimal_zero_bool,
   add-zero-decimal  .initial:n  = true,
-  add-zero-integer  .set_bool:N = \l_siunitx_process_integer_zero_bool,
+  add-zero-integer  .bool:N     = \l_siunitx_process_integer_zero_bool,
   add-zero-integer  .initial:n  = true,
   explicit-sign     .set:N      = \l_siunitx_process_sign_tl,
   explicit-sign     .initial:n  = { + },
-  retain-plus       .set_bool:N = \l_siunitx_process_plus_tl,
-  retain-unity-mantissa .set_bool:N = 
+  retain-plus       .bool:N     = \l_siunitx_process_plus_tl,
+  retain-unity-mantissa .bool:N = 
     \l_siunitx_process_unity_mantissa_bool,
   retain-unity-mantissa .initial:n = { true }, 
-  retain-zero-exponent .set_bool:N =
+  retain-zero-exponent .bool:N =
     \l_siunitx_process_zero_exponent_bool,
   round-mode        .choice: ,
   round-mode / figures .code:n = {
@@ -1903,6 +1901,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_zero_fill:
   \siunitx_number_process_mantissa:
   \siunitx_number_process_exponent:
+  \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } {
+    \siunitx_number_process_round:
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1958,6 +1959,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_number_process_figures:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_figures:n {
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_number_process_mantissa:}
 % A check for the mantissa consisting only of the token \texttt{1}, when
 % an exponent is also available.
@@ -1974,6 +1982,32 @@ This work consists of the file  siunitx.dtx
         }
       }
     }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_places:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_places:n {
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_round:}
+% The lead-off for rounding is the same for decimal places and 
+% significant figures.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_round: {
+  \tl_if_empty:NF \l_siunitx_process_round_tl {
+    \use:c { siunitx_number_process_ \l_siunitx_process_round_tl :n }
+      { mantissa }
+    \use:c { siunitx_number_process_ \l_siunitx_process_round_tl :n }
+      { mantissa-complex }
+    \use:c { siunitx_number_process_ \l_siunitx_process_round_tl :n }
+      { exponent }
+    \use:c { siunitx_number_process_ \l_siunitx_process_round_tl :n }
+      { exponent-complex }
   }
 }
 %    \end{macrocode}
@@ -2083,7 +2117,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_redefine_symbols_bool}
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  redefine-symbols .set_bool:N = \l_siunitx_redefine_symbols_bool,
+  redefine-symbols .bool:N = \l_siunitx_redefine_symbols_bool,
   redefine-symbols .initial:n     = { true }
 }
 %    \end{macrocode}
@@ -2381,6 +2415,18 @@ This work consists of the file  siunitx.dtx
 % correct then print it. 
 %    \begin{macrocode}
 \DeclareDocumentCommand \num { o m } {
+  \group_begin:
+    \IfNoValueF {#1} {
+      \keys_set:nn { siunitx } {#1}
+    }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\si}
+%    \begin{macrocode}
+\DeclareDocumentCommand \si { o m } {
   \group_begin:
     \IfNoValueF {#1} {
       \keys_set:nn { siunitx } {#1}
