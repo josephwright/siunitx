@@ -1863,6 +1863,7 @@ This work consists of the file  siunitx.dtx
   retain-plus       .set_bool:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .set_bool:N = 
     \l_siunitx_process_unity_mantissa_bool,
+  retain-unity-mantissa .initial:n = { true }, 
   retain-zero-exponent .set_bool:N =
     \l_siunitx_process_zero_exponent_bool,
   round-mode        .choice: ,
@@ -1897,6 +1898,28 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_process: {
   \siunitx_number_process_sign:
   \siunitx_number_process_zero_fill:
+  \siunitx_number_process_mantissa:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_mantissa:}
+% A check for the mantissa consisting only of the token \texttt{1}, when
+% an exponent is also available.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_mantissa: {
+  \bool_if:NF \l_siunitx_process_unity_mantissa_bool {
+    \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } {
+      \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa } {
+        \prop_get:NnN \l_siunitx_number_in_prop { mantissa }
+          \l_siunitx_tmp_tl
+        \tl_if_eq:nVT { 1 } \l_siunitx_tmp_tl { 
+          \prop_del:Nn \l_siunitx_number_in_prop { mantissa } 
+          \prop_del:Nn \l_siunitx_number_in_prop { mantissa-integer }
+        }
+      }
+    }
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1979,14 +2002,14 @@ This work consists of the file  siunitx.dtx
   }
 }
 \cs_new_nopar:Nn \siunitx_number_process_zero_fill_aux:nn {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 - #2 } {
-    \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } 
-      \l_siunitx_tmp_tl
-    \tl_if_empty:NT \l_siunitx_tmp_tl {
-      \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
-    }
-  }{
-    \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } {
+    \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 - #2 } {
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } 
+        \l_siunitx_tmp_tl
+      \tl_if_empty:NT \l_siunitx_tmp_tl {
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
+      }
+    }{
       \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
     }
   }
