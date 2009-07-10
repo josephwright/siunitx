@@ -1839,7 +1839,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\l_siunitx_round_int}
 %\begin{macro}{\l_siunitx_round_tl}
-%\begin{macro}{\l_siunitx_round_carry_bool}
+%\begin{macro}{\l_siunitx_round_bool}
 %\begin{macro}{\l_siunitx_round_decimal_in_tl}
 %\begin{macro}{\l_siunitx_round_decimal_out_tl}
 %\begin{macro}{\l_siunitx_round_integer_in_tl}
@@ -1848,7 +1848,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \int_new:N \l_siunitx_round_int
 \tl_new:N \l_siunitx_round_tl
-\bool_new:N \l_siunitx_round_carry_bool
+\bool_new:N \l_siunitx_round_bool
 \tl_new:N \l_siunitx_round_decimal_in_tl
 \tl_new:N \l_siunitx_round_decimal_out_tl
 \tl_new:N \l_siunitx_round_integer_in_tl
@@ -1981,8 +1981,99 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_figures:n}
+%\begin{macro}[aux]{\siunitx_number_process_figures_init:n}
+% Rather than count figures to start with, a completely different 
+% approach is used here.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_figures:n {
+  \siunitx_number_process_figures_init:n {#1}
+  \siunitx_number_process_figures_count:n { integer }
+  \siunitx_number_process_figures_count:n { decimal }
+  \bool_if:NTF \l_siunitx_round_bool {
+    \bool_set_false:N \l_siunitx_round_bool
+    \intexpr_compare:nTF { 
+      \l_siunitx_round_int > \l_siunitx_process_figures_int 
+    } {
+      \siunitx_number_process_figures_round:
+    }{
+      \siunitx_number_process_figures_pad:n {#1}
+    }
+    \siunitx_number_process_round_tidy:n {#1}
+  }{
+    \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+    \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_process_figures_init:n {
+ \int_zero:N \l_siunitx_round_int
+ \bool_set_false:N \l_siunitx_round_bool
+ \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } {
+   \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+     \l_siunitx_round_decimal_in_tl
+ }{
+   \tl_clear:N \l_siunitx_round_decimal_in_tl
+ }
+ \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -integer } {
+   \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } 
+     \l_siunitx_round_integer_in_tl
+ }{
+   \tl_clear:N \l_siunitx_round_integer_in_tl
+ }
+ \tl_clear:N \l_siunitx_round_decimal_out_tl
+ \tl_clear:N \l_siunitx_round_integer_out_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_number_process_figures_count:n}
+% The counting code has to check that characters are actually 
+% significant.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_figures_count:n {
+  \int_set:Nn \l_siunitx_tmp_int {
+    \exp_args:Nv \tl_head_i:n { l_siunitx_round_ #1 _in_tl }
+  }
+  \tl_set:cx { l_siunitx_round_ #1 _in_tl } {
+    \exp_args:Nv \tl_tail:n { l_siunitx_round_ #1 _in_tl }
+  }
+  \tl_put_left:cV { l_siunitx_round_ #1 _out_tl } \l_siunitx_tmp_int
+  \bool_if:NF \l_siunitx_round_bool {
+    \intexpr_compare:nF { \l_siunitx_tmp_int = \c_zero } {
+      \bool_set_true:N \l_siunitx_round_bool
+    }
+  }
+  \bool_if:NT \l_siunitx_round_bool {
+    \int_incr:N \l_siunitx_round_int
+  }
+  \tl_if_empty:cTF { l_siunitx_round_ #1 _in_tl } {
+    \tl_set_eq:cc { l_siunitx_round_ #1 _in_tl } 
+      { l_siunitx_round_ #1 _out_tl }
+    \tl_clear:c { l_siunitx_round_ #1 _out_tl }
+  }{
+    \siunitx_number_process_figures_count:n {#1}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_figures_round:}
+% The control macro for rounding to figures does the decimal part
+% then the integer part as loops. There is then some tidying up if a
+% digit is carried at the end.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_figures_round: {
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_figures_pad:n}
+% If the number is too short, then the reversal is undone and the 
+% padding routine is called.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_figures_pad:n {
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+    \l_siunitx_round_integer_in_tl
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+    \l_siunitx_round_decimal_in_tl
+  \siunitx_number_process_round_pad:n {#1}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2091,7 +2182,7 @@ This work consists of the file  siunitx.dtx
   \tl_reverse:N \l_siunitx_round_decimal_in_tl
   \tl_clear:N \l_siunitx_round_integer_out_tl
   \tl_clear:N \l_siunitx_round_decimal_out_tl
-  \bool_set_false:N \l_siunitx_round_carry_bool
+  \bool_set_false:N \l_siunitx_round_bool
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2100,14 +2191,15 @@ This work consists of the file  siunitx.dtx
 % If there is an integer, do the same. Only if both are empty does the
 % loop stop.
 %    \begin{macrocode}
-\cs_new_nopar:Nn  \siunitx_number_process_places_loop:n {
+\cs_new_nopar:Nn \siunitx_number_process_places_loop:n {
   \tl_if_empty:NTF \l_siunitx_round_decimal_in_tl {
     \tl_if_empty:NF \l_siunitx_round_integer_in_tl {
       \siunitx_number_process_places_integer:n {#1}
       \siunitx_number_process_places_loop:n {#1}
     }
-    \bool_if:NT \l_siunitx_round_carry_bool {
+    \bool_if:NT \l_siunitx_round_bool {
       \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 1 }
+      \bool_set_false:N \l_siunitx_round_bool
     }
   }{
     \siunitx_number_process_round_decimal:n {#1}
@@ -2119,20 +2211,20 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_process_places_integer:n}
 % Rounding for integers is just a case of carrying digits.
 %    \begin{macrocode}
-\cs_new_nopar:Nn  \siunitx_number_process_places_integer:n {
+\cs_new_nopar:Nn \siunitx_number_process_places_integer:n {
   \int_set:Nn \l_siunitx_tmp_int {
     \exp_args:NV \tl_head_i:n \l_siunitx_round_integer_in_tl
   }
   \tl_set:Nx \l_siunitx_round_integer_in_tl {
     \exp_args:NV \tl_tail:n \l_siunitx_round_integer_in_tl 
   }
-  \bool_if:NT \l_siunitx_round_carry_bool {
+  \bool_if:NT \l_siunitx_round_bool {
     \int_incr:N \l_siunitx_tmp_int
   }
-  \bool_set_false:N \l_siunitx_round_carry_bool
+  \bool_set_false:N \l_siunitx_round_bool
   \intexpr_compare:nT { \l_siunitx_tmp_int = \c_ten } {
     \int_zero:N \l_siunitx_tmp_int
-    \bool_set_true:N \l_siunitx_round_carry_bool 
+    \bool_set_true:N \l_siunitx_round_bool 
   }
   \tl_put_left:NV \l_siunitx_round_integer_out_tl \l_siunitx_tmp_int
 }
@@ -2176,17 +2268,17 @@ This work consists of the file  siunitx.dtx
   \int_set:Nn \l_siunitx_tmp_int {
     \exp_args:NV \tl_head_i:n \l_siunitx_round_decimal_in_tl
   }
-  \bool_if:NT \l_siunitx_round_carry_bool {
+  \bool_if:NT \l_siunitx_round_bool {
     \int_incr:N \l_siunitx_tmp_int
   }
-  \bool_set_false:N \l_siunitx_round_carry_bool
+  \bool_set_false:N \l_siunitx_round_bool
   \intexpr_compare:nTF { \l_siunitx_round_int = \c_one } {
     \intexpr_compare:nT { \l_siunitx_tmp_int > \c_four } {
-      \bool_set_true:N \l_siunitx_round_carry_bool
+      \bool_set_true:N \l_siunitx_round_bool
     }
   }{
     \intexpr_compare:nT { \l_siunitx_tmp_int = \c_ten } {
-      \bool_set_true:N \l_siunitx_round_carry_bool
+      \bool_set_true:N \l_siunitx_round_bool
       \int_zero:N \l_siunitx_tmp_int
     }
     \tl_put_left:NV \l_siunitx_round_decimal_out_tl \l_siunitx_tmp_int
