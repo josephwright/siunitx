@@ -587,10 +587,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_family_maths: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \intexp_compare:nT { \int:use:N \fam = \c_siunitx_mathsf_int } {
+  \intexpr_compare:nT { \int:use:N \fam = \c_siunitx_mathsf_int } {
     \tl_set:Nn \l_siunitx_font_family_tl { sf }
   }
-  \intexp_compare:nT { \int:use:N \fam = \c_siunitx_mathtt_int } {
+  \intexpr_compare:nT { \int:use:N \fam = \c_siunitx_mathtt_int } {
     \tl_set:Nn \l_siunitx_font_family_tl { tt }
   }  
 }
@@ -1834,11 +1834,14 @@ This work consists of the file  siunitx.dtx
 % information and rounding numbers. Nothing is added here that is
 % for `formatting': this is left for the output part of the system.
 % 
+%\begin{macro}{\l_siunitx_process_round_int}
 %\begin{macro}{\l_siunitx_process_round_tl}
 % For storing the method used for rounding, if any.
 %    \begin{macrocode}
+\int_new:N \l_siunitx_process_round_int
 \tl_new:N \l_siunitx_process_round_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 % 
 %\begin{macro}{\l_siunitx_process_sign_bool}
@@ -1988,8 +1991,26 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_places:n}
+% When rounding to a number of places, the number of tokens in the
+% decimal parts is counted, as this is always needed. A check is then
+% made on the value of the number: if it is zero then a different 
+% approach is used to that if there is a value.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_places:n {
+  \intexpr_compare:nTF { \l_siunitx_process_places_int = \c_zero } {
+    \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+  }{
+    \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } {
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+        \l_siunitx_tmp_tl
+      \tl_if_empty:NT \l_siunitx_tmp_tl { 
+        \tl_set:Nn \l_siunitx_tmp_tl { 0 }
+      }
+      \int_set:Nn \l_siunitx_process_round_int {
+        \tl_elt_count:N \l_siunitx_tmp_tl 
+      }
+    }
+  }
 }
 %    \end{macrocode}
 %\end{macro}
