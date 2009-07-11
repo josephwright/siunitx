@@ -1125,13 +1125,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 % 
-%\begin{macro}{\l_siunitx_input_close_uncert_tl}
+%\begin{macro}{\l_siunitx_input_uncert_close_tl}
 %\begin{macro}{\l_siunitx_input_complex_tl}
 %\begin{macro}{\l_siunitx_input_decimal_tl}
 %\begin{macro}{\l_siunitx_input_digit_tl}
 %\begin{macro}{\l_siunitx_input_exponent_tl}
 %\begin{macro}{\l_siunitx_input_ignore_tl}
-%\begin{macro}{\l_siunitx_input_open_uncert_tl}
+%\begin{macro}{\l_siunitx_input_uncert_open_tl}
 %\begin{macro}{\l_siunitx_input_protect_tl}
 %\begin{macro}{\l_siunitx_input_sign_tl}
 %\begin{macro}{\l_siunitx_input_symbol_tl}
@@ -1140,7 +1140,7 @@ This work consists of the file  siunitx.dtx
 % set up the appropriate things for products and quotients.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } { % (
-  input-close-uncertainty .set:N     = \l_siunitx_input_close_uncert_tl, 
+  input-close-uncertainty .set:N     = \l_siunitx_input_uncert_close_tl, 
   input-close-uncertainty .initial:n = ),
   input-complex-roots     .set:N     = \l_siunitx_input_complex_tl,
   input-complex-roots     .initial:n = { ij },
@@ -1151,7 +1151,7 @@ This work consists of the file  siunitx.dtx
   input-exponent-markers  .set:N     = \l_siunitx_input_exponent_tl,
   input-exponent-markers  .initial:n = { dDeE },
   input-ignore            .set:N     = \l_siunitx_input_ignore_tl,
-  input-open-uncertainty  .set:N     = \l_siunitx_input_open_uncert_tl, 
+  input-open-uncertainty  .set:N     = \l_siunitx_input_uncert_open_tl, 
   input-open-uncertainty  .initial:n = (, % )
   input-protect-tokens    .set:N     = \l_siunitx_input_protect_tl,
   input-protect-tokens    .initial:n = { \mp \pi \pm },
@@ -1505,8 +1505,8 @@ This work consists of the file  siunitx.dtx
       \l_siunitx_input_exponent_tl
       \l_siunitx_input_complex_tl
       \l_siunitx_input_symbol_tl
-      \l_siunitx_input_open_uncert_tl
-      \l_siunitx_input_close_uncert_tl
+      \l_siunitx_input_uncert_open_tl
+      \l_siunitx_input_uncert_close_tl
     }
   \exp_args:NNNV \group_end:
   \tl_set:Nn \l_siunitx_number_valid_tl \l_siunitx_number_valid_tl
@@ -1762,7 +1762,7 @@ This work consists of the file  siunitx.dtx
       \tl_map_break:
     }
   }
-  \tl_map_function:NN \l_siunitx_input_close_uncert_tl
+  \tl_map_function:NN \l_siunitx_input_uncert_close_tl
     \siunitx_number_in_uncertainty_close:N
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 - uncertainty } {
     \siunitx_number_in_uncertainty_open:nn {#1} {#2}
@@ -1793,7 +1793,7 @@ This work consists of the file  siunitx.dtx
       \tl_map_break:
     }
   }
-  \tl_map_function:NN \l_siunitx_input_open_uncert_tl
+  \tl_map_function:NN \l_siunitx_input_uncert_open_tl
     \siunitx_number_in_uncertainty_open:N
 }
 \cs_new_nopar:Nn \siunitx_number_in_uncertainty_open:N { }
@@ -1813,9 +1813,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_in_uncertainty_check_aux:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
     \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmp_tl
-    \tl_map_function:NN \l_siunitx_input_open_uncert_tl
+    \tl_map_function:NN \l_siunitx_input_uncert_open_tl
       \siunitx_number_in_uncertainty_check_aux:N
-    \tl_map_function:NN \l_siunitx_input_close_uncert_tl
+    \tl_map_function:NN \l_siunitx_input_uncert_close_tl
       \siunitx_number_in_uncertainty_check_aux:N
   }
 }
@@ -2620,6 +2620,99 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+
+%\subsection{Formatting numbers for output}
+%
+% Getting numbers ready for printing requires the reconstruction of the
+% number from the various parts processed earlier. Spaces and brackets
+% are added back into the main numbers, as the various parts are also 
+% correctly formatted. The difference between the \texttt{in} and
+% \texttt{out} store is that the later can include formatting such as 
+% hard spaces.
+% 
+%\begin{macro}{\l_siunitx_number_out_prop}
+% Like the \texttt{in} version!
+%    \begin{macrocode}
+\prop_new:N \l_siunitx_number_out_prop
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\l_siunitx_bracket_close_tl}
+%\begin{macro}{\l_siunitx_exponent_base_tl}
+%\begin{macro}{\l_siunitx_exponent_product_tl}
+%\begin{macro}{\l_siunitx_group_decimal_bool}
+%\begin{macro}{\l_siunitx_group_four_bool}
+%\begin{macro}{\l_siunitx_group_integer_bool}
+%\begin{macro}{\l_siunitx_group_sep_tl}
+%\begin{macro}{\l_siunitx_negative_colour_tl}
+%\begin{macro}{\l_siunitx_bracket_open_tl}
+%\begin{macro}{\l_siunitx_output_uncert_close_tl}
+%\begin{macro}{\l_siunitx_output_complex_tl}
+%\begin{macro}{\l_siunitx_output_decimal_tl}
+%\begin{macro}{\l_siunitx_output_uncert_open_tl}
+%\begin{macro}{\l_siunitx_uncert_sep_bool}
+%\begin{macro}{\l_siunitx_tight_bool}
+%\begin{macro}{\l_siunitx_uncert_sep_tl}
+%\begin{macro}{\l_siunitx_brackets_bool}
+%    \begin{macrocode}
+% Lots of settings, some used only for numbers, some more widely.
+\keys_define:nn { siunitx } {
+  close-bracket            .set:N     = \l_siunitx_bracket_close_tl, % (
+  close-bracket            .initial:n = ),
+  exponent-base            .set:N     = \l_siunitx_exponent_base_tl,
+  exponent-base            .initial:n = { 10 },
+  exponent-product         .set:N     = \l_siunitx_exponent_product_tl,
+  exponent-product         .initial:n = { \times },
+  group-decimal-digits     .bool:N    = \l_siunitx_group_decimal_bool,
+  group-decimal-digits     .initial:n = { true },
+  group-digits             .meta:n    = {
+    group-decimal-digits = #1,
+    group-integer-digits = #1
+  },
+  group-four-digits        .bool:N    = \l_siunitx_group_four_bool,
+  group-integer-digits     .bool:N    = \l_siunitx_group_integer_bool,
+  group-integer-digits     .initial:n = { true },
+  group-separator          .set:N     = \l_siunitx_group_sep_tl,
+  group-separator          .initial:n = { \, },
+  negative-color           .meta:n    = { negative-colour = #1 },
+  negative-colour          .set:N     = \l_siunitx_negative_colour_tl,
+  open-bracket             .set:N     = \l_siunitx_bracket_open_tl, 
+  open-bracket             .initial:n = (, % )
+  output-close-uncertainty .set:N     = 
+    \l_siunitx_output_uncert_close_tl, % (
+  output-close-uncertainty .initial:n = ),
+  output-complex-root      .set:N     = \l_siunitx_output_complex_tl,
+  output-complex-root      .initial:n = { \mathrm { i } },
+  output-decimal-marker    .set:N     = \l_siunitx_output_decimal_tl,
+  output-decimal-marker    .initial:n = { . },
+  output-open-uncertainty  .set:N     = 
+    \l_siunitx_output_uncert_open_tl, 
+  output-open-uncertainty  .initial:n = (, % )
+  separate-uncertainty     .set:N     = \l_siunitx_uncert_sep_bool,
+  tight-spacing            .bool:N    = \l_siunitx_tight_bool,
+  uncertainty-separator    .set:N     = \l_siunitx_uncert_sep_tl,
+  use-brackets             .bool:N    = \l_siunitx_brackets_bool,
+  use-brackets             .initial:n = { true }
+}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%\end{macro} 
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -2627,6 +2720,7 @@ This work consists of the file  siunitx.dtx
 % Second, the user needs to be able to adjust each symbol.
 % 
 %\begin{macro}{\l_siunitx_redefine_symbols_bool}
+% Only one setting applies here!
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   redefine-symbols .bool:N = \l_siunitx_redefine_symbols_bool,
