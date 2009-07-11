@@ -1861,6 +1861,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_process_decimal_int}
+%\begin{macro}{\l_siunitx_process_uncertainty_int}
+%\begin{macro}{\l_siunitx_uncertainty_decimal_tl}
+%\begin{macro}{\l_siunitx_uncertainty_integer_tl}
+% The code to expand uncertainties needs to know numbers of digits, and
+% to store various data.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_process_decimal_int
+\int_new:N \l_siunitx_process_uncertainty_int
+\tl_new:N \l_siunitx_uncertainty_decimal_tl
+\tl_new:N \l_siunitx_uncertainty_integer_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_process_sign_bool}
 %\begin{macro}{\l_siunitx_process_decimal_zero_bool}
@@ -1924,6 +1941,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_exponent:
   \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } {
     \siunitx_number_process_round:
+    \siunitx_number_process_uncertainty:
   }
 }
 %    \end{macrocode}
@@ -2039,7 +2057,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_figures_count:n {
   \tl_if_empty:cF { l_siunitx_round_ #1 _in_tl } {
-    \siunitx_number_process_figures_count_aux:n  {#1}
+    \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty } {
+      \siunitx_number_process_figures_count_aux:n  {#1}
+    }
   }
 }
 \cs_new_nopar:Nn \siunitx_number_process_figures_count_aux:n {
@@ -2207,7 +2227,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_places:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
-    \siunitx_number_process_places_aux_i:n {#1}
+   \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty } {
+      \siunitx_number_process_places_aux_i:n {#1}
+    }
   }
 }
 \cs_new_nopar:Nn \siunitx_number_process_places_aux_i:n {
@@ -2452,6 +2474,115 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_uncertainty:}
+%\begin{macro}[aux]{\siunitx_number_process_uncertainty_aux_i:n}
+%\begin{macro}[aux]{\siunitx_number_process_uncertainty_aux_ii:n}
+% There may be a need to expand uncertainties into a decimal and integer
+% part. This is done here so that the core \texttt{in} code is faster.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty: {
+  \siunitx_number_process_uncertainty_aux_i:n { mantissa }
+  \siunitx_number_process_uncertainty_aux_i:n { exponent }
+}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_aux_i:n {
+  \siunitx_number_process_uncertainty_aux_ii:n {#1}
+  \siunitx_number_process_uncertainty_aux_ii:n { #1 -complex }
+}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_aux_ii:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } {
+    \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } {
+      \siunitx_number_process_uncertainty_decimal:n {#1}
+    }{
+      \siunitx_number_process_uncertainty_integer:n {#1}
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_uncertainty_decimal:n}
+%\begin{macro}[aux]{\siunitx_number_process_uncertainty_count:nn}
+% To deal with an error in the decimal part, care needs to be taken to
+% correctly pad with zeros and also to allow for the possibility that
+% the error crosses the decimal--integer boundary.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_decimal:n {
+  \siunitx_number_process_uncertainty_count:nn {#1} { decimal }
+  \siunitx_number_process_uncertainty_count:nn {#1} { uncertainty }
+  \tl_clear:N \l_siunitx_uncertainty_decimal_tl
+  \tl_clear:N \l_siunitx_uncertainty_integer_tl
+  \intexpr_compare:nTF { 
+    \l_siunitx_process_uncertainty_int > \l_siunitx_process_decimal_int
+  } {
+    \siunitx_number_process_uncertainty_separate:
+  }{
+    \siunitx_number_process_uncertainty_pad:
+  }
+  \tl_if_empty:NF \l_siunitx_uncertainty_integer_tl {
+    \prop_put:NnN \l_siunitx_number_in_prop { #1 -uncertainty-integer } 
+      \l_siunitx_uncertainty_integer_tl
+  } 
+  \prop_put:NnV \l_siunitx_number_in_prop { #1 -uncertainty-decimal } 
+    \l_siunitx_uncertainty_decimal_tl
+}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_count:nn {
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmp_tl
+  \int_set:cn { l_siunitx_process_ #2 _int } {
+    \tl_elt_count:N \l_siunitx_tmp_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_uncertainty_pad:}
+% Uncertainty is short: add zeros.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_pad: {
+  \intexpr_while_do:nn {
+    \l_siunitx_process_uncertainty_int < \l_siunitx_process_decimal_int
+  } {
+    \tl_put_right:Nn \l_siunitx_uncertainty_decimal_tl {0} 
+    \int_incr:N \l_siunitx_process_uncertainty_int
+  }
+  \tl_put_right:NV \l_siunitx_uncertainty_decimal_tl \l_siunitx_tmp_tl 
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_uncertainty_separate:}
+%\begin{macro}{\siunitx_number_process_uncertainty_separate_aux:N}
+% Find the integer--decimal boundary and work appropriately.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_separate: {
+  \tl_map_function:NN \l_siunitx_tmp_tl 
+    \siunitx_number_process_uncertainty_separate_aux:N
+}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_separate_aux:N {
+  \intexpr_compare:nTF {
+    \l_siunitx_process_uncertainty_int > \l_siunitx_process_decimal_int
+  } {
+    \tl_put_right:Nn \l_siunitx_uncertainty_integer_tl {#1}
+  }{
+    \tl_put_right:Nn \l_siunitx_uncertainty_decimal_tl {#1}
+  }
+  \int_decr:N \l_siunitx_process_uncertainty_int
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_number_process_uncertainty_integer:n}
+% Relatively easy: the uncertainty is in the integer part of the number,
+% and so there is no need to generate zeros.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_integer:n {
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
+    \l_siunitx_tmp_tl
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty-integer }
+    \l_siunitx_tmp_tl
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_zero_fill:}
