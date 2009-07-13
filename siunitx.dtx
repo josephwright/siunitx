@@ -2468,7 +2468,7 @@ This work consists of the file  siunitx.dtx
   }
 }
 \cs_new_nopar:Nn \siunitx_number_process_sign_add_aux:n {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } {
+  \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -sign } {
     \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
       \l_siunitx_process_sign_tl
   }
@@ -2754,11 +2754,12 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_output_complex:
     \siunitx_number_output_sign:n { mantissa }
     \siunitx_number_output_sign:n { exponent }
+    \siunitx_number_output_colour:
+    \siunitx_number_output_final:
   }
 }
 %    \end{macrocode}
 %\end{macro}
-%
 %
 %\begin{macro}{\siunitx_number_output_brackets:n}
 %\begin{macro}{\siunitx_number_output_brackets_aux:n}
@@ -2784,6 +2785,24 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_colour:}
+% If the mantissa is negative, then any colour for output might change.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_colour: {
+  \tl_if_empty:NF \l_siunitx_negative_colour_tl { 
+    \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign } {
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign } 
+        \l_siunitx_tmpa_tl
+      \tl_if_eq:nVT { - } \l_siunitx_tmpa_tl {
+         \prop_put:NnV \l_siunitx_number_out_prop { colour } 
+           \l_siunitx_negative_colour_tl
+      }
+    }
+  }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_complex:}
@@ -2829,6 +2848,59 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_final:}
+% The exponent system starts by making sure that the mantissa contains
+% brackets if needed. A sign is then added to the exponent part, before
+% creating the full output (including the mantissa sign if needed).
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_final: {
+  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa } {
+    \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent } {
+      \siunitx_number_output_final_mantissa:
+      \siunitx_number_output_final_exponent:
+    }{
+      \siunitx_number_output_copy:nn { mantissa } { result }
+    }
+  }{
+    \siunitx_number_output_final_exponent:
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_output_final_exponent: {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent } {
+    \prop_get:NnN \l_siunitx_number_out_prop { exponent } 
+      \l_siunitx_tmpa_tl
+    \tl_set:No \l_siunitx_tmpa_tl {
+      \exp_after:wN ^ \exp_after:wN { \l_siunitx_tmpa_tl }
+    }
+    \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+    \prop_put:NnV \l_siunitx_number_out_prop { exponent } 
+      \l_siunitx_tmpa_tl
+    \prop_if_in:NnT \l_siunitx_number_out_prop { result } {
+      \prop_get:NnN \l_siunitx_number_out_prop { result } 
+        \l_siunitx_tmpb_tl
+      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+    }
+    \prop_put:NnV \l_siunitx_number_out_prop { result } 
+      \l_siunitx_tmpa_tl
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_output_final_mantissa: {
+  \siunitx_number_output_brackets:n { mantissa } 
+  \prop_get:NnN \l_siunitx_number_out_prop { mantissa } 
+    \l_siunitx_tmpa_tl
+  \tl_set_eq:NN \l_siunitx_tmpb_tl  \l_siunitx_exponent_product_tl
+  \bool_if:NT \l_siunitx_tight_bool {  
+    \tl_set:No \l_siunitx_tmpb_tl {
+      \exp_after:wN { \l_siunitx_tmpb_tl }
+    }
+  }
+  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+    \l_siunitx_tmpb_tl
+  \prop_put:NnV \l_siunitx_number_out_prop { result } \l_siunitx_tmpa_tl
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_group:n}
