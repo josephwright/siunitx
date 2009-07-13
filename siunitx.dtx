@@ -225,7 +225,6 @@ This work consists of the file  siunitx.dtx
 \RequirePackage{ 
   amstext,
   array,
-  keys3,
   xparse
 } 
 %    \end{macrocode}
@@ -2753,6 +2752,8 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_output_init:
     \siunitx_number_output_reassemble:
     \siunitx_number_output_complex:
+    \siunitx_number_output_sign:n { mantissa }
+    \siunitx_number_output_sign:n { exponent }
   }
 }
 %    \end{macrocode}
@@ -2803,7 +2804,7 @@ This work consists of the file  siunitx.dtx
     \prop_put:NnV  \l_siunitx_number_out_prop { #1 -complex }
       \l_siunitx_tmpa_tl
     \prop_if_in:NnT \l_siunitx_number_out_prop {#1} {
-      \siunitx_number_out_sign:n { #1 -complex }
+      \siunitx_number_output_sign:n { #1 -complex }
     }
     \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
     \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
@@ -3017,8 +3018,25 @@ This work consists of the file  siunitx.dtx
 % Some simple sign manipulation: for tight signs, a little shuffling.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_sign:n {
-}
-\cs_new_nopar:Nn \siunitx_number_output_sign_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_out_prop {#1} {
+    \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } {
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
+        \l_siunitx_tmpa_tl
+      \bool_if:NT \l_siunitx_tight_bool {
+        \tl_set:No \l_siunitx_tmpb_tl {
+          \exp_after:wN { \l_siunitx_tmpa_tl  }
+        }
+      }
+      \tl_clear:N \l_siunitx_tmpb_tl
+      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+        \l_siunitx_tmpa_tl
+      \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign } 
+        \l_siunitx_tmpb_tl        
+      \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl   
+      \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl      
+      \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+    }
+  }
 }
 %    \end{macrocode}
 %\end{macro}
