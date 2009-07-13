@@ -2505,20 +2505,17 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_uncertainty:}
-%\begin{macro}[aux]{\siunitx_number_process_uncertainty_aux_i:n}
-%\begin{macro}[aux]{\siunitx_number_process_uncertainty_aux_ii:n}
+%\begin{macro}[aux]{\siunitx_number_process_uncertainty_aux:n}
 % There may be a need to expand uncertainties into a decimal and integer
 % part. This is done here so that the core \texttt{in} code is faster.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_uncertainty: {
-  \siunitx_number_process_uncertainty_aux_i:n { mantissa }
-  \siunitx_number_process_uncertainty_aux_i:n { exponent }
+  \siunitx_number_process_uncertainty_aux:n { mantissa }
+  \siunitx_number_process_uncertainty_aux:n { mantissa-complex }
+  \siunitx_number_process_uncertainty_aux:n { exponent }
+  \siunitx_number_process_uncertainty_aux:n { exponent-complex }
 }
-\cs_new_nopar:Nn \siunitx_number_process_uncertainty_aux_i:n {
-  \siunitx_number_process_uncertainty_aux_ii:n {#1}
-  \siunitx_number_process_uncertainty_aux_ii:n { #1 -complex }
-}
-\cs_new_nopar:Nn \siunitx_number_process_uncertainty_aux_ii:n {
+\cs_new_nopar:Nn \siunitx_number_process_uncertainty_aux:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } {
     \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } {
       \siunitx_number_process_uncertainty_decimal:n {#1}
@@ -2528,7 +2525,6 @@ This work consists of the file  siunitx.dtx
   }
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_number_process_uncertainty_decimal:n}
@@ -2607,7 +2603,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_process_uncertainty_integer:n {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
     \l_siunitx_tmpa_tl
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty-integer }
+  \prop_put:NnV \l_siunitx_number_in_prop { #1 -uncertainty-integer }
     \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
@@ -2756,9 +2752,66 @@ This work consists of the file  siunitx.dtx
   \prop_if_empty:NF \l_siunitx_number_in_prop {
     \siunitx_number_output_init:
     \siunitx_number_output_reassemble:
+    \siunitx_number_output_complex:
   }
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%
+%\begin{macro}{\siunitx_number_output_brackets:n}
+%\begin{macro}{\siunitx_number_output_brackets_aux:n}
+% There are various points at which brackets might be added to
+% avoid ambiguity. The function here adds the appropriate tokens
+% around whatever is in the supplied named store.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_brackets:n {
+  \bool_if:NT \l_siunitx_brackets_bool {
+    \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -bracket } {
+      \siunitx_number_output_brackets_aux:n {#1}
+      \prop_del:Nn \l_siunitx_number_out_prop { #1 -bracket }
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_output_brackets_aux:n {
+  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+    \l_siunitx_bracket_open_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
+    \l_siunitx_bracket_close_tl
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_complex:}
+%\begin{macro}[aux]{\siunitx_number_output_complex_aux:n}
+% The real and complex parts of each number are reassembled, with 
+% brackets if needed.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_complex: {
+  \siunitx_number_output_complex_aux:n { mantissa }
+  \siunitx_number_output_complex_aux:n { exponent }
+}
+\cs_new_nopar:Nn \siunitx_number_output_complex_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 - complex } {
+    \siunitx_number_output_brackets:n {#1}
+    \siunitx_number_output_brackets:n { #1 -complex }
+    \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+      \l_siunitx_output_complex_tl
+    \prop_put:NnV  \l_siunitx_number_out_prop { #1 -complex }
+      \l_siunitx_tmpa_tl
+    \prop_if_in:NnT \l_siunitx_number_out_prop {#1} {
+      \siunitx_number_out_sign:n { #1 -complex }
+    }
+    \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+    \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+    \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_copy:n}
@@ -2959,6 +3012,18 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_number_output_sign:n}
+%\begin{macro}[aux]{\siunitx_number_output_sign_aux:n}
+% Some simple sign manipulation: for tight signs, a little shuffling.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_sign:n {
+}
+\cs_new_nopar:Nn \siunitx_number_output_sign_aux:n {
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_number_output_uncertainty:n}
 %\begin{macro}[aux]{\siunitx_number_output_uncertainty_pm:n}
 % Uncertainty output varies depending on whether there is a need to 
@@ -2967,14 +3032,14 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_output_uncertainty:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } {
     \bool_if:NTF \l_siunitx_uncert_sep_bool {
-      \prop_put:Nnn \l_siunitx_number_out_prop { #1 -parts } { true }
+      \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } { true }
       \siunitx_number_output_group:n { #1 -uncertainty }
       \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer } {
         \prop_if_in:NnF \l_siunitx_number_out_prop { 
           #1 -uncertainty-integer 
         } {
           \prop_put:Nnn \l_siunitx_number_out_prop 
-            { #1 uncertainty-integer } { 0 }
+            { #1 -uncertainty-integer } { 0 }
           \tl_put_left:Nn \l_siunitx_tmpa_tl { 0 }  
         }
       }
