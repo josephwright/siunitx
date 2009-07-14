@@ -3069,8 +3069,10 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_format_reassemble:}
 %\begin{macro}[aux]{\siunitx_number_format_reassemble_aux:n}
-% The integer, decimal and any uncertainty parts are put back together.
-% This gives a ``minimal'' unit which cannot need any brackets.
+% The integer, decimal and any non-separated uncertainty parts are 
+% put back together. This gives a `minimal' unit which cannot need any
+% brackets or repeated units (if applicable). If the uncertainty is
+% separate, it is stored at this stage pending later re-attachment.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_reassemble: {
   \siunitx_number_format_reassemble_aux:n { mantissa }
@@ -3118,6 +3120,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
+%\begin{macro}{\siunitx_number_format_uncertainty_joined:n}
+%\begin{macro}{\siunitx_number_format_uncertainty_sep:n}
 %\begin{macro}[aux]{\siunitx_number_format_uncertainty_pm:n}
 % Uncertainty output varies depending on whether there is a need to 
 % separate the error form the number in the output. 
@@ -3125,46 +3129,50 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_format_uncertainty:n {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } {
     \bool_if:NTF \l_siunitx_uncert_sep_bool {
-      \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } { true }
-      \siunitx_number_format_group:n { #1 -uncertainty }
-      \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer } {
-        \prop_if_in:NnF \l_siunitx_number_out_prop { 
-          #1 -uncertainty-integer 
-        } {
-          \prop_put:Nnn \l_siunitx_number_out_prop 
-            { #1 -uncertainty-integer } { 0 }
-          \tl_put_left:Nn \l_siunitx_tmpa_tl { 0 }  
-        }
-      }
-      \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
-         \l_siunitx_tmpa_tl
-      \siunitx_number_format_uncertainty_pm:n {#1}
+      \siunitx_number_format_uncertainty_sep:n {#1}
     }{
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
-        \l_siunitx_tmpa_tl
-      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl
-        \l_siunitx_output_uncert_open_tl
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
-        \l_siunitx_output_uncert_close_tl
-      \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
-        \l_siunitx_tmpa_tl
-      \prop_get:NnN \l_siunitx_number_out_prop {#1}
-         \l_siunitx_tmpb_tl
+      \siunitx_number_format_uncertainty_joined:n {#1}
     }
-    \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
-%    \prop_put:NnV \l_siunitx_number_out_prop {#1} 
-%      \l_siunitx_tmpb_tl
   }
 }
-\cs_new_nopar:Nn \siunitx_number_format_uncertainty_pm:n {
+\cs_new_nopar:Nn \siunitx_number_format_uncertainty_joined:n {
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
+    \l_siunitx_tmpa_tl
+  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+    \l_siunitx_output_uncert_open_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+    \l_siunitx_output_uncert_close_tl
+  \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
+    \l_siunitx_tmpa_tl
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+  \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+}
+\cs_new_nopar:Nn \siunitx_number_format_uncertainty_sep:n {
+  \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } { true }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer } {
+    \prop_if_in:NnF \l_siunitx_number_out_prop { 
+      #1 -uncertainty-integer
+        } {
+        \prop_put:Nnn \l_siunitx_number_out_prop 
+          { #1 -uncertainty-integer } { 0 }
+      }
+    }
+    \siunitx_number_format_group:n { #1 -uncertainty }
+    \siunitx_number_format_uncertainty_pm:n {#1}
+    \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
+         \l_siunitx_tmpa_tl
+}
+\cs_new_nopar:Nn \siunitx_number_format_uncertainty_pm:n {
   \bool_if:NTF \l_siunitx_tight_bool {
-    \tl_put_right:Nn \l_siunitx_tmpb_tl { \ensuremath { { \pm } } }
+    \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { \pm } } }
   }{
-    \tl_put_right:Nn \l_siunitx_tmpb_tl { \ensuremath { \pm } }
+    \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { \pm } }
   }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
