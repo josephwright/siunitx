@@ -2735,15 +2735,17 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_number_format:}
-%\begin{macro}{\siunitx_number_format_short:}
+%\begin{macro}{\siunitx_number_format_parts:}
 % The master control function for formatting output: the usual set up.
-% The number is put back together in stages.
+% The number is put back together in stages. The \texttt{parts} version
+% does not construct a full result, and so is faster and intended for
+% use with repeated units.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format: {
   \prop_if_empty:NF \l_siunitx_number_in_prop {
     \siunitx_number_format_init:
     \siunitx_number_format_reassemble:
-    \siunitx_number_format_join:
+    \siunitx_number_format_join_uncert:
     \siunitx_number_format_complex:
     \siunitx_number_format_sign:n { mantissa }
     \siunitx_number_format_sign:n { exponent }
@@ -2751,10 +2753,13 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_format_final:
   }
 }
-\cs_new_nopar:Nn \siunitx_number_format_short: {
+\cs_new_nopar:Nn \siunitx_number_format_parts: {
   \prop_if_empty:NF \l_siunitx_number_in_prop {
     \siunitx_number_format_init:
     \siunitx_number_format_reassemble:
+    \siunitx_number_format_sign:n { mantissa }
+    \siunitx_number_format_sign:n { exponent }
+    \siunitx_number_format_colour:
   }
 }
 %    \end{macrocode}
@@ -3064,6 +3069,30 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_number_format_join_uncert:}
+%\begin{macro}{\siunitx_number_format_join_uncert_aux:n}
+% For adding the uncertainty to the main part of a number
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_format_join_uncert: {
+  \clist_map_function:NN \c_siunitx_number_parts_clist 
+    \siunitx_number_format_join_uncert_aux:n
+}
+\cs_new_nopar:Nn \siunitx_number_format_join_uncert_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_out_prop {#1} {
+    \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -uncertainty } {
+      \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { #1 -uncertainty }
+        \l_siunitx_tmpb_tl
+      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+      \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+      \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } { true }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_number_format_reassemble:}
 %\begin{macro}[aux]{\siunitx_number_format_reassemble_aux:n}
 % The integer, decimal and any non-separated uncertainty parts are 
@@ -3144,7 +3173,6 @@ This work consists of the file  siunitx.dtx
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
 }
 \cs_new_nopar:Nn \siunitx_number_format_uncertainty_sep:n {
-  \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } { true }
   \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer } {
     \prop_if_in:NnF \l_siunitx_number_out_prop { 
       #1 -uncertainty-integer
