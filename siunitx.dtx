@@ -425,15 +425,36 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \sisetup{
 %    detect-bold        = true, 
-%  %  detect-inline-bold = maths
+%    detect-inline-bold = maths
 %  }%
 %  $\num{1234}$ \\
 %  { \boldmath $\num{1234}$ } \\ 
 %  { \bfseries $\num{1234}$ } \\
-%  % \sisetup{detect-inline-bold = text}
+%   \sisetup{detect-inline-bold = text}
 %  { \boldmath $\num{1234}$ } \\
 %  { \bfseries $\num{1234}$ }
 %\end{LaTeXdemo} 
+%
+%\DescribeOption{detect-display-maths}
+% The font detection system can treat displayed mathematical content
+% in two ways.  This is controlled by the \opt{detect-display-maths}
+% option. When set \opt{true}, display mathematics is treated 
+% independently from the body of the document.  Thus the local 
+% \emph{maths} font is checked for matching.  In contrast, when set 
+% \opt{false}, display material is treated with the current running 
+% text font.
+%\begin{LaTeXdemo}
+%  \sffamily
+%  Some text
+%  \sisetup{
+%    detect-all,
+%    detect-display-maths = true
+%  }
+%  \[ x = \SI{1.2e3}{\kilogram\kelvin\candela} \]
+%  More text
+%  \sisetup{detect-display-maths = false}
+%  \[ y = \SI{3}{\metre\second\mole} \]
+%\end{LaTeXdemo}
 %
 %\end{documentation}
 %
@@ -672,6 +693,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_detect_inline_bold_bool}
+% Used by the keys, but needs to be created here.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_detect_inline_bold_bool
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_detect_bold_bool}
 %\begin{macro}{\l_siunitx_detect_display_maths_bool}
 %\begin{macro}{\l_siunitx_detect_family_bool}
@@ -702,18 +730,15 @@ This work consists of the file  siunitx.dtx
   detect-family        .bool:N = \l_siunitx_detect_family_bool,
   detect-inline-bold   .choice:,
   detect-inline-bold   .value_required:,
-  detect-inline-bold / math  .bool:N = 
-    \l_siunitx_detect_inline_bold_bool,
-  detect-inline-bold / maths .bool:N = 
-    \l_siunitx_detect_inline_bold_bool,
-  detect-inline-bold / text .choice:, 
-  detect-inline-bold / text / true .code:n = {
-    \bool_set_false:N \l_siunitx_detect_inline_bold_bool
-  }, 
-  detect-inline-bold / text / false .code:n = {
+  detect-inline-bold / math  .code:n = {
     \bool_set_true:N \l_siunitx_detect_inline_bold_bool
   },
-  detect-inline-bold / text .default:n = true,
+  detect-inline-bold / maths .code:n = {
+    \bool_set_true:N \l_siunitx_detect_inline_bold_bool
+  },
+  detect-inline-bold / text  .code:n = {
+    \bool_set_false:N \l_siunitx_detect_inline_bold_bool
+  },
   detect-italic        .bool:N = \l_siunitx_detect_italic_bool,
   detect-mode          .bool:N = \l_siunitx_detect_mode_bool,
   detect-none          .choice:,
@@ -776,7 +801,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NF \l_siunitx_font_set_bool {
     \siunitx_detect_font_init:
     \bool_if:NT \l_siunitx_detect_bold_bool {
-      \siunitx_detect_font_bold:
+       \siunitx_detect_font_bold:
     }
     \bool_if:NT \l_siunitx_detect_family_bool {
       \siunitx_detect_font_family:
@@ -866,7 +891,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_detect_font_family: {
   \siunitx_detect_font_family_text:
   \bool_if:NT \l_siunitx_detect_display_maths_bool {  
-    \mode_if_math:TF {
+    \mode_if_math:T {
       \mode_if_inner:F {
         \siunitx_detect_font_family_maths:
       }
@@ -885,10 +910,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_detect_font_family_maths: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \intexpr_compare:nT { \int:use:N \fam = \c_siunitx_mathsf_int } {
+  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathsf_int } {
     \tl_set:Nn \l_siunitx_font_family_tl { sf }
   }
-  \intexpr_compare:nT { \int:use:N \fam = \c_siunitx_mathtt_int } {
+  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathtt_int } {
     \tl_set:Nn \l_siunitx_font_family_tl { tt }
   }  
 }
@@ -3604,6 +3629,10 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_format:
     \prop_get:NnN \l_siunitx_number_out_prop { result } 
       \l_siunitx_tmpa_tl
+    \prop_if_in:NnT \l_siunitx_number_out_prop { colour } {
+      \prop_get:NnN \l_siunitx_number_out_prop { colour } 
+        \l_siunitx_number_colour_tl
+    }  
     \siunitx_print:nV  { number } \l_siunitx_tmpa_tl
   }
 }
