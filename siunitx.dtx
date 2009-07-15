@@ -109,12 +109,101 @@ This work consists of the file  siunitx.dtx
   [\filedate\space v\fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{helvet,mathpazo,siunitx}
+\usepackage{booktabs,helvet,mathpazo,siunitx}
+\usepackage[final]{listings}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
 %</driver>
 % \fi
+% 
+%\makeatletter
+%
+%^^A For creating examples with nice highlighting of code, and so
+%^^A on; based on the system used in the listings source (lstsample).
+%\lst@RequireAspects{writefile}
+%\newsavebox{\LaTeXdemo@box}
+%\lstnewenvironment{LaTeXdemo}[1][code and example]{^^A
+%  \global\let\lst@intname\@empty
+%  \expandafter\let\expandafter\LaTeXdemo@end
+%    \csname LaTeXdemo@#1@end\endcsname
+%  \@nameuse{LaTeXdemo@#1}^^A
+%}{^^A
+%  \LaTeXdemo@end
+%}
+%\newcommand*\LaTeXdemo@new[3]{^^A
+%  \expandafter\newcommand\expandafter*\expandafter
+%    {\csname LaTeXdemo@#1\endcsname}{#2}^^A
+%  \expandafter\newcommand\expandafter*\expandafter
+%    {\csname LaTeXdemo@#1@end\endcsname}{#3}^^A
+%}
+%\newcommand*\LaTeXdemo@common{^^A
+%  \setkeys{lst}{
+%    basicstyle   = \small\ttfamily,
+%    basewidth    = 0.51em,
+%    gobble       = 3,
+%    keywordstyle = \color{blue},
+%    language     = [LaTeX]{TeX},
+%    moretexcs    = {
+%      color,
+%      DeclareSIPrefix,
+%      DeclareSIPower,
+%      DeclareSIQualifier,
+%      DeclareSIUnit,
+%      mathnormal,
+%      num,
+%      si,
+%      SI,
+%      sisetup,
+%      text,
+%    }
+%  }^^A 
+%}
+%\newcommand*\LaTeXdemo@input{^^A
+%  \MakePercentComment
+%  \catcode`\^^M=10\relax
+%  \small
+%  \begingroup
+%    \setkeys{lst}{
+%      SelectCharTable=\lst@ReplaceInput{\^\^I}{\lst@ProcessTabulator}
+%    }^^A
+%    \leavevmode 
+%      \input{\jobname.tmp}^^A
+%  \endgroup
+%  \MakePercentIgnore
+%}
+%\LaTeXdemo@new{code and example}{^^A
+%  \setbox\LaTeXdemo@box=\hbox\bgroup
+%    \lst@BeginAlsoWriteFile{\jobname.tmp}^^A
+%    \LaTeXdemo@common
+%}{^^A
+%    \lst@EndWriteFile
+%  \egroup
+%  \begin{center}
+%    \ifdim\wd\LaTeXdemo@box>0.48\linewidth\relax
+%      \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%        \begin{minipage}{\linewidth}
+%          \LaTeXdemo@input
+%        \end{minipage}
+%    \else
+%      \begin{minipage}{0.48\linewidth}
+%        \LaTeXdemo@input
+%      \end{minipage}
+%      \hfill
+%      \begin{minipage}{0.48\linewidth}
+%        \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%      \end{minipage}
+%    \fi
+%  \end{center}
+%}
+%\LaTeXdemo@new{code only}{^^A
+%  \LaTeXdemo@common
+%}{^^A
+%}
+%
+%\providecommand*{\opt}{\texttt}
+%
+%\makeatother
 % 
 %\title{^^A
 %  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{^^A
@@ -166,6 +255,185 @@ This work consists of the file  siunitx.dtx
 %\end{multicols}
 %
 %\begin{documentation}
+%
+%\section{Introduction}
+%
+% The correct application of units of measurement is very important
+% in technical applications.  For this reason, carefully-crafted
+% definitions of a coherent units system have been laid down by the
+% \emph{Conf\'erence G\'en\'erale des Poids et
+% Mesures}\footnote{General Conference on Weights and Measures.}
+% (CGPM): this has resulted in the \emph{Syst\`eme International
+% d'Unit\'es}\footnote{International System of Units.} (SI).  At the
+% same time, typographic conventions for correctly displaying both
+% numbers and units exist to ensure that no loss of meaning occurs in
+% printed matter.
+%
+% \pkg{siunitx} aims to provide a unified method for \LaTeX\ users to
+% typeset units and values correctly and easily.  The design
+% philosophy of \pkg{siunitx} is to follow the agreed rules by 
+% default, but to allow variation through option settings.  In this way,
+% users can use \pkg{siunitx} to follow the requirements of 
+% publishers, co-authors, universities, \emph{etc}.~without needing to 
+% alter the input at all.
+% 
+%\section{Installation}
+%
+% The entire bundle is supplied with the TDS-ready \texttt{zip} file,
+% \texttt{siunitx.tds.zip}.  Simply unzip this into your local texmf
+% tree and run your hash program (\texttt{texhash} for \TeX{}Live or
+% \texttt{initextmf -u} for MiK\TeX).
+% 
+%\section{\pkg{siunitx} for the impatient}
+%
+% The package provides the user macros:
+%\begin{itemize}
+%  \item \cs{SI}\oarg{options}\marg{value}\oarg{pre-unit}\marg{unit}
+%  \item \cs{si}\oarg{options}\marg{unit}
+%  \item \cs{num}\oarg{options}\marg{number}
+%  \item \cs{ang}\oarg{options}\marg{angle}
+%  \item \cs{sisetup}\marg{options}
+%\end{itemize}
+% plus the \texttt{S} and \texttt{s} column types for decimal 
+% alignments and units in tables.  These macros are designed for 
+% typesetting units and values with control of appearance and with 
+% intelligent processing.
+%\begin{LaTeXdemo}
+%  \num{12345,67890} \\
+%  \num{1+-2i}       \\
+%  \num{.3e45}
+%\end{LaTeXdemo} 
+% 
+% By default, all text is typeset in the current upright, serif maths
+% font.  This can be changed by setting the appropriate options: 
+% |\sisetup{detect-all}| will use the current font for typesetting.
+% 
+%\section{Using the \pkg{siunitx} package}
+%
+%\subsection{Loading the package}
+%
+% The package should be loaded in the usual \LaTeXe\ way.
+%\begin{LaTeXdemo}[code only]
+%  \usepackage{siunitx}
+%\end{LaTeXdemo} 
+%
+%\subsection{Numbers}
+%
+%\DescribeMacro{\num}
+% Numbers are automatically formatted by the \cs{num} macro.  This
+% takes one optional and one mandatory argument:
+% \cs{num}\oarg{options}\marg{number}.  The contents of \meta{number}
+% are automatically formatted.  The formatter removes ``hard'' spaces 
+% (\cs{,} and |~|), automatically identifies exponents (by default 
+% marked using \texttt{e} or \texttt{d}) and adds the appropriate 
+% spacing of large numbers.  A leading zero is added before a decimal 
+% marker, if needed: both `\texttt{.}' and `\texttt{,}' are 
+% recognised as decimal marker.
+%\begin{LaTeXdemo}
+%  \num{123}     \\
+%  \num{1234}    \\
+%  \num{12345}   \\
+%  \num{0.123}   \\
+%  \num{0,1234}  \\
+%  \num{.12345}  \\
+%  \num{3.45d-4} \\
+%  \num{-e10}
+%\end{LaTeXdemo} 
+%
+%\section{The key--value control system}
+%
+%\DescribeMacro{\sisetup}
+% The behaviour of the \pkg{siunitx} package is controlled by a 
+% number of key--value options. These can be given globally using
+% the \cs{sisetup} function or locally as the optional argument to the
+% user macros. 
+%  
+% The package uses a range of different key types:
+%\begin{description}
+%  \item[\texttt{Choice}] Takes a limited number of choices, which 
+%    are described separately for each key. 
+%  \item[\texttt{Literal}] A key which uses the value(s) given directly,
+%    either to check input (for example the \texttt{input-digits} key)
+%    or in output.
+%  \item[\texttt{Maths}] Similar to a \texttt{literal} option, but the
+%    input is always used in maths mode, irrespective of other 
+%    \pkg{siunitx} settings. Thus to text-mode only input must be
+%    placed inside the argument of a \cs{text} macro.
+%  \item[\texttt{Macro}] Requires a macro, which may need a single 
+%    argument.
+%  \item[\texttt{Switch}] These are on--off switches, and recognise
+%    \opt{true} and \opt{false}.  Giving just the key name also 
+%    turns the key on.
+%\end{description}
+% The tables of option names use these descriptions to indicate how the
+% keys should be used.
+% 
+% In all cases, UK and US English spellings are available for both 
+% option names and for settings. Thus \opt{centre} and 
+% \opt{center} can be used for alignment options, and \opt{maths}
+% or \opt{math} is valid in the names of font options. In the rest of
+% this document, UK English spelling is used.
+%
+%\subsection{Detecting fonts}
+%
+% The \pkg{siunitx} package controls the font used to print output
+% independently of the surrounding material.  The standard method is to
+% ignore the surroundings entirely, and to use the current upright maths
+% font for all printing.\footnote{This will typically use \cs{mathrm}.}
+% However, the package can detect and follow surrounding bold, italic 
+% and font family changes. The font detection options are summarised in 
+% Table~\ref{tab:opt:font:det}.
+%\begin{table}
+%  \centering
+%  \caption{Font detection options}
+%  \label{tab:opt:font:det}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule
+%      detect-all           & Meta   & \meta{none} \\
+%      detect-bold          & Switch & false    \\ 
+%      detect-display-maths & Switch & false    \\
+%      detect-family        & Switch & false    \\
+%      detect-inline-bold   & Choice & text     \\
+%      detect-italic        & Switch & false    \\
+%      detect-mode          & Switch & false    \\
+%      detect-none          & Meta   & \meta{none} \\ 
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{detect-bold}
+%\DescribeOption{detect-family}
+%\DescribeOption{detect-italic}
+%\DescribeOption{detect-mode}
+% The options \opt{detect-bold} and \opt{detect-italic} set detection
+% of the prevailing bold and italic states, respectively. The italic
+% state is only checked if the surrounding material is not in maths mode
+% (as maths text is always italic). Detecting the current family (roman,
+% sans serif or monospaced) is controlled by the \opt{detect-family} 
+% setting, while the current mode (text or maths) is detected using the
+% \opt{detect-mode} switch. 
+% 
+%\DescribeOption{detect-inline-bold}
+% Bold detection is influenced by the value of \opt{detect-inline-bold},
+% which takes values \opt{text} and \opt{maths}.  The package
+% can detect the local value of bold for either the surrounding text,
+% or the surrounding inline (|$|\ldots|$|) maths.
+%\begin{LaTeXdemo}
+%  \sisetup{
+%    detect-bold        = true, 
+%  %  detect-inline-bold = maths
+%  }%
+%  $\num{1234}$ \\
+%  { \boldmath $\num{1234}$ } \\ 
+%  { \bfseries $\num{1234}$ } \\
+%  % \sisetup{detect-inline-bold = text}
+%  { \boldmath $\num{1234}$ } \\
+%  { \bfseries $\num{1234}$ }
+%\end{LaTeXdemo} 
 %
 %\end{documentation}
 %
@@ -864,7 +1132,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 % 
 %\begin{macro}{\l_siunitx_print_type_tl}
-% The type of output (\texttt{num} or \texttt{unit}) is always needed.
+% The type of output (\texttt{number} or \texttt{unit}) is always 
+% needed.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_print_type_tl
 %    \end{macrocode}
@@ -1033,6 +1302,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_number_multi_tl}
+% For products and quotients, a way of feeding information back.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_multi_tl
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_number_denominator_tl}
 %\begin{macro}{\l_siunitx_number_numerator_tl}
 % When searching for quotients, some more storage is needed.
@@ -1062,6 +1338,7 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_number_preprocess_init: {
   \bool_set_false:N \l_siunitx_error_bool
   \tl_clear:N \l_siunitx_number_pre_arg_tl
+  \tl_clear:N \l_siunitx_number_multi_tl
 }
 %    \end{macrocode}
 %\end{macro}
@@ -1079,7 +1356,8 @@ This work consists of the file  siunitx.dtx
   \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
     \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop {
       \tl_set:Nn \l_siunitx_number_arg_tl {##1}
-      \tl_set:Nn \l_siunitx_number_next_arg_tl {##2}      
+      \tl_set:Nn \l_siunitx_number_next_arg_tl {##2}
+      \tl_set:Nn \l_siunitx_number_multi_tl { product }      
     }
     \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
     \tl_if_empty:NT \l_siunitx_number_pre_arg_tl {
@@ -1108,7 +1386,8 @@ This work consists of the file  siunitx.dtx
   \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
     \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop {
       \tl_set:Nn \l_siunitx_number_numerator_tl {##1}
-      \tl_set:Nn \l_siunitx_number_denominator_tl {##2}      
+      \tl_set:Nn \l_siunitx_number_denominator_tl {##2}     
+      \tl_set:Nn \l_siunitx_number_multi_tl { quotient } 
     }
     \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
     \tl_if_empty:NT \l_siunitx_number_numerator_tl {
@@ -1609,8 +1888,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_separate: {
   \siunitx_number_in_exponent:
-  \siunitx_number_in_separate_aux:n { mantissa }
   \siunitx_number_in_separate_aux:n { exponent }
+  \siunitx_number_in_separate_aux:n { mantissa }
 }
 \cs_new_nopar:Nn \siunitx_number_in_separate_aux:n {
   \bool_if:NF \l_siunitx_error_bool {
@@ -1664,6 +1943,20 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_in_tidy: { 
   \clist_map_function:NN \c_siunitx_number_parts_clist
     \siunitx_number_in_tidy_zeros:n
+  \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa } {
+    \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign } {
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa } 
+        \l_siunitx_tmpa_tl
+      \tl_if_empty:NT \l_siunitx_tmpa_tl {
+        \prop_del:Nn \l_siunitx_number_in_prop { mantissa }
+        \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+          \l_siunitx_tmpa_tl
+        \prop_del:Nn \l_siunitx_number_in_prop { mantissa-sign }  
+        \prop_put:NnV \l_siunitx_number_in_prop { sign } 
+          \l_siunitx_tmpa_tl
+      }
+    }
+  }
   \siunitx_number_in_tidy_sign:n { mantissa }
   \siunitx_number_in_tidy_sign:n { exponent }
 }
@@ -2675,8 +2968,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_tight_bool}
 %\begin{macro}{\l_siunitx_uncert_sep_tl}
 %\begin{macro}{\l_siunitx_brackets_bool}
-%    \begin{macrocode}
 % Lots of settings, some used only for numbers, some more widely.
+%    \begin{macrocode}
 \keys_define:nn { siunitx } {
   close-bracket            .set:N     = \l_siunitx_bracket_close_tl, % (
   close-bracket            .initial:n = ),
@@ -2806,21 +3099,26 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_colour:}
+%\begin{macro}{\siunitx_number_format_colour_aux:n}
 % If the mantissa is negative, then any colour for output might change.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_colour: {
   \tl_if_empty:NF \l_siunitx_negative_colour_tl { 
-    \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign } {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign } 
-        \l_siunitx_tmpa_tl
-      \tl_if_eq:nVT { - } \l_siunitx_tmpa_tl {
-         \prop_put:NnV \l_siunitx_number_out_prop { colour } 
-           \l_siunitx_negative_colour_tl
-      }
+    \siunitx_number_format_colour_aux:n { mantissa-sign }
+    \siunitx_number_format_colour_aux:n { sign }
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_format_colour_aux:n {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+    \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
+    \tl_if_eq:nVT { - } \l_siunitx_tmpa_tl {
+       \prop_put:NnV \l_siunitx_number_out_prop { colour } 
+         \l_siunitx_negative_colour_tl
     }
   }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_complex:nn}
@@ -2876,6 +3174,17 @@ This work consists of the file  siunitx.dtx
     }
   }{
     \siunitx_number_format_final_exponent:
+    \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign } {
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+        \l_siunitx_tmpa_tl
+      \tl_clear:N \l_siunitx_tmpb_tl  
+      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
+        \l_siunitx_tmpa_tl
+      \prop_put:NnV \l_siunitx_number_out_prop { result }
+        \l_siunitx_tmpb_tl
+    }{
+      \prop_put:Nnn \l_siunitx_number_out_prop { result } { }
+    }
     \siunitx_number_format_final_join_exp:
   }
 }
@@ -2887,6 +3196,12 @@ This work consists of the file  siunitx.dtx
       \exp_after:wN ^ \exp_after:wN { \l_siunitx_tmpa_tl }
     }
     \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+    \prop_if_in:NnT \l_siunitx_number_in_prop { sign } {
+      \prop_get:NnN \l_siunitx_number_in_prop { sign } 
+        \l_siunitx_tmpb_tl
+      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+        \l_siunitx_tmpb_tl
+    }
     \prop_put:NnV \l_siunitx_number_out_prop { exponent } 
       \l_siunitx_tmpa_tl
   }
@@ -3230,6 +3545,71 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Numerical output}
+%
+% The outer level of number processing for actually printing things.
+% 
+%\begin{macro}{\l_siunitx_calc_product_bool}
+%\begin{macro}{\l_siunitx_calc_quotient_bool}
+%\begin{macro}{\l_siunix_number_parse_bool}
+% Some options related to numbers at the output stage.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  calculate-product  .bool:N    = \l_siunitx_calc_product_bool,
+  calculate-quotient .bool:N    = \l_siunitx_calc_quotient_bool,
+  parse-numbers      .bool:N    = \l_siunix_number_parse_bool,
+  parse-numbers      .initial:n = { true }
+}
+%    \end{macrocode} 
+%\end{macro} 
+%\end{macro}
+%\end{macro}
+% 
+%\begin{macro}{\siunitx_number_output:n}
+% The control function for everything else. After pre-processing, 
+% check if there are multiple parts.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_number_output:n {
+  \bool_if:NTF \l_siunix_number_parse_bool {
+    \siunitx_number_preprocess:n {#1}
+    \bool_if:NF \l_siunitx_error_bool {
+      \tl_if_empty:NTF \l_siunitx_number_multi_tl {
+        \siunitx_number_output_aux:
+      }{
+        \bool_if:cTF { 
+          l_siunitx_calc_ \l_siunitx_number_multi_tl _bool
+        } {
+          \siunitx_number_calc:nN {#1} \l_siunitx_number_arg_tl
+          \siunitx_number_output_aux:
+        }{
+          \use:c { siunitx_number_output \l_siunitx_number_multi_tl : }
+        }
+      }
+    }
+  }{
+    \siunitx_print:nn  { number } {#1}
+  }
+}
+%    \end{macrocode}
+%\end{macro} 
+%\begin{macro}[aux]{\siunitx_number_output_aux:}
+% At this stage, the number to print is inside 
+% \cs{l_siunitx_number_arg_tl}. This is passed through by name, parsed
+% and post-processed before formatting.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_aux: {
+  \siunitx_number_in_parse:V \l_siunitx_number_arg_tl 
+  \bool_if:NF \l_siunitx_error_bool {
+    \siunitx_number_process:
+    \siunitx_number_format:
+    \prop_get:NnN \l_siunitx_number_out_prop { result } 
+      \l_siunitx_tmpa_tl
+    \siunitx_print:nV  { number } \l_siunitx_tmpa_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -3542,6 +3922,7 @@ This work consists of the file  siunitx.dtx
     \IfNoValueF {#1} {
       \keys_set:nn { siunitx } {#1}
     }
+    \siunitx_number_output:n {#2}
   \group_end:
 }
 %    \end{macrocode}
