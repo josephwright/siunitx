@@ -385,7 +385,7 @@ This work consists of the file  siunitx.dtx
 % Table~\ref{tab:opt:font:det}.
 %\begin{table}
 %  \centering
-%  \caption{Font detection options}
+%  \caption{Font detection options.}
 %  \label{tab:opt:font:det}
 %  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
 %    \toprule
@@ -454,6 +454,388 @@ This work consists of the file  siunitx.dtx
 %  More text
 %  \sisetup{detect-display-maths = false}
 %  \[ y = \SI{3}{\metre\second\mole} \]
+%\end{LaTeXdemo}
+%
+%\subsection{Output font families}
+%
+% The relationship between font family detected and font family used
+% for output is not fixed. The font detected by the package in the 
+% surrounding material does not have to match that used for output.
+% 
+%\begin{table}
+%  \centering
+%  \caption{^^A
+%    Font options (all available as \opt{number-\ldots} and 
+%    \opt{unit-\ldots} versions).
+%  }
+%  \label{tab:opt:font:set}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule
+%      colour  & Literal & \meta{none}      \\
+%      mathsrm & Macro   & \cs{mathrm}   \\
+%      mathssf & Macro   & \cs{mathsf}   \\ 
+%      mathstt & Macro   & \cs{mathtt}   \\
+%      mode    & Choice  & maths         \\
+%      textrm  & Macro   & \cs{rmfamily} \\
+%      textsf  & Macro   & \cs{sffamily} \\ 
+%      texttt  & Macro   & \cs{ttfamily} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{mode}
+% The \opt{mode} option determines whether \pkg{siunitx} uses
+% maths or text mode when printing output. The choices are 
+% \opt{maths}, \opt{math} and \opt{text}. When using maths
+% mode, text is printed using a maths font whereas in text mode a
+% text font is used.  The extent to which this is visually obvious
+% depends on the fonts in use in the document. This manual uses old
+% style (lower-case) figures in text mode to highlight the differences.
+% This option has no effect if the \opt{detect-mode} switch is
+% \opt{true}.
+% 
+%\DescribeOption{mathsrm}
+%\DescribeOption{textrm}
+%\DescribeOption{mathssf}
+%\DescribeOption{mathstt}
+%\DescribeOption{textsf}
+%\DescribeOption{texttt}
+% If font family detection is inactive, \pkg{siunitx} uses the font
+% family stored in either \opt{mathsrm} or \opt{textrm} for
+% output. The choice of \opt{maths} or \opt{text} depends on the
+% \opt{mode} setting. If font family detection is active, 
+% \pkg{siunitx} may be using a sans serif or monospaced font for 
+% output. In maths mode, these are stored in \opt{mathssf} and 
+% \opt{mathstt}, and for text mode in \opt{textsf} and \opt{texttt}. 
+% Notice that the detected and output font families can differ.
+%\begin{LaTeXdemo}
+%  \sisetup{detect-family}%
+%  \num{1234} \\
+%  { \sffamily \num{1234} } \\
+%  \SI{99}{\metre} \\
+%  \sisetup{mathsrm = \mathtt}%
+%  \SI{99}{\metre} 
+%\end{LaTeXdemo}
+% This can be used to good effect to change all output from 
+% \pkg{siunitx} without needing to detect the font.  For example, 
+% when creating \pkg{beamer} presentations the settings
+%\begin{LaTeXdemo}[code only]
+%  \sisetup{
+%    mathsrm = \mathsf,
+%    textrm  = \sffamily
+%  }
+%\end{LaTeXdemo}
+% given all output in sans serif font without font detection.
+% 
+%\DescribeOption{colour} 
+% The colour of printed output can be set using the \opt{colour} 
+% option. When no colour is given, printing follows the surrounding 
+% text. In contrast, when a specific colour is given, it is used 
+% irrespective of the surroundings. As there are a number of different
+% colour models available, it is left to to user to load \pkg{color} or
+% a more powerful colour package.
+%\begin{LaTeXdemo}
+%  \color{red}
+%  Some text \\
+%  \SI{4}{\metre\per\sievert} \\
+%  More text \\
+%  \SI[colour = blue]{4}{\metre\per\sievert} \\
+%  Still red here!
+%\end{LaTeXdemo}
+%
+% Every one of the font options can be given independently for units 
+% and number, with the prefixes \opt{unit-} and \opt{number-}, 
+% respectively. This allows fine control of output.
+% 
+%\subsection{Parsing numbers}
+% 
+% The package uses a sophisticated parsing system to understand 
+% numbers. This allows \pkg{siunitx} to carry out a range of
+% formatting, as described later. All of the input options take lists of
+% literal tokens, and are summarised in Table~\ref{tab:opt:num:in}.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Options for number parsing}
+%  \label{tab:opt:num:in}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      input-close-uncertainty & Literal & )                \\ 
+%      input-complex-roots     & Literal & ij               \\ 
+%      input-decimal-markers   & Literal & .,               \\
+%      input-digits            & Literal & 0123456789       \\
+%      input-exponent-markers  & Literal & dDeE             \\
+%      input-ignore            & Literal & \meta{none}      \\
+%      input-open-uncertainty  & Literal & (                \\ ^^A ) 
+%      input-protect-tokens    & Literal & \verb=\mp\pi\pm= \\
+%      input-signs             & Literal & +-\cs{pm}\cs{mp} \\
+%      input-symbols           & Literal & \cs{pi}          \\
+%      parse-numbers           & Switch  & true             \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{input-digits}
+%\DescribeOption{input-decimal-markers}
+%\DescribeOption{input-signs}
+%\DescribeOption{input-exponent-markers} 
+% The basic parts of a number are the digits, any sign and a separator
+% between the integer and decimal parts. These are stored in the input
+% options \opt{input-digits}, \opt{input-decimal-markers} and 
+% \opt{input-signs}, respectively. More than one input decimal marker 
+% can be used: it will be converted by the package to the appropriate 
+% output marker. Numbers which include an exponent part also require 
+% a marker for the exponent: this again is taken from the range of 
+% tokens in the \opt{exponent markers} option.
+% 
+%\DescribeOption{input-ignore}
+%\DescribeOption{input-symbols}
+% As well as `normal' digits, the package will interpret symbolic
+% `numbers' (such as \cs{pi}) correctly if they are included in the 
+% \opt{input-symbols} list. Tokens given in the \opt{input-ignore} list
+% are totally passed over by \pkg{siunitx}: they will be removed from 
+% the input with no further processing.
+% 
+%\DescribeOption{input-open-uncertainty}
+%\DescribeOption{input-close-uncertainty} 
+% In some fields, it is common to give the uncertainty in a value 
+% in brackets after the main part of the number, for example 
+% `\num{1.234(5)}'. The opening and closing symbols used for this type
+% of input are set as \opt{input-open-uncertainty} and 
+% \opt{input-close-uncertainty}.
+%
+%\DescribeOption{input-complex-roots}
+% When using complex numbers in input, the complex root ($\sqrt{-1}$) is
+% indicated by one of the tokens stored in \opt{input-complex-roots}.
+% 
+%\DescribeOption{input-protect-tokens}
+% Some symbols can be problematic under expansion in \LaTeXe. To allow 
+% these to be used in input without issue, the package can protect these
+% tokens while expanding input. Symbols to be protected in this way 
+% should be listed in \opt{input-protect-tokens}.
+% 
+%\DescribeOption{parse-numbers}
+% The \opt{parse-numbers} option turns the entire parsing system on
+% and off. The option is made available for two reasons. First, if
+% all of the numbers in a document are to be reproduced `as given', 
+% turning off the parser will represent a significant saving in 
+% processing required. Second, it allows the use of arbitrary \TeX\
+% code in numbers. If the parser is turned off, it is the users 
+% responsibility to control maths/text mode selection (although
+% |^| and |_| can safely be used to give superscripts and subscripts,
+% respectively, even in text mode).
+%\begin{LaTeXdemo}
+%  \num[parse-numbers = false]{\sqrt{2}}        \\
+%  \SI[parse-numbers = false]{\sqrt{3}}{\metre}
+%\end{LaTeXdemo}
+%
+%\subsection{Post-processing numbers}
+%
+% Before typesetting numbers, various post-processing steps can be 
+% carried out. These involve adding or removing information from the 
+% number in a systematic way; the options are summarised in 
+% Table~\ref{tab:opt:num:post}.
+%
+%\begin{table}
+%  \centering
+%  \caption{Number post-processing options}
+%  \label{tab:opt:num:post}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule
+%      add-zero-decimal      & Switch  & false \\
+%      add-zero-integer      & Switch  & false \\
+%      explicit-sign         & Literal &       \\
+%      retain-explicit-plus  & Switch  & false \\
+%      retain-unity-mantissa & Switch  & true  \\
+%      retain-zero-exponent  & Switch  & false \\
+%      round-mode            & Choice  & off   \\
+%      round-figures         & Number  & 2     \\
+%      round-places          & Number  & 2     \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{round-mode}
+%\DescribeOption{round-figures}
+%\DescribeOption{round-places}
+% The \pkg{siunitx} package can round numerical input to a fixed
+% number of significant figures or decimal places. This is controlled by
+% the \opt{round-mode} option, which takes the choices \opt{off},
+% \opt{figures} and \opt{places}. When rounding is turned on, the
+% number of figures to use is determined by the \opt{round-figures}
+% and \opt{round-places} option: both of these options require a 
+% number.
+%\begin{LaTeXdemo}
+%  \num{1.23456} \\
+%  \num{14.23} \\
+%  \sisetup{
+%    round-mode   = places,
+%    round-places = 3
+%  }%
+%  \num{1.23456} \\
+%  \num{14.23} \\
+%  \sisetup{
+%    round-mode    = figures,
+%    round-figures = 3
+%  }%
+%  \num{1.23456} \\
+%  \num{14.23} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{add-zero-decimal}
+%\DescribeOption{add-zero-integer}
+% It is possible to give real (floating point) numbers as input omitting
+% the decimal or the integer parts of the number (for example \num{.123} 
+% or \num{123.}). The options \opt{add-zero-decimal} and 
+% \opt{add-zero-integer} allow the package to `fill in' the missing 
+% zero.
+%\begin{LaTeXdemo}
+%  \num{123.} \\
+%  \num{.456} \\
+%  \sisetup{
+%    add-zero-decimal = false,
+%    add-zero-integer = false,
+%  }%
+%  \num{123.} \\
+%  \num{.456} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{explicit-sign}
+%\DescribeOption{retain-explicit-plus}
+% The inclusion of a leading plus sign is usually unnecessary for
+% positive numbers, and so the \opt{retain-explicit-plus} option is
+% available to control whether these are printed. As the same time, it
+% may be useful to force all numbers to have a sign. This behaviour
+% is controlled by the \opt{explicit-sign} option: this is used if
+% given and if no sign was present in the input.
+%\begin{LaTeXdemo}
+%  \num{+345} \\
+%  \num[retain-explicit-plus]{+345} \\
+%  \num[explicit-sign = -]{345} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{retain-unity-mantissa}
+%\DescribeOption{retain-zero-exponent}
+% The retention of a zero exponent is controlled by the 
+% \opt{retain-zero-exponent} option. The retention of a mantissa of one
+% is likewise controlled by the \opt{retain-unity-mantissa} option.
+%\begin{LaTeXdemo}
+%  \num{1e4} \\
+%  \num[retain-unity-mantissa = false]{1e4} \\
+%  \num{444e0} \\
+%  \num[retain-zero-exponent = true]{444e0} 
+%\end{LaTeXdemo}
+%
+%\subsection{Printing numbers}
+%
+% Actually printing numbers is controlled by a number of settings,
+% which apply ideas such as differing decimal markers, digit
+% grouping and so on.  All of these options are concerned with the
+% appearance of output, rather than the data it conveys. The options are
+% summarised in Table~\ref{tab:opt:num:out}.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Output options for numbers}
+%  \label{tab:opt:num:out}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      close-bracket            & Literal & )           \\ 
+%      exponent-base            & Literal & 10          \\
+%      exponent-product         & Maths   & \cs{times}  \\
+%      group-decimal-digits     & Switch  & true        \\
+%      group-digits             & Switch  & true        \\
+%      group-four-digits        & Switch  & false       \\
+%      group-integer-digits     & Switch  & true        \\
+%      group-separator          & Maths   & \cs{,}      \\
+%      negative-colour          & Literal & \meta{none} \\
+%      open-bracket             & Literal & (           \\ ^^A ) (
+%      output-close-uncertainty & Literal & )           \\ 
+%      output-complex-root      & Maths   & i           \\
+%      output-decimal-marker    & Maths   & .           \\
+%      output-open-uncertainty  & Literal & (           \\ ^^A )
+%      separate-uncertainty     & Switch  & false       \\
+%      tight-spacing            & Switch  & false       \\
+%      uncertainty-separator    & Maths   & \meta{none} \\
+%      use-brackets             & Switch  & true        \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{group-digits}
+%\DescribeOption{group-decimal-digits}
+%\DescribeOption{group-integer-digits}
+%\DescribeOption{group-four-digits}
+%\DescribeOption{group-separator}
+% Grouping digits into blocks of three is a common method to increase
+% the ease of reading of numbers.  The \opt{group-digits} choice
+% turns this behaviour on and off, with grouping for numbers of exactly
+% four digits controlled by the \opt{group-four-digits} choice. Note
+% that the later only applies if \opt{group-digits} is turned on.
+% The separator used between groups of digits is stored by the 
+% \opt{group separator} option.  This takes literal input and is
+% used in maths mode: for a text-mode full space use |\text{~}|.
+%\begin{LaTeXdemo}
+%  \num{12345} \\
+%  \num[group-digits = false]{12345} \\
+%  \num{1234} \\
+%  \num[group-four-digits = true]{1234} \\
+%  \num{12345} \\
+%  \num[group-separator = {{,}}]{12345} \\
+%  \num[group-separator = \text{~}]{12345} 
+%\end{LaTeXdemo} 
+% Grouping can be activated separately for the integer and decimal
+% parts of a number using the \opt{group-integer-digits} and 
+% \opt{group-decimal-digits} options.
+%\begin{LaTeXdemo}
+%  \sisetup{group-digits = false}%
+%  \num{12345.67890} \\
+%  \num[group-decimal-digits]{12345.67890} \\
+%  \num[group-integer-digits]{12345.67890} \\
+%\end{LaTeXdemo}
+%
+%\DescribeOption{output-complex-root}
+%\DescribeOption{output-decimal-marker}
+% The decimal marker used in output is set using the 
+% \opt{output-decimal-marker} option. This can differ from the input 
+% marker, as can the root of $\sqrt{-1}$, which is stored in the 
+% \opt{output-complex-root} option. The later is always in maths mode, 
+% but notice that \pkg{siunitx} uses \cs{mathrm} by default.  To force 
+% standard \TeX\ maths output to give $i$, the construction 
+% |\text{\ensuremath{i}}| can be used.
+%\begin{LaTeXdemo}
+%  \num{1.23} \\
+%  \num[output-decimal-marker = {{,}}]{1.23} \\
+%  \num{1+2i} \\
+%  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{exponent-base}
+%\DescribeOption{exponent-product}
+% When exponents are present in the input, the options 
+% \opt{exponent-base} and \opt{exponent-product} set the obvious parts 
+% of the output.  Notice that the base is in the current mode, but the
+% product sign is always in maths mode.
+%\begin{LaTeXdemo}
+%  \num[exponent-product = \times]{1e2} \\
+%  \num[exponent-product = \cdot]{1e2} \\
+%  \num[exponent-base = 2]{1e2}
 %\end{LaTeXdemo}
 %
 %\end{documentation}
@@ -992,10 +1374,19 @@ This work consists of the file  siunitx.dtx
   number-mathrm .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathrm: {#1}
   },
+  number-mathsrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathrm: {#1}
+  },
   number-mathsf .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathsf: {#1}
   },
+  number-mathssf .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathsf: {#1}
+  },
   number-mathtt .code:n = {
+    \cs_set_nopar:Nn \siunitx_number_mathtt: {#1}
+  },
+  number-mathstt .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathtt: {#1}
   },
   number-mode .choice:,
@@ -1048,10 +1439,19 @@ This work consists of the file  siunitx.dtx
   unit-mathrm .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathrm: {#1}
   },
+  unit-mathsrm .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathrm: {#1}
+  },
   unit-mathsf .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathsf: {#1}
   },
+  unit-mathssf .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathsf: {#1}
+  },
   unit-mathtt .code:n = {
+    \cs_set_nopar:Nn \siunitx_unit_mathtt: {#1}
+  },
+  unit-mathstt .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathtt: {#1}
   },
   unit-mode .choice:,
@@ -1099,17 +1499,29 @@ This work consists of the file  siunitx.dtx
     number-mathrm = #1,
     unit-mathrm   = #1
   },
-  mathrm .initial:n = \mathrm,
+  mathsrm .meta:n = {
+    number-mathsrm = #1,
+    unit-mathsrm   = #1
+  },
+  mathsrm .initial:n = \mathrm,
   mathsf .meta:n = {
     number-mathsf = #1,
     unit-mathsf   = #1
   },
-  mathsf .initial:n = \mathsf,
+  mathssf .meta:n = {
+    number-mathssf = #1,
+    unit-mathssf   = #1
+  },
+  mathssf .initial:n = \mathsf,
   mathtt .meta:n = {
     number-mathtt = #1,
     unit-mathtt   = #1
   },
-  mathtt .initial:n = \mathtt,
+  mathstt .meta:n = {
+    number-mathstt = #1,
+    unit-mathstt   = #1
+  },
+  mathstt .initial:n = \mathtt,
   mode .choice:,
   mode / math .meta:n = {
     number-mode = math,
@@ -1201,7 +1613,8 @@ This work consists of the file  siunitx.dtx
     \siunitx_font_bold:
     \siunitx_font_italic:
     \use:c {
-      siunitx_ \l_siunitx_print_type_tl _ \l_siunitx_font_family_tl :
+      siunitx_ \l_siunitx_print_type_tl _ 
+      text \l_siunitx_font_family_tl :
     }
     \bool_if:NTF \l_siunitx_font_maths_mode_bool {
       \siunitx_print_maths:
@@ -1250,7 +1663,13 @@ This work consists of the file  siunitx.dtx
 \tl_to_lowercase:n {
   \group_end:
   \cs_new:Nn \siunitx_print_maths: {
-    \ensuremath { \l_siunitx_print_arg_tl }
+    \ensuremath { 
+      \use:c {
+        siunitx_ \l_siunitx_print_type_tl _ 
+        math \l_siunitx_font_family_tl :
+      }
+      \l_siunitx_print_arg_tl 
+    }
   }
   \cs_new:Nn \siunitx_print_text: {
     \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { & } 
@@ -1316,13 +1735,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_number_arg_tl}
-%\begin{macro}{\l_siunitx_number_next_arg_tl}
+%\begin{macro}{\l_siunitx_number_next_tl}
 % Storage for the pre-parsed material.  The \texttt{arg} variable 
 % contains the current argument, the \texttt{next} variable contains
 % anything held-over for the next round.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_number_arg_tl
-\tl_new:N \l_siunitx_number_next_arg_tl
+\tl_new:N \l_siunitx_number_next_tl
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -1345,6 +1764,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_preprocess:n}
+%\begin{macro}{\siunitx_number_preprocess:V}
 % The pre-processor starts with the obvious: the most likely outcome is
 % that all of the argument is passed through unchanged.
 %    \begin{macrocode}
@@ -1354,7 +1774,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_preprocess_product:
   \siunitx_number_preprocess_quotient:
 }
+\cs_generate_variant:Nn \siunitx_number_preprocess:n { V }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_preprocess_init:}
@@ -1362,7 +1784,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_number_preprocess_init: {
   \bool_set_false:N \l_siunitx_error_bool
-  \tl_clear:N \l_siunitx_number_pre_arg_tl
+  \tl_clear:N \l_siunitx_number_next_tl
   \tl_clear:N \l_siunitx_number_multi_tl
 }
 %    \end{macrocode}
@@ -1381,14 +1803,14 @@ This work consists of the file  siunitx.dtx
   \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
     \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop {
       \tl_set:Nn \l_siunitx_number_arg_tl {##1}
-      \tl_set:Nn \l_siunitx_number_next_arg_tl {##2}
+      \tl_set:Nn \l_siunitx_number_next_tl {##2}
       \tl_set:Nn \l_siunitx_number_multi_tl { product }      
     }
     \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
-    \tl_if_empty:NT \l_siunitx_number_pre_arg_tl {
+    \tl_if_empty:NT \l_siunitx_number_arg_tl {
       \siunitx_error:n { starting-product-token }
     }
-    \tl_if_empty:NT \l_siunitx_number_next_arg_tl {
+    \tl_if_empty:NT \l_siunitx_number_next_tl {
       \siunitx_error:n { ending-product-token }
     }
     \tl_map_break:
@@ -2244,7 +2666,7 @@ This work consists of the file  siunitx.dtx
   add-zero-integer  .bool:N     = \l_siunitx_process_integer_zero_bool,
   add-zero-integer  .initial:n  = true,
   explicit-sign     .set:N      = \l_siunitx_process_sign_tl,
-  retain-plus       .bool:N     = \l_siunitx_process_plus_tl,
+  retain-explicit-plus  .bool:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool:N = 
     \l_siunitx_process_unity_mantissa_bool,
   retain-unity-mantissa .initial:n = { true }, 
@@ -2754,12 +3176,12 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_process_sign: {
   \bool_if:NF \l_siunitx_process_plus_tl {
-    \siunitx_number_process_sign_plus:n { mantissa }
     \siunitx_number_process_sign_plus:n { exponent }
+    \siunitx_number_process_sign_plus:n { mantissa }
   }
   \tl_if_empty:NF \l_siunitx_process_sign_tl {
-    \siunitx_number_process_sign_add:n { mantissa }
     \siunitx_number_process_sign_add:n { exponent }
+    \siunitx_number_process_sign_add:n { mantissa }
   }
 }
 %    \end{macrocode}
@@ -2780,8 +3202,17 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Nn \siunitx_number_process_sign_add_aux:n {
   \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -sign } {
-    \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
-      \l_siunitx_process_sign_tl
+    \prop_if_in:NnT \l_siunitx_number_in_prop {#1} {
+      \prop_get:NnN \l_siunitx_number_in_prop {#1}
+        \l_siunitx_tmpa_tl
+      \tl_if_empty:NTF \l_siunitx_tmpa_tl {
+        \prop_put:NnV \l_siunitx_number_in_prop { sign } 
+          \l_siunitx_process_sign_tl 
+      }{
+        \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
+          \l_siunitx_process_sign_tl
+      }
+    }
   }
 }
 %    \end{macrocode}
@@ -2969,13 +3400,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%\begin{macro}{\l_siunitx_number_out_tl}
-% The complete number, for output.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_number_out_tl
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\l_siunitx_bracket_close_tl}
 %\begin{macro}{\l_siunitx_exponent_base_tl}
 %\begin{macro}{\l_siunitx_exponent_product_tl}
@@ -3021,7 +3445,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_output_uncert_close_tl, % (
   output-close-uncertainty .initial:n = ),
   output-complex-root      .set:N     = \l_siunitx_output_complex_tl,
-  output-complex-root      .initial:n = { \mathrm { i } },
+  output-complex-root      .initial:n = { i },
   output-decimal-marker    .set:N     = \l_siunitx_output_decimal_tl,
   output-decimal-marker    .initial:n = { . },
   output-open-uncertainty  .set:N     = 
@@ -3062,7 +3486,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format: {
   \prop_if_empty:NF \l_siunitx_number_in_prop {
-    \siunitx_number_format_init:
+    \prop_clear:N \l_siunitx_number_out_prop
     \siunitx_number_format_reassemble:
     \siunitx_number_format_join_uncert:
     \siunitx_number_format_aux:n { mantissa } 
@@ -3078,7 +3502,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Nn \siunitx_number_format_parts: {
   \prop_if_empty:NF \l_siunitx_number_in_prop {
-    \siunitx_number_format_init:
+    \prop_clear:N \l_siunitx_number_out_prop
     \siunitx_number_format_reassemble:
     \siunitx_number_format_join_uncert:n { exponent }
     \siunitx_number_format_complex:nn { mantissa } { }
@@ -3307,16 +3731,20 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_group_four:nn {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmpa_tl
-  \bool_if:NTF \l_siunitx_group_four_bool {
-    \siunitx_number_format_group_four_aux:nn {#1} {#2}
+  \tl_if_empty:NTF \l_siunitx_tmpa_tl {
+    \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { }
   }{
-    \int_set:Nn \l_siunitx_tmp_int {
-      \tl_elt_count:N \l_siunitx_tmpa_tl
-    }
-    \intexpr_compare:nTF { \l_siunitx_tmp_int > \c_four } {
+    \bool_if:NTF \l_siunitx_group_four_bool {
       \siunitx_number_format_group_four_aux:nn {#1} {#2}
     }{
-      \siunitx_number_format_copy:n {#1 - #2}
+      \int_set:Nn \l_siunitx_tmp_int {
+        \tl_elt_count:N \l_siunitx_tmpa_tl
+      }
+      \intexpr_compare:nTF { \l_siunitx_tmp_int > \c_four } {
+        \siunitx_number_format_group_four_aux:nn {#1} {#2}
+      }{
+        \siunitx_number_format_copy:n {#1 - #2}
+      }
     }
   }
 }
@@ -3409,16 +3837,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_format_init:}
-% All of the set up in one place.
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_number_format_init: {
-  \prop_clear:N \l_siunitx_number_out_prop
-  \tl_clear:N \l_siunitx_number_out_tl
-}
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_join_complex:n}
@@ -3574,19 +3992,33 @@ This work consists of the file  siunitx.dtx
 %
 % The outer level of number processing for actually printing things.
 % 
+%\begin{macro}{\l_siunitx_number_out_tl}
+%\begin{macro}{\l_siunitx_number_out_multi_tl}
+% The final result.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_out_tl
+\tl_new:N \l_siunitx_number_out_multi_tl
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro} 
+% 
 %\begin{macro}{\l_siunitx_calc_product_bool}
 %\begin{macro}{\l_siunitx_calc_quotient_bool}
+%\begin{macro}{\l_siunitx_output_product_tl}
 %\begin{macro}{\l_siunix_number_parse_bool}
 % Some options related to numbers at the output stage.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   calculate-product  .bool:N    = \l_siunitx_calc_product_bool,
   calculate-quotient .bool:N    = \l_siunitx_calc_quotient_bool,
+  output-product     .set:N     = \l_siunitx_output_product_tl,
+  output-product     .initial:n = { \times },
   parse-numbers      .bool:N    = \l_siunix_number_parse_bool,
   parse-numbers      .initial:n = { true }
 }
 %    \end{macrocode} 
 %\end{macro} 
+%\end{macro}
 %\end{macro}
 %\end{macro}
 % 
@@ -3596,47 +4028,88 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_number_output:n {
   \bool_if:NTF \l_siunix_number_parse_bool {
-    \siunitx_number_preprocess:n {#1}
-    \bool_if:NF \l_siunitx_error_bool {
-      \tl_if_empty:NTF \l_siunitx_number_multi_tl {
-        \siunitx_number_output_aux:
-      }{
-        \bool_if:cTF { 
-          l_siunitx_calc_ \l_siunitx_number_multi_tl _bool
-        } {
-          \siunitx_number_calc:nN {#1} \l_siunitx_number_arg_tl
-          \siunitx_number_output_aux:
-        }{
-          \use:c { siunitx_number_output \l_siunitx_number_multi_tl : }
-        }
-      }
-    }
+    \siunitx_number_output_parse:n {#1}
   }{
     \siunitx_print:nn  { number } {#1}
   }
 }
 %    \end{macrocode}
-%\end{macro} 
-%\begin{macro}[aux]{\siunitx_number_output_aux:}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_parse:n} 
+%\begin{macro}[aux]{\siunitx_number_output_parse_aux:}
+% Most of the work is done here: is there sub-division to do.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_parse:n {
+  \siunitx_number_preprocess:n {#1}
+  \bool_if:NF \l_siunitx_error_bool {
+    \tl_if_empty:NTF \l_siunitx_number_multi_tl {
+      \siunitx_number_output_parse_aux:
+      \bool_if:NF \l_siunitx_error_bool {
+        \siunitx_print:nV  { number } \l_siunitx_number_out_tl
+      }
+    }{
+      \bool_if:cTF { 
+        l_siunitx_calc_ \l_siunitx_number_multi_tl _bool
+      } {
+        \siunitx_number_calc:nN {#1} \l_siunitx_number_arg_tl
+        \siunitx_number_output_aux:
+        \bool_if:NF \l_siunitx_error_bool {
+          \siunitx_print:nV  { number } \l_siunitx_number_out_tl
+        }
+      }{
+        \use:c { siunitx_number_output_ \l_siunitx_number_multi_tl : }
+      }
+    }
+  }
+}
+%    \end{macrocode}
 % At this stage, the number to print is inside 
 % \cs{l_siunitx_number_arg_tl}. This is passed through by name, parsed
 % and post-processed before formatting.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_number_output_aux: {
+\cs_new_nopar:Nn \siunitx_number_output_parse_aux: {
   \siunitx_number_in_parse:V \l_siunitx_number_arg_tl 
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_number_process:
     \siunitx_number_format:
     \prop_get:NnN \l_siunitx_number_out_prop { result } 
-      \l_siunitx_tmpa_tl
+      \l_siunitx_number_out_tl
     \prop_if_in:NnT \l_siunitx_number_out_prop { colour } {
       \prop_get:NnN \l_siunitx_number_out_prop { colour } 
         \l_siunitx_number_colour_tl
     }  
-    \siunitx_print:nV  { number } \l_siunitx_tmpa_tl
   }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_product:}
+%\begin{macro}{\siunitx_number_output_product_aux:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_product: {
+  \tl_clear:N \l_siunitx_number_out_multi_tl
+  \siunitx_number_output_product_aux:
+  \bool_if:NF \l_siunitx_error_bool {
+    \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
+  }
+}
+\cs_new_nopar:Nn \siunitx_number_output_product_aux: {
+  \siunitx_number_output_parse_aux:
+  \bool_if:NF \l_siunitx_error_bool {
+    \tl_put_right:NV \l_siunitx_number_out_multi_tl 
+      \l_siunitx_number_out_tl
+    \tl_if_empty:NF \l_siunitx_number_next_tl {
+      \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_multi_tl
+        \l_siunitx_output_product_tl
+      \siunitx_number_preprocess:V \l_siunitx_number_next_tl
+      \siunitx_number_output_product_aux:
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Symbols}
