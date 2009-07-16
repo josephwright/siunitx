@@ -838,6 +838,103 @@ This work consists of the file  siunitx.dtx
 %  \num[exponent-base = 2]{1e2}
 %\end{LaTeXdemo}
 %
+%\DescribeOption{separate-uncertainty}
+%\DescribeOption{uncertainty-separator}
+%\DescribeOption{output-open-uncertainty}
+%\DescribeOption{output-close-uncertainty}
+% When input is given including an uncertainty in a value, it can be 
+% printed either with the uncertainty in brackets or as a separate 
+% number. This behaviour is controlled by the 
+% \opt{separate-uncertainty} choice. If the uncertainty is given in 
+% brackets, a space may be added between the main value and the 
+% uncertainty: this is stored using the \opt{uncertainty-separator}
+% option. The opening and closing brackets used are stored 
+% \opt{output-open-uncertainty} and
+% \opt{output-close-uncertainty}, respectively.
+%\begin{LaTeXdemo}
+%  \num{1.234(5)} \\
+%  \num[separate-uncertainty = true]{1.234(5)} \\
+%  \sisetup{
+%    output-open-uncertainty  = [,
+%    output-close-uncertainty = ],
+%    uncertainty-separator    = {\,}
+%  }
+%  \num{1.234(5)}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{use-brackets}
+%\DescribeOption{open-bracket}
+%\DescribeOption{close-bracket}
+% There are certain combinations of numerical input which can be
+% ambiguous. This can be corrected by adding brackets in the appropriate
+% place, and is controlled by the \opt{use-brackets} switch.  The 
+% opening and closing brackets used are stored \opt{open-bracket} and
+% \opt{close-bracket}, respectively.
+%\begin{LaTeXdemo}
+%  \num{1+2i e10} \\
+%  \num[use-brackets = false]{1+2i e10} \\
+%  \sisetup{
+%    open-bracket  = \{,
+%    close-bracket = \},
+%  }
+%  \num{1+2i e10}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{negative-colour}
+% \pkg{siunitx} can detect negative mantissa values and alter print
+% colour accordingly. This is disabled by setting the option to an empty
+% value.
+%\begin{LaTeXdemo}
+%  \num{-15673} \\
+%  \num[negative-colour = red]{-15673}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{tight-spacing}
+% Under some circumstances is may be desirable to `squeeze' the output
+% spacing.  This is turned on using the \opt{tight-spacing} switch,
+% which compresses spacing where possible.
+%\begin{LaTeXdemo}
+%  \num{1 \pm 2i e3} \\
+%  \num[tight-spacing = true]{1 \pm 2i e3} \\
+%\end{LaTeXdemo}
+%
+%\subsection{Multi-part numbers}
+%
+% \pkg{siunitx} recognises the idea of products and quotients in 
+% numbers, both with and without units. These multi-part numbers have
+% a number of options affecting how they are processed. The options are
+% summarised in Table~\ref{tab:opt:num:multi}.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Multi-part number options}
+%  \label{tab:opt:num:multi}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      calculate-product  & Switch & false       \\
+%      calculate-quotient & Switch & false       \\
+%      input-product      & Literal & x          \\
+%      input-quotient     & Literal & /          \\
+%      output-product     & Maths   & \cs{times} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{input-product}
+%\DescribeOption{input-quotient}
+% The options \opt{input-product} and \opt{input-quotient} contain the
+% tokens used to determine if a number contains multiple parts.
+%\begin{LaTeXdemo}
+%  \num{1 x 2 x 3} \\
+%  \num{1e4 x 2(3) x 3} \\
+%  \num[input-product=*]{4 * 5 * 6} \\
+%  \num{ 1 / 2e4 }
+%\end{LaTeXdemo}
+%
 %\end{documentation}
 %
 %\begin{implementation}
@@ -3605,9 +3702,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_final:}
-%\begin{macro}{\siunitx_number_format_final_exponent:}
-%\begin{macro}{\siunitx_number_format_final_join_exp:}
-%\begin{macro}{\siunitx_number_format_final_mantissa:}
 % The exponent system starts by making sure that the mantissa contains
 % brackets if needed. A sign is then added to the exponent part, before
 % creating the full output (including the mantissa sign if needed).
@@ -3616,28 +3710,42 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa } {
     \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent } {
       \siunitx_number_format_final_mantissa:
-      \siunitx_number_format_final_exponent:
+      \siunitx_number_format_final_exponent_aux:
       \siunitx_number_format_final_join_exp:
     }{
       \siunitx_number_format_copy:nn { mantissa } { result }
     }
   }{
     \siunitx_number_format_final_exponent:
-    \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign } {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
-        \l_siunitx_tmpa_tl
-      \tl_clear:N \l_siunitx_tmpb_tl  
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
-        \l_siunitx_tmpa_tl
-      \prop_put:NnV \l_siunitx_number_out_prop { result }
-        \l_siunitx_tmpb_tl
-    }{
-      \prop_put:Nnn \l_siunitx_number_out_prop { result } { }
-    }
-    \siunitx_number_format_final_join_exp:
+  }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } {
+    \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
+      { true }
+    \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
   }
 }
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_format_final_exponent:}
+%\begin{macro}[aux]{\siunitx_number_format_final_exponent_aux:}
+% For tidying up the exponent part.
+%    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_final_exponent: {
+  \siunitx_number_format_final_exponent_aux:
+  \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign } {
+    \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+      \l_siunitx_tmpa_tl
+    \tl_clear:N \l_siunitx_tmpb_tl  
+    \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
+      \l_siunitx_tmpa_tl
+    \prop_put:NnV \l_siunitx_number_out_prop { result }
+      \l_siunitx_tmpb_tl
+  }{
+    \prop_put:Nnn \l_siunitx_number_out_prop { result } { }
+  }
+  \siunitx_number_format_final_join_exp:
+}
+\cs_new_nopar:Nn \siunitx_number_format_final_exponent_aux: {
   \prop_if_in:NnT \l_siunitx_number_out_prop { exponent } {
     \prop_get:NnN \l_siunitx_number_out_prop { exponent } 
       \l_siunitx_tmpa_tl
@@ -3655,6 +3763,13 @@ This work consists of the file  siunitx.dtx
       \l_siunitx_tmpa_tl
   }
 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_number_format_final_join_exp:}
+% If there is an exponent, this function is called to add it to the
+% result if necessary.
+%    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_final_join_exp: {
   \prop_if_in:NnT \l_siunitx_number_out_prop { result } {
     \prop_get:NnN \l_siunitx_number_out_prop { result } 
@@ -3662,8 +3777,15 @@ This work consists of the file  siunitx.dtx
     \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
     \prop_put:NnV \l_siunitx_number_out_prop { result } 
       \l_siunitx_tmpa_tl
+    \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } { true }
   }
 }
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_format_final_mantissa:}
+% Tidying up the mantissa, perhaps including adding a product sign
+% if there is an exponent to come.
+%    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_final_mantissa: {
   \siunitx_number_format_brackets:n { mantissa } 
   \prop_get:NnN \l_siunitx_number_out_prop { mantissa } 
@@ -3679,9 +3801,6 @@ This work consists of the file  siunitx.dtx
   \prop_put:NnV \l_siunitx_number_out_prop { result } \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_group:n}
@@ -3955,6 +4074,8 @@ This work consists of the file  siunitx.dtx
   \prop_del:Nn \l_siunitx_number_in_prop { #1 -uncertainty }
   \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
     \l_siunitx_output_uncert_open_tl
+  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl
+    \l_siunitx_uncert_sep_tl
   \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
     \l_siunitx_output_uncert_close_tl
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
@@ -4001,6 +4122,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %\end{macro} 
+%
+%\begin{macro}{\l_siunitx_number_part_bool}
+% To indicate that the current result is a sub-unit.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_number_part_bool
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_calc_product_bool}
 %\begin{macro}{\l_siunitx_calc_quotient_bool}
@@ -4043,6 +4171,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_output_parse:n {
   \siunitx_number_preprocess:n {#1}
   \bool_if:NF \l_siunitx_error_bool {
+    \bool_set_false:N \l_siunitx_number_part_bool
     \tl_if_empty:NTF \l_siunitx_number_multi_tl {
       \siunitx_number_output_parse_aux:
       \bool_if:NF \l_siunitx_error_bool {
@@ -4073,6 +4202,9 @@ This work consists of the file  siunitx.dtx
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_number_process:
     \siunitx_number_format:
+    \bool_if:NT \l_siunitx_number_part_bool {
+      \siunitx_number_format_brackets:n { result }
+    }
     \prop_get:NnN \l_siunitx_number_out_prop { result } 
       \l_siunitx_number_out_tl
     \prop_if_in:NnT \l_siunitx_number_out_prop { colour } {
@@ -4087,9 +4219,11 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_output_product:}
 %\begin{macro}{\siunitx_number_output_product_aux:}
+% For products, a loop and the addition of the appropriate symbol.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_product: {
   \tl_clear:N \l_siunitx_number_out_multi_tl
+  \bool_set_true:N \l_siunitx_number_part_bool
   \siunitx_number_output_product_aux:
   \bool_if:NF \l_siunitx_error_bool {
     \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
@@ -4101,8 +4235,14 @@ This work consists of the file  siunitx.dtx
     \tl_put_right:NV \l_siunitx_number_out_multi_tl 
       \l_siunitx_number_out_tl
     \tl_if_empty:NF \l_siunitx_number_next_tl {
+      \tl_set_eq:NN \l_siunitx_tmpa_tl  \l_siunitx_output_product_tl
+      \bool_if:NT \l_siunitx_tight_bool {  
+        \tl_set:No \l_siunitx_tmpa_tl {
+          \exp_after:wN { \l_siunitx_tmpa_tl }
+        }
+      }
       \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_multi_tl
-        \l_siunitx_output_product_tl
+        \l_siunitx_tmpa_tl
       \siunitx_number_preprocess:V \l_siunitx_number_next_tl
       \siunitx_number_output_product_aux:
     }
@@ -4110,6 +4250,26 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_quotient:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_quotient: {
+  \bool_set_true:N \l_siunitx_number_part_bool
+  \cs_set_eq:NN \l_siunitx_number_arg_tl \l_siunitx_number_numerator_tl
+  \siunitx_number_output_parse_aux:
+  \cs_set_eq:NN \l_siunitx_number_out_multi_tl \l_siunitx_number_out_tl
+  \siunitx_tl_put_right_maths:Nn \l_siunitx_number_out_multi_tl { / }
+  \cs_set_eq:NN \l_siunitx_number_arg_tl 
+    \l_siunitx_number_denominator_tl
+  \siunitx_number_output_parse_aux:
+  \tl_put_right:NV \l_siunitx_number_out_multi_tl 
+    \l_siunitx_number_out_tl
+  \bool_if:NF \l_siunitx_error_bool {
+    \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
+  }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Symbols}
