@@ -205,6 +205,9 @@ This work consists of the file  siunitx.dtx
 %
 %\makeatother
 % 
+%\GetIdInfo$Id$
+%  {A comprehensive (SI) units package}
+% 
 %\title{^^A
 %  \textsf{siunitx} --- A comprehensive (SI) units package\thanks{^^A
 %    This file describes version \fileversion, last revised 
@@ -4279,37 +4282,248 @@ This work consists of the file  siunitx.dtx
 % method only makes these available inside the unit-processing functions
 % (\cs{SI}, \cs{si} and the \texttt{S} column).
 % 
-%\begin{macro}{\l_siunitx_unit_list_tl}
+%\begin{macro}{\l_siunitx_declare_list_tl}
+% A list of all unit and related functions.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_unit_list_tl
+\tl_new:Nn \l_siunitx_declare_list_tl { \per \raiseto \tothe }
 %    \end{macrocode}
 %\end{macro} 
+%
+%\begin{macro}{\siunitx_declare_power_post:Nn}
+%\begin{macro}{\siunitx_declare_power_pre:Nn}
+% Creating powers is all about manipulating stored values. This means 
+% that the call to \cs{siunitx_unit_parse_store:nn} does not really need
+% an argument.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_declare_power_post:Nn {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
+    \textsuperscript {#2}
+  }
+  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+    % \def\si@unit@parse@power@current{#2}%
+    \siunitx_unit_parse_store:nn { power } {#2}
+  }
+}
+\cs_new:Nn \siunitx_declare_power_pre:Nn {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn ##1 { siunitx_ \token_to_str:N #1 _literal:w } {
+    ##1 \textsuperscript {#2}
+  }
+  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+    % \def\si@unit@parse@power@last{#2}%
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_declare_prefix:Nnn}
+%\begin{macro}{\siunitx_declare_prefix_binary:Nnn}
+% Prefixes need to store both the symbol and the power they represent.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_declare_prefix:Nnn {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
+  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+    \siunitx_unit_parse_store:nn { prefix } {#2}
+  }
+  \cs_if_free:cT { l_siunitx_ \token_to_str:N #1 _int } {
+    \int_new:c { l_siunitx_ \token_to_str:N #1 _int }
+  }
+  \int_set:cn { l_siunitx_ \token_to_str:N #1 _int } {#3}
+}
+\cs_new:Nn \siunitx_declare_prefix_binary:Nnn {
+  \siunitx_declare_prefix:Nnn #1 {#2} {#3}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_declare_qualifier:Nn}
+% Qualifiers just need storing.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_declare_qualifier:Nn {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
+    \text { ~ } ( #2 ) 
+  }
+  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+    \siunitx_unit_parse_store:nn { qualifier } {#2}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
 % 
-%\begin{macro}{\siunitx_unit_set:nnn}
-%\begin{macro}[aux]{\siunitx_unit_get_first:n}
+%\begin{macro}{\siunitx_declare_unit:Nnn}
+%\begin{macro}[aux]{\siunitx_unit_first_token:n}
 % Creating units requires various things to be stored.  This is done
 % with several storage bins to keep the code clear.  For the 
 % \texttt{macro} definition, the test occurs at use so that there is no
 % problem with the creation order for units.
 %    \begin{macrocode}
-\cs_new:Nn \siunitx_unit_set:Nnn {
-  \tl_put_right:Nn \l_siunitx_unit_list_tl {#1}
-  \cs_set:cn { siunitx_unit_literal_ \token_to_str:N #1 : } {#2}
-  \cs_set:cn { siunitx_unit_function_ \token_to_str:N #1 : } {
+\cs_new:Nn \siunitx_declare_unit:Nnn {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
+  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
     \cs_if_exist:cTF { 
-      siunitx_unit_function_ \siunitx_unit_get_first:n {#1} : 
+      siunitx_ \siunitx_unit_first_token:n {#1} _function:w
     } {
       #2
     }{
       \siunitx_unit_parse_store:nn { unit } {#2}
     }
   }
+  \cs_if_free:cTF { l_siunitx_ \token_to_str:N #1 _options_tl } {
+    \tl_new:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3}
+  }{
+    \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3}
+  }
 }
-\cs_set:Nn \siunitx_unit_get_first:n {
+\cs_set:Nn \siunitx_unit_first_token:n {
   \exp_after:wN \tl_head_i:w \token_to_str:N #1 \q_nil
 }
 %    \end{macrocode}
 %\end{macro} 
+%\end{macro}
+%
+%\begin{macro}{\per}
+% The \cs{per} macro does not generate any direct output but does
+% set up the appropriate flags.
+%    \begin{macrocode}
+\cs_new:cpn { siunitx_ \token_to_str:N \per _literal:w } { / }
+\cs_new:cpn { siunitx_ \token_to_str:N \per _function:w } {
+  %\bool_true:N ?????
+  % Something else?
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\raiseto}
+%\begin{macro}{\tothe}
+% The \cs{per} macro does not generate any direct output but does
+% set up the appropriate flags.
+%    \begin{macrocode}
+\cs_new:cpn { siunitx_ \token_to_str:N \raiseto _literal:w } #1#2 {
+  #2
+  \textsuperscript {#1}
+}
+\cs_new:cpn { siunitx_ \token_to_str:N \raiseto _function:w } #1 {
+    % \def\si@unit@parse@power@last{#2}%
+}
+\cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
+  \textsuperscript {#1}
+}
+\cs_new:cpn { siunitx_ \token_to_str:N \tothe _function:w } #1 {
+    % \def\si@unit@parse@power@current{#1}%
+    \siunitx_unit_parse_store:nn { power } { \tothe }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Creating body unit macros}
+%
+% The user might have asked for the unit macros to be available in the
+% document body. If so, then these are created at the start of the 
+% document body. 
+% 
+%\begin{macro}{\l_siunitx_create_free_bool}
+%\begin{macro}{\l_siunitx_create_overwrite_bool}
+%\begin{macro}{\l_siunitx_create_prespace_bool}
+%\begin{macro}{\l_siunitx_create_optional_bool}
+%\begin{macro}{\l_siunitx_create_xspace_bool}
+% There are a few options which control this behaviour.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  free-standing-units    .bool:N = \l_siunitx_create_free_bool,
+  overwrite-functions    .bool:N = \l_siunitx_create_overwrite_bool,
+  space-before-unit      .bool:N = \l_siunitx_create_prespace_bool,
+  unit-optional-argument .bool:N = \l_siunitx_create_optional_bool,
+  use-xspace             .bool:N = \l_siunitx_create_xspace_bool
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_create_check:}
+% The master control macro which occurs at the start of the document.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_create_check: {
+  \bool_if:NT \l_siunitx_create_free_bool {
+    \siunitx_create_functions:
+  }
+}
+\AtBeginDocument { \siunitx_create_check: }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_create_functions:}
+% Creation of macros essentially involves picking up a couple of loops.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_create_functions: {
+  \bool_if:NT \l_siunitx_create_overwrite_bool {
+    \tl_map_function:NN \l_siunitx_declare_list_tl \cs_gundefine:N
+  }
+  \bool_if:NTF \l_siunitx_create_optional_bool {
+    \tl_map_function:NN \l_siunitx_declare_list_tl 
+      \siunitx_create_with_arg:N
+  }{
+    \tl_map_function:NN \l_siunitx_declare_list_tl \siunitx_create:N
+  }
+  \bool_if:NT \l_siunitx_create_xspace_bool {
+    \RequirePackage { xspace }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_create:N}
+%\begin{macro}{\siunitx_create_with_arg:N}
+% The creation functions expand everything as far as possible so that
+% there is less to do in the document.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_create:N {
+  \cs_if_free:NT #1 {
+    \cs_set:Npx \siunitx_tmp:w {
+      \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { } {
+        \bool_if:NT \l_siunitx_create_prespace_bool {
+          \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
+        }
+        \exp_not:n { \si {#1} }
+        \bool_if:NT \l_siunitx_create_xspace_bool {
+          \exp_not:N \xspace
+        }
+      }
+    }
+    \siunitx_tmp:w
+  }
+}
+\cs_new_nopar:Nn \siunitx_create_with_arg:N {
+  \cs_if_free:NT #1 {
+    \cs_set:Npx \siunitx_tmp:w {
+      \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { o } {
+        \exp_not:N \IfNoValueTF {####1} {
+          \exp_not:n { \si {#1} }
+        }{
+          \bool_if:NT \l_siunitx_create_prespace_bool {
+            \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
+          }
+          \exp_not:N \SI {####1} { \exp_not:N #1 }
+        }
+        \bool_if:NT \l_siunitx_create_xspace_bool {
+          \exp_not:N \xspace
+        }
+      }
+    }
+    \siunitx_tmp:w
+  }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Symbols}
@@ -4583,21 +4797,32 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\DeclareSIPower}
 %\begin{macro}{\DeclareSIPrefix}
 %\begin{macro}{\DeclareSIQualifier}
-%\begin{macro}{\DeclareSIUnit}%
+%\begin{macro}{\DeclareSIUnit}
 % The macros for creating units and so on are in design name space.
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
 \DeclareDocumentCommand \DeclareSIPower { s m m } {
+  \IfNoValueTF {#1} {
+    \siunitx_declare_power_pre:Nn #2 {#3} 
+  }{
+    \siunitx_declare_power_post:Nn #2 {#3}
+  }
 }
 \DeclareDocumentCommand \DeclareSIPrefix { s m m m } {
+  \IfNoValueTF {#1} {
+    \siunitx_declare_prefix:Nnn #2 {#3} {#4}
+  }{
+    \siunitx_declare_prefix_binary:Nnn #2 {#3} {#4}
+  }
 }
-\DeclareDocumentCommand \DeclareSIQualifier { s m m m } {
+\DeclareDocumentCommand \DeclareSIQualifier { m m } {
+  \siunitx_declare_qualifier:Nn #1 {#2}
 }
 \DeclareDocumentCommand \DeclareSIUnit { o m m } {
   \IfNoValueTF {#1} {
-    \siunitx_unit_set:Nnn #2 {#3} { }
+    \siunitx_declare_unit:Nnn #2 {#3} { }
   }{
-    \siunitx_unit_set:Nnn #2 {#3} {#1}
+    \siunitx_declare_unit:Nnn #2 {#3} {#1}
   }
 }
 %    \end{macrocode}
