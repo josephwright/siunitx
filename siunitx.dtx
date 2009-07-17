@@ -4272,6 +4272,46 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\subsection{Creating unit macros}
+%
+% Unit macros and related support are created here. To avoid cluttering
+% up the user name-space with a lot of short macro names, the standard
+% method only makes these available inside the unit-processing functions
+% (\cs{SI}, \cs{si} and the \texttt{S} column).
+% 
+%\begin{macro}{\l_siunitx_unit_list_tl}
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_unit_list_tl
+%    \end{macrocode}
+%\end{macro} 
+% 
+%\begin{macro}{\siunitx_unit_set:nnn}
+%\begin{macro}[aux]{\siunitx_unit_get_first:n}
+% Creating units requires various things to be stored.  This is done
+% with several storage bins to keep the code clear.  For the 
+% \texttt{macro} definition, the test occurs at use so that there is no
+% problem with the creation order for units.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_set:Nnn {
+  \tl_put_right:Nn \l_siunitx_unit_list_tl {#1}
+  \cs_set:cn { siunitx_unit_literal_ \token_to_str:N #1 : } {#2}
+  \cs_set:cn { siunitx_unit_function_ \token_to_str:N #1 : } {
+    \cs_if_exist:cTF { 
+      siunitx_unit_function_ \siunitx_unit_get_first:n {#1} : 
+    } {
+      #2
+    }{
+      \siunitx_unit_parse_store:nn { unit } {#2}
+    }
+  }
+}
+\cs_set:Nn \siunitx_unit_get_first:n {
+  \exp_after:wN \tl_head_i:w \token_to_str:N #1 \q_nil
+}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -4554,7 +4594,10 @@ This work consists of the file  siunitx.dtx
 \DeclareDocumentCommand \DeclareSIQualifier { s m m m } {
 }
 \DeclareDocumentCommand \DeclareSIUnit { o m m } {
-  \IfNoValueF {#1} {
+  \IfNoValueTF {#1} {
+    \siunitx_unit_set:Nnn #2 {#3} { }
+  }{
+    \siunitx_unit_set:Nnn #2 {#3} {#1}
   }
 }
 %    \end{macrocode}
