@@ -934,7 +934,7 @@ This work consists of the file  siunitx.dtx
 % tokens used to determine if a number contains multiple parts.
 %\begin{LaTeXdemo}
 %  \num{1 x 2 x 3} \\
-%  \num{1e4 x 2(3) x 3} \\
+%  \num{1e4 x 2(3) x 3/4} \\
 %  \num[input-product=*]{4 * 5 * 6} \\
 %  \num{ 1 / 2e4 }
 %\end{LaTeXdemo}
@@ -1946,7 +1946,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_number_preprocess_init: {
   \bool_set_false:N \l_siunitx_error_bool
-  \tl_clear:N \l_siunitx_number_next_tl
   \tl_clear:N \l_siunitx_number_multi_tl
 }
 %    \end{macrocode}
@@ -4179,19 +4178,27 @@ This work consists of the file  siunitx.dtx
 % The outer level of number processing for actually printing things.
 % 
 %\begin{macro}{\l_siunitx_number_out_tl}
-%\begin{macro}{\l_siunitx_number_out_multi_tl}
-% The final result.
+%\begin{macro}{\l_siunitx_number_out_saved_tl}
+% The final result, plus a version for loops.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_number_out_tl
-\tl_new:N \l_siunitx_number_out_multi_tl
+\tl_new:N \l_siunitx_number_out_saved_tl
 %    \end{macrocode}
 %\end{macro} 
 %\end{macro} 
 %
-%\begin{macro}{\l_siunitx_number_part_bool}
-% To indicate that the current result is a sub-unit.
+%\begin{macro}{\l_siunitx_number_fraction_tl}
+% Fractions need to be build separately, so that there is no problem 
+% with stack order.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_number_part_bool
+\tl_new:N \l_siunitx_number_fraction_tl
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_compound_bool}
+% To help with brackets.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_number_compound_bool
 %    \end{macrocode}
 %\end{macro}
 %
@@ -4256,7 +4263,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_number_output:n {
   \bool_if:NTF \l_siunitx_number_parse_bool {
+    \tl_clear:N \l_siunitx_number_out_tl
+    \tl_clear:N \l_siunitx_number_out_saved_tl
+    \bool_set_false:N \l_siunitx_number_compound_bool
     \siunitx_number_output_parse:n {#1}
+    \siunitx_number_output_print:
   }{
     \siunitx_print:nn  { number } {#1}
   }
@@ -4264,153 +4275,200 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_output_parse:n} 
-%\begin{macro}[aux]{\siunitx_number_output_parse_aux:}
-% Most of the work is done here: is there sub-division to do.
+%\begin{macro}{\siunitx_number_output_bracket:}
+% Compound numbers may need brackets adding.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_number_output_parse:n {
-  \siunitx_number_preprocess:n {#1}
+\cs_new_nopar:Nn \siunitx_number_output_bracket: {
   \bool_if:NF \l_siunitx_error_bool {
-    \bool_set_false:N \l_siunitx_number_part_bool
-    \tl_if_empty:NTF \l_siunitx_number_multi_tl {
-      \siunitx_number_output_parse_aux:
-      \bool_if:NF \l_siunitx_error_bool {
-        \siunitx_print:nV  { number } \l_siunitx_number_out_tl
-      }
-    }{
-      \bool_if:cTF { 
-        l_siunitx_calculate_ \l_siunitx_number_multi_tl _bool
-      } {
-        \siunitx_number_calc:nN {#1} \l_siunitx_number_arg_tl
-        \siunitx_number_output_aux:
-        \bool_if:NF \l_siunitx_error_bool {
-          \siunitx_print:nV  { number } \l_siunitx_number_out_tl
-        }
-      }{
-        \use:c { siunitx_number_output_ \l_siunitx_number_multi_tl : }
-      }
-    }
-  }
-}
-%    \end{macrocode}
-% At this stage, the number to print is inside 
-% \cs{l_siunitx_number_arg_tl}. This is passed through by name, parsed
-% and post-processed before formatting.
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_number_output_parse_aux: {
-  \siunitx_number_in_parse:V \l_siunitx_number_arg_tl 
-  \bool_if:NF \l_siunitx_error_bool {
-    \siunitx_number_process:
-    \siunitx_number_format:
-    \bool_if:NT \l_siunitx_number_part_bool {
+    \bool_if:NT \l_siunitx_number_compound_bool {
       \siunitx_number_format_brackets:n { result }
     }
-    \prop_get:NnN \l_siunitx_number_out_prop { result } 
-      \l_siunitx_number_out_tl
-    \prop_if_in:NnT \l_siunitx_number_out_prop { colour } {
-      \prop_get:NnN \l_siunitx_number_out_prop { colour } 
-        \l_siunitx_number_colour_tl
-    }  
   }
 }
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_colour:}
+% If a colour needs to be set, it is recovered here and put into the
+% appropriate place.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_colour: {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { colour } {
+    \prop_get:NnN \l_siunitx_number_out_prop { colour } 
+      \l_siunitx_number_colour_tl
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_compound:n}
+%\begin{macro}{\siunitx_number_output_compound:V}
+% Two possible choices if \cs{l_siunitx_number_multi_tl} is not empty:
+% either it is set to \texttt{product} or \texttt{quotient}. 
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_compound:n {
+  \bool_if:cTF { l_siunitx_calculate_ #1 _bool } {
+    \siunitx_number_output_calculate:n {#1}
+  }{
+    \use:c { siunitx_number_output_ #1 : }
+  }
+}
+\cs_generate_variant:Nn \siunitx_number_output_compound:n { V }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_parse:n}
+%\begin{macro}{\siunitx_number_output_parse:V}
+% The parsing system just has to check if there are multiple parts to
+% worry about.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_number_output_parse:n {
+  \siunitx_number_preprocess:n {#1}
+  \bool_if:NF \l_siunitx_error_bool {
+    \tl_if_empty:NTF \l_siunitx_number_multi_tl {
+      \siunitx_number_output_single:
+    }{
+      \siunitx_number_output_compound:V \l_siunitx_number_multi_tl
+    }
+  }
+}
+\cs_generate_variant:Nn \siunitx_number_output_parse:n { V }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_print:}
+% The final stage: print.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_print: {
+  \bool_if:NF \l_siunitx_error_bool {
+    \tl_if_eq:nVF { quotient } \l_siunitx_number_multi_tl {
+      \tl_if_empty:NF \l_siunitx_number_out_saved_tl {
+        \tl_put_left:NV \l_siunitx_number_out_tl 
+          \l_siunitx_number_out_saved_tl
+      }
+    }
+    \siunitx_print:nV  { number } \l_siunitx_number_out_tl
+  }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_product:}
-%\begin{macro}{\siunitx_number_output_product_aux:}
-% For products, a loop and the addition of the appropriate symbol.
+% For a product, there could still be a quotient to worry about. So
+% first a second pass through the pre-processor.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_product: {
-  \tl_clear:N \l_siunitx_number_out_multi_tl
-  \bool_set_true:N \l_siunitx_number_part_bool
-  \siunitx_number_preprocess_quotient:
-  \tl_if_eq:nVTF { quotient } \l_siunitx_number_multi_tl {
-  }{  
-    \siunitx_number_output_product_aux:
-    \bool_if:NF \l_siunitx_error_bool {
-      \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
-    }
-  }
-}
-\cs_new_nopar:Nn \siunitx_number_output_product_aux: {
-  \siunitx_number_output_parse_aux:
+  \bool_set_true:N \l_siunitx_number_compound_bool
+  \siunitx_number_preprocess:V \l_siunitx_number_arg_tl
   \bool_if:NF \l_siunitx_error_bool {
-    \tl_put_right:NV \l_siunitx_number_out_multi_tl 
-      \l_siunitx_number_out_tl
-    \tl_if_empty:NF \l_siunitx_number_next_tl {
-      \tl_set_eq:NN \l_siunitx_tmpa_tl  \l_siunitx_output_product_tl
-      \bool_if:NT \l_siunitx_tight_bool {  
-        \tl_set:No \l_siunitx_tmpa_tl {
-          \exp_after:wN { \l_siunitx_tmpa_tl }
-        }
-      }
-      \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_multi_tl
-        \l_siunitx_tmpa_tl
-      \siunitx_number_preprocess:V \l_siunitx_number_next_tl
-      \siunitx_number_output_product_aux:
+    \tl_if_empty:NTF \l_siunitx_number_multi_tl {
+      \tl_set_eq:NN \l_siunitx_number_out_saved_tl 
+        \l_siunitx_number_out_tl
+      \siunitx_number_output_single:
+      \tl_put_left:NV \l_siunitx_number_out_tl
+        \l_siunitx_number_out_saved_tl
+    }{
+      \siunitx_number_output_compound:n { quotient }
     }
   }
+  \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_tl 
+    \l_siunitx_output_product_tl
+  \tl_set_eq:NN \l_siunitx_number_out_saved_tl \l_siunitx_number_out_tl
+  \siunitx_number_output_parse:V \l_siunitx_number_next_tl
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_quotient:}
-% The code is subtly dependent on the type of output: this is to allow
-% proper bracketing for in-line output.
+% For quotients, there are two options.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient: {
   \use:c { 
     siunitx_number_output_quotient_ \l_siunitx_quotient_mode_tl : 
   }
-  \siunitx_print:nV { number } \l_siunitx_number_out_multi_tl
 }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_number_output_quotient_fraction:}
-%\begin{macro}{\siunitx_number_output_quotient_symbol:}
-% The two output modes are pretty obvious: move things about then print.
+% For fraction output, there are quite a lot of braces to construct,
+% unfortunately.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient_fraction: {
-  \siunitx_number_output_quotient_aux:
-  \tl_set:No \l_siunitx_tmpa_tl {
+  \bool_set_false:N \l_siunitx_number_compound_bool
+  \siunitx_number_output_quotient_aux_i:
+  \tl_set:No \l_siunitx_number_fraction_tl {
     \exp_after:wN { \l_siunitx_number_numerator_tl }
   }
-  \tl_set:No \l_siunitx_tmpb_tl {
+  \tl_set:No \l_siunitx_tmpa_tl {
     \exp_after:wN { \l_siunitx_number_denominator_tl }
   }
-  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-  \tl_put_left:Nn \l_siunitx_tmpa_tl { \frac } 
-  \tl_set:No \l_siunitx_number_out_multi_tl {
-    \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_tmpa_tl }
+  \tl_put_right:NV \l_siunitx_number_fraction_tl \l_siunitx_tmpa_tl
+  \tl_put_left:Nn \l_siunitx_number_fraction_tl { \frac } 
+  \tl_set:No \l_siunitx_number_fraction_tl {
+    \exp_after:wN \ensuremath \exp_after:wN { 
+      \l_siunitx_number_fraction_tl 
+    }
   }
+  \tl_put_right:NV \l_siunitx_number_out_tl 
+    \l_siunitx_number_fraction_tl
 }
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_output_quotient_symbol:}
+% If a symbol is used for the division, the build process is less 
+% complex.
+%    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient_symbol: {
-  \bool_set_true:N \l_siunitx_number_part_bool
-  \siunitx_number_output_quotient_aux:
-  \cs_set_eq:NN \l_siunitx_number_out_multi_tl 
+  \bool_set_true:N \l_siunitx_number_compound_bool
+  \siunitx_number_output_quotient_aux_i:
+  \tl_put_right:NV \l_siunitx_number_out_tl 
     \l_siunitx_number_numerator_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_multi_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_tl
     \l_siunitx_output_quotient_tl
-  \tl_put_right:NV \l_siunitx_number_out_multi_tl 
+  \tl_put_right:NV \l_siunitx_number_out_tl 
     \l_siunitx_number_denominator_tl 
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_number_output_quotient_aux:}
-% Some shuffling.
+%\begin{macro}[aux]{\siunitx_number_output_quotient_aux_i:}
+%\begin{macro}[aux]{\siunitx_number_output_quotient_aux_ii:}
+% The two parts of the number are parsed and formatted.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_number_output_quotient_aux: {
-  \cs_set_eq:NN \l_siunitx_number_arg_tl \l_siunitx_number_numerator_tl
-  \siunitx_number_output_parse_aux:
-  \cs_set_eq:NN \l_siunitx_number_numerator_tl \l_siunitx_number_out_tl
-  \cs_set_eq:NN \l_siunitx_number_arg_tl 
-    \l_siunitx_number_denominator_tl
-  \siunitx_number_output_parse_aux:
-  \cs_set_eq:NN \l_siunitx_number_denominator_tl 
-    \l_siunitx_number_out_tl
+\cs_new_nopar:Nn \siunitx_number_output_quotient_aux_i: {
+  \siunitx_number_in_parse:V \l_siunitx_number_numerator_tl
+  \siunitx_number_output_quotient_aux_ii:
+  \siunitx_number_output_colour:
+  \prop_get:NnN \l_siunitx_number_out_prop { result }
+    \l_siunitx_number_numerator_tl 
+  \siunitx_number_in_parse:V \l_siunitx_number_denominator_tl
+  \siunitx_number_output_quotient_aux_ii:
+  \prop_get:NnN \l_siunitx_number_out_prop { result }
+    \l_siunitx_number_denominator_tl    
+}
+\cs_new_nopar:Nn \siunitx_number_output_quotient_aux_ii: {
+  \siunitx_number_process:
+  \siunitx_number_format:
+  \siunitx_number_output_bracket:
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_output_single:}
+% Printing a number with no multiple parts is easy.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_single: {
+  \siunitx_number_in_parse:V \l_siunitx_number_arg_tl 
+  \bool_if:NF \l_siunitx_error_bool {
+    \siunitx_number_process:
+    \siunitx_number_format:
+    \siunitx_number_output_colour:
+    \siunitx_number_output_bracket:
+    \prop_get:NnN \l_siunitx_number_out_prop { result } 
+      \l_siunitx_number_out_tl
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4932,8 +4990,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\subsection{Final unit output}
-%
-
 %
 %\subsection{Symbols}
 %
