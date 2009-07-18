@@ -918,12 +918,12 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      calculate-product  & Switch & false       \\
-%      calculate-quotient & Switch & false       \\
 %      input-product      & Literal & x          \\
 %      input-quotient     & Literal & /          \\
 %      output-product     & Maths   & \cs{times} \\
-%      quotient           & Choice  & slash      \\
+%      output-quotient    & Maths   & /          \\
+%      product-mode       & Choice  & symbol     \\
+%      quotient-mode      & Choice  & symbol     \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -939,24 +939,23 @@ This work consists of the file  siunitx.dtx
 %  \num{ 1 / 2e4 }
 %\end{LaTeXdemo}
 %\DescribeOption{output-product}
-% The symbol used for printing products is stored in 
-% \opt{output-product}: typically \cs{times} is used but other options
-% are of course possible.
+%\DescribeOption{output-quotient}
+% The symbols used for printing products and quotients are stored using
+% the options \opt{output-product} and \opt{output-quotient}.
 %\begin{LaTeXdemo}
-%  \num[
-%    input-product  = *,
-%    output-product = \cdot 
-%  ]{4 * 5 * 6} \\
+%  \num[output-product = \cdot]{4.87 x 5.321 x 6.90545} \\
+%  \num[output-quotient = \text{ div }]{1 / 2}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{quotient}
+%\DescribeOption{product-mode}
+%\DescribeOption{quotient-mode}
 % For quotients, there is the possibility to print output either using
 % a slash, or using the \cs{frac} macro. This is controlled by the 
 % \opt{quotient} choice option, which takes values \opt{slash} and
 % \opt{fraction}.
 %\begin{LaTeXdemo}
-%  \num[quotient = slash]{ 1 / 2e4 } \\
-%  \num[quotient = fraction]{ 1 / 2e4 }
+%  \num{1 / 2e4} \\
+%  \num[quotient-mode = fraction]{1 / 2e4}
 %\end{LaTeXdemo}
 %
 %\end{documentation}
@@ -1933,7 +1932,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_preprocess_init:
   \tl_set:Nn \l_siunitx_number_arg_tl {#1}
   \siunitx_number_preprocess_product:
-  \siunitx_number_preprocess_quotient:
+  \tl_if_empty:NT \l_siunitx_number_multi_tl {
+    \siunitx_number_preprocess_quotient:
+  }
 }
 \cs_generate_variant:Nn \siunitx_number_preprocess:n { V }
 %    \end{macrocode}
@@ -4194,37 +4195,57 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_quotient_tl}
+%\begin{macro}{\l_siunitx_quotient_mode_tl}
 % The action for quotients is stored as a token list variable.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_quotient_tl
+\tl_new:N \l_siunitx_quotient_mode_tl
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_calculate_product_bool}
+%\begin{macro}{\l_siunitx_calculate_quotient_bool}
+% Calculation mode needs some flags creating.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_calculate_product_bool
+\bool_new:N \l_siunitx_calculate_quotient_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 % 
-%\begin{macro}{\l_siunitx_calc_product_bool}
-%\begin{macro}{\l_siunitx_calc_quotient_bool}
 %\begin{macro}{\l_siunitx_output_product_tl}
+%\begin{macro}{\l_siunitx_output_quotient_tl}
 %\begin{macro}{\l_siunix_number_parse_bool}
 % Some options related to numbers at the output stage.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  calculate-product  .bool:N    = \l_siunitx_calc_product_bool,
-  calculate-quotient .bool:N    = \l_siunitx_calc_quotient_bool,
   output-product     .set:N     = \l_siunitx_output_product_tl,
   output-product     .initial:n = { \times },
-  parse-numbers      .bool:N    = \l_siunix_number_parse_bool,
+  output-quotient    .set:N     = \l_siunitx_output_quotient_tl,
+  output-quotient    .initial:n = { / },
+  parse-numbers      .bool:N    = \l_siunitx_number_parse_bool,
   parse-numbers      .initial:n = { true },
-  quotient           .choice:,
-  quotient / fraction .code:n = {
-    \tl_set:Nn \l_siunitx_quotient_tl { fraction }
+  product-mode       .choice:,
+  product-mode / calculate .code:n = {
+    \bool_set_true:N \l_siunitx_calculate_product_bool
   },
-  quotient / slash .code:n = {
-    \tl_set:Nn \l_siunitx_quotient_tl { slash }
+  product-mode / symbol .code:n = {
+    \bool_set_false:N \l_siunitx_calculate_product_bool
   },
-  quotient           .initial:n = { slash }
+  quotient-mode      .choice:,
+  quotient-mode / calculate .code:n = {
+    \bool_set_true:N \l_siunitx_calculate_quotient_bool
+  },  
+  quotient-mode / fraction .code:n = {
+    \bool_set_false:N \l_siunitx_calculate_quotient_bool
+    \tl_set:Nn \l_siunitx_quotient_mode_tl { fraction }
+  },  
+  quotient-mode / symbol .code:n = {
+    \bool_set_false:N \l_siunitx_calculate_quotient_bool
+    \tl_set:Nn \l_siunitx_quotient_mode_tl { symbol }
+  },
+  quotient-mode      .initial:n = { symbol }
 }
 %    \end{macrocode} 
-%\end{macro} 
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -4234,7 +4255,7 @@ This work consists of the file  siunitx.dtx
 % check if there are multiple parts.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_number_output:n {
-  \bool_if:NTF \l_siunix_number_parse_bool {
+  \bool_if:NTF \l_siunitx_number_parse_bool {
     \siunitx_number_output_parse:n {#1}
   }{
     \siunitx_print:nn  { number } {#1}
@@ -4258,7 +4279,7 @@ This work consists of the file  siunitx.dtx
       }
     }{
       \bool_if:cTF { 
-        l_siunitx_calc_ \l_siunitx_number_multi_tl _bool
+        l_siunitx_calculate_ \l_siunitx_number_multi_tl _bool
       } {
         \siunitx_number_calc:nN {#1} \l_siunitx_number_arg_tl
         \siunitx_number_output_aux:
@@ -4303,9 +4324,13 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_output_product: {
   \tl_clear:N \l_siunitx_number_out_multi_tl
   \bool_set_true:N \l_siunitx_number_part_bool
-  \siunitx_number_output_product_aux:
-  \bool_if:NF \l_siunitx_error_bool {
-    \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
+  \siunitx_number_preprocess_quotient:
+  \tl_if_eq:nVTF { quotient } \l_siunitx_number_multi_tl {
+  }{  
+    \siunitx_number_output_product_aux:
+    \bool_if:NF \l_siunitx_error_bool {
+      \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
+    }
   }
 }
 \cs_new_nopar:Nn \siunitx_number_output_product_aux: {
@@ -4336,12 +4361,15 @@ This work consists of the file  siunitx.dtx
 % proper bracketing for in-line output.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient: {
-  \use:c { siunitx_number_output_quotient_ \l_siunitx_quotient_tl : }
+  \use:c { 
+    siunitx_number_output_quotient_ \l_siunitx_quotient_mode_tl : 
+  }
+  \siunitx_print:nV { number } \l_siunitx_number_out_multi_tl
 }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_number_output_quotient_fraction:}
-%\begin{macro}{\siunitx_number_output_quotient_slash:}
+%\begin{macro}{\siunitx_number_output_quotient_symbol:}
 % The two output modes are pretty obvious: move things about then print.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient_fraction: {
@@ -4357,17 +4385,16 @@ This work consists of the file  siunitx.dtx
   \tl_set:No \l_siunitx_number_out_multi_tl {
     \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_tmpa_tl }
   }
-  \siunitx_print:nV { number } \l_siunitx_number_out_multi_tl
 }
-\cs_new_nopar:Nn \siunitx_number_output_quotient_slash: {
+\cs_new_nopar:Nn \siunitx_number_output_quotient_symbol: {
   \bool_set_true:N \l_siunitx_number_part_bool
   \siunitx_number_output_quotient_aux:
   \cs_set_eq:NN \l_siunitx_number_out_multi_tl 
     \l_siunitx_number_numerator_tl
-  \siunitx_tl_put_right_maths:Nn \l_siunitx_number_out_multi_tl { / }
+  \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_multi_tl
+    \l_siunitx_output_quotient_tl
   \tl_put_right:NV \l_siunitx_number_out_multi_tl 
     \l_siunitx_number_denominator_tl 
-  \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
 }
 %    \end{macrocode}
 %\end{macro}
