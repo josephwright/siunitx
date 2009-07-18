@@ -923,6 +923,7 @@ This work consists of the file  siunitx.dtx
 %      input-product      & Literal & x          \\
 %      input-quotient     & Literal & /          \\
 %      output-product     & Maths   & \cs{times} \\
+%      quotient           & Choice  & slash      \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -936,6 +937,26 @@ This work consists of the file  siunitx.dtx
 %  \num{1e4 x 2(3) x 3} \\
 %  \num[input-product=*]{4 * 5 * 6} \\
 %  \num{ 1 / 2e4 }
+%\end{LaTeXdemo}
+%\DescribeOption{output-product}
+% The symbol used for printing products is stored in 
+% \opt{output-product}: typically \cs{times} is used but other options
+% are of course possible.
+%\begin{LaTeXdemo}
+%  \num[
+%    input-product  = *,
+%    output-product = \cdot 
+%  ]{4 * 5 * 6} \\
+%\end{LaTeXdemo}
+%
+%\DescribeOption{quotient}
+% For quotients, there is the possibility to print output either using
+% a slash, or using the \cs{frac} macro. This is controlled by the 
+% \opt{quotient} choice option, which takes values \opt{slash} and
+% \opt{fraction}.
+%\begin{LaTeXdemo}
+%  \num[quotient = slash]{ 1 / 2e4 } \\
+%  \num[quotient = fraction]{ 1 / 2e4 }
 %\end{LaTeXdemo}
 %
 %\end{documentation}
@@ -1099,6 +1120,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_tl_put_left_maths:NV}
 %\begin{macro}{\siunitx_tl_put_right_maths:Nn}
 %\begin{macro}{\siunitx_tl_put_right_maths:NV}
+%\begin{macro}{\siunitx_tl_put_right_maths:cV}
 % To add stuff in maths mode.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_tl_put_left_maths:Nn {
@@ -1108,10 +1130,49 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_tl_put_right_maths:Nn {
   \tl_put_right:Nn #1 { \ensuremath {#2} }
 }
-\cs_generate_variant:Nn \siunitx_tl_put_right_maths:Nn { NV }
+\cs_generate_variant:Nn \siunitx_tl_put_right_maths:Nn { NV, cV }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_option_deactivate_clist}
+%\begin{macro}{\siunitx_option_deactivate:n}
+%\begin{macro}{\siunitx_options_deactivate:}
+%\begin{macro}[aux]{\siunitx_option_deactivate_aux:n}
+% Some options need to be deactivated at the start of the document.
+%    \begin{macrocode}
+\clist_new:N \l_siunitx_option_deactivate_clist
+\cs_new_nopar:Nn \siunitx_option_deactivate:n {
+  \clist_put_right:Nn \l_siunitx_option_deactivate_clist {#1}
+}
+\cs_new_nopar:Nn \siunitx_options_deactivate: {
+  \clist_map_function:NN \l_siunitx_option_deactivate_clist
+    \siunitx_options_deactivate_aux:n
+}
+\cs_new_nopar:Nn \siunitx_options_deactivate_aux:n {
+  \keys_define:nn { siunitx } {
+    #1 .code:n = { 
+      \msg_warning:nnx { siunitx } { option-preamble-only } {#1} 
+    }
+  }
+}
+\AtBeginDocument { \siunitx_options_deactivate: }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\tl_put_right:cv}
+%\begin{macro}{\tl_if_eq:nvTF}
+% Variants needed which are not in \pkg{expl3}.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \tl_put_right:Nn { cv }
+\cs_generate_variant:Nn \tl_if_eq:nnTF { nv }
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
@@ -4132,6 +4193,13 @@ This work consists of the file  siunitx.dtx
 \bool_new:N \l_siunitx_number_part_bool
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_quotient_tl}
+% The action for quotients is stored as a token list variable.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_quotient_tl
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_calc_product_bool}
 %\begin{macro}{\l_siunitx_calc_quotient_bool}
@@ -4145,7 +4213,15 @@ This work consists of the file  siunitx.dtx
   output-product     .set:N     = \l_siunitx_output_product_tl,
   output-product     .initial:n = { \times },
   parse-numbers      .bool:N    = \l_siunix_number_parse_bool,
-  parse-numbers      .initial:n = { true }
+  parse-numbers      .initial:n = { true },
+  quotient           .choice:,
+  quotient / fraction .code:n = {
+    \tl_set:Nn \l_siunitx_quotient_tl { fraction }
+  },
+  quotient / slash .code:n = {
+    \tl_set:Nn \l_siunitx_quotient_tl { slash }
+  },
+  quotient           .initial:n = { slash }
 }
 %    \end{macrocode} 
 %\end{macro} 
@@ -4256,21 +4332,58 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_quotient:}
+% The code is subtly dependent on the type of output: this is to allow
+% proper bracketing for in-line output.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_output_quotient: {
+  \use:c { siunitx_number_output_quotient_ \l_siunitx_quotient_tl : }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_output_quotient_fraction:}
+%\begin{macro}{\siunitx_number_output_quotient_slash:}
+% The two output modes are pretty obvious: move things about then print.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_quotient_fraction: {
+  \siunitx_number_output_quotient_aux:
+  \tl_set:No \l_siunitx_tmpa_tl {
+    \exp_after:wN { \l_siunitx_number_numerator_tl }
+  }
+  \tl_set:No \l_siunitx_tmpb_tl {
+    \exp_after:wN { \l_siunitx_number_denominator_tl }
+  }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  \tl_put_left:Nn \l_siunitx_tmpa_tl { \frac } 
+  \tl_set:No \l_siunitx_number_out_multi_tl {
+    \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_tmpa_tl }
+  }
+  \siunitx_print:nV { number } \l_siunitx_number_out_multi_tl
+}
+\cs_new_nopar:Nn \siunitx_number_output_quotient_slash: {
   \bool_set_true:N \l_siunitx_number_part_bool
+  \siunitx_number_output_quotient_aux:
+  \cs_set_eq:NN \l_siunitx_number_out_multi_tl 
+    \l_siunitx_number_numerator_tl
+  \siunitx_tl_put_right_maths:Nn \l_siunitx_number_out_multi_tl { / }
+  \tl_put_right:NV \l_siunitx_number_out_multi_tl 
+    \l_siunitx_number_denominator_tl 
+  \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_number_output_quotient_aux:}
+% Some shuffling.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_number_output_quotient_aux: {
   \cs_set_eq:NN \l_siunitx_number_arg_tl \l_siunitx_number_numerator_tl
   \siunitx_number_output_parse_aux:
-  \cs_set_eq:NN \l_siunitx_number_out_multi_tl \l_siunitx_number_out_tl
-  \siunitx_tl_put_right_maths:Nn \l_siunitx_number_out_multi_tl { / }
+  \cs_set_eq:NN \l_siunitx_number_numerator_tl \l_siunitx_number_out_tl
   \cs_set_eq:NN \l_siunitx_number_arg_tl 
     \l_siunitx_number_denominator_tl
   \siunitx_number_output_parse_aux:
-  \tl_put_right:NV \l_siunitx_number_out_multi_tl 
+  \cs_set_eq:NN \l_siunitx_number_denominator_tl 
     \l_siunitx_number_out_tl
-  \bool_if:NF \l_siunitx_error_bool {
-    \siunitx_print:nV  { number } \l_siunitx_number_out_multi_tl
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4300,9 +4413,9 @@ This work consists of the file  siunitx.dtx
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
     \textsuperscript {#2}
   }
-  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
     % \def\si@unit@parse@power@current{#2}%
-    \siunitx_unit_parse_store:nn { power } {#2}
+    \siunitx_unit_parse_store_power:n {#2}
   }
 }
 \cs_new:Nn \siunitx_declare_power_pre:Nn {
@@ -4310,7 +4423,7 @@ This work consists of the file  siunitx.dtx
   \cs_set:cpn ##1 { siunitx_ \token_to_str:N #1 _literal:w } {
     ##1 \textsuperscript {#2}
   }
-  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
     % \def\si@unit@parse@power@last{#2}%
   }
 }
@@ -4325,8 +4438,8 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_declare_prefix:Nnn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_store:nn { prefix } {#2}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
+    \siunitx_unit_parse_store_prefix:n {#2}
   }
   \cs_if_free:cT { l_siunitx_ \token_to_str:N #1 _int } {
     \int_new:c { l_siunitx_ \token_to_str:N #1 _int }
@@ -4348,8 +4461,8 @@ This work consists of the file  siunitx.dtx
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
     \text { ~ } ( #2 ) 
   }
-  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_store:nn { qualifier } {#2}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
+    \siunitx_unit_parse_store_qualifier:n {#2}
   }
 }
 %    \end{macrocode}
@@ -4365,13 +4478,13 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_declare_unit:Nnn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cn { siunitx_ \token_to_str:N #1 _function:w } {
-    \cs_if_exist:cTF { 
-      siunitx_ \siunitx_unit_first_token:n {#1} _function:w
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
+    \cs_if_exist:cTF {
+      siunitx_ \siunitx_unit_first_token:n {#2} _function:w
     } {
       #2
     }{
-      \siunitx_unit_parse_store:nn { unit } {#2}
+      \siunitx_unit_parse_unit:n {#2}
     }
   }
   \cs_if_free:cTF { l_siunitx_ \token_to_str:N #1 _options_tl } {
@@ -4381,7 +4494,7 @@ This work consists of the file  siunitx.dtx
   }
 }
 \cs_set:Nn \siunitx_unit_first_token:n {
-  \exp_after:wN \tl_head_i:w \token_to_str:N #1 \q_nil
+  \exp_after:wN \token_to_str:N \tl_head_i:w #1 \q_nil
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -4416,7 +4529,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _function:w } #1 {
     % \def\si@unit@parse@power@current{#1}%
-    \siunitx_unit_parse_store:nn { power } { \tothe }
+    \siunitx_unit_parse_store_power:n { \tothe }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4433,7 +4546,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_create_prespace_bool}
 %\begin{macro}{\l_siunitx_create_optional_bool}
 %\begin{macro}{\l_siunitx_create_xspace_bool}
-% There are a few options which control this behaviour.
+% There are a few options which control this behaviour: these are all
+% preamble-only.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   free-standing-units    .bool:N = \l_siunitx_create_free_bool,
@@ -4442,6 +4556,13 @@ This work consists of the file  siunitx.dtx
   unit-optional-argument .bool:N = \l_siunitx_create_optional_bool,
   use-xspace             .bool:N = \l_siunitx_create_xspace_bool
 }
+\siunitx_option_deactivate:n {
+  free-standing-units, 
+  overwrite-functions,
+  space-before-unit,
+  unit-optional-argument,
+  use-xspace
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -4449,30 +4570,31 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro} 
 %
-%\begin{macro}{\siunitx_create_check:}
+%\begin{macro}{\siunitx_unit_create_check:}
 % The master control macro which occurs at the start of the document.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_create_check: {
+\cs_new_nopar:Nn \siunitx_unit_create_check: {
   \bool_if:NT \l_siunitx_create_free_bool {
-    \siunitx_create_functions:
+    \siunitx_unit_create_functions:
   }
 }
-\AtBeginDocument { \siunitx_create_check: }
+\AtBeginDocument { \siunitx_unit_create_check: }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_create_functions:}
+%\begin{macro}{\siunitx_unit_create_functions:}
 % Creation of macros essentially involves picking up a couple of loops.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_create_functions: {
+\cs_new_nopar:Nn \siunitx_unit_create_functions: {
   \bool_if:NT \l_siunitx_create_overwrite_bool {
     \tl_map_function:NN \l_siunitx_declare_list_tl \cs_gundefine:N
   }
   \bool_if:NTF \l_siunitx_create_optional_bool {
     \tl_map_function:NN \l_siunitx_declare_list_tl 
-      \siunitx_create_with_arg:N
+      \siunitx_unit_create_with_arg:N
   }{
-    \tl_map_function:NN \l_siunitx_declare_list_tl \siunitx_create:N
+    \tl_map_function:NN \l_siunitx_declare_list_tl 
+      \siunitx_unit_create:N
   }
   \bool_if:NT \l_siunitx_create_xspace_bool {
     \RequirePackage { xspace }
@@ -4481,19 +4603,19 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_create:N}
-%\begin{macro}{\siunitx_create_with_arg:N}
+%\begin{macro}{\siunitx_unit_create:N}
+%\begin{macro}{\siunitx_unit_create_with_arg:N}
 % The creation functions expand everything as far as possible so that
 % there is less to do in the document.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_create:N {
+\cs_new_nopar:Nn \siunitx_unit_create:N {
   \cs_if_free:NT #1 {
     \cs_set:Npx \siunitx_tmp:w {
       \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { } {
         \bool_if:NT \l_siunitx_create_prespace_bool {
           \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
         }
-        \exp_not:n { \si {#1} }
+        \exp_not:n { \siunitx_unit_in:nn {#1} { } }
         \bool_if:NT \l_siunitx_create_xspace_bool {
           \exp_not:N \xspace
         }
@@ -4502,12 +4624,12 @@ This work consists of the file  siunitx.dtx
     \siunitx_tmp:w
   }
 }
-\cs_new_nopar:Nn \siunitx_create_with_arg:N {
+\cs_new_nopar:Nn \siunitx_unit_create_with_arg:N {
   \cs_if_free:NT #1 {
     \cs_set:Npx \siunitx_tmp:w {
       \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { o } {
         \exp_not:N \IfNoValueTF {####1} {
-          \exp_not:n { \si {#1} }
+          \exp_not:n { \siunitx_unit_in:nn {#1} { } }
         }{
           \bool_if:NT \l_siunitx_create_prespace_bool {
             \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
@@ -4525,6 +4647,266 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+%\subsection{Initial unit processing}
+%
+% The unit processor has to convert the input (which may be all macros
+% or may contain literal input) into formatted text for output.  The 
+% input part of the process is used to sort out parsed or literal units.
+%
+%\begin{macro}{\l_siunitx_unit_allow_literal_bool}
+% One option is related to how units are pre-processed.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  allow-literal-units .bool:N    = \l_siunitx_unit_allow_literal_bool,
+  allow-literal-units .initial:n =  { true }
+}
+%    \end{macrocode}
+%\end{macro}  
+% 
+%\begin{macro}{\siunitx_unit_in:nn}
+%\begin{macro}{\siunitx_unit_in:Vn}
+% The master function does a very simple checks then hands off.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_in:nn {
+  \siunitx_unit_if_literal:nTF {#1} {
+    \bool_if:NTF \l_siunitx_unit_allow_literal_bool {
+      \siunitx_unit_literal:n {#1}
+    }{
+      \msg_error:nnx { siunitx } { literal-unit } {#1}
+    }
+  }{
+    \siunitx_unit_parse:nn {#1} {#2}
+  }
+}
+\cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_if_literal:nTF}
+%\begin{macro}[aux]{\siunitx_unit_if_literal_aux:N}
+% A test is needed to see if the input only contains unit macros. This 
+% is done by altering setting all of the unit macros to expand to 
+% nothing at all. Thus there will only be anything left if there is
+% a literal in the unit.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_if_literal:nTF {
+  \group_begin:
+    \tl_map_function:NN \l_siunitx_declare_list_tl
+      \siunitx_unit_if_literal_aux:N
+    \cs_set_eq:NN \raiseto \use_none:n
+    \cs_set_eq:NN \tothe \use_none:n
+    \protected@edef \l_siunitx_tmpa_tl {#1}
+  \exp_args:NNNV \group_end:
+  \tl_set:Nn \l_siunitx_tmpa_tl \l_siunitx_tmpa_tl
+  \tl_if_empty:NTF \l_siunitx_tmpa_tl {#3} {#2}
+}
+\cs_new_nopar:Nn \siunitx_unit_if_literal_aux:N {
+  \cs_set_eq:NN #1 \prg_do_nothing:
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Parsing macro units}
+%
+% For macro-based units, the macros are converted into literal text,
+% which is then passed on for printing.
+%
+%\begin{macro}{\l_siunitx_stack_tl}
+% Which part of the output is currently in use.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_stack_tl
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_fraction_stack_int}
+%\begin{macro}{\l_siunitx_main_stack_int}
+% Used to count the units in the two stacks.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_fraction_stack_int
+\int_new:N \l_siunitx_main_stack_int
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_fraction_last_tl}
+%\begin{macro}{\l_siunitx_main_last_tl}
+% The last item onto each stack is recorded by type.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_fraction_last_tl
+\tl_new:N \l_siunitx_main_last_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_fraction_current_tl}
+%\begin{macro}{\l_siunitx_fraction_earlier_tl}
+%\begin{macro}{\l_siunitx_main_current_tl}
+%\begin{macro}{\l_siunitx_main_earlier_tl}
+% The stacks themselves.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_fraction_current_tl
+\tl_new:N \l_siunitx_fraction_earlier_tl
+\tl_new:N \l_siunitx_main_current_tl
+\tl_new:N \l_siunitx_main_earlier_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+% 
+%\begin{macro}{\l_siunitx_unit_separator_tl}
+%\begin{macro}{\l_siunitx_number_unit_separator_tl}
+%\begin{macro}{\l_siunitx_sticky_per_bool}
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  inter-unit-separator  .set:N     = \l_siunitx_unit_separator_tl,
+  inter-unit-separator  .initial:n = { \, },
+  qualifier-format      .choice:,
+  qualifier-format / brackets .code:n = {
+  },
+  qualifier-format / space .code:n = {
+  },
+  qualifier-format / subscript .code:n = {
+  },
+  number-unit-separator .set:N     = 
+    \l_siunitx_number_unit_separator_tl,
+  sticky-per            .bool:N    = \l_siunitx_sticky_per_bool,
+}
+%    \end{macrocode} 
+%\end{macro} 
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_unit_parse:nn}
+% Parsing units is quite easy, the only trick being to add an extra
+% `unit' at the end to deal with the remaining powers.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse:nn {
+  \siunitx_unit_parse_init:
+  \siunitx_unit_parse_options:nn {#1} {#2}
+  % \si@unit@out@sep@print
+  #1
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_add:n}
+% Items are added to the `current' list, with the move to the `earlier'
+% list coming later.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_add:n {
+  \tl_put_right:cn { l_siunitx_ \l_siunitx_stack_tl _current_tl } {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_block_new:n}
+% Creating a new block means moving the data from the current block to
+% the queue, adding a space at the start of the current block and then
+% adding data to the new block. A check is needed so that the first 
+% block does not gain a space.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_block_new:n {
+  \siunitx_unit_parse_block_transfer:
+  \tl_set:cn { l_siunitx_ \l_siunitx_stack_tl _current_tl } {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_unit_parse_block_transfer:}
+% Some functions for transferring content from the current block to the
+% queue. An inter-block separator is added only if there is something 
+% for it to follow.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_block_transfer: {
+  \tl_if_empty:cF { l_siunitx_ \l_siunitx_stack_tl _earlier_tl } {
+    \siunitx_tl_put_right_maths:cV 
+      { l_siunitx_ \l_siunitx_stack_tl _current_tl }
+      \l_siunitx_unit_separator_tl
+  }
+  \tl_put_right:cv { l_siunitx_ \l_siunitx_stack_tl _earlier_tl } 
+    { l_siunitx_ \l_siunitx_stack_tl _current_tl }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_if_last:nTF}
+% Checks on the last addition are stack dependent.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_unit_parse_if_last:nTF #1 {
+  \tl_if_eq:nvTF {#1} { l_siunitx_ \l_siunitx_stack_tl _last_tl }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_init:}
+%\begin{macro}[aux]{\siunitx_unit_parse_init_aux:N}
+% Initialisation starts by making all of the unit macros active. Markers
+% are then added to prevent spaces being added accidentally to material
+% at the start of a unit.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_init: {
+  \tl_map_function:NN \l_siunitx_declare_list_tl 
+    \siunitx_unit_parse_init_aux:N
+  \int_zero:N \l_siunitx_fraction_stack_int
+  \int_zero:N \l_siunitx_main_stack_int
+  \tl_clear:N \l_siunitx_fraction_current_tl
+  \tl_clear:N \l_siunitx_fraction_earlier_tl
+  \tl_clear:N \l_siunitx_main_current_tl
+  \tl_clear:N \l_siunitx_main_earlier_tl
+  \tl_set:Nn \l_siunitx_fraction_last_tl { start }
+  \tl_set:Nn \l_siunitx_main_last_tl { start }
+  \tl_set:Nn \l_siunitx_stack_tl { main }
+}
+\cs_new_nopar:Nn \siunitx_unit_parse_init_aux:N {
+  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_options:n}
+% Any unit-specific options are loaded, followed by re-applying any
+% options given for this particular macro. The second call to 
+% \cs{keys_set:nn}  is needed to allow the local overriding of settings.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_options:nn {
+  \keys_set:nv { siunitx } 
+    { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
+  \keys_set:nn { siunitx } {#2}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%
+%\begin{macro}{\siunitx_unit_parse_set_last:n}
+% To save the type of the last item saved.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_set_last:n {
+  \tl_set:cn { l_siunitx_ \l_siunitx_stack_tl _last_tl } {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_unit:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_unit:n {
+  \int_incr:c { l_siunitx_ \l_siunitx_stack_tl _stack_int }
+  \siunitx_unit_parse_if_last:nTF { prefix } {
+    \siunitx_unit_parse_add:n {#1}
+  }{
+    \siunitx_unit_parse_block_new:n {#1}
+  }
+  \siunitx_unit_parse_set_last:n { unit }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Final unit output}
+%
+
 %
 %\subsection{Symbols}
 %
@@ -4754,6 +5136,12 @@ This work consists of the file  siunitx.dtx
   \msg_space: \msg_space: #2\\%
   are valid for numerical input.%
 }
+\msg_new:nnnn { siunitx } { literal-unit } {%
+  Literal units disabled.%
+}{%
+  You gave the literal input `\exp_not:n {#1}'\\%
+  but literal unit output is disabled.%
+}
 \msg_new:nnnn { siunitx } { misplaced-complex-root } {%
   Misplaced complex root.%
 }{%
@@ -4774,6 +5162,9 @@ This work consists of the file  siunitx.dtx
   Misplaced uncertainty token.%
 }{%
   The uncertainty token `#1' does not properly match another token.%
+}
+\msg_new:nnn { siunitx } { option-preamble-only } {%
+  Option `#1' only available in the preamble.%
 }
 \msg_new:nnnn { siunitx } { starting-product-token } {%
   Misplaced product token.%
@@ -4862,8 +5253,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \DeclareDocumentCommand \si { o m } {
   \group_begin:
-    \IfNoValueF {#1} {
+    \IfNoValueTF {#1} {
+      \siunitx_unit_in:nn {#2} { }
+    }{
       \keys_set:nn { siunitx } {#1}
+      \siunitx_unit_in:nn {#2} {#1}
     }
   \group_end:
 }
