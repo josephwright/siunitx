@@ -958,14 +958,182 @@ This work consists of the file  siunitx.dtx
 %  \num[quotient-mode = fraction]{1 / 2e4}
 %\end{LaTeXdemo}
 %
+%\subsection{Creating units}
+%
+% The various macro units are created at the start of the document. 
+% These can be defined only inside the \cs{si} and \cs{SI} macros, or
+% can also be made available in the document body. There are a number of
+% settings which control this creation process 
+% (Table~\ref{tab:opt:units:def}). As a result, these options all apply
+% in the preamble only.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Unit creation options}
+%  \label{tab:opt:units:def}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      free-standing-units    & Switch & false \\
+%      overwrite-functions    & Switch & false \\
+%      space-before-unit      & Switch & false \\
+%      unit-optional-argument & Switch & false \\
+%      use-xspace             & Switch & false \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{free-standing-units}
+%\DescribeOption{overwrite-functions}
+% The \opt{free-standing-units} option controls whether the unit macros 
+% exist outside of the \cs{si} and \cs{SI} arguments. When this option
+% is \opt{true}, \pkg{siunitx} creates the macros for general use.
+% The standard method to achieve this does not overwrite any existing
+% macros: this behaviour can be altered using the 
+% \opt{overwrite-functions} switch.
+% 
+%\DescribeOption{space-before-unit}
+%\DescribeOption{unit-optional-argument}
+%\DescribeOption{use-xspace}
+% When `free standing' unit macros are created, their behaviour can
+% be adjusted by a number of options. These are mainly intended for
+% emulating the input syntax of older packages. The option 
+% \opt{unit-optional-argument} gives the same behaviour for the
+% inputs
+%\begin{LaTeXdemo}[code only]
+%  \SI{10}{\metre}
+%\end{LaTeXdemo}
+% and
+%\begin{LaTeXdemo}[code only]
+%  \metre[10].
+%\end{LaTeXdemo}
+% The \opt{space-before-unit} and \opt{use-xspace} options control
+% the behaviour at the `ends' of the unit macros. Activating 
+% \opt{space-before-unit} inserts the number--unit space before the
+% unit is printed. This is suitable for the input syntax
+%\begin{LaTeXdemo}[code only]
+%  30\metre
+%\end{LaTeXdemo}
+% but does mean that the unit macros are incorrectly spaced in running
+% text.  On the other hand, the \opt{use-xspace} option attempts to
+% correctly space input such as
+%\begin{LaTeXdemo}[code only]
+%  \metre is the symbol for metres.
+%\end{LaTeXdemo}
+%
+%\subsection{Using units}
+%
+% Part of the power of \pkg{siunitx} is the ability to alter the output
+% format for units without changing the input. The behaviour of units
+% is therefore controlled by a number of options which alter either the
+% processing of units or the output directly.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Unit output options}
+%  \label{tab:opt:num:out}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      allow-literal-units      & Switch  & true      \\
+%      allow-number-unit-breaks & Switch  & false     \\
+%      inter-unit-separator     & Literal & \cs{,}    \\
+%      number-unit-separator    & Literal & \cs{,}    \\
+%      qualifier-format         & Choice  & subscript \\
+%      sticky-per               & Switch  & false     \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{allow-literal-units}
+% Some users may prefer to completely disable the use of literal input
+% in units, for example to enforce consistency. This can be
+% accomplished by setting the \opt{allow literal units} switch. With 
+% this option enabled, only macro-based units can be used in a document.
+% 
+%\subsection{Symbols}
+%
+% Most units use letters as the symbol for the unit, and these are all
+% very easy to control.  However, a small number of units use other
+% symbols, and matching these to the body text requires more work.
+% \pkg{siunitx} provides appropriate symbols for commonly-used units,
+% but the definitions may need adjustment depending on the body font
+% used in a document.
+% 
+%\DescribeOption{redefine-symbols}
+% The package provides one general option for the handling of symbols.
+% If the packages \pkg{textcomp} or \pkg{upgreek} are loaded, symbols 
+% can be taken from these for units, rather than using the
+% \pkg{siunitx} default values. The switch \opt{redefine-symbols} 
+% can be used to turn this behaviour on or off: the standard setting
+% is \opt{true}.
+% 
+% The individual symbols are set up independently for maths and text
+% output, and are summarised in Table~\ref{tab:opt:symbols}.  Many of 
+% the definitions are variations using \cs{text} or \cs{ensuremath} to
+% produce the correct output, as the symbols available in the document
+% may vary considerably. In the case of the micro symbol 
+% (\SIUnitSymbolMicro), \pkg{sunitx} provides a suitable low-level 
+% definition for the symbol. Depending on the fonts available, this
+% may need to be replaces by an alternative by the user.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Symbol options}
+%  \label{tab:opt:symbols}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      maths-angstrom  & Literal & \verb=\text{\AA}=                 \\ 
+%      maths-arcminute & Literal & \verb={}^{\prime}=                \\
+%      maths-arcsecond & Literal & \verb={}^{\prime\prime}=          \\
+%      maths-celsius   & Literal & 
+%        \verb={}^{\circ}\kern -\scriptspace C= \\ 
+%      maths-degree    & Literal & \verb={}^{\circ}=                 \\
+%      maths-micro     & Literal & \meta{see text}                   \\
+%      maths-ohm       & Literal & \verb=\text{\ensuremath{\Omega}}= \\
+%      redefine-symbols & Switch & true \\
+%      text-angstrom   & Literal & \cs{AA}                           \\ 
+%      text-arcminute  & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
+%      text-arcsecond  & Literal & 
+%        \verb=\ensuremath{{}^{\prime\prime}}= \\
+%      text-celsius    & Literal &
+%        \verb=\ensuremath{{}^{\circ}\kern -\scriptspace C}= \\ 
+%      text-degree     & Literal & \verb=\ensuremath{{}^{\circ}}=   \\
+%      text-micro      & Literal & \meta{see text}                   \\
+%      text-ohm        & Literal & \verb=\ensuremath{\Omega}=       \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeMacro{\SIUnitSymbolAngstrom}
+%\DescribeMacro{\SIUnitSymbolArcminute}
+%\DescribeMacro{\SIUnitSymbolArcsecond}
+%\DescribeMacro{\SIUnitSymbolCelsius}
+%\DescribeMacro{\SIUnitSymbolDegree}
+%\DescribeMacro{\SIUnitSymbolMicro}
+%\DescribeMacro{\SIUnitSymbolOhm}
+% The maths and text symbols defined above are wrapped up into mode
+% independent functions with user names.  These are then used in the
+% definitions of the appropriate units.  For example, the angstrom
+% symbol can be accessed using the macro \cs{SIUnitSymbolAngstrom}.
+% Notice that these names capitalise the unit name (to make reading 
+% the macro name easier!).
+%
 %\end{documentation}
 %
 %\begin{implementation}
 %
 %\section{Implementation}
-%
-% Most of the code here is \LaTeX3, but there are some parts which need
-% to use \LaTeXe functions to work correctly. 
 %
 %\subsection{Preliminaries}
 %
@@ -1167,11 +1335,17 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\tl_put_right:cv}
 %\begin{macro}{\tl_if_eq:nvTF}
+%\begin{macro}{\tl_replace_all_in:NnV}
+%\begin{macro}{\tl_set_rescan:NnV}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \tl_put_right:Nn { cv }
 \cs_generate_variant:Nn \tl_if_eq:nnTF { nv }
+\cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
+\cs_generate_variant:Nn \tl_set_rescan:Nnn { NnV }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -1557,7 +1731,7 @@ This work consists of the file  siunitx.dtx
     \bool_set_true:N \l_siunitx_number_maths_mode_bool
   },
   number-mode / text .code:n = {
-    \bool_set_true:N \l_siunitx_number_maths_mode_bool
+    \bool_set_false:N \l_siunitx_number_maths_mode_bool
   },
   number-textrm .code:n = {
     \cs_set_nopar:Nn \siunitx_number_textrm: {#1}
@@ -1622,7 +1796,7 @@ This work consists of the file  siunitx.dtx
     \bool_set_true:N \l_siunitx_unit_maths_mode_bool
   },
   unit-mode / text .code:n = {
-    \bool_set_true:N \l_siunitx_unit_maths_mode_bool
+    \bool_set_false:N \l_siunitx_unit_maths_mode_bool
   },
   unit-textrm .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_textrm: {#1}
@@ -1695,6 +1869,7 @@ This work consists of the file  siunitx.dtx
     number-mode = text,
     unit-mode   = text
   },
+  mode    .initial:n = { maths },
   textrm .meta:n = {
     number-textrm = #1,
     unit-textrm   = #1
@@ -1750,9 +1925,9 @@ This work consists of the file  siunitx.dtx
     \siunitx_detect_font:
     \bool_if:NF \l_siunitx_detect_mode_bool {
       \bool_if:cTF { l_siunitx_ #1 _maths_mode_bool } {
-        \bool_set_true:N \l_siunitx_maths_mode_bool
+        \bool_set_true:N \l_siunitx_font_maths_mode_bool
       }{
-        \bool_set_false:N \l_siunitx_maths_mode_bool
+        \bool_set_false:N \l_siunitx_font_maths_mode_bool
       }
     }
     \siunitx_print_aux:
@@ -1832,14 +2007,16 @@ This work consists of the file  siunitx.dtx
     }
   }
   \cs_new:Nn \siunitx_print_text: {
-    \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { & } 
-      { \siunitx_print_text_sub:n }
-    \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
-      { \siunitx_print_text_super:n }
     \group_begin:
       \char_make_active:N \-
       \cs_set:Npn - { \text { \c_siunitx_minus_tl } }
-      \exp_args:NnV \tl_rescan:nn { } \l_siunitx_print_arg_tl
+      \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
+        \l_siunitx_print_arg_tl
+      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { & } 
+        { \siunitx_print_text_sub:n }
+      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
+        { \siunitx_print_text_super:n }
+      \l_siunitx_print_arg_tl
     \group_end:
   }
 }
@@ -3841,7 +4018,10 @@ This work consists of the file  siunitx.dtx
     \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
     \prop_put:NnV \l_siunitx_number_out_prop { result } 
       \l_siunitx_tmpa_tl
-    \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } { true }
+    \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa } {
+      \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
+        { true }
+    }
   }
 }
 %    \end{macrocode}
@@ -4991,6 +5171,36 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Final unit output}
 %
+%\begin{macro}{\siunitx_unit_literal:n}
+%\begin{macro}{\siunitx_unit_literal_aux:N}
+% If the unit given contains anything which is not a unit macro, then
+% any unit macros that are there simply dump literal meanings. There is 
+% then a little work to do sorting out |~| and |.| characters at the 
+% outer level. Once that is done, the standard printing routine can 
+% take over.
+%    \begin{macrocode}
+\char_make_active:N \~
+\cs_new:Nn \siunitx_unit_literal:n {
+  \tl_map_function:NN \l_siunitx_declare_list_tl
+    \siunitx_unit_literal_aux:N
+  \tl_set:Nn \l_siunitx_tmpa_tl {#1}
+  \tl_set:No \l_sunitx_tmpb_tl {
+    \exp_after:wN \ensuremath \exp_after:wN { 
+      \l_siunitx_unit_separator_tl 
+    }
+  }
+  \tl_replace_all_in:NnV \l_siunitx_tmpa_tl { . } \l_sunitx_tmpb_tl
+  \tl_replace_all_in:NnV \l_siunitx_tmpa_tl { ~ } \l_sunitx_tmpb_tl
+  \siunitx_print:nV { unit } \l_siunitx_tmpa_tl
+}
+\cs_new_nopar:Nn \siunitx_unit_literal_aux:N {
+  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
+}  
+\char_make_ignore:N \~
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -5333,6 +5543,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\si}
+% The \cs{si} macro needs to pass options through to the internal
+% function as well as setting them here. This is used so that options
+% set for a unit can be overridden on a one-off basis.
 %    \begin{macrocode}
 \DeclareDocumentCommand \si { o m } {
   \group_begin:
