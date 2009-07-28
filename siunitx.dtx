@@ -4942,7 +4942,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   allow-literal-units .bool:N    = \l_siunitx_unit_allow_literal_bool,
-  allow-literal-units .initial:n = { true }
+  allow-literal-units .initial:n = { true },
 }
 %    \end{macrocode}
 %\end{macro}  
@@ -4998,45 +4998,30 @@ This work consists of the file  siunitx.dtx
 % which is then passed on for printing. The code reads through the 
 % input to collect up the units, before re-combining everything into
 % a single block at the end of the process.
-% 
-%\begin{macro}{\l_siunitx_unit_master_seq}
-%\begin{macro}{\l_siunitx_unit_numerator_seq}
-%\begin{macro}{\l_siunitx_unit_denominator_seq}
-% The parsed information is stored in sequences so that it can be
-% unwounded when needed.
+%
+%\begin{macro}{\l_siunitx_unit_int}
+%\begin{macro}{\l_siunitx_unit_prop}
+% Parsed units are stored in a property list, to keep things compact.
+% An integer is also needed to count up units.
 %    \begin{macrocode}
-\seq_new:N \l_siunitx_unit_master_seq
-\seq_new:N \l_siunitx_unit_numerator_seq
-\seq_new:N \l_siunitx_unit_denominator_seq
+\int_new:N \l_siunitx_unit_int
+\prop_new:N \l_siunitx_unit_prop
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\end{macro} 
 % 
+%\begin{macro}{\l_siunitx_prefix_symbols_bool}
 %\begin{macro}{\l_siunitx_sticky_per_bool}
 % Some options are directly related to how units are handled at this
 % stage, so need be created before the reconstruction part of the code.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  per-mode         .choice:,
-  per-mode / fraction .code:n = {
-  },
-  per-mode / reciprocal .code:n = {
-  },
-  per-mode / repeated-symbol .code:n = {
-  },
-  per-mode / symbol .code:n = {
-  },
-  qualifier-format .choice:,
-  qualifier-format / brackets .code:n = {
-  },
-  qualifier-format / space .code:n = {
-  },
-  qualifier-format / subscript .code:n = {
-  },
-  sticky-per       .bool:N = \l_siunitx_sticky_per_bool,
+  prefix-symbols .bool:N    = \l_siunitx_prefix_symbols_bool,
+  prefix-symbols .initial:n = { true },
+  sticky-per     .bool:N    = \l_siunitx_sticky_per_bool,
 }
 %    \end{macrocode} 
+%\end{macro} 
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_unit_parse:nn}
@@ -5051,15 +5036,21 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_init:}
+%\begin{macro}[aux]{\siunitx_unit_parse_init_aux:N}
 % As always, the initialisation is a separate routine to make life a
 % little clearer.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_parse_init: {
-  \seq_clear:N \l_siunitx_unit_master_seq
-  \seq_clear:N \l_siunitx_unit_numerator_seq
-  \seq_clear:N \l_siunitx_unit_denominator_seq
+  \prop_clear:N \l_siunitx_unit_prop
+  \int_zero:N \l_siunitx_unit_int
+  \tl_map_function:NN \l_siunitx_declare_list_tl 
+    \siunitx_unit_parse_init_aux:N
+}
+\cs_new_nopar:Nn \siunitx_unit_parse_init_aux:N {
+  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Final unit output}
