@@ -1,4 +1,4 @@
-% \iffalse meta-comment
+ % \iffalse meta-comment
 % !TEX program  = pdflatex
 %<*internal>
 \iffalse
@@ -468,7 +468,7 @@ This work consists of the file  siunitx.dtx
 %\begin{table}
 %  \centering
 %  \caption{^^A
-%    Font options (all available as \opt{number-\ldots} and 
+%    Font options (also available as \opt{number-\ldots} and 
 %    \opt{unit-\ldots} versions).
 %  }
 %  \label{tab:opt:font:set}
@@ -1128,6 +1128,24 @@ This work consists of the file  siunitx.dtx
 % symbol can be accessed using the macro \cs{SIUnitSymbolAngstrom}.
 % Notice that these names capitalise the unit name (to make reading 
 % the macro name easier!).
+% 
+%\section{Usage tips} 
+% 
+%\subsection{Ensuring text or maths output}
+%
+% The macros \cs{ensuremath} and \cs{text} should be used to ensure that
+% a particular item is always printed in the desired mode. Some 
+% mathematical output does not work well in \cs{mathrm} (the standard
+% font used by \pkg{siunitx} for printing). The easiest way to solve
+% this is to use the construction |\text{\ensuremath{...}}|, which will
+% print the material in the standard mathematics font without affecting
+% the rest of the output.
+%\begin{LaTeXdemo}
+%  \num[output-complex-root = i]{1+2i} \\
+%  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i}
+%\end{LaTeXdemo}  
+% In some circumstances, forcing \cs{mathnormal} may suffice, but this
+% deals less well with non-Latin characters.
 %
 %\end{documentation}
 %
@@ -4924,7 +4942,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   allow-literal-units .bool:N    = \l_siunitx_unit_allow_literal_bool,
-  allow-literal-units .initial:n =  { true }
+  allow-literal-units .initial:n = { true }
 }
 %    \end{macrocode}
 %\end{macro}  
@@ -4977,194 +4995,69 @@ This work consists of the file  siunitx.dtx
 %\subsection{Parsing macro units}
 %
 % For macro-based units, the macros are converted into literal text,
-% which is then passed on for printing.
-%
-%\begin{macro}{\l_siunitx_stack_tl}
-% Which part of the output is currently in use.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_stack_tl
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_fraction_stack_int}
-%\begin{macro}{\l_siunitx_main_stack_int}
-% Used to count the units in the two stacks.
-%    \begin{macrocode}
-\int_new:N \l_siunitx_fraction_stack_int
-\int_new:N \l_siunitx_main_stack_int
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_fraction_last_tl}
-%\begin{macro}{\l_siunitx_main_last_tl}
-% The last item onto each stack is recorded by type.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_fraction_last_tl
-\tl_new:N \l_siunitx_main_last_tl
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_fraction_current_tl}
-%\begin{macro}{\l_siunitx_fraction_earlier_tl}
-%\begin{macro}{\l_siunitx_main_current_tl}
-%\begin{macro}{\l_siunitx_main_earlier_tl}
-% The stacks themselves.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_fraction_current_tl
-\tl_new:N \l_siunitx_fraction_earlier_tl
-\tl_new:N \l_siunitx_main_current_tl
-\tl_new:N \l_siunitx_main_earlier_tl
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
+% which is then passed on for printing. The code reads through the 
+% input to collect up the units, before re-combining everything into
+% a single block at the end of the process.
 % 
-%\begin{macro}{\l_siunitx_unit_separator_tl}
-%\begin{macro}{\l_siunitx_number_unit_separator_tl}
+%\begin{macro}{\l_siunitx_unit_master_seq}
+%\begin{macro}{\l_siunitx_unit_numerator_seq}
+%\begin{macro}{\l_siunitx_unit_denominator_seq}
+% The parsed information is stored in sequences so that it can be
+% unwounded when needed.
+%    \begin{macrocode}
+\seq_new:N \l_siunitx_unit_master_seq
+\seq_new:N \l_siunitx_unit_numerator_seq
+\seq_new:N \l_siunitx_unit_denominator_seq
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+% 
 %\begin{macro}{\l_siunitx_sticky_per_bool}
+% Some options are directly related to how units are handled at this
+% stage, so need be created before the reconstruction part of the code.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  inter-unit-separator  .set:N     = \l_siunitx_unit_separator_tl,
-  inter-unit-separator  .initial:n = { \, },
-  qualifier-format      .choice:,
+  per-mode         .choice:,
+  per-mode / fraction .code:n = {
+  },
+  per-mode / reciprocal .code:n = {
+  },
+  per-mode / repeated-symbol .code:n = {
+  },
+  per-mode / symbol .code:n = {
+  },
+  qualifier-format .choice:,
   qualifier-format / brackets .code:n = {
   },
   qualifier-format / space .code:n = {
   },
   qualifier-format / subscript .code:n = {
   },
-  number-unit-separator .set:N     = 
-    \l_siunitx_number_unit_separator_tl,
-  sticky-per            .bool:N    = \l_siunitx_sticky_per_bool,
+  sticky-per       .bool:N = \l_siunitx_sticky_per_bool,
 }
 %    \end{macrocode} 
 %\end{macro} 
-%\end{macro}
-%\end{macro} 
 %
 %\begin{macro}{\siunitx_unit_parse:nn}
-% Parsing units is quite easy, the only trick being to add an extra
-% `unit' at the end to deal with the remaining powers.
+% The unit to be parsed is received here along with any options given.
+% The later are needed so that the user can override any saved options
+% on a one-off basis.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_unit_parse:nn {
   \siunitx_unit_parse_init:
-  \siunitx_unit_parse_options:nn {#1} {#2}
-  % \si@unit@out@sep@print
-  #1
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_unit_parse_add:n}
-% Items are added to the `current' list, with the move to the `earlier'
-% list coming later.
-%    \begin{macrocode}
-\cs_new:Nn \siunitx_unit_parse_add:n {
-  \tl_put_right:cn { l_siunitx_ \l_siunitx_stack_tl _current_tl } {#1}
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_unit_parse_block_new:n}
-% Creating a new block means moving the data from the current block to
-% the queue, adding a space at the start of the current block and then
-% adding data to the new block. A check is needed so that the first 
-% block does not gain a space.
-%    \begin{macrocode}
-\cs_new:Nn \siunitx_unit_parse_block_new:n {
-  \siunitx_unit_parse_block_transfer:
-  \tl_set:cn { l_siunitx_ \l_siunitx_stack_tl _current_tl } {#1}
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_unit_parse_block_transfer:}
-% Some functions for transferring content from the current block to the
-% queue. An inter-block separator is added only if there is something 
-% for it to follow.
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_unit_parse_block_transfer: {
-  \tl_if_empty:cF { l_siunitx_ \l_siunitx_stack_tl _earlier_tl } {
-    \siunitx_tl_put_right_maths:cV 
-      { l_siunitx_ \l_siunitx_stack_tl _current_tl }
-      \l_siunitx_unit_separator_tl
-  }
-  \tl_put_right:cv { l_siunitx_ \l_siunitx_stack_tl _earlier_tl } 
-    { l_siunitx_ \l_siunitx_stack_tl _current_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_unit_parse_if_last:nTF}
-% Checks on the last addition are stack dependent.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_unit_parse_if_last:nTF #1 {
-  \tl_if_eq:nvTF {#1} { l_siunitx_ \l_siunitx_stack_tl _last_tl }
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_init:}
-%\begin{macro}[aux]{\siunitx_unit_parse_init_aux:N}
-% Initialisation starts by making all of the unit macros active. Markers
-% are then added to prevent spaces being added accidentally to material
-% at the start of a unit.
+% As always, the initialisation is a separate routine to make life a
+% little clearer.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_parse_init: {
-  \tl_map_function:NN \l_siunitx_declare_list_tl 
-    \siunitx_unit_parse_init_aux:N
-  \int_zero:N \l_siunitx_fraction_stack_int
-  \int_zero:N \l_siunitx_main_stack_int
-  \tl_clear:N \l_siunitx_fraction_current_tl
-  \tl_clear:N \l_siunitx_fraction_earlier_tl
-  \tl_clear:N \l_siunitx_main_current_tl
-  \tl_clear:N \l_siunitx_main_earlier_tl
-  \tl_set:Nn \l_siunitx_fraction_last_tl { start }
-  \tl_set:Nn \l_siunitx_main_last_tl { start }
-  \tl_set:Nn \l_siunitx_stack_tl { main }
-}
-\cs_new_nopar:Nn \siunitx_unit_parse_init_aux:N {
-  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_unit_parse_options:n}
-% Any unit-specific options are loaded, followed by re-applying any
-% options given for this particular macro. The second call to 
-% \cs{keys_set:nn}  is needed to allow the local overriding of settings.
-%    \begin{macrocode}
-\cs_new:Nn \siunitx_unit_parse_options:nn {
-  \keys_set:nv { siunitx } 
-    { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
-  \keys_set:nn { siunitx } {#2}
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%
-%\begin{macro}{\siunitx_unit_parse_set_last:n}
-% To save the type of the last item saved.
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_unit_parse_set_last:n {
-  \tl_set:cn { l_siunitx_ \l_siunitx_stack_tl _last_tl } {#1}
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_unit_parse_unit:n}
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_unit_parse_unit:n {
-  \int_incr:c { l_siunitx_ \l_siunitx_stack_tl _stack_int }
-  \siunitx_unit_parse_if_last:nTF { prefix } {
-    \siunitx_unit_parse_add:n {#1}
-  }{
-    \siunitx_unit_parse_block_new:n {#1}
-  }
-  \siunitx_unit_parse_set_last:n { unit }
+  \seq_clear:N \l_siunitx_unit_master_seq
+  \seq_clear:N \l_siunitx_unit_numerator_seq
+  \seq_clear:N \l_siunitx_unit_denominator_seq
 }
 %    \end{macrocode}
 %\end{macro}
