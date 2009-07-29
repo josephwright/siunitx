@@ -1351,17 +1351,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\prop_put:NVn}
 %\begin{macro}{\tl_put_right:cv}
 %\begin{macro}{\tl_if_eq:nvTF}
 %\begin{macro}{\tl_replace_all_in:NnV}
 %\begin{macro}{\tl_set_rescan:NnV}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
+\cs_generate_variant:Nn \prop_put:Nnn { NVn }
 \cs_generate_variant:Nn \tl_put_right:Nn { cv }
 \cs_generate_variant:Nn \tl_if_eq:nnTF { nv }
 \cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
 \cs_generate_variant:Nn \tl_set_rescan:Nnn { NnV }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -4687,9 +4690,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_declare_power_post:Nn}
 %\begin{macro}{\siunitx_declare_power_pre:Nn}
-% Creating powers is all about manipulating stored values. This means 
-% that the call to \cs{siunitx_unit_parse_store:nn} does not really need
-% an argument.
+% Creating powers is all about storing values.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_declare_power_post:Nn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
@@ -4697,43 +4698,37 @@ This work consists of the file  siunitx.dtx
     \textsuperscript {#2}
   }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    % \def\si@unit@parse@power@current{#2}%
-    \siunitx_unit_parse_store_power:n {#2}
+    \siunitx_unit_parse_power_after:n {#2}
   }
 }
 \cs_new:Nn \siunitx_declare_power_pre:Nn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn ##1 { siunitx_ \token_to_str:N #1 _literal:w } {
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1 {
     ##1 \textsuperscript {#2}
   }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    % \def\si@unit@parse@power@last{#2}%
+    \siunitx_unit_parse_power_before:n {#2}
   }
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_declare_prefix:Nnn}
-%\begin{macro}{\siunitx_declare_prefix_binary:Nnn}
+%\begin{macro}{\siunitx_declare_prefix:Nnnn}
 % Prefixes need to store both the symbol and the power they represent.
 %    \begin{macrocode}
-\cs_new:Nn \siunitx_declare_prefix:Nnn {
+\cs_new:Nn \siunitx_declare_prefix:Nnnn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_store_prefix:n {#2}
+    \bool_if:NTF \l_siunitx_prefix_symbols_bool {
+      \siunitx_unit_parse_prefix:n {#2}
+    }{
+      \siunitx_unit_parse_prefix:nn {#3} {#4}
+    }
   }
-  \cs_if_free:cT { l_siunitx_ \token_to_str:N #1 _int } {
-    \int_new:c { l_siunitx_ \token_to_str:N #1 _int }
-  }
-  \int_set:cn { l_siunitx_ \token_to_str:N #1 _int } {#3}
-}
-\cs_new:Nn \siunitx_declare_prefix_binary:Nnn {
-  \siunitx_declare_prefix:Nnn #1 {#2} {#3}
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_declare_qualifier:Nn}
@@ -4745,7 +4740,7 @@ This work consists of the file  siunitx.dtx
     \text { ~ } ( #2 ) 
   }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_store_qualifier:n {#2}
+    \siunitx_unit_parse_qualifier:n {#2}
   }
 }
 %    \end{macrocode}
@@ -4784,35 +4779,31 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\per}
-% The \cs{per} macro does not generate any direct output but does
-% set up the appropriate flags.
+% The \cs{per} function is pretty simple.
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \per _literal:w } { / }
 \cs_new:cpn { siunitx_ \token_to_str:N \per _function:w } {
-  %\bool_true:N ?????
-  % Something else?
+  \siunitx_unit_parse_per:
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\raiseto}
 %\begin{macro}{\tothe}
-% The \cs{per} macro does not generate any direct output but does
-% set up the appropriate flags.
+% Generic versions of the pre-set powers.
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _literal:w } #1#2 {
   #2
   \textsuperscript {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _function:w } #1 {
-    % \def\si@unit@parse@power@last{#2}%
+  \siunitx_unit_parse_power_before:n { #1 }
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
   \textsuperscript {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _function:w } #1 {
-    % \def\si@unit@parse@power@current{#1}%
-    \siunitx_unit_parse_store_power:n { \tothe }
+  \siunitx_unit_parse_power_after:n { #1 }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5031,6 +5022,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_unit_parse:nn {
   \siunitx_unit_parse_init:
+  #1
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5051,6 +5043,116 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_power_before:n}
+%\begin{macro}{\siunitx_unit_parse_power_after:n}
+% Storing powers depends on whether they are given before or after
+% the unit.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_power_before:n {
+  \showthe\l_siunitx_unit_int
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    power- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+\cs_new:Nn \siunitx_unit_parse_power_after:n {
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    power- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_prefix:n}
+%\begin{macro}{\siunitx_unit_parse_prefix:nn}
+% Saving prefixes always increments the counter. For non-symbolic 
+% mode, the base needs to be saved along with the power.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_prefix:n {
+  \int_incr:N \l_siunitx_unit_int
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    prefix- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+\cs_new:Nn \siunitx_unit_parse_prefix:nn {
+  \siunitx_unit_parse_prefix:n {#2}
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    prefix-base- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_per:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_per: {
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    symbol- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \tl_set:Nx \l_siunitx_tmpa_tl { 
+      per- \int_use:N \l_siunitx_unit_int
+    }
+  }{
+    \tl_set:Nx \l_siunitx_tmpa_tl { 
+      per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
+    }
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_qualifier:n}
+% Qualifiers never alter the number of units.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_qualifier:n {
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    symbol- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \msg_error:nn { siunitx } { qualifier-before-unit }
+  }
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    qualifier- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_unit:n}
+% For units, there is a check in case a prefix is present (which will 
+% have incremented the counter). With the counter correct, simply add
+% the literal to the property list.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_parse_unit:n {
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    prefix- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \tl_set:Nx \l_siunitx_tmpa_tl {
+      symbol- \int_use:N \l_siunitx_unit_int
+    }  
+    \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+      \int_incr:N \l_siunitx_unit_int
+    }
+  }{
+    \int_incr:N \l_siunitx_unit_int
+  }
+  \tl_set:Nx \l_siunitx_tmpa_tl { 
+    symbol- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Final unit output}
@@ -5343,6 +5445,11 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnn { siunitx } { option-preamble-only } {%
   Option `#1' only available in the preamble.%
 }
+\msg_new:nnnn { siunitx } { qualifier-before-unit } {%
+  Qualifier before unit.%
+}{%
+  Unit qualifiers have to follow after units, not before them.%
+}
 \msg_new:nnnn { siunitx } { starting-product-token } {%
   Misplaced product token.%
 }{%
@@ -5370,17 +5477,17 @@ This work consists of the file  siunitx.dtx
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
 \DeclareDocumentCommand \DeclareSIPower { s m m } {
-  \IfNoValueTF {#1} {
+  \IfBooleanTF #1 {
     \siunitx_declare_power_pre:Nn #2 {#3} 
   }{
     \siunitx_declare_power_post:Nn #2 {#3}
   }
 }
 \DeclareDocumentCommand \DeclareSIPrefix { s m m m } {
-  \IfNoValueTF {#1} {
-    \siunitx_declare_prefix:Nnn #2 {#3} {#4}
+  \IfBooleanTF #1 {
+    \siunitx_declare_prefix:Nnnn #2 {#3} { 2 } {#4}
   }{
-    \siunitx_declare_prefix_binary:Nnn #2 {#3} {#4}
+    \siunitx_declare_prefix:Nnnn #2 {#3} { 10 } {#4}
   }
 }
 \DeclareDocumentCommand \DeclareSIQualifier { m m } {
