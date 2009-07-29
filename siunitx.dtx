@@ -4945,12 +4945,13 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_unit_in:nn {
   \siunitx_unit_if_literal:nTF {#1} {
     \bool_if:NTF \l_siunitx_unit_allow_literal_bool {
-      \siunitx_unit_literal:n {#1}
+      \siunitx_unit_format_literal:n {#1}
     }{
       \msg_error:nnx { siunitx } { literal-unit } {#1}
     }
   }{
     \siunitx_unit_parse:nn {#1} {#2}
+    \siunitx_unit_format:
   }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
@@ -5187,34 +5188,127 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\subsection{Final unit output}
+%\subsection{Unit output}
 %
-%\begin{macro}{\siunitx_unit_literal:n}
-%\begin{macro}{\siunitx_unit_literal_aux:N}
+%\begin{macro}{\l_siunitx_unit_tl}
+%\begin{macro}{\l_siunitx_unit_numerator_tl}
+%\begin{macro}{\l_siunitx_unit_denominator_tl}
+% Storage space for creating unit output.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_unit_tl
+\tl_new:N \l_siunitx_unit_numerator_tl
+\tl_new:N \l_siunitx_unit_denominator_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_unit_prefix_int}
+% Used to calculate the overall prefix value.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_unit_prefix_int
+%    \end{macrocode}
+%\end{macro}
+%
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  inter-unit-separator .set:N     = \l_siunitx_unit_separator_tl ,
+  inter-unit-separator .initial:n = { \, },
+}
+%    \end{macrocode}
+%
+%\begin{macro}{\siunitx_unit_format:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format: {
+  \siunitx_unit_format_init:
+  \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } {
+    \siunitx_unit_format_loop:
+  }
+} 
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_init:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_init: {
+  \tl_clear:N \l_siunitx_unit_tl
+  \tl_clear:N \l_siunitx_unit_numerator_tl
+  \tl_clear:N \l_siunitx_unit_denominator_tl
+  \int_zero:N \l_siunitx_unit_prefix_int
+} 
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_literal:n}
+%\begin{macro}{\siunitx_unit_format_literal_aux:N}
 % If the unit given contains anything which is not a unit macro, then
 % any unit macros that are there simply dump literal meanings. There is 
 % then a little work to do sorting out |~| and |.| characters at the 
-% outer level. Once that is done, the standard printing routine can 
-% take over.
+% outer level. 
 %    \begin{macrocode}
 \char_make_active:N \~
-\cs_new:Nn \siunitx_unit_literal:n {
+\cs_new:Nn \siunitx_unit_format_literal:n {
   \tl_map_function:NN \l_siunitx_declare_list_tl
-    \siunitx_unit_literal_aux:N
-  \tl_set:Nn \l_siunitx_tmpa_tl {#1}
-  \tl_set:No \l_sunitx_tmpb_tl {
+    \siunitx_unit_print_literal_aux:N
+  \tl_set:Nn \l_siunitx_unit_tl {#1}
+  \tl_set:No \l_sunitx_tmpa_tl {
     \exp_after:wN \ensuremath \exp_after:wN { 
       \l_siunitx_unit_separator_tl 
     }
   }
-  \tl_replace_all_in:NnV \l_siunitx_tmpa_tl { . } \l_sunitx_tmpb_tl
-  \tl_replace_all_in:NnV \l_siunitx_tmpa_tl { ~ } \l_sunitx_tmpb_tl
-  \siunitx_print:nV { unit } \l_siunitx_tmpa_tl
+  \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } \l_sunitx_tmpa_tl
+  \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } \l_sunitx_tmpa_tl
 }
-\cs_new_nopar:Nn \siunitx_unit_literal_aux:N {
+\cs_new_nopar:Nn \siunitx_unit_print_literal_aux:N {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }  
 \char_make_ignore:N \~
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_loop:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_loop: {
+%  \siunitx_unit_format_prefix:
+%  \siunitx_unit_format_symbol:
+%  \siunitx_unit_format_qualifier:
+%  \siunitx_unit_format_power:
+} 
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_prefix:}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_prefix: {
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    prefix- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+      \l_siunitx_tmpb_tl
+    \bool_if:NTF \l_siunitx_prefix_symbols_bool {
+      \siunitx_unit_format_prefix_symbol:
+    }{
+      \siunitx_unit_format_prefix_number:
+    }
+  }
+} 
+\cs_new_nopar:Nn \siunitx_unit_format_prefix_number: {
+}
+\cs_new_nopar:Nn \siunitx_unit_format_prefix_symbol: {
+  \siunitx_unit_format_put_right:V \l_siunitx_tmpb_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_put_right:n}
+%\begin{macro}{\siunitx_unit_format_put_right:V}
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_format_put_right:n {
+  \tl_put_right:Nn \l_siunitx_unit_tl {#1}
+} 
+\cs_generate_variant:Nn \siunitx_unit_format_put_right:n { V }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -5578,6 +5672,7 @@ This work consists of the file  siunitx.dtx
       \keys_set:nn { siunitx } {#1}
       \siunitx_unit_in:nn {#2} {#1}
     }
+    \siunitx_print:nV { unit } \l_siunitx_unit_tl
   \group_end:
 }
 %    \end{macrocode}
