@@ -4688,11 +4688,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%\begin{macro}{\siunitx_declare_power_post:Nn}
-%\begin{macro}{\siunitx_declare_power_pre:Nn}
+%\begin{macro}{\siunitx_declare_power_after:Nn}
+%\begin{macro}{\siunitx_declare_power_before:Nn}
 % Creating powers is all about storing values.
 %    \begin{macrocode}
-\cs_new:Nn \siunitx_declare_power_post:Nn {
+\cs_new:Nn \siunitx_declare_power_after:Nn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
     \textsuperscript {#2}
@@ -4701,7 +4701,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_unit_parse_power_after:n {#2}
   }
 }
-\cs_new:Nn \siunitx_declare_power_pre:Nn {
+\cs_new:Nn \siunitx_declare_power_before:Nn {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1 {
     ##1 \textsuperscript {#2}
@@ -5000,6 +5000,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_per_bool}
+% To allow \cs{per} to be `sticky'.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_per_bool
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_prefix_symbols_bool}
 %\begin{macro}{\l_siunitx_sticky_per_bool}
@@ -5022,6 +5029,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_unit_parse:nn {
   \siunitx_unit_parse_init:
+  \siunitx_unit_parse_options:nn {#1} {#2}
   #1
 }
 %    \end{macrocode}
@@ -5035,6 +5043,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_unit_parse_init: {
   \prop_clear:N \l_siunitx_unit_prop
   \int_zero:N \l_siunitx_unit_int
+  \bool_set_false:N \l_siunitx_per_bool
   \tl_map_function:NN \l_siunitx_declare_list_tl 
     \siunitx_unit_parse_init_aux:N
 }
@@ -5045,13 +5054,29 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_unit_parse_options:n}
+% Any unit-specific options are loaded, followed by re-applying any
+% options given for this particular macro. The second call to 
+% \cs{keys_set:nn}  is needed to allow the local overriding of settings.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_parse_options:nn {
+  \cs_if_free:cF { 
+    l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl 
+  } {
+    \keys_set:nv { siunitx } 
+      { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
+    \keys_set:nn { siunitx } {#2}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_unit_parse_power_before:n}
 %\begin{macro}{\siunitx_unit_parse_power_after:n}
 % Storing powers depends on whether they are given before or after
 % the unit.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_unit_parse_power_before:n {
-  \showthe\l_siunitx_unit_int
   \tl_set:Nx \l_siunitx_tmpa_tl { 
     power- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
   }
@@ -5091,19 +5116,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_per:}
+% The \cs{per} function always applies to the next unit seen, so
+% the counter has to be advanced by one.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_parse_per: {
   \tl_set:Nx \l_siunitx_tmpa_tl { 
-    symbol- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \tl_set:Nx \l_siunitx_tmpa_tl { 
-      per- \int_use:N \l_siunitx_unit_int
-    }
-  }{
-    \tl_set:Nx \l_siunitx_tmpa_tl { 
-      per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
-    }
+    per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
   }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
@@ -5129,9 +5147,11 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_unit:n}
+%\begin{macro}[aux]{\siunitx_unit_parse_unit_per:}
 % For units, there is a check in case a prefix is present (which will 
 % have incremented the counter). With the counter correct, simply add
-% the literal to the property list.
+% the literal to the property list. There is also a check to see if
+% there is a `sticky' \cs{per} to think about.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_parse_unit:n {
   \tl_set:Nx \l_siunitx_tmpa_tl { 
@@ -5151,8 +5171,20 @@ This work consists of the file  siunitx.dtx
     symbol- \int_use:N \l_siunitx_unit_int
   }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+  \siunitx_unit_parse_unit_per: 
+}
+\cs_new_nopar:Nn \siunitx_unit_parse_unit_per: {
+  \bool_if:NT \l_siunitx_sticky_per_bool {
+    \bool_if:NT \l_siunitx_per_bool {
+      \tl_set:Nx \l_siunitx_tmpa_tl { 
+        per- \int_use:N \l_siunitx_unit_int
+      }
+      \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {true}
+    }
+  }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Final unit output}
@@ -5478,9 +5510,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \DeclareDocumentCommand \DeclareSIPower { s m m } {
   \IfBooleanTF #1 {
-    \siunitx_declare_power_pre:Nn #2 {#3} 
+    \siunitx_declare_power_after:Nn #2 {#3} 
   }{
-    \siunitx_declare_power_post:Nn #2 {#3}
+    \siunitx_declare_power_before:Nn #2 {#3}
   }
 }
 \DeclareDocumentCommand \DeclareSIPrefix { s m m m } {
