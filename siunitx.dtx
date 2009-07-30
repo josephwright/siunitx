@@ -1,4 +1,4 @@
- % \iffalse meta-comment
+% \iffalse meta-comment
 % !TEX program  = pdflatex
 %<*internal>
 \iffalse
@@ -5188,26 +5188,35 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\subsection{Unit output}
+%\subsection{Unit formatting}
 %
-%\begin{macro}{\l_siunitx_unit_tl}
-%\begin{macro}{\l_siunitx_unit_numerator_tl}
+%\begin{macro}{\l_siunitx_unit_current_tl}
 %\begin{macro}{\l_siunitx_unit_denominator_tl}
+%\begin{macro}{\l_siunitx_unit_master_tl}
+%\begin{macro}{\l_siunitx_unit_numerator_tl}
 % Storage space for creating unit output.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_unit_tl
-\tl_new:N \l_siunitx_unit_numerator_tl
+\tl_new:N \l_siunitx_unit_current_tl
 \tl_new:N \l_siunitx_unit_denominator_tl
+\tl_new:N \l_siunitx_unit_master_tl
+\tl_new:N \l_siunitx_unit_numerator_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_unit_prefix_int}
+%\begin{macro}{\l_siunitx_unit_prefix_base_int}
+%\begin{macro}{\l_siunitx_unit_prefix_current_tl}
 % Used to calculate the overall prefix value.
 %    \begin{macrocode}
 \int_new:N \l_siunitx_unit_prefix_int
+\int_new:N \l_siunitx_unit_prefix_base_int
+\tl_new:N \l_siunitx_unit_prefix_current_tl
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %    \begin{macrocode}
@@ -5229,11 +5238,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_init:}
+% The normal initialisation stuff.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_init: {
-  \tl_clear:N \l_siunitx_unit_tl
-  \tl_clear:N \l_siunitx_unit_numerator_tl
+  \tl_clear:N \l_siunitx_unit_current_tl
   \tl_clear:N \l_siunitx_unit_denominator_tl
+  \tl_clear:N \l_siunitx_unit_master_tl
+  \tl_clear:N \l_siunitx_unit_numerator_tl
+  \int_zero:N \l_siunitx_unit_prefix_base_int
   \int_zero:N \l_siunitx_unit_prefix_int
 } 
 %    \end{macrocode}
@@ -5250,14 +5262,16 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_unit_format_literal:n {
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
-  \tl_set:Nn \l_siunitx_unit_tl {#1}
+  \tl_set:Nn \l_siunitx_unit_master_tl {#1}
   \tl_set:No \l_sunitx_tmpa_tl {
     \exp_after:wN \ensuremath \exp_after:wN { 
       \l_siunitx_unit_separator_tl 
     }
   }
-  \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } \l_sunitx_tmpa_tl
-  \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } \l_sunitx_tmpa_tl
+  \tl_replace_all_in:NnV \l_siunitx_unit_master_tl { . } 
+    \l_sunitx_tmpa_tl
+  \tl_replace_all_in:NnV \l_siunitx_unit_master_tl { ~ } 
+    \l_sunitx_tmpa_tl
 }
 \cs_new_nopar:Nn \siunitx_unit_print_literal_aux:N {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
@@ -5268,17 +5282,35 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_loop:}
+% The unit components are examined and reconstructed. This is done on
+% a unit-by-unit basis as there is the possibility that brackets will be
+% needed to be added.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_loop: {
-%  \siunitx_unit_format_prefix:
-%  \siunitx_unit_format_symbol:
-%  \siunitx_unit_format_qualifier:
+  \siunitx_unit_format_prefix:
+  \siunitx_unit_format_symbol:
+  \siunitx_unit_format_qualifier:
 %  \siunitx_unit_format_power:
+  \intexpr_compare:nT { \l_siunitx_unit_int > \c_one } {
+    \siunitx_tl_put_left_maths:NV \l_siunitx_unit_master_tl
+      \l_siunitx_unit_separator_tl
+  }
+  \tl_put_left:NV \l_siunitx_unit_master_tl \l_siunitx_unit_current_tl
+  \tl_clear:N \l_siunitx_unit_current_tl
+  \int_decr:N \l_siunitx_unit_int
+  \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } {
+    \siunitx_unit_format_loop:
+  }
 } 
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_prefix:}
+%\begin{macro}[aux]{\siunitx_unit_format_prefix_number:}
+%\begin{macro}[aux]{\siunitx_unit_format_prefix_number_calc:}
+%\begin{macro}[aux]{\siunitx_unit_format_prefix_symbol:}
+% If there is a prefix, it is added to the output. When using numerical
+% output, some conversion is needed instead.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_prefix: {
   \tl_set:Nx \l_siunitx_tmpa_tl {
@@ -5286,7 +5318,7 @@ This work consists of the file  siunitx.dtx
   }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
     \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_tmpb_tl
+      \l_siunitx_unit_prefix_current_tl
     \bool_if:NTF \l_siunitx_prefix_symbols_bool {
       \siunitx_unit_format_prefix_symbol:
     }{
@@ -5295,22 +5327,130 @@ This work consists of the file  siunitx.dtx
   }
 } 
 \cs_new_nopar:Nn \siunitx_unit_format_prefix_number: {
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    prefix-base- \int_use:N \l_siunitx_unit_int
+  }
+ \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+   \l_siunitx_tmpa_tl
+  \intexpr_compare:nT { \l_siunitx_unit_prefix_base_int = \c_zero } {
+    \int_set:Nn \l_siunitx_unit_prefix_base_int { \l_siunitx_tmpa_tl }
+  }
+  \intexpr_compare:nTF { 
+    \l_siunitx_unit_prefix_base_int = \l_siunitx_tmpa_tl 
+  } {
+    \siunitx_unit_format_prefix_number_calc:
+  }{
+    \msg_error:nn { siunitx } { prefix-base-mismatch }
+  }
+}
+\cs_new_nopar:Nn \siunitx_unit_format_prefix_number_calc: {
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    power- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+      \l_siunitx_tmpa_tl
+  }{
+    \tl_set:Nn \l_siunitx_tmpa_tl { 1 }
+  }
+  \tl_set:Nx \l_siunitx_unit_prefix_current_tl {
+    \intexpr_eval:n {
+      \l_siunitx_unit_prefix_current_tl * \l_siunitx_tmpa_tl
+    }
+  }
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    per- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \int_set:Nn \l_siunitx_unit_prefix_int {
+      \l_siunitx_unit_prefix_int - \l_siunitx_unit_prefix_current_tl
+    } 
+  }{
+    \int_set:Nn \l_siunitx_unit_prefix_int {
+      \l_siunitx_unit_prefix_int + \l_siunitx_unit_prefix_current_tl
+    }
+  }
 }
 \cs_new_nopar:Nn \siunitx_unit_format_prefix_symbol: {
-  \siunitx_unit_format_put_right:V \l_siunitx_tmpb_tl
+  \tl_set_eq:NN \l_siunitx_unit_current_tl 
+    \l_siunitx_unit_prefix_current_tl
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %
-%\begin{macro}{\siunitx_unit_format_put_right:n}
-%\begin{macro}{\siunitx_unit_format_put_right:V}
+%\begin{macro}{\siunitx_unit_format_qualifier:}
+%\begin{macro}{\siunitx_unit_format_qualifier_brackets:}
+%\begin{macro}{\siunitx_unit_format_qualifier_space:}
+%\begin{macro}{\siunitx_unit_format_qualifier_subscript:}
+% Three methods for showing qualifiers, each with its own sub-function.
+% For the \texttt{space} methods, a warning is set in the property list
+% as if there is a power then some brackets will be needed.
 %    \begin{macrocode}
-\cs_new:Nn \siunitx_unit_format_put_right:n {
-  \tl_put_right:Nn \l_siunitx_unit_tl {#1}
+\cs_new_nopar:Nn \siunitx_unit_format_qualifier: {
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    qualifier- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+      \l_siunitx_tmpa_tl
+    \use:c { 
+      siunitx_unit_format_qualifier_ \l_siunitx_qualifier_mode_tl : 
+    }
+  }
 } 
-\cs_generate_variant:Nn \siunitx_unit_format_put_right:n { V }
+\cs_new_nopar:Nn \siunitx_unit_format_qualifier_brackets: {
+  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+    \l_siunitx_bracket_open_tl
+  \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+    \l_siunitx_bracket_closr_tl
+}
+\char_make_active:N \~
+\cs_new_nopar:Nn \siunitx_unit_format_qualifier_space: {
+  \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
+  \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    bracket- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
+}
+\char_make_space:N \~
+\group_begin:
+  \char_set_lccode:nn { `\& } { `\_ }
+  \char_make_math_subscript:N \&
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_new_nopar:Nn \siunitx_unit_format_qualifier_subscript: {
+    \tl_put_right:No \l_siunitx_unit_current_tl {
+      \exp_after:wN & \exp_after:wN { \l_siunitx_tmpa_tl }      
+    }
+  }
+}
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_symbol:}
+% If there is no symbol, something is wrong!
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_symbol: {
+  \tl_set:Nx \l_siunitx_tmpa_tl {
+    symbol- \int_use:N \l_siunitx_unit_int
+  }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+      \l_siunitx_tmpa_tl
+    \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+  }{
+    \msg_error:nn { siunitx } { prefix-only }
+  }
+} 
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Symbols}
@@ -5571,6 +5711,15 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnn { siunitx } { option-preamble-only } {%
   Option `#1' only available in the preamble.%
 }
+\msg_new:nnnn { siunitx } { prefix-base-mismatch } {%
+  Prefix bases do not match.%
+}{%
+  You have asked for prefixes to be converted into a power,\\%
+  but the bases do not match.%
+}
+\msg_new:nnn { siunitx } { prefix-only } {%
+  Prefix with no unit.%
+}
 \msg_new:nnnn { siunitx } { qualifier-before-unit } {%
   Qualifier before unit.%
 }{%
@@ -5672,7 +5821,7 @@ This work consists of the file  siunitx.dtx
       \keys_set:nn { siunitx } {#1}
       \siunitx_unit_in:nn {#2} {#1}
     }
-    \siunitx_print:nV { unit } \l_siunitx_unit_tl
+    \siunitx_print:nV { unit } \l_siunitx_unit_master_tl
   \group_end:
 }
 %    \end{macrocode}
