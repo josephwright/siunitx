@@ -109,8 +109,12 @@ This work consists of the file  siunitx.dtx
   [\filedate\space v\fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{booktabs,helvet,mathpazo,siunitx}
+\usepackage{booktabs,caption,helvet,mathpazo,siunitx}
 \usepackage[final]{listings}
+\DeclareSIPower\quartic{4}
+\DeclareSIPower*\tothefourth{4}
+\DeclareSIQualifier\polymer{pol}
+\DeclareSIQualifier\catalyst{cat}
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -118,6 +122,18 @@ This work consists of the file  siunitx.dtx
 % \fi
 % 
 %\makeatletter
+%
+%^^A Some short cuts for the tables
+%\newcommand*\DescribePrefix[1]{^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
+%    #1 & \cs{#1} 
+%}
+%\newcommand*\DescribeUnit[1]{^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
+%  #1 &
+%  \cs{#1} &
+%  \expandafter\si\expandafter{\csname #1\endcsname}
+%}
 %
 %^^A For creating examples with nice highlighting of code, and so
 %^^A on; based on the system used in the listings source (lstsample).
@@ -155,6 +171,7 @@ This work consists of the file  siunitx.dtx
 %      si,
 %      SI,
 %      sisetup,
+%      SIUnitSymbolDegree,
 %      text,
 %    }
 %  }^^A 
@@ -221,12 +238,13 @@ This work consists of the file  siunitx.dtx
 %
 %\maketitle
 %
+%\changes{v0.6}{2008/02/18}{First public testing release (as \pkg{si})}
 %\changes{v1.0}{2008/06/15}{First official release}
 %\changes{v1.1}{2008/09/28}{Package extended to a greater range of unit
 %  types}
 %\changes{v1.2}{2009/01/22}{Correct handling for ranges of numbers 
 %  added}
-%\changes{v2.0}{2009/06/29}{Complete re-write of package to add many new
+%\changes{v2.0}{2009/08/01}{Complete re-write of package to add many new
 %  features}
 %  
 %\begin{abstract}
@@ -342,6 +360,400 @@ This work consists of the file  siunitx.dtx
 %  \num{3.45d-4} \\
 %  \num{-e10}
 %\end{LaTeXdemo} 
+%
+%\subsection{Units}
+%
+%\DescribeMacro{\si}
+% The symbol for a unit can be typeset using the \cs{si} macro: this 
+% provides full control over output format for the unit. Like the
+% \cs{num} macro, \cs{si} takes  one optional and one mandatory 
+% argument: \cs{si}\oarg{options}\marg{unit}. The unit formatting system
+% can accept two types of input. When \meta{unit} contains one or more
+% literal items, the output is processed in the same manner as with the
+% \pkg{sistyle} package. Sub- and superscripts can be input without 
+% concern over maths mode, and the tokens \texttt{.} and |~| are 
+% converted into inter-unit separators.
+%\begin{LaTeXdemo}
+%  \si{kg.m/s^2} \\
+%  \si{g_{polymer}~mol_{cat}.s^{-1}}
+%\end{LaTeXdemo}
+% The second operation mode for the \cs{si} macro is an `interpreted'
+% system, Here, each unit, SI multiple prefix and power is given a macro 
+% name.  These are entered in a method very similar to the reading of the 
+% unit name in English.
+%\begin{LaTeXdemo}
+%  \si{\kilo\gram\metre\per\square\second} \\
+%  \si{\gram\per\cubic\centi\metre}        \\
+%  \si{\square\volt\cubic\lumen\per\farad} \\
+%  \si{\metre\squared\per\gray\cubic\lux}  \\
+%  \si{\henry\second}                      
+%\end{LaTeXdemo}
+% On its own, this is less convenient than the direct method, although
+% it does use meaning rather than appearance for input. However, the
+% the package allows you to define new unit macros; a large number of
+% pre-defined abbreviations are also supplied.  More importantly, by
+% defining macros for units, instead of literal values, new
+% functionality is made available.  Units may be re-defined to give
+% different output, and handling of reciprocal values can be altered.
+%
+%\DescribeMacro{\SI}
+% Very often, numbers and values are given together. Mathematically, 
+% these form a single entity, and should be separated by a non-breaking
+% space. The \cs{SI} macro combines the functionality of \cs{num} and
+% \cs{si}, and makes this both possible and easy. The \cs{SI} macro takes 
+% two mandatory arguments, in addition to the optional set up argument, 
+% and a second optional argument:
+% \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}. The
+% \meta{number} and \meta{unit} arguments work exactly like those for 
+% the \cs{num} and \cs{si} macros, respectively. \meta{preunit} is a unit 
+% to be typeset \emph{before} the numerical value (most likely to be a 
+% currency).
+%\begin{LaTeXdemo}
+%  \SI[mode=text]{1.23}{J.mol^{-1}.K^{-1}} \\
+%  \SI{.23e7}{\candela}                         \\
+%  \SI[per-mode=symbol]{1.99}[\$]{\per\kilogram}     \\
+%  \SI{70}{\metre\per\second}                   \\
+%  \SI[per-mode=fraction]{1,345}{\ampere\per\mole}
+%\end{LaTeXdemo}
+%
+% It is possible set up the unit macros to be available outside of
+% the \cs{SI} and \cs{si} functions. This is not the standard behaviour
+% as there is the risk of name clashes (for example, \cs{bar} is used
+% by other packages, and several packages define \cs{degree}). Full
+% details of using `stand alone' units are found in 
+% Section~\ref{sec:units:creating}.
+%
+%\subsection{The unit macros}
+%
+% The package always defines the basic set of SI units with macro names.
+% This includes the base SI units, the derived units with special names
+% and the prefixes. A small number of powers are also given pre-defined
+% names. Full details of units in the SI are available 
+% on-line~\cite{BIPM}.
+% 
+%\DescribeMacro{\meter} 
+% The seven base SI units are always defined 
+% (Table~\ref{tab:unit:base}). In addition, the macro \cs{meter} is
+% available as an alias for \cs{metre}, for users of US spellings.
+% The full details of the base units are given in the SI 
+% Brochure~\cite{SI:2.1}. The SI also lists a number of units which 
+% have special names and symbols \cite{SI:2.2.2}: these are listed
+% in Table~\ref{tab:unit:derived}.
+%\begin{table}
+%  \caption{SI base units}
+%  \label{tab:unit:base}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit} &
+%      \multicolumn{1}{c}{Macro} &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{ampere}   \\
+%      \DescribeUnit{candela}  \\
+%      \DescribeUnit{kelvin}   \\
+%      \DescribeUnit{kilogram} \\ 
+%      \DescribeUnit{metre}    \\
+%      \DescribeUnit{mole}     \\
+%      \DescribeUnit{second}   \\ 
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\begin{table}
+%  \caption{Coherent derived units in the SI with special names and 
+%    symbols}
+%  \label{tab:unit:derived}
+%  \centering
+%  \begin{tabular}{llllll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{becquerel} &
+%      \DescribeUnit{newton}    \\ 
+%      \SpecialUsageIndex{\celsius}^^A 
+%      degree Celsius & \cs{celsius} & \si{\celsius} &
+%      \DescribeUnit{ohm}       \\
+%      \DescribeUnit{coulomb}   &
+%      \DescribeUnit{pascal}    \\
+%      \DescribeUnit{farad}     &
+%      \DescribeUnit{radian}    \\
+%      \DescribeUnit{gray}      &
+%      \DescribeUnit{siemens}   \\
+%      \DescribeUnit{hertz}     &
+%      \DescribeUnit{sievert}   \\
+%      \DescribeUnit{henry}     &
+%      \DescribeUnit{steradian} \\
+%      \DescribeUnit{joule}     &
+%      \DescribeUnit{tesla}     \\
+%      \DescribeUnit{katal}     &
+%      \DescribeUnit{volt}      \\
+%      \DescribeUnit{lumen}     &
+%      \DescribeUnit{watt}      \\
+%      \DescribeUnit{lux}       &
+%      \DescribeUnit{weber}     \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+% In addition to the official SI units, \pkg{siunitx} also provides
+% macros for a number of units which are accepted for use in the SI
+% although they are not SI units. Table~\ref{tab:unit:accepted} lists 
+% the ``accepted'' units \cite{SI:4.1.T6}. Some units are fundamental
+% physical quantities, and these are non-SI but can be used with in the
+% SI (Table~\ref{tab:unit:physical}, \cite{SI:4.1.T7}). There are also a
+% set of non-SI units which are used in certain defined circumstances 
+% (Table~\ref{tab:unit:other}), although they are not necessarily 
+% official sanctioned \cite{SI:4.1.T8}.
+%\begin{table}
+%  \caption{Non-SI units accepted for use with the 
+%    International System of Units}
+%  \label{tab:unit:accepted}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{day}     \\
+%      \DescribeUnit{degree}  \\
+%      \DescribeUnit{hectare} \\
+%      \DescribeUnit{hour}    \\
+%      \DescribeUnit{litre}   \\
+%        \SpecialUsageIndex{\liter}^^A 
+%       & \cs{liter} & \si{\liter} \\
+%      \SpecialUsageIndex{\arcminute}^^A 
+%        minute (plane angle) & \cs{arcminute} & \si{\arcminute} \\
+%      \SpecialUsageIndex{\minute}^^A 
+%        minute (time)        & \cs{minute}    & \si{\minute}    \\
+%      \DescribeUnit{percent}   \\
+%      \SpecialUsageIndex{\arcsecond}^^A 
+%        second (plane angle) & \cs{arcsecond} & \si{\arcsecond} \\
+%      \DescribeUnit{tonne}   \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%\begin{table}
+%  \caption{Non-SI units whose values in SI units must be obtained 
+%    experimentally}
+%  \label{tab:unit:physical}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \SpecialUsageIndex{\astronomicalunit}^^A 
+%      astronomical unit & \cs{astronomicalunit} 
+%        & \si{\astronomicalunit} \\
+%      \SpecialUsageIndex{\atomicmassunit}^^A 
+%        atomic mass unit & \cs{atomicmassunit} & 
+%        \si{\atomicmassunit} \\
+%      \DescribeUnit{bohr}         \\
+%      \SpecialUsageIndex{\clight}^^A 
+%        speed of light & \cs{clight} & \si{\clight} \\
+%      \DescribeUnit{dalton}       \\
+%      \SpecialUsageIndex{\electronmass}^^A 
+%        electron mass & \cs{electronmass} & \si{\electronmass} \\
+%      \DescribeUnit{electronvolt} \\
+%      \SpecialUsageIndex{\elementarycharge}^^A 
+%        elementary charge & \cs{elementarycharge} 
+%        & \si{\elementarycharge} \\
+%      \DescribeUnit{hartree} \\
+%      \SpecialUsageIndex{\planckbar}^^A 
+%      reduced Planck constant & \cs{planckbar} & \si{\planckbar} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%\begin{table}
+%  \caption{Other non-SI units}
+%  \label{tab:unit:other}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \SpecialUsageIndex{\angstrom}^^A 
+%      {\aa}ngstr{\"o}m & \cs{angstrom} & \si{\angstrom} \\
+%      \DescribeUnit{bar}  \\
+%      \DescribeUnit{barn} \\
+%      \DescribeUnit{bel}  \\
+%      \DescribeUnit{decibel}  \\
+%      \DescribeUnit{knot} \\
+%      \SpecialUsageIndex{\mmHg}^^A 
+%      millimetre of mercury & \cs{mmHg} & \si{\mmHg} \\
+%      \SpecialUsageIndex{\nauticalmile}^^A  
+%      nautical mile & \cs{nauticalmile} & \si{\nauticalmile} \\ 
+%      \DescribeUnit{neper} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeMacro{\deka}
+% In addition to the units themselves, \pkg{siunitx} provides 
+% pre-defined macros for all of the SI prefixes 
+% (Table~\ref{tab:unit:prefix}, \cite{SI:3.1}). The spelling
+% ``\cs{deka}'' is provided for US users as an alternative to 
+% \cs{deca}.
+%\begin{table}
+%  \caption{SI prefixes}
+%  \label{tab:unit:prefix}
+%  \centering
+%  \begin{tabular}{llc>{$}l<{$}llc>{$}l<{$}}
+%    \toprule
+%      \multicolumn{1}{c}{Prefix} &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Power}  &
+%      \multicolumn{1}{c}{Prefix} &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Power} \\
+%    \midrule
+%      \DescribePrefix{yocto} &  y & -24 &
+%      \DescribePrefix{deca}  & da &   1 \\
+%      \DescribePrefix{zepto} &  z & -21 &
+%      \DescribePrefix{hecto} &  h &   2 \\
+%      \DescribePrefix{atto}  &  a & -18 &
+%      \DescribePrefix{kilo}  &  k &   3 \\
+%      \DescribePrefix{femto} &  f & -15 &
+%      \DescribePrefix{mega}  &  M &   6 \\
+%      \DescribePrefix{pico}  &  p & -12 &
+%      \DescribePrefix{giga}  &  G  &  9 \\
+%      \DescribePrefix{nano}  &  n &  -9 &
+%      \DescribePrefix{tera}  &  T &  12 \\
+%      \DescribePrefix{micro} & \SIUnitSymbolMicro & -6 &
+%      \DescribePrefix{peta}  &  P &  15 \\
+%      \DescribePrefix{milli} &  m &  -3 &
+%      \DescribePrefix{exa}   &  E &  18 \\
+%      \DescribePrefix{centi} &  c &  -2 &
+%      \DescribePrefix{zetta} &  Z &  21 \\
+%      \DescribePrefix{deci}  &  d &  -1 &
+%      \DescribePrefix{yotta} &  Y &  24 \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeMacro{\square}
+%\DescribeMacro{\squared}
+%\DescribeMacro{\cubic}
+%\DescribeMacro{\cubed}
+% A small number of pre-defined powers are provided as macros. 
+% \cs{square} and \cs{cubic} are intended for use before units, with
+% \cs{squared} and \cs{cubed} going after the unit.
+%\begin{LaTeXdemo} 
+%  \si{\square\becquerel} \\
+%  \si{\joule\squared\per\lumen} \\
+%  \si{\cubic\lux\volt\tesla\cubed}
+%\end{LaTeXdemo}
+%\DescribeMacro{\tothe}
+%\DescribeMacro{\raiseto}
+% Generic powers can be inserted on a one-off basis using the \cs{tothe}
+% and \cs{raiseto} macros. These are the only macros for units which
+% take an argument:
+%\begin{LaTeXdemo} 
+%  \si{\henry\tothe{5}} \\
+%  \si{\raiseto{4.5}\radian}
+%\end{LaTeXdemo}
+%\DescribeMacro{\per}
+% Reciprocal powers are indicated using the \cs{per} macro. This applies
+% to the next unit only, unless the \opt{units/output/sticky per} option
+% is turned on.
+%\begin{LaTeXdemo} 
+%  \si{\joule\per\mole\per\kelvin} \\
+%  \si{\joule\per\mole\kelvin} \\
+%  \si{\per\henry\tothe{5}} \\
+%  \si{\per\square\becquerel} \\
+%\end{LaTeXdemo}
+%
+%\subsection{Creating new macros}
+%
+% The various macro components of a unit have to be defined before
+% they can be used. The package supplies a number of common definitions,
+% but new definitions are also possible. As the definition of a logical
+% unit should remain the same in a single document, these creation
+% functions are all preamble-only.
+%
+%\DescribeMacro{\DeclareSIUnit}
+% New units are produced using the \cs{DeclareSIUnit} macro.  This takes
+% two mandatory arguments, as well as one optional one:
+% \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}. 
+% \meta{symbol} can contain literal values, other units, multiple
+% prefixes, powers and \cs{per}, although literal text should not be
+% intermixed with unit macros. The \meta{options} argument can be
+% any suitable options, and applies the specific unit macro only. The 
+% (first) optional argument to \cs{SI} and \cs{si} can be used to 
+% override the settings for the unit. A typical example is the 
+% \cs{degree} unit.
+%\begin{LaTeXdemo}
+%  \SI{3.1415}{\degree} \\
+%\end{LaTeXdemo} 
+% This is declared in the package as:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIUnit[number-unit-separator={}]
+%    \degree{\SIUnitSymbolDegree}
+%\end{LaTeXdemo}
+% The spacing can still be altered at point of use:
+%\begin{LaTeXdemo}
+%  \SI{67890}{\degree} \\
+%  \SI[number-unit-separator = \;]{67890}{\degree}
+%\end{LaTeXdemo}
+% 
+%\DescribeMacro{\DeclareSIPrefix}
+%\DescribeMacro{\DeclareSIPrefix*}
+% The standard SI powers of ten are defined by the package, and are
+% described above.  However, the user can define new prefixes with
+% \cs{DeclareSIPrefix}.  This has syntax 
+% \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}. A
+% starred-version is also available for creating binary prefixes, with
+% the same syntax (\meta{powers-ten} being replaced by 
+% \meta{powers-two}). For example, \cs{kilo} and \cs{kibi} are defined:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIPrefix\kilo{k}{3}
+%  \DeclareSIPrefix*\kibi{Ki}{10}
+%\end{LaTeXdemo}
+%
+%\DescribeMacro{\DeclareSIPower}
+%\DescribeMacro{\DeclareSIPower*}
+% Descriptions for powers are created using \cs{DeclareSIPower}, with
+% syntax \cs{DeclareSIPower}\marg{power}\marg{num}. This creates a
+% power macro to appear before the unit it applies to. A starred version
+% of the macro creates powers to appear after the unit. For example, the 
+% preamble to a document might contain:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIPower\quartic{4}
+%  \DeclareSIPower*\tothefourth{4}
+%\end{LaTeXdemo}
+% with the functions then used in the document as:
+%\begin{LaTeXdemo}
+%  \si{\kilogram\tothefourth}\\
+%  \si{\quartic\metre}
+%\end{LaTeXdemo}
+%
+%\DescribeMacro{\DeclareSIQualifier}
+% Following the syntax of the other macros, qualifiers are created
+% with the syntax \cs{DeclareSIQualifier}\marg{qualifier}\marg{symbol}.
+% In contrast to the other parts of a unit, there are no pre-defined
+% qualifiers. It is therefore entirely up to the user to create these.
+% For example, to identify the mass of a product created when using
+% a particular catalyst, the preamble could contain:
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIQualifier\polymer{pol}
+%  \DeclareSIQualifier*\catalyst{cat}
+%\end{LaTeXdemo}
+% and then in the body the document could read:
+%\begin{LaTeXdemo}
+%  \SI{1.234}{\gram\polymer\per\mole\catalyst\per\hour}
+%\end{LaTeXdemo}
 %
 %\section{The key--value control system}
 %
@@ -959,6 +1371,7 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\subsection{Creating units}
+%\label{sec:units:creating}
 %
 % The various macro units are created at the start of the document. 
 % These can be defined only inside the \cs{si} and \cs{SI} macros, or
@@ -1041,12 +1454,13 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      allow-literal-units      & Switch  & true      \\
-%      allow-number-unit-breaks & Switch  & false     \\
-%      inter-unit-separator     & Literal & \cs{,}    \\
-%      number-unit-separator    & Literal & \cs{,}    \\
-%      qualifier-format         & Choice  & subscript \\
-%      sticky-per               & Switch  & false     \\
+%      allow-literal-units  & Switch  & true       \\
+%      inter-unit-separator & Maths   & \cs{,}     \\
+%      per-mode             & Choice  & reciprocal \\
+%      per-symbol           & Literal & /          \\    
+%      prefixes-as-symbols  & Switch  & true       \\
+%      qualifier-mode       & Choice  & subscript  \\
+%      sticky-per           & Switch  & false      \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1054,8 +1468,86 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{allow-literal-units}
 % Some users may prefer to completely disable the use of literal input
 % in units, for example to enforce consistency. This can be
-% accomplished by setting the \opt{allow literal units} switch. With 
+% accomplished by setting the \opt{allow-literal-units} switch. With 
 % this option enabled, only macro-based units can be used in a document.
+% 
+%\DescribeOption{inter-unit-separator} 
+% The separator between each unit is stored using the 
+% \opt{inter-unit-separator} option. The standard setting is a thin 
+% space: another common choice is a centre dot.
+%\begin{LaTeXdemo}
+%  \si{\farad\squared\lumen\candela} \\
+%  \si[inter-unit-separator=\cdot]{\farad\squared\lumen\candela} \\
+%\end{LaTeXdemo} 
+% 
+%\DescribeOption{per-mode}
+%\DescribeOption{per-symbol}
+% The handling of \cs{per} is altered using the \opt{per-mode} choice
+% option.  The standard setting is \opt{reciprocal}, meaning that 
+% \cs{per} generates reciprocal powers for units.  Setting the option
+% to \cs{fraction} uses the \cs{frac} function to typeset the positive
+% and negative powers of a unit separately. 
+%\begin{LaTeXdemo}
+%  \si{\joule\per\mole\per\kelvin} \\
+%  \si{\metre\per\second\squared} \\
+%  \si[per-mode=fraction]{\joule\per\mole\per\kelvin} \\
+%  \si[per-mode=fraction]{\metre\per\second\squared} 
+%\end{LaTeXdemo}
+% It is possible to use a symbol (usually \texttt{/}) to separate the
+% two parts of a unit by setting \opt{per-mode} to \opt{symbol}; the 
+% symbol used is stored using the setting \opt{per-symbol}. This method
+% for displaying units can be ambiguous, and so brackets are added 
+% unless \opt{use-brackets} is set to \opt{false}.
+%\begin{LaTeXdemo}
+%  \sisetup{per-mode=symbol}%
+%  \si{\joule\per\mole\per\kelvin} \\
+%  \si{\metre\per\second\squared} \\
+%  \si[per-symbol={~div~}]{\joule\per\mole\per\kelvin} \\
+%  \si[use-brackets=false]{\joule\per\mole\per\kelvin}
+%\end{LaTeXdemo}
+% Finally, the often-requested (but mathematically invalid) 
+% \opt{repeated-symbol} option is also available to repeat the symbol 
+% for each \cs{per}.
+%\begin{LaTeXdemo}
+%  \si[per-mode=repeated-symbol]{\joule\per\mole\per\kelvin}
+%\end{LaTeXdemo}
+% 
+%\DescribeOption{sticky-per}
+% By default, \cs{per} applies only to the next unit
+% given.\footnote{This is the standard method of reading units in
+% English: for example, \si{\joule\per\mole\per\kelvin} is pronounced
+% `joules per mole per kelvin'.}  By setting the \opt{sticky-per}
+% flag, this behaviour is changed so that \cs{per} applies to all
+% subsequent units.
+%\begin{LaTeXdemo}
+%  \si{\pascal\per\gray\henry} \\
+%  \si[sticky-per]{\pascal\per\gray\henry}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{qualifier-mode}
+% Unit qualifiers can be printed in three different formats, set by the
+% \opt{qualifier-mode} option. The standard setting is \opt{subscript},
+% while the options \opt{brackets} and \opt{space} are also possible.
+% With the last settings, powers can lead to ambiguity and are 
+% automatically detected and brackets added as appropriate.
+%\begin{LaTeXdemo}
+%  \si{\kilogram\polymer\per\mole\catalyst\per\hour} \\
+%  \si[qualifier-mode=brackets]
+%    {\kilogram\polymer\per\mole\catalyst\per\hour} \\
+%  \si[qualifier-mode=space]
+%    {\kilogram\polymer\per\mole\catalyst\per\hour} \\
+%\end{LaTeXdemo}
+%
+%\DescribeOption{prefixes-as-symbols}
+% The unit prefixes (\cs{kilo}, \emph{etc.}) are normally given as 
+% letters. However, the package can convert these into numerical powers.
+% This is controlled by the \opt{prefixes-as-symbols} switch option.
+%\begin{LaTeXdemo}
+%  \si{\milli\litre} \\
+%  \SI{10}{\kilo\gram} \\
+%  \si[prefixes-as-symbols=false]{\milli\litre} \\
+%  \SI[prefixes-as-symbols=false]{10}{\kilo\gram}
+%\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
 %
@@ -1303,6 +1795,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_tl_put_left_maths:Nn}
 %\begin{macro}{\siunitx_tl_put_left_maths:NV}
+%\begin{macro}{\siunitx_tl_put_left_maths:cV}
 %\begin{macro}{\siunitx_tl_put_right_maths:Nn}
 %\begin{macro}{\siunitx_tl_put_right_maths:NV}
 %\begin{macro}{\siunitx_tl_put_right_maths:cV}
@@ -1311,12 +1804,13 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_tl_put_left_maths:Nn {
   \tl_put_left:Nn #1 { \ensuremath {#2} }
 }
-\cs_generate_variant:Nn \siunitx_tl_put_left_maths:Nn { NV }
+\cs_generate_variant:Nn \siunitx_tl_put_left_maths:Nn { NV, cV }
 \cs_new:Nn \siunitx_tl_put_right_maths:Nn {
   \tl_put_right:Nn #1 { \ensuremath {#2} }
 }
 \cs_generate_variant:Nn \siunitx_tl_put_right_maths:Nn { NV, cV }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -4786,6 +5280,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \per _literal:w } { / }
 \cs_new:cpn { siunitx_ \token_to_str:N \per _function:w } {
+  \bool_set_true:N \l_siunitx_per_bool
   \siunitx_unit_parse_per:
 }
 %    \end{macrocode}
@@ -5018,9 +5513,9 @@ This work consists of the file  siunitx.dtx
 % stage, so need be created before the reconstruction part of the code.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  prefix-symbols .bool:N    = \l_siunitx_prefix_symbols_bool,
-  prefix-symbols .initial:n = { true },
-  sticky-per     .bool:N    = \l_siunitx_sticky_per_bool,
+  prefixes-as-symbols .bool:N    = \l_siunitx_prefix_symbols_bool,
+  prefixes-as-symbols .initial:n = { true },
+  sticky-per          .bool:N    = \l_siunitx_sticky_per_bool,
 }
 %    \end{macrocode} 
 %\end{macro} 
@@ -5193,19 +5688,29 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Unit formatting}
 %
+%\begin{macro}{\l_siunitx_unit_tl}
 %\begin{macro}{\l_siunitx_unit_current_tl}
 %\begin{macro}{\l_siunitx_unit_denominator_tl}
-%\begin{macro}{\l_siunitx_unit_master_tl}
 %\begin{macro}{\l_siunitx_unit_numerator_tl}
 % Storage space for creating unit output.
 %    \begin{macrocode}
+\tl_new:N \l_siunitx_unit_tl
 \tl_new:N \l_siunitx_unit_current_tl
 \tl_new:N \l_siunitx_unit_denominator_tl
-\tl_new:N \l_siunitx_unit_master_tl
 \tl_new:N \l_siunitx_unit_numerator_tl
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_unit_denominator_int}
+%\begin{macro}{\l_siunitx_unit_numerator_int}
+% For tracking in case brackets are needed.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_unit_denominator_int
+\int_new:N \l_siunitx_unit_numerator_int
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
@@ -5222,16 +5727,22 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_per_fraction_tl}
+%\begin{macro}{\l_siunitx_per_fraction_bool}
+%\begin{macro}{\l_siunitx_per_mode_tl}
 %\begin{macro}{\l_siunitx_qualifier_mode_tl}
 % For saving settings.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_per_fraction_tl
+\bool_new:N \l_siunitx_per_fraction_bool
+\tl_new:N \l_siunitx_per_mode_tl
 \tl_new:N \l_siunitx_qualifier_mode_tl
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %
+%\begin{macro}{\l_siunitx_unit_separator_tl}
+%\begin{macro}{\l_siunitx_per_symbol_tl}
+% At this stage, output formatting options are created.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   inter-unit-separator .set:N     = \l_siunitx_unit_separator_tl ,
@@ -5239,14 +5750,23 @@ This work consists of the file  siunitx.dtx
   per-mode             .choice:,
   per-mode / fraction .code:n = {
     \bool_set_true:N \l_siunitx_per_fraction_bool
+    \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
   },
   per-mode / power .code:n = {
     \bool_set_false:N \l_siunitx_per_fraction_bool
+    \tl_clear:N \l_siunitx_per_mode_tl 
+  },
+  per-mode / repeated-symbol .code:n = {
+    \bool_set_false:N \l_siunitx_per_fraction_bool
+    \tl_set:Nn \l_siunitx_per_mode_tl { repeat }
   },
   per-mode / symbol .code:n = {
     \bool_set_true:N \l_siunitx_per_fraction_bool
+    \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
   },
   per-mode             .initial:n = { power },
+  per-symbol           .set:N     = \l_siunitx_per_symbol_tl,
+  per-symbol           .initial:n = { / },
   qualifier-mode       .choice:,
   qualifier-mode / brackets .code:n = {
     \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets }
@@ -5260,28 +5780,136 @@ This work consists of the file  siunitx.dtx
   qualifier-mode .initial:n = { subscript }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format:}
+% Most of the work is done by the loop, with a little tidying up for
+% fraction-like output.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format: {
   \siunitx_unit_format_init:
   \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } {
     \siunitx_unit_format_loop:
   }
+  \bool_if:NT \l_siunitx_per_fraction_bool {
+    \siunitx_unit_format_fraction:
+  }
 } 
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_add:}
+%\begin{macro}[aux]{\siunitx_unit_format_add_aux:n}
+% Adding the current unit to the output means checking where it goes.
+% The odd code when adding a space is to pick up repeated per symbols, 
+% which need to suppress the space.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_add: {
+  \bool_if:NTF \l_siunitx_per_fraction_bool {
+    \tl_set:Nx \l_siunitx_tmpb_tl {
+      per- \int_use:N \l_siunitx_unit_int
+    }  
+    \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
+      \siunitx_unit_format_add_aux:n { _denominator }
+      \int_incr:N \l_siunitx_unit_denominator_int
+    }{
+      \siunitx_unit_format_add_aux:n { _numerator }
+      \int_incr:N \l_siunitx_unit_numerator_int
+    }
+  }{
+    \siunitx_unit_format_add_aux:n { }
+  }
+  \tl_clear:N \l_siunitx_unit_current_tl
+} 
+\cs_new_nopar:Nn \siunitx_unit_format_add_aux:n {
+  \tl_if_empty:cF { l_siunitx_unit #1 _tl } {
+    \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl {
+      \tl_set:Nx \l_siunitx_tmpa_tl {
+        per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
+      }
+      \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+        \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+          \l_siunitx_unit_separator_tl
+      }
+    }{  
+      \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+        \l_siunitx_unit_separator_tl
+    }
+  }
+  \tl_put_left:cV { l_siunitx_unit #1 _tl } \l_siunitx_unit_current_tl
+} 
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_fraction:}
+%\begin{macro}[aux]{\siunitx_unit_format_fraction:}
+%\begin{macro}[aux]{\siunitx_unit_format_symbol:}
+%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux:n}
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_fraction: {
+  \intexpr_compare:nTF { \l_siunitx_unit_denominator_int > \c_zero } {
+    \use:c { siunitx_unit_format_fraction_ \l_siunitx_per_mode_tl : }
+  }{
+    \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
+  }
+} 
+\cs_new_nopar:Nn \siunitx_unit_format_fraction_fraction: {
+  \tl_if_empty:NT \l_siunitx_unit_numerator_tl {
+    \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 }
+  }
+  \tl_set:No \l_siunitx_unit_numerator_tl {
+    \exp_after:wN { \l_siunitx_unit_numerator_tl }
+  }
+  \tl_set:No \l_siunitx_unit_denominator_tl {
+    \exp_after:wN { \l_siunitx_unit_denominator_tl }
+  }
+  \tl_set:Nn \l_siunitx_unit_tl { \frac }
+  \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
+  \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
+  \tl_set:No \l_siunitx_unit_tl {
+    \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_unit_tl }
+  }
+} 
+\cs_new_nopar:Nn \siunitx_unit_format_fraction_symbol: {
+  \siunitx_unit_format_fraction_symbol_aux:n { numerator }
+  \siunitx_unit_format_fraction_symbol_aux:n { denominator }
+  \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_tl
+    \l_siunitx_per_symbol_tl
+  \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
+}
+\cs_new_nopar:Nn \siunitx_unit_format_fraction_symbol_aux:n {
+  \intexpr_compare:nT { 
+    \int_use:c { l_siunitx_unit_ #1 _int } > \c_one 
+  } {
+    \bool_if:NT \l_siunitx_brackets_bool {
+      \siunitx_tl_put_left_maths:cV { l_siunitx_unit_ #1 _tl }
+        \l_siunitx_bracket_open_tl
+      \siunitx_tl_put_right_maths:cV { l_siunitx_unit_ #1 _tl }
+        \l_siunitx_bracket_close_tl
+    }
+  }
+} 
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_init:}
 % The normal initialisation stuff.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_init: {
+  \tl_clear:N \l_siunitx_unit_tl
   \tl_clear:N \l_siunitx_unit_current_tl
   \tl_clear:N \l_siunitx_unit_denominator_tl
-  \tl_clear:N \l_siunitx_unit_master_tl
   \tl_clear:N \l_siunitx_unit_numerator_tl
   \int_zero:N \l_siunitx_unit_prefix_base_int
   \int_zero:N \l_siunitx_unit_prefix_int
+  \int_zero:N \l_siunitx_unit_denominator_int
+  \int_zero:N \l_siunitx_unit_numerator_int
 } 
 %    \end{macrocode}
 %\end{macro}
@@ -5295,17 +5923,18 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \char_make_active:N \~
 \cs_new:Nn \siunitx_unit_format_literal:n {
+  \int_zero:N \l_siunitx_unit_prefix_int
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
-  \tl_set:Nn \l_siunitx_unit_master_tl {#1}
+  \tl_set:Nn \l_siunitx_unit_tl {#1}
   \tl_set:No \l_sunitx_tmpa_tl {
     \exp_after:wN \ensuremath \exp_after:wN { 
       \l_siunitx_unit_separator_tl 
     }
   }
-  \tl_replace_all_in:NnV \l_siunitx_unit_master_tl { . } 
+  \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } 
     \l_sunitx_tmpa_tl
-  \tl_replace_all_in:NnV \l_siunitx_unit_master_tl { ~ } 
+  \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } 
     \l_sunitx_tmpa_tl
 }
 \cs_new_nopar:Nn \siunitx_unit_print_literal_aux:N {
@@ -5326,13 +5955,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_format_symbol:
   \siunitx_unit_format_qualifier:
   \siunitx_unit_format_power:
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-  \intexpr_compare:nT { \l_siunitx_unit_int > \c_one } {
-    \siunitx_tl_put_left_maths:NV \l_siunitx_unit_master_tl
-      \l_siunitx_unit_separator_tl
-  }
-  \tl_put_left:NV \l_siunitx_unit_master_tl \l_siunitx_unit_current_tl
-  \tl_clear:N \l_siunitx_unit_current_tl
+  \siunitx_unit_format_add:
   \int_decr:N \l_siunitx_unit_int
   \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } {
     \siunitx_unit_format_loop:
@@ -5342,37 +5965,50 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_power:}
-%\begin{macro}[aux]{\siunitx_unit_format_power_per:}
-%\begin{macro}[aux]{\siunitx_unit_format_power_brackets:}
+%\begin{macro}[aux]{\siunitx_unit_format_power_aux:}
 % To format powers, there are a few issues: are brackets needed, is
-% the power reciprocal and is fraction-formatting in operation.
+% the power reciprocal and is fraction-formatting in operation. Repeated
+% per symbols make life a little more complex, as they have to be 
+% handled here as well. 
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_power: {
   \tl_set:Nx \l_siunitx_tmpa_tl {
     power- \int_use:N \l_siunitx_unit_int
   }
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
     \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
       \l_siunitx_tmpa_tl
+    \siunitx_unit_format_power_aux:
+  }{
+    \tl_set:Nx \l_siunitx_tmpa_tl {
+      per- \int_use:N \l_siunitx_unit_int
+    }
+    \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
+      \tl_set:Nn \l_siunitx_tmpa_tl { 1 }
+      \siunitx_unit_format_power_aux:
+    }
+  }
+}
+\cs_new_nopar:Nn \siunitx_unit_format_power_aux: {
+  \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl {
+    \siunitx_unit_format_power_repeat:
+  }{
     \siunitx_unit_format_power_per:
+  }
+  \tl_if_eq:nVF { 1 } \l_siunitx_tmpa_tl {
     \siunitx_unit_format_power_brackets:
     \tl_put_right:No \l_siunitx_unit_current_tl {
       \exp_after:wN ^ \exp_after:wN { \l_siunitx_tmpa_tl }
     }
   }
 }
-\cs_new_nopar:Nn \siunitx_unit_format_power_per: {
-  \tl_set:Nx \l_siunitx_tmpb_tl {
-    per- \int_use:N \l_siunitx_unit_int
-  }  
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
-    \bool_if:NF \l_siunitx_per_fraction_tl {
-      \tl_set:Nx \l_siunitx_tmpa_tl {
-        \intexpr_eval:n { - \l_siunitx_tmpa_tl }
-      }
-    }
-  } 
-}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_unit_format_power_brackets:}
+% A check is made for a qualifier with a space, which needs brackets
+% if there is also a power.
+%    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_unit_format_power_brackets: {
   \tl_set:Nx \l_siunitx_tmpb_tl {
     bracket- \int_use:N \l_siunitx_unit_int
@@ -5388,6 +6024,39 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}[aux]{\siunitx_unit_format_power_per:}
+%\begin{macro}[aux]{\siunitx_unit_format_power_repeat:}
+% For dealing with \cs{per} and repeated \cs{per} symbols. The sign
+% change does not use any numbers, as this makes life easier with 
+% non-integer values.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_format_power_per: {
+  \tl_set:Nx \l_siunitx_tmpb_tl {
+    per- \int_use:N \l_siunitx_unit_int
+  }  
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
+    \bool_if:NF \l_siunitx_per_fraction_bool {
+      \tl_if_in:NnTF \l_siunitx_tmpa_tl { - } {
+        \cs_set:Npn \siunitx_tmp:w ##1 - ##2 \q_stop {
+          \tl_set:Nn \l_siunitx_tmpa_tl {##2}
+        }
+        \exp_afer:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
+      }{
+        \tl_put_left:Nn \l_siunitx_tmpa_tl { - }
+      }
+    }
+  } 
+}
+\cs_new_nopar:Nn \siunitx_unit_format_power_repeat: {
+  \tl_set:Nx \l_siunitx_tmpb_tl {
+    per- \int_use:N \l_siunitx_unit_int
+  }  
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
+    \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
+      \l_siunitx_per_symbol_tl
+  } 
+}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
@@ -5536,6 +6205,57 @@ This work consists of the file  siunitx.dtx
     \msg_error:nn { siunitx } { prefix-only }
   }
 } 
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Unit output}
+% 
+% A collection of the internal parts of various user functions.
+% 
+%\begin{macro}{\l_siunitx_number_unit_breaks_bool}
+%\begin{macro}{\l_siunitx_number_unit_separator_tl}
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  allow-number-unit-breaks .bool:N    = 
+    \l_siunitx_number_unit_breaks_bool,
+  number-unit-separator    .set:N     = 
+    \l_siunitx_number_unit_separator_tl,
+  number-unit-separator    .initial:n = { \, }
+}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
+% 
+%\begin{macro}{\siunitx_unit_output:nn}
+% For typesetting a unit directly: used by \cs{si} and the \texttt{s}
+% column. The second argument is any options to set locally.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_unit_output:nn {
+  \siunitx_unit_in:nn {#1} {#2}
+  \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } {
+    \tl_set:Nx \l_siunitx_tmpa_tl {
+      \int_use:N \l_siunitx_unit_prefix_base_int ^
+        { \int_use:N \l_siunitx_unit_prefix_int }
+    }
+    \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+    \siunitx_unit_output_number_sep:
+  }
+  \siunitx_print:nV { unit } \l_siunitx_unit_tl
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_unit_output_number_sep:}
+% For printing the number separator.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_unit_output_number_sep: {
+  \bool_if:NTF \l_siunitx_number_unit_breaks_bool {
+    \allowbreak
+  }{
+    \nobreak
+  }
+  \ensuremath { \l_siunitx_number_unit_separator_tl }
+}
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5902,12 +6622,11 @@ This work consists of the file  siunitx.dtx
 \DeclareDocumentCommand \si { o m } {
   \group_begin:
     \IfNoValueTF {#1} {
-      \siunitx_unit_in:nn {#2} { }
+      \siunitx_unit_output:nn {#2} { }
     }{
       \keys_set:nn { siunitx } {#1}
-      \siunitx_unit_in:nn {#2} {#1}
+      \siunitx_unit_output:nn {#2} {#1}
     }
-    \siunitx_print:nV { unit } \l_siunitx_unit_master_tl
   \group_end:
 }
 %    \end{macrocode}
