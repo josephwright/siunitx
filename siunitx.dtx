@@ -109,8 +109,9 @@ This work consists of the file  siunitx.dtx
   [\filedate\space v\fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{booktabs,caption,helvet,mathpazo,siunitx}
+\usepackage{booktabs,caption,helvet,siunitx}
 \usepackage[final]{listings}
+\usepackage[osf]{mathpazo}
 \DeclareSIPower\quartic{4}
 \DeclareSIPower*\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
@@ -169,8 +170,10 @@ This work consists of the file  siunitx.dtx
 %      DeclareSIUnit,
 %      mathnormal,
 %      num,
+%      numrange,
 %      si,
 %      SI,
+%      SIrange,
 %      sisetup,
 %      SIUnitSymbolDegree,
 %      text,
@@ -303,8 +306,8 @@ This work consists of the file  siunitx.dtx
 %
 % The entire bundle is supplied with the TDS-ready \texttt{zip} file,
 % \texttt{siunitx.tds.zip}.  Simply unzip this into your local texmf
-% tree and run your hash program (\texttt{texhash} for \TeX{}Live or
-% \texttt{initextmf -u} for MiK\TeX).
+% tree and run your hash program (\texttt{texhash} for most recent
+% \TeX\ systems).
 % 
 %\section{\pkg{siunitx} for the impatient}
 %
@@ -314,6 +317,7 @@ This work consists of the file  siunitx.dtx
 %  \item \cs{si}\oarg{options}\marg{unit}
 %  \item \cs{SI}\oarg{options}\marg{value}\oarg{pre-unit}\marg{unit}
 %  \item \cs{numrange}\oarg{options}\marg{number}\marg{number}
+%  \item \cs{SIrange}\oarg{options}\marg{number}\marg{number}\marg{unit}
 %  \item \cs{ang}\oarg{options}\marg{angle}
 %  \item \cs{sisetup}\marg{options}
 %\end{itemize}
@@ -339,6 +343,12 @@ This work consists of the file  siunitx.dtx
 %  \si{\kilogram\metre\per\second} \\
 %  \si[per-mode=symbol]
 %    {\kilogram\metre\per\second}      
+%\end{LaTeXdemo}
+%
+% Simple ranges of numbers can be handled.
+%\begin{LaTeXdemo}
+%  \numrange{10}{20}  \\
+%  \SIrange{0.13}{0.67}{\milli\metre}
 %\end{LaTeXdemo}
 % 
 % By default, all text is typeset in the current upright, serif maths
@@ -375,7 +385,16 @@ This work consists of the file  siunitx.dtx
 %  \num{.12345}  \\
 %  \num{3.45d-4} \\
 %  \num{-e10}
-%\end{LaTeXdemo} 
+%\end{LaTeXdemo}
+%
+%\DescribeMacro{\numrange} 
+% Simple ranges of numbers can be handled using the \cs{numrange}
+% function. This acts in the same way as \cs{num}, but inserts a 
+% pharse or other text between the two entries. This function will not
+% accept multi-part numbers.
+%\begin{LaTeXdemo}
+%  \numrange{10}{30} \\
+%\end{LaTeXdemo}
 %
 %\subsection{Units}
 %
@@ -1187,24 +1206,25 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      close-bracket            & Literal & )           \\ 
-%      exponent-base            & Literal & 10          \\
-%      exponent-product         & Maths   & \cs{times}  \\
-%      group-decimal-digits     & Switch  & true        \\
-%      group-digits             & Switch  & true        \\
-%      group-four-digits        & Switch  & false       \\
-%      group-integer-digits     & Switch  & true        \\
-%      group-separator          & Maths   & \cs{,}      \\
-%      negative-colour          & Literal & \meta{none} \\
-%      open-bracket             & Literal & (           \\ ^^A ) (
-%      output-close-uncertainty & Literal & )           \\ 
-%      output-complex-root      & Maths   & i           \\
-%      output-decimal-marker    & Maths   & .           \\
-%      output-open-uncertainty  & Literal & (           \\ ^^A )
-%      separate-uncertainty     & Switch  & false       \\
-%      tight-spacing            & Switch  & false       \\
-%      uncertainty-separator    & Maths   & \meta{none} \\
-%      use-brackets             & Switch  & true        \\
+%      close-bracket            & Literal & )            \\ 
+%      exponent-base            & Literal & 10           \\
+%      exponent-product         & Maths   & \cs{times}   \\
+%      group-decimal-digits     & Switch  & true         \\
+%      group-digits             & Switch  & true         \\
+%      group-four-digits        & Switch  & false        \\
+%      group-integer-digits     & Switch  & true         \\
+%      group-separator          & Maths   & \cs{,}       \\
+%      negative-colour          & Literal & \meta{none}  \\
+%      open-bracket             & Literal & (            \\ ^^A ) (
+%      output-close-uncertainty & Literal & )            \\ 
+%      output-complex-root      & Maths   & i            \\
+%      output-decimal-marker    & Maths   & .            \\
+%      output-open-uncertainty  & Literal & (            \\ ^^A )
+%      range-phrase             & Literal & \verb*= to = \\
+%      separate-uncertainty     & Switch  & false        \\
+%      tight-spacing            & Switch  & false        \\
+%      uncertainty-separator    & Maths   & \meta{none}  \\
+%      use-brackets             & Switch  & true         \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1327,6 +1347,16 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \num{1 \pm 2i e3} \\
 %  \num[tight-spacing = true]{1 \pm 2i e3} \\
+%\end{LaTeXdemo}
+%
+%\DescribeOption{range-phrase}
+% Ranges of numbers can be given as input. These will have an 
+% appropriate word or symbol inserted between the two entries: this
+% is stored using the \opt{range-phrase} option. The phrase should 
+% include any necessary spaces: no extra space is added.
+%\begin{LaTeXdemo}
+%  \numrange{5}{100} \\
+%  \numrange[range-phrase = --]{5}{100}
 %\end{LaTeXdemo}
 %
 %\subsection{Multi-part numbers}
@@ -6275,6 +6305,63 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\subsection{Ranges}
+%
+%\begin{macro}{\l_siunitx_range_phrase_tl}
+% Simple settings for ranges.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  range-phrase .set:N     = \l_siunitx_range_phrase_tl,
+  range-phrase .initial:n = { ~ to ~ }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_range_numbers:nn}
+%\begin{macro}{\siunitx_range_numbers_aux:n}
+% A range of numbers. This is more restrictive than the \cs{num} 
+% function: nothing compound.
+%    \begin{macrocode}
+\cs_set:Nn \siunitx_range_numbers:nn {
+    \siunitx_range_numbers_aux:n {#1}
+    \text { \l_siunitx_range_phrase_tl }
+    \siunitx_range_numbers_aux:n {#2}
+}
+\cs_new:Nn \siunitx_range_numbers_aux:n {
+  \bool_if:NTF \l_siunitx_number_parse_bool {
+    \tl_clear:N \l_siunitx_number_out_tl
+    \tl_clear:N \l_siunitx_number_out_saved_tl
+    \bool_set_false:N \l_siunitx_number_compound_bool
+    \siunitx_number_output_parse:n {#1}
+    \bool_if:NTF \l_siunitx_number_compound_bool {
+      \msg_error:nnx { siunitx } { multi-part-range } {#1}
+    }{
+      \siunitx_number_output_print:
+    }
+  }{
+    \siunitx_print:nn  { number } {#1}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_range_unit:nnnn}
+% Unit printing is also simple: basically a past-up job.
+%    \begin{macrocode}
+\cs_set:Nn \siunitx_range_unit:nnnn {
+  \siunitx_unit_in:nn {#1} {#2}
+  \siunitx_range_numbers_aux:n {#3}
+  \siunitx_unit_output_number_sep:
+  \siunitx_print:nV { unit } \l_siunitx_unit_tl
+  \text { \l_siunitx_range_phrase_tl }
+  \siunitx_range_numbers_aux:n {#4}
+  \siunitx_unit_output_number_sep:
+  \siunitx_print:nV { unit } \l_siunitx_unit_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
@@ -6509,6 +6596,12 @@ This work consists of the file  siunitx.dtx
   You gave the literal input `\exp_not:n {#1}'\\%
   but literal unit output is disabled.%
 }
+\msg_new:nnnn { siunitx } { multi-part-range } {%
+  Numerical range with multiple parts.%
+}{%
+  The input `#1' is a number which has more than one part.\\
+  Ranges can only contain one number in each part.%
+}
 \msg_new:nnnn { siunitx } { misplaced-complex-root } {%
   Misplaced complex root.%
 }{%
@@ -6630,6 +6723,21 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\numrange}
+% A very simple approach is taken here: this is not intended for 
+% anything complicated.
+%    \begin{macrocode}
+\DeclareDocumentCommand \numrange { o m m } {
+  \group_begin:
+    \IfNoValueF {#1} {
+      \keys_set:nn { siunitx } {#1}
+    }
+    \siunitx_range_numbers:nn {#2} {#3}
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\si}
 % The \cs{si} macro needs to pass options through to the internal
 % function as well as setting them here. This is used so that options
@@ -6642,6 +6750,23 @@ This work consists of the file  siunitx.dtx
     }{
       \keys_set:nn { siunitx } {#1}
       \siunitx_unit_output:nn {#2} {#1}
+    }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\SIrange}
+% Printing unit ranges is a lot less complex than printing single 
+% numbers with units, as we insist that everything is kept simple.
+%    \begin{macrocode}
+\DeclareDocumentCommand \SIrange { o m m m } {
+  \group_begin:
+    \IfNoValueTF {#1} {
+      \siunitx_range_unit:nnnn {#4} { } {#2} {#3}
+    }{
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_range_unit:nnnn {#4} {#1} {#2} {#3}
     }
   \group_end:
 }
@@ -6799,7 +6924,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \gray      { Gy }
 \DeclareSIUnit \hertz     { Hz }
 \DeclareSIUnit \henry     { H }
-\DeclareSIUnit\joule      { J }
+\DeclareSIUnit \joule     { J }
 \DeclareSIUnit \katal     { kat }
 \DeclareSIUnit \lumen     { lm }
 \DeclareSIUnit \lux       { lx }
@@ -6865,13 +6990,13 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\tonne}
 % Non-SI, but accepted for general use.
 %    \begin{macrocode}
-\DeclareSIUnit[number-unit-separator={}] \arcmin { \arcminute } 
-\DeclareSIUnit[number-unit-separator={}] \arcminute 
+\DeclareSIUnit[number-unit-separator = ] \arcmin { \arcminute } 
+\DeclareSIUnit[number-unit-separator = ] \arcminute 
   { \SIUnitSymbolArcminute }
-\DeclareSIUnit[number-unit-separator={}] \arcsecond 
+\DeclareSIUnit[number-unit-separator = ] \arcsecond 
   { \SIUnitSymbolArcsecond }
 \DeclareSIUnit \day { d }
-\DeclareSIUnit[number-unit-separator={}] \degree { \SIUnitSymbolDegree }
+\DeclareSIUnit[number-unit-separator = ] \degree { \SIUnitSymbolDegree }
 \DeclareSIUnit \hectare { ha }
 \DeclareSIUnit \hour    { h }
 \DeclareSIUnit \litre   { l }
@@ -6979,7 +7104,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-
 %    
 %    \begin{macrocode}
 %</package>
