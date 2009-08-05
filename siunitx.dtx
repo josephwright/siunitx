@@ -3008,7 +3008,7 @@ This work consists of the file  siunitx.dtx
 % Finally for complex numbers, make sure there are no stray tokens.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_complex_check:n {
-  \siunitx_number_in_complex_check_aux:n { #1 }
+  \siunitx_number_in_complex_check_aux:n {#1}
   \siunitx_number_in_complex_check_aux:n { #1 -complex }
 }
 \cs_new_nopar:Nn \siunitx_number_in_complex_check_aux:n {
@@ -3469,7 +3469,7 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:NN \l_siunitx_input_uncert_open_tl
     \siunitx_number_in_uncertainty_open:N
 }
-\cs_new_nopar:Nn \siunitx_number_in_uncertainty_open:N { }
+\cs_new:Nn \siunitx_number_in_uncertainty_open:N { }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -4617,8 +4617,8 @@ This work consists of the file  siunitx.dtx
 % of course if grouping has been requested.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_format_group:n {
-  \siunitx_number_format_group_aux:nn { #1 } { integer }
-  \siunitx_number_format_group_aux:nn { #1 } { decimal }
+  \siunitx_number_format_group_aux:nn {#1} { integer }
+  \siunitx_number_format_group_aux:nn {#1} { decimal }
   \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -integer } {
     \siunitx_number_format_copy:nn { #1 -integer } {#1}
   }{
@@ -4728,7 +4728,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_format_group_integer_setup:V \l_siunitx_tmpa_tl
   }
 }
-\cs_new_nopar:Nn \siunitx_number_format_group_integer_setup:n {
+\cs_new:Nn \siunitx_number_format_group_integer_setup:n {
   \siunitx_number_format_group_integer_setup_aux:NNNN { } #1 { } { } { }
 }
 \cs_generate_variant:Nn \siunitx_number_format_group_integer_setup:n 
@@ -4863,7 +4863,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
 %\begin{macro}{\siunitx_number_format_uncertainty_joined:n}
 %\begin{macro}{\siunitx_number_format_uncertainty_sep:n}
-%\begin{macro}[aux]{\siunitx_number_format_uncertainty_pm:n}
+%\begin{macro}[aux]{\siunitx_number_format_uncertainty_pm:}
 % Uncertainty output varies depending on whether there is a need to 
 % separate the error form the number in the output. 
 %    \begin{macrocode}
@@ -4900,11 +4900,11 @@ This work consists of the file  siunitx.dtx
       }
     }
     \siunitx_number_format_group:n { #1 -uncertainty }
-    \siunitx_number_format_uncertainty_pm:n {#1}
+    \siunitx_number_format_uncertainty_pm:
     \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
          \l_siunitx_tmpa_tl
 }
-\cs_new_nopar:Nn \siunitx_number_format_uncertainty_pm:n {
+\cs_new_nopar:Nn \siunitx_number_format_uncertainty_pm: {
   \bool_if:NTF \l_siunitx_tight_bool {
     \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { \pm } } }
   }{
@@ -5426,7 +5426,7 @@ This work consists of the file  siunitx.dtx
 % The creation functions expand everything as far as possible so that
 % there is less to do in the document.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_unit_create:N {
+\cs_new:Nn \siunitx_unit_create:N {
   \cs_if_free:NT #1 {
     \cs_set:Npx \siunitx_tmp:w {
       \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { } {
@@ -5442,7 +5442,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_tmp:w
   }
 }
-\cs_new_nopar:Nn \siunitx_unit_create_with_arg:N {
+\cs_new:Nn \siunitx_unit_create_with_arg:N {
   \cs_if_free:NT #1 {
     \cs_set:Npx \siunitx_tmp:w {
       \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { o } {
@@ -5521,7 +5521,7 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nn \l_siunitx_tmpa_tl \l_siunitx_tmpa_tl
   \tl_if_empty:NTF \l_siunitx_tmpa_tl {#3} {#2}
 }
-\cs_new_nopar:Nn \siunitx_unit_if_literal_aux:N {
+\cs_new:Nn \siunitx_unit_if_literal_aux:N {
   \cs_set_eq:NN #1 \prg_do_nothing:
 }
 %    \end{macrocode}
@@ -5592,7 +5592,7 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:NN \l_siunitx_declare_list_tl 
     \siunitx_unit_parse_init_aux:N
 }
-\cs_new_nopar:Nn \siunitx_unit_parse_init_aux:N {
+\cs_new:Nn \siunitx_unit_parse_init_aux:N {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
 }
 %    \end{macrocode}
@@ -5698,7 +5698,7 @@ This work consists of the file  siunitx.dtx
 % the literal to the property list. There is also a check to see if
 % there is a `sticky' \cs{per} to think about.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_unit_parse_unit:n {
+\cs_new:Nn \siunitx_unit_parse_unit:n {
   \tl_set:Nx \l_siunitx_tmpa_tl { 
     prefix- \int_use:N \l_siunitx_unit_int
   }
@@ -5983,7 +5983,7 @@ This work consists of the file  siunitx.dtx
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } 
     \l_sunitx_tmpa_tl
 }
-\cs_new_nopar:Nn \siunitx_unit_print_literal_aux:N {
+\cs_new:Nn \siunitx_unit_print_literal_aux:N {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }  
 \char_make_ignore:N \~
@@ -6501,7 +6501,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_symbol_new:n}
 % For creating the outer symbol macro.
 %    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_symbol_new:n {
+\cs_new:Nn \siunitx_symbol_new:n {
   \exp_args:Nc \DeclareDocumentCommand { SIUnitSymbol #1 } { } {
     \mode_if_math:TF {
       \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } }
