@@ -1825,14 +1825,18 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_upgreek_check: { 
   \@ifpackageloaded { upgreek } {
-    \cs_set_eq:NN \c_siunitx_mu_maths_tl \ipmu
+    \cs_set_eq:NN \c_siunitx_mu_maths_tl \upmu
   }{
-    \DeclareFontFamily { OML } { eur } { \skewchar \font 127 }
-    \DeclareFontShape { OML } { eur } { m } { n } 
-      { <-6> eurm5 <6-8> eurm7 <8-> eurm10 } { }
-    \DeclareSymbolFont { siunitx_symbol } { OML } { eur } { m } { n }
-    \DeclareMathSymbol \c_siunitx_mu_maths_tl \mathord 
-      { siunitx_symbol } { 22 }
+    \@ifpackageloaded { fourier } {
+      \cs_set_eq:NN \c_siunitx_mu_maths_tl \othermu
+    }{
+      \DeclareFontFamily { OML } { eur } { \skewchar \font 127 }
+      \DeclareFontShape { OML } { eur } { m } { n } 
+        { <-6> eurm5 <6-8> eurm7 <8-> eurm10 } { }
+      \DeclareSymbolFont { siunitx_symbol } { OML } { eur } { m } { n }
+      \DeclareMathSymbol \c_siunitx_mu_maths_tl \mathord 
+        { siunitx_symbol } { 22 }
+    }
   }
 }
 \AtBeginDocument { \siunitx_upgreek_check: }
