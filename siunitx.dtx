@@ -1662,10 +1662,11 @@ This work consists of the file  siunitx.dtx
 %\DescribeMacro{\SIUnitSymbolOhm}
 % The maths and text symbols defined above are wrapped up into mode
 % independent functions with user names.  These are then used in the
-% definitions of the appropriate units.  For example, the angstrom
-% symbol can be accessed using the macro \cs{SIUnitSymbolAngstrom}.
+% definitions of the appropriate units.  For example, the micro
+% symbol can be accessed using the macro \cs{SIUnitSymbolMicro}.
 % Notice that these names capitalise the unit name (to make reading 
-% the macro name easier!).
+% the macro name easier!).\footnote{The function 
+% \cs{SIUnitSymbolAngstrom} uses the name without accents.}
 % 
 %\section{Usage tips} 
 % 
@@ -6258,15 +6259,40 @@ This work consists of the file  siunitx.dtx
 % 
 % A collection of the internal parts of various user functions.
 % 
+%\begin{macro}{\l_siunitx_number_unit_power_bool}
+%\begin{macro}{\l_siunitx_number_unit_repeat_bool}
+% Some storage for options.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_number_unit_power_bool
+\bool_new:N \l_siunitx_number_unit_repeat_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+% 
 %\begin{macro}{\l_siunitx_number_unit_breaks_bool}
 %\begin{macro}{\l_siunitx_number_unit_separator_tl}
+% Options for printing units or units with numbers.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   allow-number-unit-breaks .bool:N    = 
     \l_siunitx_number_unit_breaks_bool,
   number-unit-separator    .set:N     = 
     \l_siunitx_number_unit_separator_tl,
-  number-unit-separator    .initial:n = { \, }
+  number-unit-separator    .initial:n = { \, },
+  repeated-units .choice:,
+  repeated-units / false .code:n = {
+    \bool_set_false:N \l_siunitx_number_unit_power_bool
+    \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+  },
+  repeated-units / power .code:n = {
+    \bool_set_false:N \l_siunitx_number_unit_power_bool
+    \bool_set_true:N \l_siunitx_number_unit_repeat_bool
+  },
+  repeated-units / true .code:n = {
+    \bool_set_true:N \l_siunitx_number_unit_power_bool
+    \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+  },
+  repeated-units           .initial:n = { true }
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -6305,6 +6331,129 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\subsection{Numbers with units}
+%
+% Numbers with units have to be formatted in a more complex way than
+% simply sticking the two together.
+% 
+%\begin{macro}{\l_siunitx_pre_unit_tl}
+% When there is a pre-unit, it gets stored here.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_pre_unit_tl
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_product_int}
+% Used to count up the number of product tokens in a number.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_number_product_int
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_combined:nnnn}
+% Setting up for printing numbers with units is a more complex operation
+% than it first appears. First, the pre-unit is set up: this is easy.
+% The main unit is a bit more complex, so is handled separately. The
+% number part is then handed off.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_combined:nnnn {
+  \IfNoValueTF {#3} {
+    \siunitx_unit_in:nn {#3} {#1} 
+    \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
+  }{
+    \tl_clear:N \l_siunitx_pre_unit_tl 
+  }
+  \siunitx_combined_unit:nnn {#2} {#4} {#1}
+  \siunitx_combined_loop:n {#2}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_combined_loop:n}
+%\begin{macro}{\siunitx_combined_loop:V}
+% Printing is controlled here. There are a number of tasks to carry out,
+% hence needing to work in this way.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_combined_loop:n {
+  \intexpr_compare:nTF { \l_siunitx_unit_prefix_int = \c_zero } {
+    \siunitx_number_output:n {#1}
+  }{
+    \tl_set:Nn \l_siunitx_tmpa_tl { #1 e }
+    \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_unit_prefix_int
+    \exp_args:NV \siunitx_number_output:n \l_siunitx_tmpa_tl
+  }
+  \siunitx_unit_output_number_sep:
+  \siunitx_print:nV { unit } \l_siunitx_unit_tl
+}
+\cs_generate_variant:Nn \siunitx_combined_loop:n { V } 
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_combined_number:n}
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_combined_number:n {
+  \bool_if:NTF \l_siunitx_number_parse_bool {
+    \tl_clear:N \l_siunitx_number_out_tl
+    \tl_clear:N \l_siunitx_number_out_saved_tl
+    \bool_set_false:N \l_siunitx_number_compound_bool
+    \siunitx_number_output_parse:n {#1}
+    \siunitx_number_output_print:
+  }{
+    \siunitx_print:nn  { number } {#1}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_combined_main_unit:nnn}
+% In most cases, sorting out the main unit is easy: simply set up for
+% printing using \cs{siunitx_unit_in:nn}. However, if there are multiple
+% parts to the number, and they are to be combined into the unit, then
+% there is more work to do. In either case, the result is the 
+% correctly-prepared unit stored in \cs{l_siunitx_unit_tl}.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_combined_unit:nnn {
+  \bool_if:NTF \l_siunitx_number_unit_repeat_bool {
+    \siunitx_combined_product_count:n {#1}
+    \intexpr_compare:nTF { \l_siunitx_number_product_int > \c_zero } {
+      \tl_set:Nn \l_siunitx_tmpa_tl {#2}
+      \tl_set:No \l_siunitx_tmpb_tl {
+        \exp_after:wN \tothe \exp_after:wN 
+          { \int_use:N \l_siunitx_number_product_int }
+      }
+      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+      \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#1}
+    }{
+      \siunitx_unit_in:nn {#2} {#3}
+    }
+  }{
+    \siunitx_unit_in:nn {#2} {#3}
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_combined_product_count:n}
+%\begin{macro}[aux]{\siunitx_combined_product_count_aux:n}
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_combined_product_count:n {
+  \int_zero:N \l_siunitx_number_product_int
+  \tl_set:Nn \l_siunitx_tmpa_tl {#1}
+  \tl_map_function:NN \l_siunitx_input_product_tl 
+    \siunitx_combined_product_count_aux:N
+}
+\cs_new:Nn \siunitx_combined_product_count_aux:N {
+  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} {
+    \int_incr:N \l_siunitx_number_product_int
+    \tl_remove_in:Nn \l_siunitx_tmpa_tl {#1}
+    \siunitx_combined_product_count_aux:N #1
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Ranges}
 %
 %\begin{macro}{\l_siunitx_range_phrase_tl}
@@ -6312,7 +6461,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   range-phrase .set:N     = \l_siunitx_range_phrase_tl,
-  range-phrase .initial:n = { ~ to ~ }
+  range-phrase .initial:n = { ~to~ }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6359,6 +6508,32 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_output_number_sep:
   \siunitx_print:nV { unit } \l_siunitx_unit_tl
 }
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Setting up tables}
+%
+%\begin{macro}{\siunitx_table_rewrite_cellspace:}
+% There is a slight problem with the \pkg{cellspace} package: it also
+% uses \texttt{S} for a column type  Here, \texttt{S} seems to make
+% more sense for \pkg{siunitx}, with \texttt{C} used for 
+% \pkg{cellspace}. To enable this to work well, the column
+% rewriting code happens \cs{AtBeginDocument}. The \texttt{S} column
+%  is deleted from \cs{NC@list} so that no warning appears.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_rewrite_cellspace: {
+  \@ifpackageloaded { cellspace } {
+    \newcolumntype { C } [1] {
+      > { \bcolumn ##1 \@nil } ##1 < { \ecolumn }
+    }
+    \cs_set:Npn \siunitx_tmp:w ##1 \NC@do~S ##2 \q_stop {
+      \toks_set:N \NC@list { ##1 ##2 }
+    }
+    \exp_after:wN \siunitx_tmp:w \toks_use:N \NC@list \q_stop
+    \cs_gundefine:N \NC@find@S
+  } { }
+}
+\AtBeginDocument { \siunitx_table_rewrite_cellspace: }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -6777,8 +6952,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \DeclareDocumentCommand \SI { o m o m } {
   \group_begin:
-    \IfNoValueF {#1} {
+    \IfNoValueTF {#1} {
+      \siunitx_combined:nnnn { } {#2} {#3} {#4}
+    }{
       \keys_set:nn { siunitx } {#1}
+      \siunitx_combined:nnnn {#1} {#2} {#3} {#4}
     }
   \group_end:
 }
