@@ -6537,6 +6537,78 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_table_rewrite_create:N}
+% The \texttt{s} and \texttt{S} column types are both created using
+% the \pkg{array} package, but with the internal macros redefined
+% to work with optional argument. First, there is a need to do a 
+% quick shuffle with the \cs{NC@list} macro. The \pkg{siunitx} 
+% columns have to be listed first, as otherwise the optional 
+% arguments do not work correctly. So they are added `by hand' to 
+% the appropriate macro.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_rewrite_create:N {
+  \tl_set:Nn \l_siunitx_tmpa_tl { \NC@do ~ #1 }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \NC@list
+  \newcolumntype {#1} { }
+  \toks_set:NV \NC@list \l_siunitx_tmpa_tl
+  \exp_args:NNc \renewcommand * { NC@rewrite@ #1 } [1] [ ] {
+    \toks_put_right:Nn \@temptokena {
+      > { \siunitx_table_collect_begin:Nn #1 {##1} } 
+      c
+      < { \siunitx_table_print: } 
+    }
+    \use:c { siunitx_table_column_start_ #1 : }
+    \NC@find
+  }
+}
+\AtBeginDocument { \siunitx_table_rewrite_create:N S }
+\AtBeginDocument { \siunitx_table_rewrite_create:N s }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_column_start_S:}
+%\begin{macro}{\siunitx_table_column_start_s:}
+%\begin{macro}{\siunitx_table_column_start_s_aux}
+% There is a slight issue with the \texttt{s} column: \TeX\ attempts to
+% expand material in columns \emph{before} using the template to wrap
+% material up (this allows \cs{omit} and \cs{span} to be inside other 
+% macros). The result is that the unit macros have to be defined when
+% the column starts if they are to work correctly. Everything needs to
+% be unexpandable, hence the \cs{protected} definition used.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_column_start_S: { }
+\cs_new_nopar:Nn \siunitx_table_column_start_s: {
+  \group_execute_after:N \siunitx_table_column_start_s_aux:
+}
+\cs_new_nopar:Nn \siunitx_table_column_start_s_aux: {
+  \bool_if:NF \l_siunitx_create_free_bool {
+    \tl_map_inline:Nn \l_siunitx_declare_list_tl {
+      \cs_set_protected_nopar:Npn ##1 { }
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Collecting tokens in tables}
+%
+% The table system is in two parts, collecting tokens and typesetting
+% the result.  The collection routine tries to ensure that the 
+% typesetting part only receives real cell contents.
+% 
+%\begin{macro}{\siunitx_table_collect_begin:Nn}
+% The collector starts by setting up local options, then clears and
+% initialises the storage and testing system.  
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_begin:Nn {
+  \group_begin:
+    \keys_set:nn { siunitx } {#2}
+}
+%    \end{macrocode}
+%\end{macro} 
+%
 %\subsection{Symbols}
 %
 % Not all units use letters alone for their symbol. This raises two 
