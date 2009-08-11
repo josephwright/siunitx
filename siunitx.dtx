@@ -6587,7 +6587,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_table_column_start_s_aux: {
   \bool_if:NF \l_siunitx_create_free_bool {
     \tl_map_inline:Nn \l_siunitx_declare_list_tl {
-      \cs_set_protected_nopar:Npn ##1 { }
+      \cs_set_protected_nopar:Npn ##1 { \ERROR }
     }
   }
 }
@@ -6602,6 +6602,29 @@ This work consists of the file  siunitx.dtx
 % the result.  The collection routine tries to ensure that the 
 % typesetting part only receives real cell contents.
 % 
+%\begin{macro}{\l_siunitx_table_collect_tl}
+%\begin{macro}{\l_siunitx_table_collect_pre_tl}
+%\begin{macro}{\l_siunitx_table_collect_post_tl}
+% Three storage areas.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_table_collect_tl
+\tl_new:N \l_siunitx_table_collect_pre_tl
+\tl_new:N \l_siunitx_table_collect_post_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_table_collect_pre_bool}
+%\begin{macro}{\l_siunitx_table_collect_post_bool}
+% Flags for having found a number in an \texttt{S} column.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_table_collect_pre_bool
+\bool_new:N \l_siunitx_table_collect_post_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+% 
 %\begin{macro}{\siunitx_table_collect_begin:Nn}
 % The collector starts by setting up local options, then clears and
 % initialises the storage and testing system.  
@@ -6609,9 +6632,61 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_table_collect_begin:Nn {
   \group_begin:
     \keys_set:nn { siunitx } {#2}
+    \cs_set_eq:Nc \siunitx_table_collect_token:
+      { siunitx_table_collect_token_ #1 : }
+    \cs_set_eq:Nc \siunitx_table_print:
+      { siunitx_table_print_ #1 : }
+    \use:c { siunitx_table_collect_init_ #1 : }
+    \siunitx_table_collect_get:
 }
 %    \end{macrocode}
 %\end{macro} 
+%
+%\begin{macro}{\siunitx_table_collect_braced:n}
+% The collection of braced items depends on the column type. So we
+% start of with an empty definition.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_braced:n { }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_init:}
+% The usual spin-out of basics.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_collect_init: {
+  \tl_clear:N \l_siunitx_table_collect_tl
+  \tl_clear:N \l_siunitx_table_collect_pre_tl
+  \tl_clear:N \l_siunitx_table_collect_post_tl
+  \bool_set_false:N \l_siunitx_table_collect_post_bool
+}
+%    \end{macrocode}
+%\end{macro} 
+%\begin{macro}{\siunitx_table_collect_init_s:}
+%\begin{macro}{\siunitx_table_collect_init_S:}
+% Some type-specific definitions.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_collect_init_s: {
+  \bool_set_false:N \l_siunitx_table_collect_pre_bool
+  \cs_set:Nn \siunitx_table_collect_braced:n {
+    \tl_put_right:Nn \l_siunitx_table_collect_tl { {##1} }
+    \siunitx_table_collect_next:
+  }
+}
+\cs_new_nopar:Nn \siunitx_table_collect_init_S: {
+  \bool_set_true:N \l_siunitx_table_collect_pre_bool
+  \cs_set:Nn \siunitx_table_collect_braced:n {
+    \bool_if:NTF \l_siunitx_table_collect_pre_bool { 
+      \tl_put_right:Nn \l_siunitx_table_collect_pre_tl { {##1} }
+    }{
+      \bool_set_true:N \l_siunitx_table_collect_post_bool
+      \tl_put_right:Nn \l_siunitx_table_collect_post_tl { {##1} }
+    }
+    \siunitx_table_collect_next:
+  }
+}
+%    \end{macrocode}
+%\end{macro} 
+%\end{macro}
 %
 %\subsection{Symbols}
 %
