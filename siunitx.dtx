@@ -1918,6 +1918,28 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_if_tl:NTF}
+%\begin{macro}[aux]{\siunitx_if_tl_aux:w}
+% This is basically a re-hash of stuff from \pkg{expl3}, but to test for
+% short macros only.
+%    \begin{macrocode}
+\group_begin:
+\tl_map_inline:nn { \M \A \C \R \O }
+ { \char_set_catcode:nn { ‘#1 } { 12 } }
+\tl_to_lowercase:n{
+  \group_end:
+  \prg_new_conditional:Nnn \siunitx_if_tl:N { TF } {
+    \exp_after:wN \siunitx_if_tl_aux:w
+      \token_to_meaning:N #1 MACRO \q_nil
+  }
+  \cs_new_nopar:Npn \siunitx_if_tl_aux:w #1 MACRO #2 \q_nil {
+    \tl_if_empty:nTF {#1} { \prg_return_true: } { \prg_return_false: }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Font detection}
 %
 % A number of controls and tests are needed to control the font used
@@ -3159,7 +3181,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_in_init:}
 % In the initialisation code, the token list 
-% \cs{l_siunitx_number_valid_tl} is constructed to 
+% \cs{l_siunitx_number_valid_tl} is constructed for the checks.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_number_in_init: {
   \bool_set_false:N \l_siunitx_error_bool
@@ -6632,8 +6654,8 @@ This work consists of the file  siunitx.dtx
 \cs_new:Nn \siunitx_table_collect_begin:Nn {
   \group_begin:
     \keys_set:nn { siunitx } {#2}
-    \cs_set_eq:Nc \siunitx_table_collect_token:
-      { siunitx_table_collect_token_ #1 : }
+    \cs_set_eq:Nc \siunitx_table_collect_token:N
+      { siunitx_table_collect_token_ #1 :N }
     \cs_set_eq:Nc \siunitx_table_print:
       { siunitx_table_print_ #1 : }
     \use:c { siunitx_table_collect_init_ #1 : }
@@ -6650,6 +6672,50 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_table_collect_expand:N}
+% The idea here is to expand content if possible.  There are a few 
+% things to note. Only macros which are not \cs{long} or \cs{protected}
+% are expanded. There is the possibility that the macro may need the
+% contents of the pre-numeral part to be executed, for example see
+% Table~\ref{tab:xmpl:calc} in the user part of the documentation. 
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_expand:N {
+  \siunitx_if_tl:NTF #1 {
+    \tl_use:N \siunitx_table_collect_pre_tl
+    \tl_clear:N \siunitx_table_collect_pre_tl
+    \cs_set_nopar:Nx \siunitx_table_collect_next: {
+      \exp_not:N \siunitx_table_collect_get: \exp_not:V #1
+    }
+  }{
+    \bool_if:NTF \siunitx_table_collect_pre_bool {
+      \tl_put_right:Nn \siunitx_table_collect_pre_tl {#1}
+    }{
+      \bool_set_true:N \siunitx_table_collect_post_bool
+      \bool_set_false:N \siunitx_table_collect_pre_bool 
+      \tl_put_right:Nn \siunitx_table_collect_post_tl {#1}
+    }
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_get:}
+% The token collection system first has to check that the next argument
+% does not start with an opening-brace character.  If it does, the 
+% testing is skipped and the braced token is stored.  Otherwise, a check
+% is made against various ignored tokens.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_collect_get: {
+  \cs_set_eq:NN \siunitx_table_collect_next: \siunitx_table_collect_get:
+  \peek_charcode:NTF \c_group_begin_token {
+    \siunitx_table_collect_braced:n
+  }{
+    \siunitx_table_collect_not_braced:N
+  }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_table_collect_init:}
 % The usual spin-out of basics.
 %    \begin{macrocode}
@@ -6663,7 +6729,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\begin{macro}{\siunitx_table_collect_init_s:}
 %\begin{macro}{\siunitx_table_collect_init_S:}
-% Some type-specific definitions.
+% Some type-specific definitions. In the \texttt{S} case, the 
+% initialisation function for numbers is used to set 
+% \cs{l_siunitx_number_valid_tl} correctly.
 %    \begin{macrocode}
 \cs_new_nopar:Nn \siunitx_table_collect_init_s: {
   \bool_set_false:N \l_siunitx_table_collect_pre_bool
@@ -6673,6 +6741,7 @@ This work consists of the file  siunitx.dtx
   }
 }
 \cs_new_nopar:Nn \siunitx_table_collect_init_S: {
+  \siunitx_number_in_init:
   \bool_set_true:N \l_siunitx_table_collect_pre_bool
   \cs_set:Nn \siunitx_table_collect_braced:n {
     \bool_if:NTF \l_siunitx_table_collect_pre_bool { 
@@ -6686,6 +6755,96 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro} 
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_next:}
+% A holder for the next thing to do.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \siunitx_table_collect_next: { }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_newline:}
+% The end macro needs to come before the new line is called.
+%    \begin{macrocode}
+\cs_new_npar:Nn  \siunitx_table_collect_newline: {
+  \siunitx_table_print:
+  \tabularnewline
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_not_braced:N}
+%\begin{macro}[aux]{\siunitx_table_collect_not_braced_aux_i:N}
+%\begin{macro}[aux]{\siunitx_table_collect_not_braced_aux_ii:N}
+% A few macros are simply passed through to be executed; this is mainly
+% so that the table actually works. The newline function needs its own 
+% function, which is picked up by hand.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_not_braced:N {
+  \token_if_eq_meaning:NNF #1 \ignorespaces {
+    \token_if_eq_meaning:NNF #1 \unskip {
+      \siunitx_table_collect_not_braced_aux_i:N #1
+    }%
+  }%
+  \siunitx_table_collect_next:
+}
+\cs_new:Nn \siunitx_table_collect_not_braced_aux_i:N {
+  \cs_set:Nn \siunitx_table_collect_not_braced_aux_ii:N {
+    \token_if_eq_meaning:NNT #1 ##1 {
+      \cs_set_eq:NN \siunitx_table_collect_next: ##1
+    }
+  }
+  \tl_map_function:nN 
+    { \csname \end \endtabular \relax \siunitx_table_print: }
+    \siunitx_table_collect_not_braced_aux_ii:N
+  \token_if_eq_meaning:NNT \siunitx_table_collect_next: 
+    \siunitx_table_collect_get: {
+    \token_if_eq_meaning:NNTF #1 \tabularnewline {
+      \cs_set_eq:NN \siunitx_table_collect_next: 
+        \siunitx_table_collect_newline:
+    }{
+      \siunitx_table_collect_token:N #1
+    }
+  }
+}
+\cs_new:Nn \siunitx_table_collect_not_braced_aux_ii:N { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_collect_token:N}
+%\begin{macro}{\siunitx_table_collect_token_s:N}
+% For the \texttt{s} column, every token is added to the same storage
+% area, so life is simple.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_token:N { }
+\cs_new:Nn \siunitx_table_collect_token_s:N { 
+  \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_table_collect_token_S:N}
+% Not so easy for the \texttt{S} column type. If the content is after
+% a number, things are easy.  On the other hand, if the token might be
+% a number, then a check is made. It the token is still unmatched, then
+% it is passed on to the expansion handler.
+%    \begin{macrocode}
+\cs_new:Nn \siunitx_table_collect_token_S:N {
+  \bool_if:NTF  \l_siunitx_table_collect_post_bool {
+    \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1}
+  }{
+    \tl_if_in:NnTF \l_siunitx_number_valid_tl {#1} {
+      \bool_set_false:N \l_siunitx_table_collect_pre_tl
+      \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
+    }{
+      \siunitx_table_collect_expand:N #1
+    }
+  }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Symbols}
