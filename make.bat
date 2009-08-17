@@ -3,7 +3,7 @@
 setlocal
 
 set AUXFILES=aux cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
-set CLEAN=bib bst cls eps gz ins cfg pdf sty tex txt zip
+set CLEAN=bib cls eps gz ins cfg pdf sty tex txt zip
 set NEXT=end
 set SOURCE=siunitx
 set TDSNAME=siunitx
@@ -73,10 +73,12 @@ set TIDY=eps gz ins cfg sty tex txt
   copy /y *.ins temp\%TDSNAME%\ > temp.log
   copy /y %TDSNAME%.tds.zip temp\ > temp.log
   
-  cd temp
-  "%ZIP%" %ZIPFLAG% %TDSNAME%.zip > temp.log
-  cd ..
-  copy temp\%TDSNAME%.zip > temp.log
+  pushd temp
+  %ZIP% %ZIPFLAG% zip.zip *  > ..\temp.log
+  popd
+  copy /y temp\zip.zip > temp.log
+  ren zip.zip %TDSNAME%.zip
+  
   rmdir /q /s temp
   
   goto :clean-int
@@ -87,11 +89,11 @@ set TIDY=eps gz ins cfg sty tex txt
   echo Typesetting
   
   for %%I in (%SOURCE%) do (
-    pdflatex -quiet -interaction=nonstopmode -draftmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx"
+    pdflatex -interaction=nonstopmode -draftmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
     makeindex -q -s gglo.ist -o %%~nI.gls %%~nI.glo > temp.log
     makeindex -q -s gind.ist -o %%~nI.ind %%~nI.idx > temp.log
-    pdflatex -quiet -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx"
-    pdflatex -quiet -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx"
+    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
+    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
   )
   
   goto :clean-int
@@ -127,8 +129,6 @@ set TIDY=eps gz ins cfg sty tex txt
   
   if exist "%LTEXMF%\*.*" del /q "%LTEXMF%\*.*"
   xcopy /y *.sty "%LTEXMF%\*.*" > temp.log
-  copy /y  *.cls "%LTEXMF%\*.*" > temp.log
-  xcopy /y *.cfg "%LTEXMF%\config\*.*" > temp.log
   
   goto :clean-int
   
@@ -146,10 +146,6 @@ set TIDY=eps gz ins cfg sty tex txt
   echo Making TDS structure 
   
   xcopy /y *.sty tds\tex\latex\%TDSNAME%\ > temp.log
-  copy /y *.cls tds\tex\latex\%TDSNAME%\ > temp.log
-  xcopy /y *.cfg tds\tex\latex\%TDSNAME%\config\ > temp.log
-  
-  xcopy /y *.bst tds\bibtex\bst\%TDSNAME%\ > temp.log
   
   xcopy /y *.dtx tds\source\latex\%TDSNAME%\ > temp.log
   copy /y *.ins tds\source\latex\%TDSNAME%\ > temp.log
@@ -161,12 +157,12 @@ set TIDY=eps gz ins cfg sty tex txt
   for %%I in (%SOURCE%) do (
     copy /y %%I.pdf tds\doc\latex\%TDSNAME%\ > temp.log
   )
-  copy /y *.tex tds\doc\latex\%TDSNAME%\ > temp.log
  
-  cd tds
-  "%ZIP%" %ZIPFLAG% %TDSNAME%.tds.zip > temp.log
-  cd ..
-  copy /y tds\%TDSNAME%.tds.zip > temp.log
+  pushd tds
+  %ZIP% %ZIPFLAG% zip.zip *  > ..\temp.log
+  popd
+  copy /y tds\zip.zip > temp.log
+  ren zip.zip %TDSNAME%.tds.zip
   
   rmdir /q /s tds
   
@@ -184,7 +180,7 @@ set TIDY=eps gz ins cfg sty tex txt
   echo Unpacking files
   
   for %%I in (%SOURCE%) do (
-    tex -quiet %%I.dtx
+    tex %%I.dtx > temp.log
   )
   del /q *.log
   
@@ -198,9 +194,9 @@ set TIDY=eps gz ins cfg sty tex txt
 :zip-loop
   
   for /f "delims=; tokens=1,2*" %%I in ("%PATHCOPY%") do (
-    if exist %%I\7z.exe (
-      set ZIP=7z
-      set ZIPFLAG=a
+    if exist %%I\zip.exe (
+      set ZIP=zip
+      set ZIPFLAG=-r -X
     )
     set PATHCOPY=%%J;%%K
   )
@@ -209,9 +205,14 @@ set TIDY=eps gz ins cfg sty tex txt
 
   if not "%PATHCOPY%"==";" goto :zip-loop
   
-  if exist %ProgramFiles%\7-zip\7z.exe (
-    set ZIP=%ProgramFiles%\7-zip\7z.exe
-    set ZIPFLAG=a
+  if exist %ProgramFiles%\Info-ZIP\zip.exe (
+    set ZIP=%ProgramFiles%\Info-ZIP\zip.exe
+    set ZIPFLAG=-r -X
+  )
+  
+  if exist %ProgramFiles%\Zip\zip.exe (
+    set ZIP=%ProgramFiles%\Zip\zip.exe
+    set ZIPFLAG=-r -X
   )
   
   if defined ZIP (

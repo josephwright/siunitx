@@ -1925,8 +1925,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
 \tl_map_inline:nn { \M \A \C \R \O }
- { \char_set_catcode:nn { ‘#1 } { 12 } }
-\tl_to_lowercase:n{
+ { \char_set_catcode:nn { `#1 } { 12 } }
+\tl_map_inline:nn { \F \N \T }
+ { \char_set_lccode:nn { `#1 } { `#1 } } 
+\tl_to_lowercase:n {
   \group_end:
   \prg_new_conditional:Nnn \siunitx_if_tl:N { TF } {
     \exp_after:wN \siunitx_if_tl_aux:w
@@ -6767,7 +6769,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_collect_newline:}
 % The end macro needs to come before the new line is called.
 %    \begin{macrocode}
-\cs_new_npar:Nn  \siunitx_table_collect_newline: {
+\cs_new_nopar:Nn  \siunitx_table_collect_newline: {
   \siunitx_table_print:
   \tabularnewline
 }
