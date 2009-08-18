@@ -9,9 +9,8 @@ set AUXFILES=aux cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
 set CLEAN=bib cls eps gz ins cfg pdf sty tex txt zip
 set DOCEXTRA=\AtBeginDocument{\DisableImplementation}
 set INDEXFILE=l3doc
-set PACKAGE=siunitx
 set PATHCOPY=%PATH%
-set PDF=siunitx
+set PDF=si
 set TDSROOT=latex\%PACKAGE%
 set TEMPLOG=%TEMP%\temp.log
 set TEX=
@@ -39,6 +38,7 @@ set UNPACK=siunitx.dtx
   for %%I in (%AUXFILES%) do if exist *.%%I del /q *.%%I
 
   goto :end
+
 :ctan
 
   call :zip
@@ -171,22 +171,22 @@ set UNPACK=siunitx.dtx
   if exist tds\*.*  rmdir /q /s tds
 
   if exist *.cfg (
-    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config  > %TEMPLOG%
+    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config\ > %TEMPLOG%
   )
   if exist *.cls (
-    xcopy /q /y *.cls tds\tex\%TDSROOT%\      > %TEMPLOG%
+    xcopy /q /y *.cls tds\tex\%TDSROOT%\        > %TEMPLOG%    
   )
-  xcopy /q /y *.dtx tds\source\%TDSROOT%\     > %TEMPLOG%
+  xcopy /q /y *.dtx tds\source\%TDSROOT%\       > %TEMPLOG%    
   for %%I in (%PDF%) do (
-    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\    > %TEMPLOG%
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\      > %TEMPLOG%  
   )
-  xcopy /q /y *.ins tds\source\%TDSROOT%\     > %TEMPLOG%
-  xcopy /q /y *.sty tds\tex\%TDSROOT%\        > %TEMPLOG%
+  xcopy /q /y *.ins tds\source\%TDSROOT%\       > %TEMPLOG%  
+  xcopy /q /y *.sty tds\tex\%TDSROOT%\          > %TEMPLOG%  
   for %%I in (%TEX%) do (
-    xcopy /q /y %%I.tex tds\source\%TDSROOT%\ > %TEMPLOG%
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\   > %TEMPLOG%
   )
   for %%I in (%TXT%) do (
-    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\    > %TEMPLOG%
+    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > %TEMPLOG%  
     ren tds\doc\%TDSROOT%\%%I.txt %%I
   )
 
