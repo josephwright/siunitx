@@ -6,16 +6,17 @@ rem require a zip program such as Info-ZIP (http://www.info-zip.org).
 setlocal
 
 set AUXFILES=aux cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
-set CLEAN=bib cls eps gz ins cfg pdf sty tex txt zip
+set CLEAN=bib bst cls eps gz ins cfg pdf sty tex txt zip
 set DOCEXTRA=\AtBeginDocument{\DisableImplementation}
 set INDEXFILE=l3doc
+set PACKAGE=siunitx
 set PATHCOPY=%PATH%
-set PDF=si
+set PDF=%PACKAGE%
 set TDSROOT=latex\%PACKAGE%
 set TEMPLOG=%TEMP%\temp.log
 set TEX=
 set TXT=README
-set UNPACK=siunitx.dtx
+set UNPACK=%PACKAGE%.dtx
 
 :loop
 
@@ -50,24 +51,27 @@ set UNPACK=siunitx.dtx
   if exist temp\*.*  rmdir /q /s temp
   if exist tds\*.*   rmdir /q /s tds
 
+  if exist *.bst (
+    xcopy /q /y *.bst tds\bibtex\%PACKAGE%\bst\ > %TEMPLOG%
+  )
   if exist *.cfg (
-    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config  > %TEMPLOG%
+    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config\ > %TEMPLOG%
   )
   if exist *.cls (
-    xcopy /q /y *.cls tds\tex\%TDSROOT%\       > %TEMPLOG%
+    xcopy /q /y *.cls tds\tex\%TDSROOT%\        > %TEMPLOG%
   )
-  xcopy /q /y *.dtx temp\%PACKAGE%\            > %TEMPLOG%
-  xcopy /q /y *.dtx tds\source\%TDSROOT%\      > %TEMPLOG%
+  xcopy /q /y *.dtx temp\%PACKAGE%\             > %TEMPLOG%
+  xcopy /q /y *.dtx tds\source\%TDSROOT%\       > %TEMPLOG%
   for %%I in (%PDF%) do (
-    xcopy /q /y %%I.pdf temp\%PACKAGE%\        > %TEMPLOG%
-    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\     > %TEMPLOG%
+    xcopy /q /y %%I.pdf temp\%PACKAGE%\         > %TEMPLOG%
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\      > %TEMPLOG%
   )
-  xcopy /q /y *.ins temp\%PACKAGE%\            > %TEMPLOG%
-  xcopy /q /y *.ins tds\source\%TDSROOT%\      > %TEMPLOG%
-  xcopy /q /y *.sty tds\tex\%TDSROOT%\         > %TEMPLOG%
+  xcopy /q /y *.ins temp\%PACKAGE%\             > %TEMPLOG%
+  xcopy /q /y *.ins tds\source\%TDSROOT%\       > %TEMPLOG%
+  xcopy /q /y *.sty tds\tex\%TDSROOT%\          > %TEMPLOG%
   for %%I in (%TEX%) do (
-    xcopy /q /y %%I.tex temp\%PACKAGE%\        > %TEMPLOG%
-    xcopy /q /y %%I.tex tds\source\%TDSROOT%\  > %TEMPLOG%
+    xcopy /q /y %%I.tex temp\%PACKAGE%\         > %TEMPLOG%
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\   > %TEMPLOG%
   )
   for %%I in (%TXT%) do (
     xcopy /q /y %%I.txt temp\%PACKAGE%\    > %TEMPLOG%
@@ -170,6 +174,9 @@ set UNPACK=siunitx.dtx
 
   if exist tds\*.*  rmdir /q /s tds
 
+  if exist *.bst (
+    xcopy /q /y *.bst tds\bibtex\%PACKAGE%\bst\ > %TEMPLOG%
+  )
   if exist *.cfg (
     xcopy /q /y *.cfg tds\tex\%TDSROOT%\config\ > %TEMPLOG%
   )
