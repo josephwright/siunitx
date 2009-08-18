@@ -1,44 +1,34 @@
 @echo off
+rem This Windows batch file provides very similar functionality to the
+rem Makefile also available here.  Some of the options provided here 
+rem require a zip program such as Info-ZIP (http://www.info-zip.org).
 
 setlocal
 
 set AUXFILES=aux cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
 set CLEAN=bib cls eps gz ins cfg pdf sty tex txt zip
-set NEXT=end
-set SOURCE=siunitx
-set TDSNAME=siunitx
-set TIDY=eps gz ins cfg sty tex txt
+set DOCEXTRA=\AtBeginDocument{\DisableImplementation}
+set INDEXFILE=l3doc
+set PACKAGE=siunitx
+set PATHCOPY=%PATH%
+set PDF=siunitx
+set TDSROOT=latex\%PACKAGE%
+set TEMPLOG=%TEMP%\temp.log
+set TEX=
+set TXT=README
+set UNPACK=siunitx.dtx
 
 :loop
 
-  if /i [%1] == [checkdoc]     goto :checkdoc
   if /i [%1] == [clean]        goto :clean
   if /i [%1] == [ctan]         goto :ctan
   if /i [%1] == [doc]          goto :doc
   if /i [%1] == [localinstall] goto :localinstall
   if /i [%1] == [tds]          goto :tds
-  if /i [%1] == [tidy]         goto :tidy
   if /i [%1] == [unpack]       goto :unpack
 
   goto :help
-  
-:checkdoc
 
-  echo.
-  echo Checking documentation
-  
-  for %%I in (%SOURCE%) do (
-    echo  %%~nI
-    pdflatex -interaction=nonstopmode -draftmode "\AtBeginDocument{\EnableImplementation} \input %%I.dtx" > temp.log
-    pause
-    for /f "delims=:,tokens=3*" %%J in (temp.log) do (
-      if "%%J" == " Package doc Error" (
-        echo    %%K
-      )
-    )
-  )
-
-  goto :end
 
 :clean
 
@@ -47,191 +37,210 @@ set TIDY=eps gz ins cfg sty tex txt
 :clean-int
 
   for %%I in (%AUXFILES%) do if exist *.%%I del /q *.%%I
-    
+
   goto :end
-  
 :ctan
 
-  set NEXT=ctan
-  if not defined ZIP goto :zip
-  
-  call make tds
-  
+  call :zip
+  call :doc
+
   echo.
-  echo Making CTAN archive
-  
-  if exist temp\*.* del /q /s temp\*.* > temp.log
-  
-  xcopy /y *.dtx temp\%TDSNAME%\ > temp.log
-  for %%I in (%SOURCE%) do (
-    copy /y %%I.pdf temp\%TDSNAME%\ > temp.log
+  echo Creating archive
+
+  if exist temp\*.*  rmdir /q /s temp
+  if exist tds\*.*   rmdir /q /s tds
+
+  if exist *.cfg (
+    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config  > %TEMPLOG%
   )
-  copy /y *.txt temp\%TDSNAME%\ > temp.log
-  pushd temp\%TDSNAME%
-  ren README.txt README
+  if exist *.cls (
+    xcopy /q /y *.cls tds\tex\%TDSROOT%\       > %TEMPLOG%
+  )
+  xcopy /q /y *.dtx temp\%PACKAGE%\            > %TEMPLOG%
+  xcopy /q /y *.dtx tds\source\%TDSROOT%\      > %TEMPLOG%
+  for %%I in (%PDF%) do (
+    xcopy /q /y %%I.pdf temp\%PACKAGE%\        > %TEMPLOG%
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\     > %TEMPLOG%
+  )
+  xcopy /q /y *.ins temp\%PACKAGE%\            > %TEMPLOG%
+  xcopy /q /y *.ins tds\source\%TDSROOT%\      > %TEMPLOG%
+  xcopy /q /y *.sty tds\tex\%TDSROOT%\         > %TEMPLOG%
+  for %%I in (%TEX%) do (
+    xcopy /q /y %%I.tex temp\%PACKAGE%\        > %TEMPLOG%
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\  > %TEMPLOG%
+  )
+  for %%I in (%TXT%) do (
+    xcopy /q /y %%I.txt temp\%PACKAGE%\    > %TEMPLOG%
+    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > %TEMPLOG%
+    ren temp\%PACKAGE%\%%I.txt    %%I
+    ren tds\doc\%TDSROOT%\%%I.txt %%I
+  )
+
+  pushd tds
+  %ZIPEXE% %ZIPFLAG% %PACKAGE%.tds.zip .
   popd
-  copy /y *.ins temp\%TDSNAME%\ > temp.log
-  copy /y %TDSNAME%.tds.zip temp\ > temp.log
-  
+  xcopy /q /y tds\%PACKAGE%.tds.zip temp\ > %TEMPLOG%
+
   pushd temp
-  %ZIP% %ZIPFLAG% zip.zip *  > ..\temp.log
+  %ZIPEXE% %ZIPFLAG% %PACKAGE%.zip .
   popd
-  copy /y temp\zip.zip > temp.log
-  ren zip.zip %TDSNAME%.zip
-  
+  xcopy /q /y temp\%PACKAGE%.zip > %TEMPLOG%
+
+  rmdir /q /s tds
   rmdir /q /s temp
   
-  goto :clean-int
-  
+  goto :end
+
 :doc
 
-  echo.
-  echo Typesetting
+  call :unpack
+
+  for %%I in (*.dtx) do (
+    call :doc-int %%~nI
+  )
+
+  goto :end
+
+:doc-int
   
-  for %%I in (%SOURCE%) do (
-    pdflatex -interaction=nonstopmode -draftmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
-    makeindex -q -s gglo.ist -o %%~nI.gls %%~nI.glo > temp.log
-    makeindex -q -s gind.ist -o %%~nI.ind %%~nI.idx > temp.log
-    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
-    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %%I.dtx" > temp.log
+  echo.
+  echo Typesetting %1
+  
+  pdflatex -interaction=nonstopmode -draftmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
+  if not ERRORLEVEL 1 (
+    makeindex -q -s gglo.ist        -o %1.gls %1.glo > %TEMPLOG%
+    makeindex -q -s %INDEXFILE%.ist -o %1.ind %1.idx > %TEMPLOG%
+    pdflatex -interaction=nonstopmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
+    pdflatex -interaction=nonstopmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
+  ) else (
+    echo ! %1 compilation failed
   )
   
   goto :clean-int
-   
+
 :help
 
-  echo.
   echo  make clean        - delete all generated files
   echo  make ctan         - create an archive ready for CTAN
+  echo  make doc          - typesets documentation
   echo  make localinstall - extract packages
   echo  make tds          - create a TDS-ready archive
-  echo  make tidy         - tidy files after CTAN submission
   echo  make unpack       - extract packages
-  echo.
   
   goto :end
-  
+
 :localinstall
+
+  call :unpack
+
+  echo.
+  echo Installing files
 
   if not defined TEXMFHOME (
     set TEXMFHOME=%USERPROFILE%\texmf
-    echo.
-    echo TEXMFHOME variable was not set:
-    echo using default value %USERPROFILE%\texmf
   )
-  
-  SET LTEXMF=%TEXMFHOME%\tex\latex\%TDSNAME%
-  
-  call make unpack
+  set INSTALLROOT=%TEXMFHOME%\%TDSROOT%
+
+  if exist "%INSTALLROOT%\*.*" rmdir /q /s "%INSTALLROOT%"
+
+  if exist *.cfg (
+    xcopy /q /y *.cfg "%INSTALLROOT%\config\" > %TEMPLOG%
+  )
+  if exist *.cls ( 
+    xcopy /q /y *.cls "%INSTALLROOT%\"        > %TEMPLOG%
+  )
+  xcopy /q /y *.sty "%INSTALLROOT%\"          > %TEMPLOG%
+
+  goto :clean-int
+
+:no-dtx
   
   echo.
-  echo Installing files
-  
-  if exist "%LTEXMF%\*.*" del /q "%LTEXMF%\*.*"
-  xcopy /y *.sty "%LTEXMF%\*.*" > temp.log
-  
-  goto :clean-int
+  echo No such file %1.dtx
+
+  goto :end
   
 :tds
 
-  set NEXT=tds
-  if not defined ZIP goto :zip
+  call :zip
+  call :doc
 
-  if exist tds\*.* del /q /s tds\*.* > temp.log
-  
-  call make unpack
-  call make doc
-  
   echo.
-  echo Making TDS structure 
-  
-  xcopy /y *.sty tds\tex\latex\%TDSNAME%\ > temp.log
-  
-  xcopy /y *.dtx tds\source\latex\%TDSNAME%\ > temp.log
-  copy /y *.ins tds\source\latex\%TDSNAME%\ > temp.log
-    
-  xcopy /y *.txt tds\doc\latex\%TDSNAME%\ > temp.log
-  pushd tds\doc\latex\%TDSNAME%
-  ren README.txt README
-  popd
-  for %%I in (%SOURCE%) do (
-    copy /y %%I.pdf tds\doc\latex\%TDSNAME%\ > temp.log
+  echo Creating archive
+
+  if exist tds\*.*  rmdir /q /s tds
+
+  if exist *.cfg (
+    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config  > %TEMPLOG%
   )
- 
+  if exist *.cls (
+    xcopy /q /y *.cls tds\tex\%TDSROOT%\      > %TEMPLOG%
+  )
+  xcopy /q /y *.dtx tds\source\%TDSROOT%\     > %TEMPLOG%
+  for %%I in (%PDF%) do (
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\    > %TEMPLOG%
+  )
+  xcopy /q /y *.ins tds\source\%TDSROOT%\     > %TEMPLOG%
+  xcopy /q /y *.sty tds\tex\%TDSROOT%\        > %TEMPLOG%
+  for %%I in (%TEX%) do (
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\ > %TEMPLOG%
+  )
+  for %%I in (%TXT%) do (
+    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\    > %TEMPLOG%
+    ren tds\doc\%TDSROOT%\%%I.txt %%I
+  )
+
   pushd tds
-  %ZIP% %ZIPFLAG% zip.zip *  > ..\temp.log
+  %ZIPEXE% %ZIPFLAG% %PACKAGE%.tds.zip .
   popd
-  copy /y tds\zip.zip > temp.log
-  ren zip.zip %TDSNAME%.tds.zip
-  
+  xcopy /q /y tds\%PACKAGE%.tds.zip > %TEMPLOG%
+
   rmdir /q /s tds
   
-  goto :clean-int
-  
-:tidy 
+  goto :end
 
-  for %%I in (%TIDY%) do if exist *.%%I del /q *.%%I
-  
-  goto :clean-int
-  
 :unpack
-  
+
   echo.
   echo Unpacking files
-  
-  for %%I in (%SOURCE%) do (
-    tex %%I.dtx > temp.log
+
+  for %%I in (%UNPACK%) do (
+    tex %%I > %TEMPLOG%
   )
-  del /q *.log
-  
-  goto :end
-  
- 
-:zip  
+
+  goto :clean-int
+
+:zip 
 
   set PATHCOPY=%PATH%
-  
+
 :zip-loop
-  
+
+  if defined ZIPEXE goto :EOF
+
   for /f "delims=; tokens=1,2*" %%I in ("%PATHCOPY%") do (
-    if exist %%I\zip.exe (
-      set ZIP=zip
-      set ZIPFLAG=-r -X
+    if exist "%%I\zip.exe" (
+      set ZIPEXE=zip
+      set ZIPFLAG=-ll -q -r -X
     )
     set PATHCOPY=%%J;%%K
   )
+  if not "%PATHCOPY%" == ";" goto :zip-loop
   
-  if defined ZIP goto :%NEXT%
-
-  if not "%PATHCOPY%"==";" goto :zip-loop
-  
-  if exist %ProgramFiles%\Info-ZIP\zip.exe (
-    set ZIP=%ProgramFiles%\Info-ZIP\zip.exe
-    set ZIPFLAG=-r -X
-  )
-  
-  if exist %ProgramFiles%\Zip\zip.exe (
-    set ZIP=%ProgramFiles%\Zip\zip.exe
-    set ZIPFLAG=-r -X
-  )
-  
-  if defined ZIP (
-    goto :%NEXT%
-  ) else (
+  if not defined ZIPEXE (
     echo.
     echo This procedure requires a zip program,
     echo but one could not be found.
     echo
     echo If you do have a command-line zip program installed,
-    echo set ZIP to the full executable path and ZIPFLAG to the
+    echo set ZIPEXE to the full executable path and ZIPFLAG to the
     echo appropriate flag to create an archive.
     echo.
-    goto :end
   )
-  
+
+  goto :EOF
+
 :end
 
   shift
-  if not "%1" == "" goto :loop
-  
-  endlocal
+  if not [%1] == [] goto :loop
