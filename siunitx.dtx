@@ -701,7 +701,7 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %\DescribeMacro{\per}
 % Reciprocal powers are indicated using the \cs{per} macro. This applies
-% to the next unit only, unless the \opt{units/output/sticky per} option
+% to the next unit only, unless the \opt{sticky-per} option
 % is turned on.
 %\begin{LaTeXdemo} 
 %  \si{\joule\per\mole\per\kelvin} \\
@@ -925,14 +925,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      colour  & Literal & \meta{none}      \\
-%      mathsrm & Macro   & \cs{mathrm}   \\
-%      mathssf & Macro   & \cs{mathsf}   \\ 
-%      mathstt & Macro   & \cs{mathtt}   \\
-%      mode    & Choice  & maths         \\
-%      textrm  & Macro   & \cs{rmfamily} \\
-%      textsf  & Macro   & \cs{sffamily} \\ 
-%      texttt  & Macro   & \cs{ttfamily} \\
+%      colour   & Literal & \meta{none}      \\
+%      maths-rm & Macro   & \cs{mathrm}   \\
+%      maths-sf & Macro   & \cs{mathsf}   \\ 
+%      maths-tt & Macro   & \cs{mathtt}   \\
+%      mode     & Choice  & maths         \\
+%      text-rm  & Macro   & \cs{rmfamily} \\
+%      text-sf  & Macro   & \cs{sffamily} \\ 
+%      text-tt  & Macro   & \cs{ttfamily} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -948,26 +948,26 @@ This work consists of the file  siunitx.dtx
 % This option has no effect if the \opt{detect-mode} switch is
 % \opt{true}.
 % 
-%\DescribeOption{mathsrm}
-%\DescribeOption{textrm}
-%\DescribeOption{mathssf}
-%\DescribeOption{mathstt}
-%\DescribeOption{textsf}
-%\DescribeOption{texttt}
+%\DescribeOption{maths-rm}
+%\DescribeOption{text-rm}
+%\DescribeOption{maths-sf}
+%\DescribeOption{maths-tt}
+%\DescribeOption{text-sf}
+%\DescribeOption{text-tt}
 % If font family detection is inactive, \pkg{siunitx} uses the font
-% family stored in either \opt{mathsrm} or \opt{textrm} for
+% family stored in either \opt{maths-rm} or \opt{text-rm} for
 % output. The choice of \opt{maths} or \opt{text} depends on the
 % \opt{mode} setting. If font family detection is active, 
 % \pkg{siunitx} may be using a sans serif or monospaced font for 
-% output. In maths mode, these are stored in \opt{mathssf} and 
-% \opt{mathstt}, and for text mode in \opt{textsf} and \opt{texttt}. 
+% output. In maths mode, these are stored in \opt{maths-sf} and 
+% \opt{maths-tt}, and for text mode in \opt{text-sf} and \opt{text-tt}. 
 % Notice that the detected and output font families can differ.
 %\begin{LaTeXdemo}
 %  \sisetup{detect-family}%
 %  \num{1234} \\
 %  { \sffamily \num{1234} } \\
 %  \SI{99}{\metre} \\
-%  \sisetup{mathsrm = \mathtt}%
+%  \sisetup{maths-rm = \mathtt}%
 %  \SI{99}{\metre} 
 %\end{LaTeXdemo}
 % This can be used to good effect to change all output from 
@@ -975,8 +975,8 @@ This work consists of the file  siunitx.dtx
 % when creating \pkg{beamer} presentations the settings
 %\begin{LaTeXdemo}[code only]
 %  \sisetup{
-%    mathsrm = \mathsf,
-%    textrm  = \sffamily
+%    maths-rm = \mathsf,
+%    text-rm  = \sffamily
 %  }
 %\end{LaTeXdemo}
 % given all output in sans serif font without font detection.
@@ -1104,15 +1104,15 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      add-zero-decimal      & Switch  & false \\
-%      add-zero-integer      & Switch  & false \\
-%      explicit-sign         & Literal &       \\
-%      retain-explicit-plus  & Switch  & false \\
-%      retain-unity-mantissa & Switch  & true  \\
-%      retain-zero-exponent  & Switch  & false \\
-%      round-mode            & Choice  & off   \\
-%      round-figures         & Number  & 2     \\
-%      round-places          & Number  & 2     \\
+%      add-zero-decimal      & Switch  & false    \\
+%      add-zero-integer      & Switch  & false    \\
+%      explicit-sign         & Literal & \m{none} \\
+%      retain-explicit-plus  & Switch  & false    \\
+%      retain-unity-mantissa & Switch  & true     \\
+%      retain-zero-exponent  & Switch  & false    \\
+%      round-mode            & Choice  & off      \\
+%      round-figures         & Number  & 2        \\
+%      round-places          & Number  & 2        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2296,24 +2296,24 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Nn \siunitx_number_textsf: { }
 \cs_new_nopar:Nn \siunitx_number_texttt: { }
 \keys_define:nn { siunitx } {
-  number-color  .meta:n = { number-colour = #1 },
-  number-colour .set:N  = \l_siunitx_number_colour_tl,
-  number-mathrm .code:n = {
+  number-color  .meta:n   = { number-colour = #1 },
+  number-colour .set:N    = \l_siunitx_number_colour_tl,
+  number-math-rm .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_mathrm: {#1}
   },
-  number-mathsrm .code:n = {
+  number-maths-rm .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathrm: {#1}
   },
-  number-mathsf .code:n = {
+  number-math-sf .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_mathsf: {#1}
   },
-  number-mathssf .code:n = {
+  number-maths-sf .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathsf: {#1}
   },
-  number-mathtt .code:n = {
+  number-math-tt .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_mathtt: {#1}
   },
-  number-mathstt .code:n = {
+  number-maths-tt .code:n = {
     \cs_set_nopar:Nn \siunitx_number_mathtt: {#1}
   },
   number-mode .choice:,
@@ -2326,13 +2326,13 @@ This work consists of the file  siunitx.dtx
   number-mode / text .code:n = {
     \bool_set_false:N \l_siunitx_number_maths_mode_bool
   },
-  number-textrm .code:n = {
+  number-text-rm .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_textrm: {#1}
   },
-  number-textsf .code:n = {
+  number-text-sf .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_textsf: {#1}
   },
-  number-texttt .code:n = {
+  number-text-tt .code:n  = {
     \cs_set_nopar:Nn \siunitx_number_texttt: {#1}
   }
 }
@@ -2363,22 +2363,22 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   unit-color  .meta:n = { unit-colour = #1 },
   unit-colour .set:N  = \l_siunitx_unit_colour_tl,
-  unit-mathrm .code:n = {
+  unit-math-rm .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathrm: {#1}
   },
-  unit-mathsrm .code:n = {
+  unit-maths-rm .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathrm: {#1}
   },
-  unit-mathsf .code:n = {
+  unit-math-sf .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathsf: {#1}
   },
-  unit-mathssf .code:n = {
+  unit-maths-sf .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathsf: {#1}
   },
-  unit-mathtt .code:n = {
+  unit-math-tt .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathtt: {#1}
   },
-  unit-mathstt .code:n = {
+  unit-maths-tt .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_mathtt: {#1}
   },
   unit-mode .choice:,
@@ -2391,13 +2391,13 @@ This work consists of the file  siunitx.dtx
   unit-mode / text .code:n = {
     \bool_set_false:N \l_siunitx_unit_maths_mode_bool
   },
-  unit-textrm .code:n = {
+  unit-text-rm .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_textrm: {#1}
   },
-  unit-textsf .code:n = {
+  unit-text-sf .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_textsf: {#1}
   },
-  unit-texttt .code:n = {
+  unit-text-tt .code:n = {
     \cs_set_nopar:Nn \siunitx_unit_texttt: {#1}
   }
 }
@@ -2422,33 +2422,30 @@ This work consists of the file  siunitx.dtx
     number-colour = #1,
     unit-colour   = #1
   },
-  mathrm .meta:n = {
-    number-mathrm = #1,
-    unit-mathrm   = #1
+  math-rm .meta:n = {
+    number-math-rm = #1,
+    unit-math-rm   = #1
   },
-  mathsrm .meta:n = {
-    number-mathsrm = #1,
-    unit-mathsrm   = #1
+  maths-rm .meta:n = {
+    number-maths-rm = #1,
+    unit-maths-rm   = #1
   },
-  mathsrm .initial:n = \mathrm,
-  mathsf .meta:n = {
-    number-mathsf = #1,
-    unit-mathsf   = #1
+  math-sf .meta:n = {
+    number-math-sf = #1,
+    unit-math-sf   = #1
   },
-  mathssf .meta:n = {
-    number-mathssf = #1,
-    unit-mathssf   = #1
+  maths-sf .meta:n = {
+    number-maths-sf = #1,
+    unit-maths-sf   = #1
   },
-  mathssf .initial:n = \mathsf,
-  mathtt .meta:n = {
-    number-mathtt = #1,
-    unit-mathtt   = #1
+  math-tt .meta:n = {
+    number-math-tt = #1,
+    unit-math-tt   = #1
   },
-  mathstt .meta:n = {
-    number-mathstt = #1,
-    unit-mathstt   = #1
+  maths-tt .meta:n = {
+    number-maths-tt = #1,
+    unit-maths-tt   = #1
   },
-  mathstt .initial:n = \mathtt,
   mode .choice:,
   mode / math .meta:n = {
     number-mode = math,
@@ -2462,22 +2459,27 @@ This work consists of the file  siunitx.dtx
     number-mode = text,
     unit-mode   = text
   },
-  mode    .initial:n = { maths },
-  textrm .meta:n = {
-    number-textrm = #1,
-    unit-textrm   = #1
+  text-rm .meta:n = {
+    number-text-rm = #1,
+    unit-text-rm   = #1
   },
-  textrm .initial:n = \rmfamily,
-  textsf .meta:n = {
-    number-textsf = #1,
-    unit-textsf   = #1
+  text-sf .meta:n = {
+    number-text-sf = #1,
+    unit-text-sf   = #1
   },
-  textsf .initial:n = \sffamily,
-  texttt .meta:n = {
-    number-texttt = #1,
-    unit-texttt   = #1
+  text-tt .meta:n = {
+    number-text-tt = #1,
+    unit-text-tt   = #1
   },
-  texttt .initial:n = \ttfamily
+}
+\keys_set:nn { siunitx } {
+  maths-rm = \mathrm,
+  maths-sf = \mathsf,
+  maths-tt = \mathtt,
+  mode     = maths,
+  text-rm  = \rmfamily,
+  text-sf  = \sffamily,
+  text-tt  = \ttfamily
 }
 %    \end{macrocode}
 %    
@@ -2655,10 +2657,12 @@ This work consists of the file  siunitx.dtx
 % only for pre-processing.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  input-product  .set:N     = \l_siunitx_input_product_tl,
-  input-product  .initial:n = x,
-  input-quotient .set:N     = \l_siunitx_input_quotient_tl,
-  input-quotient .initial:n = /,
+  input-product  .set:N = \l_siunitx_input_product_tl,
+  input-quotient .set:N = \l_siunitx_input_quotient_tl,
+}
+\keys_set:nn { siunitx } {
+  input-product  = x,
+  input-quotient = /
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2834,26 +2838,28 @@ This work consists of the file  siunitx.dtx
 % These are valid inside a single number: the pre-processor has already
 % set up the appropriate things for products and quotients.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } { % (
-  input-close-uncertainty .set:N     = \l_siunitx_input_uncert_close_tl, 
-  input-close-uncertainty .initial:n = ),
-  input-complex-roots     .set:N     = \l_siunitx_input_complex_tl,
-  input-complex-roots     .initial:n = { ij },
-  input-decimal-markers   .set:N     = \l_siunitx_input_decimal_tl,
-  input-decimal-markers   .initial:n = { ., },
-  input-digits            .set:N     = \l_siunitx_input_digit_tl,
-  input-digits            .initial:n = { 0123456789 },
-  input-exponent-markers  .set:N     = \l_siunitx_input_exponent_tl,
-  input-exponent-markers  .initial:n = { dDeE },
-  input-ignore            .set:N     = \l_siunitx_input_ignore_tl,
-  input-open-uncertainty  .set:N     = \l_siunitx_input_uncert_open_tl, 
-  input-open-uncertainty  .initial:n = (, % )
-  input-protect-tokens    .set:N     = \l_siunitx_input_protect_tl,
-  input-protect-tokens    .initial:n = { \mp \pi \pm },
-  input-signs             .set:N     = \l_siunitx_input_sign_tl,
-  input-signs             .initial:n = { +-\mp\pm },
-  input-symbols           .set:N     = \l_siunitx_input_symbol_tl,
-  input-symbols           .initial:n = \pi,
+\keys_define:nn { siunitx } {
+  input-close-uncertainty .set:N = \l_siunitx_input_uncert_close_tl, 
+  input-complex-roots     .set:N = \l_siunitx_input_complex_tl,
+  input-decimal-markers   .set:N = \l_siunitx_input_decimal_tl,
+  input-digits            .set:N = \l_siunitx_input_digit_tl,
+  input-exponent-markers  .set:N = \l_siunitx_input_exponent_tl,
+  input-ignore            .set:N = \l_siunitx_input_ignore_tl,
+  input-open-uncertainty  .set:N = \l_siunitx_input_uncert_open_tl, 
+  input-protect-tokens    .set:N = \l_siunitx_input_protect_tl,
+  input-signs             .set:N = \l_siunitx_input_sign_tl,
+  input-symbols           .set:N = \l_siunitx_input_symbol_tl,
+}
+\keys_set:nn { siunitx } { % (
+  input-close-uncertainty = ),
+  input-complex-roots     = ij,
+  input-decimal-markers   = {.,},
+  input-digits            = 0123456789,
+  input-exponent-markers  = dDeE,
+  input-open-uncertainty  = (, % )
+  input-protect-tokens    = \mp\pi\pm,
+  input-signs             = +-\mp\pm,
+  input-symbols           = \pi,
 }
 %    \end{macrocode}
 %\end{macro}
@@ -3593,14 +3599,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   add-zero-decimal  .bool:N     = \l_siunitx_process_decimal_zero_bool,
-  add-zero-decimal  .initial:n  = true,
   add-zero-integer  .bool:N     = \l_siunitx_process_integer_zero_bool,
-  add-zero-integer  .initial:n  = true,
   explicit-sign     .set:N      = \l_siunitx_process_sign_tl,
   retain-explicit-plus  .bool:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool:N = 
     \l_siunitx_process_unity_mantissa_bool,
-  retain-unity-mantissa .initial:n = { true }, 
   retain-zero-exponent .bool:N =
     \l_siunitx_process_zero_exponent_bool,
   round-mode        .choice: ,
@@ -3614,9 +3617,14 @@ This work consists of the file  siunitx.dtx
     \tl_set:Nn \l_siunitx_round_tl { places }
   },
   round-figures     .set:N      = \l_siunitx_process_figures_int,
-  round-figures     .initial:n  = 2,
   round-places      .set:N      = \l_siunitx_process_places_int,
-  round-places      .initial:n  = 2
+}
+\keys_set:nn { siunitx } {
+  add-zero-decimal      = true,
+  add-zero-integer      = true,
+  retain-unity-mantissa = true, 
+  round-figures         = 2,
+  round-places          = 2
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4351,42 +4359,42 @@ This work consists of the file  siunitx.dtx
 % Lots of settings, some used only for numbers, some more widely.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  close-bracket            .set:N     = \l_siunitx_bracket_close_tl, % (
-  close-bracket            .initial:n = ),
-  exponent-base            .set:N     = \l_siunitx_exponent_base_tl,
-  exponent-base            .initial:n = { 10 },
-  exponent-product         .set:N     = \l_siunitx_exponent_product_tl,
-  exponent-product         .initial:n = { \times },
-  group-decimal-digits     .bool:N    = \l_siunitx_group_decimal_bool,
-  group-decimal-digits     .initial:n = { true },
-  group-digits             .meta:n    = {
+  close-bracket            .set:N  = \l_siunitx_bracket_close_tl, % (
+  exponent-base            .set:N  = \l_siunitx_exponent_base_tl,
+  exponent-product         .set:N  = \l_siunitx_exponent_product_tl,
+  group-decimal-digits     .bool:N = \l_siunitx_group_decimal_bool,
+  group-digits             .meta:n = {
     group-decimal-digits = #1,
     group-integer-digits = #1
   },
-  group-four-digits        .bool:N    = \l_siunitx_group_four_bool,
-  group-integer-digits     .bool:N    = \l_siunitx_group_integer_bool,
-  group-integer-digits     .initial:n = { true },
-  group-separator          .set:N     = \l_siunitx_group_sep_tl,
-  group-separator          .initial:n = { \, },
-  negative-color           .meta:n    = { negative-colour = #1 },
-  negative-colour          .set:N     = \l_siunitx_negative_colour_tl,
-  open-bracket             .set:N     = \l_siunitx_bracket_open_tl, 
-  open-bracket             .initial:n = (, % )
-  output-close-uncertainty .set:N     = 
-    \l_siunitx_output_uncert_close_tl, % (
-  output-close-uncertainty .initial:n = ),
-  output-complex-root      .set:N     = \l_siunitx_output_complex_tl,
-  output-complex-root      .initial:n = { i },
-  output-decimal-marker    .set:N     = \l_siunitx_output_decimal_tl,
-  output-decimal-marker    .initial:n = { . },
-  output-open-uncertainty  .set:N     = 
-    \l_siunitx_output_uncert_open_tl, 
-  output-open-uncertainty  .initial:n = (, % )
-  separate-uncertainty     .bool:N    = \l_siunitx_uncert_sep_bool,
-  tight-spacing            .bool:N    = \l_siunitx_tight_bool,
-  uncertainty-separator    .set:N     = \l_siunitx_uncert_sep_tl,
-  use-brackets             .bool:N    = \l_siunitx_brackets_bool,
-  use-brackets             .initial:n = { true }
+  group-four-digits        .bool:N = \l_siunitx_group_four_bool,
+  group-integer-digits     .bool:N = \l_siunitx_group_integer_bool,
+  group-separator          .set:N  = \l_siunitx_group_sep_tl,
+  negative-color           .meta:n = { negative-colour = #1 },
+  negative-colour          .set:N  = \l_siunitx_negative_colour_tl,
+  open-bracket             .set:N  = \l_siunitx_bracket_open_tl, 
+  output-close-uncertainty .set:N  = \l_siunitx_output_uncert_close_tl,
+  output-complex-root      .set:N  = \l_siunitx_output_complex_tl,
+  output-decimal-marker    .set:N  = \l_siunitx_output_decimal_tl,
+  output-open-uncertainty  .set:N  = \l_siunitx_output_uncert_open_tl, 
+  separate-uncertainty     .bool:N = \l_siunitx_uncert_sep_bool,
+  tight-spacing            .bool:N = \l_siunitx_tight_bool,
+  uncertainty-separator    .set:N  = \l_siunitx_uncert_sep_tl,
+  use-brackets             .bool:N = \l_siunitx_brackets_bool,
+}
+\keys_set:nn { siunitx } { % (
+  close-bracket            = ),
+  exponent-base            = 10,
+  exponent-product         = \times,
+  group-decimal-digits     = true,
+  group-integer-digits     = true,
+  group-separator          = \,,
+  open-bracket             = (, % ) (
+  output-close-uncertainty = ),
+  output-complex-root      = i,
+  output-decimal-marker    = .,
+  output-open-uncertainty  = (, % )
+  use-brackets             = true
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -4998,12 +5006,9 @@ This work consists of the file  siunitx.dtx
 % Some options related to numbers at the output stage.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  output-product     .set:N     = \l_siunitx_output_product_tl,
-  output-product     .initial:n = { \times },
-  output-quotient    .set:N     = \l_siunitx_output_quotient_tl,
-  output-quotient    .initial:n = { / },
-  parse-numbers      .bool:N    = \l_siunitx_number_parse_bool,
-  parse-numbers      .initial:n = { true },
+  output-product     .set:N  = \l_siunitx_output_product_tl,
+  output-quotient    .set:N  = \l_siunitx_output_quotient_tl,
+  parse-numbers      .bool:N = \l_siunitx_number_parse_bool,
   product-mode       .choice:,
   product-mode / calculate .code:n = {
     \bool_set_true:N \l_siunitx_calculate_product_bool
@@ -5023,7 +5028,12 @@ This work consists of the file  siunitx.dtx
     \bool_set_false:N \l_siunitx_calculate_quotient_bool
     \tl_set:Nn \l_siunitx_quotient_mode_tl { symbol }
   },
-  quotient-mode      .initial:n = { symbol }
+}
+\keys_set:nn { siunitx } {
+  output-product  = \times,
+  output-quotient = /,
+  parse-numbers   = true,
+  quotient-mode   = symbol
 }
 %    \end{macrocode} 
 %\end{macro}
@@ -5505,8 +5515,10 @@ This work consists of the file  siunitx.dtx
 % One option is related to how units are pre-processed.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  allow-literal-units .bool:N    = \l_siunitx_unit_allow_literal_bool,
-  allow-literal-units .initial:n = { true },
+  allow-literal-units .bool:N = \l_siunitx_unit_allow_literal_bool,
+}
+\keys_set:nn { siunitx } {
+  allow-literal-units = true
 }
 %    \end{macrocode}
 %\end{macro}  
@@ -5589,8 +5601,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   prefixes-as-symbols .bool:N    = \l_siunitx_prefix_symbols_bool,
-  prefixes-as-symbols .initial:n = { true },
   sticky-per          .bool:N    = \l_siunitx_sticky_per_bool,
+}
+\keys_set:nn { siunitx } {
+  prefixes-as-symbols = true
 }
 %    \end{macrocode} 
 %\end{macro} 
@@ -5821,7 +5835,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   inter-unit-separator .set:N     = \l_siunitx_unit_separator_tl ,
-  inter-unit-separator .initial:n = { \, },
   per-mode             .choice:,
   per-mode / fraction .code:n = {
     \bool_set_true:N \l_siunitx_per_fraction_bool
@@ -5839,9 +5852,7 @@ This work consists of the file  siunitx.dtx
     \bool_set_true:N \l_siunitx_per_fraction_bool
     \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
   },
-  per-mode             .initial:n = { power },
   per-symbol           .set:N     = \l_siunitx_per_symbol_tl,
-  per-symbol           .initial:n = { / },
   qualifier-mode       .choice:,
   qualifier-mode / brackets .code:n = {
     \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets }
@@ -5852,7 +5863,12 @@ This work consists of the file  siunitx.dtx
   qualifier-mode / subscript .code:n = {
     \tl_set:Nn \l_siunitx_qualifier_mode_tl { subscript }
   },
-  qualifier-mode .initial:n = { subscript }
+}
+\keys_set:nn { siunitx } {
+  inter-unit-separator = \,,
+  per-mode             = power,
+  per-symbol           = /,
+  qualifier-mode       = subscript
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6302,25 +6318,27 @@ This work consists of the file  siunitx.dtx
 % Options for printing units or units with numbers.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  allow-number-unit-breaks .bool:N    = 
+  allow-number-unit-breaks .bool:N = 
     \l_siunitx_number_unit_breaks_bool,
-  number-unit-separator    .set:N     = 
+  number-unit-separator    .set:N = 
     \l_siunitx_number_unit_separator_tl,
-  number-unit-separator    .initial:n = { \, },
   repeated-units .choice:,
-  repeated-units / false .code:n = {
+  repeated-units / false .code:n  = {
     \bool_set_false:N \l_siunitx_number_unit_power_bool
     \bool_set_false:N \l_siunitx_number_unit_repeat_bool
   },
-  repeated-units / power .code:n = {
+  repeated-units / power .code:n  = {
     \bool_set_false:N \l_siunitx_number_unit_power_bool
     \bool_set_true:N \l_siunitx_number_unit_repeat_bool
   },
-  repeated-units / true .code:n = {
+  repeated-units / true .code:n   = {
     \bool_set_true:N \l_siunitx_number_unit_power_bool
     \bool_set_false:N \l_siunitx_number_unit_repeat_bool
   },
-  repeated-units           .initial:n = { true }
+}
+\keys_set:nn { siunitx } {
+  number-unit-separator = \,,
+  repeated-units        = true
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -6488,8 +6506,10 @@ This work consists of the file  siunitx.dtx
 % Simple settings for ranges.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  range-phrase .set:N     = \l_siunitx_range_phrase_tl,
-  range-phrase .initial:n = { ~to~ }
+  range-phrase .set:N = \l_siunitx_range_phrase_tl,
+}
+\keys_set:nn { siunitx } {
+  range-phrase = { ~to~ }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6860,7 +6880,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   redefine-symbols .bool:N = \l_siunitx_redefine_symbols_bool,
-  redefine-symbols .initial:n     = { true }
+}
+\keys_set:nn { siunitx } {
+  redefine-symbols = true
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -6915,29 +6937,29 @@ This work consists of the file  siunitx.dtx
 % deals with the case where \cs{mathnormal} has the wrong symbol.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  math-angstrom   .set:N     = \l_siunitx_angstrom_maths_tl,
-  maths-angstrom  .set:N     = \l_siunitx_angstrom_maths_tl,
-  maths-angstrom  .initial:n = { \text { \AA } },
-  math-arcminute  .set:N     = \l_siunitx_arcminute_maths_tl,
-  maths-arcminute .set:N     = \l_siunitx_arcminute_maths_tl,
-  maths-arcminute .initial:n = { { } ^ { \prime } },
-  math-arcsecond  .set:N     = \l_siunitx_arcsecond_maths_tl,
-  maths-arcsecond .set:N     = \l_siunitx_arcsecond_maths_tl,
-  maths-arcsecond .initial:n = { { } ^ { \prime \prime } },
-  math-celsius    .set:N     = \l_siunitx_celsius_maths_tl,
-  maths-celsius   .set:N     = \l_siunitx_celsius_maths_tl,
-  maths-celsius   .initial:n = { 
-    { } ^ { \circ } \kern - \scriptspace C 
-  },
-  math-degree     .set:N     = \l_siunitx_degree_maths_tl,
-  maths-degree    .set:N     = \l_siunitx_degree_maths_tl,
-  maths-degree    .initial:n = { { } ^ { \circ } },
-  math-micro      .set:N     = \l_siunitx_micro_maths_tl,
-  maths-micro     .set:N     = \l_siunitx_micro_maths_tl,
-  maths-micro     .initial:n = { \c_siunitx_mu_maths_tl },
-  math-ohm        .set:N     = \l_siunitx_ohm_maths_tl,
-  maths-ohm       .set:N     = \l_siunitx_ohm_maths_tl,
-  maths-ohm       .initial:n = { \text { \ensuremath { \Omega } } },
+  math-angstrom   .set:N = \l_siunitx_angstrom_maths_tl,
+  maths-angstrom  .set:N = \l_siunitx_angstrom_maths_tl,
+  math-arcminute  .set:N = \l_siunitx_arcminute_maths_tl,
+  maths-arcminute .set:N = \l_siunitx_arcminute_maths_tl,
+  math-arcsecond  .set:N = \l_siunitx_arcsecond_maths_tl,
+  maths-arcsecond .set:N = \l_siunitx_arcsecond_maths_tl,
+  math-celsius    .set:N = \l_siunitx_celsius_maths_tl,
+  maths-celsius   .set:N = \l_siunitx_celsius_maths_tl,
+  math-degree     .set:N = \l_siunitx_degree_maths_tl,
+  maths-degree    .set:N = \l_siunitx_degree_maths_tl,
+  math-micro      .set:N = \l_siunitx_micro_maths_tl,
+  maths-micro     .set:N = \l_siunitx_micro_maths_tl,
+  math-ohm        .set:N = \l_siunitx_ohm_maths_tl,
+  maths-ohm       .set:N = \l_siunitx_ohm_maths_tl,
+}
+\keys_set:nn { siunitx } {
+  maths-angstrom  = \text { \AA },
+  maths-arcminute = { } ^ { \prime },
+  maths-arcsecond = { } ^ { \prime \prime },
+  maths-celsius   = { } ^ { \circ } \kern - \scriptspace C,
+  maths-degree    = { } ^ { \circ },
+  maths-micro     = \c_siunitx_mu_maths_tl,
+  maths-ohm       = \text { \ensuremath { \Omega } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6957,24 +6979,23 @@ This work consists of the file  siunitx.dtx
 % Text versions are similar.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  text-angstrom  .set:N     = \l_siunitx_angstrom_text_tl,
-  text-angstrom  .initial:n = { \AA },
-  text-arcminute .set:N     = \l_siunitx_arcminute_text_tl,
-  text-arcminute .initial:n = { \ensuremath { { } ^ { \prime } } },
-  text-arcsecond .set:N     = \l_siunitx_arcsecond_text_tl,
-  text-arcsecond .initial:n = { 
-    \ensuremath { { } ^ { \prime \prime } } 
-  },
-  text-celsius   .set:N     = \l_siunitx_celsius_text_tl,
-  text-celsius   .initial:n = { 
-    \ensuremath { { } ^ { \circ } \kern - \scriptspace C }
-  },
-  text-degree    .set:N     = \l_siunitx_degree_text_tl,
-  text-degree    .initial:n = { \ensuremath { { } ^ { \circ } } },
-  text-micro     .set:N     = \l_siunitx_micro_text_tl,
-  text-micro     .initial:n = { \c_siunitx_mu_text_tl },
-  text-ohm       .set:N     = \l_siunitx_ohm_text_tl,
-  text-ohm       .initial:n = { \ensuremath { \Omega } },
+  text-angstrom  .set:N = \l_siunitx_angstrom_text_tl,
+  text-arcminute .set:N = \l_siunitx_arcminute_text_tl,
+  text-arcsecond .set:N = \l_siunitx_arcsecond_text_tl,
+  text-celsius   .set:N = \l_siunitx_celsius_text_tl,
+  text-degree    .set:N = \l_siunitx_degree_text_tl,
+  text-micro     .set:N = \l_siunitx_micro_text_tl,
+  text-ohm       .set:N = \l_siunitx_ohm_text_tl,
+}
+\keys_set:nn { siunitx } {
+  text-angstrom  = \AA,
+  text-arcminute = \ensuremath { { } ^ { \prime } },
+  text-arcsecond = \ensuremath { { } ^ { \prime \prime } },
+  text-celsius   = 
+    \ensuremath { { } ^ { \circ } \kern - \scriptspace C },
+  text-degree    = \ensuremath { { } ^ { \circ } },
+  text-micro     = \c_siunitx_mu_text_tl ,
+  text-ohm       = \ensuremath { \Omega },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7594,6 +7615,177 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+%\subsection{Support for version one}
+%
+% The re-arrangements made to the code in version two, and in particular
+% the new option names, mean that support for version one needs to be
+% included explicitly. Looking forward, this code is unlikely to be
+% taken forward to a stand-alone \LaTeX3 version of \pkg{siunitx}. 
+% However, that is likely to be some way off.
+% 
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  addsign .choice:,
+  addsign / false .meta:n = { explicit-sign =           },
+  addsign / true  .meta:n = { explicit-sign = +         },
+  allowlitunits .meta:n = { free-standing-units    = #1 },
+  allowoptarg   .meta:n = { unit-optional-argument = #1 },
+  allowzeroexp  .meta:n = { retain-zero-exponent   = #1 },
+%  angformat & List & Conversion of angle format \\
+%  anglesep & List or literal & Space between angle components \\
+%  astroang & Boolean & Astronomy-style angles \\
+  closeerr      .meta:n = { close-bracket            = #1 },
+  closefrac     .meta:n = { close-bracket            = #1 },
+  closerange    .meta:n = { close-bracket            = #1 },
+  colorall      .code:n = ,
+  colourall     .code:n = ,
+  colorneg      .code:n = ,
+  colourneg     .code:n = ,
+  colorunits    .meta:n = ,
+  colourunits   .meta:n = ,
+  colorvalues   .meta:n = ,
+  colourvalues  .meta:n = ,
+%  decimalsymbol & List or literal & Decimal symbol \\
+%  debug & Boolean & Write debugging data to log \\
+  detectdisplay .meta:n = { detect-display-maths     = #1 },
+%  digitsep & List & Separation of digits in large numbers \\
+  dp         .meta:n = { 
+    round-mode   = places,
+    round-places = #1,
+  },
+%  emulate & Modules & Emulation modules to load \\
+%  errspace & List & Spacing of bracketed error \\
+%  eVcorra & Length & Spacing correction in \eV \\
+%  eVcorrb & Length & Spacing correction after \eV \\
+%  expbase & List or literal & Base used for exponents \\
+%  expproduct & List or literal & Product sign for exponents \\
+  fixdp .choice:,
+  fixdp / false .meta:n = { round-mode = none },
+  fixdp / true  .meta:n = { round-mode = places },
+  fixsf .choice:,
+  fixsf / false .meta:n = { round-mode = none },
+  fixsf / true  .meta:n = { round-mode = figures },
+%  fraction & List & Method used when setting \opt{per=frac} \\
+%  inlinebold & List & Select how inline bold is tested \\
+%  load & Modules & Modules to load \\
+%  locale & Modules & Locale to follow \\
+%  loctolang & Special & Associate locale with \pkg{babel}
+%    language \\
+%  log & List & Amount of data added to log \\
+  mathOmega    .meta:n = { math-ohm                = #1              },
+  mathcelsius  .meta:n = { math-celsius            = #1              },
+  mathdegree   .meta:n = { math-degree             = #1              },
+  mathminute   .meta:n = { math-arcminute          = #1              },
+  mathmu       .meta:n = { math-micro              = #1              },
+  mathringA    .meta:n = { math-angstrom           = #1              },
+  mathrm       .meta:x = { math-rm                 = \exp_not:c {#1} },
+  mathsOmega   .meta:n = { maths-ohm               = #1              },
+  mathscelsius .meta:n = { maths-celsius           = #1              },
+  mathsdegree  .meta:n = { maths-degree            = #1              },
+  mathsecond   .meta:n = { math-arcsecond          = #1              },
+  mathsf       .meta:x = { math-sf                 = \exp_not:c {#1} },
+  mathsminute  .meta:n = { maths-arcminute         = #1              },
+  mathsmu      .meta:n = { maths-micro             = #1              },
+  mathsringA   .meta:n = { maths-angstrom          = #1              },
+  mathssecond  .meta:n = { maths-arcsecond         = #1              },
+  mathssf      .meta:x = { maths-sf                = \exp_not:c {#1} },
+  mathstt      .meta:x = { maths-tt                = \exp_not:c {#1} },
+  mathtt       .meta:x = { math-tt                 = \exp_not:c {#1} },
+  negcolor     .meta:n = { negative-color          = #1              },
+  negcolour    .meta:n = { negative-colour         = #1              },
+%  noload & Modules & Modules not to load \\
+%  numaddn & Literal & Additional input allowed in numbers \\
+  numcloseerr  .meta:n = { input-close-uncertainty = #1              },
+  numdecimal   .meta:n = { input-decimal-markers   = #1              },
+  numdigits    .meta:n = { input-digits            = #1              },
+  numdiv       .meta:n = { input-quotient          = #1              },
+  numexp       .meta:n = { input-exponent-markers  = #1              },
+  numgobble    .meta:n = { input-ignore            = #1              },
+  numopenerr   .meta:n = { input-open-uncertainty  = #1              },
+  numprod      .meta:n = { input-product           = #1              },
+  numsign      .meta:n = { input-signs             = #1              },
+  obeyall      .meta:n = { detect-all              = #1              },
+  obeybold     .meta:n = { detect-bold             = #1              },
+  obeyitalic   .meta:n = { detect-italic           = #1              },
+  obeymode     .meta:n = { detect-mode             = #1              },
+  openerr      .meta:n = { open-bracket            = #1              },
+  openfrac     .meta:n = { open-bracket            = #1              },
+  openrange    .meta:n = { open-bracket            = #1              },
+%  padangle & List & Add zeros to blank parts of angles  \\
+%  padnumber & List & Add zeros to blank parts of numbers \\
+%  per & List & Behaviour of \cs{per} \\
+%  prefixbase & List or literal & Base used when making prefixes \\
+%   & & numerical \\
+%  prefixproduct & List or literal & Product sign for prefixes \\
+%  prefixsymbolic & Boolean & Behaviour of unit prefixes\\
+  prespace     .meta:n = { space-before-unit = #1 },
+  redefsymbols .meta:n = { redefine-symbols  = #1 },
+%  repeatunits & List & Repeat units with separated errors, \\
+%   & &  products and in ranges \\
+%  retainplus & Boolean & Retain explicit plus sign\\
+%  seperr & Boolean & Separate number and error \\ 
+  seperr        .meta:n = { separate-uncertainty = #1 },
+  sepfour       .meta:n = { group-four-digits    = true },
+  sf         .meta:n = { 
+    round-mode   = figures,
+    round-places = #1,
+  },
+  sign          .meta:n = { explicit-sign = #1 },
+%  slash & List or literal & Symbol used for ``/'' \\
+  stickyper     .meta:n = { sticky-per      = #1 },
+%  strict & Boolean & Obey the rules strictly \\
+%  strictarc & Boolean & Require exactly zero or \\
+%   & & two semi-colons \\
+%  tabalign & List & Positioning of all column data \\
+%  tabalignexp & Boolean & Alignment of exponents in tables \\
+%  tabautofit & Boolean & Switch for rounding numbers to \\
+%   & & length given by \opt{tabformat} \\
+%  tabformat & Number & Space reserved in table for numbers \\
+%  tabnumalign & List & Alignment of |S| column numbers \\
+%  tabparseonly & Boolean & Do not align |S| columns \\
+%   & & on decimal marker \\
+%  tabtextalign & List & Positioning of text in |S| columns \\
+%  tabunitalign & List & Positioning of units in |s| columns \\
+  textOmega    .meta:n = { text-ohm             = #1               },
+  textcelsius  .meta:n = { text-celsius         = #1               },
+  textdegree   .meta:n = { text-degree          = #1               },
+  textminute   .meta:n = { text-arcminute       = #1               },
+  textmu       .meta:n = { text-micro           = #1               },
+  textringA    .meta:n = { text-angstrom         = #1              },
+  textrm       .meta:x = { text-rm               = \exp_not:c {#1} },
+  textsecond   .meta:n = { text-arcsecond        = #1              },
+  textsf       .meta:x = { text-sf               = \exp_not:c {#1} },
+  texttt       .meta:x = { text-tt               = \exp_not:c {#1} },
+%  tightpm & Boolean & Reduce space around $\pm$ \\
+%  tophrase & List or literal & The phrase ``to'' for ranges \\
+%  trapambigerr & Boolean & Check for ambiguous errors \\
+%  trapambigfrac & Boolean & Check for ambiguous fractions \\
+%  trapambigrange & Boolean & Check for ambiguous ranges \\
+  unitcolor    .meta:n = { unit-color            = #1              },
+  unitcolour   .meta:n = { unit-colour           = #1              },
+  unitmathrm   .meta:x = { unit-math-rm          = \exp_not:c {#1} },
+  unitmathsf   .meta:x = { unit-math-sf          = \exp_not:c {#1} },
+  unitmathsrm  .meta:x = { unit-maths-rm         = \exp_not:c {#1} },
+  unitmathssf  .meta:x = { unit-maths-sf         = \exp_not:c {#1} },
+  unitmathstt  .meta:x = { unit-maths-tt         = \exp_not:c {#1} },
+  unitmathtt   .meta:x = { unit-math-tt          = \exp_not:c {#1} },
+  unitmode     .meta:n = { unit-mode            = #1               },
+%  unitsep & List or lieral & Separator for units \\
+%  unitspace & List or literal & Space used for ``|~|'' in units \\
+  valuecolor   .meta:n = { number-color         = #1              },
+  valuecolour  .meta:n = { number-colour        = #1              },
+  valuemathrm  .meta:x = { number-math-rm        = \exp_not:c {#1} },
+  valuemathsf  .meta:x = { number-math-sf        = \exp_not:c {#1} },
+  valuemathsrm .meta:x = { number-maths-rm       = \exp_not:c {#1} },
+  valuemathssf .meta:x = { number-maths-sf       = \exp_not:c {#1} },
+  valuemathstt .meta:x = { number-maths-tt       = \exp_not:c {#1} },
+  valuemathtt  .meta:x = { number-math-tt        = \exp_not:c {#1} },
+  valuemode    .meta:n = { number-mode          = #1              },
+%  valuesep & List or literal & Separator between value and unit \\
+  xspace       .meta:n = { use-xspace           = #1              }
+}
+%    \end{macrocode}
 %    
 %    \begin{macrocode}
 %</package>
