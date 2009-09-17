@@ -6332,12 +6332,12 @@ This work consists of the file  siunitx.dtx
     \bool_set_false:N \l_siunitx_number_unit_repeat_bool
   },
   repeated-units / power .code:n  = {
-    \bool_set_false:N \l_siunitx_number_unit_power_bool
-    \bool_set_true:N \l_siunitx_number_unit_repeat_bool
-  },
-  repeated-units / true .code:n   = {
     \bool_set_true:N \l_siunitx_number_unit_power_bool
     \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+  },
+  repeated-units / true .code:n   = {
+    \bool_set_false:N \l_siunitx_number_unit_power_bool
+    \bool_set_true:N \l_siunitx_number_unit_repeat_bool
   },
 }
 \keys_set:nn { siunitx } {
@@ -6408,10 +6408,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_combined:nnnn {
   \IfNoValueTF {#3} {
+    \tl_clear:N \l_siunitx_pre_unit_tl 
+  }{
     \siunitx_unit_in:nn {#3} {#1} 
     \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
-  }{
-    \tl_clear:N \l_siunitx_pre_unit_tl 
   }
   \siunitx_combined_unit:nnn {#2} {#4} {#1}
   \siunitx_combined_loop:n {#2}
@@ -6456,7 +6456,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_combined_main_unit:nnn}
+%\begin{macro}{\siunitx_combined_unit:nnn}
 % In most cases, sorting out the main unit is easy: simply set up for
 % printing using \cs{siunitx_unit_in:nn}. However, if there are multiple
 % parts to the number, and they are to be combined into the unit, then
@@ -6464,16 +6464,17 @@ This work consists of the file  siunitx.dtx
 % correctly-prepared unit stored in \cs{l_siunitx_unit_tl}.
 %    \begin{macrocode}
 \cs_new:Nn \siunitx_combined_unit:nnn {
-  \bool_if:NTF \l_siunitx_number_unit_repeat_bool {
+  \bool_if:NTF \l_siunitx_number_unit_power_bool {
     \siunitx_combined_product_count:n {#1}
     \intexpr_compare:nTF { \l_siunitx_number_product_int > \c_zero } {
+      \int_incr:N \l_siunitx_number_product_int
       \tl_set:Nn \l_siunitx_tmpa_tl {#2}
       \tl_set:No \l_siunitx_tmpb_tl {
         \exp_after:wN \tothe \exp_after:wN 
           { \int_use:N \l_siunitx_number_product_int }
       }
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-      \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#1}
+      \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#3}
     }{
       \siunitx_unit_in:nn {#2} {#3}
     }
