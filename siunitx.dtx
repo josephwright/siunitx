@@ -1810,38 +1810,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_mu_text_tl}
+%\begin{macro}{\c_siunitx_mu_tl}
 % The lack of an upright mu has to be sorted out.
 %    \begin{macrocode}
-\DeclareTextSymbol \c_siunitx_mu_text_tl { TS1 } { 181 }
-\DeclareTextSymbolDefault \c_siunitx_mu_text_tl { TS1 }
+\DeclareTextSymbol \c_siunitx_mu_tl { TS1 } { 181 }
+\DeclareTextSymbolDefault \c_siunitx_mu_tl { TS1 }
 %    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_upgreek_check:}
-%\begin{macro}{\c_siunitx_mu_maths_tl}
-% For maths mode, there is a need for some care as there are a limited
-% number of maths fonts available.
-%    \begin{macrocode}
-\cs_new_nopar:Nn \siunitx_upgreek_check: { 
-  \@ifpackageloaded { upgreek } {
-    \cs_set_eq:NN \c_siunitx_mu_maths_tl \upmu
-  }{
-    \@ifpackageloaded { fourier } {
-      \cs_set_eq:NN \c_siunitx_mu_maths_tl \othermu
-    }{
-      \DeclareFontFamily { OML } { eur } { \skewchar \font 127 }
-      \DeclareFontShape { OML } { eur } { m } { n } 
-        { <-6> eurm5 <6-8> eurm7 <8-> eurm10 } { }
-      \DeclareSymbolFont { siunitx_symbol } { OML } { eur } { m } { n }
-      \DeclareMathSymbol \c_siunitx_mu_maths_tl \mathord 
-        { siunitx_symbol } { 22 }
-    }
-  }
-}
-\AtBeginDocument { \siunitx_upgreek_check: }
-%    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_tl_put_left_maths:Nn}
@@ -6963,7 +6937,7 @@ This work consists of the file  siunitx.dtx
   maths-arcsecond = { } ^ { \prime \prime },
   maths-celsius   = { } ^ { \circ } \kern - \scriptspace C,
   maths-degree    = { } ^ { \circ },
-  maths-micro     = \c_siunitx_mu_maths_tl,
+  maths-micro     = \text { \c_siunitx_mu_tl },
   maths-ohm       = \text { \ensuremath { \Omega } },
 }
 %    \end{macrocode}
@@ -6999,7 +6973,7 @@ This work consists of the file  siunitx.dtx
   text-celsius   = 
     \ensuremath { { } ^ { \circ } \kern - \scriptspace C },
   text-degree    = \ensuremath { { } ^ { \circ } },
-  text-micro     = \c_siunitx_mu_text_tl ,
+  text-micro     = \c_siunitx_mu_tl ,
   text-ohm       = \ensuremath { \Omega },
 }
 %    \end{macrocode}
