@@ -1,20 +1,12 @@
 @echo off
-rem This Windows batch file provides very similar functionality to the
-rem Makefile also available here.  Some of the options provided here 
-rem require a zip program such as Info-ZIP (http://www.info-zip.org).
 
 setlocal
 
-set AUXFILES=aux cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
+set AUXFILES=aux bbl blg cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
 set CLEAN=bib bst cls eps gz ins cfg pdf sty tex txt zip
-set DOCEXTRA=\AtBeginDocument{\DisableImplementation}
-set INDEXFILE=l3doc
 set PACKAGE=siunitx
-set PATHCOPY=%PATH%
 set PDF=%PACKAGE%
 set TDSROOT=latex\%PACKAGE%
-set TEMPLOG=%TEMP%\temp.log
-set TEX=
 set TXT=README
 set UNPACK=%PACKAGE%.dtx
 
@@ -27,7 +19,14 @@ set UNPACK=%PACKAGE%.dtx
   if /i [%1] == [tds]          goto :tds
   if /i [%1] == [unpack]       goto :unpack
 
-  goto :help
+  echo  make clean        - delete all generated files
+  echo  make ctan         - create an archive ready for CTAN
+  echo  make doc          - typesets documentation
+  echo  make localinstall - extract packages
+  echo  make tds          - create a TDS-ready archive
+  echo  make unpack       - extract packages
+  
+  goto :end
 
 
 :clean
@@ -51,31 +50,28 @@ set UNPACK=%PACKAGE%.dtx
   if exist temp\*.*  rmdir /q /s temp
   if exist tds\*.*   rmdir /q /s tds
 
-  if exist *.bst (
-    xcopy /q /y *.bst tds\bibtex\%PACKAGE%\bst\ > %TEMPLOG%
+  for %%I in (*.dtx) do (
+    xcopy /q /y %%I temp\%PACKAGE%\           > nul
+    xcopy /q /y %%I tds\source\%TDSROOT%\      > nul
   )
-  if exist *.cfg (
-    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config\ > %TEMPLOG%
-  )
-  if exist *.cls (
-    xcopy /q /y *.cls tds\tex\%TDSROOT%\        > %TEMPLOG%
-  )
-  xcopy /q /y *.dtx temp\%PACKAGE%\             > %TEMPLOG%
-  xcopy /q /y *.dtx tds\source\%TDSROOT%\       > %TEMPLOG%
   for %%I in (%PDF%) do (
-    xcopy /q /y %%I.pdf temp\%PACKAGE%\         > %TEMPLOG%
-    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\      > %TEMPLOG%
+    xcopy /q /y %%I.pdf temp\%PACKAGE%\       > nul
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\    > nul
   )
-  xcopy /q /y *.ins temp\%PACKAGE%\             > %TEMPLOG%
-  xcopy /q /y *.ins tds\source\%TDSROOT%\       > %TEMPLOG%
-  xcopy /q /y *.sty tds\tex\%TDSROOT%\          > %TEMPLOG%
+  for %%I in (*.ins) do (
+    xcopy /q /y %%I temp\%PACKAGE%\           > nul
+    xcopy /q /y %%I tds\source\%TDSROOT%\      > nul
+  )
+  for %%I in (*.sty) do (
+    xcopy /q /y %%I tds\tex\%TDSROOT%\        > nul
+  )
   for %%I in (%TEX%) do (
-    xcopy /q /y %%I.tex temp\%PACKAGE%\         > %TEMPLOG%
-    xcopy /q /y %%I.tex tds\source\%TDSROOT%\   > %TEMPLOG%
+    xcopy /q /y %%I.tex temp\%PACKAGE%\       > nul
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\ > nul
   )
   for %%I in (%TXT%) do (
-    xcopy /q /y %%I.txt temp\%PACKAGE%\    > %TEMPLOG%
-    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > %TEMPLOG%
+    xcopy /q /y %%I.txt temp\%PACKAGE%\    > nul
+    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > nul
     ren temp\%PACKAGE%\%%I.txt    %%I
     ren tds\doc\%TDSROOT%\%%I.txt %%I
   )
@@ -83,12 +79,12 @@ set UNPACK=%PACKAGE%.dtx
   pushd tds
   %ZIPEXE% %ZIPFLAG% %PACKAGE%.tds.zip .
   popd
-  xcopy /q /y tds\%PACKAGE%.tds.zip temp\ > %TEMPLOG%
+  xcopy /q /y tds\%PACKAGE%.tds.zip temp\ > nul
 
   pushd temp
   %ZIPEXE% %ZIPFLAG% %PACKAGE%.zip .
   popd
-  xcopy /q /y temp\%PACKAGE%.zip > %TEMPLOG%
+  xcopy /q /y temp\%PACKAGE%.zip > nul
 
   rmdir /q /s tds
   rmdir /q /s temp
@@ -96,8 +92,6 @@ set UNPACK=%PACKAGE%.dtx
   goto :end
 
 :doc
-
-  call :unpack
 
   for %%I in (*.dtx) do (
     call :doc-int %%~nI
@@ -110,28 +104,19 @@ set UNPACK=%PACKAGE%.dtx
   echo.
   echo Typesetting %1
   
-  pdflatex -interaction=nonstopmode -draftmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
+  pdflatex -interaction=nonstopmode -draftmode "\AtBeginDocument{\DisableImplementation} \input %1.dtx" > nul
   if not ERRORLEVEL 1 (
-    makeindex -q -s gglo.ist        -o %1.gls %1.glo > %TEMPLOG%
-    makeindex -q -s %INDEXFILE%.ist -o %1.ind %1.idx > %TEMPLOG%
-    pdflatex -interaction=nonstopmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
-    pdflatex -interaction=nonstopmode "%DOCEXTRA% \input %1.dtx" > %TEMPLOG%
+    makeindex -q -s gglo.ist  -o %1.gls %1.glo > nul
+    makeindex -q -s l3doc.ist -o %1.ind %1.idx > nul
+    bibtex8 --wolfgang %1.aux > nul
+    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %1.dtx" > nul
+    pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %1.dtx" > nul
   ) else (
     echo ! %1 compilation failed
   )
   
   goto :clean-int
 
-:help
-
-  echo  make clean        - delete all generated files
-  echo  make ctan         - create an archive ready for CTAN
-  echo  make doc          - typesets documentation
-  echo  make localinstall - extract packages
-  echo  make tds          - create a TDS-ready archive
-  echo  make unpack       - extract packages
-  
-  goto :end
 
 :localinstall
 
@@ -148,12 +133,12 @@ set UNPACK=%PACKAGE%.dtx
   if exist "%INSTALLROOT%\*.*" rmdir /q /s "%INSTALLROOT%"
 
   if exist *.cfg (
-    xcopy /q /y *.cfg "%INSTALLROOT%\config\" > %TEMPLOG%
+    xcopy /q /y *.cfg "%INSTALLROOT%\config\" > nul
   )
   if exist *.cls ( 
-    xcopy /q /y *.cls "%INSTALLROOT%\"        > %TEMPLOG%
+    xcopy /q /y *.cls "%INSTALLROOT%\"        > nul
   )
-  xcopy /q /y *.sty "%INSTALLROOT%\"          > %TEMPLOG%
+  xcopy /q /y *.sty "%INSTALLROOT%\"          > nul
 
   goto :clean-int
 
@@ -174,33 +159,30 @@ set UNPACK=%PACKAGE%.dtx
 
   if exist tds\*.*  rmdir /q /s tds
 
-  if exist *.bst (
-    xcopy /q /y *.bst tds\bibtex\%PACKAGE%\bst\ > %TEMPLOG%
+  for %%I in (*.dtx) do (
+    xcopy /q /y %%I tds\source\%TDSROOT%\      > nul  
   )
-  if exist *.cfg (
-    xcopy /q /y *.cfg tds\tex\%TDSROOT%\config\ > %TEMPLOG%
-  )
-  if exist *.cls (
-    xcopy /q /y *.cls tds\tex\%TDSROOT%\        > %TEMPLOG%    
-  )
-  xcopy /q /y *.dtx tds\source\%TDSROOT%\       > %TEMPLOG%    
   for %%I in (%PDF%) do (
-    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\      > %TEMPLOG%  
+    xcopy /q /y %%I.pdf tds\doc\%TDSROOT%\     > nul  
   )
-  xcopy /q /y *.ins tds\source\%TDSROOT%\       > %TEMPLOG%  
-  xcopy /q /y *.sty tds\tex\%TDSROOT%\          > %TEMPLOG%  
+  for %%I in (*.ins) do (
+    xcopy /q /y %%I tds\source\%TDSROOT%\      > nul  
+  )  
+  for %%I in (*.sty) do (
+    xcopy /q /y %%I tds\tex\%TDSROOT%\         > nul  
+  )
   for %%I in (%TEX%) do (
-    xcopy /q /y %%I.tex tds\source\%TDSROOT%\   > %TEMPLOG%
+    xcopy /q /y %%I.tex tds\source\%TDSROOT%\  > nul
   )
   for %%I in (%TXT%) do (
-    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > %TEMPLOG%  
+    xcopy /q /y %%I.txt tds\doc\%TDSROOT%\ > nul  
     ren tds\doc\%TDSROOT%\%%I.txt %%I
   )
 
   pushd tds
   %ZIPEXE% %ZIPFLAG% %PACKAGE%.tds.zip .
   popd
-  xcopy /q /y tds\%PACKAGE%.tds.zip > %TEMPLOG%
+  xcopy /q /y tds\%PACKAGE%.tds.zip > nul
 
   rmdir /q /s tds
   
@@ -212,7 +194,7 @@ set UNPACK=%PACKAGE%.dtx
   echo Unpacking files
 
   for %%I in (%UNPACK%) do (
-    tex %%I > %TEMPLOG%
+    tex %%I > nul
   )
 
   goto :clean-int
