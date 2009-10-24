@@ -4,19 +4,21 @@
 ################################################################
 ################################################################
 
+.SILENT:
+
 ################################################################
 # Default with no target is to give help                       #
 ################################################################
 
 help:
-	@echo ""
-	@echo " make clean        - clean out test directory"
-	@echo " make ctan         - create a CTAN-ready archive"
-	@echo " make doc          - typeset documentation"
-	@echo " make localinstall - install files in local texmf tree"
-	@echo " make tds          - create a TDS-ready archive"
-	@echo " make unpack       - extract packages"
-	@echo ""
+	echo ""
+	echo " make clean        - clean out test directory"
+	echo " make ctan         - create a CTAN-ready archive"
+	echo " make doc          - typeset documentation"
+	echo " make localinstall - install files in local texmf tree"
+	echo " make tds          - create a TDS-ready archive"
+	echo " make unpack       - extract packages"
+	echo ""
 	
 ##############################################################
 # Master package name                                        #
