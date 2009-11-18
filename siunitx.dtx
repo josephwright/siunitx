@@ -1967,14 +1967,19 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_set_maths_fam:n #1 {
   \group_begin:
-    \hbox_set:Nn \l_tmpa_box {
-      \ensuremath {
-        \use:c { math #1 } {
-          \exp_after:wN \pref_global:D \exp_after:wN \tex_chardef:D
-            \csname c_siunitx_math #1 _int \endcsname \fam \scan_stop:       
-        }
-      }
-    }
+    \hbox_set:Nn \l_tmpa_box 
+      {
+        \ensuremath 
+          {
+            \use:c { math #1 } 
+              {
+                \exp_after:wN \pref_global:D 
+                \exp_after:wN \tex_chardef:D
+                \csname c_siunitx_math #1 _int \endcsname 
+                  \fam \scan_stop:       
+              }
+          }
+      }  
   \group_end:
 }
 \tl_put_right:Nn \document {
@@ -1998,7 +2003,7 @@ This work consists of the file  siunitx.dtx
   \tl_new:c { c_siunitx_text #1 _tl }
   \tl_set:cx { c_siunitx_text #1 _tl } { \use:c { #1 default } }
 }
-\AtBeginDocument{
+\AtBeginDocument {
   \siunitx_set_text_fam:n { sf }
   \siunitx_set_text_fam:n { tt }
 }
@@ -2026,18 +2031,20 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   detect-all .choice:,
   detect-all .default:n = true,
-  detect-all / false .meta:n = {
-    detect-bold   = false,
-    detect-family = false,
-    detect-italic = false,
-    detect-mode   = false
-  },
-  detect-all / true .meta:n = {
-    detect-bold   = true,
-    detect-family = true,
-    detect-italic = true,
-    detect-mode   = true
-  },
+  detect-all / false .meta:n = 
+    {
+      detect-bold   = false,
+      detect-family = false,
+      detect-italic = false,
+      detect-mode   = false
+    },
+  detect-all / true .meta:n = 
+    {
+      detect-bold   = true,
+      detect-family = true,
+      detect-italic = true,
+      detect-mode   = true
+    },
   detect-bold          .bool_set:N = \l_siunitx_detect_bold_bool,
   detect-display-math  .bool_set:N = 
     \l_siunitx_detect_display_maths_bool,
@@ -2046,31 +2053,30 @@ This work consists of the file  siunitx.dtx
   detect-family        .bool_set:N = \l_siunitx_detect_family_bool,
   detect-inline-bold   .choice:,
   detect-inline-bold   .value_required:,
-  detect-inline-bold / math  .code:n = {
-    \bool_set_true:N \l_siunitx_detect_inline_bold_bool
-  },
-  detect-inline-bold / maths .code:n = {
-    \bool_set_true:N \l_siunitx_detect_inline_bold_bool
-  },
-  detect-inline-bold / text  .code:n = {
-    \bool_set_false:N \l_siunitx_detect_inline_bold_bool
-  },
+  detect-inline-bold / math  .code:n = 
+    { \bool_set_true:N \l_siunitx_detect_inline_bold_bool },
+  detect-inline-bold / maths .code:n = 
+    { \bool_set_true:N \l_siunitx_detect_inline_bold_bool },
+  detect-inline-bold / text  .code:n = 
+    { \bool_set_false:N \l_siunitx_detect_inline_bold_bool },
   detect-italic        .bool_set:N = \l_siunitx_detect_italic_bool,
   detect-mode          .bool_set:N = \l_siunitx_detect_mode_bool,
   detect-none          .choice:,
   detect-none          .default:n = true,
-  detect-none / false .meta:n = {
-    detect-bold   = true,
-    detect-family = true,
-    detect-italic = true,
-    detect-mode   = true
-  },
-  detect-none / true .meta:n = {
-    detect-bold   = false,
-    detect-family = false,
-    detect-italic = false,
-    detect-mode   = false
-  }
+  detect-none / false .meta:n = 
+    {
+      detect-bold   = true,
+      detect-family = true,
+      detect-italic = true,
+      detect-mode   = true
+    },
+  detect-none / true .meta:n = 
+    {
+      detect-bold   = false,
+      detect-family = false,
+      detect-italic = false,
+      detect-mode   = false
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2114,21 +2120,18 @@ This work consists of the file  siunitx.dtx
 % test is to ensure this is not happening.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font: {
-  \bool_if:NF \l_siunitx_font_set_bool {
-    \siunitx_detect_font_init:
-    \bool_if:NT \l_siunitx_detect_bold_bool {
-       \siunitx_detect_font_bold:
+  \bool_if:NF \l_siunitx_font_set_bool 
+    {
+      \siunitx_detect_font_init:
+      \bool_if:NT \l_siunitx_detect_bold_bool 
+        { \siunitx_detect_font_bold: }
+      \bool_if:NT \l_siunitx_detect_family_bool 
+        { \siunitx_detect_font_family: }
+      \bool_if:NT \l_siunitx_detect_italic_bool 
+        { \siunitx_detect_font_italic: }
+      \bool_if:NT \l_siunitx_detect_mode_bool 
+        { \siunitx_detect_font_mode: }
     }
-    \bool_if:NT \l_siunitx_detect_family_bool {
-      \siunitx_detect_font_family:
-    }
-    \bool_if:NT \l_siunitx_detect_italic_bool {
-      \siunitx_detect_font_italic:
-    }
-    \bool_if:NT \l_siunitx_detect_mode_bool {
-      \siunitx_detect_font_mode:
-    }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2138,10 +2141,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_init: {
   \bool_set_true:N \l_siunitx_font_set_bool
-  \cs_set:Npn \siunitx_font_bold: {
-    \unboldmath 
-    \mdseries
-  }
+  \cs_set:Npn \siunitx_font_bold: 
+    {
+      \unboldmath 
+      \mdseries
+    }
   \cs_set:Npn \siunitx_font_italic: { \upshape }
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
   \bool_set_true:N \l_siunitx_font_maths_mode_bool
@@ -2155,23 +2159,21 @@ This work consists of the file  siunitx.dtx
 % maths, there is a choice of what test to apply.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_bold: {
-  \mode_if_math:TF {
-    \mode_if_inner:TF {
-      \bool_if:NTF \l_siunitx_detect_inline_bold_bool {
-        \siunitx_detect_font_bold_maths:
-      }{
-        \siunitx_detect_font_bold_text:
-      }
-    }{
-      \bool_if:NTF \l_siunitx_detect_display_maths_bool {
-        \siunitx_detect_font_bold_maths:
-      }{
-        \siunitx_detect_font_bold_text:
-      }
+  \mode_if_math:TF 
+    {
+      \mode_if_inner:TF 
+        {
+          \bool_if:NTF \l_siunitx_detect_inline_bold_bool 
+            { \siunitx_detect_font_bold_maths: }
+            { \siunitx_detect_font_bold_text: }
+        }
+        {
+          \bool_if:NTF \l_siunitx_detect_display_maths_bool 
+            { \siunitx_detect_font_bold_maths: }
+            { \siunitx_detect_font_bold_text: }
+        }
     }
-  }{
-    \siunitx_detect_font_bold_text:
-  }
+    { \siunitx_detect_font_bold_text: }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2181,20 +2183,24 @@ This work consists of the file  siunitx.dtx
 % maths content.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_bold_maths: {
-  \tl_if_eq:nVT { bold } \math@version {
-    \cs_set:Npn \siunitx_font_bold: {
-      \boldmath
-      \bfseries
+  \tl_if_eq:nVT { bold } \math@version 
+    {
+      \cs_set:Npn \siunitx_font_bold: 
+        {
+          \boldmath
+          \bfseries
+        }
     }
-  }
 }
 \cs_new_nopar:Npn \siunitx_detect_font_bold_text: {
-  \tl_if_eq:nxT { b } { \exp_args:NV \tl_head_i:n \f@series } {
-    \cs_set:Npn \siunitx_font_bold: {
-      \boldmath
-      \bfseries
+  \tl_if_eq:nxT { b } { \exp_args:NV \tl_head_i:n \f@series } 
+    {
+      \cs_set:Npn \siunitx_font_bold: 
+        {
+          \boldmath
+          \bfseries
+        }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2206,13 +2212,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_family: {
   \siunitx_detect_font_family_text:
-  \bool_if:NT \l_siunitx_detect_display_maths_bool {  
-    \mode_if_math:T {
-      \mode_if_inner:F {
-        \siunitx_detect_font_family_maths:
-      }
+  \bool_if:NT \l_siunitx_detect_display_maths_bool 
+    {  
+      \mode_if_math:T 
+        { \mode_if_inner:F { \siunitx_detect_font_family_maths: } }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2226,20 +2230,16 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_family_maths: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathsf_int } {
-    \tl_set:Nn \l_siunitx_font_family_tl { sf }
-  }
-  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathtt_int } {
-    \tl_set:Nn \l_siunitx_font_family_tl { tt }
-  }  
+  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathsf_int } 
+    { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
+  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathtt_int } 
+    { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
 \cs_new_nopar:Npn \siunitx_detect_font_family_text: {
-  \tl_if_eq:NNT \f@family \c_siunitx_textsf_tl {
-    \tl_set:Nn \l_siunitx_font_family_tl { sf }
-  }
-  \tl_if_eq:NNT \f@family \c_siunitx_texttt_tl {
-    \tl_set:Nn \l_siunitx_font_family_tl { tt }
-  }
+  \tl_if_eq:NNT \f@family \c_siunitx_textsf_tl 
+    { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
+  \tl_if_eq:NNT \f@family \c_siunitx_texttt_tl 
+    { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2249,9 +2249,8 @@ This work consists of the file  siunitx.dtx
 % The italic test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_italic: {
-  \tl_if_eq:nVT { it } \f@shape {
-    \cs_set:Npn \siunitx_font_italic: { \itshape }
-  }
+  \tl_if_eq:nVT { it } \f@shape 
+    { \cs_nopar_set:Npn \siunitx_font_italic: { \itshape } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2261,9 +2260,8 @@ This work consists of the file  siunitx.dtx
 % standard.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_mode: {
-  \mode_if_math:F {
-    \bool_set_false:N \l_siunitx_font_maths_mode_bool
-  }
+  \mode_if_math:F 
+    { \bool_set_false:N \l_siunitx_font_maths_mode_bool }
 }
 %    \end{macrocode}
 %\end{macro}
