@@ -2513,13 +2513,12 @@ This work consists of the file  siunitx.dtx
     \tl_set:Nn \l_siunitx_print_type_tl {#1}
     \tl_set:Nn \l_siunitx_print_arg_tl {#2}
     \siunitx_detect_font:
-    \bool_if:NF \l_siunitx_detect_mode_bool {
-      \bool_if:cTF { l_siunitx_ #1 _maths_mode_bool } {
-        \bool_set_true:N \l_siunitx_font_maths_mode_bool
-      }{
-        \bool_set_false:N \l_siunitx_font_maths_mode_bool
+    \bool_if:NF \l_siunitx_detect_mode_bool 
+      {
+        \bool_if:cTF { l_siunitx_ #1 _maths_mode_bool } 
+          { \bool_set_true:N \l_siunitx_font_maths_mode_bool }
+          { \bool_set_false:N \l_siunitx_font_maths_mode_bool }
       }
-    }
     \siunitx_print_aux:
   \group_end:
 }
@@ -2533,20 +2532,20 @@ This work consists of the file  siunitx.dtx
 % proper setting of the various mode settings.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_print_aux: {
-  \text {
-    \siunitx_print_colour:
-    \siunitx_font_bold:
-    \siunitx_font_italic:
-    \use:c {
-      siunitx_ \l_siunitx_print_type_tl _ 
-      text \l_siunitx_font_family_tl :
+  \text 
+    {
+      \siunitx_print_colour:
+      \siunitx_font_bold:
+      \siunitx_font_italic:
+      \use:c 
+        { 
+          siunitx_ \l_siunitx_print_type_tl _  
+          text \l_siunitx_font_family_tl :
+        }
+      \bool_if:NTF \l_siunitx_font_maths_mode_bool 
+        { \siunitx_print_maths: }
+        { \siunitx_print_text: }
     }
-    \bool_if:NTF \l_siunitx_font_maths_mode_bool {
-      \siunitx_print_maths:
-    }{
-      \siunitx_print_text:
-    }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2558,16 +2557,17 @@ This work consists of the file  siunitx.dtx
 % there will be colour out of the box!
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_print_colour: {
-  \tl_if_empty:cF { l_siunitx_ \l_siunitx_print_type_tl _colour_tl } {
-    \color {
-      \tl_use:c { l_siunitx_ \l_siunitx_print_type_tl _colour_tl }
+  \tl_if_empty:cF { l_siunitx_ \l_siunitx_print_type_tl _colour_tl } 
+    {
+      \color 
+        {
+          \tl_use:c { l_siunitx_ \l_siunitx_print_type_tl _colour_tl }
+        }
     }
-  }
 }
 \cs_new_nopar:Npn \siunitx_colour_check: {
-  \@ifpackageloaded { color } { } {
-    \cs_set_eq:NN \siunitx_print_colour: \scan_stop:
-  }
+  \@ifpackageloaded { color } { } 
+    { \cs_set_eq:NN \siunitx_print_colour: \scan_stop: }
 }
 \AtBeginDocument { \siunitx_colour_check: }
 %    \end{macrocode}
@@ -2587,28 +2587,32 @@ This work consists of the file  siunitx.dtx
   \char_make_active:N \-
 \tl_to_lowercase:n {
   \group_end:
-  \cs_new_nopar:Npn \siunitx_print_maths: {
-    \ensuremath { 
-      \use:c {
-        siunitx_ \l_siunitx_print_type_tl _ 
-        math \l_siunitx_font_family_tl :
-      }
-      \l_siunitx_print_arg_tl 
+  \cs_new_nopar:Npn \siunitx_print_maths: 
+    {
+      \ensuremath 
+        { 
+          \use:c 
+            {
+              siunitx_ \l_siunitx_print_type_tl _ 
+              math \l_siunitx_font_family_tl :
+            }
+          \l_siunitx_print_arg_tl 
+        }
     }
-  }
-  \cs_new_nopar:Npn \siunitx_print_text: {
-    \group_begin:
-      \char_make_active:N \-
-      \cs_set:Npn - { \text { \c_siunitx_minus_tl } }
-      \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
+  \cs_new_nopar:Npn \siunitx_print_text: 
+    {
+      \group_begin:
+        \char_make_active:N \-
+        \cs_set:Npn - { \text { \c_siunitx_minus_tl } }
+        \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
+          \l_siunitx_print_arg_tl
+        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
+          { \siunitx_print_text_sub:n }
+        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
+          { \siunitx_print_text_super:n }
         \l_siunitx_print_arg_tl
-      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
-        { \siunitx_print_text_sub:n }
-      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
-        { \siunitx_print_text_super:n }
-      \l_siunitx_print_arg_tl
-    \group_end:
-  }
+      \group_end:
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2625,16 +2629,11 @@ This work consists of the file  siunitx.dtx
   \char_make_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
-  \cs_new:Npn \siunitx_print_text_sub:n #1 {
-    \ensuremath {
-      @ { \text {#1} }
-    }
-  }
+  \cs_new:Npn \siunitx_print_text_sub:n #1 
+    { \ensuremath { @ { \text {#1} } } }
 }
 \cs_new:Npn \siunitx_print_text_super:n #1 {
-  \ensuremath {
-    ^ { \text {#1} }
-  }
+  \ensuremath { ^ { \text {#1} } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2701,9 +2700,8 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_preprocess_init:
   \tl_set:Nn \l_siunitx_number_arg_tl {#1}
   \siunitx_number_preprocess_product:
-  \tl_if_empty:NT \l_siunitx_number_multi_tl {
-    \siunitx_number_preprocess_quotient:
-  }
+  \tl_if_empty:NT \l_siunitx_number_multi_tl 
+    { \siunitx_number_preprocess_quotient: }
 }
 \cs_generate_variant:Nn \siunitx_number_preprocess:n { V }
 %    \end{macrocode}
@@ -2730,21 +2728,21 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_preprocess_product_aux:N
 }
 \cs_new:Npn \siunitx_number_preprocess_product_aux:N #1 {
-  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
-    \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop {
-      \tl_set:Nn \l_siunitx_number_arg_tl {##1}
-      \tl_set:Nn \l_siunitx_number_next_tl {##2}
-      \tl_set:Nn \l_siunitx_number_multi_tl { product }      
+  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} 
+    {
+      \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop 
+        {
+          \tl_set:Nn \l_siunitx_number_arg_tl {##1}
+          \tl_set:Nn \l_siunitx_number_next_tl {##2}
+          \tl_set:Nn \l_siunitx_number_multi_tl { product }      
+        }
+      \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
+      \tl_if_empty:NT \l_siunitx_number_arg_tl
+        { \siunitx_error:n { starting-product-token } }
+      \tl_if_empty:NT \l_siunitx_number_next_tl 
+        { \siunitx_error:n { ending-product-token } }
+      \tl_map_break:
     }
-    \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
-    \tl_if_empty:NT \l_siunitx_number_arg_tl {
-      \siunitx_error:n { starting-product-token }
-    }
-    \tl_if_empty:NT \l_siunitx_number_next_tl {
-      \siunitx_error:n { ending-product-token }
-    }
-    \tl_map_break:
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2760,24 +2758,23 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_preprocess_quotient_aux:N
 }
 \cs_new:Npn \siunitx_number_preprocess_quotient_aux:N #1 {
-  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} {
-    \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop {
-      \tl_set:Nn \l_siunitx_number_numerator_tl {##1}
-      \tl_set:Nn \l_siunitx_number_denominator_tl {##2}     
-      \tl_set:Nn \l_siunitx_number_multi_tl { quotient } 
+  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} 
+    {
+      \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop 
+        {
+          \tl_set:Nn \l_siunitx_number_numerator_tl {##1}
+          \tl_set:Nn \l_siunitx_number_denominator_tl {##2}     
+          \tl_set:Nn \l_siunitx_number_multi_tl { quotient } 
+        }
+      \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
+      \tl_if_empty:NT \l_siunitx_number_numerator_tl 
+        { \siunitx_error:n { starting-quotient-token } }
+      \tl_if_empty:NT \l_siunitx_number_denominator_tl
+        { \siunitx_error:n { ending-quotient-token } }
+      \tl_if_in:NnT \l_siunitx_number_denominator_tl {#1}
+        { \siunitx_error:n { duplicate-quotient-token } }
+      \tl_map_break:
     }
-    \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
-    \tl_if_empty:NT \l_siunitx_number_numerator_tl {
-      \siunitx_error:n { starting-quotient-token }
-    }
-    \tl_if_empty:NT \l_siunitx_number_denominator_tl {
-      \siunitx_error:n { ending-quotient-token }
-    }
-    \tl_if_in:NnT \l_siunitx_number_denominator_tl {#1} {
-      \siunitx_error:n { duplicate-quotient-token }
-    }
-    \tl_map_break:
-  }
 }
 %    \end{macrocode}
 %\end{macro}
