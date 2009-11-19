@@ -5379,21 +5379,17 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_declare_power_after:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
-    \textsuperscript {#2}
-  }
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_power_after:n {#2}
-  }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } 
+    { \textsuperscript {#2} }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+    { \siunitx_unit_parse_power_after:n {#2} }
 }
 \cs_new:Npn \siunitx_declare_power_before:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1 {
-    ##1 \textsuperscript {#2}
-  }
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_power_before:n {#2}
-  }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1 
+    { ##1 \textsuperscript {#2} }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+    { \siunitx_unit_parse_power_before:n {#2} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5405,13 +5401,12 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_declare_prefix:Nnnn #1#2#3#4 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \bool_if:NTF \l_siunitx_prefix_symbols_bool {
-      \siunitx_unit_parse_prefix:n {#2}
-    }{
-      \siunitx_unit_parse_prefix:nn {#3} {#4}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+    {
+      \bool_if:NTF \l_siunitx_prefix_symbols_bool 
+        { \siunitx_unit_parse_prefix:n {#2} }
+        { \siunitx_unit_parse_prefix:nn {#3} {#4} }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5421,12 +5416,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_declare_qualifier:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {
-    \text { ~ } ( #2 ) 
-  }
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \siunitx_unit_parse_qualifier:n {#2}
-  }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } 
+    { \text { ~ } ( #2 ) }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
+    { \siunitx_unit_parse_qualifier:n {#2} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5441,20 +5434,16 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_declare_unit:Nnn #1#2#3 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } {
-    \cs_if_exist:cTF {
-      siunitx_ \siunitx_unit_first_token:n {#2} _function:w
-    } {
-      #2
-    }{
-      \siunitx_unit_parse_unit:n {#2}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+    {
+      \cs_if_exist:cTF 
+        { siunitx_ \siunitx_unit_first_token:n {#2} _function:w }
+        {#2}
+        { \siunitx_unit_parse_unit:n {#2} }
     }
-  }
-  \cs_if_free:cTF { l_siunitx_ \token_to_str:N #1 _options_tl } {
-    \tl_new:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3}
-  }{
-    \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3}
-  }
+  \cs_if_free:cTF { l_siunitx_ \token_to_str:N #1 _options_tl } 
+    { \tl_new:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3} }
+    { \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3} }
 }
 \cs_new:Npn \siunitx_unit_first_token:n #1 {
   \exp_after:wN \token_to_str:N \tl_head_i:w #1 \q_nil
@@ -5483,13 +5472,13 @@ This work consists of the file  siunitx.dtx
   \textsuperscript {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _function:w } #1 {
-  \siunitx_unit_parse_power_before:n { #1 }
+  \siunitx_unit_parse_power_before:n {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
   \textsuperscript {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _function:w } #1 {
-  \siunitx_unit_parse_power_after:n { #1 }
+  \siunitx_unit_parse_power_after:n {#1}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5534,9 +5523,8 @@ This work consists of the file  siunitx.dtx
 % The master control macro which occurs at the start of the document.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_create_check: {
-  \bool_if:NT \l_siunitx_create_free_bool {
-    \siunitx_unit_create_functions:
-  }
+  \bool_if:NT \l_siunitx_create_free_bool 
+    { \siunitx_unit_create_functions: }
 }
 \AtBeginDocument { \siunitx_unit_create_check: }
 %    \end{macrocode}
@@ -5546,19 +5534,19 @@ This work consists of the file  siunitx.dtx
 % Creation of macros essentially involves picking up a couple of loops.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_create_functions: {
-  \bool_if:NT \l_siunitx_create_overwrite_bool {
-    \tl_map_function:NN \l_siunitx_declare_list_tl \cs_gundefine:N
-  }
-  \bool_if:NTF \l_siunitx_create_optional_bool {
-    \tl_map_function:NN \l_siunitx_declare_list_tl 
-      \siunitx_unit_create_with_arg:N
-  }{
-    \tl_map_function:NN \l_siunitx_declare_list_tl 
-      \siunitx_unit_create:N
-  }
-  \bool_if:NT \l_siunitx_create_xspace_bool {
-    \RequirePackage { xspace }
-  }
+  \bool_if:NT \l_siunitx_create_overwrite_bool 
+    { \tl_map_function:NN \l_siunitx_declare_list_tl \cs_gundefine:N }
+  \bool_if:NTF \l_siunitx_create_optional_bool 
+    {
+      \tl_map_function:NN \l_siunitx_declare_list_tl 
+        \siunitx_unit_create_with_arg:N
+    }
+    {
+      \tl_map_function:NN \l_siunitx_declare_list_tl 
+        \siunitx_unit_create:N
+    }
+  \bool_if:NT \l_siunitx_create_xspace_bool 
+    { \RequirePackage { xspace } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5569,40 +5557,48 @@ This work consists of the file  siunitx.dtx
 % there is less to do in the document.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_create:N #1 {
-  \cs_if_free:NT #1 {
-    \cs_set:Npx \siunitx_tmp:w {
-      \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { } {
-        \bool_if:NT \l_siunitx_create_prespace_bool {
-          \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
+  \cs_if_free:NT #1 
+    {
+      \cs_set:Npx \siunitx_tmp:w 
+        {
+          \DeclareDocumentCommand \exp_not:N #1 { } 
+            {
+              \bool_if:NT \l_siunitx_create_prespace_bool 
+                {
+                  \exp_not:n 
+                    { \ensuremath { \l_siunitx_number_unit_sep_tl } }
+                }
+              \exp_not:n { \siunitx_unit_in:nn {#1} { } }
+              \bool_if:NT \l_siunitx_create_xspace_bool 
+                { \exp_not:N \xspace }
+            }
         }
-        \exp_not:n { \siunitx_unit_in:nn {#1} { } }
-        \bool_if:NT \l_siunitx_create_xspace_bool {
-          \exp_not:N \xspace
-        }
-      }
+      \siunitx_tmp:w
     }
-    \siunitx_tmp:w
-  }
 }
 \cs_new:Npn \siunitx_unit_create_with_arg:N #1 {
-  \cs_if_free:NT #1 {
-    \cs_set:Npx \siunitx_tmp:w {
-      \exp_not:N \DeclareDocumentCommand \exp_not:N #1 { o } {
-        \exp_not:N \IfNoValueTF {####1} {
-          \exp_not:n { \siunitx_unit_in:nn {#1} { } }
-        }{
-          \bool_if:NT \l_siunitx_create_prespace_bool {
-            \exp_not:n { \ensuremath { \l_siunitx_number_unit_sep_tl } }
-          }
-          \exp_not:N \SI {####1} { \exp_not:N #1 }
+  \cs_if_free:NT #1 
+    {
+      \cs_set:Npx \siunitx_tmp:w 
+        {
+          \DeclareDocumentCommand \exp_not:N #1 { o } 
+            {
+              \exp_not:N \IfNoValueTF {####1} 
+                { \exp_not:n { \siunitx_unit_in:nn {#1} { } } }
+                {
+                  \bool_if:NT \l_siunitx_create_prespace_bool 
+                    {
+                      \exp_not:n 
+                        { \ensuremath { \l_siunitx_number_unit_sep_tl } }
+                    }
+                  \SI {####1} { \exp_not:N #1 }
+                }
+              \bool_if:NT \l_siunitx_create_xspace_bool
+                { \exp_not:N \xspace }
+            }
         }
-        \bool_if:NT \l_siunitx_create_xspace_bool {
-          \exp_not:N \xspace
-        }
-      }
+      \siunitx_tmp:w
     }
-    \siunitx_tmp:w
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5631,16 +5627,16 @@ This work consists of the file  siunitx.dtx
 % The master function does a very simple checks then hands off.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_in:nn #1#2 {
-  \siunitx_unit_if_literal:nTF {#1} {
-    \bool_if:NTF \l_siunitx_unit_allow_literal_bool {
-      \siunitx_unit_format_literal:n {#1}
-    }{
-      \msg_error:nnx { siunitx } { literal-unit } {#1}
+  \siunitx_unit_if_literal:nTF {#1} 
+    {
+      \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
+        { \siunitx_unit_format_literal:n {#1} }
+        {  \msg_error:nnx { siunitx } { literal-unit } {#1} }
     }
-  }{
-    \siunitx_unit_parse:nn {#1} {#2}
-    \siunitx_unit_format:
-  }
+    {
+      \siunitx_unit_parse:nn {#1} {#2}
+      \siunitx_unit_format:
+    }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
 %    \end{macrocode}
@@ -5751,13 +5747,13 @@ This work consists of the file  siunitx.dtx
 % \cs{keys_set:nn}  is needed to allow the local overriding of settings.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_parse_options:nn #1#2 {
-  \cs_if_free:cF { 
-    l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl 
-  } {
-    \keys_set:nv { siunitx } 
-      { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
-    \keys_set:nn { siunitx } {#2}
-  }
+  \cs_if_free:cF 
+    { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
+    {
+      \keys_set:nv { siunitx } 
+        { l_siunitx_ \siunitx_unit_first_token:n {#1} _options_tl }
+      \keys_set:nn { siunitx } {#2}
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5768,15 +5764,13 @@ This work consists of the file  siunitx.dtx
 % the unit.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_parse_power_before:n #1 {
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    power- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { power- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 \cs_new:Npn \siunitx_unit_parse_power_after:n #1 {
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    power- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { power- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 %    \end{macrocode}
@@ -5790,16 +5784,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_parse_prefix:n #1 {
   \int_incr:N \l_siunitx_unit_int
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    prefix- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { prefix- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 \cs_new:Npn \siunitx_unit_parse_prefix:nn #1#2 {
   \siunitx_unit_parse_prefix:n {#2}
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    prefix-base- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { prefix-base- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 %    \end{macrocode}
@@ -5811,9 +5803,8 @@ This work consists of the file  siunitx.dtx
 % the counter has to be advanced by one.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_parse_per: {
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    {  per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
 %    \end{macrocode}
@@ -5823,15 +5814,12 @@ This work consists of the file  siunitx.dtx
 % Qualifiers never alter the number of units.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_parse_qualifier:n #1 {
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    symbol- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \msg_error:nn { siunitx } { qualifier-before-unit }
-  }
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    qualifier- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { symbol- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    { \msg_error:nn { siunitx } { qualifier-before-unit } }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { qualifier- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 %    \end{macrocode}
@@ -5845,34 +5833,31 @@ This work consists of the file  siunitx.dtx
 % there is a \enquote{sticky} \cs{per} to think about.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_parse_unit:n #1 {
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    prefix- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \tl_set:Nx \l_siunitx_tmpa_tl {
-      symbol- \int_use:N \l_siunitx_unit_int
-    }  
-    \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-      \int_incr:N \l_siunitx_unit_int
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { prefix- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl 
+        { symbol- \int_use:N \l_siunitx_unit_int }
+      \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+        { \int_incr:N \l_siunitx_unit_int }
     }
-  }{
-    \int_incr:N \l_siunitx_unit_int
-  }
-  \tl_set:Nx \l_siunitx_tmpa_tl { 
-    symbol- \int_use:N \l_siunitx_unit_int
-  }
+    { \int_incr:N \l_siunitx_unit_int }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { symbol- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
   \siunitx_unit_parse_unit_per: 
 }
 \cs_new_nopar:Npn \siunitx_unit_parse_unit_per: {
-  \bool_if:NT \l_siunitx_sticky_per_bool {
-    \bool_if:NT \l_siunitx_per_bool {
-      \tl_set:Nx \l_siunitx_tmpa_tl { 
-        per- \int_use:N \l_siunitx_unit_int
-      }
-      \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {true}
+  \bool_if:NT \l_siunitx_sticky_per_bool 
+    {
+      \bool_if:NT \l_siunitx_per_bool 
+        {
+          \tl_set:Nx \l_siunitx_tmpa_tl 
+            { per- \int_use:N \l_siunitx_unit_int }
+          \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
+        }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5939,33 +5924,34 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   inter-unit-separator .tl_set:N  = \l_siunitx_unit_separator_tl ,
   per-mode             .choice:,
-  per-mode / fraction .code:n = {
-    \bool_set_true:N \l_siunitx_per_fraction_bool
-    \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
-  },
-  per-mode / power .code:n = {
-    \bool_set_false:N \l_siunitx_per_fraction_bool
-    \tl_clear:N \l_siunitx_per_mode_tl 
-  },
-  per-mode / repeated-symbol .code:n = {
-    \bool_set_false:N \l_siunitx_per_fraction_bool
-    \tl_set:Nn \l_siunitx_per_mode_tl { repeat }
-  },
-  per-mode / symbol .code:n = {
-    \bool_set_true:N \l_siunitx_per_fraction_bool
-    \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
-  },
+  per-mode / fraction .code:n = 
+    {
+      \bool_set_true:N \l_siunitx_per_fraction_bool
+      \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
+    },
+  per-mode / power .code:n = 
+    {
+      \bool_set_false:N \l_siunitx_per_fraction_bool
+      \tl_clear:N \l_siunitx_per_mode_tl 
+    },
+  per-mode / repeated-symbol .code:n = 
+    {
+      \bool_set_false:N \l_siunitx_per_fraction_bool
+      \tl_set:Nn \l_siunitx_per_mode_tl { repeat }
+    },
+  per-mode / symbol .code:n = 
+    {
+      \bool_set_true:N \l_siunitx_per_fraction_bool
+      \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
+    },
   per-symbol           .tl_set:N  = \l_siunitx_per_symbol_tl,
   qualifier-mode       .choice:,
-  qualifier-mode / brackets .code:n = {
-    \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets }
-  },
-  qualifier-mode / space .code:n = {
-    \tl_set:Nn \l_siunitx_qualifier_mode_tl { space }
-  },
-  qualifier-mode / subscript .code:n = {
-    \tl_set:Nn \l_siunitx_qualifier_mode_tl { subscript }
-  },
+  qualifier-mode / brackets .code:n = 
+    { \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets } },
+  qualifier-mode / space .code:n = 
+    { \tl_set:Nn \l_siunitx_qualifier_mode_tl { space } },
+  qualifier-mode / subscript .code:n = 
+    { \tl_set:Nn \l_siunitx_qualifier_mode_tl { subscript } },
 }
 \keys_set:nn { siunitx } {
   inter-unit-separator = \,,
@@ -5983,12 +5969,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format: {
   \siunitx_unit_format_init:
-  \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } {
-    \siunitx_unit_format_loop:
-  }
-  \bool_if:NT \l_siunitx_per_fraction_bool {
-    \siunitx_unit_format_fraction:
-  }
+  \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } 
+    {\siunitx_unit_format_loop: }
+  \bool_if:NT \l_siunitx_per_fraction_bool 
+    { \siunitx_unit_format_fraction: }
 } 
 %    \end{macrocode}
 %\end{macro}
@@ -6000,37 +5984,41 @@ This work consists of the file  siunitx.dtx
 % which need to suppress the space.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_add: {
-  \bool_if:NTF \l_siunitx_per_fraction_bool {
-    \tl_set:Nx \l_siunitx_tmpb_tl {
-      per- \int_use:N \l_siunitx_unit_int
-    }  
-    \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
-      \siunitx_unit_format_add_aux:n { _denominator }
-      \int_incr:N \l_siunitx_unit_denominator_int
-    }{
-      \siunitx_unit_format_add_aux:n { _numerator }
-      \int_incr:N \l_siunitx_unit_numerator_int
+  \bool_if:NTF \l_siunitx_per_fraction_bool 
+    {
+      \tl_set:Nx \l_siunitx_tmpb_tl 
+        { per- \int_use:N \l_siunitx_unit_int }
+      \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpb_tl 
+        {
+          \siunitx_unit_format_add_aux:n { _denominator }
+          \int_incr:N \l_siunitx_unit_denominator_int
+        }
+        {
+          \siunitx_unit_format_add_aux:n { _numerator }
+          \int_incr:N \l_siunitx_unit_numerator_int
+        }
     }
-  }{
-    \siunitx_unit_format_add_aux:n { }
-  }
+    { \siunitx_unit_format_add_aux:n { } }
   \tl_clear:N \l_siunitx_unit_current_tl
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_add_aux:n #1 {
-  \tl_if_empty:cF { l_siunitx_unit #1 _tl } {
-    \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl {
-      \tl_set:Nx \l_siunitx_tmpa_tl {
-        per- \intexpr_eval:n { \l_siunitx_unit_int + 1 }
-      }
-      \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-        \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
-          \l_siunitx_unit_separator_tl
-      }
-    }{  
-      \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
-        \l_siunitx_unit_separator_tl
+  \tl_if_empty:cF { l_siunitx_unit #1 _tl } 
+    {
+      \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+        {
+          \tl_set:Nx \l_siunitx_tmpa_tl 
+            { per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
+          \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+            {
+              \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+                \l_siunitx_unit_separator_tl
+            }
+        }
+        {  
+          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+            \l_siunitx_unit_separator_tl
+        }
     }
-  }
   \tl_put_left:cV { l_siunitx_unit #1 _tl } \l_siunitx_unit_current_tl
 } 
 %    \end{macrocode}
@@ -6043,28 +6031,24 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_unit_format_symbol_aux:n}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_fraction: {
-  \intexpr_compare:nTF { \l_siunitx_unit_denominator_int > \c_zero } {
-    \use:c { siunitx_unit_format_fraction_ \l_siunitx_per_mode_tl : }
-  }{
-    \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
-  }
+  \intexpr_compare:nTF { \l_siunitx_unit_denominator_int > \c_zero } 
+    {
+      \use:c { siunitx_unit_format_fraction_ \l_siunitx_per_mode_tl : }
+    }
+    { \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_fraction: {
-  \tl_if_empty:NT \l_siunitx_unit_numerator_tl {
-    \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 }
-  }
-  \tl_set:No \l_siunitx_unit_numerator_tl {
-    \exp_after:wN { \l_siunitx_unit_numerator_tl }
-  }
-  \tl_set:No \l_siunitx_unit_denominator_tl {
-    \exp_after:wN { \l_siunitx_unit_denominator_tl }
-  }
+  \tl_if_empty:NT \l_siunitx_unit_numerator_tl 
+    { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
+  \tl_set:No \l_siunitx_unit_numerator_tl 
+    { \exp_after:wN { \l_siunitx_unit_numerator_tl } }
+  \tl_set:No \l_siunitx_unit_denominator_tl 
+    { \exp_after:wN { \l_siunitx_unit_denominator_tl } }
   \tl_set:Nn \l_siunitx_unit_tl { \frac }
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
-  \tl_set:No \l_siunitx_unit_tl {
-    \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_unit_tl }
-  }
+  \tl_set:No \l_siunitx_unit_tl 
+    { \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_unit_tl } }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_symbol: {
   \siunitx_unit_format_fraction_symbol_aux:n { numerator }
@@ -6075,16 +6059,17 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_symbol_aux:n #1 {
-  \intexpr_compare:nT { 
-    \int_use:c { l_siunitx_unit_ #1 _int } > \c_one 
-  } {
-    \bool_if:NT \l_siunitx_brackets_bool {
-      \siunitx_tl_put_left_maths:cV { l_siunitx_unit_ #1 _tl }
-        \l_siunitx_bracket_open_tl
-      \siunitx_tl_put_right_maths:cV { l_siunitx_unit_ #1 _tl }
-        \l_siunitx_bracket_close_tl
+  \intexpr_compare:nT 
+    { \int_use:c { l_siunitx_unit_ #1 _int } > \c_one }
+    {
+      \bool_if:NT \l_siunitx_brackets_bool 
+        {
+          \siunitx_tl_put_left_maths:cV { l_siunitx_unit_ #1 _tl }
+            \l_siunitx_bracket_open_tl
+          \siunitx_tl_put_right_maths:cV { l_siunitx_unit_ #1 _tl }
+            \l_siunitx_bracket_close_tl
+        }
     }
-  }
 } 
 %    \end{macrocode}
 %\end{macro}
@@ -6121,11 +6106,11 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
   \tl_set:Nn \l_siunitx_unit_tl {#1}
-  \tl_set:No \l_sunitx_tmpa_tl {
-    \exp_after:wN \ensuremath \exp_after:wN { 
-      \l_siunitx_unit_separator_tl 
+  \tl_set:No \l_sunitx_tmpa_tl 
+    {
+      \exp_after:wN \ensuremath \exp_after:wN 
+        { \l_siunitx_unit_separator_tl }
     }
-  }
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } 
     \l_sunitx_tmpa_tl
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } 
@@ -6166,22 +6151,23 @@ This work consists of the file  siunitx.dtx
 % handled here as well. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_power: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    power- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_tmpa_tl
-    \siunitx_unit_format_power_aux:
-  }{
-    \tl_set:Nx \l_siunitx_tmpa_tl {
-      per- \int_use:N \l_siunitx_unit_int
-    }
-    \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-      \tl_set:Nn \l_siunitx_tmpa_tl { 1 }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { power- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+        \l_siunitx_tmpa_tl
       \siunitx_unit_format_power_aux:
     }
-  }
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl 
+        { per- \int_use:N \l_siunitx_unit_int }
+      \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+        {
+          \tl_set:Nn \l_siunitx_tmpa_tl { 1 }
+          \siunitx_unit_format_power_aux:
+        }
+    }
 }
 %    \end{macrocode}
 % The auxiliary function needs to make sure that the printing routine
@@ -6189,17 +6175,15 @@ This work consists of the file  siunitx.dtx
 % different.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_power_aux: {
-  \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl {
-    \siunitx_unit_format_power_repeat:
-  }{
-    \siunitx_unit_format_power_per:
-  }
-  \tl_if_eq:nVF { 1 } \l_siunitx_tmpa_tl {
-    \siunitx_unit_format_power_brackets:
-    \tl_put_right:Nx \l_siunitx_unit_current_tl {
-       ^ { \PrintNumber { \exp_not:V \l_siunitx_tmpa_tl } }
+  \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+    { \siunitx_unit_format_power_repeat: }
+    { \siunitx_unit_format_power_per: }
+  \tl_if_eq:nVF { 1 } \l_siunitx_tmpa_tl 
+    {
+      \siunitx_unit_format_power_brackets:
+      \tl_put_right:Nx \l_siunitx_unit_current_tl 
+        { ^ { \PrintNumber { \exp_not:V \l_siunitx_tmpa_tl } } }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6209,17 +6193,18 @@ This work consists of the file  siunitx.dtx
 % if there is also a power.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_power_brackets: {
-  \tl_set:Nx \l_siunitx_tmpb_tl {
-    bracket- \int_use:N \l_siunitx_unit_int
-  }  
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
-    \bool_if:NT \l_siunitx_brackets_bool {
-      \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
-        \l_siunitx_bracket_open_tl
-      \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl 
-        \l_siunitx_bracket_close_tl
+  \tl_set:Nx \l_siunitx_tmpb_tl 
+    { bracket- \int_use:N \l_siunitx_unit_int }  
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl 
+    {
+      \bool_if:NT \l_siunitx_brackets_bool 
+        {
+          \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
+            \l_siunitx_bracket_open_tl
+          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+            \l_siunitx_bracket_close_tl
+        }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6230,30 +6215,30 @@ This work consists of the file  siunitx.dtx
 % non-integer values.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_power_per: {
-  \tl_set:Nx \l_siunitx_tmpb_tl {
-    per- \int_use:N \l_siunitx_unit_int
-  }  
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
-    \bool_if:NF \l_siunitx_per_fraction_bool {
-      \tl_if_in:NnTF \l_siunitx_tmpa_tl { - } {
-        \cs_set:Npn \siunitx_tmp:w ##1 - ##2 \q_stop {
-          \tl_set:Nn \l_siunitx_tmpa_tl {##2}
+  \tl_set:Nx \l_siunitx_tmpb_tl 
+    { per- \int_use:N \l_siunitx_unit_int }  
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl 
+    {
+      \bool_if:NF \l_siunitx_per_fraction_bool 
+        {
+          \tl_if_in:NnTF \l_siunitx_tmpa_tl { - } 
+            {
+              \cs_set:Npn \siunitx_tmp:w ##1 - ##2 \q_stop 
+                { \tl_set:Nn \l_siunitx_tmpa_tl {##2} }
+              \exp_afer:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
+            }
+            { \tl_put_left:Nn \l_siunitx_tmpa_tl { - } }
         }
-        \exp_afer:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-      }{
-        \tl_put_left:Nn \l_siunitx_tmpa_tl { - }
-      }
-    }
-  } 
+    } 
 }
 \cs_new_nopar:Npn \siunitx_unit_format_power_repeat: {
-  \tl_set:Nx \l_siunitx_tmpb_tl {
-    per- \int_use:N \l_siunitx_unit_int
-  }  
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl {
-    \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
-      \l_siunitx_per_symbol_tl
-  } 
+  \tl_set:Nx \l_siunitx_tmpb_tl 
+    { per- \int_use:N \l_siunitx_unit_int }  
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl 
+    {
+      \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
+        \l_siunitx_per_symbol_tl
+    }   
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6267,63 +6252,61 @@ This work consists of the file  siunitx.dtx
 % output, some conversion is needed instead.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_prefix: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    prefix- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_unit_prefix_current_tl
-    \bool_if:NTF \l_siunitx_prefix_symbols_bool {
-      \siunitx_unit_format_prefix_symbol:
-    }{
-      \siunitx_unit_format_prefix_number:
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { prefix- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+        \l_siunitx_unit_prefix_current_tl
+      \bool_if:NTF \l_siunitx_prefix_symbols_bool 
+        { \siunitx_unit_format_prefix_symbol: }
+        { \siunitx_unit_format_prefix_number: }
     }
-  }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_prefix_number: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    prefix-base- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { prefix-base- \int_use:N \l_siunitx_unit_int }
  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
    \l_siunitx_tmpa_tl
-  \intexpr_compare:nT { \l_siunitx_unit_prefix_base_int = \c_zero } {
-    \int_set:Nn \l_siunitx_unit_prefix_base_int { \l_siunitx_tmpa_tl }
-  }
-  \intexpr_compare:nTF { 
-    \l_siunitx_unit_prefix_base_int = \l_siunitx_tmpa_tl 
-  } {
-    \siunitx_unit_format_prefix_number_calc:
-  }{
-    \msg_error:nn { siunitx } { prefix-base-mismatch }
-  }
+  \intexpr_compare:nT { \l_siunitx_unit_prefix_base_int = \c_zero } 
+    {
+      \int_set:Nn \l_siunitx_unit_prefix_base_int { \l_siunitx_tmpa_tl }
+    }
+  \intexpr_compare:nTF 
+    { \l_siunitx_unit_prefix_base_int = \l_siunitx_tmpa_tl }
+    { \siunitx_unit_format_prefix_number_calc: }
+    { \msg_error:nn { siunitx } { prefix-base-mismatch } }
 }
 \cs_new_nopar:Npn \siunitx_unit_format_prefix_number_calc: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    power- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_tmpa_tl
-  }{
-    \tl_set:Nn \l_siunitx_tmpa_tl { 1 }
-  }
-  \tl_set:Nx \l_siunitx_unit_prefix_current_tl {
-    \intexpr_eval:n {
-      \l_siunitx_unit_prefix_current_tl * \l_siunitx_tmpa_tl
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { power- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+        \l_siunitx_tmpa_tl
     }
-  }
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    per- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \int_set:Nn \l_siunitx_unit_prefix_int {
-      \l_siunitx_unit_prefix_int - \l_siunitx_unit_prefix_current_tl
-    } 
-  }{
-    \int_set:Nn \l_siunitx_unit_prefix_int {
-      \l_siunitx_unit_prefix_int + \l_siunitx_unit_prefix_current_tl
+    { \tl_set:Nn \l_siunitx_tmpa_tl { 1 } }
+  \tl_set:Nx \l_siunitx_unit_prefix_current_tl 
+    {
+       \intexpr_eval:n {
+         \l_siunitx_unit_prefix_current_tl * \l_siunitx_tmpa_tl
+       }
     }
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { per- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \int_set:Nn \l_siunitx_unit_prefix_int 
+        {
+          \l_siunitx_unit_prefix_int - \l_siunitx_unit_prefix_current_tl
+        } 
+    }
+    {
+      \int_set:Nn \l_siunitx_unit_prefix_int 
+        {
+          \l_siunitx_unit_prefix_int + \l_siunitx_unit_prefix_current_tl
+        }
+    }
 }
 \cs_new_nopar:Npn \siunitx_unit_format_prefix_symbol: {
   \tl_set_eq:NN \l_siunitx_unit_current_tl 
@@ -6344,16 +6327,17 @@ This work consists of the file  siunitx.dtx
 % as if there is a power then some brackets will be needed.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_qualifier: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    qualifier- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_tmpa_tl
-    \use:c { 
-      siunitx_unit_format_qualifier_ \l_siunitx_qualifier_mode_tl : 
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { qualifier- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+        \l_siunitx_tmpa_tl
+      \use:c 
+        { 
+          siunitx_unit_format_qualifier_ \l_siunitx_qualifier_mode_tl :
+        }
     }
-  }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_qualifier_brackets: {
   \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
@@ -6366,9 +6350,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_unit_format_qualifier_space: {
   \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    bracket- \int_use:N \l_siunitx_unit_int
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { bracket- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
 \char_make_space:N \~
@@ -6377,11 +6360,11 @@ This work consists of the file  siunitx.dtx
   \char_make_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
-  \cs_new_nopar:Npn \siunitx_unit_format_qualifier_subscript: {
-    \tl_put_right:No \l_siunitx_unit_current_tl {
-      \exp_after:wN @ \exp_after:wN { \l_siunitx_tmpa_tl }      
+  \cs_new_nopar:Npn \siunitx_unit_format_qualifier_subscript: 
+    {
+      \tl_put_right:No \l_siunitx_unit_current_tl 
+        { \exp_after:wN @ \exp_after:wN { \l_siunitx_tmpa_tl } }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6393,16 +6376,15 @@ This work consists of the file  siunitx.dtx
 % If there is no symbol, something is wrong!
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_symbol: {
-  \tl_set:Nx \l_siunitx_tmpa_tl {
-    symbol- \int_use:N \l_siunitx_unit_int
-  }
-  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl {
-    \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
-      \l_siunitx_tmpa_tl
-    \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
-  }{
-    \msg_error:nn { siunitx } { prefix-only }
-  }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { symbol- \int_use:N \l_siunitx_unit_int }
+  \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
+    {
+      \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+        \l_siunitx_tmpa_tl
+      \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+    }
+    { \msg_error:nn { siunitx } { prefix-only } }
 } 
 %    \end{macrocode}
 %\end{macro}
@@ -6431,18 +6413,21 @@ This work consists of the file  siunitx.dtx
   number-unit-separator    .tl_set:N = 
     \l_siunitx_number_unit_separator_tl,
   repeated-units .choice:,
-  repeated-units / false .code:n  = {
-    \bool_set_false:N \l_siunitx_number_unit_power_bool
-    \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-  },
-  repeated-units / power .code:n  = {
-    \bool_set_true:N \l_siunitx_number_unit_power_bool
-    \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-  },
-  repeated-units / true .code:n   = {
-    \bool_set_false:N \l_siunitx_number_unit_power_bool
-    \bool_set_true:N \l_siunitx_number_unit_repeat_bool
-  },
+  repeated-units / false .code:n  = 
+    {
+      \bool_set_false:N \l_siunitx_number_unit_power_bool
+      \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+    },
+  repeated-units / power .code:n  = 
+    {
+      \bool_set_true:N \l_siunitx_number_unit_power_bool
+      \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+    },
+  repeated-units / true .code:n   = 
+    {
+      \bool_set_false:N \l_siunitx_number_unit_power_bool
+      \bool_set_true:N \l_siunitx_number_unit_repeat_bool
+    },
 }
 \keys_set:nn { siunitx } {
   number-unit-separator = \,,
@@ -6458,14 +6443,16 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_output:nn #1#2 {
   \siunitx_unit_in:nn {#1} {#2}
-  \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } {
-    \tl_set:Nx \l_siunitx_tmpa_tl {
-      \int_use:N \l_siunitx_unit_prefix_base_int ^
-        { \int_use:N \l_siunitx_unit_prefix_int }
+  \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } 
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl 
+        {
+          \int_use:N \l_siunitx_unit_prefix_base_int
+          ^ { \int_use:N \l_siunitx_unit_prefix_int }
+        }
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+      \siunitx_unit_output_number_sep:
     }
-    \siunitx_print:nV { number } \l_siunitx_tmpa_tl
-    \siunitx_unit_output_number_sep:
-  }
   \siunitx_print:nV { unit } \l_siunitx_unit_tl
 }
 %    \end{macrocode}
@@ -6475,11 +6462,8 @@ This work consists of the file  siunitx.dtx
 % For printing the number separator.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_output_number_sep: {
-  \bool_if:NTF \l_siunitx_number_unit_breaks_bool {
-    \allowbreak
-  }{
-    \nobreak
-  }
+  \bool_if:NTF \l_siunitx_number_unit_breaks_bool 
+    { \allowbreak } { \nobreak }
   \ensuremath { \l_siunitx_number_unit_separator_tl }
 }
 %    \end{macrocode}
@@ -6511,12 +6495,12 @@ This work consists of the file  siunitx.dtx
 % number part is then handed off.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined:nnnn #1#2#3#4 {
-  \IfNoValueTF {#3} {
-    \tl_clear:N \l_siunitx_pre_unit_tl 
-  }{
-    \siunitx_unit_in:nn {#3} {#1} 
-    \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
-  }
+  \IfNoValueTF {#3} 
+    { \tl_clear:N \l_siunitx_pre_unit_tl }
+    {
+      \siunitx_unit_in:nn {#3} {#1} 
+      \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
+    }
   \siunitx_combined_unit:nnn {#2} {#4} {#1}
   \siunitx_combined_loop:n {#2}
 }
@@ -6529,13 +6513,13 @@ This work consists of the file  siunitx.dtx
 % hence needing to work in this way.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_loop:n #1 {
-  \intexpr_compare:nTF { \l_siunitx_unit_prefix_int = \c_zero } {
-    \siunitx_number_output:n {#1}
-  }{
-    \tl_set:Nn \l_siunitx_tmpa_tl { #1 e }
-    \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_unit_prefix_int
-    \exp_args:NV \siunitx_number_output:n \l_siunitx_tmpa_tl
-  }
+  \intexpr_compare:nTF { \l_siunitx_unit_prefix_int = \c_zero } 
+    { \siunitx_number_output:n {#1} }
+    {
+      \tl_set:Nn \l_siunitx_tmpa_tl { #1 e }
+      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_unit_prefix_int
+      \exp_args:NV \siunitx_number_output:n \l_siunitx_tmpa_tl
+    }
   \siunitx_unit_output_number_sep:
   \siunitx_print:nV { unit } \l_siunitx_unit_tl
 }
@@ -6547,15 +6531,15 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_combined_number:n}
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_number:n #1 {
-  \bool_if:NTF \l_siunitx_number_parse_bool {
-    \tl_clear:N \l_siunitx_number_out_tl
-    \tl_clear:N \l_siunitx_number_out_saved_tl
-    \bool_set_false:N \l_siunitx_number_compound_bool
-    \siunitx_number_output_parse:n {#1}
-    \siunitx_number_output_print:
-  }{
-    \siunitx_print:nn  { number } {#1}
-  }
+  \bool_if:NTF \l_siunitx_number_parse_bool 
+    {
+      \tl_clear:N \l_siunitx_number_out_tl
+      \tl_clear:N \l_siunitx_number_out_saved_tl
+      \bool_set_false:N \l_siunitx_number_compound_bool
+      \siunitx_number_output_parse:n {#1}
+      \siunitx_number_output_print:
+    }
+    { \siunitx_print:nn  { number } {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6568,23 +6552,24 @@ This work consists of the file  siunitx.dtx
 % correctly-prepared unit stored in \cs{l_siunitx_unit_tl}.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_unit:nnn #1#2#3 {
-  \bool_if:NTF \l_siunitx_number_unit_power_bool {
-    \siunitx_combined_product_count:n {#1}
-    \intexpr_compare:nTF { \l_siunitx_number_product_int > \c_zero } {
-      \int_incr:N \l_siunitx_number_product_int
-      \tl_set:Nn \l_siunitx_tmpa_tl {#2}
-      \tl_set:No \l_siunitx_tmpb_tl {
-        \exp_after:wN \tothe \exp_after:wN 
-          { \int_use:N \l_siunitx_number_product_int }
-      }
-      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-      \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#3}
-    }{
-      \siunitx_unit_in:nn {#2} {#3}
+  \bool_if:NTF \l_siunitx_number_unit_power_bool 
+    {
+      \siunitx_combined_product_count:n {#1}
+      \intexpr_compare:nTF { \l_siunitx_number_product_int > \c_zero } 
+        {
+          \int_incr:N \l_siunitx_number_product_int
+          \tl_set:Nn \l_siunitx_tmpa_tl {#2}
+          \tl_set:No \l_siunitx_tmpb_tl 
+            {
+              \exp_after:wN \tothe \exp_after:wN 
+                { \int_use:N \l_siunitx_number_product_int }
+            }
+          \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+          \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#3}
+        }
+        { \siunitx_unit_in:nn {#2} {#3} }
     }
-  }{
-    \siunitx_unit_in:nn {#2} {#3}
-  }
+    { \siunitx_unit_in:nn {#2} {#3} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6599,11 +6584,12 @@ This work consists of the file  siunitx.dtx
     \siunitx_combined_product_count_aux:N
 }
 \cs_new:Npn \siunitx_combined_product_count_aux:N #1 {
-  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} {
-    \int_incr:N \l_siunitx_number_product_int
-    \tl_remove_in:Nn \l_siunitx_tmpa_tl {#1}
-    \siunitx_combined_product_count_aux:N #1
-  }
+  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} 
+    {
+      \int_incr:N \l_siunitx_number_product_int
+      \tl_remove_in:Nn \l_siunitx_tmpa_tl {#1}
+      \siunitx_combined_product_count_aux:N #1
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6618,7 +6604,7 @@ This work consists of the file  siunitx.dtx
   range-phrase .tl_set:N = \l_siunitx_range_phrase_tl,
 }
 \keys_set:nn { siunitx } {
-  range-phrase = { ~to~ }
+  range-phrase = { ~ to ~ }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6634,19 +6620,17 @@ This work consists of the file  siunitx.dtx
     \siunitx_range_numbers_aux:n {#2}
 }
 \cs_new:Npn \siunitx_range_numbers_aux:n #1 {
-  \bool_if:NTF \l_siunitx_number_parse_bool {
-    \tl_clear:N \l_siunitx_number_out_tl
-    \tl_clear:N \l_siunitx_number_out_saved_tl
-    \bool_set_false:N \l_siunitx_number_compound_bool
-    \siunitx_number_output_parse:n {#1}
-    \bool_if:NTF \l_siunitx_number_compound_bool {
-      \msg_error:nnx { siunitx } { multi-part-range } {#1}
-    }{
-      \siunitx_number_output_print:
+  \bool_if:NTF \l_siunitx_number_parse_bool 
+    {
+      \tl_clear:N \l_siunitx_number_out_tl
+      \tl_clear:N \l_siunitx_number_out_saved_tl
+      \bool_set_false:N \l_siunitx_number_compound_bool
+      \siunitx_number_output_parse:n {#1}
+      \bool_if:NTF \l_siunitx_number_compound_bool 
+        { \msg_error:nnx { siunitx } { multi-part-range } {#1} }
+        { \siunitx_number_output_print: }
     }
-  }{
-    \siunitx_print:nn  { number } {#1}
-  }
+    { \siunitx_print:nn  { number } {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6679,16 +6663,15 @@ This work consists of the file  siunitx.dtx
 %  is deleted from \cs{NC@list} so that no warning appears.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_rewrite_cellspace: {
-  \@ifpackageloaded { cellspace } {
-    \newcolumntype { C } [1] {
-      > { \bcolumn ##1 \@nil } ##1 < { \ecolumn }
-    }
-    \cs_set:Npn \siunitx_tmp:w ##1 \NC@do~S ##2 \q_stop {
-      \toks_set:N \NC@list { ##1 ##2 }
-    }
-    \exp_after:wN \siunitx_tmp:w \toks_use:N \NC@list \q_stop
-    \cs_gundefine:N \NC@find@S
-  } { }
+  \@ifpackageloaded { cellspace } 
+    {
+      \newcolumntype { C } [1] 
+        { > { \bcolumn ##1 \@nil } ##1 < { \ecolumn } }
+      \cs_set:Npn \siunitx_tmp:w ##1 \NC@do~S ##2 \q_stop 
+        { \toks_set:N \NC@list { ##1 ##2 } }
+      \exp_after:wN \siunitx_tmp:w \toks_use:N \NC@list \q_stop
+      \cs_gundefine:N \NC@find@S
+    } { }
 }
 \AtBeginDocument { \siunitx_table_rewrite_cellspace: }
 %    \end{macrocode}
@@ -6708,15 +6691,17 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \l_siunitx_tmpa_tl \NC@list
   \newcolumntype {#1} { }
   \toks_set:NV \NC@list \l_siunitx_tmpa_tl
-  \exp_args:NNc \renewcommand * { NC@rewrite@ #1 } [1] [ ] {
-    \toks_put_right:Nn \@temptokena {
-      > { \siunitx_table_collect_begin:Nn #1 {##1} } 
-      c
-      < { \siunitx_table_print: } 
+  \exp_args:NNc \renewcommand * { NC@rewrite@ #1 } [1] [ ] 
+    {
+      \toks_put_right:Nn \@temptokena 
+        {
+          > { \siunitx_table_collect_begin:Nn #1 {##1} } 
+          c
+          < { \siunitx_table_print: } 
+        }
+      \use:c { siunitx_table_column_start_ #1 : }
+      \NC@find
     }
-    \use:c { siunitx_table_column_start_ #1 : }
-    \NC@find
-  }
 }
 \AtBeginDocument { \siunitx_table_rewrite_create:N S }
 \AtBeginDocument { \siunitx_table_rewrite_create:N s }
@@ -6738,11 +6723,11 @@ This work consists of the file  siunitx.dtx
   \group_execute_after:N \siunitx_table_column_start_s_aux:
 }
 \cs_new_nopar:Npn \siunitx_table_column_start_s_aux: {
-  \bool_if:NF \l_siunitx_create_free_bool {
-    \tl_map_inline:Nn \l_siunitx_declare_list_tl {
-      \cs_set_protected_nopar:Npn ##1 { \ERROR }
+  \bool_if:NF \l_siunitx_create_free_bool 
+    {
+      \tl_map_inline:Nn \l_siunitx_declare_list_tl 
+        { \cs_set_protected_nopar:Npn ##1 { \ERROR } }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6811,21 +6796,22 @@ This work consists of the file  siunitx.dtx
 % Table~\ref{tab:xmpl:calc} in the user part of the documentation. 
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_expand:N #1 {
-  \siunitx_if_tl:NTF #1 {
-    \tl_use:N \siunitx_table_collect_pre_tl
-    \tl_clear:N \siunitx_table_collect_pre_tl
-    \cs_set_nopar:Npx \siunitx_table_collect_next: {
-      \exp_not:N \siunitx_table_collect_get: \exp_not:V #1
+  \siunitx_if_tl:NTF #1 
+    {
+      \tl_use:N \siunitx_table_collect_pre_tl
+      \tl_clear:N \siunitx_table_collect_pre_tl
+      \cs_set_nopar:Npx \siunitx_table_collect_next: 
+        { \exp_not:N \siunitx_table_collect_get: \exp_not:V #1 }
     }
-  }{
-    \bool_if:NTF \siunitx_table_collect_pre_bool {
-      \tl_put_right:Nn \siunitx_table_collect_pre_tl {#1}
-    }{
-      \bool_set_true:N \siunitx_table_collect_post_bool
-      \bool_set_false:N \siunitx_table_collect_pre_bool 
-      \tl_put_right:Nn \siunitx_table_collect_post_tl {#1}
+    {
+      \bool_if:NTF \siunitx_table_collect_pre_bool
+        { \tl_put_right:Nn \siunitx_table_collect_pre_tl {#1} }
+        {
+          \bool_set_true:N \siunitx_table_collect_post_bool
+          \bool_set_false:N \siunitx_table_collect_pre_bool 
+          \tl_put_right:Nn \siunitx_table_collect_post_tl {#1}
+        }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6838,11 +6824,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_get: {
   \cs_set_eq:NN \siunitx_table_collect_next: \siunitx_table_collect_get:
-  \peek_charcode:NTF \c_group_begin_token {
-    \siunitx_table_collect_braced:n
-  }{
-    \siunitx_table_collect_not_braced:N
-  }
+  \peek_charcode:NTF \c_group_begin_token
+    { \siunitx_table_collect_braced:n }
+    { \siunitx_table_collect_not_braced:N }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6866,23 +6850,25 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_init_s: {
   \bool_set_false:N \l_siunitx_table_collect_pre_bool
-  \cs_set:Npn \siunitx_table_collect_braced:n ##1 {
-    \tl_put_right:Nn \l_siunitx_table_collect_tl { {##1} }
-    \siunitx_table_collect_next:
-  }
+  \cs_set:Npn \siunitx_table_collect_braced:n ##1 
+    {
+      \tl_put_right:Nn \l_siunitx_table_collect_tl { {##1} }
+      \siunitx_table_collect_next:
+    }
 }
 \cs_new_nopar:Npn \siunitx_table_collect_init_S: {
   \siunitx_number_in_init:
   \bool_set_true:N \l_siunitx_table_collect_pre_bool
-  \cs_set:Npn \siunitx_table_collect_braced:n ##1 {
-    \bool_if:NTF \l_siunitx_table_collect_pre_bool { 
-      \tl_put_right:Nn \l_siunitx_table_collect_pre_tl { {##1} }
-    }{
-      \bool_set_true:N \l_siunitx_table_collect_post_bool
-      \tl_put_right:Nn \l_siunitx_table_collect_post_tl { {##1} }
+  \cs_set:Npn \siunitx_table_collect_braced:n ##1 
+    {
+      \bool_if:NTF \l_siunitx_table_collect_pre_bool
+        { \tl_put_right:Nn \l_siunitx_table_collect_pre_tl { {##1} } }
+        {
+          \bool_set_true:N \l_siunitx_table_collect_post_bool
+          \tl_put_right:Nn \l_siunitx_table_collect_post_tl { {##1} }
+        }
+      \siunitx_table_collect_next:
     }
-    \siunitx_table_collect_next:
-  }
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -6913,31 +6899,32 @@ This work consists of the file  siunitx.dtx
 % function, which is picked up by hand.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_not_braced:N #1 {
-  \token_if_eq_meaning:NNF #1 \ignorespaces {
-    \token_if_eq_meaning:NNF #1 \unskip {
-      \siunitx_table_collect_not_braced_aux_i:N #1
-    }%
-  }%
+  \token_if_eq_meaning:NNF #1 \ignorespaces 
+    {
+      \token_if_eq_meaning:NNF #1 \unskip 
+        { \siunitx_table_collect_not_braced_aux_i:N #1 }
+    }
   \siunitx_table_collect_next:
 }
 \cs_new:Npn \siunitx_table_collect_not_braced_aux_i:N #1 {
-  \cs_set:Npn \siunitx_table_collect_not_braced_aux_ii:N ##1 {
-    \token_if_eq_meaning:NNT #1 ##1 {
-      \cs_set_eq:NN \siunitx_table_collect_next: ##1
+  \cs_set:Npn \siunitx_table_collect_not_braced_aux_ii:N ##1 
+    {
+      \token_if_eq_meaning:NNT #1 ##1 
+        { \cs_set_eq:NN \siunitx_table_collect_next: ##1 }
     }
-  }
   \tl_map_function:nN 
     { \csname \end \endtabular \relax \siunitx_table_print: }
     \siunitx_table_collect_not_braced_aux_ii:N
   \token_if_eq_meaning:NNT \siunitx_table_collect_next: 
-    \siunitx_table_collect_get: {
-    \token_if_eq_meaning:NNTF #1 \tabularnewline {
-      \cs_set_eq:NN \siunitx_table_collect_next: 
-        \siunitx_table_collect_newline:
-    }{
-      \siunitx_table_collect_token:N #1
+    \siunitx_table_collect_get: 
+    {
+      \token_if_eq_meaning:NNTF #1 \tabularnewline 
+        {
+          \cs_set_eq:NN \siunitx_table_collect_next: 
+            \siunitx_table_collect_newline:
+        }
+        { \siunitx_table_collect_token:N #1 }
     }
-  }
 }
 \cs_new:Npn \siunitx_table_collect_not_braced_aux_ii:N #1 { }
 %    \end{macrocode}
@@ -6964,16 +6951,16 @@ This work consists of the file  siunitx.dtx
 % it is passed on to the expansion handler.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_token_S:N #1 {
-  \bool_if:NTF  \l_siunitx_table_collect_post_bool {
-    \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1}
-  }{
-    \tl_if_in:NnTF \l_siunitx_number_valid_tl {#1} {
-      \bool_set_false:N \l_siunitx_table_collect_pre_tl
-      \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
-    }{
-      \siunitx_table_collect_expand:N #1
+  \bool_if:NTF  \l_siunitx_table_collect_post_bool 
+    { \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1} }
+    {
+      \tl_if_in:NnTF \l_siunitx_number_valid_tl {#1} 
+        {
+          \bool_set_false:N \l_siunitx_table_collect_pre_tl
+          \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
+        }
+        { \siunitx_table_collect_expand:N #1 }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7001,31 +6988,38 @@ This work consists of the file  siunitx.dtx
 % that there are no clashes.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_redefine_symbols: {
-  \bool_if:NT \l_siunitx_redefine_symbols_bool {
-    \@ifpackageloaded { textcomp } {
-      \keys_set:nn { siunitx } {
-        maths-degree = \text { \textdegree },
-        text-degree  = \textdegree,
-      }
-      \@ifpackageloaded { mathptmx } { } {
-        \keys_set:nn { siunitx } {
-          text-micro = \textmu,
-          text-ohm   = \textohm
-        } 
-      }
-      \tl_if_eq:nVT { OT1 } \encodingdefault { 
-        \keys_set:nn { siunitx } {
-         maths-angstrom = \text { \capitalring { A } },
-         text-angstrom  = \capitalring { A }
-        }
-      }
-    } { }
-    \@ifpackageloaded { upgreek } {
-      \keys_set:nn { siunitx } {
-        maths-ohm = \Upomega
-      }
-    } { }
-  }
+  \bool_if:NT \l_siunitx_redefine_symbols_bool 
+    {
+      \@ifpackageloaded { textcomp } 
+        {
+          \keys_set:nn { siunitx } 
+            {
+              maths-degree = \text { \textdegree },
+              text-degree  = \textdegree,
+            }
+          \@ifpackageloaded { mathptmx } { } 
+            {
+              \keys_set:nn { siunitx } 
+                {
+                  text-micro = \textmu,
+                  text-ohm   = \textohm
+                }   
+            }
+          \tl_if_eq:nVT { OT1 } \encodingdefault 
+            { 
+              \keys_set:nn { siunitx } 
+                {
+                 maths-angstrom = \text { \capitalring { A } },
+                 text-angstrom  = \capitalring { A }
+                }
+            }
+        } { }
+      \@ifpackageloaded { upgreek } 
+        {
+          \keys_set:nn { siunitx } 
+            { maths-ohm = \Upomega }
+        } { }
+    }
 }
 \AtBeginDocument { \siunitx_redefine_symbols: }
 %    \end{macrocode}
@@ -7119,13 +7113,12 @@ This work consists of the file  siunitx.dtx
 % For creating the outer symbol macro.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_symbol_new:n #1 {
-  \exp_args:Nc \DeclareDocumentCommand { SIUnitSymbol #1 } { } {
-    \mode_if_math:TF {
-      \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } }
-    }{
-      \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _text_tl } }
+  \exp_args:Nc \DeclareDocumentCommand { SIUnitSymbol #1 } { } 
+    {
+      \mode_if_math:TF 
+        { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } } }
+        { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _text_tl } } }
     }
-  }
 }
 %    \end{macrocode}
 %\end{macro}
