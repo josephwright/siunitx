@@ -2579,11 +2579,15 @@ This work consists of the file  siunitx.dtx
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses |_| and
 % |^| to represent sub- and superscripts, respectively. In this way, 
-% mode decisions can be delayed as long as possible. 
+% mode decisions can be delayed as long as possible.  The
+% \pkg{underscore} package may make |_| active, or more likely
+% it will be a superscript character. Both are tested for here.
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
   \char_make_math_subscript:N \@
+  \char_set_lccode:nn { `\! } { `\_ }
+  \char_make_active:N \!
   \char_make_active:N \-
 \tl_to_lowercase:n {
   \group_end:
@@ -2607,6 +2611,8 @@ This work consists of the file  siunitx.dtx
         \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
           \l_siunitx_print_arg_tl
         \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
+          { \siunitx_print_text_sub:n }
+        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! } 
           { \siunitx_print_text_sub:n }
         \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
           { \siunitx_print_text_super:n }
