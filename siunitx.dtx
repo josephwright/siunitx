@@ -1553,7 +1553,7 @@ This work consists of the file  siunitx.dtx
 % The handling of \cs{per} is altered using the \opt{per-mode} choice
 % option.  The standard setting is \opt{reciprocal}, meaning that 
 % \cs{per} generates reciprocal powers for units.  Setting the option
-% to \cs{fraction} uses the \cs{frac} function to typeset the positive
+% to \opt{fraction} uses the \cs{frac} function to typeset the positive
 % and negative powers of a unit separately. 
 %\begin{LaTeXdemo}
 %  \si{\joule\per\mole\per\kelvin} \\
@@ -7680,8 +7680,15 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\planckbar}
 % A set of \enquote{natural units}.
 %    \begin{macrocode}
-\DeclareSIUnit \clight       {\text{\ensuremath{c_{0}}}}
-\DeclareSIUnit \electronmass {\text{\ensuremath{m_{\text{e}}}}}
+\group_begin:
+  \char_set_lccode:nn { `\@ } { `\_ }
+  \char_make_math_subscript:N \@
+\tl_to_lowercase:n {
+  \group_end:
+  \DeclareSIUnit \clight { \text { \ensuremath { c @ { 0 } } } }
+  \DeclareSIUnit \electronmass 
+    { \text { \ensuremath { m @ { \text { e } } } } } 
+}
 \DeclareSIUnit \planckbar    {\text{\ensuremath{\hbar}}}
 %    \end{macrocode}
 %\end{macro}
@@ -7692,9 +7699,16 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\hartree}
 % A set of \enquote{atomic units}.
 %    \begin{macrocode}
-\DeclareSIUnit \elementarycharge {\text{\ensuremath{e}}}
-\DeclareSIUnit \bohr             {\text{\ensuremath{a_{0}}}}
-\DeclareSIUnit \hartree          {\text{\ensuremath{E_{\textup{h}}}}}
+\DeclareSIUnit \elementarycharge { \text { \ensuremath { e } } }
+\group_begin:
+  \char_set_lccode:nn { `\@ } { `\_ }
+  \char_make_math_subscript:N \@
+\tl_to_lowercase:n {
+  \group_end:
+  \DeclareSIUnit \bohr { \text { \ensuremath { a @ { 0 } } } }
+  \DeclareSIUnit \hartree 
+    { \text { \ensuremath { E @ { \textup { h } } } } }
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7758,18 +7772,21 @@ This work consists of the file  siunitx.dtx
 % 
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  addsign .choice:,
-  addsign / false .meta:n = { explicit-sign =           },
-  addsign / true  .meta:n = { explicit-sign = +         },
-  allowlitunits .meta:n = { free-standing-units    = #1 },
-  allowoptarg   .meta:n = { unit-optional-argument = #1 },
-  allowzeroexp  .meta:n = { retain-zero-exponent   = #1 },
+  addsign       .choice:,
+  addsign / 
+    false       .meta:n = { explicit-sign         =                   },
+  addsign / 
+    true        .meta:n = { explicit-sign         = +                 },
+  allowlitunits .meta:n = { free-standing-units   = #1                },
+  allowoptarg   .meta:n = 
+    { unit-optional-argument = #1 },
+  allowzeroexp  .meta:n = { retain-zero-exponent  = #1                },
 %  angformat & List & Conversion of angle format \\
 %  anglesep & List or literal & Space between angle components \\
 %  astroang & Boolean & Astronomy-style angles \\
-  closeerr      .meta:n = { close-bracket            = #1 },
-  closefrac     .meta:n = { close-bracket            = #1 },
-  closerange    .meta:n = { close-bracket            = #1 },
+  closeerr      .meta:n = { close-bracket         = #1                },
+  closefrac     .meta:n = { close-bracket         = #1                },
+  closerange    .meta:n = { close-bracket         = #1                },
   colorall      .code:n = ,
   colourall     .code:n = ,
   colorneg      .code:n = ,
@@ -7778,10 +7795,54 @@ This work consists of the file  siunitx.dtx
   colourunits   .meta:n = ,
   colorvalues   .meta:n = ,
   colourvalues  .meta:n = ,
-%  decimalsymbol & List or literal & Decimal symbol \\
+  decimalsymbol .choice:,
+  decimalsymbol /
+    cdot        .code:n = { inter-unit-separator  = { } \cdot { }     }, 
+  decimalsymbol /
+    fullstop    .code:n = { inter-unit-separator  = { { . } }         }, 
+  decimalsymbol /
+    period      .code:n = { inter-unit-separator  = { { . } }         },
+  decimalsymbol /
+    stop        .code:n = { inter-unit-separator = { { . } }          },
+  decimalsymbol /
+    tightcdot   .code:n = 
+      { inter-unit-separator = \bgroup \cdot \egroup },
+  decimalsymbol /
+    unknown
 %  debug & Boolean & Write debugging data to log \\
-  detectdisplay .meta:n = { detect-display-maths     = #1 },
-%  digitsep & List & Separation of digits in large numbers \\
+  detectdisplay .meta:n = { detect-display-maths  = #1                },
+  digitsep      .choice:,
+  digitsep / 
+    cdot        .code:n = { inter-unit-separator  = { } \cdot { }     },
+  digitsep / 
+    comma       .code:n = { inter-unit-separator  = { {,} }           },
+  digitsep / 
+    fullstop    .code:n = { inter-unit-separator  = { { . } }         },
+  digitsep / 
+    med         .code:n = { inter-unit-separator  = \:                },
+  digitsep / 
+    medium      .code:n = { inter-unit-separator  = \:                },
+  digitsep / 
+    none        .code:n = { inter-unit-separator  =                   },
+  digitsep / 
+    period      .code:n = { inter-unit-separator  = { { . } }         },
+  digitsep / 
+    space       .code:n = { inter-unit-separator  = \text { ~ }       },
+  digitsep / 
+    stop        .code:n = { inter-unit-separator  = { { . } }         },
+  digitsep / 
+    thick       .code:n = { inter-unit-separator  = \;                },
+  digitsep / 
+    thin        .code:n = { inter-unit-separator  = \,                },
+  digitsep / 
+    tightcdot   .code:n = 
+      { inter-unit-separator = \bgroup \cdot \egroup },
+  digitsep / tighttimes .code:n =
+    { inter-unit-separator = \bgroup \times \egroup },
+  digitsep / times  .code:n =
+    { inter-unit-separator = \times },
+  digitsep / unknown .code:n =
+    { inter-unit-separator = #1 },
   dp         .meta:n = { 
     round-mode   = places,
     round-places = #1,
@@ -7793,11 +7854,15 @@ This work consists of the file  siunitx.dtx
 %  expbase & List or literal & Base used for exponents \\
 %  expproduct & List or literal & Product sign for exponents \\
   fixdp .choice:,
-  fixdp / false .meta:n = { round-mode = none },
-  fixdp / true  .meta:n = { round-mode = places },
-  fixsf .choice:,
-  fixsf / false .meta:n = { round-mode = none },
-  fixsf / true  .meta:n = { round-mode = figures },
+  fixdp / 
+    false      .meta:n = { round-mode            = none              },
+  fixdp / 
+    true       .meta:n = { round-mode            = places            },
+  fixsf        .choice:,
+  fixsf / 
+    false      .meta:n = { round-mode            = none              },
+  fixsf / 
+    true       .meta:n = { round-mode            = figures           },
 %  fraction & List & Method used when setting \opt{per=frac} \\
 %  inlinebold & List & Select how inline bold is tested \\
 %  load & Modules & Modules to load \\
@@ -7846,27 +7911,38 @@ This work consists of the file  siunitx.dtx
   openrange    .meta:n = { open-bracket            = #1              },
 %  padangle & List & Add zeros to blank parts of angles  \\
 %  padnumber & List & Add zeros to blank parts of numbers \\
-%  per & List & Behaviour of \cs{per} \\
-%  prefixbase & List or literal & Base used when making prefixes \\
+  per            .choice,
+  per /
+    fraction     .code:n = { per-mode            = fraction          },
+  per / 
+    reciprocal   .code:n = { per-mode            = reciprocal        },
+  per /
+    slash        .code:n = { per-mode            = symbol            },
+ %  prefixbase & List or literal & Base used when making prefixes \\
 %   & & numerical \\
 %  prefixproduct & List or literal & Product sign for prefixes \\
-%  prefixsymbolic & Boolean & Behaviour of unit prefixes\\
-  prespace     .meta:n = { space-before-unit = #1 },
-  redefsymbols .meta:n = { redefine-symbols  = #1 },
+  prefixsymbolic .meta:n = { prefixes-as-symbols = #1                },
+  prespace       .meta:n = { space-before-unit   = #1                },
+  redefsymbols   .meta:n = { redefine-symbols    = #1                },
 %  repeatunits & List & Repeat units with separated errors, \\
 %   & &  products and in ranges \\
-%  retainplus & Boolean & Retain explicit plus sign\\
-%  seperr & Boolean & Separate number and error \\ 
-  seperr        .meta:n = { separate-uncertainty = #1 },
-  sepfour       .meta:n = { group-four-digits    = true },
-  sf         .meta:n = { 
-    round-mode   = figures,
-    round-places = #1,
-  },
-  sign          .meta:n = { explicit-sign = #1 },
-%  slash & List or literal & Symbol used for ``/'' \\
-  stickyper     .meta:n = { sticky-per      = #1 },
-%  strict & Boolean & Obey the rules strictly \\
+  retainplus    .meta:n = { retain-explicit-plus = #1                },
+  seperr        .meta:n = { separate-uncertainty = #1                },
+  seperr        .meta:n = { separate-uncertainty = #1                },
+  sepfour       .meta:n = { group-four-digits    = true              },
+  sf            .meta:n = 
+    { 
+      round-mode   = figures,
+      round-places = #1,
+    },
+  sign          .meta:n = { explicit-sign        = #1                },
+  slash         .choice:,
+  slash / 
+    slash       .code:n = { per-symbol           = /                 },
+  slash / 
+    unknown     .code:n = { per symbol           = #1                },
+  stickyper     .meta:n = { sticky-per           = #1                },
+%  strict & Boolean & Obey the rules strictly \\       
 %  strictarc & Boolean & Require exactly zero or \\
 %   & & two semi-colons \\
 %  tabalign & List & Positioning of all column data \\
@@ -7891,14 +7967,14 @@ This work consists of the file  siunitx.dtx
     mode = maths
   },
   textmode     .default:n = { true } ,
-  textmu       .meta:n = { text-micro           = #1               },
+  textmu       .meta:n = { text-micro            = #1              },
   textringA    .meta:n = { text-angstrom         = #1              },
   textrm       .meta:x = { text-rm               = \exp_not:c {#1} },
   textsecond   .meta:n = { text-arcsecond        = #1              },
   textsf       .meta:x = { text-sf               = \exp_not:c {#1} },
   texttt       .meta:x = { text-tt               = \exp_not:c {#1} },
-%  tightpm & Boolean & Reduce space around $\pm$ \\
-%  tophrase & List or literal & The phrase ``to'' for ranges \\
+  tightpm      .meta:n = { tight-spacing         = #1              },
+  tophrase     .meta:n = { range-phrase          = #1              },
 %  trapambigerr & Boolean & Check for ambiguous errors \\
 %  trapambigfrac & Boolean & Check for ambiguous fractions \\
 %  trapambigrange & Boolean & Check for ambiguous ranges \\
@@ -7911,8 +7987,52 @@ This work consists of the file  siunitx.dtx
   unitmathstt  .meta:x = { unit-maths-tt         = \exp_not:c {#1} },
   unitmathtt   .meta:x = { unit-math-tt          = \exp_not:c {#1} },
   unitmode     .meta:n = { unit-mode            = #1               },
-%  unitsep & List or lieral & Separator for units \\
-%  unitspace & List or literal & Space used for ``|~|'' in units \\
+  unitsep      .choice:,
+  unitsep / cdot   .code:n =
+    { inter-unit-separator = { } \cdot { } },
+  unitsep / comma  .code:n =
+    { inter-unit-separator = { {,} } },
+  unitsep / fullstop .code:n =
+    { inter-unit-separator = { { . } } },
+  unitsep / med    .code:n =
+    { inter-unit-separator = \: },
+  unitsep / medium .code:n =
+    { inter-unit-separator = \: },
+  unitsep / none   .code:n =
+    { inter-unit-separator = },
+  unitsep / period .code:n =
+    { inter-unit-separator = { { . } } },
+  unitsep / space  .code:n =
+    { inter-unit-separator = \text { ~ } },
+  unitsep / stop .code:n   =
+    { inter-unit-separator = { { . } } },
+  unitsep / thick  .code:n =
+    { inter-unit-separator = \; },
+  unitsep / thin   .code:n =
+    { inter-unit-separator = \, },
+  unitsep / tightcdot .code:n =
+    { inter-unit-separator = \bgroup \cdot \egroup },
+  unitsep / tighttimes .code:n =
+    { inter-unit-separator = \bgroup \times \egroup },
+  unitsep / times  .code:n =
+    { inter-unit-separator = \times },
+  unitsep / unknown .code:n =
+    { inter-unit-separator = #1 },
+  unitspace      .choice:,
+  unitspace / med    .code:n =
+    { inter-unit-separator = \: },
+  unitspace / medium .code:n =
+    { inter-unit-separator = \: },
+  unitspace / none   .code:n =
+    { inter-unit-separator = },
+  unitspace / space  .code:n =
+    { inter-unit-separator = \text { ~ } },
+  unitspace / thick  .code:n =
+    { inter-unit-separator = \; },
+  unitspace / thin   .code:n =
+    { inter-unit-separator = \, },
+  unitspace / unknown .code:n =
+    { inter-unit-separator = #1 },
   valuecolor   .meta:n = { number-color         = #1              },
   valuecolour  .meta:n = { number-colour        = #1              },
   valuemathrm  .meta:x = { number-math-rm        = \exp_not:c {#1} },
@@ -7922,7 +8042,37 @@ This work consists of the file  siunitx.dtx
   valuemathstt .meta:x = { number-maths-tt       = \exp_not:c {#1} },
   valuemathtt  .meta:x = { number-math-tt        = \exp_not:c {#1} },
   valuemode    .meta:n = { number-mode          = #1              },
-%  valuesep & List or literal & Separator between value and unit \\
+  valuesep      .choice:,
+  valuesep / cdot  .code:n =
+    { inter-unit-separator = { } \cdot { } },
+  valuesep / comma .code:n =
+    { inter-unit-separator = { { , } } },
+  valuesep / fullstop .code:n =
+    { inter-unit-separator = { { . } } },
+  valuesep / med    .code:n =
+    { inter-unit-separator = \: },
+  valuesep / medium .code:n =
+    { inter-unit-separator = \: },
+  valuesep / none   .code:n =
+    { inter-unit-separator = },
+  valuesep / period .code:n =
+    { inter-unit-separator = { { . } } },
+  valuesep / space  .code:n =
+    { inter-unit-separator = \text { ~ } },
+  valuesep / stop .code:n   =
+    { inter-unit-separator = { { . } } },
+  valuesep / thick  .code:n =
+    { inter-unit-separator = \; },
+  valuesep / thin   .code:n =
+    { inter-unit-separator = \, },
+  valuesep / tightcdot .code:n =
+    { inter-unit-separator = \bgroup \cdot \egroup },
+  valuesep / tighttimes .code:n =
+    { inter-unit-separator = \bgroup \times \egroup },
+  valuesep / times  .code:n =
+    { inter-unit-separator = \times },
+  valuesep / unknown .code:n =
+    { inter-unit-separator = #1 },
   xspace       .meta:n = { use-xspace           = #1              }
 }
 %    \end{macrocode}
