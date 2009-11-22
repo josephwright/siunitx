@@ -141,14 +141,14 @@ This work consists of the file  siunitx.dtx
 %^^A on; based on the system used in the listings source (lstsample).
 %\lst@RequireAspects{writefile}
 %\newsavebox{\LaTeXdemo@box}
-%\lstnewenvironment{LaTeXdemo}[1][code and example]{^^A
-%  \global\let\lst@intname\@empty
-%  \expandafter\let\expandafter\LaTeXdemo@end
-%    \csname LaTeXdemo@#1@end\endcsname
-%  \@nameuse{LaTeXdemo@#1}^^A
-%}{^^A
-%  \LaTeXdemo@end
-%}
+%\lstnewenvironment{LaTeXdemo}[1][code and example]
+%  {^^A
+%    \global\let\lst@intname\@empty
+%    \expandafter\let\expandafter\LaTeXdemo@end
+%      \csname LaTeXdemo@#1@end\endcsname
+%    \@nameuse{LaTeXdemo@#1}^^A
+%  }
+%  {\LaTeXdemo@end}
 %\newcommand*\LaTeXdemo@new[3]{^^A
 %  \expandafter\newcommand\expandafter*\expandafter
 %    {\csname LaTeXdemo@#1\endcsname}{#2}^^A
@@ -156,71 +156,105 @@ This work consists of the file  siunitx.dtx
 %    {\csname LaTeXdemo@#1@end\endcsname}{#3}^^A
 %}
 %\newcommand*\LaTeXdemo@common{^^A
-%  \setkeys{lst}{
-%    basicstyle   = \small\ttfamily,
-%    basewidth    = 0.51em,
-%    gobble       = 3,
-%    keywordstyle = \color{blue},
-%    language     = [LaTeX]{TeX},
-%    moretexcs    = {
-%      color,
-%      DeclareSIPrefix,
-%      DeclareSIPower,
-%      DeclareSIQualifier,
-%      DeclareSIUnit,
-%      mathnormal,
-%      num,
-%      numrange,
-%      si,
-%      SI,
-%      SIrange,
-%      sisetup,
-%      SIUnitSymbolDegree,
-%      text,
-%    }
-%  }^^A 
+%  \setkeys{lst}
+%    {
+%      basicstyle   = \small\ttfamily,
+%      basewidth    = 0.51em,
+%      gobble       = 3,
+%      keywordstyle = \color{blue},
+%      language     = [LaTeX]{TeX},
+%      moretexcs    = 
+%        {
+%          ampere,
+%          candela,
+%          centi,
+%          color,
+%          cubic,
+%          degree,
+%          DeclareSIPrefix,
+%          DeclareSIPower,
+%          DeclareSIQualifier,
+%          DeclareSIUnit,
+%          farad,
+%          gram,
+%          gray,
+%          henry,
+%          hour,
+%          joule,
+%          kelvin,
+%          kibi,
+%          kilo,
+%          kilogram,
+%          litre,
+%          lumen,
+%          lux,
+%          mathnormal,
+%          metre,
+%          milli,
+%          mole,
+%          num,
+%          numrange,
+%          pascal,
+%          per,
+%          raiseto,
+%          second,
+%          si,
+%          SI,
+%          sievert,
+%          SIrange,
+%          sisetup,
+%          SIUnitSymbolDegree,
+%          square,
+%          squared,
+%          texorpdfstring,
+%          text,
+%          tothe,
+%          volt
+%        }
+%    }^^A 
 %}
 %\newcommand*\LaTeXdemo@input{^^A
 %  \MakePercentComment
 %  \catcode`\^^M=10\relax
 %  \small
 %  \begingroup
-%    \setkeys{lst}{
-%      SelectCharTable=\lst@ReplaceInput{\^\^I}{\lst@ProcessTabulator}
-%    }^^A
+%    \setkeys{lst}
+%      {
+%        SelectCharTable=\lst@ReplaceInput{\^\^I}{\lst@ProcessTabulator}
+%      }^^A
 %    \leavevmode 
 %      \input{\jobname.tmp}^^A
 %  \endgroup
 %  \MakePercentIgnore
 %}
-%\LaTeXdemo@new{code and example}{^^A
-%  \setbox\LaTeXdemo@box=\hbox\bgroup
-%    \lst@BeginAlsoWriteFile{\jobname.tmp}^^A
-%    \LaTeXdemo@common
-%}{^^A
-%    \lst@EndWriteFile
-%  \egroup
-%  \begin{center}
-%    \ifdim\wd\LaTeXdemo@box>0.48\linewidth\relax
-%      \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
-%        \begin{minipage}{\linewidth}
+%\LaTeXdemo@new{code and example}
+%  {^^A
+%    \setbox\LaTeXdemo@box=\hbox\bgroup
+%      \lst@BeginAlsoWriteFile{\jobname.tmp}^^A
+%      \LaTeXdemo@common
+%  }
+%  {^^A
+%      \lst@EndWriteFile
+%    \egroup
+%    \begin{center}
+%      \ifdim\wd\LaTeXdemo@box>0.48\linewidth\relax
+%        \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%          \begin{minipage}{\linewidth}
+%            \LaTeXdemo@input
+%          \end{minipage}
+%      \else
+%        \begin{minipage}{0.48\linewidth}
 %          \LaTeXdemo@input
 %        \end{minipage}
-%    \else
-%      \begin{minipage}{0.48\linewidth}
-%        \LaTeXdemo@input
-%      \end{minipage}
-%      \hfill
-%      \begin{minipage}{0.48\linewidth}
-%        \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
-%      \end{minipage}
-%    \fi
-%  \end{center}
-%}
-%\LaTeXdemo@new{code only}{^^A
-%  \LaTeXdemo@common
-%}{^^A
-%}
+%        \hfill
+%        \begin{minipage}{0.48\linewidth}
+%          \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%        \end{minipage}
+%      \fi
+%    \end{center}
+%  }
+%\LaTeXdemo@new{code only}
+%  {\LaTeXdemo@common}{}
 %
 %\providecommand*\opt[1]{\texttt{#1}}
 %
@@ -1713,12 +1747,24 @@ This work consists of the file  siunitx.dtx
 % In some circumstances, forcing \cs{mathnormal} may suffice, but this
 % deals less well with non-Latin characters.
 % 
-%\subsection{Why do most of the examples use 
-%  \si{\joule\per\mole\per\kelvin}?}
-% The package author is a chemist, and this is the unit of entropy
-% (disorder).  It nicely demonstrates the use of the \cs{per} macro,
-% and so it crops up a lot.  It is also in the subsection heading
-% here to act as a test with \pkg{hyperref} and moving arguments!
+%\subsection{Using units such as \si{\micro\metre\per\second} in 
+%  headings}
+%
+% The \pkg{siunitx} code is designed to work correctly with functions 
+% in headings. They will print correctly in headings and in the table
+% of contents. As illustrated here, the standard behaviour is to ignore
+% font changes. When the \pkg{hyperref} package is loaded, the
+% functions automatically \enquote{degrade gracefully} to produce 
+% useful information in PDF bookmarks. If you want more control over
+% the bookmark text, use the \cs{texorpdfstring} function from 
+% \pkg{hyperref}, for example:
+%\begin{LaTeXdemo}[code only]
+%  \section{Some text 
+%    \texorpdfstring
+%      {\si{\joule\per\mole\per\kelvin}}
+%      {J mol-1 K-1}%
+%    }
+%\end{LaTeXdemo}
 %
 %\end{documentation}
 %
@@ -7177,7 +7223,7 @@ This work consists of the file  siunitx.dtx
 % For creating the outer symbol macro.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_symbol_new:n #1 {
-  \exp_args:Nc \DeclareDocumentCommand { SIUnitSymbol #1 } { } 
+  \exp_args:Nc \NewDocumentCommand { SIUnitSymbol #1 } { } 
     {
       \mode_if_math:TF 
         { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } } }
@@ -7491,7 +7537,10 @@ This work consists of the file  siunitx.dtx
 % commands are made expandable. This allows a bit of re-arrangement
 % of the input, removes any set up options (which are being ignored)
 % and stops \pkg{hyperref} issuing a warning. The \pkg{xparse} warning
-% about redefining commands is also silenced.
+% about redefining commands is also silenced. To save a few 
+% expansions, the expandable commands which do not need any optional
+% arguments are redefined using \cs{cs_set_nopar:Npn} rather than
+% using \pkg{xparse}.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_contents_bookmarks: {
   \tl_map_function:NN \l_siunitx_declare_list_tl
@@ -7506,6 +7555,13 @@ This work consists of the file  siunitx.dtx
     { \IfNoValueF {##3} {##3} ##2~##4 }
   \DeclareExpandableDocumentCommand \SIrange { o m m m } 
     { ##2~##4 \l_siunitx_range_phrase_tl ##3~##4 }
+  \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
+  \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
+  \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
+  \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
+  \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
+  \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
+  \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
 }
 %    \end{macrocode}
 %\end{macro} 
