@@ -105,6 +105,7 @@ This work consists of the file  siunitx.dtx
 \usepackage{booktabs,caption,csquotes,helvet,siunitx}
 \usepackage[final]{listings}
 \usepackage[osf]{mathpazo}
+
 \DeclareSIPower\quartic{4}
 \DeclareSIPower*\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
@@ -7504,22 +7505,28 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_contents_add_setup:}
 %\begin{macro}{\siunitx_contents_add:nnn}
 %\begin{macro}{\siunitx_contents_add_aux:N}
-% The usual method to add something to the start of a \LaTeXe\ command
-% with no sensible hook: make a copy and provide a new version. The 
-% aim here is that anything written to file will not expand: the
-% definition itself is unimportant.
+% An updated version of \cs{addtocontents} which will ensure that
+% everything works properly. Life is complicated by the
+% asynchronous nature of the \TeX\ writing system. Using \eTeX's
+% \cs{protected} mechanism fails here as the protection has to 
+% survive beyond the current group.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_contents_add_setup: {
-  \cs_new_eq:NN \siunitx_contents_add:nnn \addcontentsline
-  \cs_set_nopar:Npn \addcontentsline 
+  \cs_set:Npn \addtocontents ##1##2
     {
-      \tl_map_function:NN \l_siunitx_declare_list_tl 
-        \siunitx_contents_add_aux:N
-      \siunitx_contents_add:nnn
+      \protected@write \@auxout
+        {
+          \cs_set_eq:NN \label \use_none:n 
+          \cs_set_eq:NN \index \use_none:n  
+          \cs_set_eq:NN \glossary\use_none:n
+          \tl_map_function:NN \l_siunitx_declare_list_tl 
+            \siunitx_contents_add_aux:N 
+        }
+        { \token_to_str:N \@writefile {##1} {##2} }
     }
 }
 \cs_new_nopar:Npn \siunitx_contents_add_aux:N #1 {
-  \cs_set_protected_nopar:Npn #1 { }
+  \cs_set_nopar:Npn #1 { \protect #1 }
 }
 \AtBeginDocument { \siunitx_contents_add_setup: }
 %    \end{macrocode}
