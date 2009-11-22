@@ -1712,6 +1712,13 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}  
 % In some circumstances, forcing \cs{mathnormal} may suffice, but this
 % deals less well with non-Latin characters.
+% 
+%\subsection{Why do most of the examples use 
+%  \si{\joule\per\mole\per\kelvin}?}
+% The package author is a chemist, and this is the unit of entropy
+% (disorder).  It nicely demonstrates the use of the \cs{per} macro,
+% and so it crops up a lot.  It is also in the subsection heading
+% here to act as a test with \pkg{hyperref} and moving arguments!
 %
 %\end{documentation}
 %
@@ -6463,24 +6470,28 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   allow-number-unit-breaks .bool_set:N = 
     \l_siunitx_number_unit_breaks_bool,
-  number-unit-separator    .tl_set:N = 
+  number-unit-separator    .tl_set:N   = 
     \l_siunitx_number_unit_separator_tl,
-  repeated-units .choice:,
-  repeated-units / false .code:n  = 
-    {
-      \bool_set_false:N \l_siunitx_number_unit_power_bool
-      \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-    },
-  repeated-units / power .code:n  = 
-    {
-      \bool_set_true:N \l_siunitx_number_unit_power_bool
-      \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-    },
-  repeated-units / true .code:n   = 
-    {
-      \bool_set_false:N \l_siunitx_number_unit_power_bool
-      \bool_set_true:N \l_siunitx_number_unit_repeat_bool
-    },
+  repeated-units           .choice:,
+  repeated-units / 
+    false                  .code:n     = 
+      {
+        \bool_set_false:N \l_siunitx_number_unit_power_bool
+        \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+      },
+  repeated-units / 
+    power                  .code:n     = 
+      {
+        \bool_set_true:N \l_siunitx_number_unit_power_bool
+        \bool_set_false:N \l_siunitx_number_unit_repeat_bool
+      },
+  repeated-units / 
+    true                   .code:n     = 
+      {
+        \bool_set_false:N \l_siunitx_number_unit_power_bool
+        \bool_set_true:N \l_siunitx_number_unit_repeat_bool
+      },
+  repeated-units           .default:n  = { true }
 }
 \keys_set:nn { siunitx } {
   number-unit-separator = \,,
@@ -7436,6 +7447,78 @@ This work consists of the file  siunitx.dtx
 \DeclareDocumentCommand \sisetup { m } {
   \keys_set:nn { siunitx } {#1}
 }
+%    \end{macrocode}
+%\end{macro}
+%
+%\subsection{Precautions for section headings}
+%
+% There are two issues to be handled for section headings, \emph{etc}.
+% First, within the \cs{addcontentline} macro the various unit functions 
+% need to be \cs{protected}. Secondly, there is a need to worry about
+% \pkg{hyperref}, and ensure that everything works cleanly and with
+% no unnecessary warnings.
+% 
+%\begin{macro}{\siunitx_contents_add_setup:}
+%\begin{macro}{\siunitx_contents_add:nnn}
+%\begin{macro}{\siunitx_contents_add_aux:N}
+% The usual method to add something to the start of a \LaTeXe\ command
+% with no sensible hook: make a copy and provide a new version. The 
+% aim here is that anything written to file will not expand: the
+% definition itself is unimportant.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_contents_add_setup: {
+  \cs_new_eq:NN \siunitx_contents_add:nnn \addcontentsline
+  \cs_set_nopar:Npn \addcontentsline 
+    {
+      \tl_map_function:NN \l_siunitx_declare_list_tl 
+        \siunitx_contents_add_aux:N
+      \siunitx_contents_add:nnn
+    }
+}
+\cs_new_nopar:Npn \siunitx_contents_add_aux:N #1 {
+  \cs_set_protected_nopar:Npn #1 { }
+}
+\AtBeginDocument { \siunitx_contents_add_setup: }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+% 
+%\begin{macro}{\siunitx_contents_bookmarks:}
+% The idea here is two-fold. First, all of the unit macros are set
+% up to simply print their literal interpretation: this is hopefully
+% good enough for most bookmark situations. Secondly, the document
+% commands are made expandable. This allows a bit of re-arrangement
+% of the input, removes any set up options (which are being ignored)
+% and stops \pkg{hyperref} issuing a warning. The \pkg{xparse} warning
+% about redefining commands is also silenced.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_contents_bookmarks: {
+  \tl_map_function:NN \l_siunitx_declare_list_tl
+    \siunitx_unit_print_literal_aux:N
+  \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command } 
+    { none }
+  \DeclareExpandableDocumentCommand \num { o m } {##2}
+  \DeclareExpandableDocumentCommand \numrange { o m m } 
+    { ##2 \l_siunitx_range_phrase_tl ##3 }
+  \DeclareExpandableDocumentCommand \si { o m } {##2}
+  \DeclareExpandableDocumentCommand \SI { o m o m } 
+    { \IfNoValueF {##3} {##3} ##2~##4 }
+  \DeclareExpandableDocumentCommand \SIrange { o m m m } 
+    { ##2~##4 \l_siunitx_range_phrase_tl ##3~##4 }
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_hyperref_check:}
+% A short check to get things working.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_hyperref_check: {
+  \@ifpackageloaded { hyperref } 
+    { \pdfstringdefDisableCommands { \siunitx_contents_bookmarks: } }
+    { }
+}
+\AtBeginDocument { \siunitx_hyperref_check: }
 %    \end{macrocode}
 %\end{macro}
 %
