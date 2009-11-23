@@ -7506,10 +7506,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_contents_add:nnn}
 %\begin{macro}{\siunitx_contents_add_aux:N}
 % An updated version of \cs{addtocontents} which will ensure that
-% everything works properly. Life is complicated by the
-% asynchronous nature of the \TeX\ writing system. Using \eTeX's
-% \cs{protected} mechanism fails here as the protection has to 
-% survive beyond the current group.
+% everything works properly. Using \cs{token_to_str:N} means that
+% there is no problem with the asynchronous nature of \TeX's writing
+% mechanism.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_contents_add_setup: {
   \cs_set:Npn \addtocontents ##1##2
@@ -7526,7 +7525,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_nopar:Npn \siunitx_contents_add_aux:N #1 {
-  \cs_set_nopar:Npn #1 { \protect #1 }
+  \cs_set_nopar:Npn #1 { \token_to_str:N #1 }
 }
 \AtBeginDocument { \siunitx_contents_add_setup: }
 %    \end{macrocode}
