@@ -7917,15 +7917,29 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Loading additional configurations}
 %
+% There is only only option for loading files: keeps things 
+% simple.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   load-configuration .code:n =
-    {
-      \file_if_exist:nT { siunitx- #1 .cfg }
-        { \file_input:n { siunitx- #1 .cfg } }
-    }
+    { \siunitx_load_configuration:n {#1} }
 }
 %    \end{macrocode}
+%    
+%\begin{macro}{\siunitx_load_configuration:n}
+%\begin{macro}[aux]{\siunitx_load_configuration_aux:n}
+% Loading files is just a question of traversing the list given.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_load_configuration:n #1 {
+  \clist_map_function:nN {#1} \siunitx_load_configuration_aux:n
+}
+\cs_new:Npn \siunitx_load_configuration_aux:n #1 {
+  \file_if_exist:nT { siunitx- #1 .cfg }
+    { \file_input:n { siunitx- #1 .cfg } }
+}
+%    \end{macrocode}
+%\end{macro}    
+%\end{macro} 
 %    
 %    \begin{macrocode}
 %</package>
@@ -7935,9 +7949,7 @@ This work consists of the file  siunitx.dtx
 %
 % The re-arrangements made to the code in version two, and in particular
 % the new option names, mean that support for version one needs to be
-% included explicitly. Looking forward, this code is unlikely to be
-% taken forward to a stand-alone \LaTeX3 version of \pkg{siunitx}. 
-% However, that is likely to be some way off.
+% included explicitly. 
 % 
 %    \begin{macrocode}
 %<*version1>    
@@ -8327,6 +8339,130 @@ This work consists of the file  siunitx.dtx
 }
 %</version1> 
 %    \end{macrocode}
+%    
+%\begin{macro}{\newunit}
+%\begin{macro}{\renewunit}
+%\begin{macro}{\provideunit}
+% The functions for creating units from version one are easy to create.
+%    \begin{macrocode}
+\cs_new_eq:NN \newunit     \DeclareSIUnit
+\cs_new_eq:NN \renewunit   \DeclareSIUnit
+\cs_new_eq:NN \provideunit \DeclareSIUnit
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}   
+%
+%\begin{macro}{\newpower}
+%\begin{macro}{\renewpower}
+%\begin{macro}{\providepower}
+% Slightly more complex: an optional argument to check. A simple 
+% assumption is made that it will be \texttt{post}: anything else
+% would not make sense anyway.
+%    \begin{macrocode}
+\NewDocumentCommand \newpower     { o m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPower   #2 {#3} }
+    { \DeclareSIPower * #2 {#3} }
+}
+\NewDocumentCommand \renewpower   { o m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPower   #2 {#3} }
+    { \DeclareSIPower * #2 {#3} }
+}
+\NewDocumentCommand \providepower { o m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPower   #2 {#3} }
+    { \DeclareSIPower * #2 {#3} }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\newprefix}
+%\begin{macro}{\renewprefix}
+%\begin{macro}{\provideprefix}
+% Slightly more complex: an optional argument to check. A simple 
+% assumption is made that it will be \texttt{post}: anything else
+% would not make sense anyway.
+%    \begin{macrocode}
+\NewDocumentCommand \newprefix     { o m m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPrefix   #2 {#3} {#4} }
+    { \DeclareSIPrefix * #2 {#3} {#4} }
+}
+\NewDocumentCommand \renewprefix   { o m m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPrefix   #2 {#3} {#4} }
+    { \DeclareSIPrefix * #2 {#3} {#4} }
+}
+\NewDocumentCommand \provideprefix { o m m m } {
+  \IfNoValueTF {#1} 
+    { \DeclareSIPrefix   #2 {#3} {#4} }
+    { \DeclareSIPrefix * #2 {#3} {#4} }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}  
+%
+%\begin{macro}{\newqualifier}
+%\begin{macro}{\renewqualifier}
+%\begin{macro}{\providequalifier}
+% The functions for creating qualifiers are easy to create again.
+%    \begin{macrocode}
+\cs_new_eq:NN \newqualifier     \DeclareSIQualifier
+\cs_new_eq:NN \renewqualifier   \DeclareSIQualifier
+\cs_new_eq:NN \providequalifier \DeclareSIQualifier
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\micA}
+%\begin{macro}{\micmol}
+%\begin{macro}{\micl}
+%\begin{macro}{\micL}
+%\begin{macro}{\nanog}
+%\begin{macro}{\micg}
+%\begin{macro}{\picm}
+%\begin{macro}{\micm}
+%\begin{macro}{\Sec}
+%\begin{macro}{\mics}
+%\begin{macro}{\cmc}
+%\begin{macro}{\dmc}
+%\begin{macro}{\cms}
+% A few abbreviations which have been renamed.
+%    \begin{macrocode}
+\DeclareSIUnit \micA   { \micro \ampere }
+\DeclareSIUnit \micmol { \micro \mole   }
+\DeclareSIUnit \micl   { \micro \litre  }
+\DeclareSIUnit \micL   { \micro \liter  }
+\DeclareSIUnit \nanog  { \nano  \gram   }
+\DeclareSIUnit \micg   { \micro \gram   }
+\DeclareSIUnit \picm   { \pico  \metre  }
+\DeclareSIUnit \micm   { \micro \metre  }
+\DeclareSIUnit \Sec    { \second }
+\DeclareSIUnit \mics   { \micro \second }
+\DeclareSIUnit \cmc    { \centi \metre \cubed }
+\DeclareSIUnit \dmc    { \deci  \metre \cubed }
+\DeclareSIUnit \cms    { \centi \metre \squared }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %
 %\subsection{Abbreviated units}
 %
@@ -8420,18 +8556,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\cmc}
-%\begin{macro}{\dmc}
-%\begin{macro}{\cms}
-% Areas.
-%    \begin{macrocode}
-\DeclareSIUnit \cmc { \centi \metre \cubed }
-\DeclareSIUnit \dmc { \deci  \metre \cubed }
-\DeclareSIUnit \cms { \centi \metre \squared }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\begin{macro}{\fg}
 %\begin{macro}{\pg}
 %\begin{macro}{\ng}
@@ -8504,16 +8628,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\sec}
 %\begin{macro}{\as}
 %\begin{macro}{\fs}
 %\begin{macro}{\ps}
 %\begin{macro}{\ns}
-%\begin{macro}{\mics}
+%\begin{macro}{\mus}
 %\begin{macro}{\ms}
 % Finally, times.
 %    \begin{macrocode}
-\DeclareSIUnit \sec {        \second }
 \DeclareSIUnit \as  { \atto  \second }
 \DeclareSIUnit \fs  { \femto \second }
 \DeclareSIUnit \ps  { \pico  \second }
@@ -8521,7 +8643,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \mus { \micro \second }
 \DeclareSIUnit \ms  { \milli \second }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
