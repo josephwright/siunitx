@@ -76,6 +76,7 @@ This work consists of the file  siunitx.dtx
 \usedir{tex/latex/siunitx/config}
 \generate{
   \file{siunitx-abbreviations.cfg}{\from{\jobname.dtx}{abbreviations}}
+  \file{siunitx-version1.cfg}{\from{\jobname.dtx}{version1}}
 }
 %</install>
 %<install>\endbatchfile
@@ -7914,6 +7915,22 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Loading additional configurations}
+%
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  load-configuration .code:n =
+    {
+      \file_if_exist:nT { siunitx- #1 .cfg }
+        { \file_input:n { siunitx- #1 .cfg } }
+    }
+}
+%    \end{macrocode}
+%    
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%
 %\subsection{Support for version one}
 %
 % The re-arrangements made to the code in version two, and in particular
@@ -7923,6 +7940,7 @@ This work consists of the file  siunitx.dtx
 % However, that is likely to be some way off.
 % 
 %    \begin{macrocode}
+%<*version1>    
 \keys_define:nn { siunitx } {
   addsign        .choice: ,
   addsign / 
@@ -8307,10 +8325,7 @@ This work consists of the file  siunitx.dtx
   xspace         .meta:n    = { use-xspace               = #1         },
   xpace          .default:n = { true                                  }
 }
-%    \end{macrocode}
-%    
-%    \begin{macrocode}
-%</package>
+%</version1> 
 %    \end{macrocode}
 %
 %\subsection{Abbreviated units}
@@ -8465,6 +8480,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\pm}
 %\begin{macro}{\nm}
 %\begin{macro}{\mum}
 %\begin{macro}{\mm}
@@ -8474,12 +8490,14 @@ This work consists of the file  siunitx.dtx
 % Lengths.
 %    \begin{macrocode}
 \DeclareSIUnit \nm  { \nano  \metre }
+\DeclareSIUnit \pm  { \pico  \metre }
 \DeclareSIUnit \mum { \micro \metre }
 \DeclareSIUnit \mm  { \milli \metre }
 \DeclareSIUnit \cm  { \centi \metre }
 \DeclareSIUnit \dm  { \deci  \metre }
 \DeclareSIUnit \km  { \kilo  \metre }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}

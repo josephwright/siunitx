@@ -59,7 +59,7 @@
   rem sources are not inlcuded here: they are dealt with separately
 
   set CTANFILES=dtx ins pdf
-  set TDSFILES=%CTANFILES% sty 
+  set TDSFILES=%CTANFILES% cfg sty 
 
   rem Locations for building archives
 
