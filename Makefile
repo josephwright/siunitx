@@ -143,6 +143,8 @@ localinstall: unpack
 	TEXMFHOME=`kpsewhich --var-value=TEXMFHOME` ; \
 	mkdir -p $$TEXMFHOME/tex/$(PACKAGEROOT)/ ; \
 	rm -rf $$TEXMFHOME/tex/$(PACKAGEROOT)/* ; \
+	mkdir -p $$TEXMFHOME/tex/$(PACKAGEROOT)/config/ ; \
+	cp *.cfg $$TEXMFHOME/tex/$(PACKAGEROOT)/config/ ; \
 	cp *.sty $$TEXMFHOME/tex/$(PACKAGEROOT)/ ; \
 	texhash &> /dev/null
 	
@@ -152,7 +154,8 @@ tds: doc
 	rm -rf $(TDSDIR)/*
 	mkdir -p $(TDSDIR)/doc/$(PACKAGEROOT)/
 	mkdir -p $(TDSDIR)/source/$(PACKAGEROOT)/
-	mkdir -p $(TDSDIR)/tex/$(PACKAGEROOT)/
+	mkdir -p $(TDSDIR)/tex/$(PACKAGEROOT)/config/
+	cp -f *.sty $(TDSDIR)/tex/$(PACKAGEROOT)/config/ ; \
 	cp -f *.dtx $(TDSDIR)/source/$(PACKAGEROOT)/ ; \
 	for I in $(INCLUDEPDF) ; do \
 	  cp -f $$I.pdf $(TDSDIR)/doc/$(PACKAGEROOT)/ ; \
