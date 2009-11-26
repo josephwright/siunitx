@@ -70,7 +70,7 @@ AUXFILES = \
 	toc  
 		
 CLEAN = \
-	bib \
+	cfg \
 	gz  \
 	ins \
 	pdf \
