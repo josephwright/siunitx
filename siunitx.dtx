@@ -8042,9 +8042,12 @@ This work consists of the file  siunitx.dtx
 %    
 %\begin{macro}{\siunitx_load_configuration:n}
 %\begin{macro}[aux]{\siunitx_load_configuration_aux:n}
-% Loading files is just a question of traversing the list given. The
-% rescanning here gets rid of any extra spaces that the user might 
-% put in their input to lay it out cleanly.
+%\begin{macro}{\c_siunitx_configuration_ext_tl}
+% Loading configuration files is made slightly complex by the need
+% to remove spaces in the file names (none of the files contain any at
+% all, so this is easy). Secondly, the \LaTeXe\ \cs{@onefilewithoptions}
+% function is used for file loading, as \LaTeX3 currently needs the
+% \LaTeXe\ category code stack to keep things sane.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_load_configuration:n #1 {
   \tl_set_rescan:Nnn \l_siunitx_tmpa_tl
@@ -8053,11 +8056,16 @@ This work consists of the file  siunitx.dtx
     \siunitx_load_configuration_aux:n
 }
 \cs_new:Npn \siunitx_load_configuration_aux:n #1 {
-  \file_if_exist:nT { siunitx- #1 .cfg }
-    { \file_input:n { siunitx- #1 .cfg } }
+   \file_if_exist:nT { siunitx- #1 .cfg }
+    { 
+      \@onefilewithoptions { siunitx- #1 } [ ] [ ] 
+        \c_siunitx_configuration_ext_tl  
+    }
 }
+\tl_new:Nn \c_siunitx_configuration_ext_tl { cfg }
 %    \end{macrocode}
 %\end{macro}    
+%\end{macro} 
 %\end{macro} 
 %    
 %    \begin{macrocode}
@@ -8068,6 +8076,11 @@ This work consists of the file  siunitx.dtx
 %
 %    \begin{macrocode}
 %<*version-1> 
+%    \end{macrocode}
+%    
+%    \begin{macrocode}
+\ProvidesExplFile {siunitx-version-1.cfg} {\filedate} 
+  {\fileversion} {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
 % The re-arrangements made to the code in version two, and in particular
@@ -8774,7 +8787,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \ns { \nano  \second }
 \DeclareSIUnit \us { \micro \second }
 \DeclareSIUnit \ms { \milli \second }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8804,7 +8816,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \DeclareSIUnit \parsec    { pc }
 \DeclareSIUnit \lightyear { ly }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8832,7 +8843,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \gmol  { g  \text { - } mol }
 \DeclareSIUnit \kgmol { kg \text { - } mol }
 \DeclareSIUnit \lbmol { lb \text { - } mol }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8862,7 +8872,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \molar { \mole \per \cubic \deci \metre }
 \DeclareSIUnit \Molar { \textsc { m } }
 \DeclareSIUnit \torr  { Torr }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8887,7 +8896,6 @@ This work consists of the file  siunitx.dtx
 % A single unit for geophysics.
 %    \begin{macrocode}
 \DeclareSIUnit \gon    { gon }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %    
@@ -9169,7 +9177,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \hectopascal   { \hecto \pascal }
 \DeclareSIUnit \megabecquerel { \mega  \becquerel }
 \DeclareSIUnit \millisievert  { \milli \sievert }
-\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
