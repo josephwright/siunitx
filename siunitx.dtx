@@ -5556,8 +5556,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_declare_unit:Nnn #1#2#3 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+  \cs_new:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
+  \cs_new:cpn { siunitx_ \token_to_str:N #1 _function:w } 
     {
       \cs_if_exist:cTF 
         { siunitx_ \siunitx_unit_first_token:n {#2} _function:w }
@@ -7954,7 +7954,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_load_configuration_aux:n
 }
 \cs_new:Npn \siunitx_load_configuration_aux:n #1 {
-  \file_if_exist:nT { siunitx- #1 .cfg } { }
+  \file_if_exist:nT { siunitx- #1 .cfg }
     { \file_input:n { siunitx- #1 .cfg } }
 }
 %    \end{macrocode}
@@ -8675,6 +8675,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \ns { \nano  \second }
 \DeclareSIUnit \us { \micro \second }
 \DeclareSIUnit \ms { \milli \second }
+\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8698,21 +8699,17 @@ This work consists of the file  siunitx.dtx
   {\fileversion} {siunitx: Units for chemistry}
 %    \end{macrocode}
 %    
-%\begin{macro}{\mmHg}
 %\begin{macro}{\molar}
 %\begin{macro}{\Molar}
 %\begin{macro}{\torr}
 % A few common units for chemistry. \cs{molar} is simply a handy 
-% abbreviation: \cs{Molar} is common but rather questionable. \cs{mmHg}
-% and \cs{torr} are almost identical in reality: the later is rather 
-% less common in use than the former.
+% abbreviation: \cs{Molar} is common but rather questionable. 
 %    \begin{macrocode}
-\DeclareSIUnit \mmHg  { mmHg }
 \DeclareSIUnit \molar { \mole \per \cubic \deci \metre }
 \DeclareSIUnit \Molar { \textsc { m } }
 \DeclareSIUnit \torr  { Torr }
+\ExplSyntaxOff
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9005,6 +9002,7 @@ This work consists of the file  siunitx.dtx
 \newunit{\hectopascal}{\hecto\pascal}
 \newunit{\megabecquerel}{\mega\becquerel}
 \newunit{\millisievert}{\milli\sievert}
+\ExplSyntaxOff
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
