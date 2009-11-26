@@ -5556,17 +5556,26 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_declare_unit:Nnn #1#2#3 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_new:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_new:cpn { siunitx_ \token_to_str:N #1 _function:w } 
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w } 
     {
       \cs_if_exist:cTF 
         { siunitx_ \siunitx_unit_first_token:n {#2} _function:w }
         {#2}
         { \siunitx_unit_parse_unit:n {#2} }
     }
-  \cs_if_free:cTF { l_siunitx_ \token_to_str:N #1 _options_tl } 
-    { \tl_new:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3} }
-    { \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3} }
+  \tl_if_empty:nTF {#3}
+    { 
+      \cs_if_free:cF { l_siunitx_ \token_to_str:N #1 _options_tl }
+        { 
+          \cs_gundefine:c { l_siunitx_ \token_to_str:N #1 _options_tl } 
+        }
+    }
+    {
+      \cs_if_free:cT { l_siunitx_ \token_to_str:N #1 _options_tl } 
+        { \tl_new:c { l_siunitx_ \token_to_str:N #1 _options_tl } }
+      \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3} 
+    }
 }
 \cs_new:Npn \siunitx_unit_first_token:n #1 {
   \exp_after:wN \token_to_str:N \tl_head_i:w #1 \q_nil
