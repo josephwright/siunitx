@@ -75,8 +75,9 @@ This work consists of the file  siunitx.dtx
 }
 \usedir{tex/latex/siunitx/config}
 \generate{
-  \file{siunitx-abbreviations.cfg}{\from{\jobname.dtx}{abbreviations}}
-  \file{siunitx-version1.cfg}{\from{\jobname.dtx}{version1}}
+  \file{siunitx-abbreviations.cfg}{\from{\jobname.dtx}{config,abbreviations}}
+  \file{siunitx-chemistry.cfg}{\from{\jobname.dtx}{config,chemistry}}
+  \file{siunitx-version-1.cfg}{\from{\jobname.dtx}{config,version-1}}
 }
 %</install>
 %<install>\endbatchfile
@@ -98,13 +99,22 @@ This work consists of the file  siunitx.dtx
 %</internal>
 %<*driver|package>
 \RequirePackage{expl3}
+%</driver|package>
+%<*config|driver|package>
 \GetIdInfo$Id$
+%\edef\fileversion{v2.0a (\fileversion)}
+%</config|driver|package>
+%<*driver|package>
   {A comprehensive (SI) units package}
 %</driver|package>
+%<*config>
+\ProvidesFile { \filename . \filenameext }
+  [ \filedate \space \fileversion \space ]
+%</config>
 %<*driver>
 %\fi
 \ProvidesFile{\filename.\filenameext}
-  [\filedate\space v\fileversion\space\filedescription]
+  [\filedate\space \fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
 \usepackage{booktabs,caption,csquotes,helvet,siunitx}
@@ -1779,11 +1789,14 @@ This work consists of the file  siunitx.dtx
 %
 %\section{Implementation}
 %
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%
 %\subsection{Preliminaries}
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-%<*package>
 \ProvidesExplPackage
   {\filename}{\filedate}{\fileversion}{\filedescription}
 %    \end{macrocode}
@@ -7917,11 +7930,10 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Loading additional configurations}
 %
-% There is only only option for loading files: keeps things 
-% simple.
+% There is only only option for loading files: keeps things simple.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  load-configuration .code:n =
+  load-configurations .code:n =
     { \siunitx_load_configuration:n {#1} }
 }
 %    \end{macrocode}
@@ -7947,12 +7959,15 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Support for version one}
 %
+%    \begin{macrocode}
+%<*version-1> 
+%    \end{macrocode}
+%
 % The re-arrangements made to the code in version two, and in particular
 % the new option names, mean that support for version one needs to be
 % included explicitly. 
 % 
-%    \begin{macrocode}
-%<*version1>    
+%    \begin{macrocode}   
 \keys_define:nn { siunitx } {
   addsign        .choice: ,
   addsign / 
@@ -8336,8 +8351,7 @@ This work consists of the file  siunitx.dtx
     unknown      .code:n    = { unit-value-separator     = #1         },
   xspace         .meta:n    = { use-xspace               = #1         },
   xpace          .default:n = { true                                  }
-}
-%</version1> 
+} 
 %    \end{macrocode}
 %    
 %\begin{macro}{\newunit}
@@ -8463,8 +8477,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%    \begin{macrocode}
+%</version-1>
+%    \end{macrocode}
 %
 %\subsection{Abbreviated units}
+%
+%    \begin{macrocode}
+%<*abbreviations>
+%    \end{macrocode}
 %
 % The abbreviation file contains a number of short (mainly two or
 % three letter) versions of the usual long names. They are divided up
@@ -8473,17 +8494,16 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\pA}
 %\begin{macro}{\nA}
-%\begin{macro}{\muA}
+%\begin{macro}{\uA}
 %\begin{macro}{\mA}
 %\begin{macro}{\kA}
 % Currents.
 %    \begin{macrocode}
-%<*abbreviations>
-\DeclareSIUnit \pA  { \pico  \ampere }
-\DeclareSIUnit \nA  { \nano  \ampere }
-\DeclareSIUnit \muA { \micro \ampere }
-\DeclareSIUnit \mA  { \milli \ampere }
-\DeclareSIUnit \kA  { \kilo  \ampere }
+\DeclareSIUnit \pA { \pico  \ampere }
+\DeclareSIUnit \nA { \nano  \ampere }
+\DeclareSIUnit \uA { \micro \ampere }
+\DeclareSIUnit \mA { \milli \ampere }
+\DeclareSIUnit \kA { \kilo  \ampere }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8514,17 +8534,17 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\fmol}
 %\begin{macro}{\pmol}
 %\begin{macro}{\nmol}
-%\begin{macro}{\mumol}
+%\begin{macro}{\umol}
 %\begin{macro}{\mmol}
 %\begin{macro}{\kmol}
 % Amounts of substance (moles).
 %    \begin{macrocode}
-\DeclareSIUnit \fmol  { \femto \mole }
-\DeclareSIUnit \pmol  { \pico  \mole }
-\DeclareSIUnit \nmol  { \nano  \mole }
-\DeclareSIUnit \mumol { \micro \mole }
-\DeclareSIUnit \mmol  { \milli \mole }
-\DeclareSIUnit \kmol  { \kilo  \mole }
+\DeclareSIUnit \fmol { \femto \mole }
+\DeclareSIUnit \pmol { \pico  \mole }
+\DeclareSIUnit \nmol { \nano  \mole }
+\DeclareSIUnit \umol { \micro \mole }
+\DeclareSIUnit \mmol { \milli \mole }
+\DeclareSIUnit \kmol { \kilo  \mole }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8542,15 +8562,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\ml}
-%\begin{macro}{\mul}
+%\begin{macro}{\ul}
 %\begin{macro}{\mL}
-%\begin{macro}{\muL}
+%\begin{macro}{\uL}
 % Volumes.
 %    \begin{macrocode}
-\DeclareSIUnit \ml  { \milli \litre }
-\DeclareSIUnit \mul { \micro \litre }
-\DeclareSIUnit \mL  { \milli \liter }
-\DeclareSIUnit \muL { \micro \liter }
+\DeclareSIUnit \ml { \milli \litre }
+\DeclareSIUnit \ul { \micro \litre }
+\DeclareSIUnit \mL { \milli \liter }
+\DeclareSIUnit \uL { \micro \liter }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8559,7 +8579,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\fg}
 %\begin{macro}{\pg}
 %\begin{macro}{\ng}
-%\begin{macro}{\mug}
+%\begin{macro}{\ug}
 %\begin{macro}{\mg}
 %\begin{macro}{\amu}
 % Masses.
@@ -8567,7 +8587,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \fg  { \femto \gram }
 \DeclareSIUnit \pg  { \pico  \gram }
 \DeclareSIUnit \ng  { \nano  \gram }
-\DeclareSIUnit \mug { \micro \gram }
+\DeclareSIUnit \ug  { \micro \gram }
 \DeclareSIUnit \mg  { \milli \gram }
 \DeclareSIUnit \amu { \atomicmassunit }
 %    \end{macrocode}
@@ -8606,20 +8626,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\pm}
 %\begin{macro}{\nm}
-%\begin{macro}{\mum}
+%\begin{macro}{\um}
 %\begin{macro}{\mm}
 %\begin{macro}{\cm}
 %\begin{macro}{\dm}
 %\begin{macro}{\km}
 % Lengths.
 %    \begin{macrocode}
-\DeclareSIUnit \nm  { \nano  \metre }
-\DeclareSIUnit \pm  { \pico  \metre }
-\DeclareSIUnit \mum { \micro \metre }
-\DeclareSIUnit \mm  { \milli \metre }
-\DeclareSIUnit \cm  { \centi \metre }
-\DeclareSIUnit \dm  { \deci  \metre }
-\DeclareSIUnit \km  { \kilo  \metre }
+\DeclareSIUnit \nm { \nano  \metre }
+\DeclareSIUnit \pm { \pico  \metre }
+\DeclareSIUnit \um { \micro \metre }
+\DeclareSIUnit \mm { \milli \metre }
+\DeclareSIUnit \cm { \centi \metre }
+\DeclareSIUnit \dm { \deci  \metre }
+\DeclareSIUnit \km { \kilo  \metre }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8632,16 +8652,16 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\fs}
 %\begin{macro}{\ps}
 %\begin{macro}{\ns}
-%\begin{macro}{\mus}
+%\begin{macro}{\us}
 %\begin{macro}{\ms}
 % Finally, times.
 %    \begin{macrocode}
-\DeclareSIUnit \as  { \atto  \second }
-\DeclareSIUnit \fs  { \femto \second }
-\DeclareSIUnit \ps  { \pico  \second }
-\DeclareSIUnit \ns  { \nano  \second }
-\DeclareSIUnit \mus { \micro \second }
-\DeclareSIUnit \ms  { \milli \second }
+\DeclareSIUnit \as { \atto  \second }
+\DeclareSIUnit \fs { \femto \second }
+\DeclareSIUnit \ps { \pico  \second }
+\DeclareSIUnit \ns { \nano  \second }
+\DeclareSIUnit \us { \micro \second }
+\DeclareSIUnit \ms { \milli \second }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8649,9 +8669,330 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
 %    \begin{macrocode}
 %</abbreviations>
+%    \end{macrocode}   
+%    
+%\subsection{Additional units for chemistry}
+%
+%    \begin{macrocode}
+%<*chemistry>
+%    \end{macrocode}  
+%    
+%\begin{macro}{\mmHg}
+%\begin{macro}{\molar}
+%\begin{macro}{\Molar}
+%\begin{macro}{\torr}
+% A few common units for chemistry. \cs{molar} is simply a handy 
+% abbreviation: \cs{Molar} is common but rather questionable. \cs{mmHg}
+% and \cs{torr} are almost identical in reality: the later is rather 
+% less common in use than the former.
+%    \begin{macrocode}
+\DeclareSIUnit \mmHg  { mmHg }
+\DeclareSIUnit \molar { \mole \per \cubic \deci \metre }
+\DecarleSIUnit \Molar { \textsc { m } }
+\DeclareSIUnit \torr  { Torr }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%    
+%    \begin{macrocode}
+%</chemistry>
 %    \end{macrocode}    
+%    
+%\subsection{Units with prefixes}
+%
+%    \begin{macrocode}
+%<*prefixed>
+%    \end{macrocode}   
+%
+% Units in which the name is a single token, rather than each one 
+% separately.
+%    
+%\begin{macro}{\picometre}
+%\begin{macro}{\nanometre}
+%\begin{macro}{\micrometre}
+%\begin{macro}{\millimetre}
+%\begin{macro}{\centimetre}
+%\begin{macro}{\decimetre}
+%\begin{macro}{\kilometre}
+% Lengths.
+%    \begin{macrocode}
+\DeclareSIUnit \picometre  { \pico  \metre }
+\DeclareSIUnit \nanometre  { \nano  \metre }
+\DeclareSIUnit \micrometre { \micro \metre }
+\DeclareSIUnit \millimetre { \milli \metre }
+\DeclareSIUnit \centimetre { \centi \metre }
+\DeclareSIUnit \decimetre  { \deci  \metre }
+\DeclareSIUnit \kilometre  { \kilo  \metre }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\femtogram}
+%\begin{macro}{\picogram}
+%\begin{macro}{\nanogram}
+%\begin{macro}{\microgram}
+%\begin{macro}{\milligram}
+% Masses.
+%    \begin{macrocode}
+\DeclareSIUnit \femtogram { \femto \gram }
+\DeclareSIUnit \picogram  { \pico  \gram }
+\DeclareSIUnit \nanogram  { \nano  \gram }
+\DeclareSIUnit \microgram { \micro \gram }
+\DeclareSIUnit \milligram { \milli \gram }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\femtomole}
+%\begin{macro}{\picomole}
+%\begin{macro}{\nanomole}
+%\begin{macro}{\micromole}
+%\begin{macro}{\millimole}
+%\begin{macro}{\kilomole}
+% Amounts of substance.
+%    \begin{macrocode}
+\DeclareSIUnit \femtomole { \femto \mole }
+\DeclareSIUnit \picomole  { \pico  \mole }
+\DeclareSIUnit \nanomole  { \nano  \mole }
+\DeclareSIUnit \micromole { \micro \mole }
+\DeclareSIUnit \millimole { \milli \mole }
+\DeclareSIUnit \kilomole  { \kilo  \mole }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\attosecond}
+%\begin{macro}{\femtosecond}
+%\begin{macro}{\picosecond}
+%\begin{macro}{\nanosecond}
+%\begin{macro}{\microsecond}
+%\begin{macro}{\millisecond}
+% Times.
+%    \begin{macrocode}
+\DeclareSIUnit \attosecond  { \atto  \second }
+\DeclareSIUnit \femtosecond { \femto \second }
+\DeclareSIUnit \picosecond  { \pico  \second }
+\DeclareSIUnit \nanosecond  { \nano  \second }
+\DeclareSIUnit \microsecond { \micro \second }
+\DeclareSIUnit \millisecond { \milli \second }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\picoampere}
+%\begin{macro}{\nanoampere}
+%\begin{macro}{\microampere}
+%\begin{macro}{\milliampere}
+%\begin{macro}{\kiloampere}
+% The last prefixed base units are amperes.
+%    \begin{macrocode}
+\DeclareSIUnit \picoampere  { \pico  \ampere }
+\DeclareSIUnit \nanoampere  { \nano  \ampere }
+\DeclareSIUnit \microampere { \micro \ampere }
+\DeclareSIUnit \milliampere { \milli \ampere }
+\DeclareSIUnit \kiloampere  { \kilo  \ampere }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\millivolt}
+%\begin{macro}{\kilovolt}
+%\begin{macro}{\milliwatt}
+%\begin{macro}{\kilowatt}
+%\begin{macro}{\megawatt}
+%\begin{macro}{\femtofarad}
+%\begin{macro}{\picofarad}
+%\begin{macro}{\nanofarad}
+%\begin{macro}{\microfarad}
+%\begin{macro}{\millifarad}
+%\begin{macro}{\millisiemens}
+% Various electricity-related bits and pieces.
+%    \begin{macrocode}
+\DeclareSIUnit \millivolt    { \milli \volt }
+\DeclareSIUnit \kilovolt     { \kilo  \volt }
+\DeclareSIUnit \milliwatt    { \milli \watt }
+\DeclareSIUnit \kilowatt     { \kilo  \watt }
+\DeclareSIUnit \megawatt     { \mega  \watt } 
+\DeclareSIUnit \femtofarad   { \femto \farad }
+\DeclareSIUnit \picofarad    { \pico  \farad }
+\DeclareSIUnit \nanofarad    { \nano  \farad }
+\DeclareSIUnit \microfarad   { \micro \farad }
+\DeclareSIUnit \millifarad   { \milli \farad }
+\DeclareSIUnit \millisiemens { \milli \siemens }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\kilohm}
+%\begin{macro}{\megohm}
+%\begin{macro}{\gigaohm}
+% For resistance, checks are needed again for the definition of
+% \cs{ohm}.
+%    \begin{macrocode}
+\ifsi@old@OHM
+  \newunit{\kilohm}{\kilo\Ohm}
+  \newunit{\megohm}{\mega\Ohm}
+  \newunit{\gigaohm}{\giga\Ohm}
+\else
+  \ifsi@gensymb\else
+  \newunit{\kilohm}{\kilo\ohm}
+  \newunit{\megohm}{\mega\ohm}
+  \newunit{\gigaohm}{\giga\ohm}
+  \fi
+\fi
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\microlitre}
+%\begin{macro}{\millilitre}
+%\begin{macro}{\microliter}
+%\begin{macro}{\milliliter}
+%\begin{macro}{\cubicmetre}
+%\begin{macro}{\cubiccentimetre}
+%\begin{macro}{\centimetrecubed}
+%\begin{macro}{\cubicmicrometre}
+%\begin{macro}{\cubicmillimetre}
+%\begin{macro}{\cubicdecimetre}
+% Volumes. \cs{millilitre} and \cs{microlitre} are defined
+% as they are the two officially-sanctioned prefixes for the litre.
+%    \begin{macrocode}
+\newunit{\microlitre}{\micro\litre}
+\newunit{\millilitre}{\milli\litre}
+\newunit{\microliter}{\micro\liter}
+\newunit{\milliliter}{\milli\liter}
+\newunit{\cubicmetre}{\metre\cubed}
+\newunit{\cubiccentimetre}{\centi\metre\cubed}
+\newunit{\centimetrecubed}{\centi\metre\cubed}
+\newunit{\cubicmicrometre}{\micro\metre\cubed}
+\newunit{\cubicmillimetre}{\milli\metre\cubed}
+\newunit{\cubicdecimetre}{\cubic\deci\metre}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\squaremetre}
+%\begin{macro}{\squarecentimetre}
+%\begin{macro}{\centimetresquared}
+%\begin{macro}{\squarekilometre}
+% Areas, with metre spelled corrected; \cs{are} and \cs{hectare} are
+% in the ``temporarily accepted'' file.
+%    \begin{macrocode}
+\newunit{\squaremetre}{\Square\metre}
+\newunit{\squarecentimetre}{\Square\centi\metre}
+\newunit{\centimetresquared}{\centi\metre\squared}
+\newunit{\squarekilometre}{\Square\kilo\metre}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\millijoule}
+%\begin{macro}{\kilojoule}
+%\begin{macro}{\megajoule}
+%\begin{macro}{\millielectronvolt}
+%\begin{macro}{\kiloelectronvolt}
+%\begin{macro}{\megaelectronvolt}
+%\begin{macro}{\gigaelectronvolt}
+%\begin{macro}{\teraelectronvolt}
+%\begin{macro}{\kilowatthour}
+% Some energy is needed by now!  Notice the definition of
+% \cs{kilowatthour}
+%    \begin{macrocode}
+\newunit{\millijoule}{\milli\joule}
+\newunit{\kilojoule}{\kilo\joule}
+\newunit{\megajoule}{\mega\joule}
+\newunit{\millielectronvolt}{\milli\electronvolt}
+\newunit{\kiloelectronvolt}{\kilo\electronvolt}
+\newunit{\megaelectronvolt}{\mega\electronvolt}
+\newunit{\gigaelectronvolt}{\giga\electronvolt}
+\newunit{\teraelectronvolt}{\tera\electronvolt}
+\newunit[unitsep=none]{\kilowatthour}{\kilo\watt\hour}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\millihertz}
+%\begin{macro}{\kilohertz}
+%\begin{macro}{\megahertz}
+%\begin{macro}{\gigahertz}
+%\begin{macro}{\terahertz}
+% Frequencies.
+%    \begin{macrocode}
+\newunit{\millihertz}{\milli\hertz}
+\newunit{\kilohertz}{\kilo\hertz}
+\newunit{\megahertz}{\mega\hertz}
+\newunit{\gigahertz}{\giga\hertz}
+\newunit{\terahertz}{\tera\hertz}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\millinewton}
+%\begin{macro}{\kilonewton}
+%\begin{macro}{\hectopascal}
+%\begin{macro}{\megabecquerel}
+%\begin{macro}{\millisievert}
+% A few more from various areas.
+%    \begin{macrocode}
+\newunit{\millinewton}{\milli\newton}
+\newunit{\kilonewton}{\kilo\newton}
+\newunit{\hectopascal}{\hecto\pascal}
+\newunit{\megabecquerel}{\mega\becquerel}
+\newunit{\millisievert}{\milli\sievert}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+
+%    
+%    \begin{macrocode}
+%<*prefixed>
+%    \end{macrocode}
 %
 %\end{implementation}
 % 
