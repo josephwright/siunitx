@@ -125,6 +125,7 @@ This work consists of the file  siunitx.dtx
     {
       abbreviations,
       astronomy,
+      binary,
       chemical-engineering,
       chemistry,
       geophysics,
@@ -2771,7 +2772,7 @@ This work consists of the file  siunitx.dtx
     {
       \group_begin:
         \char_make_active:N \-
-        \cs_set:Npn - { \text { \c_siunitx_minus_tl } }
+        \cs_set_nopar:Npn - { \text { \c_siunitx_minus_tl } }
         \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
           \l_siunitx_print_arg_tl
         \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
@@ -6325,11 +6326,13 @@ This work consists of the file  siunitx.dtx
 % outer level. 
 %    \begin{macrocode}
 \char_make_active:N \~
+\char_make_active:N \-
 \cs_new:Npn \siunitx_unit_format_literal:n #1 {
   \int_zero:N \l_siunitx_unit_prefix_int
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
-  \tl_set:Nn \l_siunitx_unit_tl {#1}
+  \tl_set_rescan:Nnn \l_siunitx_unit_tl
+    { \char_make_active:N \- } {#1}
   \tl_set:No \l_sunitx_tmpa_tl 
     {
       \exp_after:wN \ensuremath \exp_after:wN 
@@ -6344,6 +6347,7 @@ This work consists of the file  siunitx.dtx
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }  
 \char_make_ignore:N \~
+\char_make_other:N \-
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7982,7 +7986,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\bar}
 %\begin{macro}{\barn}
 %\begin{macro}{\bel}
-%\begin{macro}{\bel}
+%\begin{macro}{\decibel}
 %\begin{macro}{\knot}
 %\begin{macro}{\mmHg}
 %\begin{macro}{\nauticalmile}
@@ -8888,7 +8892,7 @@ This work consists of the file  siunitx.dtx
   {\fileversion} {siunitx: Units for geophysics}
 %    \end{macrocode}
 %    
-%\begin{macro}{\parsec}
+%\begin{macro}{\gon}
 % A single unit for geophysics.
 %    \begin{macrocode}
 \DeclareSIUnit \gon    { gon }
