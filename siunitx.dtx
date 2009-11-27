@@ -82,6 +82,7 @@ This work consists of the file  siunitx.dtx
     {\from{\jobname.dtx}{config,chemical-engineering}}
   \file{siunitx-chemistry.cfg}{\from{\jobname.dtx}{config,chemistry}}
   \file{siunitx-geophysics.cfg}{\from{\jobname.dtx}{config,geophysics}}
+  \file{siunitx-prefixed.cfg}{\from{\jobname.dtx}{config,prefixed}}
   \file{siunitx-version-1.cfg}{\from{\jobname.dtx}{config,version-1}}
 }
 %</install>
@@ -116,7 +117,7 @@ This work consists of the file  siunitx.dtx
   [\filedate\space \fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{booktabs,caption,csquotes,helvet,siunitx}
+\usepackage{booktabs,caption,csquotes,helvet,siunitx,xtab}
 \usepackage[final]{listings}
 \usepackage[osf]{mathpazo}
 
@@ -147,14 +148,20 @@ This work consists of the file  siunitx.dtx
 %
 %^^A Some short cuts for the tables
 %\newcommand*\DescribePrefix[1]{^^A
-%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
 %    #1 & \cs{#1} 
 %}
 %\newcommand*\DescribeUnit[1]{^^A
-%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname} ^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
 %  #1 &
 %  \cs{#1} &
 %  \expandafter\si\expandafter{\csname #1\endcsname}
+%}
+%\newcommand*\DescribeNamedUnit[2]{^^A
+%  \expandafter\SpecialUsageIndex\expandafter{\csname #2\endcsname}^^A
+%  #1 &
+%  \cs{#2} &
+%  \expandafter\si\expandafter{\csname #2\endcsname}
 %}
 %
 %^^A For creating examples with nice highlighting of code, and so
@@ -584,8 +591,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule
 %      \DescribeUnit{becquerel} &
 %      \DescribeUnit{newton}    \\ 
-%      \SpecialUsageIndex{\degreeCelsius}^^A 
-%      degree Celsius & \cs{degreeCelsius} & \si{\degreeCelsius} &
+%      \DescribeNamedUnit{degree Celsius}{degreeCelsius} \\
 %      \DescribeUnit{ohm}       \\
 %      \DescribeUnit{coulomb}   &
 %      \DescribeUnit{pascal}    \\
@@ -636,13 +642,10 @@ This work consists of the file  siunitx.dtx
 %      \DescribeUnit{litre}   \\
 %        \SpecialUsageIndex{\liter}^^A 
 %       & \cs{liter} & \si{\liter} \\
-%      \SpecialUsageIndex{\arcminute}^^A 
-%        minute (plane angle) & \cs{arcminute} & \si{\arcminute} \\
-%      \SpecialUsageIndex{\minute}^^A 
-%        minute (time)        & \cs{minute}    & \si{\minute}    \\
-%      \DescribeUnit{percent}   \\
-%      \SpecialUsageIndex{\arcsecond}^^A 
-%        second (plane angle) & \cs{arcsecond} & \si{\arcsecond} \\
+%      \DescribeNamedUnit{minute (plane angle)}{arcminute} \\ 
+%      \DescribeNamedUnit{minute (time)}{minute} \\
+%      \DescribeNamedUnit{second (plane angle)}{arcsecond} \\ 
+%      \DescribeNamedUnit{second (time)}{second} \\
 %      \DescribeUnit{tonne}   \\
 %    \bottomrule
 %  \end{tabular}
@@ -658,25 +661,16 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Macro}  &
 %      \multicolumn{1}{c}{Symbol} \\
 %    \midrule
-%      \SpecialUsageIndex{\astronomicalunit}^^A 
-%      astronomical unit & \cs{astronomicalunit} 
-%        & \si{\astronomicalunit} \\
-%      \SpecialUsageIndex{\atomicmassunit}^^A 
-%        atomic mass unit & \cs{atomicmassunit} & 
-%        \si{\atomicmassunit} \\
+%      \DescribeNamedUnit{astronomical unit}{astronomicalunit} \\
+%      \DescribeNamedUnit{atomic mass unit}{atomicmassunit} \\
 %      \DescribeUnit{bohr}         \\
-%      \SpecialUsageIndex{\clight}^^A 
-%        speed of light & \cs{clight} & \si{\clight} \\
+%      \DescribeNamedUnit{speed of light}{clight} \\
 %      \DescribeUnit{dalton}       \\
-%      \SpecialUsageIndex{\electronmass}^^A 
-%        electron mass & \cs{electronmass} & \si{\electronmass} \\
+%      \DescribeNamedUnit{electron mass}{electronmass} \\
 %      \DescribeUnit{electronvolt} \\
-%      \SpecialUsageIndex{\elementarycharge}^^A 
-%        elementary charge & \cs{elementarycharge} 
-%        & \si{\elementarycharge} \\
+%      \DescribeNamedUnit{elementary charge}{elementarycharge} \\
 %      \DescribeUnit{hartree} \\
-%      \SpecialUsageIndex{\planckbar}^^A 
-%      reduced Planck constant & \cs{planckbar} & \si{\planckbar} \\
+%      \DescribeNamedUnit{reduced Planck constant}{planckbar} \\ 
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -690,17 +684,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Macro}  &
 %      \multicolumn{1}{c}{Symbol} \\
 %    \midrule
-%      \SpecialUsageIndex{\angstrom}^^A 
-%      {\aa}ngstr{\"o}m & \cs{angstrom} & \si{\angstrom} \\
+%      \DescribeNamedUnit{{\aa}ngstr{\"o}m}{angstrom} \\
 %      \DescribeUnit{bar}  \\
 %      \DescribeUnit{barn} \\
 %      \DescribeUnit{bel}  \\
-%      \DescribeUnit{decibel}  \\
+%      \DescribeUnit{decibel} \\
 %      \DescribeUnit{knot} \\
-%      \SpecialUsageIndex{\mmHg}^^A 
-%      millimetre of mercury & \cs{mmHg} & \si{\mmHg} \\
-%      \SpecialUsageIndex{\nauticalmile}^^A  
-%      nautical mile & \cs{nauticalmile} & \si{\nauticalmile} \\ 
+%      \DescribeNamedUnit{millimetre of mercury}{mmHg} \\
+%      \DescribeNamedUnit{nautical mile}{nauticalmile} \\ 
 %      \DescribeUnit{neper} \\
 %    \bottomrule
 %  \end{tabular}
@@ -1573,6 +1564,154 @@ This work consists of the file  siunitx.dtx
 % A comma-separated list of configurations to load should be
 % given as the argument to the \opt{load-configurations} option.
 % 
+% The first group of add-on units are those which provide either
+% abbreviations or combined names for SI units. These
+% 
+%\begin{table}
+%  \caption{Astronomy-related units \\
+%    (\opt{load-configurations=astronomy})}
+%  \label{tab:unit:astro}
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%      \multicolumn{1}{c}{Unit}   &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} \\
+%    \midrule
+%      \DescribeUnit{parsec}  \\ 
+%      \DescribeUnit{lightyear}  \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+% 
+% 
+%\newcommand*{\csindex}[1]{^^A
+%  \cs{#1}^^A
+%  \expandafter\SpecialUsageIndex\csname#1\endcsname}
+%^^A\newcommand*{\tablesubhead}[1]{^^A
+%^^A  \addlinespace \emph{#1} \\*}
+%\tablecaption{Prefixed and abbreviated units}
+%\label{tab:unit:abbr}
+%\tablefirsthead{^^A
+%  \toprule
+%  Unit & Macro & Symbol & Abbreviation \\
+%  \midrule
+%}
+%\tablehead{^^A
+%  \toprule
+%  Unit & Macro & Symbol & Abbreviation \\
+%  \midrule
+%}
+%\tabletail{^^A
+%  \bottomrule
+%  \multicolumn{4}{r}{\emph{Continued on next page}} \\
+%}
+%\tablelasttail{^^A
+%  \bottomrule
+%}
+%\begin{xtabular}{llll}
+%^^A  \tablesubhead{Masses}
+%  \DescribeUnit{kilogram} & \csindex{kg} \\
+%  \DescribeUnit{femtogram} & \csindex{fg} \\
+%  \DescribeUnit{picogram} & \csindex{pg} \\
+%  \DescribeUnit{nanogram} & \csindex{ng} \\
+%  \DescribeUnit{microgram} & \csindex{ug} \\
+%  \DescribeUnit{milligram} & \csindex{mg} \\
+%  atomic mass & \csindex{atomicmassunit} & \cs{amu} & \csindex{amu} \\
+%
+%^^A  \tablesubhead{Lengths}
+%  \DescribeUnit{picometre} & \csindex{pm} \\
+%  \DescribeUnit{nanometre} & \csindex{nm} \\
+%  \DescribeUnit{micrometre} & \csindex{um} \\
+%  \DescribeUnit{millimetre} & \csindex{mm} \\
+%  \DescribeUnit{centimetre} & \csindex{cm} \\
+%  \DescribeUnit{decimetre} & \csindex{dm} \\
+%  \DescribeUnit{kilometre} & \csindex{km} \\
+%
+%^^A  \tablesubhead{Times}
+%  \DescribeUnit{second} \\
+%  \DescribeUnit{attosecond} & \csindex{as} \\
+%  \DescribeUnit{femtosecond} & \csindex{fs} \\
+%  \DescribeUnit{picosecond} & \csindex{ps} \\
+%  \DescribeUnit{nanosecond} & \csindex{ns} \\
+%  \DescribeUnit{microsecond} & \csindex{us} \\
+%  \DescribeUnit{millisecond} & \csindex{ms} \\
+%
+%^^A  \tablesubhead{Moles}
+%  \DescribeUnit{femtomole} & \csindex{fmol} \\
+%  \DescribeUnit{picomole} & \csindex{pmol} \\
+%  \DescribeUnit{nanomole} & \csindex{nmol} \\
+%  \DescribeUnit{micromole} & \csindex{umol} \\
+%  \DescribeUnit{millimole} & \csindex{mmol} \\
+%  \DescribeUnit{kilomole} & \csindex{kmol} \\
+%
+%^^A  \tablesubhead{Currents}
+%  \DescribeUnit{picoampere} & \csindex{pA} \\
+%  \DescribeUnit{nanoampere} & \csindex{nA} \\
+%  \DescribeUnit{microampere} & \csindex{uA} \\
+%  \DescribeUnit{milliampere} & \csindex{mA} \\
+%  \DescribeUnit{kiloampere} & \csindex{kA} \\
+%
+%^^A  \tablesubhead{Volumes}
+%  \DescribeUnit{microlitre} & \csindex{ul} \\
+%  \DescribeUnit{millilitre} & \csindex{ml} \\
+%  \DescribeUnit{microliter} & \csindex{uL} \\
+%  \DescribeUnit{milliliter} & \csindex{mL} \\
+%
+%^^A  \tablesubhead{Frequencies}
+%  \DescribeUnit{hertz} & \csindex{Hz} \\
+%  \DescribeUnit{millihertz} & \csindex{mHz} \\
+%  \DescribeUnit{kilohertz} & \csindex{kHz} \\
+%  \DescribeUnit{megahertz} & \csindex{MHz} \\
+%  \DescribeUnit{gigahertz} & \csindex{GHz} \\
+%  \DescribeUnit{terahertz} & \csindex{THz} \\
+%
+%^^A  \tablesubhead{Potentials}
+%  \DescribeUnit{millivolt} & \csindex{mV} \\
+%  \DescribeUnit{kilovolt} & \csindex{kV} \\
+%
+%^^A  \tablesubhead{Energies}
+%  \DescribeUnit{kilojoule}  & \csindex{kJ}\\
+%  \DescribeUnit{electronvolt} & \csindex{eV} \\
+%  \DescribeUnit{millielectronvolt} & \csindex{meV} \\
+%  \DescribeUnit{kiloelectronvolt} & \csindex{keV} \\
+%  \DescribeUnit{megaelectronvolt} & \csindex{MeV} \\
+%  \DescribeUnit{gigaelectronvolt} & \csindex{GeV} \\
+%  \DescribeUnit{teraelectronvolt} & \csindex{TeV} \\
+%  \DescribeUnit{kilowatthour} & \cs{kWh} \\
+%
+%^^A  \tablesubhead{Powers}
+%  \DescribeUnit{milliwatt} \\
+%  \DescribeUnit{kilowatt} \\
+%  \DescribeUnit{megawatt} \\
+%
+%^^A  \tablesubhead{Capacitances}
+%  \DescribeUnit{femtofarad} \\
+%  \DescribeUnit{picofarad} \\
+%  \DescribeUnit{nanofarad} \\
+%  \DescribeUnit{microfarad} \\
+%  \DescribeUnit{millifarad} \\
+%
+%^^A  \tablesubhead{Resistances}
+%  \DescribeUnit{kilohm} \\
+%  \DescribeUnit{megohm} \\
+%  \DescribeUnit{gigaohm} \\
+%  \DescribeUnit{millisiemens} \\
+%
+%^^A  \tablesubhead{Forces}
+%  \DescribeUnit{millinewton} \\
+%  \DescribeUnit{kilonewton} \\
+%
+%^^A  \tablesubhead{Other units}
+%  \DescribeUnit{hectopascal} \\
+%  \DescribeUnit{megabecquerel} \\
+%  \DescribeUnit{millisievert} \\
+%\end{xtabular}
+%
+% Units for specialist areas are given in Tables~\ref{tab:unit:astro}
+% to \ref{tab:unit:geophys}. These are not SI units, but are defined
+% here as they are in common usage in the subject areas concerned.
+% 
 %\begin{table}
 %  \caption{Astronomy-related units \\
 %    (\opt{load-configurations=astronomy})}
@@ -1593,7 +1732,7 @@ This work consists of the file  siunitx.dtx
 %\begin{table}
 %  \caption{Chemical engineering related units \\
 %    (\opt{load-configurations=chemical-engineering})}
-%  \label{tab:unit:chem}
+%  \label{tab:unit:chemeng}
 %  \centering
 %  \begin{tabular}{lll}
 %    \toprule
@@ -1601,12 +1740,9 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Macro}  &
 %      \multicolumn{1}{c}{Symbol} \\
 %    \midrule
-%      \SpecialUsageIndex{\gmol}^^A 
-%       gram-mole  & \cs{gmol} & \si{\gmol} \\
-%      \SpecialUsageIndex{\kgmol}^^A 
-%       kilogram-mole  & \cs{kgmol} & \si{\kgmol} \\
-%      \SpecialUsageIndex{\lbmol}^^A 
-%       pound-mole  & \cs{lbmol} & \si{\lbmol} \\
+%      \DescribeNamedUnit{gram-mole}{gmol} \\
+%      \DescribeNamedUnit{kilogram-mole}{kgmol} \\
+%      \DescribeNamedUnit{pound-mole}{lbmol} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1633,7 +1769,7 @@ This work consists of the file  siunitx.dtx
 %\begin{table}
 %  \caption{Geophysics-related units \\
 %    (\opt{load-configurations=geophysics})}
-%  \label{tab:unit:chem}
+%  \label{tab:unit:geophys}
 %  \centering
 %  \begin{tabular}{lll}
 %    \toprule
@@ -8737,7 +8873,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \MeV { \mega  \electronvolt }
 \DeclareSIUnit \GeV { \giga  \electronvolt }
 \DeclareSIUnit \TeV { \tera  \electronvolt }
-\DeclareSIUnit [unit-value-separator = ] \kWh { \kilo \watt \hour }
+\DeclareSIUnit [inter-unit-separator = ] \kWh { \kilo \watt \hour }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -9133,7 +9269,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \megaelectronvolt  { \mega  \electronvolt }
 \DeclareSIUnit \gigaelectronvolt  { \giga  \electronvolt }
 \DeclareSIUnit \teraelectronvolt  { \tera  \electronvolt }
-\DeclareSIUnit[unit-value-separator = ] \kilowatthour
+\DeclareSIUnit[inter-unit-separator = ] \kilowatthour
   { \kilo \watt \hour }
 %    \end{macrocode}
 %\end{macro}
