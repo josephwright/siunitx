@@ -2070,20 +2070,11 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\tl_put_right:cv}
-%\begin{macro}{\tl_if_eq:nvTF}
 %\begin{macro}{\tl_replace_all_in:NnV}
-%\begin{macro}{\tl_set_rescan:NnV}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
-\cs_generate_variant:Nn \tl_put_right:Nn { cv }
-\cs_generate_variant:Nn \tl_if_eq:nnTF { nv }
 \cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
-\cs_generate_variant:Nn \tl_set_rescan:Nnn { NnV }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_if_tl:NTF}
@@ -2753,7 +2744,6 @@ This work consists of the file  siunitx.dtx
   \char_make_math_subscript:N \@
   \char_set_lccode:nn { `\! } { `\_ }
   \char_make_active:N \!
-  \char_make_active:N \-
 \tl_to_lowercase:n {
   \group_end:
   \cs_new_nopar:Npn \siunitx_print_maths: 
@@ -2771,10 +2761,6 @@ This work consists of the file  siunitx.dtx
   \cs_new_nopar:Npn \siunitx_print_text: 
     {
       \group_begin:
-        \char_make_active:N \-
-        \cs_set_nopar:Npn - { \text { \c_siunitx_minus_tl } }
-        \tl_set_rescan:NnV \l_siunitx_print_arg_tl { } 
-          \l_siunitx_print_arg_tl
         \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
           { \siunitx_print_text_sub:n }
         \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! } 
@@ -2793,7 +2779,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_print_text_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
 % the appearance is the same as maths mode. As |_| is a letter, there
-% is the need to do a category-code juggle.
+% is the need to do a category-code juggle. The search and replace 
+% code for superscripts deals with the case where a literal number has
+% been given with text mode printing.
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
@@ -2804,7 +2792,17 @@ This work consists of the file  siunitx.dtx
     { \ensuremath { @ { \text {#1} } } }
 }
 \cs_new:Npn \siunitx_print_text_super:n #1 {
-  \ensuremath { ^ { \text {#1} } }
+  \tl_set:Nn \l_siunitx_tmpa_tl {#1}
+  \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - } 
+    { \c_siunitx_minus_tl }
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    {
+      \exp_not:N \ensuremath
+        {
+          ^ { \exp_not:N \text { \exp_not:V \l_siunitx_tmpa_tl } }
+        }
+    }
+  \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6261,12 +6259,14 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
   \tl_set:No \l_siunitx_unit_numerator_tl 
     { \exp_after:wN { \l_siunitx_unit_numerator_tl } }
-  \tl_put_left:Nn \l_siunitx_unit_numerator_tl { \PrintSIUnit }   
+  \tl_put_left:Nn \l_siunitx_unit_numerator_tl 
+    { \siunitx_print:nn { unit } }   
   \tl_set:No \l_siunitx_unit_numerator_tl 
     { \exp_after:wN { \l_siunitx_unit_numerator_tl } }
   \tl_set:No \l_siunitx_unit_denominator_tl 
     { \exp_after:wN { \l_siunitx_unit_denominator_tl } }
-  \tl_put_left:Nn \l_siunitx_unit_denominator_tl { \PrintSIUnit }   
+  \tl_put_left:Nn \l_siunitx_unit_denominator_tl 
+    { \siunitx_print:nn { unit } }   
   \tl_set:No \l_siunitx_unit_denominator_tl 
     { \exp_after:wN { \l_siunitx_unit_denominator_tl } }
   \tl_set:Nn \l_siunitx_unit_tl { \frac }
@@ -6326,13 +6326,11 @@ This work consists of the file  siunitx.dtx
 % outer level. 
 %    \begin{macrocode}
 \char_make_active:N \~
-\char_make_active:N \-
 \cs_new:Npn \siunitx_unit_format_literal:n #1 {
   \int_zero:N \l_siunitx_unit_prefix_int
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
-  \tl_set_rescan:Nnn \l_siunitx_unit_tl
-    { \char_make_active:N \- } {#1}
+  \tl_set:Nn \l_siunitx_unit_tl {#1}
   \tl_set:No \l_sunitx_tmpa_tl 
     {
       \exp_after:wN \ensuremath \exp_after:wN 
@@ -6346,8 +6344,7 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_unit_print_literal_aux:N #1 {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }  
-\char_make_ignore:N \~
-\char_make_other:N \-
+\char_make_space:N \~
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -6372,7 +6369,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_power:}
-%\begin{macro}[aux]{\siunitx_unit_format_power_aux:}
 % To format powers, there are a few issues: are brackets needed, is
 % the power reciprocal and is fraction-formatting in operation. Repeated
 % per symbols make life a little more complex, as they have to be 
@@ -6398,9 +6394,13 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_unit_format_power_aux:}
+%\begin{macro}[aux]{\siunitx_unit_format_power_aux:n}
 % The auxiliary function needs to make sure that the printing routine
 % prints the power as a number, not as text: the two modes may be
-% different.
+% different. A search and replace function is needed for superscripts
+% in text mode so that negative signs get printed correctly.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_power_aux: {
   \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
@@ -6410,8 +6410,24 @@ This work consists of the file  siunitx.dtx
     {
       \siunitx_unit_format_power_brackets:
       \tl_put_right:Nx \l_siunitx_unit_current_tl 
-        { ^ { \PrintNumber { \exp_not:V \l_siunitx_tmpa_tl } } }
+        { 
+          ^ 
+            { 
+              \siunitx_unit_format_power_aux:n 
+                { \exp_not:V \l_siunitx_tmpa_tl } 
+            } 
+        }
     }
+}
+\cs_new_protected:Npn \siunitx_unit_format_power_aux:n #1 {
+  \bool_if:NTF \l_siunitx_number_maths_mode_bool
+    { \siunitx_print:nn { number } {#1} }
+    {
+      \tl_set:Nn \l_siunitx_tmpa_tl {#1}
+      \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - } 
+        { \text { \c_siunitx_minus_tl } }
+    \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+   }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7538,24 +7554,6 @@ This work consists of the file  siunitx.dtx
   \group_end:
 }
 %    \end{macrocode}
-%\end{macro}
-% 
-%\begin{macro}{\PrintNumber}
-%\begin{macro}{\PrintSIUnit}
-% There are some places where a macro to print numbers is needed with
-% user category codes. For consistency, there is also one for printing
-% units. In neither case is there any processing at all. These functions
-% are given design-like names to indicate that they are not intended 
-% for general use.
-%    \begin{macrocode}
-\NewDocumentCommand \PrintNumber { m } {
-  \siunitx_print:nn { number } {#1}
-}
-\NewDocumentCommand \PrintSIUnit { m } {
-  \siunitx_print:nn { unit } {#1}
-}
-%    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\si}
