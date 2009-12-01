@@ -1,4 +1,4 @@
-% \iffalse meta-comment
+ % \iffalse meta-comment
 % !TeX program  = pdfLaTeX
 %<*internal>
 \iffalse
@@ -589,7 +589,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule
 %      \DescribeUnit{becquerel} &
 %      \DescribeUnit{newton}    \\ 
-%      \DescribeNamedUnit{degree Celsius}{degreeCelsius} \\
+%      \DescribeNamedUnit{degree Celsius}{degreeCelsius} &
 %      \DescribeUnit{ohm}       \\
 %      \DescribeUnit{coulomb}   &
 %      \DescribeUnit{pascal}    \\
@@ -852,7 +852,7 @@ This work consists of the file  siunitx.dtx
 % a particular catalyst, the preamble could contain:
 %\begin{LaTeXdemo}[code only]
 %  \DeclareSIQualifier\polymer{pol}
-%  \DeclareSIQualifier*\catalyst{cat}
+%  \DeclareSIQualifier\catalyst{cat}
 %\end{LaTeXdemo}
 % and then in the body the document could read:
 %\begin{LaTeXdemo}
@@ -897,8 +897,7 @@ This work consists of the file  siunitx.dtx
 %
 % The \pkg{siunitx} package controls the font used to print output
 % independently of the surrounding material.  The standard method is to
-% ignore the surroundings entirely, and to use the current upright maths
-% font for all printing.\footnote{This will typically use \cs{mathrm}.}
+% ignore the surroundings entirely, and to use the current body fonts.
 % However, the package can detect and follow surrounding bold, italic 
 % and font family changes. The font detection options are summarised in 
 % Table~\ref{tab:opt:font:det}.
@@ -1147,10 +1146,9 @@ This work consists of the file  siunitx.dtx
 % all of the numbers in a document are to be reproduced \enquote{as 
 % given}, turning off the parser will represent a significant saving in
 % processing required. Second, it allows the use of arbitrary \TeX\
-% code in numbers. If the parser is turned off, it is the users 
-% responsibility to control maths/text mode selection (although
-% |^| and |_| can safely be used to give superscripts and subscripts,
-% respectively, even in text mode).
+% code in numbers. If the parser is turned off, the input will be
+% printed in maths mode (requiring \cs{text} to protect any text
+% in the number).
 %\begin{LaTeXdemo}
 %  \num[parse-numbers = false]{\sqrt{2}}        \\
 %  \SI[parse-numbers = false]{\sqrt{3}}{\metre}
@@ -1275,25 +1273,25 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      close-bracket            & Literal & )            \\ 
-%      exponent-base            & Literal & 10           \\
-%      exponent-product         & Maths   & \cs{times}   \\
-%      group-decimal-digits     & Switch  & true         \\
-%      group-digits             & Switch  & true         \\
-%      group-four-digits        & Switch  & false        \\
-%      group-integer-digits     & Switch  & true         \\
-%      group-separator          & Maths   & \cs{,}       \\
-%      negative-colour          & Literal & \meta{none}  \\
-%      open-bracket             & Literal & (            \\ ^^A ) (
-%      output-close-uncertainty & Literal & )            \\ 
-%      output-complex-root      & Maths   & i            \\
-%      output-decimal-marker    & Maths   & .            \\
-%      output-open-uncertainty  & Literal & (            \\ ^^A )
-%      range-phrase             & Literal & \verb*= to = \\
-%      separate-uncertainty     & Switch  & false        \\
-%      tight-spacing            & Switch  & false        \\
-%      uncertainty-separator    & Maths   & \meta{none}  \\
-%      use-brackets             & Switch  & true         \\
+%      close-bracket            & Literal & )                 \\ 
+%      exponent-base            & Literal & 10                \\
+%      exponent-product         & Maths   & \cs{times}        \\
+%      group-decimal-digits     & Switch  & true              \\
+%      group-digits             & Switch  & true              \\
+%      group-four-digits        & Switch  & false             \\
+%      group-integer-digits     & Switch  & true              \\
+%      group-separator          & Maths   & \cs{,}            \\
+%      negative-colour          & Literal & \meta{none}       \\
+%      open-bracket             & Literal & (                 \\ ^^A ) (
+%      output-close-uncertainty & Literal & )                 \\ 
+%      output-complex-root      & Maths   & \verb=\mathrm{i}= \\
+%      output-decimal-marker    & Maths   & .                 \\
+%      output-open-uncertainty  & Literal & (                 \\ ^^A )
+%      range-phrase             & Literal & \verb*= to =      \\
+%      separate-uncertainty     & Switch  & false             \\
+%      tight-spacing            & Switch  & false             \\
+%      uncertainty-separator    & Maths   & \meta{none}       \\
+%      use-brackets             & Switch  & true              \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1336,9 +1334,8 @@ This work consists of the file  siunitx.dtx
 % \opt{output-decimal-marker} option. This can differ from the input 
 % marker, as can the root of $\sqrt{-1}$, which is stored in the 
 % \opt{output-complex-root} option. The later is always in maths mode, 
-% but notice that \pkg{siunitx} uses \cs{mathrm} by default.  To force 
-% standard \TeX\ maths output to give $i$, the construction 
-% |\text{\ensuremath{i}}| can be used.
+% but the standard setting uses \cs{mathrm} to give an upright 
+% \enquote{i}: this can easily be altered.
 %\begin{LaTeXdemo}
 %  \num{1.23} \\
 %  \num[output-decimal-marker = {{,}}]{1.23} \\
@@ -1866,7 +1863,7 @@ This work consists of the file  siunitx.dtx
 % the macro name easier!).\footnote{The function 
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
 % 
-%\section{Usage tips} 
+%\section{Usage tips}   
 % 
 %\subsection{Ensuring text or maths output}
 %
@@ -1876,13 +1873,8 @@ This work consists of the file  siunitx.dtx
 % font used by \pkg{siunitx} for printing). The easiest way to solve
 % this is to use the construction |\text{\ensuremath{...}}|, which will
 % print the material in the standard mathematics font without affecting
-% the rest of the output.
-%\begin{LaTeXdemo}
-%  \num[output-complex-root = i]{1+2i} \\
-%  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i}
-%\end{LaTeXdemo}  
-% In some circumstances, forcing \cs{mathnormal} may suffice, but this
-% deals less well with non-Latin characters.
+% the rest of the output. In some cases, simply forcing \cs{mathnormal}
+% will suffice, but this is less reliable with non-Latin characters.
 % 
 %\subsection{Using units such as \si{\micro\metre\per\second} in 
 %  headings}
@@ -2660,7 +2652,7 @@ This work consists of the file  siunitx.dtx
   number-mode = maths,
   text-rm     = \rmfamily,
   text-sf     = \sffamily,
-  text-tt     = \ttfamily
+  text-tt     = \ttfamily,
 }
 %    \end{macrocode}
 %    
@@ -4662,7 +4654,7 @@ This work consists of the file  siunitx.dtx
   group-separator          = \,,
   open-bracket             = (, % ) (
   output-close-uncertainty = ),
-  output-complex-root      = i,
+  output-complex-root      = \mathrm { i },
   output-decimal-marker    = .,
   output-open-uncertainty  = (, % )
   use-brackets             = true
@@ -5391,7 +5383,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_output_print:
     }
     {
-      \siunitx_print:nn  { number } {#1}
+      \siunitx_print:nn  { number } { \ensuremath {#1} }
     }
 }
 %    \end{macrocode}
@@ -5878,7 +5870,7 @@ This work consists of the file  siunitx.dtx
     {
       \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
         { \siunitx_unit_format_literal:n {#1} }
-        {  \msg_error:nnx { siunitx } { literal-unit } {#1} }
+        { \msg_error:nnx { siunitx } { literal-unit } {#1} }
     }
     {
       \siunitx_unit_parse:nn {#1} {#2}
@@ -6053,6 +6045,11 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nx \l_siunitx_tmpa_tl 
     {  per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
+  \bool_if:NT \l_siunitx_sticky_per_bool
+    { \cs_set_eq:NN \per \siunitx_unit_parse_per_error: }
+}
+\cs_new_nopar:Npn \siunitx_unit_parse_per_error: {
+  \msg_error:nn { siunitx } { duplicate-sticky-per }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7440,6 +7437,13 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { duplicate-quotient-token } 
   {Duplicate quotient token.} 
   {Only one quotient token can appear in a single number.}
+\msg_new:nnnn { siunitx } { duplicate-sticky-per } 
+  {Duplicate \token_to_str:N \per.} 
+  {%
+    When the sticky-per option is on, only one 
+    \token_to_str:N \per \msg_space: \\%
+    may appear in a unit.
+  }
 \msg_new:nnnn { siunitx } { empty-exponent } 
   {Empty exponent.} 
   {The exponent contains no number.}
@@ -7691,25 +7695,18 @@ This work consists of the file  siunitx.dtx
 % good enough for most bookmark situations. Secondly, the document
 % commands are made expandable. This allows a bit of re-arrangement
 % of the input, removes any set up options (which are being ignored)
-% and stops \pkg{hyperref} issuing a warning. The \pkg{xparse} warning
-% about redefining commands is also silenced. To save a few 
-% expansions, the expandable commands which do not need any optional
-% arguments are redefined using \cs{cs_set_nopar:Npn} rather than
-% using \pkg{xparse}.
+% and stops \pkg{hyperref} issuing a warning. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_contents_bookmarks: {
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
   \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command } 
     { none }
-  \DeclareExpandableDocumentCommand \num { o m } {##2}
-  \DeclareExpandableDocumentCommand \numrange { o m m } 
-    { ##2 \l_siunitx_range_phrase_tl ##3 }
-  \DeclareExpandableDocumentCommand \si { o m } {##2}
-  \DeclareExpandableDocumentCommand \SI { o m o m } 
-    { \IfNoValueF {##3} {##3} ##2~##4 }
-  \DeclareExpandableDocumentCommand \SIrange { o m m m } 
-    { ##2~##4 \l_siunitx_range_phrase_tl ##3~##4 }
+  \cs_set_eq:NN \num      \siunitx_bookmark_num:w
+  \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
+  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+  \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
+  \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
   \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
   \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
   \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
@@ -7720,6 +7717,29 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro} 
+%\begin{macro}{\siunitx_bookmark_num:w}
+%\begin{macro}{\siunitx_bookmark_numrange:w}
+%\begin{macro}{\siunitx_bookmark_si:w}
+%\begin{macro}{\siunitx_bookmark_SI:w}
+%\begin{macro}{\siunitx_bookmark_SIrange:w}
+% To keep things fast, expandable versions of the document commmands
+% are created only once. These are then used if necessary to remove
+% and re-order arguments in an expandable fashion.
+%    \begin{macrocode}
+\DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
+\DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m } 
+  { #2 \l_siunitx_range_phrase_tl #3 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_si:w { o m } {#2}
+\DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
+  { \IfNoValueF {#3} {#3} #2~#4 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_SIrange:w
+  { o m m m } { #2~#4 \l_siunitx_range_phrase_tl #3~#4 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_hyperref_check:}
 % A short check to get things working.
@@ -7985,7 +8005,7 @@ This work consists of the file  siunitx.dtx
   \DeclareSIUnit \electronmass 
     { \text { \ensuremath { m @ { \text { e } } } } } 
 }
-\DeclareSIUnit \planckbar    {\text{\ensuremath{\hbar}}}
+\DeclareSIUnit \planckbar    { \text { \ensuremath { \hbar } } }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8734,6 +8754,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\ng}
 %\begin{macro}{\ug}
 %\begin{macro}{\mg}
+%\begin{macro}{\kg}
 %\begin{macro}{\amu}
 % Masses.
 %    \begin{macrocode}
@@ -8742,8 +8763,10 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \ng  { \nano  \gram }
 \DeclareSIUnit \ug  { \micro \gram }
 \DeclareSIUnit \mg  { \milli \gram }
+\DeclareSIUnit \kg  { \kilo \gram }
 \DeclareSIUnit \amu { \atomicmassunit }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}

@@ -87,7 +87,8 @@ CLEAN = \
 	echo "Typesetting $$NAME" ; \
 	pdflatex -draftmode -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
 	if [ $$? = 0 ] ; then  \
-	  makeindex -s l3doc.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
+	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo &> /dev/null ; \
+	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
 	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
 	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
 	else \
@@ -155,8 +156,9 @@ tds: doc
 	mkdir -p $(TDSDIR)/doc/$(PACKAGEROOT)/
 	mkdir -p $(TDSDIR)/source/$(PACKAGEROOT)/
 	mkdir -p $(TDSDIR)/tex/$(PACKAGEROOT)/config/
-	cp -f *.sty $(TDSDIR)/tex/$(PACKAGEROOT)/config/ ; \
+	cp -f *.cfg $(TDSDIR)/tex/$(PACKAGEROOT)/config/ ; \
 	cp -f *.dtx $(TDSDIR)/source/$(PACKAGEROOT)/ ; \
+	cp -f *.ins $(TDSDIR)/source/$(PACKAGEROOT)/ ; \
 	for I in $(INCLUDEPDF) ; do \
 	  cp -f $$I.pdf $(TDSDIR)/doc/$(PACKAGEROOT)/ ; \
 	done ; \
