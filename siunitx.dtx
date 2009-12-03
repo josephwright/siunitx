@@ -135,7 +135,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPower*\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
-
+\DisableImplementation %TEMP
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -191,12 +191,15 @@ This work consists of the file  siunitx.dtx
 %      moretexcs    = 
 %        {
 %          ampere,
+%          angstrom,
 %          becquerel,
 %          candela,
 %          centi,
 %          color,
+%          coloumb,
 %          cubed,
 %          cubic,
+%          decibel,
 %          degree,
 %          DeclareSIPrefix,
 %          DeclareSIPower,
@@ -386,8 +389,9 @@ This work consists of the file  siunitx.dtx
 %  \item \cs{num}\oarg{options}\marg{number}
 %  \item \cs{si}\oarg{options}\marg{unit}
 %  \item \cs{SI}\oarg{options}\marg{value}\oarg{pre-unit}\marg{unit}
-%  \item \cs{numrange}\oarg{options}\marg{number}\marg{number}
-%  \item \cs{SIrange}\oarg{options}\marg{number}\marg{number}\marg{unit}
+%  \item \cs{numrange}\oarg{options}\marg{number1}\marg{number2}
+%  \item \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}^^A
+%    \marg{unit}
 %  \item \cs{ang}\oarg{options}\marg{angle}
 %  \item \cs{sisetup}\marg{options}
 %\end{itemize}
@@ -412,7 +416,9 @@ This work consists of the file  siunitx.dtx
 %  \si{kg.m.s^{-1}}                \\
 %  \si{\kilogram\metre\per\second} \\
 %  \si[per-mode=symbol]
-%    {\kilogram\metre\per\second}      
+%    {\kilogram\metre\per\second}  \\
+%  \si[per-mode=symbol]
+%    {\kilogram\metre\per\ampere\per\second}      
 %\end{LaTeXdemo}
 %
 % Simple ranges of numbers can be handled.
@@ -445,10 +451,10 @@ This work consists of the file  siunitx.dtx
 % \meta{number}.  The contents of \meta{number} are automatically 
 % formatted.  The formatter removes \enquote{hard} spaces 
 % (\cs{,} and |~|), automatically identifies exponents (by default 
-% marked using \texttt{e} or \texttt{d}) and adds the appropriate 
-% spacing of large numbers.  A leading zero is added before a decimal 
-% marker, if needed: both \enquote{\texttt{.}} and \enquote{\texttt{,}}
-% are recognised as decimal marker.
+% marked using \texttt{e}, \texttt{E}, \texttt{d} or \texttt{D}) and 
+% adds the appropriate spacing of large numbers.  A leading zero is 
+% added before a decimal marker, if needed: both \enquote{\texttt{.}} 
+% and \enquote{\texttt{,}} are recognised as decimal marker.
 %\begin{LaTeXdemo}
 %  \num{123}     \\
 %  \num{1234}    \\
@@ -522,11 +528,10 @@ This work consists of the file  siunitx.dtx
 % \cs{si} macros, respectively. \meta{preunit} is a unit to be typeset 
 % \emph{before} the numerical value (most likely to be a currency).
 %\begin{LaTeXdemo}
-%  \SI[mode=text]{1.23}{J.mol^{-1}.K^{-1}} \\
-%  \SI{.23e7}{\candela}                         \\
-%  \SI[per-mode=symbol]{1.99}[\$]{\per\kilogram}     \\
-%  \SI{70}{\metre\per\second}                   \\
-%  \SI[per-mode=fraction]{1,345}{\ampere\per\mole}
+%  \SI[mode=text]{1.23}{J.mol^{-1}.K^{-1}}          \\
+%  \SI{.23e7}{\candela}                             \\
+%  \SI[per-mode=symbol]{1.99}[\$]{\per\kilogram}    \\
+%  \SI[per-mode=fraction]{1,345}{\coulomb\per\mole}
 %\end{LaTeXdemo}
 %
 % It is possible set up the unit macros to be available outside of
@@ -549,9 +554,7 @@ This work consists of the file  siunitx.dtx
 % (Table~\ref{tab:unit:base}). In addition, the macro \cs{meter} is
 % available as an alias for \cs{metre}, for users of US spellings.
 % The full details of the base units are given in the SI 
-% Brochure~\cite{SI:2.1}. The SI also lists a number of units which 
-% have special names and symbols \cite{SI:2.2.2}: these are listed
-% in Table~\ref{tab:unit:derived}.
+% Brochure~\cite{SI:2.1}. 
 %\begin{table}
 %  \caption{SI base units}
 %  \label{tab:unit:base}
@@ -573,6 +576,11 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
+%\DescribeMacro{\celsius}
+% The SI also lists a number of units which have special names and 
+% symbols \cite{SI:2.2.2}: these are listed in 
+% Table~\ref{tab:unit:derived}. As a short-cut for the degree Celsius,
+% the unit \cs{celius} is defined equivalent to \cs{degreeCelsius} .
 %\begin{table}
 %  \caption{Coherent derived units in the SI with special names and 
 %    symbols}
@@ -1068,6 +1076,16 @@ This work consists of the file  siunitx.dtx
 % Every one of the font options can be given independently for units 
 % and number, with the prefixes \opt{unit-} and \opt{number-}, 
 % respectively. This allows fine control of output.
+%\begin{LaTeXdemo}
+%  \sisetup{
+%    number-math-rm = \mathtt,
+%    number-text-rm = \ttfamily,
+%    unit-math-rm   = \mathsf,
+%    unit-text-rm   = \sffamily
+%  }
+%  \SI{140}{\decibel} \\
+%  \SI[number-colour=green]{4}{\angstrom}
+%\end{LaTeXdemo}
 % 
 %\subsection{Parsing numbers}
 % 
@@ -1171,8 +1189,8 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      add-zero-decimal      & Switch  & false    \\
-%      add-zero-integer      & Switch  & false    \\
+%      add-zero-decimal      & Switch  & true     \\
+%      add-zero-integer      & Switch  & true     \\
 %      explicit-sign         & Literal & \m{none} \\
 %      retain-explicit-plus  & Switch  & false    \\
 %      retain-unity-mantissa & Switch  & true     \\
@@ -1220,13 +1238,15 @@ This work consists of the file  siunitx.dtx
 % missing zero.
 %\begin{LaTeXdemo}
 %  \num{123.} \\
-%  \num{.456} \\
+%  \num{456}  \\
+%  \num{.789} \\
 %  \sisetup{
 %    add-zero-decimal = false,
 %    add-zero-integer = false,
 %  }%
 %  \num{123.} \\
-%  \num{.456} 
+%  \num{456}  \\
+%  \num{.789} 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{explicit-sign}
@@ -1460,7 +1480,8 @@ This work consists of the file  siunitx.dtx
 %  \num{1 x 2 x 3} \\
 %  \num{1e4 x 2(3) x 3/4} \\
 %  \num[input-product=*]{4 * 5 * 6} \\
-%  \num{ 1 / 2e4 }
+%  \num{ 1 / 2e4 } \\
+%  \num{ 1e2 / 3e4 }
 %\end{LaTeXdemo}
 %\DescribeOption{output-product}
 %\DescribeOption{output-quotient}
@@ -1678,19 +1699,20 @@ This work consists of the file  siunitx.dtx
 % Part of the power of \pkg{siunitx} is the ability to alter the output
 % format for units without changing the input. The behaviour of units
 % is therefore controlled by a number of options which alter either the
-% processing of units or the output directly.
+% processing of units or the output directly 
+% (Table~\ref{tab:opt:units:out}).
 % 
 %\begin{table}
 %  \centering
 %  \caption{Unit output options}
-%  \label{tab:opt:num:out}
+%  \label{tab:opt:units:out}
 %  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
 %    \toprule
 %      \multicolumn{1}{c}{Option name} & 
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      allow-literal-units  & Switch  & true       \\
+%      forbid-literal-units & Switch  & false      \\
 %      inter-unit-separator & Maths   & \cs{,}     \\
 %      per-mode             & Choice  & reciprocal \\
 %      per-symbol           & Maths   & /          \\    
@@ -1701,19 +1723,19 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{allow-literal-units}
+%\DescribeOption{forbid-literal-units}
 % Some users may prefer to completely disable the use of literal input
 % in units, for example to enforce consistency. This can be
-% accomplished by setting the \opt{allow-literal-units} switch. With 
+% accomplished by setting the \opt{forbid-literal-units} switch. With 
 % this option enabled, only macro-based units can be used in a document.
 % 
 %\DescribeOption{inter-unit-separator} 
 % The separator between each unit is stored using the 
 % \opt{inter-unit-separator} option. The standard setting is a thin 
-% space: another common choice is a centre dot.
+% space: another common choice is a centred dot.
 %\begin{LaTeXdemo}
 %  \si{\farad\squared\lumen\candela} \\
-%  \si[inter-unit-separator=\cdot]{\farad\squared\lumen\candela} 
+%  \si[inter-unit-separator={}\cdot{}]{\farad\squared\lumen\candela} 
 %\end{LaTeXdemo} 
 % 
 %\DescribeOption{per-mode}
@@ -1769,11 +1791,11 @@ This work consists of the file  siunitx.dtx
 % With the last settings, powers can lead to ambiguity and are 
 % automatically detected and brackets added as appropriate.
 %\begin{LaTeXdemo}
-%  \si{\kilogram\polymer\per\mole\catalyst\per\hour} \\
+%  \si{\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
 %  \si[qualifier-mode=brackets]
-%    {\kilogram\polymer\per\mole\catalyst\per\hour} \\
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
 %  \si[qualifier-mode=space]
-%    {\kilogram\polymer\per\mole\catalyst\per\hour} 
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{prefixes-as-symbols}
@@ -1781,10 +1803,10 @@ This work consists of the file  siunitx.dtx
 % letters. However, the package can convert these into numerical powers.
 % This is controlled by the \opt{prefixes-as-symbols} switch option.
 %\begin{LaTeXdemo}
-%  \si{\milli\litre} \\
-%  \SI{10}{\kilo\gram} \\
-%  \si[prefixes-as-symbols=false]{\milli\litre} \\
-%  \SI[prefixes-as-symbols=false]{10}{\kilo\gram}
+%  \si{\milli\litre\per\mole\deci\ampere} \\
+%  \SI{10}{\kilo\gram\sqaured\deci\second} \\
+%  \si[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
+%  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\deci\second}
 %\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
@@ -1811,7 +1833,7 @@ This work consists of the file  siunitx.dtx
 % may vary considerably. In the case of the micro symbol 
 % (\SIUnitSymbolMicro), \pkg{sunitx} provides a suitable low-level 
 % definition for the symbol. Depending on the fonts available, this
-% may need to be replaces by an alternative by the user. The 
+% may need to be replaced by an alternative by the user. The 
 % ohm symbol (\SIUnitSymbolOhm) is also set up using an internal value,
 % so that packages that redefine the standard \cs{Omega} symbol to be
 % italic do not lead to an italic ohm sign.
@@ -5853,10 +5875,10 @@ This work consists of the file  siunitx.dtx
 % One option is related to how units are pre-processed.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  allow-literal-units .bool_set:N = \l_siunitx_unit_allow_literal_bool,
+  forbid-literal-units .bool_set:N = \l_siunitx_unit_allow_literal_bool,
 }
 \keys_set:nn { siunitx } {
-  allow-literal-units = true
+  forbid-literal-units = true
 }
 %    \end{macrocode}
 %\end{macro}  
@@ -7863,6 +7885,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\becquerel}
+%\begin{macro}{\celsius}
 %\begin{macro}{\degreeCelsius}
 %\begin{macro}{\coulomb}
 %\begin{macro}{\farad}
@@ -7876,6 +7899,7 @@ This work consists of the file  siunitx.dtx
 % A number of derived units with defined names and symbols.
 %    \begin{macrocode}
 \DeclareSIUnit \becquerel     { Bq }
+\DeclareSIUnit \celsius       { \SIUnitSymbolCelsius }
 \DeclareSIUnit \degreeCelsius { \SIUnitSymbolCelsius }
 \DeclareSIUnit \coulomb       { C }
 \DeclareSIUnit \farad         { F }
@@ -7887,6 +7911,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \lumen         { lm }
 \DeclareSIUnit \lux           { lx }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
