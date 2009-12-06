@@ -26,6 +26,40 @@ to follow varying typographic conventions with the same input
 syntax.  The package includes automated processing of numbers
 and units, and the ability to control tabular alignment of
 numbers.
+
+Installation
+------------
+
+The package is supplied in dtx format and as a pre-extracted zip
+file, siunitx.tds.zip. The later is most convenient for most 
+users: simply unzip this in your local texmf directory and run 
+texhash to update the database of file locations. If you want to
+unpack the dtx yourself, running 'tex siunitx.dtx' will extract
+the package whereas 'latex siunitx.dtx will extract it and also 
+typeset the documentation.
+
+The package requires LaTeX3 support as provided in the expl3 
+and xpackages bundles. Both of these are available on CTAN
+(http://www.ctan.org/) as ready-to-install zip files. Suitable
+versions are available in MiKTeX 2.8 and TeX Live 2009 
+(updating the relevant packages online may be necessary). 
+LaTeX3, and so siunitx, requires the e-TeX extensions: these 
+are available on all modern TeX systems.
+
+Typesetting the documentation requires a number of packages in
+addition to those needed to use the package. This is mainly 
+because of the number of demonstration items included in the 
+text. To compile the documentation without error, you will 
+need the packages:
+ - amsmath
+ - booktabs
+ - caption
+ - csquotes
+ - helvet
+ - mathpazo
+ - listings
+The xfrac package is also loaded if available, but is not 
+required to typeset the documentation.
 %</readme>
 %<*internal>
 \fi
@@ -116,7 +150,17 @@ This work consists of the file  siunitx.dtx
   [\filedate\space \fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{booktabs,caption,csquotes,helvet,siunitx}
+\usepackage{amsmath,booktabs,caption,csquotes,helvet,siunitx}
+\IfFileExists{xfrac.sty}
+  {\usepackage{xfrac}}
+  {%
+    \PackageWarningNoLine{siunitx}
+      {%
+        xfrac unavailable: \string\sfrac\space fraction \MessageBreak
+        will have wrong appearance%
+      }
+  }
+\providecommand*\sfrac[2]{\frac{#1}{#2}}
 \usepackage[final]{listings}
 \usepackage[osf]{mathpazo}
 
@@ -135,7 +179,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPower*\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
-\DisableImplementation %TEMP
+
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -199,6 +243,7 @@ This work consists of the file  siunitx.dtx
 %          coloumb,
 %          cubed,
 %          cubic,
+%          deci,
 %          decibel,
 %          degree,
 %          DeclareSIPrefix,
@@ -381,6 +426,22 @@ This work consists of the file  siunitx.dtx
 % \TeX\ Live 2009 (updating the relevant packages online may be
 % necessary). \LaTeX3, and so \pkg{siunitx}, requires the \eTeX\ 
 % extensions: these are available on all modern \TeX\ systems.
+% 
+% Typesetting the documentation requires a number of packages in
+% addition to those needed to use the package. This is mainly 
+% because of the number of demonstration items included in the text. To
+% compile the documentation without error, you will need the packages:
+% \begin{itemize}
+% \item \pkg{amsmath}
+% \item \pkg{booktabs}
+% \item \pkg{caption}
+% \item \pkg{csquotes}
+% \item \pkg{helvet}
+% \item \pkg{mathpazo}
+% \item \pkg{listings}
+%\end{itemize}
+% The \pkg{xfrac} package is also loaded if available, but is not 
+% required to typeset the documentation.
 % 
 %\section{\pkg{siunitx} for the impatient}
 %
@@ -945,9 +1006,11 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{detect-inline-bold}
 % Bold detection is influenced by the value of \opt{detect-inline-bold},
-% which takes values \opt{text} and \opt{maths}.  The package
-% can detect the local value of bold for either the surrounding text,
-% or the surrounding inline (|$|\ldots|$|) maths.
+% which takes values \opt{text}, \opt{maths} and \opt{combined}.  The 
+% package can detect the local value of bold for either the surrounding 
+% text, or the surrounding inline (|$|\ldots|$|) maths. The 
+% \opt{combined} option checks both and uses bold if either test is 
+% true.
 %\begin{LaTeXdemo}
 %  \sisetup{
 %    detect-bold        = true, 
@@ -1211,22 +1274,26 @@ This work consists of the file  siunitx.dtx
 % \opt{figures} and \opt{places}. When rounding is turned on, the
 % number of figures to use is determined by the \opt{round-figures}
 % and \opt{round-places} option: both of these options require a 
-% number.
+% number. No rounding will take place if the number contains an
+% uncertainty component.
 %\begin{LaTeXdemo}
 %  \num{1.23456} \\
 %  \num{14.23} \\
+%  \num{0.12345(9)} \\
 %  \sisetup{
 %    round-mode   = places,
 %    round-places = 3
 %  }%
 %  \num{1.23456} \\
 %  \num{14.23} \\
+%  \num{0.12345(9)} \\
 %  \sisetup{
 %    round-mode    = figures,
 %    round-figures = 3
 %  }%
 %  \num{1.23456} \\
-%  \num{14.23} 
+%  \num{14.23} \\
+%  \num{0.12345(9)}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{add-zero-decimal}
@@ -1462,6 +1529,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
+%      fraction-function  & Macro   & \cs{frac}  \\
 %      input-product      & Literal & x          \\
 %      input-quotient     & Literal & /          \\
 %      output-product     & Maths   & \cs{times} \\
@@ -1501,6 +1569,24 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \num{1 / 2e4} \\
 %  \num[quotient-mode = fraction]{1 / 2e4}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{fraction-function}
+% The function used when \opt{quotient-mode = fraction} is set is 
+% determined by the \opt{fraction-function} option. This should
+% be set to a function which takes two arguments, and presumably
+% creates some type of fraction. Most alternatives to the standard
+% \cs{frac} function will involve loading addition packages: the
+% demonstrations here need \pkg{amsmath} and 
+% \pkg{xfrac}.\footnote{If \pkg{xfrac} is not available when typesetting
+% this document, the demonstration of \cs{sfrac} will have the wrong
+% appearance.}
+%\begin{LaTeXdemo}
+%  \sisetup{quotient-mode = fraction}
+%  \num{1 / 1}
+%  \num[fraction-function=\dfrac]{1 / 2} 
+%  \num[fraction-function=\sfrac]{1 / 3} 
+%  \num[fraction-function=\tfrac]{1 / 4} 
 %\end{LaTeXdemo}
 %
 %\subsection{Creating units}
@@ -1584,9 +1670,9 @@ This work consists of the file  siunitx.dtx
 % abbreviations or combined names for SI units. These
 % 
 %\begin{table}
-%  \caption{Astronomy-related units \\
-%    (\opt{load-configurations=astronomy})}
-%  \label{tab:unit:astro}
+%  \caption{Astronomy-related units 
+%    (\opt{load-configurations=abbreviations})}
+%  \label{tab:unit:abbr}
 %  \centering
 %  \begin{tabular}{llllll}
 %    \toprule
@@ -1625,7 +1711,7 @@ This work consists of the file  siunitx.dtx
 % here as they are in common usage in the subject areas concerned.
 % 
 %\begin{table}
-%  \caption{Astronomy-related units \\
+%  \caption{Astronomy-related units
 %    (\opt{load-configurations=astronomy})}
 %  \label{tab:unit:astro}
 %  \centering
@@ -1642,7 +1728,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 % 
 %\begin{table}
-%  \caption{Chemical engineering related units \\
+%  \caption{Chemical engineering related units
 %    (\opt{load-configurations=chemical-engineering})}
 %  \label{tab:unit:chemeng}
 %  \centering
@@ -1660,7 +1746,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 % 
 %\begin{table}
-%  \caption{Chemistry-related units \\
+%  \caption{Chemistry-related units
 %    (\opt{load-configurations=chemistry})}
 %  \label{tab:unit:chem}
 %  \centering
@@ -1679,7 +1765,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %
 %\begin{table}
-%  \caption{Geophysics-related units \\
+%  \caption{Geophysics-related units 
 %    (\opt{load-configurations=geophysics})}
 %  \label{tab:unit:geophys}
 %  \centering
@@ -1732,7 +1818,8 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{inter-unit-separator} 
 % The separator between each unit is stored using the 
 % \opt{inter-unit-separator} option. The standard setting is a thin 
-% space: another common choice is a centred dot.
+% space: another common choice is a centred dot. To get the correct
+% spacing it is necessary to use |{}\cdot{}| in the later case.
 %\begin{LaTeXdemo}
 %  \si{\farad\squared\lumen\candela} \\
 %  \si[inter-unit-separator={}\cdot{}]{\farad\squared\lumen\candela} 
@@ -1804,9 +1891,9 @@ This work consists of the file  siunitx.dtx
 % This is controlled by the \opt{prefixes-as-symbols} switch option.
 %\begin{LaTeXdemo}
 %  \si{\milli\litre\per\mole\deci\ampere} \\
-%  \SI{10}{\kilo\gram\sqaured\deci\second} \\
+%  \SI{10}{\kilo\gram\squared\deci\second} \\
 %  \si[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
-%  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\deci\second}
+%  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\squared\deci\second}
 %\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
@@ -1834,9 +1921,9 @@ This work consists of the file  siunitx.dtx
 % (\SIUnitSymbolMicro), \pkg{sunitx} provides a suitable low-level 
 % definition for the symbol. Depending on the fonts available, this
 % may need to be replaced by an alternative by the user. The 
-% ohm symbol (\SIUnitSymbolOhm) is also set up using an internal value,
-% so that packages that redefine the standard \cs{Omega} symbol to be
-% italic do not lead to an italic ohm sign.
+% ohm symbol (\SIUnitSymbolOhm) is usually set to \cs{Omega}, but
+% will check that this has not been redefined as a slanted letter. If
+% \cs{Omega} has been redefined, an alternative definition is used.
 % 
 %\begin{table}
 %  \centering
@@ -1851,21 +1938,21 @@ This work consists of the file  siunitx.dtx
 %      maths-angstrom  & Literal & \verb=\text{\AA}=                 \\ 
 %      maths-arcminute & Literal & \verb={}^{\prime}=                \\
 %      maths-arcsecond & Literal & \verb={}^{\prime\prime}=          \\
-%      maths-celsius   & Literal & 
-%        \verb={}^{\circ}\kern -\scriptspace C= \\ 
+%      maths-celsius   & Literal & \verb={}^{\circ}=                 \\
+%        & & \verb=\kern -\scriptspace \mathrm{C}= \\ 
 %      maths-degree    & Literal & \verb={}^{\circ}=                 \\
 %      maths-micro     & Literal & \meta{see text}                   \\
-%      maths-ohm       & Literal & \meta{see text}                   \\
+%      maths-ohm       & Literal & \cs{Omega}                        \\
 %      redefine-symbols & Switch & true \\
 %      text-angstrom   & Literal & \cs{AA}                           \\ 
 %      text-arcminute  & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
 %      text-arcsecond  & Literal & 
 %        \verb=\ensuremath{{}^{\prime\prime}}= \\
-%      text-celsius    & Literal &
-%        \verb=\ensuremath{{}^{\circ}\kern -\scriptspace C}= \\ 
+%      text-celsius    & Literal &  \verb=\ensuremath{{}^{\circ}=    \\
+%        & & \verb=\kern -\scriptspace \text{C}}= \\ 
 %      text-degree     & Literal & \verb=\ensuremath{{}^{\circ}}=    \\
 %      text-micro      & Literal & \meta{see text}                   \\
-%      text-ohm        & Literal & \meta{see text}                   \\
+%      text-ohm        & Literal & \verb=\ensuremath{\Omega}=        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2212,10 +2299,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_detect_inline_bold_bool}
+%\begin{macro}{\l_siunitx_detect_inline_bold_tl}
 % Used by the keys, but needs to be created here.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_detect_inline_bold_bool
+\tl_new:N \l_siunitx_detect_inline_bold_tl
 %    \end{macrocode}
 %\end{macro}
 %
@@ -2253,12 +2340,14 @@ This work consists of the file  siunitx.dtx
   detect-family        .bool_set:N = \l_siunitx_detect_family_bool,
   detect-inline-bold   .choice:,
   detect-inline-bold   .value_required:,
+  detect-inline-bold / combined  .code:n = 
+    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { combined } },
   detect-inline-bold / math  .code:n = 
-    { \bool_set_true:N \l_siunitx_detect_inline_bold_bool },
+    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { maths } },
   detect-inline-bold / maths .code:n = 
-    { \bool_set_true:N \l_siunitx_detect_inline_bold_bool },
+    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { maths } },
   detect-inline-bold / text  .code:n = 
-    { \bool_set_false:N \l_siunitx_detect_inline_bold_bool },
+    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { text } },
   detect-italic        .bool_set:N = \l_siunitx_detect_italic_bool,
   detect-mode          .bool_set:N = \l_siunitx_detect_mode_bool,
   detect-none          .choice:,
@@ -2363,9 +2452,12 @@ This work consists of the file  siunitx.dtx
     {
       \mode_if_inner:TF 
         {
-          \bool_if:NTF \l_siunitx_detect_inline_bold_bool 
-            { \siunitx_detect_font_bold_maths: }
-            { \siunitx_detect_font_bold_text: }
+          \use:c 
+            {
+              siunitx_detect_font_bold_ 
+              \l_siunitx_detect_inline_bold_tl
+              :
+            }
         }
         {
           \bool_if:NTF \l_siunitx_detect_display_maths_bool 
@@ -2377,11 +2469,16 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}{\siunitx_detect_font_bold_combined:}
 %\begin{macro}{\siunitx_detect_font_bold_maths:}
 %\begin{macro}{\siunitx_detect_font_bold_text:}
 % The tests for bold depend on whether the module is testing text or 
 % maths content.
 %    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_detect_font_bold_combined: {
+  \siunitx_detect_font_bold_maths:
+  \siunitx_detect_font_bold_text:
+}
 \cs_new_nopar:Npn \siunitx_detect_font_bold_maths: {
   \tl_if_eq:nVT { bold } \math@version 
     {
@@ -2403,6 +2500,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -2430,9 +2528,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_family_maths: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathsf_int } 
+  \intexpr_compare:nT { \fam = \c_siunitx_mathsf_int } 
     { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
-  \intexpr_compare:nT { \int_use:N \fam = \c_siunitx_mathtt_int } 
+  \intexpr_compare:nT { \fam = \c_siunitx_mathtt_int } 
     { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
 \cs_new_nopar:Npn \siunitx_detect_font_family_text: {
@@ -3025,7 +3123,7 @@ This work consists of the file  siunitx.dtx
 \clist_put_right:Nn \c_siunitx_number_parts_clist { mantissa }
 \clist_put_right:Nn \c_siunitx_number_parts_clist { mantissa-complex }
 \clist_put_right:Nn \c_siunitx_number_parts_clist { exponent }
-\clist_put_right:Nn \c_siunitx_number_parts_clist { exponent-complex}
+\clist_put_right:Nn \c_siunitx_number_parts_clist { exponent-complex }
 %    \end{macrocode}
 %\end{macro}
 % 
@@ -3907,8 +4005,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_exponent:
   \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } 
     {
-      \siunitx_number_process_round:
       \siunitx_number_process_uncertainty:
+      \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
+        { \siunitx_number_process_round: }
     }
 }
 %    \end{macrocode}
@@ -4470,6 +4569,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_process_uncertainty_aux:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } 
     {
+      \prop_put:Nnn \l_siunitx_number_in_prop { uncertainty }
+        { true}
       \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } 
         { \siunitx_number_process_uncertainty_decimal:n {#1} }
         { \siunitx_number_process_uncertainty_integer:n {#1} }
@@ -4702,7 +4803,6 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_format:}
 %\begin{macro}[aux]{\siunitx_number_format_aux:n}
-%\begin{macro}{\siunitx_number_format_parts:}
 % The master control function for formatting output: the usual set up.
 % The number is put back together in stages. The \texttt{parts} version
 % does not construct a full result, and so is faster and intended for
@@ -4721,29 +4821,11 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_nopar:Npn \siunitx_number_format_aux:n #1 {
-  \siunitx_number_format_complex:nn {#1} { } 
+  \siunitx_number_format_complex:n {#1}
   \siunitx_number_format_join_complex:n {#1}
-  \siunitx_number_format_sign:n {#1}
-}
-\cs_new_nopar:Npn \siunitx_number_format_parts: { % TEMP
-  \prop_if_empty:NF \l_siunitx_number_in_prop 
-    {
-      \prop_clear:N \l_siunitx_number_out_prop
-      \siunitx_number_format_reassemble:
-      \siunitx_number_format_join_uncert:n { exponent }
-      \siunitx_number_format_complex:nn { mantissa } { }
-      \siunitx_number_format_complex:nn { mantissa } { -uncertainty }
-      \siunitx_number_format_complex:nn { exponent } { }
-      \siunitx_number_format_join_complex:n { exponent }
-      \siunitx_number_format_sign:n { mantissa }
-      \siunitx_number_format_sign:n { mantissa-complex }
-      \siunitx_number_format_sign:n { exponent } { }
-      \siunitx_number_format_colour:
-      \siunitx_number_format_final_exponent:
-    }
+  \siunitx_number_format_sign:nn {#1} { }
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -4776,8 +4858,12 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_bracket_open_tl
   \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
     \l_siunitx_bracket_close_tl
-  \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
-    \l_siunitx_tmpa_tl
+  \tl_if_eq:nnTF {#1} { result } 
+  { \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl }
+  {
+    \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
+      \l_siunitx_tmpa_tl
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4809,23 +4895,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_complex:nn}
+%\begin{macro}{\siunitx_number_format_complex:n}
+%\begin{macro}[aux]{\siunitx_number_format_complex_aux:n}
 % The real and complex parts of each number are reassembled, with 
 % brackets if needed.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_complex:nn #1#2 {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -complex #2 } 
+\cs_new_nopar:Npn \siunitx_number_format_complex:n #1 {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -complex } 
     {
-      \siunitx_number_format_brackets:n { #1 -complex #2 }
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -complex #2 }
-        \l_siunitx_tmpa_tl
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
-        \l_siunitx_output_complex_tl
-      \prop_put:NnV \l_siunitx_number_out_prop { #1 -complex #2 }
-        \l_siunitx_tmpa_tl
+      \siunitx_number_format_brackets:n { #1 -complex }
+      \siunitx_number_format_complex_aux:n { #1 -complex }
+      \prop_if_in:NnT \l_siunitx_number_out_prop 
+        { #1 -complex-uncertainty }
+        { 
+          \siunitx_number_format_complex_aux:n 
+            { #1 -complex-uncertainty } 
+        }
     }
 }
+\cs_new_nopar:Npn \siunitx_number_format_complex_aux:n #1 {
+  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+    \l_siunitx_output_complex_tl
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_copy:n}
@@ -4867,6 +4962,11 @@ This work consists of the file  siunitx.dtx
             }
             { \siunitx_number_format_copy:nn { mantissa } { result } }
         }
+        \prop_if_in:NnF \l_siunitx_number_out_prop { mantissa-result }
+          { 
+            \siunitx_number_format_copy:nn { mantissa } 
+              { mantissa-result } 
+          }
     }
     { \siunitx_number_format_final_exponent: }
     \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } 
@@ -4908,8 +5008,8 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux:n #1 {
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
-  \tl_set:No \l_siunitx_tmpa_tl 
-    { \exp_after:wN ^ \exp_after:wN { \l_siunitx_tmpa_tl } }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
   \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
   \prop_if_in:NnT \l_siunitx_number_in_prop { sign } 
     {
@@ -4961,11 +5061,11 @@ This work consists of the file  siunitx.dtx
       \prop_get:NnN \l_siunitx_number_out_prop { mantissa } 
         \l_siunitx_tmpa_tl
     }
-  \tl_set_eq:NN \l_siunitx_tmpb_tl  \l_siunitx_exponent_product_tl
+  \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
   \bool_if:NT \l_siunitx_tight_bool 
     {  
-      \tl_set:No \l_siunitx_tmpb_tl 
-        { \exp_after:wN { \l_siunitx_tmpb_tl } }
+      \tl_set:Nx \l_siunitx_tmpb_tl 
+        { { \exp_not:V \l_siunitx_tmpb_tl } }
     }
   \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
     \l_siunitx_tmpb_tl
@@ -5100,18 +5200,18 @@ This work consists of the file  siunitx.dtx
     {
       \tl_if_empty:nTF {#3} 
         {
-          \siunitx_number_format_group_integer_aux:NNNN { } { } #1 #2 
+          \siunitx_number_format_group_integer_aux:NNNN { } { } #1#2 
             \q_nil
         }
         {
           \tl_if_empty:nTF {#4} 
             {
-              \siunitx_number_format_group_integer_aux:NNNN { } #1 #2 #3
+              \siunitx_number_format_group_integer_aux:NNNN { } #1#2#3
                 \q_nil
             }
             {
               \siunitx_number_format_group_integer_setup_aux:NNNN 
-                { #1 #2 #3 #4 }
+                {#1#2#3#4}
             }
         }
     }  
@@ -5141,7 +5241,7 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -complex } 
         {
           \siunitx_number_format_brackets:n {#1}
-          \siunitx_number_format_sign:n { #1 -complex }
+          \siunitx_number_format_sign:nn {#1} { -complex }
           \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -result } 
             { 
               \prop_get:NnN \l_siunitx_number_out_prop { #1 -result } 
@@ -5216,39 +5316,62 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_sign:n}
+%\begin{macro}{\siunitx_number_format_sign:nn}
 %\begin{macro}[aux]{\siunitx_number_format_sign_aux:n}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_sign:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_out_prop {#1} 
+\cs_new_nopar:Npn \siunitx_number_format_sign:nn #1#2 {
+  \prop_if_in:NnT \l_siunitx_number_out_prop {#1#2} 
     {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } 
+      \prop_if_in:NnT \l_siunitx_number_in_prop { #1#2 -sign } 
         {
-          \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
+          \prop_get:NnN \l_siunitx_number_in_prop { #1#2 -sign } 
             \l_siunitx_tmpa_tl
-          \bool_if:NT \l_siunitx_tight_bool 
+          \bool_if:NTF \l_siunitx_tight_bool 
             {
-              \tl_set:No \l_siunitx_tmpb_tl 
-                {
-                  \exp_after:wN { \l_siunitx_tmpa_tl  }
-                }
+              \tl_set:Nx \l_siunitx_tmpa_tl 
+                { { \exp_not:V \l_siunitx_tmpa_tl } }
+            }
+            {
+              \siunitx_number_format_sign_complex_correction:nn 
+                {#1} {#2}
             }
           \tl_clear:N \l_siunitx_tmpb_tl
           \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
             \l_siunitx_tmpa_tl
-          \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign } 
+          \prop_put:NnV \l_siunitx_number_out_prop { #1#2 -sign } 
             \l_siunitx_tmpb_tl        
-          \prop_get:NnN \l_siunitx_number_out_prop {#1} 
+          \prop_get:NnN \l_siunitx_number_out_prop {#1#2} 
             \l_siunitx_tmpa_tl   
           \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl      
-          \prop_put:NnV \l_siunitx_number_out_prop {#1} 
+          \prop_put:NnV \l_siunitx_number_out_prop {#1#2} 
             \l_siunitx_tmpb_tl
       }
     }
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_format_sign_complex_correction:n}
+% If a number contains both a real and complex part, it is necessary
+% to correct the sign so that it will print properly in text mode.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_number_format_sign_complex_correction:nn 
+  #1#2 {
+  \tl_if_eq:nnT {#2} { -complex }
+    {
+      \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
+        {
+          \prop_if_in:NnT \l_siunitx_number_out_prop {#1#2}
+            {
+              \tl_set:Nx \l_siunitx_tmpa_tl
+                { { } \exp_not:V \l_siunitx_tmpa_tl { } }
+            }
+        }
+  }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
@@ -5298,7 +5421,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_format_uncertainty_pm: {
   \bool_if:NTF \l_siunitx_tight_bool 
     { \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { \pm } } } }
-    { \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { \pm } } }
+    { 
+      \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { } \pm { } } }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5351,6 +5476,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\siunitx_fraction:nn}
+% The function used for fractions should be stored here.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_fraction:nn { }
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_output_product_tl}
 %\begin{macro}{\l_siunitx_output_quotient_tl}
@@ -5358,6 +5490,8 @@ This work consists of the file  siunitx.dtx
 % Some options related to numbers at the output stage.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  fraction-function  .code:n     = 
+     { \cs_set_eq:NN \siunitx_fraction:nn #1 },
   output-product     .tl_set:N   = \l_siunitx_output_product_tl,
   output-quotient    .tl_set:N   = \l_siunitx_output_quotient_tl,
   parse-numbers      .bool_set:N = \l_siunitx_number_parse_bool,
@@ -5381,10 +5515,11 @@ This work consists of the file  siunitx.dtx
     },
 }
 \keys_set:nn { siunitx } {
-  output-product  = \times,
-  output-quotient = /,
-  parse-numbers   = true,
-  quotient-mode   = symbol
+  fraction-function = \frac,
+  output-product    = \times,
+  output-quotient   = /,
+  parse-numbers     = true,
+  quotient-mode     = symbol
 }
 %    \end{macrocode} 
 %\end{macro}
@@ -5537,16 +5672,16 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_output_quotient_fraction: {
   \bool_set_false:N \l_siunitx_number_compound_bool
   \siunitx_number_output_quotient_aux_i:
-  \tl_set:No \l_siunitx_number_fraction_tl 
-    { \exp_after:wN { \l_siunitx_number_numerator_tl } }
-  \tl_set:No \l_siunitx_tmpa_tl 
-    { \exp_after:wN { \l_siunitx_number_denominator_tl } }
+  \tl_set:Nx \l_siunitx_number_fraction_tl 
+    { { \exp_not:V \l_siunitx_number_numerator_tl } }
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { { \exp_not:V \l_siunitx_number_denominator_tl } }
   \tl_put_right:NV \l_siunitx_number_fraction_tl \l_siunitx_tmpa_tl
-  \tl_put_left:Nn \l_siunitx_number_fraction_tl { \frac } 
-  \tl_set:No \l_siunitx_number_fraction_tl 
+  \tl_put_left:Nn \l_siunitx_number_fraction_tl { \siunitx_fraction:nn } 
+  \tl_set:Nx \l_siunitx_number_fraction_tl 
     {
-      \exp_after:wN \ensuremath \exp_after:wN 
-        { \l_siunitx_number_fraction_tl }
+      \exp_not:N \ensuremath 
+        { \exp_not:V \l_siunitx_number_fraction_tl }
     }
   \tl_put_right:NV \l_siunitx_number_out_tl 
     \l_siunitx_number_fraction_tl
@@ -6306,23 +6441,23 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_fraction: {
   \tl_if_empty:NT \l_siunitx_unit_numerator_tl 
     { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
-  \tl_set:No \l_siunitx_unit_numerator_tl 
-    { \exp_after:wN { \l_siunitx_unit_numerator_tl } }
+  \tl_set:Nx \l_siunitx_unit_numerator_tl 
+    { { \exp_not:V \l_siunitx_unit_numerator_tl } }
   \tl_put_left:Nn \l_siunitx_unit_numerator_tl 
     { \siunitx_print:nn { unit } }   
-  \tl_set:No \l_siunitx_unit_numerator_tl 
-    { \exp_after:wN { \l_siunitx_unit_numerator_tl } }
-  \tl_set:No \l_siunitx_unit_denominator_tl 
-    { \exp_after:wN { \l_siunitx_unit_denominator_tl } }
+  \tl_set:Nx \l_siunitx_unit_numerator_tl 
+    { { \exp_not:V \l_siunitx_unit_numerator_tl } }
+  \tl_set:Nx \l_siunitx_unit_denominator_tl 
+    { { \exp_not:V \l_siunitx_unit_denominator_tl } }
   \tl_put_left:Nn \l_siunitx_unit_denominator_tl 
     { \siunitx_print:nn { unit } }   
-  \tl_set:No \l_siunitx_unit_denominator_tl 
-    { \exp_after:wN { \l_siunitx_unit_denominator_tl } }
-  \tl_set:Nn \l_siunitx_unit_tl { \frac }
+  \tl_set:Nx \l_siunitx_unit_denominator_tl 
+    { { \exp_not:V \l_siunitx_unit_denominator_tl } }
+  \tl_set:Nn \l_siunitx_unit_tl { \siunitx_fraction:nn }
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
-  \tl_set:No \l_siunitx_unit_tl 
-    { \exp_after:wN \ensuremath \exp_after:wN { \l_siunitx_unit_tl } }
+  \tl_set:Nx \l_siunitx_unit_tl 
+    { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_tl } }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_symbol: {
   \siunitx_unit_format_fraction_symbol_aux:n { numerator }
@@ -6380,10 +6515,10 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_print_literal_aux:N
   \tl_set:Nn \l_siunitx_unit_tl {#1}
-  \tl_set:No \l_sunitx_tmpa_tl 
+  \tl_set:Nx \l_sunitx_tmpa_tl 
     {
-      \exp_after:wN \ensuremath \exp_after:wN 
-        { \l_siunitx_unit_separator_tl }
+      \exp_not:N \ensuremath
+        { \exp_not:V \l_siunitx_unit_separator_tl }
     }
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } 
     \l_sunitx_tmpa_tl
@@ -6805,9 +6940,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_combined_loop:n}
-%\begin{macro}{\siunitx_combined_loop:V}
-% Printing is controlled here. There are a number of tasks to carry out,
-% hence needing to work in this way.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_loop:n #1 {
   \intexpr_compare:nTF { \l_siunitx_unit_prefix_int = \c_zero } 
@@ -6819,24 +6951,6 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_unit_output_number_sep:
   \siunitx_print:nV { unit } \l_siunitx_unit_tl
-}
-\cs_generate_variant:Nn \siunitx_combined_loop:n { V } 
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_combined_number:n}
-%    \begin{macrocode}
-\cs_new:Npn \siunitx_combined_number:n #1 {
-  \bool_if:NTF \l_siunitx_number_parse_bool 
-    {
-      \tl_clear:N \l_siunitx_number_out_tl
-      \tl_clear:N \l_siunitx_number_out_saved_tl
-      \bool_set_false:N \l_siunitx_number_compound_bool
-      \siunitx_number_output_parse:n {#1}
-      \siunitx_number_output_print:
-    }
-    { \siunitx_print:nn  { number } {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6856,11 +6970,8 @@ This work consists of the file  siunitx.dtx
         {
           \int_incr:N \l_siunitx_number_product_int
           \tl_set:Nn \l_siunitx_tmpa_tl {#2}
-          \tl_set:No \l_siunitx_tmpb_tl 
-            {
-              \exp_after:wN \tothe \exp_after:wN 
-                { \int_use:N \l_siunitx_number_product_int }
-            }
+          \tl_set:Nx \l_siunitx_tmpb_tl 
+            { \tothe { \exp_not:V \l_siunitx_number_product_int } }
           \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
           \siunitx_unit_in:Vn \l_siunitx_tmpa_tl {#3}
         }
@@ -7306,8 +7417,8 @@ This work consists of the file  siunitx.dtx
             { 
               \keys_set:nn { siunitx } 
                 {
-                 maths-angstrom = \text { \capitalring { A } },
-                 text-angstrom  = \capitalring { A }
+                  maths-angstrom = \text { \capitalring { A } },
+                  text-angstrom  = \capitalring { A }
                 }
             }
         } { }
@@ -7356,7 +7467,7 @@ This work consists of the file  siunitx.dtx
   maths-angstrom  = \text { \AA },
   maths-arcminute = { } ^ { \prime },
   maths-arcsecond = { } ^ { \prime \prime },
-  maths-celsius   = { } ^ { \circ } \kern - \scriptspace C,
+  maths-celsius   = { } ^ { \circ } \kern - \scriptspace \mathrm { C },
   maths-degree    = { } ^ { \circ },
   maths-micro     = \text { \c_siunitx_mu_tl },
   maths-ohm       = \text { \ensuremath { \c_siunitx_omega_tl } },
@@ -7392,7 +7503,7 @@ This work consists of the file  siunitx.dtx
   text-arcminute = \ensuremath { { } ^ { \prime } },
   text-arcsecond = \ensuremath { { } ^ { \prime \prime } },
   text-celsius   = 
-    \ensuremath { { } ^ { \circ } \kern - \scriptspace C },
+    \ensuremath { { } ^ { \circ } \kern - \scriptspace \text { C } },
   text-degree    = \ensuremath { { } ^ { \circ } },
   text-micro     = \c_siunitx_mu_tl ,
   text-ohm       = \ensuremath { \c_siunitx_omega_tl },
@@ -7548,20 +7659,20 @@ This work consists of the file  siunitx.dtx
 % The macros for creating units and so on are in design name space.
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
-\DeclareDocumentCommand \DeclareSIPower { s m m } {
+\NewDocumentCommand \DeclareSIPower { s m m } {
   \IfBooleanTF #1 
     { \siunitx_declare_power_after:Nn #2 {#3} }
     { \siunitx_declare_power_before:Nn #2 {#3} }
 }
-\DeclareDocumentCommand \DeclareSIPrefix { s m m m } {
+\NewDocumentCommand \DeclareSIPrefix { s m m m } {
   \IfBooleanTF #1
     { \siunitx_declare_prefix:Nnnn #2 {#3} { 2 } {#4} }
     { \siunitx_declare_prefix:Nnnn #2 {#3} { 10 } {#4} }
 }
-\DeclareDocumentCommand \DeclareSIQualifier { m m } {
+\NewDocumentCommand \DeclareSIQualifier { m m } {
   \siunitx_declare_qualifier:Nn #1 {#2}
 }
-\DeclareDocumentCommand \DeclareSIUnit { o m m } {
+\NewDocumentCommand \DeclareSIUnit { o m m } {
   \IfNoValueTF {#1}
     { \siunitx_declare_unit:Nnn #2 {#3} { } }
     { \siunitx_declare_unit:Nnn #2 {#3} {#1} }
@@ -7588,7 +7699,7 @@ This work consists of the file  siunitx.dtx
 % The \cs{num} macro is quite simple: read the number, check it is 
 % correct then print it. 
 %    \begin{macrocode}
-\DeclareDocumentCommand \num { o m } {
+\NewDocumentCommand \num { o m } {
   \group_begin:
     \IfNoValueF {#1} 
       { \keys_set:nn { siunitx } {#1} }
@@ -7602,7 +7713,7 @@ This work consists of the file  siunitx.dtx
 % A very simple approach is taken here: this is not intended for 
 % anything complicated.
 %    \begin{macrocode}
-\DeclareDocumentCommand \numrange { o m m } {
+\NewDocumentCommand \numrange { o m m } {
   \group_begin:
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
@@ -7617,7 +7728,7 @@ This work consists of the file  siunitx.dtx
 % function as well as setting them here. This is used so that options
 % set for a unit can be overridden on a one-off basis.
 %    \begin{macrocode}
-\DeclareDocumentCommand \si { o m } {
+\NewDocumentCommand \si { o m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_unit_output:nn {#2} { } }
@@ -7634,7 +7745,7 @@ This work consists of the file  siunitx.dtx
 % Printing unit ranges is a lot less complex than printing single 
 % numbers with units, as we insist that everything is kept simple.
 %    \begin{macrocode}
-\DeclareDocumentCommand \SIrange { o m m m } {
+\NewDocumentCommand \SIrange { o m m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_range_unit:nnnn {#4} { } {#2} {#3} }
@@ -7649,7 +7760,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\SI}
 %    \begin{macrocode}
-\DeclareDocumentCommand \SI { o m o m } {
+\NewDocumentCommand \SI { o m o m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_combined:nnnn { } {#2} {#3} {#4} }
@@ -7666,7 +7777,7 @@ This work consists of the file  siunitx.dtx
 % The set up macro simply moves to the correct path and executes 
 % whatever has been passed.
 %    \begin{macrocode}
-\DeclareDocumentCommand \sisetup { m } {
+\NewDocumentCommand \sisetup { m } {
   \keys_set:nn { siunitx } {#1}
 }
 %    \end{macrocode}
@@ -7753,9 +7864,9 @@ This work consists of the file  siunitx.dtx
   { #2 \l_siunitx_range_phrase_tl #3 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_si:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
-  { \IfNoValueF {#3} {#3} #2~#4 }
+  { \IfNoValueF {#3} {#3} #2 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SIrange:w
-  { o m m m } { #2~#4 \l_siunitx_range_phrase_tl #3~#4 }
+  { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
