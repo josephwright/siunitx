@@ -5919,11 +5919,28 @@ This work consists of the file  siunitx.dtx
 % The master control macro which occurs at the start of the document.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_create_check: {
-  \bool_if:NT \l_siunitx_create_free_bool 
+  \bool_if:NTF \l_siunitx_create_free_bool 
     { \siunitx_unit_create_functions: }
+    { \siunitx_unit_create_empty_functions: }
 }
 \AtBeginDocument { \siunitx_unit_create_check: }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_create_empty_functions:}
+%\begin{macro}[aux]{\siunitx_unit_create_empty_functions_aux:N}
+% Without this, horrible things happen with \pkg{memoir} and
+% \pkg{hyperref}.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_unit_create_empty_functions: {
+  \tl_map_function:NN \l_siunitx_declare_list_tl 
+    \siunitx_unit_create_empty_functions_aux:N
+}
+\cs_new_nopar:Npn \siunitx_unit_create_empty_functions_aux:N #1 {
+  \cs_if_free:NT #1 { \cs_set_protected_nopar:Npn #1 { \ERROR } }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_create_functions:}
@@ -7107,39 +7124,12 @@ This work consists of the file  siunitx.dtx
           c
           < { \siunitx_table_print: } 
         }
-      \use:c { siunitx_table_column_start_ #1 : }
       \NC@find
     }
 }
 \AtBeginDocument { \siunitx_table_rewrite_create:N S }
 \AtBeginDocument { \siunitx_table_rewrite_create:N s }
 %    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_column_start_S:}
-%\begin{macro}{\siunitx_table_column_start_s:}
-%\begin{macro}{\siunitx_table_column_start_s_aux}
-% There is a slight issue with the \texttt{s} column: \TeX\ attempts to
-% expand material in columns \emph{before} using the template to wrap
-% material up (this allows \cs{omit} and \cs{span} to be inside other 
-% macros). The result is that the unit macros have to be defined when
-% the column starts if they are to work correctly. Everything needs to
-% be unexpandable, hence the \cs{protected} definition used.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_column_start_S: { }
-\cs_new_nopar:Npn \siunitx_table_column_start_s: {
-  \group_execute_after:N \siunitx_table_column_start_s_aux:
-}
-\cs_new_nopar:Npn \siunitx_table_column_start_s_aux: {
-  \bool_if:NF \l_siunitx_create_free_bool 
-    {
-      \tl_map_inline:Nn \l_siunitx_declare_list_tl 
-        { \cs_set_protected_nopar:Npn ##1 { \ERROR } }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %\subsection{Collecting tokens in tables}
