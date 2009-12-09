@@ -1895,6 +1895,66 @@ This work consists of the file  siunitx.dtx
 %  \si[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
 %  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\squared\deci\second}
 %\end{LaTeXdemo}
+%
+%\subsection{Numbers with units}
+%
+% Some options apply to the combination of units and numbers, rather
+% than to units or numbers alone (Table~\ref{tab:opt:units:numbers}).
+% 
+%\begin{table}
+%  \centering
+%  \caption{Options for numbers with units}
+%  \label{tab:opt:units:numbers}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      allow-number-unit-breaks & Switch & false  \\
+%      number-unit-separator    & Maths  & \cs{,} \\
+%      repeated-units           & Choice & true   \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{allow-number-unit-breaks}
+% Usually, the combination of a number and unit is regards as a single
+% mathematical entity which should not be split across lines. However,
+% there are cases (very long units, narrow columns, \emph{etc}.) where 
+% breaks may be needed. This can be turned on using the 
+% \opt{allow-number-unit-breaks} option.
+%\begin{LaTeXdemo}
+%  \begin{minipage}{2.6 cm}
+%    Some filler text \SI{10}{\metre} \\
+%    \sisetup{allow-number-unit-breaks}
+%    Some filler text \SI{10}{\metre} \\
+%  \end{minipage}    
+%\end{LaTeXdemo}
+%
+%\DescribeOption{number-unit-separator}
+% The separator between the number and units is stored using the
+% \opt{inter-unit-separator} option. 
+%\begin{LaTeXdemo}
+%  \SI{2.67}{\farad} \\
+%  \SI[number-unit-separator=\text{~}]{2.67}{\farad} \\
+%  \SI[number-unit-separator=]{2.67}{\farad} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{repeated-units}
+%\begin{LaTeXdemo}
+%  \SI{10 x 20 x 30}{\metre} \\
+%  \SI[repeated-units=power]{10 x 20 x 30}{\metre} \\
+%  
+%  \sisetup{use-brackets = false}  
+%  \SI{10 x 20 x 30}{\metre} \\
+%  \SI[repeated-units=power]{10 x 20 x 30}{\metre} \\
+%  \SI[repeated-units=false]{10 x 20 x 30}{\metre} \\
+%  
+%  \sisetup{separate-uncertainty}
+%  \SI{12.3(4)}{\kilo\gram} \\
+%  \SI[repeated-units=false]{12.3(4)}{\kilo\gram}    
+%\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
 %
@@ -5667,7 +5727,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_output_parts_print:n #1 {
   \siunitx_unit_output_pre_print:
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
-  \siunitx_print:nV  { number } \l_siunitx_tmpa_tl
+  \siunitx_print:nV { number } \l_siunitx_tmpa_tl
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -5678,7 +5738,9 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_output_product:}
 % For products, there may need to be the addition of brackets if there
-% are units about. 
+% are units about. When not repeating units, some work has to be done to
+% print everything correctly. The extra group here is necessary
+% otherwise looping will delete the units entirely!
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_output_product: {
   \bool_if:NTF \l_siunitx_brackets_bool
@@ -5691,7 +5753,21 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_output_product_aux: }
         { \siunitx_number_output_product_brackets: }
     }
-    { \siunitx_number_output_product_aux: }
+    { 
+      \bool_if:NTF \l_siunitx_number_unit_repeat_bool
+        { \siunitx_number_output_product_aux: }
+        { 
+          \siunitx_unit_output_pre_print:
+          \tl_set_eq:NN \l_siunitx_unit_saved_tl \l_siunitx_unit_tl
+          \tl_clear:N \l_siunitx_pre_unit_tl
+          \tl_clear:N \l_siunitx_unit_tl
+          \group_begin:  
+            \siunitx_number_output_product_aux:
+          \group_end:   
+          \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_saved_tl
+          \siunitx_unit_output_print:
+        }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6130,19 +6206,24 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\siunitx_unit_in:nn}
 %\begin{macro}{\siunitx_unit_in:Vn}
-% The master function does a very simple checks then hands off.
+% The master function does a very simple checks then hands off. The 
+% extra group here protects numbers from any special re-definition
+% needed inside units (for example \cs{pm}).
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_in:nn #1#2 {
-  \siunitx_unit_if_literal:nTF {#1} 
-    {
-      \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
-        { \siunitx_unit_format_literal:n {#1} }
-        { \msg_error:nnx { siunitx } { literal-unit } {#1} }
-    }
-    {
-      \siunitx_unit_parse:nn {#1} {#2}
-      \siunitx_unit_format:
-    }
+  \group_begin:
+    \siunitx_unit_if_literal:nTF {#1} 
+      {
+        \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
+          { \siunitx_unit_format_literal:n {#1} }
+          { \msg_error:nnx { siunitx } { literal-unit } {#1} }
+      }
+      {
+        \siunitx_unit_parse:nn {#1} {#2}
+        \siunitx_unit_format:
+      }
+  \exp_args:NNNV \group_end: 
+  \tl_set:Nn \l_siunitx_unit_tl \l_siunitx_unit_tl
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
 %    \end{macrocode}
