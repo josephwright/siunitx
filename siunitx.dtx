@@ -5676,26 +5676,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_output_print:}
-% The final stage: print.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_output_print: {
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \tl_if_eq:nVF { quotient } \l_siunitx_number_multi_tl 
-        {
-          \tl_if_empty:NF \l_siunitx_number_out_saved_tl 
-            {
-              \tl_put_left:NV \l_siunitx_number_out_tl 
-                \l_siunitx_number_out_saved_tl
-            } 
-        }
-      \siunitx_print:nV  { number } \l_siunitx_number_out_tl
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\siunitx_number_output_product:}
 % For products, there may need to be the addition of brackets if there
 % are units about. 
@@ -7148,6 +7128,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_combined_product_count:n}
 %\begin{macro}[aux]{\siunitx_combined_product_count_aux:n}
+% For counting how many products are in a number, so that the unit
+% can be adjusted if needed.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_product_count:n #1 {
   \int_zero:N \l_siunitx_number_product_int
@@ -7187,9 +7169,9 @@ This work consists of the file  siunitx.dtx
 % function: nothing compound.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_range_numbers:nn #1#2 {
-    \siunitx_range_numbers_aux:n {#1}
-    \text { \l_siunitx_range_phrase_tl }
-    \siunitx_range_numbers_aux:n {#2}
+  \siunitx_range_numbers_aux:n {#1}
+  \text { \l_siunitx_range_phrase_tl }
+  \siunitx_range_numbers_aux:n {#2}
 }
 \cs_new:Npn \siunitx_range_numbers_aux:n #1 {
   \bool_if:NTF \l_siunitx_number_parse_bool 
@@ -7198,9 +7180,8 @@ This work consists of the file  siunitx.dtx
       \tl_clear:N \l_siunitx_number_out_saved_tl
       \bool_set_false:N \l_siunitx_number_compound_bool
       \siunitx_number_output_parse:n {#1}
-      \bool_if:NTF \l_siunitx_number_compound_bool 
+      \bool_if:NT \l_siunitx_number_compound_bool 
         { \msg_error:nnx { siunitx } { multi-part-range } {#1} }
-        { \siunitx_number_output_print: }
     }
     { \siunitx_print:nn  { number } {#1} }
 }
@@ -7214,12 +7195,8 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_range_unit:nnnn #1#2#3#4 {
   \siunitx_unit_in:nn {#1} {#2}
   \siunitx_range_numbers_aux:n {#3}
-  \siunitx_unit_output_number_sep:
-  \siunitx_print:nV { unit } \l_siunitx_unit_tl
   \text { \l_siunitx_range_phrase_tl }
   \siunitx_range_numbers_aux:n {#4}
-  \siunitx_unit_output_number_sep:
-  \siunitx_print:nV { unit } \l_siunitx_unit_tl
 }
 %    \end{macrocode}
 %\end{macro}
