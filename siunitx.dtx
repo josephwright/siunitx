@@ -1722,7 +1722,7 @@ This work consists of the file  siunitx.dtx
 % Appropriate unit prefixes, along with the units \cs{bit} and 
 % \cs{byte} are available for use in the computing field.
 %\begin{LaTeXdemo}
-%  \SI{100}{\mebi\byte}
+%  \SI{100}{\mebi\byte} \\
 %  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
 %\end{LaTeXdemo}
 %
@@ -7123,6 +7123,18 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_nopar:Npn \siunitx_unit_output_print: {
+  \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } 
+    { 
+      \tl_set:Nx \l_siunitx_tmpa_tl 
+        {
+          \bool_if:NTF \l_siunitx_tight_bool 
+            { { \exp_not:V \l_siunitx_exponent_product_tl } }    
+            { { } \exp_not:V \l_siunitx_exponent_product_tl { } }        
+          \int_use:N \l_siunitx_unit_prefix_base_int
+          ^ { \int_use:N \l_siunitx_unit_prefix_int }
+        }
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+    }
   \tl_if_empty:NF \l_siunitx_unit_tl
     {
       \siunitx_unit_output_number_sep:
@@ -7883,7 +7895,7 @@ This work consists of the file  siunitx.dtx
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \DeclareBinaryPrefix #1#2#3 {
-  \siunitx_declare_prefix:Nnnn #1 {#2} { 10 } {#3}
+  \siunitx_declare_prefix:Nnnn #1 {#2} { 2 } {#3}
 }
 \cs_new_protected_nopar:Npn \DeclareSIPostPower #1#2 {
   \siunitx_declare_power_after:Nn #1 {#2}
@@ -7991,6 +8003,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\SI}
+% The main \cs{SI} function follows the same pattern as the previous
+% ones.
 %    \begin{macrocode}
 \NewDocumentCommand \SI { o m o m } {
   \group_begin:
