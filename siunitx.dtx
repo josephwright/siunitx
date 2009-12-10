@@ -108,10 +108,11 @@ This work consists of the file  siunitx.dtx
   \file{\jobname.sty}{\from{\jobname.dtx}{package}}
 }
 \usedir{tex/latex/siunitx/config}
-\generate{
+\generate{  
   \file{siunitx-abbreviations.cfg}
     {\from{\jobname.dtx}{config,abbreviations}}
   \file{siunitx-astronomy.cfg}{\from{\jobname.dtx}{config,astronomy}}
+  \file{siunitx-binary.cfg}{\from{\jobname.dtx}{config,binary}}
   \file{siunitx-chemical-engineering.cfg}
     {\from{\jobname.dtx}{config,chemical-engineering}}
   \file{siunitx-chemistry.cfg}{\from{\jobname.dtx}{config,chemistry}}
@@ -237,6 +238,8 @@ This work consists of the file  siunitx.dtx
 %          ampere,
 %          angstrom,
 %          becquerel,
+%          bit,
+%          byte,
 %          candela,
 %          centi,
 %          color,
@@ -268,6 +271,7 @@ This work consists of the file  siunitx.dtx
 %          lux,
 %          mathnormal,
 %          metre,
+%          mebi,
 %          milli,
 %          mole,
 %          num,
@@ -1671,10 +1675,10 @@ This work consists of the file  siunitx.dtx
 % given as the argument to the \opt{load-configurations} option.
 % 
 % The first group of add-on units are those which provide either
-% abbreviations or combined names for SI units. These
+% abbreviations or combined names for SI units. 
 % 
 %\begin{table}
-%  \caption{Astronomy-related units 
+%  \caption{Abbreviated units \protect \\
 %    (\opt{load-configurations=abbreviations})}
 %  \label{tab:unit:abbr}
 %  \centering
@@ -1709,13 +1713,49 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeMacro{\bit}
+%\DescribeMacro{\byte}
+% Binary data requires the units bits and bites, and the special
+% prefixes which use powers of two rather than of ten 
+% (Table~\ref{tab:unit:binary}) have been defined for this purpose.
+% Appropriate unit prefixes, along with the units \cs{bit} and 
+% \cs{byte} are available for use in the computing field.
+%\begin{LaTeXdemo}
+%  \SI{100}{\mebi\byte}
+%  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
+%\end{LaTeXdemo}
+%
+%\begin{table}
+%  \caption{Binary prefixes \protect \\
+%  (\opt{load-configurations=binary})}
+%  \label{tab:unit:binary}
+%  \centering
+%  \begin{tabular}{llc>{$}l<{$}}
+%    \toprule
+%      \multicolumn{1}{c}{Prefix} &
+%      \multicolumn{1}{c}{Macro}  &
+%      \multicolumn{1}{c}{Symbol} &
+%      \multicolumn{1}{c}{Power}  \\
+%    \midrule
+%      \DescribePrefix{kibi} & Ki & 10 \\
+%      \DescribePrefix{mebi} & Mi & 20 \\
+%      \DescribePrefix{gibi} & Gi & 30 \\
+%      \DescribePrefix{tebi} & Ti & 40 \\
+%      \DescribePrefix{pebi} & Pi & 50 \\
+%      \DescribePrefix{exbi} & Ei & 60 \\
+%      \DescribePrefix{zebi} & Zi & 70 \\
+%      \DescribePrefix{yobi} & Yi & 80 \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
 % 
 % Units for specialist areas are given in Tables~\ref{tab:unit:astro}
 % to \ref{tab:unit:geophys}. These are not SI units, but are defined
 % here as they are in common usage in the subject areas concerned.
 % 
 %\begin{table}
-%  \caption{Astronomy-related units
+%  \caption{Astronomy-related units \protect \\
 %    (\opt{load-configurations=astronomy})}
 %  \label{tab:unit:astro}
 %  \centering
@@ -1732,7 +1772,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 % 
 %\begin{table}
-%  \caption{Chemical engineering related units
+%  \caption{Chemical engineering units \protect \\
 %    (\opt{load-configurations=chemical-engineering})}
 %  \label{tab:unit:chemeng}
 %  \centering
@@ -1750,7 +1790,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 % 
 %\begin{table}
-%  \caption{Chemistry-related units
+%  \caption{Chemistry-related units \protect \\
 %    (\opt{load-configurations=chemistry})}
 %  \label{tab:unit:chem}
 %  \centering
@@ -1769,7 +1809,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %
 %\begin{table}
-%  \caption{Geophysics-related units 
+%  \caption{Geophysics-related units \protect \\
 %    (\opt{load-configurations=geophysics})}
 %  \label{tab:unit:geophys}
 %  \centering
@@ -6202,24 +6242,19 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\siunitx_unit_in:nn}
 %\begin{macro}{\siunitx_unit_in:Vn}
-% The master function does a very simple checks then hands off. The 
-% extra group here protects numbers from any special re-definition
-% needed inside units (for example \cs{pm}).
+% The master function does a very simple checks then hands off. 
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_in:nn #1#2 {
-  \group_begin:
-    \siunitx_unit_if_literal:nTF {#1} 
-      {
-        \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
-          { \siunitx_unit_format_literal:n {#1} }
-          { \msg_error:nnx { siunitx } { literal-unit } {#1} }
-      }
-      {
-        \siunitx_unit_parse:nn {#1} {#2}
-        \siunitx_unit_format:
-      }
-  \exp_args:NNNV \group_end: 
-  \tl_set:Nn \l_siunitx_unit_tl \l_siunitx_unit_tl
+  \siunitx_unit_if_literal:nTF {#1} 
+    {
+      \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
+        { \siunitx_unit_format_literal:n {#1} }
+        { \msg_error:nnx { siunitx } { literal-unit } {#1} }
+    }
+    {
+      \siunitx_unit_parse:nn {#1} {#2}
+      \siunitx_unit_format:
+    }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
 %    \end{macrocode}
@@ -7044,7 +7079,7 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_unit_output:nn #1#2 {
   \siunitx_unit_in:nn {#1} {#2}
   \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } 
-    {
+    { 
       \tl_set:Nx \l_siunitx_tmpa_tl 
         {
           \int_use:N \l_siunitx_unit_prefix_base_int
@@ -9281,7 +9316,59 @@ This work consists of the file  siunitx.dtx
 %    
 %    \begin{macrocode}
 %</geophysics>
-%    \end{macrocode}    
+%    \end{macrocode} 
+%    
+%\subsection{Binary units}
+%
+%    \begin{macrocode}
+%<*binary>
+%    \end{macrocode}  
+%    
+%    \begin{macrocode}
+\ProvidesExplFile {siunitx-binary.cfg} {\filedate} 
+  {\fileversion} {siunitx: Binary units}
+%    \end{macrocode}
+%    
+%\begin{macro}{\kibi}
+%\begin{macro}{\mebi}
+%\begin{macro}{\gibi}
+%\begin{macro}{\tebi}
+%\begin{macro}{\pebi}
+%\begin{macro}{\exbi}
+%\begin{macro}{\zebi}
+%\begin{macro}{\yobi}
+% The binary units as specified by the IEC.
+%    \begin{macrocode}
+\DeclareBinaryPrefix \kibi { Ki } { 10 } 
+\DeclareBinaryPrefix \mebi { Mi } { 20 } 
+\DeclareBinaryPrefix \gibi { Gi } { 30 } 
+\DeclareBinaryPrefix \tebi { Ti } { 40 } 
+\DeclareBinaryPrefix \pebi { Pi } { 50 } 
+\DeclareBinaryPrefix \exbi { Ei } { 60 } 
+\DeclareBinaryPrefix \zebi { Zi } { 70 } 
+\DeclareBinaryPrefix \yobi { Yi } { 80 } 
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\bit}
+%\begin{macro}{\byte}
+% Now the units.
+%    \begin{macrocode}
+\DeclareSIUnit \bit  { bit }
+\DeclareSIUnit \byte { B }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro} 
+%
+%    \begin{macrocode}
+%</binary>
+%    \end{macrocode}   
 %
 %\end{implementation}
 % 
