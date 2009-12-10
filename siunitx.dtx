@@ -175,8 +175,8 @@ This work consists of the file  siunitx.dtx
       geophysics
     }
 }
-\DeclareSIPower\quartic{4}
-\DeclareSIPower*\tothefourth{4}
+\DeclareSIPrePower\quartic{4}
+\DeclareSIPostPower\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
 
@@ -246,10 +246,12 @@ This work consists of the file  siunitx.dtx
 %          deci,
 %          decibel,
 %          degree,
+%          DeclareSIPostPower,
 %          DeclareSIPrefix,
-%          DeclareSIPower,
+%          DeclareSIPrePower,
 %          DeclareSIQualifier,
 %          DeclareSIUnit,
+%          DeclareSIUnitWithOptions,
 %          farad,
 %          gram,
 %          gray,
@@ -850,24 +852,27 @@ This work consists of the file  siunitx.dtx
 % functions are all preamble-only.
 %
 %\DescribeMacro{\DeclareSIUnit}
+%\DescribeMacro{\DeclareSIUnitWithOptions}
 %\begin{syntax}
 %  \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}
+%  \cs{DeclareSIUnitWithOptions}\marg{unit}\marg{symbol}\marg{options}
 %\end{syntax}
 % New units are produced using the \cs{DeclareSIUnit} macro. 
 % \meta{symbol} can contain literal values, other units, multiple
 % prefixes, powers and \cs{per}, although literal text should not be
-% intermixed with unit macros. The \meta{options} argument can be
-% any suitable options, and applies the specific unit macro only. The 
-% (first) optional argument to \cs{SI} and \cs{si} can be used to 
-% override the settings for the unit. A typical example is the 
-% \cs{degree} unit.
+% intermixed with unit macros. Units can be created with options
+% using the \cs{DeclareSIUnitWithOptions} function, where the 
+% \meta{options} argument can be any suitable options, and applies the
+% specific unit macro only. The (first) optional argument to \cs{SI} 
+% and \cs{si} can be used to override the settings for the unit. A 
+% typical example is the \cs{degree} unit.
 %\begin{LaTeXdemo}
 %  \SI{3.1415}{\degree}
 %\end{LaTeXdemo} 
 % This is declared in the package as:
 %\begin{LaTeXdemo}[code only]
-%  \DeclareSIUnit[number-unit-separator={}]
-%    \degree{\SIUnitSymbolDegree}
+%  \DeclareSIUnitWithOptions\degree{\SIUnitSymbolDegree}
+%    {number-unit-separator={}}
 %\end{LaTeXdemo}
 % The spacing can still be altered at point of use:
 %\begin{LaTeXdemo}
@@ -876,35 +881,33 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 % 
 %\DescribeMacro{\DeclareSIPrefix}
-%\DescribeMacro{\DeclareSIPrefix*}
+%\DescribeMacro{\DeclareSIBinaryPrefix}
 %\begin{syntax}
 %  \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}
-%  \cs{DeclareSIPrefix*}\marg{prefix}\marg{symbol}\marg{powers-two}
+%  \cs{DeclareSIBinaryPrefix}\marg{prefix}\marg{symbol}\marg{powers-two}
 %\end{syntax}
 % The standard SI powers of ten are defined by the package, and are
 % described above.  However, the user can define new prefixes with
-% \cs{DeclareSIPrefix}. A
-% starred-version is also available for creating binary prefixes, with
-% the same syntax (\meta{powers-ten} being replaced by 
-% \meta{powers-two}). For example, \cs{kilo} and \cs{kibi} are defined:
+% \cs{DeclareSIPrefix}. The \cs{DeclareSIBinaryPrefix} function is also
+% available for creating binary prefixes, with the same syntax 
+% (\meta{powers-ten} being replaced by \meta{powers-two}). For 
+% example, \cs{kilo} and \cs{kibi} are defined:
 %\begin{LaTeXdemo}[code only]
 %  \DeclareSIPrefix\kilo{k}{3}
-%  \DeclareSIPrefix*\kibi{Ki}{10}
+%  \DeclareSIBinaryPrefix\kibi{Ki}{10}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\DeclareSIPower}
-%\DescribeMacro{\DeclareSIPower*}
+%\DescribeMacro{\DeclareSIPostPower}
+%\DescribeMacro{\DeclareSIPrePower}
 %\begin{syntax}
-%  \cs{DeclareSIPower}\marg{power}\marg{num}
-%  \cs{DeclareSIPower*}\marg{power}\marg{num}
+%  \cs{DeclareSIPostPower}\marg{power}\marg{num}
+%  \cs{DeclareSIPrePower}\marg{power}\marg{num}
 %\end{syntax}
-% This creates a
-% power macro to appear before the unit it applies to. A starred version
-% of the macro creates powers to appear after the unit. For example, the 
-% preamble to a document might contain:
+% These create power macros to appear before or after the unit they
+% apply to. For example, the preamble to a document might contain:
 %\begin{LaTeXdemo}[code only]
-%  \DeclareSIPower\quartic{4}
-%  \DeclareSIPower*\tothefourth{4}
+%  \DeclareSIPrePower\quartic{4}
+%  \DeclareSIPostPower\tothefourth{4}
 %\end{LaTeXdemo}
 % with the functions then used in the document as:
 %\begin{LaTeXdemo}
@@ -7847,32 +7850,41 @@ This work consists of the file  siunitx.dtx
 %    
 %\subsection{Design-level macros}
 % 
-%\begin{macro}{\DeclareSIPower}
+%\begin{macro}{\DeclareSIBinaryPrefix}
+%\begin{macro}{\DeclareSIPostPower}
 %\begin{macro}{\DeclareSIPrefix}
+%\begin{macro}{\DeclareSIPrePower}
 %\begin{macro}{\DeclareSIQualifier}
 %\begin{macro}{\DeclareSIUnit}
+%\begin{macro}{\DeclareSIUnitWithOptions}
 % The macros for creating units and so on are in design name space.
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
-\NewDocumentCommand \DeclareSIPower { s m m } {
-  \IfBooleanTF #1 
-    { \siunitx_declare_power_after:Nn #2 {#3} }
-    { \siunitx_declare_power_before:Nn #2 {#3} }
+\cs_new_protected_nopar:Npn \DeclareSIBinaryPrefix #1#2#3 {
+  \siunitx_declare_prefix:Nnnn #1 {#2} { 10 } {#3}
 }
-\NewDocumentCommand \DeclareSIPrefix { s m m m } {
-  \IfBooleanTF #1
-    { \siunitx_declare_prefix:Nnnn #2 {#3} { 2 } {#4} }
-    { \siunitx_declare_prefix:Nnnn #2 {#3} { 10 } {#4} }
+\cs_new_protected_nopar:Npn \DeclareSIPostPower #1#2 {
+  \siunitx_declare_power_after:Nn #1 {#2}
 }
-\NewDocumentCommand \DeclareSIQualifier { m m } {
+\cs_new_protected_nopar:Npn \DeclareSIPrefix #1#2#3 {
+  \siunitx_declare_prefix:Nnnn #1 {#2} { 10 } {#3}
+}
+\cs_new_protected_nopar:Npn \DeclareSIPrePower #1#2 {
+  \siunitx_declare_power_before:Nn #1 {#2}
+}
+\cs_new_protected_nopar:Npn \DeclareSIQualifier #1#2 {
   \siunitx_declare_qualifier:Nn #1 {#2}
 }
-\NewDocumentCommand \DeclareSIUnit { o m m } {
-  \IfNoValueTF {#1}
-    { \siunitx_declare_unit:Nnn #2 {#3} { } }
-    { \siunitx_declare_unit:Nnn #2 {#3} {#1} }
+\cs_new_protected_nopar:Npn \DeclareSIUnit #1#2 {
+  \siunitx_declare_unit:Nnn #1 {#2} { }
+}
+\cs_new_protected_nopar:Npn \DeclareSIUnitWithOptions #1#2#3 {
+  \siunitx_declare_unit:Nnn #1 {#2} {#3}
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro} 
+%\end{macro} 
 %\end{macro} 
 %\end{macro}
 %\end{macro}
@@ -7880,10 +7892,13 @@ This work consists of the file  siunitx.dtx
 % 
 % None of this should be done after the preamble.
 %    \begin{macrocode}
-\@onlypreamble \DeclareSIPower
+\@onlypreamble \DeclareSIBinaryPrefix
+\@onlypreamble \DeclareSIPostPower
 \@onlypreamble \DeclareSIPrefix
+\@onlypreamble \DeclareSIPrePower
 \@onlypreamble \DeclareSIQualifier
 \@onlypreamble \DeclareSIUnit
+\@onlypreamble \DeclareSIUnitWithOptions
 %    \end{macrocode}
 %
 %\subsection{Document macros}
@@ -8279,14 +8294,15 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\tonne}
 % Non-SI, but accepted for general use.
 %    \begin{macrocode}
-\DeclareSIUnit[ number-unit-separator = ] \arcmin { \arcminute } 
-\DeclareSIUnit[ number-unit-separator = ] \arcminute 
-  { \SIUnitSymbolArcminute }
-\DeclareSIUnit[ number-unit-separator = ] \arcsecond 
-  { \SIUnitSymbolArcsecond }
+\DeclareSIUnitWithOptions \arcmin { \arcminute } 
+  { number-unit-separator = }
+\DeclareSIUnitWithOptions \arcminute { \SIUnitSymbolArcminute } 
+  { number-unit-separator = }
+\DeclareSIUnitWithOptions \arcsecond { \SIUnitSymbolArcsecond } 
+  { number-unit-separator = }
 \DeclareSIUnit \day { d }
-\DeclareSIUnit[ number-unit-separator = ] \degree 
-  { \SIUnitSymbolDegree }
+\DeclareSIUnitWithOptions \degree { \SIUnitSymbolDegree } 
+  { number-unit-separator = }
 \DeclareSIUnit \hectare { ha }
 \DeclareSIUnit \hour    { h }
 \DeclareSIUnit \litre   { l }
@@ -8399,10 +8415,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\cubed}
 % The basic powers are also defined.
 %    \begin{macrocode}
-\DeclareSIPower  \square  { 2 }
-\DeclareSIPower* \squared { 2 }
-\DeclareSIPower  \cubic   { 3 }
-\DeclareSIPower* \cubed   { 3 }
+\DeclareSIPrePower  \square  { 2 }
+\DeclareSIPostPower \squared { 2 }
+\DeclareSIPrePower  \cubic   { 3 }
+\DeclareSIPostPower \cubed   { 3 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -9121,7 +9137,8 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \MeV { \mega  \electronvolt }
 \DeclareSIUnit \GeV { \giga  \electronvolt }
 \DeclareSIUnit \TeV { \tera  \electronvolt }
-\DeclareSIUnit [inter-unit-separator = ] \kWh { \kilo \watt \hour }
+\DeclareSIUnitWithOptions \kWh { \kilo \watt \hour }
+  { inter-unit-separator = }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
