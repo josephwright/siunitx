@@ -246,6 +246,7 @@ This work consists of the file  siunitx.dtx
 %          deci,
 %          decibel,
 %          degree,
+%          DeclareBinaryPrefix,
 %          DeclareSIPostPower,
 %          DeclareSIPrefix,
 %          DeclareSIPrePower,
@@ -881,20 +882,20 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 % 
 %\DescribeMacro{\DeclareSIPrefix}
-%\DescribeMacro{\DeclareSIBinaryPrefix}
+%\DescribeMacro{\DeclareBinaryPrefix}
 %\begin{syntax}
 %  \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}
-%  \cs{DeclareSIBinaryPrefix}\marg{prefix}\marg{symbol}\marg{powers-two}
+%  \cs{DeclareBinaryPrefix}\marg{prefix}\marg{symbol}\marg{powers-two}
 %\end{syntax}
 % The standard SI powers of ten are defined by the package, and are
 % described above.  However, the user can define new prefixes with
-% \cs{DeclareSIPrefix}. The \cs{DeclareSIBinaryPrefix} function is also
+% \cs{DeclareSIPrefix}. The \cs{DeclareBinaryPrefix} function is also
 % available for creating binary prefixes, with the same syntax 
 % (\meta{powers-ten} being replaced by \meta{powers-two}). For 
 % example, \cs{kilo} and \cs{kibi} are defined:
 %\begin{LaTeXdemo}[code only]
 %  \DeclareSIPrefix\kilo{k}{3}
-%  \DeclareSIBinaryPrefix\kibi{Ki}{10}
+%  \DeclareBinaryPrefix\kibi{Ki}{10}
 %\end{LaTeXdemo}
 %
 %\DescribeMacro{\DeclareSIPostPower}
@@ -1916,7 +1917,8 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      allow-number-unit-breaks & Switch & false  \\
 %      number-unit-separator    & Maths  & \cs{,} \\
-%      repeated-units           & Choice & true   \\
+%      repeat-units             & Switch & true   \\
+%      unit-product-to-power    & Switch & false  \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1944,19 +1946,30 @@ This work consists of the file  siunitx.dtx
 %  \SI[number-unit-separator=]{2.67}{\farad} 
 %\end{LaTeXdemo}
 %
-%\DescribeOption{repeated-units}
+%\DescribeOption{repeat-units}
+%\DescribeOption{unit-product-to-power}
+% When brackets are not in use to make the meaning of number--unit
+% combinations clear, it may be necessary to repeat units to maintain
+% the mathematical meaning of the output. This is handled by the
+% \opt{repeat-units} option, which may be \opt{true} or \opt{false}.
+% At the same time, \emph{simple} products (areas and volumes) may be
+% given with the repetition of the unit converted into a power. This
+% behaviour is set by the \opt{unit-product-to-power} option, which
+% will only act if units are not being printed repeatedly.
 %\begin{LaTeXdemo}
 %  \SI{10 x 20 x 30}{\metre} \\
-%  \SI[repeated-units=power]{10 x 20 x 30}{\metre} \\
+%  \SI[unit-product-to-power]{10 x 20 x 30}{\metre} \\
 %  
 %  \sisetup{use-brackets = false}  
 %  \SI{10 x 20 x 30}{\metre} \\
-%  \SI[repeated-units=power]{10 x 20 x 30}{\metre} \\
-%  \SI[repeated-units=false]{10 x 20 x 30}{\metre} \\
+%  \SI[unit-product-to-power]{10 x 20 x 30}{\metre} \\
+%  \SI[repeat-units=false]{10 x 20 x 30}{\metre} \\
+%  \SI[repeat-units=false,unit-product-to-power]
+%    {10 x 20 x 30}{\metre} \\
 %  
 %  \sisetup{separate-uncertainty}
 %  \SI{12.3(4)}{\kilo\gram} \\
-%  \SI[repeated-units=false]{12.3(4)}{\kilo\gram}    
+%  \SI[repeat-units=false]{12.3(4)}{\kilo\gram}    
 %\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
@@ -7018,17 +7031,9 @@ This work consists of the file  siunitx.dtx
 % 
 % A collection of the internal parts of various user functions.
 % 
+%\begin{macro}{\l_siunitx_number_unit_breaks_bool}
 %\begin{macro}{\l_siunitx_number_unit_power_bool}
 %\begin{macro}{\l_siunitx_number_unit_repeat_bool}
-% Some storage for options.
-%    \begin{macrocode}
-\bool_new:N \l_siunitx_number_unit_power_bool
-\bool_new:N \l_siunitx_number_unit_repeat_bool
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-% 
-%\begin{macro}{\l_siunitx_number_unit_breaks_bool}
 %\begin{macro}{\l_siunitx_number_unit_separator_tl}
 % Options for printing units or units with numbers.
 %    \begin{macrocode}
@@ -7037,32 +7042,18 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_number_unit_breaks_bool,
   number-unit-separator    .tl_set:N   = 
     \l_siunitx_number_unit_separator_tl,
-  repeated-units           .choice:,
-  repeated-units / 
-    false                  .code:n     = 
-      {
-        \bool_set_false:N \l_siunitx_number_unit_power_bool
-        \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-      },
-  repeated-units / 
-    power                  .code:n     = 
-      {
-        \bool_set_true:N \l_siunitx_number_unit_power_bool
-        \bool_set_false:N \l_siunitx_number_unit_repeat_bool
-      },
-  repeated-units / 
-    true                   .code:n     = 
-      {
-        \bool_set_false:N \l_siunitx_number_unit_power_bool
-        \bool_set_true:N \l_siunitx_number_unit_repeat_bool
-      },
-  repeated-units           .default:n  = { true }
+  repeat-units             .bool_set:N =
+     \l_siunitx_number_unit_repeat_bool,
+  unit-product-to-power    .bool_set:N = 
+    \l_siunitx_number_unit_power_bool
 }
 \keys_set:nn { siunitx } {
   number-unit-separator = \,,
-  repeated-units        = true
+  repeat-units          = true
 }
 %    \end{macrocode}
+%\end{macro} 
+%\end{macro}
 %\end{macro} 
 %\end{macro}
 % 
@@ -7191,7 +7182,17 @@ This work consists of the file  siunitx.dtx
 % correctly-prepared unit stored in \cs{l_siunitx_unit_tl}.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_unit:nnn #1#2#3 {
-  \bool_if:NTF \l_siunitx_number_unit_power_bool 
+  \bool_if:nTF 
+    { 
+      \l_siunitx_number_unit_power_bool  &&
+      (
+        \l_siunitx_brackets_bool  ||
+        (
+          !\l_siunitx_number_unit_repeat_bool &&
+          !\l_siunitx_brackets_bool
+        )
+      )
+    }
     {
       \siunitx_combined_product_count:n {#1}
       \intexpr_compare:nTF { \l_siunitx_number_product_int > \c_zero } 
@@ -7850,7 +7851,7 @@ This work consists of the file  siunitx.dtx
 %    
 %\subsection{Design-level macros}
 % 
-%\begin{macro}{\DeclareSIBinaryPrefix}
+%\begin{macro}{\DeclareBinaryPrefix}
 %\begin{macro}{\DeclareSIPostPower}
 %\begin{macro}{\DeclareSIPrefix}
 %\begin{macro}{\DeclareSIPrePower}
@@ -7860,7 +7861,7 @@ This work consists of the file  siunitx.dtx
 % The macros for creating units and so on are in design name space.
 % Basically, a set of shuffles for arguments.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \DeclareSIBinaryPrefix #1#2#3 {
+\cs_new_protected_nopar:Npn \DeclareBinaryPrefix #1#2#3 {
   \siunitx_declare_prefix:Nnnn #1 {#2} { 10 } {#3}
 }
 \cs_new_protected_nopar:Npn \DeclareSIPostPower #1#2 {
@@ -7892,7 +7893,7 @@ This work consists of the file  siunitx.dtx
 % 
 % None of this should be done after the preamble.
 %    \begin{macrocode}
-\@onlypreamble \DeclareSIBinaryPrefix
+\@onlypreamble \DeclareBinaryPrefix
 \@onlypreamble \DeclareSIPostPower
 \@onlypreamble \DeclareSIPrefix
 \@onlypreamble \DeclareSIPrePower
