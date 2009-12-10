@@ -1,4 +1,4 @@
- % \iffalse meta-comment
+% \iffalse meta-comment
 % !TeX program  = pdfLaTeX
 %<*internal>
 \iffalse
@@ -5030,19 +5030,13 @@ This work consists of the file  siunitx.dtx
           \siunitx_number_format_final_join_exp:
         }
         { 
-          \prop_if_in:NnTF \l_siunitx_number_out_prop 
+          \prop_if_in:NnT \l_siunitx_number_out_prop 
             { mantissa-result }
             { 
               \siunitx_number_format_copy:nn { mantissa-result } 
                 { result } 
             }
-            { \siunitx_number_format_copy:nn { mantissa } { result } }
         }
-        \prop_if_in:NnF \l_siunitx_number_out_prop { mantissa-result }
-          { 
-            \siunitx_number_format_copy:nn { mantissa } 
-              { mantissa-result } 
-          }
     }
     { \siunitx_number_format_final_exponent: }
     \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } 
@@ -5075,12 +5069,8 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_final_join_exp:
 }
 \cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux: {
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent-result }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
     { \siunitx_number_format_final_exponent_aux:n { exponent-result } }
-    { 
-      \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
-        { \siunitx_number_format_final_exponent_aux:n { exponent } }
-    }
 }
 \cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux:n #1 {
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
@@ -5128,13 +5118,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_final_mantissa: {
   \siunitx_number_format_brackets:n { mantissa }
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-result }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
     { 
       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
-        \l_siunitx_tmpa_tl
-    }
-    { 
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa } 
         \l_siunitx_tmpa_tl
     }
   \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
@@ -5254,7 +5240,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_format_group_integer_setup:n}
 %\begin{macro}[aux]{\siunitx_number_format_group_integer_setup:V}
 %\begin{macro}[aux]{\siunitx_number_format_group_integer_setup_aux:NNNN}
-%%\begin{macro}[aux]{\siunitx_number_format_group_integer_aux:NNNN}
+%\begin{macro}[aux]{\siunitx_number_format_group_integer_aux:NNNN}
 % By keeping everything on the stack, recursion can occur quite 
 % efficiently here.
 %    \begin{macrocode}
@@ -5318,15 +5304,8 @@ This work consists of the file  siunitx.dtx
         {
           \siunitx_number_format_brackets:n {#1}
           \siunitx_number_format_sign:nn {#1} { -complex }
-          \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -result } 
-            { 
-              \prop_get:NnN \l_siunitx_number_out_prop { #1 -result } 
-                \l_siunitx_tmpa_tl
-            }
-            { 
-              \prop_get:NnN \l_siunitx_number_out_prop {#1} 
-                \l_siunitx_tmpa_tl
-            }
+          \prop_get:NnN \l_siunitx_number_out_prop { #1 -result } 
+            \l_siunitx_tmpa_tl
           \prop_get:NnN \l_siunitx_number_out_prop { #1 -complex }
             \l_siunitx_tmpb_tl
           \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
@@ -5351,7 +5330,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_format_join_uncert:n #1 {
   \prop_if_in:NnT \l_siunitx_number_out_prop {#1} 
     {
-      \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -uncertainty } 
+      \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -uncertainty } 
         {
           \prop_get:NnN \l_siunitx_number_out_prop {#1} 
             \l_siunitx_tmpa_tl
@@ -5363,6 +5342,7 @@ This work consists of the file  siunitx.dtx
           \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } 
             { true }
         }
+        { \siunitx_number_format_copy:nn {#1} { #1 -result } }
     }
 }
 %    \end{macrocode}
