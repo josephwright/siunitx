@@ -1,5 +1,5 @@
 % \iffalse meta-comment
-% !TeX program  = pdfLaTeX
+% !TeX program = pdfLaTeX
 %<*internal>
 \iffalse
 %</internal>
@@ -151,7 +151,7 @@ This work consists of the file  siunitx.dtx
   [\filedate\space \fileversion\space\filedescription]
 %\iffalse
 \documentclass[full]{l3doc}
-\usepackage{amsmath,booktabs,caption,csquotes,helvet,siunitx}
+\usepackage{amsmath,booktabs,caption,csquotes,helvet,siunitx,xcolor}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -239,6 +239,7 @@ This work consists of the file  siunitx.dtx
 %          angstrom,
 %          becquerel,
 %          bit,
+%          bottomrule,
 %          byte,
 %          candela,
 %          centi,
@@ -272,6 +273,7 @@ This work consists of the file  siunitx.dtx
 %          mathnormal,
 %          metre,
 %          mebi,
+%          midrule,
 %          milli,
 %          mole,
 %          num,
@@ -292,6 +294,7 @@ This work consists of the file  siunitx.dtx
 %          tesla,
 %          texorpdfstring,
 %          text,
+%          toprule,
 %          tothe,
 %          volt
 %        }
@@ -337,6 +340,13 @@ This work consists of the file  siunitx.dtx
 %      \fi
 %    \end{center}
 %  }
+%\LaTeXdemo@new{code and float}{^^A
+%  \lst@BeginAlsoWriteFile{siunitx.tmp}^^A
+%  \LaTeXdemo@common
+%}{^^A
+%  \lst@EndWriteFile
+%  \LaTeXdemo@input
+%}
 %\LaTeXdemo@new{code only}
 %  {\LaTeXdemo@common}{}
 %  
@@ -934,6 +944,53 @@ This work consists of the file  siunitx.dtx
 % and then in the body the document could read:
 %\begin{LaTeXdemo}
 %  \SI{1.234}{\gram\polymer\per\mole\catalyst\per\hour}
+%\end{LaTeXdemo}
+%
+%\subsection{Tabular material}
+%
+% As a complement to the \texttt{S} column, \pkg{siunitx} also provides
+% a second column type, \texttt{s}.  This is intended for producing 
+% columns of units. The letters chosen are intended to be similar to 
+% \cs{SI} and \cs{si}, respectively. This allows both macro-based and 
+% explicit units to be printed easily (Table~\ref{tab:s:demo}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{Number and units in tables}
+%    \label{tab:s:demo}
+%      \begin{tabular}{s}
+%      \toprule
+%        \multicolumn{1}{c}{Unit} \\
+%      \midrule
+%        \metre\squared\per\second \\
+%        \pascal \\
+%        m.s^{-1} \\
+%      \bottomrule
+%      \end{tabular}
+%    \end{table}
+%\end{LaTeXdemo}
+%
+% As the \cs{si} macro can take literal or macro input, the \texttt{s}
+% column cannot validate the input.  \emph{Everything} in an \texttt{s}
+% column is therefore passed to the \cs{si} macro for processing.  To
+% prevent this, you have to use \cs{multicolumn}, as is shown in
+% Table~\ref{tab:s:processing}.  Notice that the braces do not prevent
+% processing and colouring of the cell contents.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{The \texttt{s} column processes everything}
+%    \label{tab:s:processing}
+%    \sisetup{colour = orange}
+%    \begin{tabular}{ss}      
+%      \toprule
+%        {Unit}     & \multicolumn{1}{c}{Unit}\\
+%      \midrule
+%        {\si{m^3}} & \multicolumn{1}{c}{\si{m^3}} \\
+%        \kilogram  & \kilogram \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
 %\end{LaTeXdemo}
 %
 %\section{The key--value control system}
@@ -2021,6 +2078,55 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{separate-uncertainty}
 %  \SI{12.3(4)}{\kilo\gram} \\
 %  \SI[repeat-units=false]{12.3(4)}{\kilo\gram}    
+%\end{LaTeXdemo}
+%
+%\subsection{Tabular material}
+%
+% Processing of material in tables obeys the same settings as described
+% for the functions already described. However, there are some settings
+% which apply only to the layout of tabular material.
+% 
+%\begin{table}
+%  \centering
+%  \caption{Options for tabular material}
+%  \label{tab:opt:tables}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule ^^A (
+%      table-align-units & Switch & centre \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+% 
+%\DescribeOption{table-align-units}
+% The contents of \texttt{s} columns can be centred or aligned to the
+% left or right using the \opt{table-align-units} option. As for the
+% other alignment options, this recognises the choices \opt{centre},
+% \opt{left} and \opt{right}. 
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{Alignment options in \texttt{s} columns}
+%    \label{tab:s:align}
+%    \begin{tabular}
+%      {
+%        s[table-align-units = right]
+%        s
+%        s[table-align-units = left]
+%      }      
+%      \toprule
+%        \multicolumn{1}{c}{Left-aligned}  &   
+%        \multicolumn{1}{c}{Centred text}  &
+%        \multicolumn{1}{c}{Right-aligned} \\
+%      \midrule
+%        \metre\per\second & \metre\per\second & \metre\per\second \\
+%        \kilogram         & \kilogram         & \kilogram         \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
 %\end{LaTeXdemo}
 % 
 %\subsection{Symbols}
@@ -7102,6 +7208,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 % 
 %\begin{macro}{\siunitx_unit_output:nn}
+%\begin{macro}{\siunitx_unit_output:Vn}
 % For typesetting a unit directly: used by \cs{si} and the \texttt{s}
 % column. The second argument is any options to set locally.
 %    \begin{macrocode}
@@ -7119,7 +7226,9 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_print:nV { unit } \l_siunitx_unit_tl
 }
+\cs_generate_variant:Nn \siunitx_unit_output:nn { Vn }
 %    \end{macrocode}
+%\end{macro} 
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_unit_output_number_sep:}
@@ -7350,15 +7459,15 @@ This work consists of the file  siunitx.dtx
 % more sense for \pkg{siunitx}, with \texttt{C} used for 
 % \pkg{cellspace}. To enable this to work well, the column
 % rewriting code happens \cs{AtBeginDocument}. The \texttt{S} column
-%  is deleted from \cs{NC@list} so that no warning appears.
+% is deleted from \cs{NC@list} so that no warning appears.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_rewrite_cellspace: {
   \@ifpackageloaded { cellspace } 
     {
       \newcolumntype { C } [1] 
         { > { \bcolumn ##1 \@nil } ##1 < { \ecolumn } }
-      \cs_set:Npn \siunitx_tmp:w ##1 \NC@do~S ##2 \q_stop 
-        { \toks_set:N \NC@list { ##1 ##2 } }
+      \cs_set:Npn \siunitx_tmp:w ##1 \NC@do S ##2 \q_stop 
+        { \toks_set:Nn \NC@list { ##1 ##2 } }
       \exp_after:wN \siunitx_tmp:w \toks_use:N \NC@list \q_stop
       \cs_gundefine:N \NC@find@S
     } { }
@@ -7377,7 +7486,7 @@ This work consists of the file  siunitx.dtx
 % to the appropriate macro.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_rewrite_create:N #1 {
-  \tl_set:Nn \l_siunitx_tmpa_tl { \NC@do ~ #1 }
+  \tl_set:Nn \l_siunitx_tmpa_tl { \NC@do #1 }
   \tl_put_right:NV \l_siunitx_tmpa_tl \NC@list
   \newcolumntype {#1} { }
   \toks_set:NV \NC@list \l_siunitx_tmpa_tl
@@ -7403,14 +7512,14 @@ This work consists of the file  siunitx.dtx
 % the result.  The collection routine tries to ensure that the 
 % typesetting part only receives real cell contents.
 % 
-%\begin{macro}{\l_siunitx_table_collect_tl}
-%\begin{macro}{\l_siunitx_table_collect_pre_tl}
-%\begin{macro}{\l_siunitx_table_collect_post_tl}
+%\begin{macro}{\l_siunitx_table_collect_toks}
+%\begin{macro}{\l_siunitx_table_collect_pre_toks}
+%\begin{macro}{\l_siunitx_table_collect_post_toks}
 % Three storage areas.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_table_collect_tl
-\tl_new:N \l_siunitx_table_collect_pre_tl
-\tl_new:N \l_siunitx_table_collect_post_tl
+\toks_new:N \l_siunitx_table_collect_toks
+\toks_new:N \l_siunitx_table_collect_pre_toks
+\toks_new:N \l_siunitx_table_collect_post_toks
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7427,20 +7536,34 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 % 
 %\begin{macro}{\siunitx_table_collect_begin:Nn}
+%\begin{macro}[aux]{\siunitx_table_collect_begin_s:}
+%\begin{macro}[aux]{\siunitx_table_collect_begin_S:}
 % The collector starts by setting up local options, then clears and
 % initialises the storage and testing system.  
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_begin:Nn #1#2 {
-  \group_begin:
-    \keys_set:nn { siunitx } {#2}
-    \cs_set_eq:Nc \siunitx_table_collect_token:N
-      { siunitx_table_collect_token_ #1 :N }
-    \cs_set_eq:Nc \siunitx_table_print:
-      { siunitx_table_print_ #1 : }
-    \use:c { siunitx_table_collect_init_ #1 : }
-    \siunitx_table_collect_get:
+  \keys_set:nn { siunitx } {#2}
+  \use:c { siunitx_table_collect_begin_ #1 : }
+}
+\cs_new_nopar:Npn \siunitx_table_collect_begin_s: {
+  \cs_set_eq:NN \siunitx_table_collect_token:N 
+    \siunitx_table_collect_token_s:N
+  \cs_set_eq:NN \siunitx_table_print: \siunitx_table_print_s:
+  \siunitx_table_collect_init_s:
+  \siunitx_table_collect_get:
+}
+\cs_new_nopar:Npn \siunitx_table_collect_begin_S: {
+  \cs_set_eq:NN \siunitx_table_collect_token:N 
+    \siunitx_table_collect_token_S:N
+  \cs_set_eq:NN \siunitx_table_print: \siunitx_table_print_S:
+  \siunitx_table_collect_init_S:
+  \bool_if:NTF \l_siunitx_number_parse_bool
+    { \siunitx_table_collect_get: }
+    { \siunitx_table_direct: }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_table_collect_braced:n}
@@ -7461,18 +7584,18 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_table_collect_expand:N #1 {
   \siunitx_if_tl:NTF #1 
     {
-      \tl_use:N \siunitx_table_collect_pre_tl
-      \tl_clear:N \siunitx_table_collect_pre_tl
+      \toks_use:N \siunitx_table_collect_pre_toks
+      \toks_clear:N \siunitx_table_collect_pre_toks
       \cs_set_nopar:Npx \siunitx_table_collect_next: 
         { \exp_not:N \siunitx_table_collect_get: \exp_not:V #1 }
     }
     {
       \bool_if:NTF \siunitx_table_collect_pre_bool
-        { \tl_put_right:Nn \siunitx_table_collect_pre_tl {#1} }
+        { \toks_put_right:Nn \siunitx_table_collect_pre_toks {#1} }
         {
           \bool_set_true:N \siunitx_table_collect_post_bool
           \bool_set_false:N \siunitx_table_collect_pre_bool 
-          \tl_put_right:Nn \siunitx_table_collect_post_tl {#1}
+          \toks_put_right:Nn \siunitx_table_collect_post_toks {#1}
         }
     }
 }
@@ -7480,27 +7603,36 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_collect_get:}
+%\begin{macro}{\siunitx_table_collect_get_aux:}
 % The token collection system first has to check that the next argument
 % does not start with an opening-brace character.  If it does, the 
 % testing is skipped and the braced token is stored.  Otherwise, a check
-% is made against various ignored tokens.
+% is made against various ignored tokens. At present, things seem to be
+% broken with \pkg{expl3}'s \cs{peek_catcode_ignore_spaces:NTF}, so 
+% everything is done by hand.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_get: {
   \cs_set_eq:NN \siunitx_table_collect_next: \siunitx_table_collect_get:
-  \peek_charcode:NTF \c_group_begin_token
-    { \siunitx_table_collect_braced:n }
-    { \siunitx_table_collect_not_braced:N }
+  \cs_set:Npn \peek_execute_branches: {
+    \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
+      \exp_after:wN \siunitx_table_collect_braced:n
+    \else:
+      \exp_after:wN \siunitx_table_collect_not_braced:N
+    \fi:
+  }
+  \peek_after:NN \peek_ignore_spaces_execute_branches:
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_collect_init:}
 % The usual spin-out of basics.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_init: {
-  \tl_clear:N \l_siunitx_table_collect_tl
-  \tl_clear:N \l_siunitx_table_collect_pre_tl
-  \tl_clear:N \l_siunitx_table_collect_post_tl
+  \toks_clear:N \l_siunitx_table_collect_toks
+  \toks_clear:N \l_siunitx_table_collect_pre_toks
+  \toks_clear:N \l_siunitx_table_collect_post_toks
   \bool_set_false:N \l_siunitx_table_collect_post_bool
 }
 %    \end{macrocode}
@@ -7512,10 +7644,11 @@ This work consists of the file  siunitx.dtx
 % \cs{l_siunitx_number_valid_tl} correctly.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_init_s: {
+  \siunitx_table_collect_init:
   \bool_set_false:N \l_siunitx_table_collect_pre_bool
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
-      \tl_put_right:Nn \l_siunitx_table_collect_tl { {##1} }
+      \toks_put_right:Nn \l_siunitx_table_collect_toks { {##1} }
       \siunitx_table_collect_next:
     }
 }
@@ -7525,10 +7658,12 @@ This work consists of the file  siunitx.dtx
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
       \bool_if:NTF \l_siunitx_table_collect_pre_bool
-        { \tl_put_right:Nn \l_siunitx_table_collect_pre_tl { {##1} } }
+        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks 
+          { {##1} } }
         {
           \bool_set_true:N \l_siunitx_table_collect_post_bool
-          \tl_put_right:Nn \l_siunitx_table_collect_post_tl { {##1} }
+          \toks_put_right:Nn \l_siunitx_table_collect_post_toks 
+            { {##1} }
         }
       \siunitx_table_collect_next:
     }
@@ -7545,12 +7680,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_collect_newline:}
-% The end macro needs to come before the new line is called.
+% The end macro needs to come before the new line is called. The 
+% print function is redefined so that it only actually does stuff once.
+% As each cell is a group anyway, there is no need to save the 
+% definition of \cs{siunitx_table_print:}, as it will re-appear on its
+% own.
 %    \begin{macrocode}
-\cs_new_nopar:Npn  \siunitx_table_collect_newline: {
+\cs_new_nopar:Npn \siunitx_table_collect_newline: {
+  % TEMP : Do we need the \hfil?
   \siunitx_table_print:
+  \tex_hfil:D \scan_stop:
+  \cs_set_eq:NN \siunitx_table_print: \prg_do_nothing:
   \tabularnewline
 }
+\cs_new_nopar:Npn \siunitx_table_print_saved: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -7602,7 +7745,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_token:N #1 { }
 \cs_new:Npn \siunitx_table_collect_token_s:N #1 { 
-  \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
+  \toks_put_right:Nn \l_siunitx_table_collect_toks {#1}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7615,18 +7758,141 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_token_S:N #1 {
   \bool_if:NTF  \l_siunitx_table_collect_post_bool 
-    { \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1} }
+    { \toks_put_right:Nn \l_siunitx_table_collect_post_toks {#1} }
     {
       \tl_if_in:NnTF \l_siunitx_number_valid_tl {#1} 
         {
-          \bool_set_false:N \l_siunitx_table_collect_pre_tl
-          \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
+          \bool_set_false:N \l_siunitx_table_collect_pre_bool
+          \toks_put_right:Nn \l_siunitx_table_collect_toks {#1}
         }
         { \siunitx_table_collect_expand:N #1 }
     }
 }
 %    \end{macrocode}
 %\end{macro}
+%
+%\subsection{Table printing: general code}
+%
+%\begin{macro}{\c_siunitx_zero_dim}
+% A zero dimension, for use in alignments.
+%    \begin{macrocode}
+\dim_new:N \c_siunitx_zero_dim
+\dim_set:Nn \c_siunitx_zero_dim { \c_zero pt }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\c_siunitx_one_fill_skip}
+% A fixed skip of one \texttt{fill}.
+%    \begin{macrocode}
+\skip_new:N \c_siunitx_one_fill_skip
+\skip_set:Nn \c_siunitx_one_fill_skip { \c_siunitx_zero_dim plus 1 fill}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\c_siunitx_table_correction_skip}
+%\begin{macro}{\siunitx_colortbl_check:}
+%\begin{macro}{\siunitx_table_colortbl_correction:}
+% If the package \pkg{colortbl} is loaded, there is a need to allow
+% that it changes how centring is carried out.
+%    \begin{macrocode}
+\skip_new:N \c_siunitx_table_correction_skip
+\cs_new_nopar:Npn \siunitx_colortbl_check: {
+  \@ifpackageloaded { colortbl }
+    { 
+      \skip_set:Nn \c_siunitx_table_correction_skip 
+        { \c_siunitx_zero_dim plus -0.5 fill } 
+    }
+    { 
+      \skip_set:Nn \c_siunitx_table_correction_skip 
+        { \c_siunitx_zero_dim } 
+    }
+}
+\AtBeginDocument { \siunitx_colortbl_check: }
+\cs_new_nopar:Npn \siunitx_table_colortbl_correction: {
+  \skip_horizontal:n { \c_siunitx_table_correction_skip }
+  \tex_kern:D \c_siunitx_zero_dim
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_align_left:n}
+%\begin{macro}{\siunitx_table_align_right:n}
+% These are simple shortcuts to keep life clearer in the rest of the 
+% code. The idea is that the kern acts as a \enquote{stop} for the 
+% horizontal skip. The correction for \pkg{colortbl} is separate as the
+% spacing needs to be explicitly deleted.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_align_left:n #1 {
+  \siunitx_table_colortbl_correction:
+  \skip_horizontal:n {#1}
+  \tex_kern:D \c_siunitx_zero_dim
+}
+\cs_new_nopar:Npn \siunitx_table_align_right:n #1 {
+  \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
+  \tex_kern:D \c_siunitx_zero_dim
+  \siunitx_table_colortbl_correction:
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Printing units in \texttt{s} columns}
+%
+% The easiest type of printing is the \texttt{s} column. Here, there is
+% no real problem with alignment. All that has to happen is to print the
+% collected input as the argument to the internal part of an \cs{si}
+% function.
+% 
+%\begin{macro}{\l_siunitx_table_unit_align_skip}
+% The spacing used is stored as a skip, which needs to be set up first.
+%    \begin{macrocode}
+\skip_new:N \l_siunitx_table_unit_align_skip
+%    \end{macrocode}
+%\end{macro} 
+% 
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  table-align-units .choice:,
+  table-align-units / center .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_unit_align_skip 
+        { \c_siunitx_zero_dim plus 0.5 fill } 
+    },
+  table-align-units / centre .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_unit_align_skip 
+        { \c_siunitx_zero_dim plus 0.5 fill } 
+    },
+  table-align-units / left   .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_unit_align_skip 
+        { \c_siunitx_zero_dim } 
+    },
+  table-align-units / right  .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_unit_align_skip 
+        { \c_siunitx_zero_dim plus 1 fill } 
+    },
+}
+\keys_set:nn { siunitx } {
+  table-align-units = centre
+}
+%    \end{macrocode}
+% 
+%\begin{macro}{\siunitx_table_print_s:}
+% Actually printing an \texttt{s} column is not very complex. There is
+% some spacing to do at each side, with the main part of the job being
+% to print the material using the internal version of \cs{si}.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_s: { 
+  \siunitx_table_align_left:n { \l_siunitx_table_unit_align_skip }
+  \siunitx_unit_output:Vn \l_siunitx_table_collect_toks { }
+  \siunitx_table_align_right:n { \l_siunitx_table_unit_align_skip }
+}
+%    \end{macrocode}
+%\end{macro} 
 %
 %\subsection{Formatting and printing in tables}
 %
