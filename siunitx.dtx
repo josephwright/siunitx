@@ -6374,16 +6374,19 @@ This work consists of the file  siunitx.dtx
 % The master function does a very simple checks then hands off. 
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_in:nn #1#2 {
-  \siunitx_unit_if_literal:nTF {#1} 
+  \tl_if_empty:nF {#1} 
     {
-      \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
-        { \siunitx_unit_format_literal:n {#1} }
-        { \msg_error:nnx { siunitx } { literal-unit } {#1} }
-    }
-    {
-      \siunitx_unit_parse:nn {#1} {#2}
-      \siunitx_unit_format:
-    }
+      \siunitx_unit_if_literal:nTF {#1} 
+        {
+          \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
+            { \siunitx_unit_format_literal:n {#1} }
+            { \msg_error:nnx { siunitx } { literal-unit } {#1} }
+        }
+        {
+          \siunitx_unit_parse:nn {#1} {#2}
+          \siunitx_unit_format:
+        }
+  }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
 %    \end{macrocode}
