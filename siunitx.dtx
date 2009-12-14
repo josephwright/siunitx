@@ -7616,13 +7616,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_collect_get: {
   \cs_set_eq:NN \siunitx_table_collect_next: \siunitx_table_collect_get:
-  \cs_set:Npn \peek_execute_branches: {
-    \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-      \exp_after:wN \siunitx_table_collect_braced:n
-    \else:
-      \exp_after:wN \siunitx_table_collect_not_braced:N
-    \fi:
-  }
+  \cs_set_nopar:Npn \peek_execute_branches: 
+    {
+      \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
+        \exp_after:wN \siunitx_table_collect_braced:n
+      \else:
+        \exp_after:wN \siunitx_table_collect_not_braced:N
+      \fi:
+    }
   \peek_after:NN \peek_ignore_spaces_execute_branches:
 }
 %    \end{macrocode}
