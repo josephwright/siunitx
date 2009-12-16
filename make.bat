@@ -239,9 +239,10 @@
   if ERRORLEVEL 1 (
     echo ! Compilation failed
   ) else (
-    makeindex -q -s gglo.ist  -o %~n1.gls %~n1.glo > nul
-    makeindex -q -s l3doc.ist -o %~n1.ind %~n1.idx > nul
+    makeindex -q -s gglo.ist -o %~n1.gls %~n1.glo > nul
+    makeindex -q -s gind.ist -o %~n1.gls %~n1.glo > nul
     pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %1" > nul
+    makeindex -q -s gind.ist -o %~n1.gls %~n1.glo > nul
     pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input %1" > nul 
   )
 

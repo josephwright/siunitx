@@ -90,6 +90,7 @@ CLEAN = \
 	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo &> /dev/null ; \
 	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
 	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
+	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
 	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
 	else \
 	  echo "  Compilation failed" ; \
