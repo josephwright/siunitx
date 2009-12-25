@@ -2475,7 +2475,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_if_tl:NTF}
 %\begin{macro}[aux]{\siunitx_if_tl_aux:w}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
-% short macros only.
+% short macros only. The second test (with the \cs{cs_sto_str:N} part)
+% is checking for \LaTeXe\ robust commands.
 %    \begin{macrocode}
 \group_begin:
 \tl_map_inline:nn { \M \A \C \R \O } 
@@ -2488,11 +2489,15 @@ This work consists of the file  siunitx.dtx
     {
       \exp_after:wN \siunitx_if_tl_aux:w
         \token_to_meaning:N #1 MACRO \q_nil
+          { 
+            \if_cs_exist:cTF { \cs_to_str:N #1 ~ }
+              { \prg_return_false: }
+              { \prg_return_true: }
+          } 
+          { \prg_return_false: }
     }
   \cs_new_nopar:Npn \siunitx_if_tl_aux:w #1 MACRO #2 \q_nil 
-    {
-      \tl_if_empty:nTF {#1} { \prg_return_true: } { \prg_return_false: }
-    }
+    { \tl_if_empty:nTF {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
