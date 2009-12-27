@@ -6129,6 +6129,9 @@ This work consists of the file  siunitx.dtx
 % Printing a number with no multiple parts is easy. There is a check for
 % any units, which if present may force the number to have brackets 
 % added. there is then simply a short run to print the units and number.
+% The test for bracketing numbers is complicated by the fact that simple
+% exponents should not be bracketed in this context, but other compound
+% numbers (for example complex values) should.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_output_single: {
   \bool_if:nF
@@ -6137,7 +6140,13 @@ This work consists of the file  siunitx.dtx
       \tl_if_empty_p:N \l_siunitx_unit_tl 
     }
     {
-      \siunitx_number_format_brackets:n { result }   
+      \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-complex }
+        { \siunitx_number_format_brackets:n { result } }
+        {
+          \prop_if_in:NnT \l_siunitx_number_out_prop 
+            { mantissa-uncertainty }
+            { \siunitx_number_format_brackets:n { result } }
+        }
     }
   \prop_get:NnN \l_siunitx_number_out_prop { result } 
     \l_siunitx_number_out_tl
