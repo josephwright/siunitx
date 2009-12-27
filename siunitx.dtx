@@ -5604,9 +5604,17 @@ This work consists of the file  siunitx.dtx
             \l_siunitx_tmpb_tl        
           \prop_get:NnN \l_siunitx_number_out_prop {#1#2} 
             \l_siunitx_tmpa_tl   
-          \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl      
+          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
           \prop_put:NnV \l_siunitx_number_out_prop {#1#2} 
-            \l_siunitx_tmpb_tl
+            \l_siunitx_tmpa_tl
+          \prop_if_in:NnT \l_siunitx_number_out_prop { #1#2 -result }
+            {
+              \prop_get:NnN \l_siunitx_number_out_prop { #1#2 -result } 
+                \l_siunitx_tmpa_tl   
+              \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
+                \prop_put:NnV \l_siunitx_number_out_prop { #1#2 -result } 
+              \l_siunitx_tmpa_tl
+            }  
       }
     }
 }
@@ -5614,7 +5622,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_sign_complex_correction:n}
+%\begin{macro}{\siunitx_number_format_sign_complex_correction:nn}
 % If a number contains both a real and complex part, it is necessary
 % to correct the sign so that it will print properly in text mode.
 %    \begin{macrocode}
@@ -7966,6 +7974,14 @@ This work consists of the file  siunitx.dtx
 % tabular material is not suitable. Instead, the strategy used by
 % \pkg{dcolumn} can be applied, which requires the decimal marker to
 % be made active in maths mode.
+% 
+%\begin{macro}{\siunitx_table_direct:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunit_table_direct: {
+  \cs_set_eq:NN \siunitx_table_print: \prg_do_nothing:
+}
+%    \end{macrocode}
+%\end{macro} 
 %
 %\subsection{Symbols}
 %
@@ -8931,15 +8947,15 @@ This work consists of the file  siunitx.dtx
     cdot         .code:n    = 
       { group-separator       = { } \cdot { }                         },
   digitsep / 
-    comma        .code:n    = { group-separator         = { {,} }    },
+    comma        .code:n    = { group-separator         = { {,} }     },
   digitsep / 
-    fullstop     .code:n    = { group-separator         = { { . } }  },
+    fullstop     .code:n    = { group-separator         = { { . } }   },
   digitsep / 
-    med          .code:n    = { group-separator         = \:         },
+    med          .code:n    = { group-separator         = \:          },
   digitsep / 
-    medium       .code:n    = { group-separator         = \:         },
+    medium       .code:n    = { group-separator         = \:          },
   digitsep / 
-    none         .code:n    = { group-separator         =            },
+    none         .code:n    = { group-separator         =             },
   digitsep / 
     period       .code:n    = { group-separator         = { { . } }   },
   digitsep / 
