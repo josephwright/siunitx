@@ -181,7 +181,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPostPower\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
-
+\DisableImplementation
 \begin{document}
   \DocInput{\jobname.dtx}
 \end{document}
@@ -245,7 +245,7 @@ This work consists of the file  siunitx.dtx
 %          candela,
 %          centi,
 %          color,
-%          coloumb,
+%          coulomb,
 %          cubed,
 %          cubic,
 %          deci,
@@ -2268,6 +2268,17 @@ This work consists of the file  siunitx.dtx
 %  \}
 %\end{flushleft}
 %
+%\section{Thanks}
+%
+% Many users have provided feedback, bug reports and ideas for new
+% features for \pkg{siunitx}: thanks to all of them. Particular thanks
+% to Stefan Pinnow, who has taken the lead role as beta tester for
+% \pkg{siunitx}, finding incorrect output, bad documentation and the 
+% odd spelling mistake in the documentation. Thanks also to 
+% Danie Els and Marcel Heldoorn for the \pkg{SIstyle} and \pkg{SIunits}
+% packages, respectively, which provided the starting point for the
+% development of \pkg{siunitx}.
+%
 %\end{documentation}
 %
 %\begin{implementation}
@@ -3171,15 +3182,13 @@ This work consists of the file  siunitx.dtx
     }
   \cs_new_nopar:Npn \siunitx_print_text: 
     {
-      \group_begin:
-        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
-          { \siunitx_print_text_sub:n }
-        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! } 
-          { \siunitx_print_text_sub:n }
-        \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
-          { \siunitx_print_text_super:n }
-        \l_siunitx_print_arg_tl
-      \group_end:
+      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ } 
+        { \siunitx_print_text_sub:n }
+      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! } 
+        { \siunitx_print_text_sub:n }
+      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ } 
+        { \siunitx_print_text_super:n }
+      \l_siunitx_print_arg_tl
     }
 }
 %    \end{macrocode}
@@ -3187,6 +3196,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_print_text_sub:n}
+%\begin{macro}[aux]{\siunitx_print_text_sub_super:n}
 %\begin{macro}{\siunitx_print_text_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
 % the appearance is the same as maths mode. As |_| is a letter, there
@@ -3200,8 +3210,21 @@ This work consists of the file  siunitx.dtx
 \tl_to_lowercase:n {
   \group_end:
   \cs_new:Npn \siunitx_print_text_sub:n #1 
-    { \ensuremath { @ { \text {#1} } } }
+    { 
+      \cs_set:Npn \siunitx_print_text_sub_super:n ##1
+        {
+          \ensuremath 
+            { 
+              @ { \text {#1} } 
+              ^ { \text {##1} }
+            }
+        }
+      \peek_meaning_remove:NTF \siunitx_print_text_super:n
+        { \siunitx_print_text_sub_super:n }
+        { \ensuremath { @ { \text {#1} } } }
+    }
 }
+\cs_new:Npn \siunitx_print_text_sub_super:n { }
 \cs_new:Npn \siunitx_print_text_super:n #1 {
   \tl_set:Nn \l_siunitx_tmpa_tl {#1}
   \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - } 
@@ -3216,6 +3239,7 @@ This work consists of the file  siunitx.dtx
   \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -6867,7 +6891,6 @@ This work consists of the file  siunitx.dtx
     { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_tl } }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_symbol: {
-  \siunitx_unit_format_fraction_symbol_aux:n { numerator }
   \siunitx_unit_format_fraction_symbol_aux:n { denominator }
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
   \siunitx_tl_put_right_maths:NV \l_siunitx_unit_tl
