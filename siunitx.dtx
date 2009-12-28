@@ -6081,7 +6081,7 @@ This work consists of the file  siunitx.dtx
       \exp_not:N \ensuremath 
         { \exp_not:V \l_siunitx_number_out_tl }
     }
-  \siunitx_print:nV  { number } \l_siunitx_number_out_tl
+  \siunitx_number_output_single_aux:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6097,7 +6097,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_output_quotient_tl
   \tl_put_right:NV \l_siunitx_number_out_tl 
     \l_siunitx_number_denominator_tl 
-  \siunitx_print:nV  { number }  \l_siunitx_number_out_tl 
+  \siunitx_number_output_single_aux:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6126,6 +6126,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_single:}
+%\begin{macro}[aux]{\siunitx_number_output_single_aux:}
 % Printing a number with no multiple parts is easy. There is a check for
 % any units, which if present may force the number to have brackets 
 % added. there is then simply a short run to print the units and number.
@@ -6147,11 +6148,15 @@ This work consists of the file  siunitx.dtx
     }
   \prop_get:NnN \l_siunitx_number_out_prop { result } 
     \l_siunitx_number_out_tl
+  \siunitx_number_output_single_aux:
+}
+\cs_new_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
   \siunitx_print:nV  { number } \l_siunitx_number_out_tl
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Creating unit macros}
