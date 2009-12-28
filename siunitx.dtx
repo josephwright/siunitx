@@ -1915,6 +1915,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      forbid-literal-units & Switch  & false      \\
 %      inter-unit-separator & Maths   & \cs{,}     \\
+%      parse-units          & Switch  & true       \\
 %      per-mode             & Choice  & reciprocal \\
 %      per-symbol           & Maths   & /          \\    
 %      prefixes-as-symbols  & Switch  & true       \\
@@ -2009,6 +2010,17 @@ This work consists of the file  siunitx.dtx
 %  \SI{10}{\kilo\gram\squared\deci\second} \\
 %  \si[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
 %  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\squared\deci\second}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{parse-units}
+% Normally, \pkg{siunitx} is used with the unit parse enabled, and
+% only prints units directly if there is literal input. However, if
+% the input is known to be essentially consistent and high performance
+% is desired, then the parser can be turned off using the
+% \opt{parse-units} switch.
+%\begin{LaTeXdemo}
+%  \SI{300}{\MHz} \\
+%  \SI[parse-units = false]{300}{\MHz} \\
 %\end{LaTeXdemo}
 %
 %\subsection{Numbers with units}
@@ -2267,6 +2279,21 @@ This work consists of the file  siunitx.dtx
 %  \ \ text-micro \ = \SIUnitSymbolMicro \\
 %  \}
 %\end{flushleft}
+%
+%\subsection{Maximising performance}
+%
+% Both the number and unit parsers require significant effort in
+% terms of \TeX\ programming. For input that does not require 
+% such processing, the maximum performance for \pkg{siunitx} can
+% therefore be obtained by turning off both systems:
+%\begin{LaTeXdemo}
+%  \SI{7.3}{\Hz} \\
+%  \SI[parse-units = false]{7.3}{\Hz} \\
+%  \SI[
+%    parse-numbers = false,
+%    parse-units   = false
+%  ]{7.3}{\Hz} \\
+%\end{LaTeXdemo}
 %
 %\section{Thanks}
 %
@@ -6437,15 +6464,19 @@ This work consists of the file  siunitx.dtx
 % input part of the process is used to sort out parsed or literal units.
 %
 %\begin{macro}{\l_siunitx_unit_allow_literal_bool}
+%\begin{macro}{\l_siunitx_unit_parse_bool}
 % One option is related to how units are pre-processed.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   forbid-literal-units .bool_set:N = \l_siunitx_unit_allow_literal_bool,
+  parse-units          .bool_set:N = \l_siunitx_unit_parse_bool
 }
 \keys_set:nn { siunitx } {
-  forbid-literal-units = true
+  forbid-literal-units = false,
+  parse-units          = true
 }
 %    \end{macrocode}
+%\end{macro} 
 %\end{macro}  
 % 
 %\begin{macro}{\siunitx_unit_in:nn}
@@ -6453,19 +6484,23 @@ This work consists of the file  siunitx.dtx
 % The master function does a very simple checks then hands off. 
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_in:nn #1#2 {
-  \tl_if_empty:nF {#1} 
+  \bool_if:NTF \l_siunitx_unit_parse_bool 
     {
-      \siunitx_unit_if_literal:nTF {#1} 
+      \tl_if_empty:nF {#1} 
         {
-          \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
-            { \siunitx_unit_format_literal:n {#1} }
-            { \msg_error:nnx { siunitx } { literal-unit } {#1} }
-        }
-        {
-          \siunitx_unit_parse:nn {#1} {#2}
-          \siunitx_unit_format:
-        }
+          \siunitx_unit_if_literal:nTF {#1} 
+            {
+              \bool_if:NTF \l_siunitx_unit_allow_literal_bool 
+                { \msg_error:nnx { siunitx } { literal-unit } {#1} }
+                { \siunitx_unit_format_literal:n {#1} }
+            }
+            {
+              \siunitx_unit_parse:nn {#1} {#2}
+              \siunitx_unit_format:            
+            }
+      }
   }
+  { \siunitx_unit_format_literal:n {#1} }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { Vn }
 %    \end{macrocode}
@@ -6765,7 +6800,7 @@ This work consists of the file  siunitx.dtx
 % At this stage, output formatting options are created.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  inter-unit-separator .tl_set:N  = \l_siunitx_unit_separator_tl ,
+  inter-unit-separator .tl_set:N = \l_siunitx_unit_separator_tl ,
   per-mode             .choice:,
   per-mode / fraction .code:n = 
     {
