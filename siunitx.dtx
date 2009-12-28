@@ -6806,10 +6806,21 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_unit_format:}
 % Most of the work is done by the loop, with a little tidying up for
-% fraction-like output.
+% fraction-like output. Before starting the loop, there is a check for
+% the case of a single reciprocal unit when per is set up to create a
+% symbol. In that special case, the space between a number and a unit 
+% has to be removed.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format: {
   \siunitx_unit_format_init:
+  \intexpr_compare:nT { \l_siunitx_unit_int = \c_one } 
+    { 
+      \tl_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
+        {
+          \prop_if_in:NnT \l_siunitx_unit_prop { per-1 }
+            { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+        }
+    }
   \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } 
     { \siunitx_unit_format_loop: }
   \bool_if:NT \l_siunitx_per_fraction_bool 
