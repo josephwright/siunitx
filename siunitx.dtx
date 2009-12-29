@@ -2295,6 +2295,10 @@ This work consists of the file  siunitx.dtx
 %    parse-units   = false
 %  ]{7.3}{\Hz} \\
 %\end{LaTeXdemo}
+% As an intermediate step, checking for complex numbers can be skipped
+% by setting \opt{input-complex-roots} to be empty. The code will 
+% detect this and skip various internal procedures which are only 
+% relevant if complex numbers are present in the input.
 %
 %\section{Thanks}
 %
@@ -3935,20 +3939,37 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_in_separate_aux:n { mantissa }
 }
 \cs_new_nopar:Npn \siunitx_number_in_separate_aux:n #1 {
+  \tl_if_empty:NTF \l_siunitx_input_complex_tl 
+    { \siunitx_number_in_separate_no_complex:n {#1} }
+    { \siunitx_number_in_separate_with_complex:n {#1} }
+}
+\cs_new:Npn \siunitx_number_in_separate_no_complex:n #1 {
+  \bool_if:NF \l_siunitx_error_bool 
+    { 
+      \siunitx_number_in_sign:n {#1} 
+      \bool_if:NF \l_siunitx_error_bool 
+        { 
+          \siunitx_number_in_decimal:n {#1} 
+          \bool_if:NF \l_siunitx_error_bool 
+            { \siunitx_number_in_uncertainty:n {#1} }
+        }
+    }        
+}
+\cs_new:Npn \siunitx_number_in_separate_with_complex:n #1 {
   \bool_if:NF \l_siunitx_error_bool 
     {
       \siunitx_number_in_sign:n {#1}
       \siunitx_number_in_complex:n {#1}
-    }
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \siunitx_number_in_decimal:n {#1}
-      \siunitx_number_in_decimal_complex:n {#1}
-    }
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \siunitx_number_in_uncertainty:n {#1}
-      \siunitx_number_in_uncertainty:n { #1 -complex }
+      \bool_if:NF \l_siunitx_error_bool 
+        {
+          \siunitx_number_in_decimal:n {#1}
+          \siunitx_number_in_decimal_complex:n {#1}
+          \bool_if:NF \l_siunitx_error_bool 
+            {
+              \siunitx_number_in_uncertainty:n {#1}
+              \siunitx_number_in_uncertainty:n { #1 -complex }
+            }
+        }      
     }
 }
 %    \end{macrocode}
@@ -6180,7 +6201,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
-  \siunitx_print:nV  { number } \l_siunitx_number_out_tl
+  \siunitx_print:nV { number } \l_siunitx_number_out_tl
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -7443,14 +7464,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_combined_output:n}
-%\begin{macro}{\siunitx_combined_output_aux:n}
 % Printing the combination of a number and a unit means checking for
 % parsing then parsing the number part.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_combined_output:n #1 {
   \bool_if:NTF \l_siunitx_number_parse_bool
     {
-      \siunitx_combined_output_aux:n {#1}
+      \tl_clear:N \l_siunitx_number_out_tl
+      \bool_set_false:N \l_siunitx_number_compound_bool
+      \siunitx_number_output_parse:n {#1}
     }
     {
       \siunitx_unit_output_pre_print:
@@ -7458,13 +7480,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_unit_output_print:
     }
 }
-\cs_new:Npn \siunitx_combined_output_aux:n #1 {
-  \tl_clear:N \l_siunitx_number_out_tl
-  \bool_set_false:N \l_siunitx_number_compound_bool
-  \siunitx_number_output_parse:n {#1}
-}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_combined_unit:nnn}
