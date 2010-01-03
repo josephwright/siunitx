@@ -85,7 +85,7 @@ See http://www.latex-project.org/lppl.txt
 \endpreamble
 \postamble
 
-Copyright (C) 2008-2009 by
+Copyright (C) 2008-2010 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
@@ -2295,10 +2295,6 @@ This work consists of the file  siunitx.dtx
 %    parse-units   = false
 %  ]{7.3}{\Hz} \\
 %\end{LaTeXdemo}
-% As an intermediate step, checking for complex numbers can be skipped
-% by setting \opt{input-complex-roots} to be empty. The code will 
-% detect this and skip various internal procedures which are only 
-% relevant if complex numbers are present in the input.
 %
 %\section{Thanks}
 %
@@ -2391,6 +2387,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_error:nxx}
 %\begin{macro}{\siunitx_error:nx}
 %\begin{macro}{\siunitx_error:n}
+%\begin{macro}{\siunitx_error:nV}
 % General-purpose functions for throwing errors.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_error_bool
@@ -2404,7 +2401,9 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_error:n #1 {
   \siunitx_error:nxx {#1} { } { }
 }
+\cs_generate_variant:Nn \siunitx_error:nx { nV }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -3418,38 +3417,85 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Parsing numbers}
 %
-% The number parser is designed to work with single numbers, which can
-% contain exponents, complex parts and uncertainties.  In general, 
-% looping over the input is avoided: instead, loops over the check 
-% values are used as these will hopefully be shorter, on average. The
-% parser will report mathematically invalid numbers here: whether the
-% input is valid in the context required is left to the calling 
-% function.
+% The parser is designed to be relativity fast, which means some code is
+% more or less duplicated to gain more speed. It is also loaded so
+% that simple numbers (such as \num{-1.23}) are parsed particularly
+% quickly. For most documents, this gain more than offsets any slight
+% losses with more complicated numbers.
 % 
-%\begin{macro}{\l_siunitx_number_in_prop}
-% The number is split up into various parts, all stored here.
+%\begin{macro}{\c_siunitx_number_part_complex_tl}
+% A couple of the comparisons needed for checking complex numbers
+% are done using stored text. To make them a little quicker, a
+% pre-stored version of the text is stored here.
 %    \begin{macrocode}
-\prop_new:N \l_siunitx_number_in_prop
-%    \end{macrocode}
-%\end{macro} 
-%
-%\begin{macro}{\l_siunitx_number_valid_tl}
-% This list of valid tokens is set when parsing a number, so that it is
-% flexible.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_number_valid_tl
+\tl_new:Nn \c_siunitx_number_part_complex_tl { complex }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_number_parts_clist}
-% The parts of a number.
+%\begin{macro}{\l_siunitx_number_in_complex_bool}
+%\begin{macro}{\l_siunitx_number_in_complex_root_bool}
+%\begin{macro}{\l_siunitx_number_in_decimal_bool}
+%\begin{macro}{\l_siunitx_number_in_exponent_bool}
+%\begin{macro}{\l_siunitx_number_in_first_bool}
+%\begin{macro}{\l_siunitx_number_in_sign_bool}
+%\begin{macro}{\l_siunitx_number_in_uncert_bool}
+%\begin{macro}{\l_siunitx_number_in_value_bool}
 %    \begin{macrocode}
-\clist_new:N \c_siunitx_number_parts_clist
-\clist_put_right:Nn \c_siunitx_number_parts_clist { mantissa }
-\clist_put_right:Nn \c_siunitx_number_parts_clist { mantissa-complex }
-\clist_put_right:Nn \c_siunitx_number_parts_clist { exponent }
-\clist_put_right:Nn \c_siunitx_number_parts_clist { exponent-complex }
+\bool_new:N \l_siunitx_number_in_complex_bool
+\bool_new:N \l_siunitx_number_in_complex_root_bool
+\bool_new:N \l_siunitx_number_in_decimal_bool
+\bool_new:N \l_siunitx_number_in_exponent_bool
+\bool_new:N \l_siunitx_number_in_first_bool
+\bool_new:N \l_siunitx_number_in_sign_bool
+\bool_new:N \l_siunitx_number_in_uncert_bool
+\bool_new:N \l_siunitx_number_in_value_bool
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_in_prop}
+% The parsed number is stored in a property list as its constituent 
+% parts.
+%    \begin{macrocode}
+\prop_new:N \l_siunitx_number_in_prop
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_parsed_tl}
+% Each part of the number parsed has to be built up in a token list.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_parsed_tl
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_part_tl}
+%\begin{macro}{\l_siunitx_number_part_decimal_tl}
+%\begin{macro}{\l_siunitx_number_part_decimal_marker_tl}
+%\begin{macro}{\l_siunitx_number_part_integer_tl}
+%\begin{macro}{\l_siunitx_number_part_sign_tl}
+%\begin{macro}{\l_siunitx_number_part_uncert_tl}
+% The names of various parts of a number are set up as stored values.
+% This lets some code be used for different parts of a number, while
+% pre-storing everything brings a performance (and clarity) benefit.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_part_tl
+\tl_new:N \l_siunitx_number_part_decimal_tl
+\tl_new:N \l_siunitx_number_part_decimal_marker_tl
+\tl_new:N \l_siunitx_number_part_integer_tl
+\tl_new:N \l_siunitx_number_part_sign_tl
+\tl_new:N \l_siunitx_number_part_uncert_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 % 
 %\begin{macro}{\l_siunitx_input_uncert_close_tl}
@@ -3503,409 +3549,90 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_in_parse:n}
 %\begin{macro}{\siunitx_number_in_parse:V}
-% The master control for parsing numbers is mainly a list of functions
-% to carry out. The rescanning allows full expansion of the input while 
-% dealing with any hard spaces or awkward characters.
+% The parsing routine starts by replacing any formatting in the input
+% using \cs{tl_set_rescan:Nnx}. Next, there is a quick routine to
+% ensure that all signs are single tokens. The main loop then takes 
+% place, which will parse the input into the property list and also
+% set up the flags. There are then some checks and possible corrections.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_in_parse:n #1 {
   \siunitx_number_in_init:
-  \tl_set_rescan:Nnx \l_siunitx_number_arg_tl 
+  \tl_set_rescan:Nnx \l_siunitx_number_arg_tl
     {
       \siunitx_number_in_protect:
       \char_make_ignore:N \~
       \char_make_other:N \,
       \char_make_other:N \.
       \cs_set_eq:NN \, \prg_do_nothing:
-    } 
-    {#1}
-  \tl_if_empty:NF \l_siunitx_number_arg_tl 
-    {
-      \siunitx_number_in_loop:V \l_siunitx_number_arg_tl
-      \bool_if:NF \l_siunitx_error_bool
-        { \siunitx_number_in_separate: }
-      \bool_if:NF \l_siunitx_error_bool 
-        { \siunitx_number_in_tidy: }
-      \bool_if:NF \l_siunitx_error_bool 
-        { \siunitx_number_in_check: }
     }
+    {#1}
+  \siunitx_number_in_sign_replace:N \l_siunitx_number_arg_tl
+  \tl_map_function:NN \l_siunitx_number_arg_tl 
+    \siunitx_number_in_parse_loop:N
+  \tl_if_empty:NF \l_siunitx_number_parsed_tl
+    {
+      \bool_if:NTF \l_siunitx_number_in_uncert_bool
+        { \siunitx_error:nx { invalid-number } {#1} }
+        {
+          \prop_put:NVn \l_siunitx_number_in_prop 
+            \l_siunitx_number_part_tl { true }
+          \bool_if:NTF \l_siunitx_number_in_decimal_bool  
+            {
+              \prop_put:NVV \l_siunitx_number_in_prop 
+                \l_siunitx_number_part_decimal_tl 
+                \l_siunitx_number_parsed_tl
+            }
+            {
+              \prop_put:NVV \l_siunitx_number_in_prop 
+                \l_siunitx_number_part_integer_tl 
+                \l_siunitx_number_parsed_tl
+            }
+       }     
+    }
+  \siunitx_number_in_check:n {#1}
 }
 \cs_generate_variant:Nn \siunitx_number_in_parse:n { V }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_in_check:}
-%\begin{macro}[aux]{\siunitx_number_in_check_uncertainty:n}
-% Checks for invalid number combinations.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_check: {
-  \clist_map_function:NN \c_siunitx_number_parts_clist
-    \siunitx_number_in_check_uncertainty:n
-  \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } 
-    {
-      \prop_if_in:NnF \l_siunitx_number_in_prop { exponent-integer } 
-        {
-          \prop_if_in:NnF \l_siunitx_number_in_prop { exponent-decimal }
-            {
-              \prop_if_in:NnF \l_siunitx_number_in_prop 
-                { exponent-complex } 
-                { \siunitx_error:n { empty-exponent } }
-            }
-        }
-    }
-}
-\cs_new_nopar:Npn \siunitx_number_in_check_uncertainty:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } 
-    {
-      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer } 
-        {
-          \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -decimal }
-            { \siunitx_error:n { uncertainty-only } }
-        }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_in_complex:n}
-%\begin{macro}[aux]{\siunitx_number_in_complex_aux:N}
-% Finding a valid complex number is a two stage process.  The first part
-% is to look for a complex root at the end of the number.  If one is 
-% found, look for a sign dividing the real and imaginary parts.  If 
-% the number is not complex, then any sign tokens are invalid.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_complex:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \cs_set:Npn \siunitx_number_in_complex_aux:N ##1 
-        {
-          \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-            {
-              \siunitx_number_in_complex_check:N ##1
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 -complex }
-                { }
-              \tl_map_break:
-            }
-        }
-      \tl_map_function:NN \l_siunitx_input_complex_tl 
-        \siunitx_number_in_complex_aux:N
-      \bool_if:NF \l_siunitx_error_bool 
-        {
-          \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex } 
-            { 
-              \prop_del:Nn \l_siunitx_number_in_prop {#1}
-              \prop_del:Nn \l_siunitx_number_in_prop { #1 -complex }
-              \siunitx_number_in_complex_separate:n {#1}
-              \siunitx_number_in_complex_tidy:n {#1}
-            }
-        }
-      \bool_if:NF \l_siunitx_error_bool 
-        { \siunitx_number_in_complex_check:n {#1} }
-    }
-}
-\cs_new:Npn \siunitx_number_in_complex_aux:N #1 { }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_complex_check:N}
-% To avoid needing to use a second loop to check for the last letter, 
-% a bit of trickery.  The argument |##2| has to be empty for the 
-% number to be valid.
-%    \begin{macrocode}
-\cs_new:Npn \siunitx_number_in_complex_check:N #1 {
-  \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop 
-    {
-      \tl_if_empty:nTF {##2} 
-        { \tl_set:Nn \l_siunitx_tmpa_tl {##1} }
-        { \siunitx_error:nx { misplaced-complex-root } {#1} }
-    }
-  \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_complex_separate:n}
-%\begin{macro}[aux]{\siunitx_number_in_complex_separate_aux:N}
-%\begin{macro}[aux]{\siunitx_number_in_complex_separate_aux:n}
-% The second part of the system has to look for a sign. The complex 
-% number is currently in \cs{l_siunitx_tmpa_tl}, so this does not need
-% to be recovered from the property list.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_complex_separate:n #1 {
-  \cs_set:Npn \siunitx_number_in_complex_seperate_aux:N ##1 
-    {
-      \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-        {
-          \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop 
-            {
-              \tl_if_empty:nF {####1} 
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop {#1} {####1}
-                }
-              \prop_put:Nnn \l_siunitx_number_in_prop 
-                { #1 -complex-sign } {##1}
-              \prop_put:Nnn \l_siunitx_number_in_prop 
-                { #1 -complex } {####2}
-            }
-          \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-        }
-    }
-  \tl_map_function:NN \l_siunitx_input_sign_tl
-    \siunitx_number_in_complex_seperate_aux:N 
-}
-\cs_new:Npn \siunitx_number_in_complex_seperate_aux:N #1 { }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_complex_tidy:n}
-% There is a need to check that the signs match up with the appropriate 
-% parts of the number.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_complex_tidy:n #1 {
-  \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -complex } 
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop { #1 -complex } 
-        \l_siunitx_tmpa_tl
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } 
-        {
-          \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
-            \l_siunitx_tmpa_tl
-          \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
-          \prop_put:NnV \l_siunitx_number_in_prop { #1 -complex-sign } 
-            \l_siunitx_tmpa_tl
-        }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_complex_check:n}
-%\begin{macro}[aux]{\siunitx_number_in_complex_check_aux:n}
-%\begin{macro}[aux]{\siunitx_number_in_complex_check_aux:N}
-% Finally for complex numbers, make sure there are no stray tokens.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_complex_check:n #1 {
-  \siunitx_number_in_complex_check_aux:n {#1}
-  \siunitx_number_in_complex_check_aux:n { #1 -complex }
-}
-\cs_new_nopar:Npn \siunitx_number_in_complex_check_aux:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \cs_set:Npn \siunitx_number_in_complex_check_aux:N ##1 
-        {
-          \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-            {
-              \siunitx_error:nx { misplaced-sign } {##1}
-              \tl_map_break:
-            }
-        }
-      \tl_map_function:NN \l_siunitx_input_sign_tl
-        \siunitx_number_in_uncertainty_check_aux:N
-      \cs_set:Npn \siunitx_number_in_complex_check_aux:N ##1 
-        {
-          \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-            {
-              \siunitx_error:nx { misplaced-complex-root } {##1}
-              \tl_map_break:
-            }
-      }  
-      \tl_map_function:NN \l_siunitx_input_complex_tl
-        \siunitx_number_in_uncertainty_check_aux:N
-    }
-}
-\cs_new:Npn \siunitx_number_in_complex_check_aux:N #1 { }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_in_decimal:n}
-% The real and complex parts need a slightly different lead-off test
-% here, as a valid complex number can have no digits at all.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_decimal:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \siunitx_number_in_decimal_aux:n {#1}
-    }
-}
-\cs_new_nopar:Npn \siunitx_number_in_decimal_complex:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex } 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -complex } 
-        \l_siunitx_tmpa_tl
-      \tl_if_empty:NTF \l_siunitx_tmpa_tl 
-        {
-          \prop_put:Nnn \l_siunitx_number_in_prop 
-            { #1 -complex-integer } { }
-        }
-        { \siunitx_number_in_decimal_aux:n { #1 -complex } }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_number_in_decimal_aux:n}
-%\begin{macro}[aux]{\siunitx_number_in_decimal_aux:N}
-% The main part of the integer--decimal separator avoids a loop. Only a
-% single token can be given, and this can be used to find the two parts 
-% rapidly. The decimal token is also saved so that it will be available
-% later in the output routine (needed under certain circumstances).
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_decimal_aux:n #1 {
-  \tl_if_empty:NF \l_siunitx_tmpa_tl 
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer } 
-        \l_siunitx_tmpa_tl
-    }
-  \cs_set:Npn \siunitx_number_in_decimal_aux:N ##1 
-    {
-      \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-        {
-          \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop 
-            {
-              \tl_if_empty:nTF {####1} 
-                { 
-                  \prop_del:Nn \l_siunitx_number_in_prop { #1 -integer }
-                }  
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop 
-                    { #1 -integer } {####1}
-                }
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal } 
-                {####2}
-              \prop_put:Nnn \l_siunitx_number_in_prop 
-                { #1 -decimal-symbol } {##1}
-            }
-          \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-          \tl_map_break:
-        }
-    }
-  \tl_map_function:NN \l_siunitx_input_decimal_tl 
-    \siunitx_number_in_decimal_aux:N
-  \siunitx_number_in_decimal_check:n { #1 -integer }
-  \siunitx_number_in_decimal_check:n { #1 -decimal }
-}
-\cs_new:Npn \siunitx_number_in_decimal_aux:N #1 { }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_number_in_decimal_check:n}
-%\begin{macro}[aux]{\siunitx_number_in_decimal_check:N}
-% A short function which makes sure that there is only one decimal 
-% marker.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_decimal_check:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} 
-        \l_siunitx_tmpa_tl
-      \tl_map_function:NN \l_siunitx_input_decimal_tl 
-        \siunitx_number_in_decimal_check:N
-    }
-}
-\cs_new:Npn \siunitx_number_in_decimal_check:N #1 {
-  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} 
-    {
-      \siunitx_error:n { duplicate-decimal-token }
-      \tl_map_break:
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_in_exponent:}
-%\begin{macro}[aux]{\siunitx_number_in_exponent_aux:N}
-% Check for an exponent marker, and if it is there do the separation.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_exponent: {
-  \tl_map_function:NN \l_siunitx_input_exponent_tl 
-    \siunitx_number_in_exponent_aux:N
-}
-\cs_new:Npn \siunitx_number_in_exponent_aux:N #1 {
-  \prop_put:NnV \l_siunitx_number_in_prop { mantissa } 
-    \l_siunitx_number_arg_tl
-  \tl_if_in:NnT \l_siunitx_number_arg_tl {#1} 
-    {
-      \cs_set:Npn \siunitx_tmp:w ##1 #1 ##2 \q_stop 
-        {
-          \prop_put:Nnn \l_siunitx_number_in_prop { mantissa } {##1}
-          \prop_put:Nnn \l_siunitx_number_in_prop { exponent } {##2}
-          \tl_set:Nn \l_siunitx_tmpa_tl {##2}
-          \tl_if_empty:nT {##1} 
-            {
-              \tl_if_empty:nT {##2} 
-                { \siunitx_error:n { empty-number } }
-            }
-        }
-      \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
-      \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} 
-        { \siunitx_error:n { duplicate-exponent-token } }
-      \tl_map_break:
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\begin{macro}{\siunitx_number_in_init:}
-% In the initialisation code, the token list 
-% \cs{l_siunitx_number_valid_tl} is constructed for the checks.
+%\begin{macro}{\siunitx_number_in_init_part:n}
+% The set up code is divided into to parts. First, code only needed
+% once to start the entire parser. Then a second group, which is 
+% carried out at the start of each part of a number, and so is called
+% from a few places.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_init: {
-  \bool_set_false:N \l_siunitx_error_bool
+\cs_new_nopar:Npn \siunitx_number_in_init: {  
+  \cs_set_eq:NN \siunitx_number_in_parse_loop:N 
+    \siunitx_number_in_parse_mantissa:N
+  \cs_set_eq:NN \siunitx_number_in_parse_more:N
+    \siunitx_number_in_parse_mantissa_aux:N
+  \cs_set_eq:NN \siunitx_number_in_check:n 
+    \siunitx_number_in_check_short:n
+  \tl_clear:N \l_siunitx_number_parsed_tl
   \prop_clear:N \l_siunitx_number_in_prop
-  \group_begin:
-    \siunitx_number_in_protect:
-    \tl_set:Nx \l_siunitx_number_valid_tl 
-      {
-        \l_siunitx_input_sign_tl
-        \l_siunitx_input_ignore_tl
-        \l_siunitx_input_digit_tl
-        \l_siunitx_input_decimal_tl
-        \l_siunitx_input_exponent_tl
-        \l_siunitx_input_complex_tl
-        \l_siunitx_input_symbol_tl
-        \l_siunitx_input_uncert_open_tl
-        \l_siunitx_input_uncert_close_tl
-      }
-  \exp_args:NNNV \group_end:
-  \tl_set:Nn \l_siunitx_number_valid_tl \l_siunitx_number_valid_tl
+  \bool_set_false:N \l_siunitx_error_bool
+  \bool_set_false:N \l_siunitx_number_in_complex_bool
+  \bool_set_false:N \l_siunitx_number_in_complex_root_bool
+  \bool_set_false:N \l_siunitx_number_in_exponent_bool
+  \bool_set_false:N \l_siunitx_number_in_uncert_bool
+  \siunitx_number_in_init_part:n { mantissa }
+}
+\cs_new_nopar:Npn \siunitx_number_in_init_part:n #1 {  
+  \bool_set_false:N \l_siunitx_number_in_decimal_bool
+  \bool_set_true:N \l_siunitx_number_in_first_bool
+  \bool_set_false:N \l_siunitx_number_in_sign_bool
+  \bool_set_false:N \l_siunitx_number_in_value_bool
+  \tl_set:Nn \l_siunitx_number_part_tl {#1}
+  \tl_set:Nn \l_siunitx_number_part_decimal_tl { #1 -decimal }
+  \tl_set:Nn \l_siunitx_number_part_decimal_marker_tl 
+    { #1 -decimal-marker }
+  \tl_set:Nn \l_siunitx_number_part_integer_tl { #1 -integer }
+  \tl_set:Nn \l_siunitx_number_part_sign_tl { #1 -sign }
+  \tl_set:Nn \l_siunitx_number_part_uncert_tl { #1 -uncertainty }
 }
 %    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_in_loop:n}
-%\begin{macro}{\siunitx_number_in_loop:V}
-%\begin{macro}[aux]{\siunitx_number_in_loop_aux:N}
-% The entire argument is looped over.  Three tasks take place here, to 
-% keep down the number of loops.  First, a check is made that the input
-% token is valid. The input stream is re-written to remove ignored 
-% tokens, and finally a check is made to see if \enquote{symbolic} 
-% tokens are present in the input.
-%    \begin{macrocode}
-\cs_new:Npn \siunitx_number_in_loop:n #1 {
-  \tl_clear:N \l_siunitx_number_arg_tl
-  \tl_map_function:nN {#1} \siunitx_number_in_loop_aux:N
-}
-\cs_generate_variant:Nn \siunitx_number_in_loop:n { V }
-\cs_new:Npn \siunitx_number_in_loop_aux:N #1 {
-  \tl_if_in:NnF \l_siunitx_number_valid_tl {#1} 
-    {
-      \siunitx_error:nxx { invalid-token-in-number } {#1}
-        { \l_siunitx_number_valid_tl }
-      \tl_map_break:
-    }
-  \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1} 
-    { \tl_put_right:Nn \l_siunitx_number_arg_tl {#1}  }
-  \tl_if_in:NnT \l_siunitx_input_symbol_tl {#1}
-    { \prop_put:Nnn \l_siunitx_number_in_prop { symbolic } { true } }
-}
-%    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -3926,315 +3653,521 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_in_separate:}
-%\begin{macro}[aux]{\siunitx_number_in_separate_aux:n}
-% The main separator macro divides the input into the various parts.
-% As everything is done for the mantissa and the exponent, an auxiliary
-% function is used to keep the code shorter. At each stage where an 
-% error might arise, a check is made for the error switch.
+%\begin{macro}{\siunitx_number_in_sign_replace:N}
+% A short spin-out to keep the replacement of tokens clear.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_separate: {
-  \siunitx_number_in_exponent:
-  \siunitx_number_in_separate_aux:n { exponent }
-  \siunitx_number_in_separate_aux:n { mantissa }
+\cs_new_nopar:Npn \siunitx_number_in_sign_replace:N #1 {
+  \tl_replace_all_in:Nnn #1 { -+ } { \mp }
+  \tl_replace_all_in:Nnn #1 { +- } { \pm }
 }
-\cs_new_nopar:Npn \siunitx_number_in_separate_aux:n #1 {
-  \tl_if_empty:NTF \l_siunitx_input_complex_tl 
-    { \siunitx_number_in_separate_no_complex:n {#1} }
-    { \siunitx_number_in_separate_with_complex:n {#1} }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_error:nx} 
+%\begin{macro}{\siunitx_number_in_parse_error:nV} 
+% There are lots of rather similar errors in the parser, all of which
+% require a \cs{tl_map_break:}. To keep life simple, this is set up 
+% here. 
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_error:nx #1#2 {
+  \siunitx_error:nx {#1} {#2}
+  \tl_map_break:
 }
-\cs_new:Npn \siunitx_number_in_separate_no_complex:n #1 {
-  \bool_if:NF \l_siunitx_error_bool 
+\cs_generate_variant:Nn \siunitx_number_in_parse_error:nx { nV }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_loop:N}
+%\begin{macro}{\siunitx_number_in_parse_more:N}
+% The main loop is set up as a place holder, as the definition is
+% varied to keep things fast. There is also a place holder for the 
+% extended routing for normal mantissas.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_loop:N #1 { }
+\cs_new:Npn \siunitx_number_in_parse_more:N #1 { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_complex:N}
+% After a complex root when the root is \emph{after} the number, there
+% are a very limited range of legitimate tokens. Thus most cases can be
+% trapped with a modified parser.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_complex:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
     { 
-      \siunitx_number_in_sign:n {#1} 
-      \bool_if:NF \l_siunitx_error_bool 
+      \cs_set_eq:NN \siunitx_number_in_parse_loop:N
+        \siunitx_number_in_parse_mantissa:N
+      \siunitx_number_in_exponent:N #1 
+    }
+    { 
+      \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
+        {
+          \siunitx_number_in_parse_error:nV 
+            { misplaced-complex-root-token } 
+            \l_siunitx_number_arg_tl
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_exponent:N}
+% When processing an exponent, the \enquote{extended} part of the
+% number which is valid in a mantissa is no longer needed. So the
+% auxiliary function is pointed to a series of errors instead.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_exponent:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
+    { 
+      \siunitx_number_in_parse_error:nx  
+        { duplicate-exponent-token } {#1} 
+    }
+    { 
+      \tl_if_in:NnTF \l_siunitx_input_uncert_open_tl {#1}
         { 
-          \siunitx_number_in_decimal:n {#1} 
-          \bool_if:NF \l_siunitx_error_bool 
-            { \siunitx_number_in_uncertainty:n {#1} }
+          \siunitx_number_in_parse_error:nV 
+            { invalid-token-in-exponent } \l_siunitx_number_arg_tl 
         }
-    }        
-}
-\cs_new:Npn \siunitx_number_in_separate_with_complex:n #1 {
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \siunitx_number_in_sign:n {#1}
-      \siunitx_number_in_complex:n {#1}
-      \bool_if:NF \l_siunitx_error_bool 
         {
-          \siunitx_number_in_decimal:n {#1}
-          \siunitx_number_in_decimal_complex:n {#1}
-          \bool_if:NF \l_siunitx_error_bool 
-            {
-              \siunitx_number_in_uncertainty:n {#1}
-              \siunitx_number_in_uncertainty:n { #1 -complex }
+          \tl_if_in:NnTF \l_siunitx_input_uncert_close_tl {#1}
+            { 
+              \siunitx_number_in_parse_error:nV 
+                { invalid-token-in-exponent } \l_siunitx_number_arg_tl
             }
-        }      
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_in_sign:n}
-% Separating signs first converts \enquote{\texttt{+-}} to \cs{pm} and 
-% \enquote{\texttt{-+}} to \cs{mp} before looking for a single-token 
-% sign. This is done using the fact that only the very first token needs
-% to be examined.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_sign:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { -+ } { \mp }
-      \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { +- } { \pm }
-      \cs_set:Npn \siunitx_tmp:w ##1##2 \q_stop 
-        {
-          \tl_if_in:NnTF \l_siunitx_input_sign_tl {##1} 
             {
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 -sign } 
-                { ##1 }
-              \prop_put:Nnn \l_siunitx_number_in_prop {#1} { ##2 }
+              \siunitx_number_in_parse_error:nx 
+                { invalid-token-in-number } {#1} 
             }
-            { \prop_put:Nnn \l_siunitx_number_in_prop {#1} { ##1 ##2 } }
         }
-      \tl_if_empty:NF \l_siunitx_tmpa_tl 
-        {  \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop }
     }
 }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_in_tidy:}
-% There are some minor bits of tidying up to do now. Two issues need to
-% be handled, both concerned with zero.
+%\begin{macro}{\siunitx_number_in_parse_mantissa:N}
+%\begin{macro}{\siunitx_number_in_parse_mantissa_aux:N}
+% For the mantissa, most things are valid. The procedure is split
+% into two parts, with the simple symbols handled here and the more
+% complex ones in a second part(which needs to be varied). Essentially
+% everything here is a comparison, done so that the code is a fast as
+% possible.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_tidy: { 
-  \clist_map_function:NN \c_siunitx_number_parts_clist
-    \siunitx_number_in_tidy_zeros:n
-  \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa } 
+\cs_new:Npn \siunitx_number_in_parse_mantissa:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_digit_tl {#1}
+    { \siunitx_number_in_digit:N #1 }
     {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign } 
+      \tl_if_in:NnTF \l_siunitx_input_decimal_tl {#1}
+        { \siunitx_number_in_decimal:N #1 }
         {
-          \prop_get:NnN \l_siunitx_number_in_prop { mantissa } 
-            \l_siunitx_tmpa_tl
-          \tl_if_empty:NT \l_siunitx_tmpa_tl 
+          \tl_if_in:NnTF \l_siunitx_input_sign_tl {#1}
+            { \siunitx_number_in_sign:N #1 }
             {
-              \prop_del:Nn \l_siunitx_number_in_prop { mantissa }
-              \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
-                \l_siunitx_tmpa_tl
-              \prop_del:Nn \l_siunitx_number_in_prop { mantissa-sign }  
-              \prop_put:NnV \l_siunitx_number_in_prop { sign } 
-                \l_siunitx_tmpa_tl
+              \tl_if_in:NnTF \l_siunitx_input_symbol_tl {#1}
+                { 
+                  \prop_put:Nnn \l_siunitx_number_in_prop { symbolic } 
+                    { true }
+                  \siunitx_number_in_digit:N #1
+                }
+                { 
+                  \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
+                    { \siunitx_number_in_parse_more:N #1 }
+                } 
             }
         }
     }
-  \siunitx_number_in_tidy_sign:n { mantissa }
-  \siunitx_number_in_tidy_sign:n { exponent }
 }
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_tidy_zeros:n}
-% Here, any leading zeros are found in the integer part of the number.
-% By constructing the loop in this way, every character in the input 
-% does not have to be tested.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_tidy_zeros:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -integer } 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } 
-        \l_siunitx_tmpa_tl
-      \tl_if_in:NnT \l_siunitx_tmpa_tl { 0 } 
+\cs_new:Npn \siunitx_number_in_parse_mantissa_aux:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
+    { \siunitx_number_in_exponent:N #1 }
+    { 
+      \tl_if_in:NnTF \l_siunitx_input_uncert_open_tl {#1}
+        { \siunitx_number_in_uncert_open:N #1 }
         {
-          \cs_set:Npn \siunitx_tmp:w ##1 0 ##2 \q_stop 
+          \tl_if_in:NnTF \l_siunitx_input_uncert_close_tl {#1}
+            { 
+              \siunitx_number_in_parse_error:nx 
+                { misplaced-uncertainty-token } {#1} 
+            }
             {
-              \tl_if_empty:nTF {##1} 
+              \tl_if_in:NnTF \l_siunitx_input_complex_tl {#1}
+                { \siunitx_number_in_complex:N #1 }
                 {
-                  \tl_if_in:nnTF {##2} { 0 } 
-                    { \siunitx_tmp:w ##2 \q_stop }
-                    {
-                      \tl_set:Nn \l_siunitx_tmpa_tl {##2}
-                      \prop_put:Nnn \l_siunitx_number_in_prop 
-                        { #1 -integer } {##2}
+                  \siunitx_number_in_parse_error:nx 
+                    { invalid-token-in-number } {#1}
+                }  
+            }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_uncert:N}
+% Within uncertainties, the range of tokens is limited. An alternative
+% parsing system can therefore be used.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_uncert:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_digit_tl {#1}
+    { \siunitx_number_in_digit:N #1 }
+    {
+      \tl_if_in:NnTF \l_siunitx_input_decimal_tl {#1}
+        { 
+          \siunitx_number_in_parse_error:nV 
+            { invalid-token-in-uncertainty } 
+            \l_siunitx_number_arg_tl
+        }         
+        {
+          \tl_if_in:NnTF \l_siunitx_input_sign_tl {#1}
+            {
+              \siunitx_number_in_parse_error:nV 
+                { invalid-token-in-uncertainty } 
+                \l_siunitx_number_arg_tl
+            }
+            {
+              \tl_if_in:NnTF \l_siunitx_input_symbol_tl {#1}
+                { 
+                  \prop_put:Nnn \l_siunitx_number_in_prop { symbolic }
+                    { true }
+                  \siunitx_number_in_digit:N #1
+                }
+                { 
+                  \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
+                    { 
+                      \tl_if_in:NnTF \l_siunitx_input_uncert_close_tl 
+                        {#1}
+                        { \siunitx_number_in_uncert_close:N #1 }
+                        {
+                          \siunitx_number_in_parse_error:nV 
+                            { invalid-token-in-uncertainty } 
+                            \l_siunitx_number_arg_tl
+                        }
                     }
-                }
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop 
-                    { #1 -integer } { ##1 0 ##2 }
-                }
-            }
-          \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-          \tl_if_empty:NT \l_siunitx_tmpa_tl 
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop 
-                { #1 -integer } { 0 }
+                } 
             }
         }
     }
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_number_in_tidy_sign:n}
-%\begin{macro}[aux]{\siunitx_number_in_tidy_sign_aux_i:n}
-%\begin{macro}[aux]{\siunitx_number_in_tidy_sign_aux_ii:n}
-% The number zero does not take a sign. The test is complicated by some 
-% issues. First, the check for complex numbers needs to ensure that it
-% only fires if there is no real part. The integer part of the problem 
-% is easy: it will just be zero if there is no value.  However, the 
-% decimal part can be an arbitrary number of zeros. 
+%
+%\begin{macro}{\siunitx_number_in_parse_uncert_after:N}
+% After an uncertainty, there is once again a very limited range of
+% tokens that can be present in a valid number.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_tidy_sign:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1} 
-    { \siunitx_number_in_tidy_sign_aux_i:n {#1} }
-    { \siunitx_number_in_tidy_sign_aux_i:n { #1 -complex } }
-}
-\cs_new_nopar:Npn \siunitx_number_in_tidy_sign_aux_i:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -integer } 
+\cs_new:Npn \siunitx_number_in_parse_uncert_after:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
+    { 
+      \cs_set_eq:NN \siunitx_number_in_parse_loop:N
+        \siunitx_number_in_parse_mantissa:N
+      \siunitx_number_in_exponent:N #1 
+    }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer } 
-        \l_siunitx_tmpa_tl 
-      \tl_if_eq:nVTF { 0 } \l_siunitx_tmpa_tl 
-        { \siunitx_number_in_tidy_sign_aux_ii:n {#1} }
+      \tl_if_in:NnTF \l_siunitx_input_sign_tl {#1}
+        { 
+          \cs_set_eq:NN \siunitx_number_in_parse_loop:N
+            \siunitx_number_in_parse_mantissa:N
+          \siunitx_number_in_sign:N #1
+        }
         {
-          \tl_if_empty:NT \l_siunitx_tmpa_tl 
-            {
-              \prop_if_in:NnT \l_siunitx_number_in_prop 
-                { #1 -decimal } 
-                { \siunitx_number_in_tidy_sign_aux_ii:n {#1} }
-            }
+          \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
+            { 
+              \tl_if_in:NnTF \l_siunitx_input_complex_tl {#1}
+                {
+                  \cs_set_eq:NN \siunitx_number_in_parse_loop:N
+                    \siunitx_number_in_parse_mantissa:N
+                  \siunitx_number_in_complex:N #1
+                }
+                {         
+                  \siunitx_number_in_parse_error:nV { invalid-number }
+                    \l_siunitx_number_arg_tl 
+                }
+            }    
         }
     }
-    { \siunitx_number_in_tidy_sign_aux_ii:n {#1} }
-}
-\cs_new_nopar:Npn \siunitx_number_in_tidy_sign_aux_ii:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
-        \l_siunitx_tmpa_tl
-      \cs_set:Npn \siunitx_tmp:w ##1 
-        {
-          \tl_if_eq:nnF {##1} { 0 } 
-            {
-              \tl_clear:N \l_siunitx_tmpa_tl
-              \tl_map_break:
-            }
-        }
-      \tl_reverse:N \l_siunitx_tmpa_tl
-      \tl_map_function:NN \l_siunitx_tmpa_tl \siunitx_tmp:w
-      \tl_if_empty:NF \l_siunitx_tmpa_tl 
-        { \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } }
-    }
-    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } }
 }
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_complex:N}
+% Only one complex root token can be give, hence the initial test.
+% More tests are needed for complex numbers than other systems, so
+% the additional ones are turned on, followed by some flag setting.
+% The complex root is stored, then there is a check to see if the
+% root is at the end of the number: if it is, prevent any more tokens 
+% being added.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_complex:N #1 {
+  \bool_set_false:N \l_siunitx_number_in_first_bool
+  \bool_if:NTF \l_siunitx_number_in_complex_root_bool
+    { 
+      \siunitx_number_in_parse_error:nx 
+        { duplicate-complex-root-token } {#1} 
+    }
+    {
+      \cs_set_eq:NN \siunitx_number_in_check:n 
+        \siunitx_number_in_check_full:n 
+      \bool_set_true:N \l_siunitx_number_in_complex_bool 
+      \bool_set_true:N \l_siunitx_number_in_complex_root_bool
+      \prop_put:Nnn \l_siunitx_number_in_prop { complex-root } {#1}
+      \siunitx_number_in_init_part:n { complex } 
+      \tl_if_empty:NF \l_siunitx_number_parsed_tl
+        { 
+          \cs_set_eq:NN \siunitx_number_in_parse_loop:N 
+            \siunitx_number_in_parse_complex:N 
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_decimal:N}
+% Only one decimal marker allowed, so a test for this. If an integer
+% part has been found, it is saved. The flag for the number being
+% found is not set unless there is an integer, to watch for the case
+% of invalid numbers.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_decimal:N #1 {
+  \bool_set_false:N \l_siunitx_number_in_first_bool
+  \bool_if:NTF \l_siunitx_number_in_decimal_bool 
+    { 
+      \siunitx_number_in_parse_error:nx { duplicate-decimal-token } {#1}
+    }
+    {
+      \bool_set_true:N \l_siunitx_number_in_decimal_bool
+      \tl_if_empty:NF \l_siunitx_number_parsed_tl
+        {
+          \prop_put:NVn \l_siunitx_number_in_prop 
+            \l_siunitx_number_part_tl { true }
+          \prop_put:NVV \l_siunitx_number_in_prop 
+            \l_siunitx_number_part_integer_tl 
+            \l_siunitx_number_parsed_tl
+          \tl_clear:N \l_siunitx_number_parsed_tl 
+        }
+      \prop_put:NVn \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_decimal_marker_tl {#1}
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_digit:N}
+% For digits, only in an uncertainty can the value be stored
+% directly. Otherwise, there is a need to see if the value is non-zero.
+% This is used to drop leading zeros and to validate any sign (as zero
+% is unsigned).
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_digit:N #1 {
+  \bool_set_false:N \l_siunitx_number_in_first_bool
+  \bool_if:NTF \l_siunitx_number_in_uncert_bool
+    { \tl_put_right:Nn \l_siunitx_number_parsed_tl {#1} }
+    {
+      \bool_if:NTF \l_siunitx_number_in_decimal_bool
+        {
+          \tl_put_right:Nn \l_siunitx_number_parsed_tl {#1}
+          \tl_if_eq:nnF {#1} { 0 } 
+            { \bool_set_true:N \l_siunitx_number_in_value_bool }
+        }
+        {
+          \tl_if_eq:nnTF {#1} { 0 } 
+            { 
+              \prop_put:NVn \l_siunitx_number_in_prop 
+                \l_siunitx_number_part_tl { true }
+              \prop_put:NVn \l_siunitx_number_in_prop 
+                \l_siunitx_number_part_integer_tl { 0 }
+            }
+            { \bool_set_true:N \l_siunitx_number_in_value_bool }
+          \bool_if:NT \l_siunitx_number_in_value_bool  
+            { \tl_put_right:Nn \l_siunitx_number_parsed_tl {#1} }
+        } 
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_exponent:N}
+% A duplicate token test starts off the code, which if passed 
+% leads to some simple storage manipulation. As exponents are 
+% more simple than the mantissa, the extra processing is swapped for
+% some that only raises errors.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_exponent:N #1 {
+  \bool_if:NTF \l_siunitx_number_in_exponent_bool
+    { 
+      \siunitx_number_in_parse_error:nx { duplicate-exponent-token } 
+        {#1}
+    }
+    {
+      \cs_set_eq:NN \siunitx_number_in_parse_more:N
+        \siunitx_number_in_parse_exponent:N
+      \tl_if_empty:NF \l_siunitx_number_parsed_tl 
+        { \siunitx_number_in_store: }
+      \bool_set_true:N \l_siunitx_number_in_exponent_bool
+      \siunitx_number_in_init_part:n { exponent } 
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_sign:N}
+% The code for signs is complicated by complex numbers. A sign token
+% must be the fist thing in a number, but after the real part of the
+% mantissa a second sign token can appear to start a complex number.
+% So most of the code here is to detect that case.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_sign:N #1 {
+  \bool_if:NTF \l_siunitx_number_in_first_bool
+    {
+      \bool_set_false:N \l_siunitx_number_in_first_bool
+      \bool_set_true:N \l_siunitx_number_in_sign_bool
+      \prop_put:NVn \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_sign_tl {#1}
+    }
+    { 
+      \bool_if:NTF \l_siunitx_number_in_exponent_bool
+        { 
+          \siunitx_number_in_parse_error:nx { misplaced-sign-token } 
+            {#1}
+        }
+        {
+          \bool_if:NTF \l_siunitx_number_in_complex_bool
+            { 
+              \siunitx_number_in_parse_error:nx { misplaced-sign-token } 
+                {#1} 
+            }
+            { 
+              \tl_if_empty:NF \l_siunitx_number_parsed_tl 
+                { \siunitx_number_in_store: }
+              \cs_set_eq:NN \siunitx_number_in_check:n 
+                \siunitx_number_in_check_full:n  
+              \siunitx_number_in_init_part:n { complex }
+              \prop_put:Nnn \l_siunitx_number_in_prop 
+                { complex-sign } {#1}  
+              \bool_set_true:N \l_siunitx_number_in_complex_bool
+            }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_uncert_open:N}
+%\begin{macro}{\siunitx_number_in_uncert_close:N}
+% Opening and closing uncertainty tokens are handled separately. For
+% opening tokens, a check is made that there is something else to the
+% number before collecting material up. For the closing token, the
+% uncertainty must contain some numbers. A special loop function is then
+% set up to prevent any additional digits after the closing token.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_uncert_open:N #1 {
+  \bool_set_false:N \l_siunitx_number_in_first_bool
+  \cs_set_eq:NN \siunitx_number_in_parse_loop:N 
+    \siunitx_number_in_parse_uncert:N
+  \bool_set_true:N \l_siunitx_number_in_uncert_bool
+  \tl_if_empty:NTF \l_siunitx_number_parsed_tl
+    {
+      \prop_if_in:NVF \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_integer_tl
+        {  
+          \siunitx_number_in_parse_error:nV { invalid-number } 
+            \l_siunitx_number_arg_tl 
+        }
+    }
+    { \siunitx_number_in_store: }
+}
+\cs_new:Npn \siunitx_number_in_uncert_close:N #1 { 
+  \bool_set_false:N \l_siunitx_number_in_uncert_bool
+  \tl_if_empty:NTF \l_siunitx_number_parsed_tl
+    { 
+      \siunitx_number_in_parse_error:nV { empty-uncertainty } 
+        \l_siunitx_number_arg_tl
+    }
+    {
+      \prop_put:NVV \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_uncert_tl \l_siunitx_number_parsed_tl
+      \prop_put:Nnn \l_siunitx_number_in_prop 
+        { uncertainty } { true }
+      \tl_clear:N \l_siunitx_number_parsed_tl
+      \cs_set_eq:NN \siunitx_number_in_parse_loop:N 
+        \siunitx_number_in_parse_uncert_after:N   
+    }  
+}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_in_uncertainty:n}
-%\begin{macro}[aux]{\siunitx_number_in_uncertainty_close:nn}
-%\begin{macro}[aux]{\siunitx_number_in_uncertainty_close:N}
-% Finding any uncertainty depends on whether there is a decimal part. A
-% check is made first for the closing symbol: it must be at the end of 
-% the number, and so is relatively easy to find.
+%\begin{macro}{\siunitx_number_in_store:}
+% A short auxiliary function needed in various places for storing
+% either the integer or decimal part of a number, as appropriate.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_uncertainty:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } 
-    { \siunitx_number_in_uncertainty_close:nn {#1} { decimal } }
+\cs_new_nopar:Npn \siunitx_number_in_store: {
+  \prop_put:NVn \l_siunitx_number_in_prop \l_siunitx_number_part_tl 
+    { true }
+  \bool_if:NTF \l_siunitx_number_in_decimal_bool
     {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -integer } 
-        { \siunitx_number_in_uncertainty_close:nn {#1} { integer } }
+      \prop_put:NVV \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_decimal_tl \l_siunitx_number_parsed_tl
     }
-  \siunitx_number_in_uncertainty_check:n {#1}
-}
-\cs_new_nopar:Npn \siunitx_number_in_uncertainty_close:nn #1#2 {
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmpa_tl
-  \cs_set:Npn \siunitx_number_in_uncertainty_close:N ##1 
     {
-      \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-        {
-          \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop 
-            {
-              \tl_if_empty:nTF {####2} 
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop 
-                    { #1 -uncertainty } { }
-                  \tl_set:Nn \l_siunitx_tmpa_tl {####1}
-                }
-                {
-                  \siunitx_error:nx { misplaced-closing-uncertainty } 
-                    {##1}
-                }
-            }
-          \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-          \tl_map_break:
-        }
-    }
-  \tl_map_function:NN \l_siunitx_input_uncert_close_tl
-    \siunitx_number_in_uncertainty_close:N
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 - uncertainty } 
-    { \siunitx_number_in_uncertainty_open:nn {#1} {#2} }
+      \prop_put:NVV \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_integer_tl \l_siunitx_number_parsed_tl
+    }    
+  \tl_clear:N \l_siunitx_number_parsed_tl 
 }
-\cs_new:Npn \siunitx_number_in_uncertainty_close:N #1 { }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_number_in_uncertainty_open:nn}
-%\begin{macro}[aux]{\siunitx_number_in_uncertainty_open:N}
-% Now to look for the opening character. This is done on the basis that
-% a search can always look first in the integer part.
+%
+%\begin{macro}{\siunitx_number_in_check:n}
+%\begin{macro}{\siunitx_number_in_check_short:n}
+%\begin{macro}{\siunitx_number_in_check_full:n}
+% The checks needed for a number depend on whether there is a complex
+% part. In all cases, there must be some digits, as well as a sign or
+% decimal marker. There is also a check for a zero-valued input, which
+% has any sign deleted. For complex numbers, the check is needed in
+% case there was no real part.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_uncertainty_open:nn #1#2 {
-  \cs_set:Npn \siunitx_number_in_uncertainty_open:N ##1 
+\cs_new_nopar:Npn \siunitx_number_in_check:n #1 { }
+\cs_new_nopar:Npn \siunitx_number_in_check_short:n #1 { 
+  \prop_if_in:NVF \l_siunitx_number_in_prop 
+    \l_siunitx_number_part_integer_tl
     {
-      \tl_if_in:NnT \l_siunitx_tmpa_tl {##1} 
-        {
-          \cs_set:Npn \siunitx_tmp:w ####1 ##1 ####2 \q_stop 
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } 
-                {####1}
-              \prop_put:Nnn \l_siunitx_number_in_prop 
-                { #1 -uncertainty } {####2}
-              \tl_if_empty:nT {####2} 
-                { \siunitx_error:n { empty-uncertainty } }
-            }
-          \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
-          \tl_map_break:
+      \prop_if_in:NVF \l_siunitx_number_in_prop 
+        \l_siunitx_number_part_decimal_tl
+        { \siunitx_error:nx { invalid-number } {#1} }
+    }
+  \bool_if:NF \l_siunitx_number_in_value_bool 
+    { 
+      \tl_if_eq:NNF \l_siunitx_number_part_tl 
+        \c_siunitx_number_part_complex_tl
+        { 
+          \prop_del:NV \l_siunitx_number_in_prop 
+            \l_siunitx_number_part_sign_tl 
         }
     }
-  \tl_map_function:NN \l_siunitx_input_uncert_open_tl
-    \siunitx_number_in_uncertainty_open:N
 }
-\cs_new:Npn \siunitx_number_in_uncertainty_open:N #1 { }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_in_uncertainty_check:n}
-%\begin{macro}{\siunitx_number_in_uncertainty_check_aux:n}
-%\begin{macro}{\siunitx_number_in_uncertainty_check_aux:N}
-% To make sure no stray tokens are about.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_in_uncertainty_check:n #1 {
-  \siunitx_number_in_uncertainty_check_aux:n { #1 -integer }
-  \siunitx_number_in_uncertainty_check_aux:n { #1 -decimal }
-  \siunitx_number_in_uncertainty_check_aux:n { #1 -uncertainty }
-}
-\cs_new_nopar:Npn \siunitx_number_in_uncertainty_check_aux:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \tl_map_function:NN \l_siunitx_input_uncert_open_tl
-        \siunitx_number_in_uncertainty_check_aux:N
-      \tl_map_function:NN \l_siunitx_input_uncert_close_tl
-        \siunitx_number_in_uncertainty_check_aux:N
+\cs_new_nopar:Npn \siunitx_number_in_check_full:n #1 {
+  \tl_if_eq:NNF \l_siunitx_number_part_tl 
+    \c_siunitx_number_part_complex_tl 
+    { \siunitx_number_in_check_short:n {#1} }
+  \bool_if:NF \l_siunitx_number_in_complex_root_bool
+    { 
+      \prop_get:NnN \l_siunitx_number_in_prop { complex-sign } 
+        \l_siunitx_tmpa_tl
+      \siunitx_error:nV { misplaced-sign-token } \l_siunitx_tmpa_tl
     }
-}
-\cs_new:Npn \siunitx_number_in_uncertainty_check_aux:N #1 {
-  \tl_if_in:NnT \l_siunitx_tmpa_tl {#1} 
+  \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign }
     {
-      \siunitx_error:nx { misplaced-uncertainty } {#1}
-      \tl_map_break:
+      \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa }
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign } 
+            \l_siunitx_tmpa_tl
+          \prop_del:Nn \l_siunitx_number_in_prop { mantissa-sign }
+          \prop_put:NnV \l_siunitx_number_in_prop { complex-sign } 
+            \l_siunitx_tmpa_tl
+        }
     }
 }
 %    \end{macrocode}
@@ -4344,9 +4277,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_sign:
   \siunitx_number_process_zero_fill:
   \siunitx_number_process_mantissa:
-  \siunitx_number_process_exponent:
   \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } 
     {
+      \siunitx_number_process_exponent:
       \siunitx_number_process_uncertainty:
       \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
         { \siunitx_number_process_round: }
@@ -4356,39 +4289,31 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_exponent:}
-%\begin{macro}[aux]{\siunitx_number_process_exponent_aux_i:n}
-%\begin{macro}[aux]{\siunitx_number_process_exponent_aux_ii:n}
-%\begin{macro}[aux]{\siunitx_number_process_exponent_clear:n}
+%\begin{macro}[aux]{\siunitx_number_process_exponent_aux:n}
 % To check for a totally zero exponent, the possibility that one or more
-% of the exponent storage areas is zero needs to be considered. This 
-% means a bit of nesting and some slightly opaque clearing functions.
+% of the exponent storage areas is zero needs to be considered. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_process_exponent: {
   \bool_if:NF \l_siunitx_process_zero_exponent_bool 
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } 
         {
-          \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } 
+          \bool_set_false:N \l_siunitx_tmp_bool
+          \siunitx_number_process_exponent_aux:n { integer }
+          \bool_if:NF \l_siunitx_tmp_bool
+            { \siunitx_number_process_exponent_aux:n { decimal } }
+          \bool_if:NF \l_siunitx_tmp_bool 
             {
-              \bool_set_false:N \l_siunitx_tmp_bool
-              \siunitx_number_process_exponent_aux_i:n { }
-              \siunitx_number_process_exponent_aux_i:n { complex- }
-              \bool_if:NF \l_siunitx_tmp_bool 
-                {
-                  \prop_del:Nn \l_siunitx_number_in_prop { exponent }
-                  \siunitx_number_process_exponent_clear:n { }
-                  \siunitx_number_process_exponent_clear:n { complex- }
-                }
-            }
+              \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { exponent-integer }
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { exponent-decimal }
+             }
         }
     }
 }
-\cs_new_nopar:Npn \siunitx_number_process_exponent_aux_i:n #1 {
-  \siunitx_number_process_exponent_aux_ii:n { #1 integer }
-  \siunitx_number_process_exponent_aux_ii:n { #1 decimal }
-  \siunitx_number_process_exponent_aux_ii:n { #1 uncertainty }
-}
-\cs_new_nopar:Npn \siunitx_number_process_exponent_aux_ii:n #1 {
+\cs_new_nopar:Npn \siunitx_number_process_exponent_aux:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { exponent- #1 } 
     {
       \prop_get:NnN \l_siunitx_number_in_prop { exponent- #1 }
@@ -4397,16 +4322,7 @@ This work consists of the file  siunitx.dtx
         { \bool_set_true:N \l_siunitx_tmp_bool }
     }
 }
-\cs_new_nopar:Npn \siunitx_number_process_exponent_clear:n #1 {
-  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 sign }
-  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 integer }
-  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 decimal }
-  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 uncertainty }
-  \prop_del:Nn \l_siunitx_number_in_prop { exponent- #1 complex }
-}
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -4582,30 +4498,38 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\c_siunitx_unity_tl}
 %\begin{macro}{\siunitx_number_process_mantissa:}
 % A check for the mantissa consisting only of the token \texttt{1}, when
 % an exponent is also available.
 %    \begin{macrocode}
+\tl_new:Nn \c_siunitx_unity_tl { 1 }
 \cs_new_nopar:Npn \siunitx_number_process_mantissa: {
   \bool_if:NF \l_siunitx_process_unity_mantissa_bool 
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } 
         {
-          \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa } 
+          \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-integer } 
             {
-              \prop_get:NnN \l_siunitx_number_in_prop { mantissa }
-                \l_siunitx_tmpa_tl
-              \tl_if_eq:nVT { 1 } \l_siunitx_tmpa_tl 
+              \prop_get:NnN \l_siunitx_number_in_prop 
+                { mantissa-integer } \l_siunitx_tmpa_tl
+              \tl_if_eq:NNT \c_siunitx_unity_tl \l_siunitx_tmpa_tl 
                 { 
-                  \prop_del:Nn \l_siunitx_number_in_prop { mantissa } 
-                  \prop_del:Nn \l_siunitx_number_in_prop 
-                    { mantissa-integer }
+                  \prop_if_in:NnF \l_siunitx_number_in_prop 
+                    { mantissa-decimal-marker }
+                    {
+                      \prop_del:Nn \l_siunitx_number_in_prop 
+                        { mantissa }
+                      \prop_del:Nn \l_siunitx_number_in_prop 
+                        { mantissa-integer }
+                    }    
                 }
             }
         }
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_pad:n}
@@ -4765,8 +4689,14 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_process_round: {
   \tl_if_empty:NF \l_siunitx_round_tl 
     {
-      \exp_args:NNc \clist_map_function:NN \c_siunitx_number_parts_clist
-        { siunitx_number_process_ \l_siunitx_round_tl :n } 
+      \cs_set_nopar:Npx \siunitx_tmp:w 
+        {
+          \exp_not:N \clist_map_function:nN 
+            { mantissa , complex }
+            \exp_not:c 
+              { siunitx_number_process_ \l_siunitx_round_tl :n }
+        }
+      \siunitx_tmp:w        
     }
 }
 %    \end{macrocode}
@@ -4827,73 +4757,63 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_process_sign: {
   \bool_if:NF \l_siunitx_process_plus_tl 
     {
-      \siunitx_number_process_sign_plus:n { exponent }
-      \siunitx_number_process_sign_plus:n { mantissa }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
+        { \siunitx_number_process_sign_plus:n { mantissa } }
+        {
+          \prop_if_in:NnT \l_siunitx_number_in_prop { complex-sign }
+            { \siunitx_number_process_sign_plus:n { complex } } 
+        }
+      \prop_if_in:NnT \l_siunitx_number_in_prop { exponent-sign }
+        { \siunitx_number_process_sign_plus:n { exponent } }
     }
   \tl_if_empty:NF \l_siunitx_process_sign_tl 
     {
-      \siunitx_number_process_sign_add:n { exponent }
-      \siunitx_number_process_sign_add:n { mantissa }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa }
+        { \siunitx_number_process_sign_add:n { mantissa } }
+        {
+          \prop_if_in:NnT \l_siunitx_number_in_prop { complex }
+            { \siunitx_number_process_sign_add:n { complex } } 
+        }
+      \prop_if_in:NnT \l_siunitx_number_in_prop { exponent }
+        { \siunitx_number_process_sign_add:n { exponent } }
     }
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_number_process_sign_add:n}
-%\begin{macro}[aux]{\siunitx_number_process_sign_add_aux:n}
-% Adding a sign to an existing number needs a couple of tests and
-% saves code with an auxiliary function.
+%\begin{macro}[aux]{\siunitx_number_process_sign_add:n}
+% Adding a sign to an existing number needs a couple of to make sure
+% there is a number to add to, and to see if there is a sign already.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_process_sign_add:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1}  
-    { \siunitx_number_process_sign_add_aux:n {#1} }
-    {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex }  
-        { \siunitx_number_process_sign_add_aux:n { #1 -complex } }
-    }
-}
-\cs_new_nopar:Npn \siunitx_number_process_sign_add_aux:n #1 {
   \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -sign } 
     {
-      \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
+      \prop_get:NnN \l_siunitx_number_in_prop {#1}
+        \l_siunitx_tmpa_tl
+      \tl_if_empty:NTF \l_siunitx_tmpa_tl 
         {
-          \prop_get:NnN \l_siunitx_number_in_prop {#1}
-            \l_siunitx_tmpa_tl
-          \tl_if_empty:NTF \l_siunitx_tmpa_tl 
-            {
-              \prop_put:NnV \l_siunitx_number_in_prop { sign } 
-                \l_siunitx_process_sign_tl 
-            }
-            {
-              \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
-                \l_siunitx_process_sign_tl
-            }
+          \prop_put:NnV \l_siunitx_number_in_prop { sign } 
+            \l_siunitx_process_sign_tl 
+        }
+        {
+          \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
+            \l_siunitx_process_sign_tl
         }
     }
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_process_sign_plus:n}
-%\begin{macro}[aux]{\siunitx_number_process_sign_plus_aux:n}
+%\begin{macro}{\c_siunitx_plus_tl}
+%\begin{macro}[aux]{\siunitx_number_process_sign_plus:n}
 % Holding onto a plus works very much in the same way as adding a sign:
-% some quick tests and an assignment.
+% some quick tests and an assignment. Using a pre-defined token list is
+% a speed-related choice: very slightly faster comparison.
 %    \begin{macrocode}
+\tl_new:Nn \c_siunitx_plus_tl { + }
 \cs_new_nopar:Npn \siunitx_number_process_sign_plus:n #1 {
-  \prop_if_in:NnTF \l_siunitx_number_in_prop {#1}  
-    { \siunitx_number_process_sign_plus_aux:n {#1} }
-    {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -complex }  
-        { \siunitx_number_process_sign_plus_aux:n { #1 -complex } }
-    }
-}
-\cs_new_nopar:Npn \siunitx_number_process_sign_plus_aux:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
-        \l_siunitx_tmpa_tl
-      \tl_if_eq:nVT { + } \l_siunitx_tmpa_tl 
-        { \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } }
-    }
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
+    \l_siunitx_tmpa_tl
+  \tl_if_eq:NNT \c_siunitx_plus_tl \l_siunitx_tmpa_tl 
+    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -4905,15 +4825,13 @@ This work consists of the file  siunitx.dtx
 % part. This is done here so that the core \texttt{in} code is faster.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_process_uncertainty: {
-  \clist_map_function:NN \c_siunitx_number_parts_clist
+  \clist_map_function:nN { mantissa , complex }
     \siunitx_number_process_uncertainty_aux:n  
 }
 \cs_new_nopar:Npn \siunitx_number_process_uncertainty_aux:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } 
     {
-      \prop_put:Nnn \l_siunitx_number_in_prop { uncertainty }
-        { true}
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal } 
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -decimal-marker } 
         { \siunitx_number_process_uncertainty_decimal:n {#1} }
         { \siunitx_number_process_uncertainty_integer:n {#1} }
     }
@@ -4948,6 +4866,10 @@ This work consists of the file  siunitx.dtx
     } 
   \prop_put:NnV \l_siunitx_number_in_prop { #1 -uncertainty-decimal } 
     \l_siunitx_uncertainty_decimal_tl
+  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal-marker } 
+    \l_siunitx_tmpa_tl
+  \prop_put:NnV \l_siunitx_number_in_prop 
+    { #1 -uncertainty-decimal-marker } \l_siunitx_tmpa_tl
 }
 \cs_new_nopar:Npn \siunitx_number_process_uncertainty_count:nn #1#2 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmpa_tl
@@ -5013,7 +4935,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_zero_fill:}
 %\begin{macro}[aux]{\siunitx_number_process_zero_fill_aux:n}
 %\begin{macro}[aux]{\siunitx_number_process_zero_fill_aux:nn}
-% Checks for adding zeros to each component are carried out.
+% Checks for adding zeros to each component are carried out. The nesting 
+% here makes checking the appropriate flag a little more efficient.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_process_zero_fill: {
   \siunitx_number_process_zero_fill_aux:n { integer }
@@ -5023,23 +4946,14 @@ This work consists of the file  siunitx.dtx
   \bool_if:cT { l_siunitx_process_ #1 _zero_bool } 
     {
       \siunitx_number_process_zero_fill_aux:nn { mantissa } {#1}
-      \siunitx_number_process_zero_fill_aux:nn { mantissa-complex } {#1}
+      \siunitx_number_process_zero_fill_aux:nn { complex }  {#1}
       \siunitx_number_process_zero_fill_aux:nn { exponent } {#1}
-      \siunitx_number_process_zero_fill_aux:nn { exponent-complex } {#1}
     }
 }
 \cs_new_nopar:Npn \siunitx_number_process_zero_fill_aux:nn #1#2 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } 
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal-marker } 
     {
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 - #2 } 
-        {
-          \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } 
-            \l_siunitx_tmpa_tl
-          \tl_if_empty:NT \l_siunitx_tmpa_tl 
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 }
-            }
-        }
+      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 - #2 } 
         { \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { 0 } }
     }
 }
@@ -5149,31 +5063,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_number_format:}
-%\begin{macro}[aux]{\siunitx_number_format_aux:n}
 % The master control function for formatting output: the usual set up.
-% The number is put back together in stages. The \texttt{parts} version
-% does not construct a full result, and so is faster and intended for
-% use with repeated units.
+% The number is put back together in stages. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format: {
   \prop_if_empty:NF \l_siunitx_number_in_prop 
-    {
+    { 
       \prop_clear:N \l_siunitx_number_out_prop
       \siunitx_number_format_reassemble:
       \siunitx_number_format_join_uncert:
-      \siunitx_number_format_aux:n { mantissa } 
-      \siunitx_number_format_aux:n { exponent }
+      \siunitx_number_format_complex:   
+      \siunitx_number_format_sign:n { mantissa }
+      \siunitx_number_format_sign:n { exponent }
       \siunitx_number_format_colour:
       \siunitx_number_format_final:
     }
 }
-\cs_new_nopar:Npn \siunitx_number_format_aux:n #1 {
-  \siunitx_number_format_complex:n {#1}
-  \siunitx_number_format_join_complex:n {#1}
-  \siunitx_number_format_sign:nn {#1} { }
-}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_brackets:n}
@@ -5242,22 +5148,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_complex:n}
+%\begin{macro}{\siunitx_number_format_complex:}
 %\begin{macro}[aux]{\siunitx_number_format_complex_aux:n}
 % The real and complex parts of each number are reassembled, with 
 % brackets if needed.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_complex:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -complex } 
+\cs_new_nopar:Npn \siunitx_number_format_complex: {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { complex } 
     {
-      \siunitx_number_format_brackets:n { #1 -complex }
-      \siunitx_number_format_complex_aux:n { #1 -complex }
+      \siunitx_number_format_brackets:n { complex }
+      \siunitx_number_format_complex_aux:n { complex }
       \prop_if_in:NnT \l_siunitx_number_out_prop 
-        { #1 -complex-uncertainty }
+        { complex-uncertainty }
         { 
           \siunitx_number_format_complex_aux:n 
-            { #1 -complex-uncertainty } 
+            { complex-uncertainty } 
         }
+      \siunitx_number_format_join_complex:  
     }
 }
 \cs_new_nopar:Npn \siunitx_number_format_complex_aux:n #1 {
@@ -5317,18 +5224,17 @@ This work consists of the file  siunitx.dtx
         }
     }
     { \siunitx_number_format_final_exponent: }
-    \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } 
-      {
-        \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
-          { true }
-        \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
-      }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } 
+    {
+      \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
+        { true }
+      \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
+    }
 }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_number_format_final_exponent:}
 %\begin{macro}[aux]{\siunitx_number_format_final_exponent_aux:}
-%\begin{macro}[aux]{\siunitx_number_format_final_exponent_aux:n}
 % For tidying up the exponent part.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_final_exponent: {
@@ -5347,26 +5253,25 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_final_join_exp:
 }
 \cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux: {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
-    { \siunitx_number_format_final_exponent_aux:n { exponent-result } }
-}
-\cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux:n #1 {
-  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
-  \tl_set:Nx \l_siunitx_tmpa_tl 
-    { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
-  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
-  \prop_if_in:NnT \l_siunitx_number_in_prop { sign } 
+  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { sign } 
-        \l_siunitx_tmpb_tl
-      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
-        \l_siunitx_tmpb_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { exponent } 
+        \l_siunitx_tmpa_tl
+      \tl_set:Nx \l_siunitx_tmpa_tl 
+        { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
+      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+      \prop_if_in:NnT \l_siunitx_number_in_prop { sign } 
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop { sign } 
+            \l_siunitx_tmpb_tl
+          \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+            \l_siunitx_tmpb_tl
+        }
+      \prop_put:NnV \l_siunitx_number_out_prop { exponent-result } 
+        \l_siunitx_tmpa_tl
     }
-  \prop_put:NnV \l_siunitx_number_out_prop { exponent } 
-    \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_number_format_final_join_exp:}
@@ -5425,10 +5330,14 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -integer } 
     { \siunitx_number_format_copy:nn { #1 -integer } {#1} }
     { \tl_clear:N \l_siunitx_tmpa_tl }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -decimal } 
+  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal-marker } 
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -decimal }
-        \l_siunitx_tmpb_tl
+      \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -decimal }
+        {
+          \prop_get:NnN \l_siunitx_number_out_prop { #1 -decimal }
+            \l_siunitx_tmpb_tl
+        }
+        { \tl_clear:N \l_siunitx_tmpb_tl }
       \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
         \l_siunitx_output_decimal_tl
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
@@ -5557,7 +5466,7 @@ This work consists of the file  siunitx.dtx
     }  
 }
 \cs_new:Npn \siunitx_number_format_group_integer_aux:NNNN #1#2#3#4 {
-  \tl_put_right:Nn \l_siunitx_tmpb_tl { #1 #2 #3 }
+  \tl_put_right:Nn \l_siunitx_tmpb_tl {#1#2#3}
   \quark_if_nil:nF {#4} 
     {
       \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
@@ -5572,26 +5481,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_join_complex:n}
+%\begin{macro}{\siunitx_number_format_join_complex:}
 % For adding the complex part to the main part of a number.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_join_complex:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_out_prop {#1} 
+\cs_new_nopar:Npn \siunitx_number_format_join_complex: {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa } 
     {
-      \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -complex } 
-        {
-          \siunitx_number_format_brackets:n {#1}
-          \siunitx_number_format_sign:nn {#1} { -complex }
-          \prop_get:NnN \l_siunitx_number_out_prop { #1 -result } 
-            \l_siunitx_tmpa_tl
-          \prop_get:NnN \l_siunitx_number_out_prop { #1 -complex }
-            \l_siunitx_tmpb_tl
-          \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-          \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
-            \l_siunitx_tmpa_tl
-          \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket } 
-            { true }
-        }
+      \siunitx_number_format_brackets:n { mantissa }
+      \siunitx_number_format_sign_complex:n
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
+        \l_siunitx_tmpa_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { complex }
+        \l_siunitx_tmpb_tl
+      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+      \prop_put:NnV \l_siunitx_number_out_prop { mantissa-result } 
+        \l_siunitx_tmpa_tl
+      \prop_put:Nnn \l_siunitx_number_out_prop { mantissa-bracket } 
+        { true }
     }
 }
 %    \end{macrocode}
@@ -5602,7 +5508,7 @@ This work consists of the file  siunitx.dtx
 % For adding separated uncertainties to the main part of a number.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_join_uncert: {
-  \clist_map_function:NN \c_siunitx_number_parts_clist 
+  \clist_map_function:nN { mantissa , complex }
     \siunitx_number_format_join_uncert:n
 }
 \cs_new_nopar:Npn \siunitx_number_format_join_uncert:n #1 {
@@ -5628,7 +5534,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_reassemble:}
-%\begin{macro}[aux]{\siunitx_number_format_reassemble_aux:n}
 % The integer, decimal and any non-separated uncertainty parts are 
 % put back together. This gives a \enquote{minimal} unit which cannot
 % need any brackets or repeated units (if applicable). If the 
@@ -5636,30 +5541,68 @@ This work consists of the file  siunitx.dtx
 % re-attachment.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_reassemble: {
-  \clist_map_function:NN \c_siunitx_number_parts_clist
-    \siunitx_number_format_reassemble_aux:n  
-}
-\cs_new_nopar:Npn \siunitx_number_format_reassemble_aux:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
+  \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa } 
     {
-      \siunitx_number_format_group:n {#1}
-      \siunitx_number_format_uncertainty:n {#1}
+      \siunitx_number_format_group:n { mantissa }
+      \siunitx_number_format_uncertainty:n { mantissa }
     }
+  \prop_if_in:NnT \l_siunitx_number_in_prop { complex } 
+    {
+      \siunitx_number_format_group:n { complex }
+      \siunitx_number_format_uncertainty:n { complex }
+    }
+  \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } 
+    { \siunitx_number_format_group:n { exponent } }
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\siunitx_number_format_sign:nn}
-%\begin{macro}[aux]{\siunitx_number_format_sign_aux:n}
+%\begin{macro}{\siunitx_number_format_sign:n}
+%\begin{macro}[aux]{\siunitx_number_format_sign_complex:}
 % Some simple sign manipulation: for tight signs, a little shuffling.
+% In the complex number case, there is a need for a correction to get
+% the right formatting in text mode. For speed reasons, this is done in
+% a separate function.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_sign:nn #1#2 {
-  \prop_if_in:NnT \l_siunitx_number_out_prop {#1#2} 
+\cs_new_nopar:Npn \siunitx_number_format_sign:n #1 {
+  \prop_if_in:NnT \l_siunitx_number_out_prop {#1} 
     {
-      \prop_if_in:NnT \l_siunitx_number_in_prop { #1#2 -sign } 
+      \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -sign } 
         {
-          \prop_get:NnN \l_siunitx_number_in_prop { #1#2 -sign } 
+          \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
+            \l_siunitx_tmpa_tl
+          \bool_if:NT \l_siunitx_tight_bool 
+            {
+              \tl_set:Nx \l_siunitx_tmpa_tl 
+                { { \exp_not:V \l_siunitx_tmpa_tl } }
+            }
+          \tl_clear:N \l_siunitx_tmpb_tl
+          \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+            \l_siunitx_tmpa_tl
+          \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign } 
+            \l_siunitx_tmpb_tl        
+          \prop_get:NnN \l_siunitx_number_out_prop {#1} 
+            \l_siunitx_tmpa_tl   
+          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
+          \prop_put:NnV \l_siunitx_number_out_prop {#1} 
+            \l_siunitx_tmpa_tl
+          \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -result }
+            {
+              \prop_get:NnN \l_siunitx_number_out_prop { #1 -result } 
+                \l_siunitx_tmpa_tl   
+              \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
+                \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
+              \l_siunitx_tmpa_tl
+            }  
+      }
+    }
+}
+\cs_new_nopar:Npn \siunitx_number_format_sign_complex:n  {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { complex} 
+    {
+      \prop_if_in:NnT \l_siunitx_number_in_prop { complex-sign } 
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop { complex-sign } 
             \l_siunitx_tmpa_tl
           \bool_if:NTF \l_siunitx_tight_bool 
             {
@@ -5667,25 +5610,28 @@ This work consists of the file  siunitx.dtx
                 { { \exp_not:V \l_siunitx_tmpa_tl } }
             }
             {
-              \siunitx_number_format_sign_complex_correction:nn 
-                {#1} {#2}
+              \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
+                {
+                  \tl_set:Nx \l_siunitx_tmpa_tl
+                    { { } \exp_not:V \l_siunitx_tmpa_tl { } }
+                }
             }
           \tl_clear:N \l_siunitx_tmpb_tl
           \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
             \l_siunitx_tmpa_tl
-          \prop_put:NnV \l_siunitx_number_out_prop { #1#2 -sign } 
+          \prop_put:NnV \l_siunitx_number_out_prop { complex-sign } 
             \l_siunitx_tmpb_tl        
-          \prop_get:NnN \l_siunitx_number_out_prop {#1#2} 
+          \prop_get:NnN \l_siunitx_number_out_prop { complex } 
             \l_siunitx_tmpa_tl   
           \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
-          \prop_put:NnV \l_siunitx_number_out_prop {#1#2} 
+          \prop_put:NnV \l_siunitx_number_out_prop { complex} 
             \l_siunitx_tmpa_tl
-          \prop_if_in:NnT \l_siunitx_number_out_prop { #1#2 -result }
+          \prop_if_in:NnT \l_siunitx_number_out_prop { complex-result }
             {
-              \prop_get:NnN \l_siunitx_number_out_prop { #1#2 -result } 
-                \l_siunitx_tmpa_tl   
+              \prop_get:NnN \l_siunitx_number_out_prop 
+                { complex-result } \l_siunitx_tmpa_tl   
               \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
-                \prop_put:NnV \l_siunitx_number_out_prop { #1#2 -result } 
+                \prop_put:NnV \l_siunitx_number_out_prop { complex-result } 
               \l_siunitx_tmpa_tl
             }  
       }
@@ -5693,27 +5639,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_number_format_sign_complex_correction:nn}
-% If a number contains both a real and complex part, it is necessary
-% to correct the sign so that it will print properly in text mode.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_sign_complex_correction:nn 
-  #1#2 {
-  \tl_if_eq:nnT {#2} { -complex }
-    {
-      \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
-        {
-          \prop_if_in:NnT \l_siunitx_number_out_prop {#1#2}
-            {
-              \tl_set:Nx \l_siunitx_tmpa_tl
-                { { } \exp_not:V \l_siunitx_tmpa_tl { } }
-            }
-        }
-  }
-}
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
@@ -5729,6 +5654,7 @@ This work consists of the file  siunitx.dtx
       \bool_if:NTF \l_siunitx_uncert_sep_bool 
         { \siunitx_number_format_uncertainty_sep:n {#1} }
         { \siunitx_number_format_uncertainty_joined:n {#1} }
+      \siunitx_number_format_join_uncert:
     }
 }
 \cs_new_nopar:Npn \siunitx_number_format_uncertainty_joined:n #1 {
@@ -8272,12 +8198,15 @@ This work consists of the file  siunitx.dtx
 % Lots of messages, all of them together in one block to make life
 % easier.
 %    \begin{macrocode}
+\msg_new:nnnn { siunitx } { duplicate-complex-root-token } 
+  {Duplicate complex root token '\exp_not:n{#1}' in input.}
+  {Only one complex root token can appear in a single number.}
 \msg_new:nnnn { siunitx } { duplicate-decimal-token } 
-  {Duplicate decimal token.}
-  {Only one decimal token can appear in a single number.}
+  {Duplicate decimal marker token '\exp_not:n{#1}' in input.}
+  {Only one decimal marker token can appear in a single number.}
 \msg_new:nnnn { siunitx } { duplicate-exponent-token } 
-  {Duplicate exponent token found.}
-  {Only one exponent token can appear in a single number.}
+  {Duplicate exponent marker token '\exp_not:n{#1}' in input.}
+  {Only one exponent marker token can appear in a single number.}
 \msg_new:nnnn { siunitx } { duplicate-quotient-token } 
   {Duplicate quotient token.} 
   {Only one quotient token can appear in a single number.}
@@ -8288,57 +8217,75 @@ This work consists of the file  siunitx.dtx
     \token_to_str:N \per \msg_space: \\%
     may appear in a unit.
   }
-\msg_new:nnnn { siunitx } { empty-exponent } 
-  {Empty exponent.} 
-  {The exponent contains no number.}
-\msg_new:nnnn { siunitx } { empty-number }
-  {Empty numerical argument.}
-  {The given `number' contains no information.}
 \msg_new:nnnn { siunitx } { empty-uncertainty }
-  {Empty uncertainty given.}
-  {The number given contains an empty uncertainty.}
+  {Empty uncertainty given in '\exp_not:n{#1}'.}
+  {The number given contains an empty uncertainty, which is invalid.}
 \msg_new:nnnn { siunitx } { ending-product-token }
   {Misplaced product token.}
   {A number cannot end with a product token.}
 \msg_new:nnnn { siunitx } { ending-quotient-token } 
   {Misplaced quotient token.}
   {A number cannot end with a quotient token.}
-\msg_new:nnnn { siunitx } { invalid-token-in-number }
-  {Invalid token `#1' in numerical input.}
+\msg_new:nnnn { siunitx } { invalid-number } 
+  {Invalid numerical input '\exp_not:n{#1}'.}
   {%
-    Only the tokens\\%
-    \msg_space: \msg_space: #2\\%
-    are valid for numerical input.%
+    The input given as a number does not make logical sense.\\%
+    This happens, for example, if a number only contains a sign.%
+  }
+\msg_new:nnnn { siunitx } { invalid-token-in-exponent }
+  {Invalid exponent in numerical input '\exp_not:n{#1}'.}
+  {%
+    The exponent part of a number cannot contain an uncertainty or
+    complex part.\\The input given appears to contain one of these in
+    the exponent.%
+  }
+\msg_new:nnnn { siunitx } { invalid-token-in-number }
+  {Invalid token '#1' in numerical input.}
+  {%
+    Numbers can only contain tokens defined using the various
+    'input-...'\\options: the token '#1' is not set up as a valid
+    part of a number.%
+  }
+\msg_new:nnnn { siunitx } { invalid-token-in-uncertainty }
+  {Invalid uncertainty in numerical input '\exp_not:n{#1}'.}
+  {%
+    The uncertainty part of a number may only contain digits or
+    symbols.%
   }
 \msg_new:nnnn { siunitx } { literal-unit }
   {Literal units disabled.}
   {%
-    You gave the literal input `\exp_not:n {#1}'\\%
+    You gave the literal input '\exp_not:n {#1}'\\%
     but literal unit output is disabled.%
+  }
+\msg_new:nnnn { siunitx } { misplaced-sign-token } 
+  {Misplaced sign token '\exp_not:n {#1}'.}
+  {Sign tokens can only come at the beginning of a number.}
+\msg_new:nnnn { siunitx } { misplaced-complex-root-token } 
+  {Misplaced complex token in numerical input '\exp_not:n {#1}'.}
+  {%
+    The root token must come either before or after the real digits
+    of the\\%
+    complex part.%
+  }
+\msg_new:nnnn { siunitx } { misplaced-uncertainty-token } 
+  {Misplaced uncertainty token '\exp_not:n {#1}'.}
+  {%
+    The uncertainty in a number must be given between a set of 
+    delimiters.\\%
+    These are '\exp_not:V \l_siunitx_input_uncert_open_tl' and
+    '\exp_not:V \l_siunitx_input_uncert_close_tl' for opening and
+    closing, respectively.%
   }
 \msg_new:nnnn { siunitx } { multi-part-range } 
   {Numerical range with multiple parts.}
   {%
-    The input `#1' is a number which has more than one part.\\
+    The input '\exp_note:n {#1}' is a number which has more than one 
+    part.\\%
     Ranges can only contain one number in each part.%
   }
-\msg_new:nnnn { siunitx } { misplaced-complex-root }
-  {Misplaced complex root.}
-  {The complex root token `#1' can only come at the end of a number.}
-\msg_new:nnnn { siunitx } { misplaced-closing-uncertainty } 
-  {Misplaced closing uncertainty token.}
-  {%
-    The closing uncertainty token `#1' can only come at the end of a 
-    number.%
-  }
-\msg_new:nnnn { siunitx } { misplaced-sign } 
-  {Misplaced sign token.}
-  {The sign token `#1' can only come at the beginning of a number.}
-\msg_new:nnnn { siunitx } { misplaced-uncertainty } 
-  {Misplaced uncertainty token.}
-  {The uncertainty token `#1' does not properly match another token.}
 \msg_new:nnn { siunitx } { option-preamble-only }
-  {Option `#1' only available in the preamble.}
+  {Option '#1' only available in the preamble.}
 \msg_new:nnnn { siunitx } { prefix-base-mismatch }
   {Prefix bases do not match.}
   {%
@@ -8356,9 +8303,6 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { starting-quotient-token } 
   {Misplaced quotient token.}
   {A number cannot begin with a quotient token.}
-\msg_new:nnnn { siunitx } { uncertainty-only }
-  {Uncertainty but no number.}
-  {A number contains an uncertainty part with no main value.}
 %    \end{macrocode}
 %    
 %\subsection{Design-level macros}
@@ -8867,7 +8811,7 @@ This work consists of the file  siunitx.dtx
   \DeclareSIUnit \electronmass 
     { \text { \ensuremath { m @ { \text { e } } } } } 
 }
-\DeclareSIUnit \planckbar    { \text { \ensuremath { \hbar } } }
+\DeclareSIUnit \planckbar { \text { \ensuremath { \hbar } } }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
