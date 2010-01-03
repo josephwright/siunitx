@@ -3893,6 +3893,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_in_complex:N}
+%\begin{macro}[aux]{\siunitx_number_in_complex_aux:nn}
 % Only one complex root token can be give, hence the initial test.
 % More tests are needed for complex numbers than other systems, so
 % the additional ones are turned on, followed by some flag setting.
@@ -3910,18 +3911,55 @@ This work consists of the file  siunitx.dtx
     {
       \cs_set_eq:NN \siunitx_number_in_check:n 
         \siunitx_number_in_check_full:n 
-      \bool_set_true:N \l_siunitx_number_in_complex_bool 
       \bool_set_true:N \l_siunitx_number_in_complex_root_bool
       \prop_put:Nnn \l_siunitx_number_in_prop { complex-root } {#1}
-      \siunitx_number_in_init_part:n { complex } 
       \tl_if_empty:NF \l_siunitx_number_parsed_tl
         { 
           \cs_set_eq:NN \siunitx_number_in_parse_loop:N 
-            \siunitx_number_in_parse_complex:N 
-        }
+            \siunitx_number_in_parse_complex:N   
+        } 
+      \bool_if:NT \l_siunitx_number_in_decimal_bool
+        { 
+          \bool_if:NF \l_siunitx_number_in_complex_bool
+            {
+              \siunitx_number_in_complex_aux:nn { mantissa-integer }
+                { complex-integer }
+              \siunitx_number_in_complex_aux:nn 
+                { mantissa-decimal-marker } { complex-decimal-marker }
+              \prop_del:Nn \l_siunitx_number_in_prop { mantissa }
+              \prop_put:Nnn \l_siunitx_number_in_prop { complex }
+                { true }
+            }
+        } 
+      \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa }
+        {
+          \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign }
+            {                
+              \siunitx_number_in_complex_aux:nn { mantissa-sign }
+                { complex-sign }
+            }
+        }  
+      \bool_set_true:N \l_siunitx_number_in_complex_bool 
+      \bool_set_false:N \l_siunitx_number_in_first_bool 
+      \siunitx_number_in_init_part:n { complex } 
+      \prop_if_in:NnT \l_siunitx_number_in_prop 
+        { complex-decimal-marker }
+        { \bool_set_true:N \l_siunitx_number_in_decimal_bool }
+      \prop_if_in:NnT \l_siunitx_number_in_prop 
+        { complex-sign }
+        { \bool_set_true:N \l_siunitx_number_in_sign_bool }
     }
 }
+\cs_new_nopar:Npn \siunitx_number_in_complex_aux:nn #1#2 {
+  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
+    {
+      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
+      \prop_del:Nn  \l_siunitx_number_in_prop {#1} 
+      \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl
+   }
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_in_decimal:N}
@@ -4761,7 +4799,10 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_process_sign_plus:n { mantissa } }
         {
           \prop_if_in:NnT \l_siunitx_number_in_prop { complex-sign }
-            { \siunitx_number_process_sign_plus:n { complex } } 
+            { 
+              \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa }
+                { \siunitx_number_process_sign_plus:n { complex } }
+            } 
         }
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent-sign }
         { \siunitx_number_process_sign_plus:n { exponent } }
@@ -5068,10 +5109,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format: {
   \prop_if_empty:NF \l_siunitx_number_in_prop 
-    { 
+    {
       \prop_clear:N \l_siunitx_number_out_prop
       \siunitx_number_format_reassemble:
-      \siunitx_number_format_join_uncert:
       \siunitx_number_format_complex:   
       \siunitx_number_format_sign:n { mantissa }
       \siunitx_number_format_sign:n { exponent }
@@ -5360,6 +5400,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_number_format_group_four:nn}
+%\begin{macro}[aux]{\siunitx_number_format_group_four_aux:NNNNNNw}
 %\begin{macro}[aux]{\siunitx_number_format_group_four_aux:nn}
 % The idea here is that grouping is only needed for items with at 
 % least four tokens in them, and perhaps five if the grouping of 
@@ -5367,19 +5408,19 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_group_four:nn #1#2 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmpa_tl
-  \tl_if_empty:NTF \l_siunitx_tmpa_tl 
-    { \prop_put:Nnn \l_siunitx_number_in_prop { #1 - #2 } { } }
+  \bool_if:NTF \l_siunitx_group_four_bool 
+    { \siunitx_number_format_group_four_aux:nn {#1} {#2} }
     {
-      \bool_if:NTF \l_siunitx_group_four_bool 
-        { \siunitx_number_format_group_four_aux:nn {#1} {#2} }
-        {
-          \int_set:Nn \l_siunitx_tmp_int 
-            { \tl_elt_count:N \l_siunitx_tmpa_tl }
-          \intexpr_compare:nTF { \l_siunitx_tmp_int > \c_four } 
-            { \siunitx_number_format_group_four_aux:nn {#1} {#2} }
-            { \siunitx_number_format_copy:n {#1 - #2} }
-        }
+      \exp_after:wN \siunitx_number_format_group_four_aux:NNNNNNw
+        \l_siunitx_tmpa_tl \q_no_value \q_no_value \q_no_value
+        \q_no_value \q_no_value \q_nil
+        { \siunitx_number_format_copy:n {#1 - #2} }
+        { \siunitx_number_format_group_four_aux:nn {#1} {#2} }       
     }
+}
+\cs_new:Npn \siunitx_number_format_group_four_aux:NNNNNNw #1#2#3#4#5#6 
+  \q_nil {
+  \quark_if_no_value:NTF #5
 }
 \cs_new_nopar:Npn \siunitx_number_format_group_four_aux:nn #1#2 {
   \tl_clear:N \l_siunitx_tmpb_tl
@@ -5388,6 +5429,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpb_tl
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_number_format_group_decimal:}
@@ -5399,8 +5441,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_format_group_decimal: {
   \tl_if_empty:NF \l_siunitx_tmpa_tl 
     { 
-    \exp_after:wN \siunitx_number_format_group_decimal_aux:NNNN 
-      \l_siunitx_tmpa_tl { } { } { }
+      \exp_after:wN \siunitx_number_format_group_decimal_aux:NNNN 
+        \l_siunitx_tmpa_tl { } { } { }
     }
 }
 \cs_new:Npn \siunitx_number_format_group_decimal_aux:NNNN #1#2#3#4 {
@@ -5485,10 +5527,10 @@ This work consists of the file  siunitx.dtx
 % For adding the complex part to the main part of a number.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_join_complex: {
+  \siunitx_number_format_sign_complex:
   \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa } 
     {
       \siunitx_number_format_brackets:n { mantissa }
-      \siunitx_number_format_sign_complex:n
       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
         \l_siunitx_tmpa_tl
       \prop_get:NnN \l_siunitx_number_out_prop { complex }
@@ -5558,7 +5600,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_sign:n}
-%\begin{macro}[aux]{\siunitx_number_format_sign_complex:}
+%\begin{macro}{\siunitx_number_format_sign_complex:}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 % In the complex number case, there is a need for a correction to get
 % the right formatting in text mode. For speed reasons, this is done in
@@ -5597,8 +5639,8 @@ This work consists of the file  siunitx.dtx
       }
     }
 }
-\cs_new_nopar:Npn \siunitx_number_format_sign_complex:n  {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { complex} 
+\cs_new_nopar:Npn \siunitx_number_format_sign_complex:  {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { complex } 
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { complex-sign } 
         {
@@ -5624,16 +5666,8 @@ This work consists of the file  siunitx.dtx
           \prop_get:NnN \l_siunitx_number_out_prop { complex } 
             \l_siunitx_tmpa_tl   
           \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
-          \prop_put:NnV \l_siunitx_number_out_prop { complex} 
-            \l_siunitx_tmpa_tl
-          \prop_if_in:NnT \l_siunitx_number_out_prop { complex-result }
-            {
-              \prop_get:NnN \l_siunitx_number_out_prop 
-                { complex-result } \l_siunitx_tmpa_tl   
-              \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl      
-                \prop_put:NnV \l_siunitx_number_out_prop { complex-result } 
-              \l_siunitx_tmpa_tl
-            }  
+          \prop_put:NnV \l_siunitx_number_out_prop { complex } 
+            \l_siunitx_tmpa_tl 
       }
     }
 }
@@ -5649,13 +5683,14 @@ This work consists of the file  siunitx.dtx
 % separate the error form the number in the output. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_uncertainty:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty } 
+  \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -uncertainty } 
     {
       \bool_if:NTF \l_siunitx_uncert_sep_bool 
         { \siunitx_number_format_uncertainty_sep:n {#1} }
         { \siunitx_number_format_uncertainty_joined:n {#1} }
       \siunitx_number_format_join_uncert:
     }
+    { \siunitx_number_format_copy:nn {#1} { #1 -result } }
 }
 \cs_new_nopar:Npn \siunitx_number_format_uncertainty_joined:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
@@ -7326,7 +7361,7 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:NF \l_siunitx_pre_unit_tl
     { 
       \nobreak
-      \siunitx_print:nV  { unit } \l_siunitx_pre_unit_tl 
+      \siunitx_print:nV { unit } \l_siunitx_pre_unit_tl 
     }
 }
 \cs_new_nopar:Npn \siunitx_unit_output_print: {
@@ -7345,7 +7380,7 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:NF \l_siunitx_unit_tl
     {
       \siunitx_unit_output_number_sep:
-      \siunitx_print:nV  { unit } \l_siunitx_unit_tl 
+      \siunitx_print:nV { unit } \l_siunitx_unit_tl 
     }
 }
 %    \end{macrocode}
@@ -7402,7 +7437,7 @@ This work consists of the file  siunitx.dtx
     }
     {
       \siunitx_unit_output_pre_print:
-      \siunitx_print:nn  { number } { \ensuremath {#1} }
+      \siunitx_print:nn { number } { \ensuremath {#1} }
       \siunitx_unit_output_print:
     }
 }
