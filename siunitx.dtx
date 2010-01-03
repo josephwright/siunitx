@@ -1441,6 +1441,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      close-bracket             & Literal & )                 \\ 
 %      complex-root-after-number & Switch  & true              \\
+%      copy-decimal-marker       & Choice  & false             \\
 %      exponent-base             & Literal & 10                \\
 %      exponent-product          & Maths   & \cs{times}        \\
 %      group-decimal-digits      & Switch  & true              \\
@@ -1498,18 +1499,22 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{output-complex-root}
 %\DescribeOption{output-decimal-marker}
+%\DescribeOption{copy-decimal-marker}
 % The decimal marker used in output is set using the 
 % \opt{output-decimal-marker} option. This can differ from the input 
 % marker, as can the root of $\sqrt{-1}$, which is stored in the 
 % \opt{output-complex-root} option. The later is always in maths mode, 
 % but the standard setting uses \cs{mathrm} to give an upright 
-% \enquote{i}: this can easily be altered.
+% \enquote{i}: this can easily be altered. The decimal marker from
+% the input can be used in the output by setting the
+% \opt{copy-decimal-marker} option.
 %\begin{LaTeXdemo}
 %  \num{1.23} \\
 %  \num[output-decimal-marker = {{,}}]{1.23} \\
 %  \num{1+2i} \\
 %  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i} \\
-%  \num[output-complex-root = j]{1+2i}
+%  \num[output-complex-root = j]{1+2i} \\
+%  \num[copy-decimal-marker]{555,555}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{complex-root-after-number}
@@ -5030,8 +5035,9 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%\begin{macro}{\l_siunitx_complex_after_bool}
 %\begin{macro}{\l_siunitx_bracket_close_tl}
+%\begin{macro}{\l_siunitx_complex_after_bool}
+%\begin{macro}{\l_siunitx_output_decimal_copy_bool}
 %\begin{macro}{\l_siunitx_exponent_base_tl}
 %\begin{macro}{\l_siunitx_exponent_product_tl}
 %\begin{macro}{\l_siunitx_group_decimal_bool}
@@ -5051,9 +5057,10 @@ This work consists of the file  siunitx.dtx
 % Lots of settings, some used only for numbers, some more widely.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  close-bracket             .tl_set:N   = \l_siunitx_bracket_close_tl, 
   complex-root-after-number .bool_set:N = \l_siunitx_complex_after_bool,
-  close-bracket             .tl_set:N   = 
-    \l_siunitx_bracket_close_tl, %(
+  copy-decimal-marker       .bool_set:N = 
+    \l_siunitx_output_decimal_copy_bool,
   exponent-base             .tl_set:N   = \l_siunitx_exponent_base_tl,
   exponent-product          .tl_set:N   = \l_siunitx_exponent_product_tl,
   group-decimal-digits      .bool_set:N = \l_siunitx_group_decimal_bool,
@@ -5079,9 +5086,10 @@ This work consists of the file  siunitx.dtx
   uncertainty-separator     .tl_set:N   = \l_siunitx_uncert_sep_tl,
   use-brackets              .bool_set:N = \l_siunitx_brackets_bool,
 }
-\keys_set:nn { siunitx } { 
-  complex-root-after-number = true, % (
+\keys_set:nn { siunitx } { % (
   close-bracket             = ),
+  complex-root-after-number = true,
+  copy-decimal-marker       = false,
   exponent-base             = 10,
   exponent-product          = \times,
   group-decimal-digits      = true,
@@ -5095,6 +5103,7 @@ This work consists of the file  siunitx.dtx
   use-brackets              = true
 }
 %    \end{macrocode}
+%\end{macro} 
 %\end{macro} 
 %\end{macro} 
 %\end{macro} 
@@ -5364,14 +5373,24 @@ This work consists of the file  siunitx.dtx
     { \tl_clear:N \l_siunitx_tmpa_tl }
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal-marker } 
     {
+      \bool_if:NTF \l_siunitx_output_decimal_copy_bool
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal-marker }
+            \l_siunitx_tmpb_tl
+          \tl_set:Nx \l_siunitx_tmpb_tl { { \l_siunitx_tmpb_tl } } 
+          \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
+            \l_siunitx_tmpb_tl
+        }  
+        {
+          \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
+            \l_siunitx_output_decimal_tl
+        }
       \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -decimal }
         {
           \prop_get:NnN \l_siunitx_number_out_prop { #1 -decimal }
             \l_siunitx_tmpb_tl
         }
         { \tl_clear:N \l_siunitx_tmpb_tl }
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
-        \l_siunitx_output_decimal_tl
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
       \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
