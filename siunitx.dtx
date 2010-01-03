@@ -1282,6 +1282,13 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{input-complex-roots}
 % When using complex numbers in input, the complex root ($\sqrt{-1}$) is
 % indicated by one of the tokens stored in \opt{input-complex-roots}.
+% The parser understands complex root symbols given either before
+% or after the associated number (but will detect any invalid
+% arrangement):
+%\begin{LaTeXdemo}
+%  \num{9.99 + 88.8i} \\
+%  \num{9.99 + i88.8}
+%\end{LaTeXdemo} 
 % 
 %\DescribeOption{input-protect-tokens}
 % Some symbols can be problematic under expansion in \LaTeXe. To allow 
@@ -5241,29 +5248,30 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_format_final:}
-% The exponent system starts by making sure that the mantissa contains
-% brackets if needed. A sign is then added to the exponent part, before
-% creating the full output (including the mantissa sign if needed).
+% For numbers which do not contain an exponent, the mantissa result is
+% simply copied to the final output position. On the other hand, for
+% exponents there are further checks, which are handed off to dedicated
+% functions. There is also a check for complex numbers with no real
+% part, which needs to be \enquote{copied} to the standard result 
+% slot.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_final: {
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa } 
+  \prop_if_in:NnT \l_siunitx_number_out_prop { complex }
     {
-      \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent } 
-        {
-          \siunitx_number_format_final_mantissa:
-          \siunitx_number_format_final_exponent_aux:
-          \siunitx_number_format_final_join_exp:
-        }
+      \prop_if_in:NnF \l_siunitx_number_out_prop { mantissa-result }
         { 
-          \prop_if_in:NnT \l_siunitx_number_out_prop 
-            { mantissa-result }
-            { 
-              \siunitx_number_format_copy:nn { mantissa-result } 
-                { result } 
-            }
+          \siunitx_number_format_copy:nn { complex } 
+            { mantissa-result } 
         }
     }
-    { \siunitx_number_format_final_exponent: }
+  \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent }
+    {
+      \siunitx_number_format_final_exponent:
+      \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-result } 
+        { \siunitx_number_format_final_combined: }
+        { \siunitx_number_format_final_exponent_only: }
+    }
+    { \siunitx_number_format_copy:nn { mantissa-result } { result } }
   \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-bracket } 
     {
       \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
@@ -5273,79 +5281,15 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_number_format_final_exponent:}
-%\begin{macro}[aux]{\siunitx_number_format_final_exponent_aux:}
-% For tidying up the exponent part.
+%\begin{macro}{\siunitx_number_format_final_combined:}
+% When there is both a mantissa and an exponent, the mantissa is
+% combined with the product sign before adding the exponent part on.
+% The combined result is then stored.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_final_exponent: {
-  \siunitx_number_format_final_exponent_aux:
-  \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign } 
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
-        \l_siunitx_tmpa_tl
-      \tl_clear:N \l_siunitx_tmpb_tl  
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
-        \l_siunitx_tmpa_tl
-      \prop_put:NnV \l_siunitx_number_out_prop { result }
-        \l_siunitx_tmpb_tl
-    }
-    { \prop_put:Nnn \l_siunitx_number_out_prop { result } { } }
-  \siunitx_number_format_final_join_exp:
-}
-\cs_new_nopar:Npn \siunitx_number_format_final_exponent_aux: {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { exponent } 
-        \l_siunitx_tmpa_tl
-      \tl_set:Nx \l_siunitx_tmpa_tl 
-        { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
-      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
-      \prop_if_in:NnT \l_siunitx_number_in_prop { sign } 
-        {
-          \prop_get:NnN \l_siunitx_number_in_prop { sign } 
-            \l_siunitx_tmpb_tl
-          \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
-            \l_siunitx_tmpb_tl
-        }
-      \prop_put:NnV \l_siunitx_number_out_prop { exponent-result } 
-        \l_siunitx_tmpa_tl
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_format_final_join_exp:}
-% If there is an exponent, this function is called to add it to the
-% result if necessary.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_final_join_exp: {
-  \prop_if_in:NnT \l_siunitx_number_out_prop { result } 
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { result } 
-        \l_siunitx_tmpb_tl
-      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-      \prop_put:NnV \l_siunitx_number_out_prop { result } 
-        \l_siunitx_tmpa_tl
-      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa } 
-        {
-          \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
-            { true }
-        }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_number_format_final_mantissa:}
-% Tidying up the mantissa, perhaps including adding a product sign
-% if there is an exponent to come.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_format_final_mantissa: {
+\cs_new_nopar:Npn \siunitx_number_format_final_combined: {
   \siunitx_number_format_brackets:n { mantissa }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
-    { 
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
-        \l_siunitx_tmpa_tl
-    }
+  \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
+    \l_siunitx_tmpa_tl
   \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
   \bool_if:NT \l_siunitx_tight_bool 
     {  
@@ -5354,7 +5298,51 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
     \l_siunitx_tmpb_tl
+  \prop_get:NnN \l_siunitx_number_out_prop { exponent-result } 
+    \l_siunitx_tmpb_tl
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
   \prop_put:NnV \l_siunitx_number_out_prop { result } \l_siunitx_tmpa_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_format_final_exponent:}
+% When there is an exponent, the base always needs to be added to the
+% front of the number itself. The number must be superscripted, of 
+% course.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_number_format_final_exponent: {
+  \prop_get:NnN \l_siunitx_number_out_prop { exponent } 
+    \l_siunitx_tmpa_tl
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+   { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
+  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+  \prop_put:NnV \l_siunitx_number_out_prop { exponent-result } 
+    \l_siunitx_tmpa_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_number_format_final_exponent_only:}
+% When there is only an exponent, a check must be made for a 
+% sign in the mantissa part. If there is one, it is copied across.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_number_format_final_exponent_only: {
+  \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa-sign }
+    { 
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+        \l_siunitx_tmpa_tl
+      \bool_if:NT \l_siunitx_tight_bool 
+        {  
+          \tl_set:Nx \l_siunitx_tmpa_tl 
+            { { \exp_not:V \l_siunitx_tmpa_tl } }
+        }
+      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+        \l_siunitx_tmpb_tl
+      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+        \l_siunitx_tmpa_tl
+      \prop_put:NnV \l_siunitx_number_out_prop { exponent-result }
+        \l_siunitx_tmpb_tl
+    }
+  \siunitx_number_format_copy:nn { exponent-result } { result }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9385,18 +9373,18 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \NewDocumentCommand \newpower     { o m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPower   #2 {#3} }
-    { \DeclareSIPower * #2 {#3} }
+    { \DeclareSIPrePower  #2 {#3} }
+    { \DeclareSIPostPower #2 {#3} }
 }
 \NewDocumentCommand \renewpower   { o m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPower   #2 {#3} }
-    { \DeclareSIPower * #2 {#3} }
+    { \DeclareSIPrePower  #2 {#3} }
+    { \DeclareSIPostPower #2 {#3} }
 }
 \NewDocumentCommand \providepower { o m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPower   #2 {#3} }
-    { \DeclareSIPower * #2 {#3} }
+    { \DeclareSIPrePower  #2 {#3} }
+    { \DeclareSIPostPower #2 {#3} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9412,18 +9400,18 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \NewDocumentCommand \newprefix     { o m m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPrefix   #2 {#3} {#4} }
-    { \DeclareSIPrefix * #2 {#3} {#4} }
+    { \DeclareSIPrefix     #2 {#3} {#4} }
+    { \DeclareBinaryPrefix #2 {#3} {#4} }
 }
 \NewDocumentCommand \renewprefix   { o m m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPrefix   #2 {#3} {#4} }
-    { \DeclareSIPrefix * #2 {#3} {#4} }
+    { \DeclareSIPrefix     #2 {#3} {#4} }
+    { \DeclareBinaryPrefix #2 {#3} {#4} }
 }
 \NewDocumentCommand \provideprefix { o m m m } {
   \IfNoValueTF {#1} 
-    { \DeclareSIPrefix   #2 {#3} {#4} }
-    { \DeclareSIPrefix * #2 {#3} {#4} }
+    { \DeclareSIPrefix     #2 {#3} {#4} }
+    { \DeclareBinaryPrefix #2 {#3} {#4} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9442,6 +9430,74 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro} 
+%
+%\begin{macro}{\Square}
+%\begin{macro}{\ssquare}
+% In version 1, \cs{square} is not used with these two alternatives
+% preferred.
+%    \begin{macrocode}
+\DeclareSIPrePower \Square  { 2 }
+\DeclareSIPrePower \ssquare { 2 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\BAR}
+%\begin{macro}{\bbar}
+%\begin{macro}{\Day}
+%\begin{macro}{\dday}
+%\begin{macro}{\Gray}
+%\begin{macro}{\ggray}
+% Units which are given awkward names in version one.
+%    \begin{macrocode}
+\DeclareSIUnit \BAR   { \bar }
+\DeclareSIUnit \bbar  { \bar }
+\DeclareSIUnit \Day   { \day }
+\DeclareSIUnit \dday  { \day }
+\DeclareSIUnit \Gray  { \gray }
+\DeclareSIUnit \ggray { \gray }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\atomicmass}
+% Slightly different: given more complete names in version two.
+%    \begin{macrocode}
+\DeclareSIUnit \atomicmass { \atomicmassunit }
+\DeclareSIUnit \arcmin     { \arcminute }
+\DeclareSIUnit \arcsec     { \arcsecond }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\are}
+%\begin{macro}{\curie}
+%\begin{macro}{\gal}
+%\begin{macro}{\millibar}
+%\begin{macro}{\rad}
+%\begin{macro}{\rem}
+%\begin{macro}{\roentgen}
+% Units which were defined in version one but are no longer listed
+% by the \textsc{bipm} as acceptable.
+%    \begin{macrocode}
+\DeclareSIUnit \are      { a }
+\DeclareSIUnit \curie    { Ci }
+\DeclareSIUnit \gal      { Gal }
+\DeclareSIUnit \millibar { \milli \bar }
+\DeclareSIUnit \rad      { rad }
+\DeclareSIUnit \rem      { rem }
+\DeclareSIUnit \roentgen { R }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\micA}
 %\begin{macro}{\micmol}
@@ -9666,6 +9722,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\begin{macro}{\s}
 %\begin{macro}{\as}
 %\begin{macro}{\fs}
 %\begin{macro}{\ps}
@@ -9674,6 +9731,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\ms}
 % Finally, times.
 %    \begin{macrocode}
+\DeclareSIUnit \s  { \second }
 \DeclareSIUnit \as { \atto  \second }
 \DeclareSIUnit \fs { \femto \second }
 \DeclareSIUnit \ps { \pico  \second }
@@ -9681,6 +9739,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \us { \micro \second }
 \DeclareSIUnit \ms { \milli \second }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
