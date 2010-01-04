@@ -1669,7 +1669,7 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{fraction-function}
 % The function used when \opt{quotient-mode = fraction} is set is 
-% determined by the \opt{fraction-function} option. This should
+% determin ed by the \opt{fraction-function} option. This should
 % be set to a function which takes two arguments, and presumably
 % creates some type of fraction. Most alternatives to the standard
 % \cs{frac} function will involve loading addition packages: the
@@ -1985,11 +1985,22 @@ This work consists of the file  siunitx.dtx
 %  \si[per-symbol=\text{~div~}]{\joule\per\mole\per\kelvin} \\
 %  \si[use-brackets=false]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
-% Finally, the often-requested (but mathematically invalid) 
+% The often-requested (but mathematically invalid) 
 % \opt{repeated-symbol} option is also available to repeat the symbol 
 % for each \cs{per}.
 %\begin{LaTeXdemo}
 %  \si[per-mode=repeated-symbol]{\joule\per\mole\per\kelvin}
+%\end{LaTeXdemo}
+% Finally, it is possible for the behaviour of the \cs{per} function
+% to depend on the surrounding environment. Setting the option to
+% \opt{symbol-or-fraction}, causes the same behaviour as
+% \opt{symbol} when the surrondings are in line, and the same 
+% behaviour as \opt{fraction} when in a display context.
+%\begin{LaTeXdemo}
+%  \sisetup{per-mode = symbol-or-fraction}%
+%  \( \si{\joule\per\mole\per\kelvin} \) 
+%  \[ \si{\joule\per\mole\per\kelvin} \]
+%     \si{\joule\per\mole\per\kelvin} 
 %\end{LaTeXdemo}
 % 
 %\DescribeOption{sticky-per}
@@ -6491,6 +6502,17 @@ This work consists of the file  siunitx.dtx
                 { \siunitx_unit_format_literal:n {#1} }
             }
             {
+              \bool_if:NT \l_siunitx_per_auto_bool
+                {
+                  \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
+                  \mode_if_inner:F
+                    { 
+                      \mode_if_math:T 
+                        { 
+                          \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
+                        }
+                    }
+                }
               \siunitx_unit_parse:nn {#1} {#2}
               \siunitx_unit_format:            
             }
@@ -6778,15 +6800,18 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_per_auto_bool}
 %\begin{macro}{\l_siunitx_per_fraction_bool}
 %\begin{macro}{\l_siunitx_per_mode_tl}
 %\begin{macro}{\l_siunitx_qualifier_mode_tl}
 % For saving settings.
 %    \begin{macrocode}
+\bool_new:N \l_siunitx_per_auto_bool
 \bool_new:N \l_siunitx_per_fraction_bool
 \tl_new:N \l_siunitx_per_mode_tl
 \tl_new:N \l_siunitx_qualifier_mode_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6800,23 +6825,32 @@ This work consists of the file  siunitx.dtx
   per-mode             .choice:,
   per-mode / fraction .code:n = 
     {
+      \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
     },
   per-mode / power .code:n = 
     {
+      \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
       \tl_clear:N \l_siunitx_per_mode_tl 
     },
   per-mode / repeated-symbol .code:n = 
     {
+      \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { repeat }
     },
   per-mode / symbol .code:n = 
     {
+      \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
+    },
+  per-mode / symbol-or-fraction .code:n = 
+    {
+      \bool_set_true:N \l_siunitx_per_auto_bool
+      \bool_set_true:N \l_siunitx_per_fraction_bool
     },
   per-symbol           .tl_set:N  = \l_siunitx_per_symbol_tl,
   qualifier-mode       .choice:,
