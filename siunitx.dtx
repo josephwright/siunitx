@@ -1971,6 +1971,14 @@ This work consists of the file  siunitx.dtx
 %  \si[per-mode=fraction]{\joule\per\mole\per\kelvin} \\
 %  \si[per-mode=fraction]{\metre\per\second\squared} 
 %\end{LaTeXdemo}
+% The closely-related \opt{power-positive-first} setting acts in the
+% same way but places all of the positive powers before any negative 
+% ones.
+%\begin{LaTeXdemo}
+%  \si{\ampere\per\mole\second} \\
+%  \si[per-mode = power-positive-first]
+%    {\ampere\per\mole\second}
+%\end{LaTeXdemo}
 % It is possible to use a symbol (usually \texttt{/}) to separate the
 % two parts of a unit by setting \opt{per-mode} to \opt{symbol}; the 
 % symbol used is stored using the setting \opt{per-symbol}. This method
@@ -6804,13 +6812,16 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_per_fraction_bool}
 %\begin{macro}{\l_siunitx_per_mode_tl}
 %\begin{macro}{\l_siunitx_qualifier_mode_tl}
+%\begin{macro}{\l_siunitx_per_two_parts_bool}
 % For saving settings.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_per_auto_bool
 \bool_new:N \l_siunitx_per_fraction_bool
 \tl_new:N \l_siunitx_per_mode_tl
+\bool_new:N \l_siunitx_two_parts_bool
 \tl_new:N \l_siunitx_qualifier_mode_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6827,30 +6838,42 @@ This work consists of the file  siunitx.dtx
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
+      \bool_set_true:N \l_siunitx_per_two_parts_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
     },
   per-mode / power .code:n = 
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
+      \bool_set_false:N \l_siunitx_per_two_parts_bool
+      \tl_clear:N \l_siunitx_per_mode_tl 
+    },
+  per-mode / power-positive-first .code:n = 
+    {
+      \bool_set_false:N \l_siunitx_per_auto_bool
+      \bool_set_false:N \l_siunitx_per_fraction_bool
+      \bool_set_true:N \l_siunitx_per_two_parts_bool
       \tl_clear:N \l_siunitx_per_mode_tl 
     },
   per-mode / repeated-symbol .code:n = 
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
+      \bool_set_false:N \l_siunitx_per_two_parts_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { repeat }
     },
   per-mode / symbol .code:n = 
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
+      \bool_set_true:N \l_siunitx_per_two_parts_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
     },
   per-mode / symbol-or-fraction .code:n = 
     {
       \bool_set_true:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
+      \bool_set_true:N \l_siunitx_per_two_parts_bool
     },
   per-symbol           .tl_set:N  = \l_siunitx_per_symbol_tl,
   qualifier-mode       .choice:,
@@ -6890,8 +6913,12 @@ This work consists of the file  siunitx.dtx
     }
   \intexpr_compare:nT { \l_siunitx_unit_int > \c_zero } 
     { \siunitx_unit_format_loop: }
-  \bool_if:NT \l_siunitx_per_fraction_bool 
-    { \siunitx_unit_format_fraction: }
+  \bool_if:NT \l_siunitx_per_two_parts_bool 
+    {
+      \bool_if:NTF \l_siunitx_per_fraction_bool
+        { \siunitx_unit_format_fraction: }
+        { \siunitx_unit_format_sorted: }
+    }
 } 
 %    \end{macrocode}
 %\end{macro}
@@ -6903,7 +6930,7 @@ This work consists of the file  siunitx.dtx
 % which need to suppress the space.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_add: {
-  \bool_if:NTF \l_siunitx_per_fraction_bool 
+  \bool_if:NTF \l_siunitx_per_two_parts_bool 
     {
       \tl_set:Nx \l_siunitx_tmpb_tl 
         { per- \int_use:N \l_siunitx_unit_int }
@@ -7315,6 +7342,26 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_format_sorted:}
+% For when the powers are sorted with the positive ones first. The only
+% slight issue is making sure that the additional space is included
+% between the two units, if needed.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_unit_format_sorted: {
+  \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
+  \tl_if_empty:NF \l_siunitx_unit_tl
+    {
+      \tl_if_empty:NF \l_siunitx_unit_denominator_tl
+        { 
+          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_tl
+            \l_siunitx_unit_separator_tl
+        }
+    }
+    \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_symbol:}
