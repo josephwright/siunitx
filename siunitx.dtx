@@ -1971,12 +1971,12 @@ This work consists of the file  siunitx.dtx
 %  \si[per-mode=fraction]{\joule\per\mole\per\kelvin} \\
 %  \si[per-mode=fraction]{\metre\per\second\squared} 
 %\end{LaTeXdemo}
-% The closely-related \opt{power-positive-first} setting acts in the
-% same way but places all of the positive powers before any negative 
+% The closely-related \opt{reciprocal-positive-first} setting acts in 
+% the same way but places all of the positive powers before any negative
 % ones.
 %\begin{LaTeXdemo}
 %  \si{\ampere\per\mole\second} \\
-%  \si[per-mode = power-positive-first]
+%  \si[per-mode = reciprocal-positive-first]
 %    {\ampere\per\mole\second}
 %\end{LaTeXdemo}
 % It is possible to use a symbol (usually \texttt{/}) to separate the
@@ -6841,14 +6841,17 @@ This work consists of the file  siunitx.dtx
       \bool_set_true:N \l_siunitx_per_two_parts_bool
       \tl_set:Nn \l_siunitx_per_mode_tl { fraction }
     },
-  per-mode / power .code:n = 
+  per-mode / power      .meta:n = { per-mode = reciprocal } ,
+  per-mode / power-positive-first .meta:n = 
+    { per-mode = reciprocal-positive-first } ,
+  per-mode / reciprocal .code:n = 
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
       \bool_set_false:N \l_siunitx_per_two_parts_bool
       \tl_clear:N \l_siunitx_per_mode_tl 
     },
-  per-mode / power-positive-first .code:n = 
+  per-mode / reciprocal-positive-first .code:n = 
     {
       \bool_set_false:N \l_siunitx_per_auto_bool
       \bool_set_false:N \l_siunitx_per_fraction_bool
@@ -6886,7 +6889,7 @@ This work consists of the file  siunitx.dtx
 }
 \keys_set:nn { siunitx } {
   inter-unit-separator = \,,
-  per-mode             = power,
+  per-mode             = reciprocal,
   per-symbol           = /,
   qualifier-mode       = subscript
 }
