@@ -6274,6 +6274,84 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Angles}
+%
+% Angles are a special case of numbers for two reasons. First, there
+% is always a unit, which is known in advance. Second, there are two
+% possible input syntaxes, |\ang{1.23}| and |\ang{1;2;3}|. Both need
+% to be handled correctly. 
+% 
+%\begin{macro}{\l_siunitx_angle_arg_tl}
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_angle_arg_tl
+%    \end{macrocode}
+%\end{macro} 
+% 
+%\begin{macro}{\siunitx_angle_output:n}
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_output:n #1 {
+  \bool_set_true:N \l_siunitx_angle_valid_arc_bool
+  \siunitx_angle_rescan:n {#1}
+  \siunitx_angle_find_semi_colons:V \l_siunitx_angle_arg_tl
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_angle_find_semi_colons:n}
+%\begin{macro}{\siunitx_angle_find_semi_colons:V}
+%\begin{macro}[aux]{\siunitx_angle_find_semi_colons:w}
+% The trailing \texttt{;} and \cs{q_no_value} tokens here mean that
+% there are four possible input cases, and all of them can be detected
+% using fast tests. First, if |#4| is \cs{q_no_value} then there were
+% no \texttt{;} in the input. Exactly one \texttt{;} will mean that
+% |#5| is \cs{q_no_value}, while exactly two \texttt{;} in the input
+% makes |#6| \cs{q_no_value}. Any more than two semi-colons means that
+% all of the tests are negative.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_find_semi_colons:n #1 {
+  \siunitx_angle_find_semi_colons:w #1  ; ; ; 
+    \q_no_value \q_no_value \q_no_value \q_nil
+}
+\cs_generate_variant:Nn \siunitx_angle_find_semi_colons:n { V }
+\cs_new:Npn \siunitx_angle_find_semi_colons:w 
+  #1 ; #2 ; #3 ; #4 #5 #6 #7 \q_nil {
+  \quark_if_no_value:NTF #4
+    { \siunitx_angle_parse_decimal:n {#1} }
+    {
+      \quark_if_no_value:NTF #5
+        { \siunitx_angle_parse_arc:n { #1 ; #2 ; } }
+        {  
+          \quark_if_no_value:NTF #6
+            { \siunitx_angle_parse_arc:n { #1 ; #2 ; #3 } }
+            { 
+              \siunitx_error:nV { invalid-arc-format} 
+                \l_siunitx_angle_arg_tl 
+            }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_rescan:n}
+% To avoid any issues with active \texttt{;} tokens in the input, a 
+% simple search and replace is employed.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_lccode:nn { `\@ } { `\; }
+  \char_make_active:N \@
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_new:Npn \siunitx_angle_rescan:n #1 
+    {
+      \tl_set:Nn \l_siunitx_angle_arg_tl {#1}
+      \tl_replace_all_in:Nnn \l_siunitx_angle_arg_tl { @ } { ; }
+    }
+}
+%\end{macro}
+%
 %\subsection{Creating unit macros}
 %
 % Unit macros and related support are created here. To avoid cluttering
@@ -8431,6 +8509,14 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { ending-quotient-token } 
   {Misplaced quotient token.}
   {A number cannot end with a quotient token.}
+\msg_new:nnnn { siunitx } { invalid-arc-format } 
+  {Invalid degree-minute-second angle '\exp_not:n{#1}'.}
+  {%
+    Angles given in degree-minute-second format should contain one or
+    two ';'\\%
+    symbols to divide up the parts of the input.\\%
+    The given input contains more than two ';' symbols.%
+  }
 \msg_new:nnnn { siunitx } { invalid-number } 
   {Invalid numerical input '\exp_not:n{#1}'.}
   {%
@@ -8566,6 +8652,20 @@ This work consists of the file  siunitx.dtx
 %\subsection{Document macros}
 %
 % The user document macros are all collected together here for ease.
+% 
+%\begin{macro}{\ang}
+% The \cs{ang} function does very little beyond setting the local
+% keys and passing on the input.
+%    \begin{macrocode}
+\NewDocumentCommand \ang { o m } {
+  \group_begin:
+    \IfNoValueF {#1} 
+      { \keys_set:nn { siunitx } {#1} }
+    \siunitx_angle_output:n {#2}
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\num}
 % The \cs{num} macro is quite simple: read the number, check it is 
