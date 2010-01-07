@@ -564,6 +564,25 @@ This work consists of the file  siunitx.dtx
 %  \numrange{10}{30}
 %\end{LaTeXdemo}
 %
+%\DescribeMacro{\ang}
+%\begin{syntax}
+%  \cs{ang}\oarg{options}\marg{angle}
+%\end{syntax}
+% Angles can be typeset using the \cs{ang} command.  The
+% \meta{angle} can be given either as a decimal number or as a
+% semi-colon separated list of degrees, minutes and seconds, which 
+% is called \enquote{arc format} in this document. The numbers which 
+% make up an angle are processed using the same system as other numbers.
+%\begin{LaTeXdemo}
+%  \ang{10}    \\
+%  \ang{12.3}  \\
+%  \ang{4,5}   \\
+%  \ang{1;2;3} \\
+%  \ang{;;1}   \\
+%  \ang{+10;;} \\
+%  \ang{-0;1;}
+%\end{LaTeXdemo}
+%
 %\subsection{Units}
 %
 %\DescribeMacro{\si}
@@ -1686,6 +1705,54 @@ This work consists of the file  siunitx.dtx
 %  \num[fraction-function=\tfrac]{1 / 4} 
 %\end{LaTeXdemo}
 %
+%\subsection{Angles}
+%
+% Angle processing provided by the \cs{ang} has a set of options which
+% apply in addition to the general ones set up for number processing
+% (Table~\ref{tab:opt:ang})
+%
+%\begin{table}
+%  \centering
+%  \caption{Angle options.}
+%  \label{tab:opt:ang}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{c}{Option name} & 
+%      \multicolumn{1}{c}{Type} &
+%      \multicolumn{1}{c}{Default} \\
+%    \midrule
+%      add-arc-degree-zero       & Switch & false        \\
+%      add-arc-second-zero       & Switch & false        \\ 
+%      angle-symbol-over-decimal & Switch & false        \\
+%      arc-separator             & Maths  & false        \\
+%      angle-output-format       & Choice & input        \\
+%      number-angle-separator    & Maths  & \meta{empty} \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{number-angle-separator}
+% The separator between the number and angle symbol (degrees, minutes
+% or seconds) can be set using the \opt{number-angle-separator}
+% option, independent of the related \opt{number-unit-separator}
+% option used by the \cs{SI} function.
+%\begin{LaTeXdemo}
+%  \ang{2.67} \\
+%  \ang[number-angle-separator = \,]{2.67}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{angle-symbol-over-decimal}
+% In some subject areas, most notably astronomy, the angle symbols
+% are given over the decimal marker, rather than at the end of the
+% number. This behaviour is available using the 
+% \opt{angle-symbol-over-decimal} option.
+%\begin{LaTeXdemo}
+%  \ang{45.697}  \\
+%  \ang{6;7;6.5} \\
+%  \ang[angle-symbol-over-decimal]{45.697} \\
+%  \ang[angle-symbol-over-decimal]{6;7;6.5}
+%\end{LaTeXdemo}
+%
 %\subsection{Creating units}
 %\label{sec:units:creating}
 %
@@ -2475,6 +2542,7 @@ This work consists of the file  siunitx.dtx
 %    
 %\begin{macro}{\siunitx_tmp:w}
 %\begin{macro}{\l_siunitx_tmp_bool}
+%\begin{macro}{\l_siunitx_tmp_box}
 %\begin{macro}{\l_siunitx_tmp_int}
 %\begin{macro}{\l_siunitx_tmpa_tl}
 %\begin{macro}{\l_siunitx_tmpb_tl}
@@ -2482,9 +2550,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_tmp:w { }
 \bool_new:N \l_siunitx_tmp_bool
+\box_new:N \l_siunitx_tmp_box
 \int_new:N \l_siunitx_tmp_int
 \tl_new:N \l_siunitx_tmpa_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -2673,7 +2743,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_set_maths_fam:n #1 {
   \group_begin:
-    \hbox_set:Nn \l_tmpa_box 
+    \hbox_set:Nn \l_siunitx_tmp_box 
       {
         \ensuremath 
           {
@@ -6334,20 +6404,44 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
+%\begin{macro}{\l_siunitx_angle_to_arc_bool}
+%\begin{macro}{\l_siunitx_angle_to_decimal_bool}
+% Some switches that are needed.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_angle_to_arc_bool
+\bool_new:N \l_siunitx_angle_to_decimal_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_angle_marker_box}
+%\begin{macro}{\l_siunitx_angle_unit_box}
+%\begin{macro}{\l_siunitx_angle_marker_dim}
+%\begin{macro}{\l_siunitx_angle_unit_dim}
+%    \begin{macrocode}
+\box_new:N \l_siunitx_angle_marker_box
+\box_new:N \l_siunitx_angle_unit_box
+\dim_new:N \l_siunitx_angle_marker_dim
+\dim_new:N \l_siunitx_angle_unit_dim
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_angle_degree_zero_bool}
 %\begin{macro}{\l_siunitx_angle_second_zero_bool}
 %\begin{macro}{\l_siunitx_angle_arc_separator_tl}
 %\begin{macro}{\l_siunitx_angle_astronomy_bool}
-%\begin{macro}{\l_siunitx_angle_to_arc_bool}
-%\begin{macro}{\l_siunitx_angle_to_decimal_bool}
 %\begin{macro}{\l_siunitx_angle_unit_separator_tl}
 % The angle-specific options are created here.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   add-arc-degree-zero  .bool_set:N = \l_siunitx_angle_degree_zero_bool , 
   add-arc-second-zero  .bool_set:N = \l_siunitx_angle_second_zero_bool ,
+  angle-symbol-over-decimal .bool_set:N = 
+    \l_siunitx_angle_astronomy_bool   ,
   arc-separator        .tl_set:N   = \l_siunitx_angle_arc_separator_tl ,
-  astronomy-angles     .bool_set:N = \l_siunitx_angle_astronomy_bool   ,
   angle-output-format  .choice: ,
   angle-output-format / arc .code:n =
     {
@@ -6367,8 +6461,6 @@ This work consists of the file  siunitx.dtx
   number-angle-separator .tl_set:N = \l_siunitx_angle_unit_separator_tl 
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6461,6 +6553,104 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_angle_print_astronomy:}
+%\begin{macro}[aux]{\siunitx_angle_print_astronomy_aux:}
+%\begin{macro}[aux]{\siunitx_angle_print_astronomy_aux:n}
+%\begin{macro}[aux]{\siunitx_angle_print_astronomy_marker:}
+%\begin{macro}[aux]{\siunitx_angle_print_astronomy_unit:}
+% The first check for astronomy-style angles is that there is a decimal
+% marker in the current input: if not, the standard method can be used.
+% The method for the astronomy-style anlge is not straight-forward, so
+% needs a little explaination. The integer and decimal parts of the
+% number are printed at each end of the function. In the middle is a 
+% method to centre the unit symbol on the decimal marker. This is done
+% by typesetting the two symbols and measuring their respective widths.
+% The two are then put into zero-width boxes, which allows them to be 
+% aligned horizonatally centred with no vertical change. The larger
+% dimension is then used to reconstruct the appropriate width for the
+% final output. There is also a need to allow for the \cs{scriptspace}
+% added in after superscripts, which otherwise messes up the 
+% calculation.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_print_astronomy: {
+  \prop_if_in:NnTF \l_siunitx_number_in_prop
+    { mantissa-decimal-marker }
+    { \siunitx_angle_print_astronomy_aux: }
+    { \siunitx_number_output_single: }
+}
+\cs_new_nopar:Npn \siunitx_angle_print_astronomy_aux: {
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-integer }
+    { 
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
+        \l_siunitx_tmpa_tl
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl 
+    } 
+  \hbox_set:Nn \l_siunitx_angle_marker_box
+    {
+      \siunitx_print:nn { number } 
+        { \ensuremath { { \l_siunitx_output_decimal_tl } } }
+    }
+  \hbox_set:Nn \l_siunitx_angle_unit_box
+    {
+      \siunitx_print:nn { unit } { \l_siunitx_unit_tl }
+      \tex_hskip:D -\scriptspace
+    }  
+  \siunitx_angle_print_astronomy_aux:n { marker }
+  \siunitx_angle_print_astronomy_aux:n { unit }
+  \hbox_set:Nn \l_siunitx_angle_marker_box 
+    {
+      \box_use:N \l_siunitx_angle_marker_box
+      \box_use:N \l_siunitx_angle_unit_box
+    }
+  \dim_compare:nNnTF 
+    { \l_siunitx_angle_marker_dim } > { \l_siunitx_angle_unit_dim }
+    { \siunitx_angle_print_astronomy_marker: }
+    { \siunitx_angle_print_astronomy_unit: }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-decimal }
+    { 
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
+        \l_siunitx_tmpa_tl
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl 
+    } 
+}
+\cs_new_nopar:Npn \siunitx_angle_print_astronomy_aux:n #1 {
+  \dim_set:cn { l_siunitx_angle_ #1 _dim  }
+    { \box_wd:c { l_siunitx_angle_ #1 _box } }
+  \hbox_set_to_wd:cnn { l_siunitx_angle_ #1 _box } { \c_zero_skip }
+    {
+      \tex_hss:D
+      \hbox_unpack_clear:c { l_siunitx_angle_ #1_box }
+      \tex_hss:D 
+    }
+}
+\cs_new_nopar:Npn \siunitx_angle_print_astronomy_marker: {
+  \hbox_set_to_wd:Nnn \l_siunitx_angle_marker_box 
+    { \l_siunitx_angle_marker_dim }
+    {
+      \tex_hss:D
+      \hbox_unpack_clear:N \l_siunitx_angle_marker_box
+      \tex_hss:D
+    }
+  \box_use:N \l_siunitx_angle_marker_box
+}
+\cs_new_nopar:Npn \siunitx_angle_print_astronomy_unit: {
+  \hbox_set_to_wd:Nnn \l_siunitx_angle_marker_box 
+    { \l_siunitx_angle_unit_dim } 
+    {
+      \tex_hss:D
+      \hbox_unpack_clear:N \l_siunitx_angle_marker_box
+      \tex_hss:D
+    }
+  \box_use:N \l_siunitx_angle_marker_box
+  \tex_hskip:D \scriptspace
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_angle_print_decimal:}
 %\begin{macro}[aux]{\siunitx_angle_print_decimal_init:}
 % Printing a decimal angle is again very much a simplified version of
@@ -6476,7 +6666,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_format:
       \siunitx_number_output_colour:
       \bool_if:NTF \l_siunitx_angle_astronomy_bool
-        { \siunitx_angle_astronomy:n { degree } }
+        { \siunitx_angle_print_astronomy: }
         { \siunitx_number_output_single: }
     } 
 } 
