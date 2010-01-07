@@ -3846,8 +3846,16 @@ This work consists of the file  siunitx.dtx
                 { invalid-token-in-exponent } \l_siunitx_number_arg_tl
             }
             {
-              \siunitx_number_in_parse_error:nx 
-                { invalid-token-in-number } {#1} 
+              \tl_if_in:NnTF \l_siunitx_input_complex_tl {#1}
+                {
+                  \siunitx_number_in_parse_error:nV 
+                    { invalid-token-in-exponent } 
+                    \l_siunitx_number_arg_tl
+                }
+                {
+                  \siunitx_number_in_parse_error:nx 
+                    { invalid-token-in-number } {#1} 
+                }
             }
         }
     }
@@ -6319,12 +6327,12 @@ This work consists of the file  siunitx.dtx
     { \siunitx_angle_parse_decimal:n {#1} }
     {
       \quark_if_no_value:NTF #5
-        { \siunitx_angle_parse_arc:n { #1 ; #2 ; } }
+        { \siunitx_angle_parse_arc:nnn {#1} {#2} { } }
         {  
           \quark_if_no_value:NTF #6
-            { \siunitx_angle_parse_arc:n { #1 ; #2 ; #3 } }
+            { \siunitx_angle_parse_arc:nnn {#1} {#2} {#3} }
             { 
-              \siunitx_error:nV { invalid-arc-format} 
+              \siunitx_error:nV { invalid-arc-format } 
                 \l_siunitx_angle_arg_tl 
             }
         }
@@ -6333,6 +6341,43 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_parse_arc:nnn}
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_parse_arc:nnn #1#2#3 {
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_parse_decimal:n}
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_parse_decimal:n #1 {
+  \group_begin:
+    \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
+    \tl_clear:N \l_siunitx_preunit_tl 
+    \tl_clear:N \l_siunitx_number_unit_separator_tl
+    \bool_if:NTF \l_siunitx_number_parse_bool
+      {
+        \tl_clear:N \l_siunitx_number_out_tl
+        \cs_set_eq:NN \siunitx_number_in_parse_more:N
+          \siunitx_number_in_parse_exponent:N
+        \siunitx_number_in_parse:n {#1}
+        \bool_if:NF \l_siunitx_error_bool 
+          {
+            \siunitx_number_process:
+            \siunitx_number_format:
+            \siunitx_number_output_colour:
+            \siunitx_number_output_single:
+          }  
+      }
+      {
+        \siunitx_print:nn { number } { \ensuremath {#1} }
+        \siunitx_unit_output_print:
+      }
+  \group_end:
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_rescan:n}
