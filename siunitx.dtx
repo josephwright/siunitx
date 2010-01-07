@@ -1332,8 +1332,8 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      add-zero-decimal      & Switch  & true     \\
-%      add-zero-integer      & Switch  & true     \\
+%      add-decimal-zero      & Switch  & true     \\
+%      add-integer-zero      & Switch  & true     \\
 %      explicit-sign         & Literal & \m{none} \\
 %      retain-explicit-plus  & Switch  & false    \\
 %      retain-unity-mantissa & Switch  & true     \\
@@ -1376,20 +1376,20 @@ This work consists of the file  siunitx.dtx
 %  \num{0.12345(9)}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{add-zero-decimal}
-%\DescribeOption{add-zero-integer}
+%\DescribeOption{add-decimal-zero}
+%\DescribeOption{add-integer-zero}
 % It is possible to give real (floating point) numbers as input omitting
 % the decimal or the integer parts of the number (for example \num{.123} 
-% or \num{123.}). The options \opt{add-zero-decimal} and 
-% \opt{add-zero-integer} allow the package to \enquote{fill in} the
+% or \num{123.}). The options \opt{add-decimal-zero} and 
+% \opt{add-integer-zero} allow the package to \enquote{fill in} the
 % missing zero.
 %\begin{LaTeXdemo}
 %  \num{123.} \\
 %  \num{456}  \\
 %  \num{.789} \\
 %  \sisetup{
-%    add-zero-decimal = false,
-%    add-zero-integer = false,
+%    add-decimal-zero = false,
+%    add-integer-zero = false,
 %  }%
 %  \num{123.} \\
 %  \num{456}  \\
@@ -3798,6 +3798,45 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_number_in_parse_angle:N}
+% When parsing numbers for the \cs{ang} function, no extended input 
+% is permitted at all.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_number_in_parse_angle:N #1 {
+  \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
+    { 
+      \siunitx_number_in_parse_error:nx  
+        { invalid-token-in-angle } {#1} 
+    }
+    { 
+      \tl_if_in:NnTF \l_siunitx_input_uncert_open_tl {#1}
+        { 
+          \siunitx_number_in_parse_error:nV 
+            { invalid-token-in-angle } \l_siunitx_number_arg_tl 
+        }
+        {
+          \tl_if_in:NnTF \l_siunitx_input_uncert_close_tl {#1}
+            { 
+              \siunitx_number_in_parse_error:nV 
+                { invalid-token-in-angle } \l_siunitx_number_arg_tl
+            }
+            {
+              \tl_if_in:NnTF \l_siunitx_input_complex_tl {#1}
+                {
+                  \siunitx_number_in_parse_error:nV 
+                    { invalid-token-in-angle } \l_siunitx_number_arg_tl
+                }
+                {
+                  \siunitx_number_in_parse_error:nx 
+                    { invalid-token-in-number } {#1} 
+                }
+            }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_number_in_parse_complex:N}
 % After a complex root when the root is \emph{after} the number, there
 % are a very limited range of legitimate tokens. Thus most cases can be
@@ -4390,8 +4429,8 @@ This work consists of the file  siunitx.dtx
 % First, the options are set up.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  add-zero-decimal  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
-  add-zero-integer  .bool_set:N = \l_siunitx_process_integer_zero_bool,
+  add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
+  add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool_set:N = 
@@ -4408,8 +4447,8 @@ This work consists of the file  siunitx.dtx
   round-places      .tl_set:N   = \l_siunitx_process_places_int,
 }
 \keys_set:nn { siunitx } {
-  add-zero-decimal      = true,
-  add-zero-integer      = true,
+  add-decimal-zero      = true,
+  add-integer-zero      = true,
   retain-unity-mantissa = true, 
   round-figures         = 2,
   round-places          = 2
@@ -6294,8 +6333,53 @@ This work consists of the file  siunitx.dtx
 \tl_new:N \l_siunitx_angle_arg_tl
 %    \end{macrocode}
 %\end{macro} 
+%
+%\begin{macro}{\l_siunitx_angle_degree_zero_bool}
+%\begin{macro}{\l_siunitx_angle_second_zero_bool}
+%\begin{macro}{\l_siunitx_angle_arc_separator_tl}
+%\begin{macro}{\l_siunitx_angle_astronomy_bool}
+%\begin{macro}{\l_siunitx_angle_to_arc_bool}
+%\begin{macro}{\l_siunitx_angle_to_decimal_bool}
+%\begin{macro}{\l_siunitx_angle_unit_separator_tl}
+% The angle-specific options are created here.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  add-arc-degree-zero  .bool_set:N = \l_siunitx_angle_degree_zero_bool , 
+  add-arc-second-zero  .bool_set:N = \l_siunitx_angle_second_zero_bool ,
+  arc-separator        .tl_set:N   = \l_siunitx_angle_arc_separator_tl ,
+  astronomy-angles     .bool_set:N = \l_siunitx_angle_astronomy_bool   ,
+  angle-output-format  .choice: ,
+  angle-output-format / arc .code:n =
+    {
+      \bool_set_true:N \l_siunitx_angle_to_arc_bool
+      \bool_set_false:N \l_siunitx_angle_to_decimal_bool
+    },
+  angle-output-format / decimal .code:n =
+    {
+      \bool_set_false:N \l_siunitx_angle_to_arc_bool
+      \bool_set_true:N \l_siunitx_angle_to_decimal_bool
+    },
+  angle-output-format / input .code:n =
+    {
+      \bool_set_false:N \l_siunitx_angle_to_arc_bool
+      \bool_set_false:N \l_siunitx_angle_to_decimal_bool
+    },
+  number-angle-separator .tl_set:N = \l_siunitx_angle_unit_separator_tl 
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 % 
 %\begin{macro}{\siunitx_angle_output:n}
+% The main output routine for angles does very little. The rescanning
+% function is called to make sure that any \texttt{;} tokens in the
+% input are not active. After than, the input is passed to the system
+% to search for semi-colons.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_output:n #1 {
   \bool_set_true:N \l_siunitx_angle_valid_arc_bool
@@ -6351,33 +6435,59 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_parse_decimal:n}
+% This is a simplified version of the number output routine. First, if
+% there is no parsing at all then the input is just dumped as given 
+% (with the appropriate unit added). Otherwise the input is parsed
+% before checking if conversion to an arc is required. The appropriate
+% hand-off then takes place.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_decimal:n #1 {
-  \group_begin:
-    \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
-    \tl_clear:N \l_siunitx_preunit_tl 
-    \tl_clear:N \l_siunitx_number_unit_separator_tl
-    \bool_if:NTF \l_siunitx_number_parse_bool
-      {
-        \tl_clear:N \l_siunitx_number_out_tl
-        \cs_set_eq:NN \siunitx_number_in_parse_more:N
-          \siunitx_number_in_parse_exponent:N
-        \siunitx_number_in_parse:n {#1}
-        \bool_if:NF \l_siunitx_error_bool 
-          {
-            \siunitx_number_process:
-            \siunitx_number_format:
-            \siunitx_number_output_colour:
-            \siunitx_number_output_single:
-          }  
-      }
-      {
-        \siunitx_print:nn { number } { \ensuremath {#1} }
-        \siunitx_unit_output_print:
-      }
-  \group_end:
+  \bool_if:NTF \l_siunitx_number_parse_bool
+   {
+     \tl_clear:N \l_siunitx_number_out_tl
+     \cs_set_eq:NN \siunitx_number_in_parse_more:N
+       \siunitx_number_in_parse_angle:N
+      \siunitx_number_in_parse:n {#1}
+      \bool_if:NTF \l_siunitx_angle_to_arc_bool
+        { \siunitx_angle_convert_to_arc: }
+        { \siunitx_angle_print_decimal: }
+    }
+    {
+      \siunitx_angle_print_decimal_init:
+      \siunitx_print:nn { number } { \ensuremath {#1} }
+      \siunitx_unit_output_print:
+    }
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_print_decimal:}
+%\begin{macro}[aux]{\siunitx_angle_print_decimal_init:}
+% Printing a decimal angle is again very much a simplified version of
+% the number printer. The only odd item here is that when angles are
+% being printed in the \enquote{astronomy} style, the construction has
+% to be carried out by a dedicated routine.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_print_decimal: {
+  \bool_if:NF \l_siunitx_error_bool 
+    {
+      \siunitx_angle_print_decimal_init:
+      \siunitx_number_process:
+      \siunitx_number_format:
+      \siunitx_number_output_colour:
+      \bool_if:NTF \l_siunitx_angle_astronomy_bool
+        { \siunitx_angle_astronomy:n { degree } }
+        { \siunitx_number_output_single: }
+    } 
+} 
+\cs_new_nopar:Npn \siunitx_angle_print_decimal_init: {
+  \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
+  \tl_clear:N \l_siunitx_preunit_tl 
+  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
+    \l_siunitx_angle_unit_separator_tl
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_rescan:n}
