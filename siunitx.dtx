@@ -6418,6 +6418,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_angle_unit_box}
 %\begin{macro}{\l_siunitx_angle_marker_dim}
 %\begin{macro}{\l_siunitx_angle_unit_dim}
+% When creating astronomy-style angles, the decimal marker and angle 
+% symbol have to be boxed up and measured.
 %    \begin{macrocode}
 \box_new:N \l_siunitx_angle_marker_box
 \box_new:N \l_siunitx_angle_unit_box
@@ -6429,7 +6431,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_angle_degree_prop}
+%\begin{macro}{\l_siunitx_angle_minute_prop}
+% Printing angles in arc format requires all three parts to be parsed 
+% before any typesetting. Hence there is a need to save two sets of
+% properties.
+%    \begin{macrocode}
+\prop_new:N \l_siunitx_angle_degree_prop
+\prop_new:N \l_siunitx_angle_minute_prop
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_angle_degree_zero_bool}
+%\begin{macro}{\l_siunitx_angle_minute_zero_bool}
 %\begin{macro}{\l_siunitx_angle_second_zero_bool}
 %\begin{macro}{\l_siunitx_angle_arc_separator_tl}
 %\begin{macro}{\l_siunitx_angle_astronomy_bool}
@@ -6438,6 +6453,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   add-arc-degree-zero  .bool_set:N = \l_siunitx_angle_degree_zero_bool , 
+  add-arc-minute-zero  .bool_set:N = \l_siunitx_angle_minute_zero_bool , 
   add-arc-second-zero  .bool_set:N = \l_siunitx_angle_second_zero_bool ,
   angle-symbol-over-decimal .bool_set:N = 
     \l_siunitx_angle_astronomy_bool   ,
@@ -6461,6 +6477,7 @@ This work consists of the file  siunitx.dtx
   number-angle-separator .tl_set:N = \l_siunitx_angle_unit_separator_tl 
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6522,6 +6539,31 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_angle_parse_arc:nnn}
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc:nnn #1#2#3 {
+  \bool_if:NTF \l_siunitx_number_parse_bool
+    {
+      \siunitx_number_in_parse:n {#1}
+      \siunitx_number_process:
+      \prop_set_eq:NN \l_siunitx_angle_decimal_prop 
+        \l_siunitx_number_in_prop
+      \siunitx_number_in_parse:n {#2}
+      \siunitx_number_process:
+      \prop_set_eq:NN \l_siunitx_angle_minute_prop 
+        \l_siunitx_number_in_prop
+      \siunitx_number_in_parse:n {#3}
+      \siunitx_number_process:
+    }
+    {
+      \siunitx_angle_parse_arc_direct:nnn {#1} {#2} {#3}
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_angle_parse_arc_direct:nnn}
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_parse_arc_direct:nnn #1#2#3 {
+  \bool_if:NT \l_siunitx_angle_decimal_zero_bool
+    {
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6535,17 +6577,17 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_decimal:n #1 {
   \bool_if:NTF \l_siunitx_number_parse_bool
-   {
-     \tl_clear:N \l_siunitx_number_out_tl
-     \cs_set_eq:NN \siunitx_number_in_parse_more:N
-       \siunitx_number_in_parse_angle:N
+    {
+      \tl_clear:N \l_siunitx_number_out_tl
+      \cs_set_eq:NN \siunitx_number_in_parse_more:N
+        \siunitx_number_in_parse_angle:N
       \siunitx_number_in_parse:n {#1}
       \bool_if:NTF \l_siunitx_angle_to_arc_bool
         { \siunitx_angle_convert_to_arc: }
         { \siunitx_angle_print_decimal: }
     }
     {
-      \siunitx_angle_print_decimal_init:
+      \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
       \siunitx_print:nn { number } { \ensuremath {#1} }
       \siunitx_unit_output_print:
     }
