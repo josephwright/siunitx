@@ -6537,8 +6537,46 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_parse_arc:nnn}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_i:nnn}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_ii:nnn}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_iii:nnn}
+% For angles given as arcs, there may be a need to zero-fill one or
+% more parts. That is done first, as otherwise life gets very
+% complicated later one (although there is a slight performance hit as
+% a result).
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc:nnn #1#2#3 {
+  \tl_if_empty:nTF { #1#2#3 }
+    { \siunitx_error:n { empty-arc } }
+    {
+      \bool_if:NTF \l_siunitx_angle_degree_zero_bool
+        {
+          \tl_if_empty:nTF {#1}
+            { \siunitx_angle_parse_arc_aux_i:nnn { 0 } {#2} {#3} }
+            { \siunitx_angle_parse_arc_aux_i:nnn {#1} {#2} {#3} }
+        }
+        { \siunitx_angle_parse_arc_aux_i:nnn {#1} {#2} {#3} }
+    }
+}
+\cs_new:Npn \siunitx_angle_parse_arc_aux_i:nnn #1#2#3 {
+  \bool_if:NTF \l_siunitx_angle_minute_zero_bool
+    {
+      \tl_if_empty:nTF {#2}
+        { \siunitx_angle_parse_arc_aux_ii:nnn {#1} { 0 } {#3} }
+        { \siunitx_angle_parse_arc_aux_ii:nnn {#1} {#2} {#3} }
+    }
+    { \siunitx_angle_parse_arc_aux_ii:nnn {#1} {#2} {#3} }
+}
+\cs_new:Npn \siunitx_angle_parse_arc_aux_ii:nnn #1#2#3 {
+  \bool_if:NTF \l_siunitx_angle_second_zero_bool
+    {
+      \tl_if_empty:nTF {#3}
+        { \siunitx_angle_parse_arc_aux_iii:nnn {#1} {#2} { 0 } }
+        { \siunitx_angle_parse_arc_aux_iii:nnn {#1} {#2} {#3} }
+    }
+    { \siunitx_angle_parse_arc_aux_iii:nnn {#1} {#2} {#3} }
+}
+\cs_new:Npn \siunitx_angle_parse_arc_aux_iii:nnn #1#2#3 {
   \bool_if:NTF \l_siunitx_number_parse_bool
     {
       \siunitx_number_in_parse:n {#1}
@@ -6558,12 +6596,53 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\end{macro}
 %\begin{macro}{\siunitx_angle_parse_arc_direct:nnn}
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc_direct:nnn #1#2#3 {
-  \bool_if:NT \l_siunitx_angle_decimal_zero_bool
+  \tl_if_empty:nTF {#1}
     {
+      \tl_if_empty:nTF {#2}
+        {
+          \siunitx_angle_parse_direct_aux:nn {#3}
+            { \SIUnitSymbolArcsecond }
+        }
+        {
+          \siunitx_angle_parse_direct_aux:nn {#2}
+            { \SIUnitSymbolArcminute }
+          \tl_if_empty:nF {#3}
+            {
+              \siunitx_angle_parse_direct_aux:nn {#3}
+                { \SIUnitSymbolArcsecond }
+            }
+        }
     }
+    {
+      \siunitx_angle_parse_direct_aux:nn {#1} { \SIUnitSymbolDegree }
+      \tl_if_empty:nTF {#2}
+        {
+          \tl_if_empty:nF {#3}
+            {
+              \siunitx_angle_parse_direct_aux:nn {#3}
+                { \SIUnitSymbolArcsecond }
+            }
+        }
+        {
+          \siunitx_angle_parse_direct_aux:nn {#2}
+            { \SIUnitSymbolArcminute }
+          \tl_if_empty:nF {#3}
+            {
+              \siunitx_angle_parse_direct_aux:nn {#3}
+                { \SIUnitSymbolArcsecond }
+            }
+        }
+    }
+}
+\cs_new:Npn \siunitx_angle_parse_direct_aux:nn #1#2 {
+  \tl_set:Nn \l_siunitx_unit_tl {#2}
+  \siunitx_print:nn { number } { \ensuremath {#1} }
+  \siunitx_unit_output_print:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6587,9 +6666,7 @@ This work consists of the file  siunitx.dtx
         { \siunitx_angle_print_decimal: }
     }
     {
-      \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
-      \siunitx_print:nn { number } { \ensuremath {#1} }
-      \siunitx_unit_output_print:
+      \siunitx_angle_parse_direct_aux:nn {#1} { \SIUnitSymbolDegree }
     }
 }
 %    \end{macrocode}
@@ -8887,6 +8964,9 @@ This work consists of the file  siunitx.dtx
     \token_to_str:N \per \msg_space: \\%
     may appear in a unit.
   }
+\msg_new:nnnn { siunitx } { empty-arc } 
+  {Empty degree-minute-second angle.}
+  { The angle given does not contain any numbers.}
 \msg_new:nnnn { siunitx } { empty-uncertainty }
   {Empty uncertainty given in '\exp_not:n{#1}'.}
   {The number given contains an empty uncertainty, which is invalid.}
