@@ -404,7 +404,7 @@ This work consists of the file  siunitx.dtx
 % The package includes automated processing of numbers and units, and
 % the ability to control tabular alignment of numbers.
 %\end{abstract}
-
+%
 %\tableofcontents
 %
 %\begin{documentation}
@@ -2196,7 +2196,7 @@ This work consists of the file  siunitx.dtx
 % \opt{parse-units} switch.
 %\begin{LaTeXdemo}
 %  \SI{300}{\MHz} \\
-%  \SI[parse-units = false]{300}{\MHz} \\
+%  \SI[parse-units = false]{300}{\MHz}
 %\end{LaTeXdemo}
 %
 %\subsection{Numbers with units}
@@ -2237,7 +2237,7 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\DescribeOption{number-unit-separator}
-% The separator between the number and units is stored using the
+% The separator between the number and unit is set using the 
 % \opt{number-unit-separator} option. 
 %\begin{LaTeXdemo}
 %  \SI{2.67}{\farad} \\
@@ -2468,7 +2468,7 @@ This work consists of the file  siunitx.dtx
 %  \SI[
 %    parse-numbers = false,
 %    parse-units   = false
-%  ]{7.3}{\Hz} \\
+%  ]{7.3}{\Hz} 
 %\end{LaTeXdemo}
 %
 %\section{Thanks}
@@ -3727,6 +3727,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_in_parse:n}
 %\begin{macro}{\siunitx_number_in_parse:V}
+%\begin{macro}[aux]{\siunitx_number_in_parse_aux:n}
 % The parsing routine starts by replacing any formatting in the input
 % using \cs{tl_set_rescan:Nnx}. Next, there is a quick routine to
 % ensure that all signs are single tokens. The main loop then takes 
@@ -3735,6 +3736,10 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_in_parse:n #1 {
   \siunitx_number_in_init:
+  \tl_if_empty:nF {#1} { \siunitx_number_in_parse_aux:n {#1} }
+}
+\cs_generate_variant:Nn \siunitx_number_in_parse:n { V }
+\cs_new:Npn \siunitx_number_in_parse_aux:n #1 {
   \tl_set_rescan:Nnx \l_siunitx_number_arg_tl
     {
       \siunitx_number_in_protect:
@@ -3769,8 +3774,8 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_number_in_check:n {#1}
 }
-\cs_generate_variant:Nn \siunitx_number_in_parse:n { V }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -6399,10 +6404,18 @@ This work consists of the file  siunitx.dtx
 % to be handled correctly. 
 % 
 %\begin{macro}{\l_siunitx_angle_arg_tl}
+% Used to store the complete angle argument.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_angle_arg_tl
 %    \end{macrocode}
 %\end{macro} 
+%
+%\begin{macro}{\l_siunitx_angle_arc_sign_tl}
+% Needed when checking for a sign with angles in arc format.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_angle_arc_sign_tl
+%    \end{macrocode}
+%\end{macro}
 %
 %\begin{macro}{\l_siunitx_angle_to_arc_bool}
 %\begin{macro}{\l_siunitx_angle_to_decimal_bool}
@@ -6433,13 +6446,16 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_angle_degree_prop}
 %\begin{macro}{\l_siunitx_angle_minute_prop}
+%\begin{macro}{\l_siunitx_angle_second_prop}
 % Printing angles in arc format requires all three parts to be parsed 
-% before any typesetting. Hence there is a need to save two sets of
-% properties.
+% before any typesetting. Two must therefore be saved: all three are 
+% done so that the code is clearer.
 %    \begin{macrocode}
 \prop_new:N \l_siunitx_angle_degree_prop
 \prop_new:N \l_siunitx_angle_minute_prop
+\prop_new:N \l_siunitx_angle_second_prop
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -6492,6 +6508,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_output:n #1 {
   \bool_set_true:N \l_siunitx_angle_valid_arc_bool
+  \tl_clear:N \l_siunitx_preunit_tl 
+  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
+    \l_siunitx_angle_unit_separator_tl
   \siunitx_angle_rescan:n {#1}
   \siunitx_angle_find_semi_colons:V \l_siunitx_angle_arg_tl
 }
@@ -6578,23 +6597,11 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new:Npn \siunitx_angle_parse_arc_aux_iii:nnn #1#2#3 {
   \bool_if:NTF \l_siunitx_number_parse_bool
-    {
-      \siunitx_number_in_parse:n {#1}
-      \siunitx_number_process:
-      \prop_set_eq:NN \l_siunitx_angle_decimal_prop 
-        \l_siunitx_number_in_prop
-      \siunitx_number_in_parse:n {#2}
-      \siunitx_number_process:
-      \prop_set_eq:NN \l_siunitx_angle_minute_prop 
-        \l_siunitx_number_in_prop
-      \siunitx_number_in_parse:n {#3}
-      \siunitx_number_process:
-    }
-    {
-      \siunitx_angle_parse_arc_direct:nnn {#1} {#2} {#3}
-    }
+    { \siunitx_angle_parse_arc_processed:nnn {#1} {#2} {#3} }
+    { \siunitx_angle_parse_arc_direct:nnn {#1} {#2} {#3} }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6604,47 +6611,120 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:nTF {#1}
     {
       \tl_if_empty:nTF {#2}
+        { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
         {
-          \siunitx_angle_parse_direct_aux:nn {#3}
-            { \SIUnitSymbolArcsecond }
-        }
-        {
-          \siunitx_angle_parse_direct_aux:nn {#2}
-            { \SIUnitSymbolArcminute }
+          \siunitx_angle_print:nn {#2} { \SIUnitSymbolArcminute }
           \tl_if_empty:nF {#3}
-            {
-              \siunitx_angle_parse_direct_aux:nn {#3}
-                { \SIUnitSymbolArcsecond }
-            }
+            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
         }
     }
     {
-      \siunitx_angle_parse_direct_aux:nn {#1} { \SIUnitSymbolDegree }
+      \siunitx_angle_print:nn {#1} { \SIUnitSymbolDegree }
       \tl_if_empty:nTF {#2}
         {
           \tl_if_empty:nF {#3}
-            {
-              \siunitx_angle_parse_direct_aux:nn {#3}
-                { \SIUnitSymbolArcsecond }
-            }
+            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
         }
         {
-          \siunitx_angle_parse_direct_aux:nn {#2}
-            { \SIUnitSymbolArcminute }
+          \siunitx_angle_print:nn {#2} { \SIUnitSymbolArcminute }
           \tl_if_empty:nF {#3}
+            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_parse_arc_processed:nnn}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_processed_aux:nn}
+% When processing an arc, there are three calls to read each part of 
+% the number, followed by running the sanity check on any signs. Only
+% after all of this does the code check for a call to the conversion
+% system.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_parse_arc_processed:nnn #1#2#3 {
+  \siunitx_angle_parse_arc_processed_aux:nn {#1} { degree }
+  \siunitx_angle_parse_arc_processed_aux:nn {#2} { minute }
+  \siunitx_angle_parse_arc_processed_aux:nn {#3} { second }
+  \siunitx_angle_parse_arc_sign_check:
+  \bool_if:NF \l_siunitx_error_bool
+    {
+      \bool_if:NTF \l_siunitx_angle_to_decimal_bool
+        { \siunitx_angle_convert_to_decimal: }
+        { \siunitx_angle_print_arc: }
+    }
+}
+\cs_new:Npn \siunitx_angle_parse_arc_processed_aux:nn #1#2 {
+  \siunitx_number_in_parse:n {#1}
+  \siunitx_number_process:
+  \prop_set_eq:cN { l_siunitx_angle_ #2 _prop } 
+    \l_siunitx_number_in_prop
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_angle_parse_arc_sign_check:}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_sign_check_aux:n}
+% There are two issues with signs for angles given as arcs. First, if
+% more than one sign has been given, they have to agree. So there is a 
+% need to find any signs and check. Second, the sign needs to be given 
+% only for the \enquote{highest order} entry. That is most easily 
+% achieved by shuffling the sign to the appropriate place.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_parse_arc_sign_check: {
+  \tl_clear:N \l_siunitx_angle_arc_sign_tl
+  \bool_set_false:N \l_siunitx_error_bool
+  \prop_if_in:NnTF \l_siunitx_angle_second_prop { mantissa-sign }
+    {
+      \prop_get:NnN \l_siunitx_angle_second_prop { mantissa-sign } 
+        \l_siunitx_angle_arc_sign_tl
+      \siunitx_angle_parse_arc_sign_check_aux:n { minute }
+      \siunitx_angle_parse_arc_sign_check_aux:n { degree }
+    }
+    {
+      \prop_if_in:NnT \l_siunitx_angle_minute_prop { mantissa-sign } 
+        {
+          \prop_get:NnN \l_siunitx_angle_minute_prop { mantissa-sign } 
+            \l_siunitx_angle_arc_sign_tl
+          \siunitx_angle_parse_arc_sign_check_aux:n { degree }  
+        }
+    }
+  \bool_if:NF \l_siunitx_error_bool
+    {
+      \tl_if_empty:NF \l_siunitx_angle_arc_sign_tl
+        {
+          \prop_if_empty:NTF \l_siunitx_angle_degree_prop
+            { 
+              \prop_if_empty:NF \l_siunitx_angle_minute_prop
+                {
+                  \prop_put:NnV \l_siunitx_angle_minute_prop 
+                    { mantissa-sign } \l_siunitx_angle_arc_sign_tl
+                  \prop_del:Nn \l_siunitx_angle_second_prop 
+                    { mantissa-sign }
+                }
+            }
             {
-              \siunitx_angle_parse_direct_aux:nn {#3}
-                { \SIUnitSymbolArcsecond }
+              \prop_put:NnV \l_siunitx_angle_degree_prop 
+                { mantissa-sign } \l_siunitx_angle_arc_sign_tl
+              \prop_del:Nn \l_siunitx_angle_minute_prop 
+                { mantissa-sign }
+              \prop_del:Nn \l_siunitx_angle_second_prop 
+                { mantissa-sign }
             }
         }
     }
 }
-\cs_new:Npn \siunitx_angle_parse_direct_aux:nn #1#2 {
-  \tl_set:Nn \l_siunitx_unit_tl {#2}
-  \siunitx_print:nn { number } { \ensuremath {#1} }
-  \siunitx_unit_output_print:
+\cs_new_nopar:Npn \siunitx_angle_parse_arc_sign_check_aux:n #1 {
+  \prop_if_in:cnT { l_siunitx_angle_ #1 _prop } { mantissa-sign } 
+    {
+      \prop_get:cnN { l_siunitx_angle_ #1 _prop } { mantissa-sign } 
+        \l_siunitx_tmpa_tl
+      \tl_if_eq:NNF \l_siunitx_angle_arc_sign_tl \l_siunitx_tmpa_tl
+         { \siunitx_error:n { arc-sign-mismatch } }
+    }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_parse_decimal:n}
@@ -6666,8 +6746,20 @@ This work consists of the file  siunitx.dtx
         { \siunitx_angle_print_decimal: }
     }
     {
-      \siunitx_angle_parse_direct_aux:nn {#1} { \SIUnitSymbolDegree }
+      \siunitx_angle_print_aux:nn {#1} { \SIUnitSymbolDegree }
     }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_print:nn}
+% For all types of angle, directly printing is done by setting the unit
+% correctly, then calling the print routine, and then the unit printer. 
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_angle_print:nn #1#2 {
+  \tl_set:Nn \l_siunitx_unit_tl {#2}
+  \siunitx_print:nn { number } { \ensuremath {#1} }
+  \siunitx_unit_output_print:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6770,8 +6862,29 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_angle_print_arc:}
+%\begin{macro}[aux]{\siunitx_angle_print_arc_aux:nn}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_print_arc: {
+  \siunitx_angle_print_arc_aux:nn { degree } { \SIUnitSymbolDegree }
+  \siunitx_angle_print_arc_aux:nn { minute } { \SIUnitSymbolArcminute }
+  \siunitx_angle_print_arc_aux:nn { second } { \SIUnitSymbolArcsecond }
+}
+\cs_new_nopar:Npn \siunitx_angle_print_arc_aux:nn #1#2 {
+  \prop_if_empty:cF { l_siunitx_angle_ #1 _prop }
+    {
+      \prop_set_eq:Nc \l_siunitx_number_in_prop 
+        { l_siunitx_angle_ #1 _prop }
+      \tl_set:Nn \l_siunitx_unit_tl {#2}  
+      \siunitx_angle_print_decimal_aux:  
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_angle_print_decimal:}
-%\begin{macro}[aux]{\siunitx_angle_print_decimal_init:}
+%\begin{macro}[aux]{\siunitx_angle_print_decimal_aux:}
 % Printing a decimal angle is again very much a simplified version of
 % the number printer. The only odd item here is that when angles are
 % being printed in the \enquote{astronomy} style, the construction has
@@ -6780,20 +6893,17 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_angle_print_decimal: {
   \bool_if:NF \l_siunitx_error_bool 
     {
-      \siunitx_angle_print_decimal_init:
+      \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
       \siunitx_number_process:
-      \siunitx_number_format:
-      \siunitx_number_output_colour:
-      \bool_if:NTF \l_siunitx_angle_astronomy_bool
-        { \siunitx_angle_print_astronomy: }
-        { \siunitx_number_output_single: }
+      \siunitx_angle_print_decimal_aux:
     } 
 } 
-\cs_new_nopar:Npn \siunitx_angle_print_decimal_init: {
-  \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
-  \tl_clear:N \l_siunitx_preunit_tl 
-  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
-    \l_siunitx_angle_unit_separator_tl
+\cs_new_nopar:Npn \siunitx_angle_print_decimal_aux: {
+  \siunitx_number_format:
+  \siunitx_number_output_colour:
+  \bool_if:NTF \l_siunitx_angle_astronomy_bool
+    { \siunitx_angle_print_astronomy: }
+    { \siunitx_number_output_single: }
 }
 %    \end{macrocode}
 %\end{macro}
