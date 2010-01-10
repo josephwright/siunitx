@@ -6419,10 +6419,21 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_angle_to_arc_bool}
 %\begin{macro}{\l_siunitx_angle_to_decimal_bool}
-% Some switches that are needed.
+% Some switches that are needed for the options.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_angle_to_arc_bool
 \bool_new:N \l_siunitx_angle_to_decimal_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_angle_degree_space_bool}
+%\begin{macro}{\l_siunitx_angle_minute_space_bool}
+% To make life a little easier when printing arcs, some flags are used
+% for indicating the need for inter-item spacing.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_angle_degree_space_bool
+\bool_new:N \l_siunitx_angle_minute_space_bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -6507,7 +6518,8 @@ This work consists of the file  siunitx.dtx
 % to search for semi-colons.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_output:n #1 {
-  \bool_set_true:N \l_siunitx_angle_valid_arc_bool
+  \bool_set_false:N \l_siunitx_angle_degree_space_bool
+  \bool_set_false:N \l_siunitx_angle_minute_space_bool
   \tl_clear:N \l_siunitx_preunit_tl 
   \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
     \l_siunitx_angle_unit_separator_tl
@@ -6562,7 +6574,8 @@ This work consists of the file  siunitx.dtx
 % For angles given as arcs, there may be a need to zero-fill one or
 % more parts. That is done first, as otherwise life gets very
 % complicated later one (although there is a slight performance hit as
-% a result).
+% a result). The appropriate flags are then set up for inter-section
+% spacing.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc:nnn #1#2#3 {
   \tl_if_empty:nTF { #1#2#3 }
@@ -6596,6 +6609,18 @@ This work consists of the file  siunitx.dtx
     { \siunitx_angle_parse_arc_aux_iii:nnn {#1} {#2} {#3} }
 }
 \cs_new:Npn \siunitx_angle_parse_arc_aux_iii:nnn #1#2#3 {
+  \bool_set_false:N \l_siunitx_angle_degree_space_bool
+  \bool_set_false:N \l_siunitx_angle_minute_space_bool
+  \tl_if_empty:nTF {#2}
+    {
+      \tl_if_empty:nF {#3}
+        { \bool_set_true:N \l_siunitx_angle_degree_space_bool } 
+    }
+    { 
+      \bool_set_true:N \l_siunitx_angle_degree_space_bool
+      \tl_if_empty:nF {#3}
+        { \bool_set_true:N \l_siunitx_angle_minute_space_bool } 
+    }
   \bool_if:NTF \l_siunitx_number_parse_bool
     { \siunitx_angle_parse_arc_processed:nnn {#1} {#2} {#3} }
     { \siunitx_angle_parse_arc_direct:nnn {#1} {#2} {#3} }
@@ -6644,7 +6669,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc_processed:nnn #1#2#3 {
   \siunitx_angle_parse_arc_processed_aux:nn {#1} { degree }
+  \bool_if:NT \l_siunitx_angle_degree_space_bool
+    { }
   \siunitx_angle_parse_arc_processed_aux:nn {#2} { minute }
+  \bool_if:NT \l_siunitx_angle_minute_space_bool
+    { }
   \siunitx_angle_parse_arc_processed_aux:nn {#3} { second }
   \siunitx_angle_parse_arc_sign_check:
   \bool_if:NF \l_siunitx_error_bool
