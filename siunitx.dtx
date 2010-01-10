@@ -194,7 +194,7 @@ This work consists of the file  siunitx.dtx
 %^^A Some short cuts for the tables
 %\newcommand*\DescribePrefix[1]{^^A
 %  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
-%    #1 & \cs{#1} 
+%    #1 & \cs{#1} & \expandafter\si\expandafter{\csname #1\endcsname} 
 %}
 %\newcommand*\DescribeUnit[1]{^^A
 %  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
@@ -830,26 +830,26 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Symbol} &
 %      \multicolumn{1}{c}{Power} \\
 %    \midrule
-%      \DescribePrefix{yocto} &  y & -24 &
-%      \DescribePrefix{deca}  & da &   1 \\
-%      \DescribePrefix{zepto} &  z & -21 &
-%      \DescribePrefix{hecto} &  h &   2 \\
-%      \DescribePrefix{atto}  &  a & -18 &
-%      \DescribePrefix{kilo}  &  k &   3 \\
-%      \DescribePrefix{femto} &  f & -15 &
-%      \DescribePrefix{mega}  &  M &   6 \\
-%      \DescribePrefix{pico}  &  p & -12 &
-%      \DescribePrefix{giga}  &  G  &  9 \\
-%      \DescribePrefix{nano}  &  n &  -9 &
-%      \DescribePrefix{tera}  &  T &  12 \\
-%      \DescribePrefix{micro} & \SIUnitSymbolMicro & -6 &
-%      \DescribePrefix{peta}  &  P &  15 \\
-%      \DescribePrefix{milli} &  m &  -3 &
-%      \DescribePrefix{exa}   &  E &  18 \\
-%      \DescribePrefix{centi} &  c &  -2 &
-%      \DescribePrefix{zetta} &  Z &  21 \\
-%      \DescribePrefix{deci}  &  d &  -1 &
-%      \DescribePrefix{yotta} &  Y &  24 \\
+%      \DescribePrefix{yocto} & -24 &
+%      \DescribePrefix{deca}  &   1 \\
+%      \DescribePrefix{zepto} & -21 &
+%      \DescribePrefix{hecto} &   2 \\
+%      \DescribePrefix{atto}  & -18 &
+%      \DescribePrefix{kilo}  &   3 \\
+%      \DescribePrefix{femto} & -15 &
+%      \DescribePrefix{mega}  &   6 \\
+%      \DescribePrefix{pico}  & -12 &
+%      \DescribePrefix{giga}  &  9 \\
+%      \DescribePrefix{nano}  &  -9 &
+%      \DescribePrefix{tera}  &  12 \\
+%      \DescribePrefix{micro} & -6 &
+%      \DescribePrefix{peta}  &  15 \\
+%      \DescribePrefix{milli} &  -3 &
+%      \DescribePrefix{exa}   &  18 \\
+%      \DescribePrefix{centi} &  -2 &
+%      \DescribePrefix{zetta} &  21 \\
+%      \DescribePrefix{deci}  &  -1 &
+%      \DescribePrefix{yotta} &  24 \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2000,14 +2000,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Symbol} &
 %      \multicolumn{1}{c}{Power}  \\
 %    \midrule
-%      \DescribePrefix{kibi} & Ki & 10 \\
-%      \DescribePrefix{mebi} & Mi & 20 \\
-%      \DescribePrefix{gibi} & Gi & 30 \\
-%      \DescribePrefix{tebi} & Ti & 40 \\
-%      \DescribePrefix{pebi} & Pi & 50 \\
-%      \DescribePrefix{exbi} & Ei & 60 \\
-%      \DescribePrefix{zebi} & Zi & 70 \\
-%      \DescribePrefix{yobi} & Yi & 80 \\
+%      \DescribePrefix{kibi} & 10 \\
+%      \DescribePrefix{mebi} & 20 \\
+%      \DescribePrefix{gibi} & 30 \\
+%      \DescribePrefix{tebi} & 40 \\
+%      \DescribePrefix{pebi} & 50 \\
+%      \DescribePrefix{exbi} & 60 \\
+%      \DescribePrefix{zebi} & 70 \\
+%      \DescribePrefix{yobi} & 80 \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -8149,7 +8149,11 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_symbol:}
-% If there is no symbol, something is wrong!
+%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux:}
+%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux_alt:}
+% If there is no symbol, something is wrong! The only exception is
+% when the code is inside the \cs{si} function (or similar) and there
+% is only a prefix with nothing else present at all.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_format_symbol: {
   \tl_set:Nx \l_siunitx_tmpa_tl 
@@ -8160,9 +8164,23 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
       \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
     }
-    { \msg_error:nn { siunitx } { prefix-only } }
+    { \siunitx_unit_format_symbol_aux: }
 } 
+\cs_new_nopar:Npn \siunitx_unit_format_symbol_aux: {
+  \msg_error:nn { siunitx } { prefix-only }
+}
+\cs_new_nopar:Npn \siunitx_unit_format_symbol_aux_alt: {
+  \intexpr_compare:nTF { \l_siunitx_unit_int = \c_one }
+    { 
+      \prop_del:Nn \l_siunitx_unit_prop { prefix-1 }
+      \prop_if_empty:NF \l_siunitx_unit_prop
+        { \msg_error:nn { siunitx } { prefix-only } } 
+    }
+    { \msg_error:nn { siunitx } { prefix-only } }
+}
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Unit output}
@@ -8201,6 +8219,8 @@ This work consists of the file  siunitx.dtx
 % column. The second argument is any options to set locally.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_unit_output:nn #1#2 {
+  \cs_set_eq:NN \siunitx_unit_format_symbol_aux: 
+    \siunitx_unit_format_symbol_aux_alt:
   \siunitx_unit_in:nn {#1} {#2}
   \intexpr_compare:nF { \l_siunitx_unit_prefix_int = \c_zero } 
     { 
