@@ -238,6 +238,7 @@ This work consists of the file  siunitx.dtx
 %      moretexcs    = 
 %        {
 %          ampere,
+%          ang,
 %          angstrom,
 %          becquerel,
 %          bit,
@@ -1722,10 +1723,10 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
 %      add-arc-degree-zero       & Switch & false        \\
+%      add-arc-minute-zero       & Switch & false        \\ 
 %      add-arc-second-zero       & Switch & false        \\ 
 %      angle-symbol-over-decimal & Switch & false        \\
 %      arc-separator             & Maths  & false        \\
-%      angle-output-format       & Choice & input        \\
 %      number-angle-separator    & Maths  & \meta{empty} \\
 %    \bottomrule
 %  \end{tabular}
@@ -1739,6 +1740,39 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \ang{2.67} \\
 %  \ang[number-angle-separator = \,]{2.67}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{arc-separator}
+% When angles are printed in arc format, the separation of the different
+% pars is set up using the \opt{arc-separator} option.
+%\begin{LaTeXdemo}
+%  \ang{6;7;6.5} \\
+%  \ang[arc-separator = \,]{6;7;6.5}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{add-arc-degree-zero}
+%\DescribeOption{add-arc-minute-zero}
+%\DescribeOption{add-arc-second-zero}
+% Zero-filling for the degree, minute or second parts of an arc is
+% controlled using the \opt{add-arc-degree-zero}, 
+% \opt{add-arc-minute-zero} and \opt{add-arc-second-zero} options.
+% All are off as standard.
+%\begin{LaTeXdemo}
+%  \ang{-1;;} \\
+%  \ang{;-2;} \\
+%  \ang{;;-3} \\
+%  \sisetup{add-arc-degree-zero}
+%  \ang{-1;;} \\
+%  \ang{;-2;} \\
+%  \ang{;;-3} \\
+%  \sisetup{add-arc-minute-zero}
+%  \ang{-1;;} \\
+%  \ang{;-2;} \\
+%  \ang{;;-3} \\
+%  \sisetup{add-arc-second-zero}
+%  \ang{-1;;} \\
+%  \ang{;-2;} \\
+%  \ang{;;-3}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{angle-symbol-over-decimal}
@@ -2229,7 +2263,7 @@ This work consists of the file  siunitx.dtx
 % breaks may be needed. This can be turned on using the 
 % \opt{allow-number-unit-breaks} option.
 %\begin{LaTeXdemo}
-%  \begin{minipage}{2.6 cm}
+%  \begin{minipage}{2.55 cm}
 %    Some filler text \SI{10}{\metre} \\
 %    \sisetup{allow-number-unit-breaks}
 %    Some filler text \SI{10}{\metre} \\
@@ -6401,39 +6435,27 @@ This work consists of the file  siunitx.dtx
 % Angles are a special case of numbers for two reasons. First, there
 % is always a unit, which is known in advance. Second, there are two
 % possible input syntaxes, |\ang{1.23}| and |\ang{1;2;3}|. Both need
-% to be handled correctly. 
+% to be handled correctly.
 % 
-%\begin{macro}{\l_siunitx_angle_arg_tl}
-% Used to store the complete angle argument.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_angle_arg_tl
-%    \end{macrocode}
-%\end{macro} 
-%
-%\begin{macro}{\l_siunitx_angle_arc_sign_tl}
-% Needed when checking for a sign with angles in arc format.
-%    \begin{macrocode}
-\tl_new:N \l_siunitx_angle_arc_sign_tl
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_angle_to_arc_bool}
-%\begin{macro}{\l_siunitx_angle_to_decimal_bool}
-% Some switches that are needed for the options.
-%    \begin{macrocode}
-\bool_new:N \l_siunitx_angle_to_arc_bool
-\bool_new:N \l_siunitx_angle_to_decimal_bool
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\begin{macro}{\l_siunitx_angle_degree_space_bool}
 %\begin{macro}{\l_siunitx_angle_minute_space_bool}
-% To make life a little easier when printing arcs, some flags are used
-% for indicating the need for inter-item spacing.
+% The need for spaces between parts of an arc needs to be accommodated:
+% this is achieved by flagging up the need for such spaces using two
+% switches.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_angle_degree_space_bool
 \bool_new:N \l_siunitx_angle_minute_space_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro} 
+% 
+%\begin{macro}{\l_siunitx_angle_to_arc_bool}
+%\begin{macro}{\l_siunitx_angle_to_decimal_bool}
+% Switches are required for the \opt{angle-output-format} option, which
+% has to set two of them at the same time.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_angle_to_arc_bool
+\bool_new:N \l_siunitx_angle_to_decimal_bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -6458,9 +6480,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_angle_degree_prop}
 %\begin{macro}{\l_siunitx_angle_minute_prop}
 %\begin{macro}{\l_siunitx_angle_second_prop}
-% Printing angles in arc format requires all three parts to be parsed 
-% before any typesetting. Two must therefore be saved: all three are 
-% done so that the code is clearer.
+% As there are potentially three numbers to parse, three properly lists
+% are made available to hold the results. This allows the code to be
+% generalised, with only the name of the storage area varying.
 %    \begin{macrocode}
 \prop_new:N \l_siunitx_angle_degree_prop
 \prop_new:N \l_siunitx_angle_minute_prop
@@ -6470,6 +6492,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_angle_arg_tl}
+% Used to store the complete angle argument.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_angle_arg_tl
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\l_siunitx_angle_arc_sign_tl}
+% Needed when checking for a sign with angles in arc format.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_angle_arc_sign_tl
+%    \end{macrocode}
+%\end{macro}
+% 
 %\begin{macro}{\l_siunitx_angle_degree_zero_bool}
 %\begin{macro}{\l_siunitx_angle_minute_zero_bool}
 %\begin{macro}{\l_siunitx_angle_second_zero_bool}
@@ -6510,7 +6546,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-% 
+%
 %\begin{macro}{\siunitx_angle_output:n}
 % The main output routine for angles does very little. The rescanning
 % function is called to make sure that any \texttt{;} tokens in the
@@ -6518,16 +6554,46 @@ This work consists of the file  siunitx.dtx
 % to search for semi-colons.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_output:n #1 {
-  \bool_set_false:N \l_siunitx_angle_degree_space_bool
-  \bool_set_false:N \l_siunitx_angle_minute_space_bool
-  \tl_clear:N \l_siunitx_preunit_tl 
-  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
-    \l_siunitx_angle_unit_separator_tl
+  \siunitx_angle_init:
   \siunitx_angle_rescan:n {#1}
   \siunitx_angle_find_semi_colons:V \l_siunitx_angle_arg_tl
 }
 %    \end{macrocode}
 %\end{macro} 
+%
+%\begin{macro}{\siunitx_angle_init:}
+% The usual separation of initial storage resets.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_init: {
+  \bool_set_false:N \l_siunitx_angle_degree_space_bool
+  \bool_set_false:N \l_siunitx_angle_minute_space_bool
+  \prop_clear:N \l_siunitx_angle_minute_prop
+  \prop_clear:N \l_siunitx_angle_second_prop
+  \tl_clear:N \l_siunitx_preunit_tl 
+  \tl_clear:N \l_siunitx_angle_arc_sign_tl
+  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
+    \l_siunitx_angle_unit_separator_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_rescan:n}
+% To avoid any issues with active \texttt{;} tokens in the input, a 
+% simple search and replace is employed.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_lccode:nn { `\@ } { `\; }
+  \char_make_active:N \@
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_new:Npn \siunitx_angle_rescan:n #1 
+    {
+      \tl_set:Nn \l_siunitx_angle_arg_tl {#1}
+      \tl_replace_all_in:Nnn \l_siunitx_angle_arg_tl { @ } { ; }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_angle_find_semi_colons:n}
 %\begin{macro}{\siunitx_angle_find_semi_colons:V}
@@ -6546,7 +6612,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_generate_variant:Nn \siunitx_angle_find_semi_colons:n { V }
 \cs_new:Npn \siunitx_angle_find_semi_colons:w 
-  #1 ; #2 ; #3 ; #4 #5 #6 #7 \q_nil {
+  #1 ; #2 ; #3 ; #4#5#6#7 \q_nil {
   \quark_if_no_value:NTF #4
     { \siunitx_angle_parse_decimal:n {#1} }
     {
@@ -6570,12 +6636,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_angle_parse_arc:nnn}
 %\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_i:nnn}
 %\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_ii:nnn}
-%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_iii:nnn}
 % For angles given as arcs, there may be a need to zero-fill one or
-% more parts. That is done first, as otherwise life gets very
-% complicated later one (although there is a slight performance hit as
-% a result). The appropriate flags are then set up for inter-section
-% spacing.
+% more parts.  Doing this here makes life slightly easier later.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc:nnn #1#2#3 {
   \tl_if_empty:nTF { #1#2#3 }
@@ -6608,9 +6670,16 @@ This work consists of the file  siunitx.dtx
     }
     { \siunitx_angle_parse_arc_aux_iii:nnn {#1} {#2} {#3} }
 }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_iii:nnn}
+% With the entries now set up correctly, the spacing flags can now be
+% set. The choice can then be made on whether to parse the three parts
+% of the arc or simply to print them as given.
+%    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_arc_aux_iii:nnn #1#2#3 {
-  \bool_set_false:N \l_siunitx_angle_degree_space_bool
-  \bool_set_false:N \l_siunitx_angle_minute_space_bool
   \tl_if_empty:nTF {#2}
     {
       \tl_if_empty:nF {#3}
@@ -6622,77 +6691,32 @@ This work consists of the file  siunitx.dtx
         { \bool_set_true:N \l_siunitx_angle_minute_space_bool } 
     }
   \bool_if:NTF \l_siunitx_number_parse_bool
-    { \siunitx_angle_parse_arc_processed:nnn {#1} {#2} {#3} }
-    { \siunitx_angle_parse_arc_direct:nnn {#1} {#2} {#3} }
+    { \siunitx_angle_parse_arc_aux_iv:nnn {#1} {#2} {#3} }
+    { \siunitx_angle_print_direct:nnn {#1} {#2} {#3} }
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_angle_parse_arc_direct:nnn}
-%    \begin{macrocode}
-\cs_new:Npn \siunitx_angle_parse_arc_direct:nnn #1#2#3 {
-  \tl_if_empty:nTF {#1}
-    {
-      \tl_if_empty:nTF {#2}
-        { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
-        {
-          \siunitx_angle_print:nn {#2} { \SIUnitSymbolArcminute }
-          \tl_if_empty:nF {#3}
-            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
-        }
-    }
-    {
-      \siunitx_angle_print:nn {#1} { \SIUnitSymbolDegree }
-      \tl_if_empty:nTF {#2}
-        {
-          \tl_if_empty:nF {#3}
-            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
-        }
-        {
-          \siunitx_angle_print:nn {#2} { \SIUnitSymbolArcminute }
-          \tl_if_empty:nF {#3}
-            { \siunitx_angle_print:nn {#3} { \SIUnitSymbolArcsecond } }
-        }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_angle_parse_arc_processed:nnn}
-%\begin{macro}[aux]{\siunitx_angle_parse_arc_processed_aux:nn}
-% When processing an arc, there are three calls to read each part of 
-% the number, followed by running the sanity check on any signs. Only
-% after all of this does the code check for a call to the conversion
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_aux_iv:nnn}
+% The final part of the parsing chain for arcs actually runs on each
+% of the three components in turn. There is then a sanity check for the
+% sign, before handing off either to the conversion code or the output
 % system.
 %    \begin{macrocode}
-\cs_new:Npn \siunitx_angle_parse_arc_processed:nnn #1#2#3 {
-  \siunitx_angle_parse_arc_processed_aux:nn {#1} { degree }
-  \bool_if:NT \l_siunitx_angle_degree_space_bool
-    { }
-  \siunitx_angle_parse_arc_processed_aux:nn {#2} { minute }
-  \bool_if:NT \l_siunitx_angle_minute_space_bool
-    { }
-  \siunitx_angle_parse_arc_processed_aux:nn {#3} { second }
+\cs_new:Npn \siunitx_angle_parse_arc_aux_iv:nnn #1#2#3 {
+  \siunitx_angle_parse_aux:nn {#1} { degree }
+  \siunitx_angle_parse_aux:nn {#2} { minute }
+  \siunitx_angle_parse_aux:nn {#3} { second }
   \siunitx_angle_parse_arc_sign_check:
   \bool_if:NF \l_siunitx_error_bool
     {
       \bool_if:NTF \l_siunitx_angle_to_decimal_bool
         { \siunitx_angle_convert_to_decimal: }
-        { \siunitx_angle_print_arc: }
+        { \siunitx_angle_print: }
     }
-}
-\cs_new:Npn \siunitx_angle_parse_arc_processed_aux:nn #1#2 {
-  \siunitx_number_in_parse:n {#1}
-  \siunitx_number_process:
-  \prop_set_eq:cN { l_siunitx_angle_ #2 _prop } 
-    \l_siunitx_number_in_prop
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_angle_parse_arc_sign_check:}
+%\begin{macro}[aux]{\siunitx_angle_parse_arc_sign_check:}
 %\begin{macro}[aux]{\siunitx_angle_parse_arc_sign_check_aux:n}
 % There are two issues with signs for angles given as arcs. First, if
 % more than one sign has been given, they have to agree. So there is a 
@@ -6701,8 +6725,6 @@ This work consists of the file  siunitx.dtx
 % achieved by shuffling the sign to the appropriate place.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_angle_parse_arc_sign_check: {
-  \tl_clear:N \l_siunitx_angle_arc_sign_tl
-  \bool_set_false:N \l_siunitx_error_bool
   \prop_if_in:NnTF \l_siunitx_angle_second_prop { mantissa-sign }
     {
       \prop_get:NnN \l_siunitx_angle_second_prop { mantissa-sign } 
@@ -6757,40 +6779,77 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_parse_decimal:n}
-% This is a simplified version of the number output routine. First, if
-% there is no parsing at all then the input is just dumped as given 
-% (with the appropriate unit added). Otherwise the input is parsed
-% before checking if conversion to an arc is required. The appropriate
-% hand-off then takes place.
+% For decimal input, there is a single piece of parsing to be done.
+% Following that, either the conversion code or the printing routine can
+% be called. On the other hand, if parsing is turned off then there is a
+% direct call to the printing system.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_angle_parse_decimal:n #1 {
   \bool_if:NTF \l_siunitx_number_parse_bool
     {
-      \tl_clear:N \l_siunitx_number_out_tl
-      \cs_set_eq:NN \siunitx_number_in_parse_more:N
-        \siunitx_number_in_parse_angle:N
-      \siunitx_number_in_parse:n {#1}
-      \bool_if:NTF \l_siunitx_angle_to_arc_bool
-        { \siunitx_angle_convert_to_arc: }
-        { \siunitx_angle_print_decimal: }
+      \siunitx_angle_parse_aux:nn {#1} { degree }
+      \bool_if:NF \l_siunitx_error_bool
+        {
+          \bool_if:NTF \l_siunitx_angle_to_arc_bool
+            { \siunitx_angle_convert_to_arc: }
+            { \siunitx_angle_print: }
+        }
     }
-    {
-      \siunitx_angle_print_aux:nn {#1} { \SIUnitSymbolDegree }
-    }
+    { \siunitx_angle_print_direct:nnn {#1} { } { } }
 }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_angle_print:nn}
-% For all types of angle, directly printing is done by setting the unit
-% correctly, then calling the print routine, and then the unit printer. 
+%\begin{macro}[aux]{\siunitx_angle_parse_aux:nn}
+% A short auxiliary function does the number parsing and also stores the
+% result appropriately.
 %    \begin{macrocode}
-\cs_new:Npn \siunitx_angle_print:nn #1#2 {
-  \tl_set:Nn \l_siunitx_unit_tl {#2}
-  \siunitx_print:nn { number } { \ensuremath {#1} }
-  \siunitx_unit_output_print:
+\cs_new:Npn \siunitx_angle_parse_aux:nn #1#2 {
+  \siunitx_number_in_parse:n {#1}
+  \siunitx_number_process:
+  \prop_set_eq:cN { l_siunitx_angle_ #2 _prop } 
+    \l_siunitx_number_in_prop
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_angle_print:}
+%\begin{macro}[aux]{\siunitx_angle_print:nn}
+% The standard printing routine examines each part of the arc in turn
+% and either does a standard format or calls the special astronomy-style
+% routine. There may also be some spaces to add.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_angle_print: {
+  \siunitx_angle_print_aux:nn { degree } { \SIUnitSymbolDegree }
+  \bool_if:NT \l_siunitx_angle_degree_space_bool
+    { 
+      \nobreak
+      \ensuremath { \l_siunitx_angle_arc_separator_tl } 
+    }
+  \siunitx_angle_print_aux:nn { minute } { \SIUnitSymbolArcminute }
+  \bool_if:NT \l_siunitx_angle_minute_space_bool
+    { 
+      \nobreak
+      \ensuremath { \l_siunitx_angle_arc_separator_tl } 
+    }
+  \siunitx_angle_print_aux:nn { second } { \SIUnitSymbolArcsecond }
+}
+\cs_new_nopar:Npn \siunitx_angle_print_aux:nn #1#2 {
+  \prop_if_empty:cF { l_siunitx_angle_ #1 _prop }
+    {
+      \prop_set_eq:Nc \l_siunitx_number_in_prop 
+        { l_siunitx_angle_ #1 _prop }
+      \tl_set:Nn \l_siunitx_unit_tl {#2}  
+      \tl_clear:N \l_siunitx_number_out_tl
+      \siunitx_number_format:
+      \siunitx_number_output_colour:
+      \bool_if:NTF \l_siunitx_angle_astronomy_bool
+        { \siunitx_angle_print_astronomy: }
+        { \siunitx_number_output_single: }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_angle_print_astronomy:}
@@ -6891,70 +6950,38 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_angle_print_arc:}
-%\begin{macro}[aux]{\siunitx_angle_print_arc_aux:nn}
+%\begin{macro}{\siunitx_angle_print_direct:nnn}
+%\begin{macro}[aux]{\siunitx_angle_print_direct_aux:nn}
+% The direct printing routine is rather similar to the standard
+% one, with just a modified final step.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_angle_print_arc: {
-  \siunitx_angle_print_arc_aux:nn { degree } { \SIUnitSymbolDegree }
-  \siunitx_angle_print_arc_aux:nn { minute } { \SIUnitSymbolArcminute }
-  \siunitx_angle_print_arc_aux:nn { second } { \SIUnitSymbolArcsecond }
+\cs_new:Npn \siunitx_angle_print_direct:nnn #1#2#3 {
+  \siunitx_angle_print_direct_aux:nn {#1} { \SIUnitSymbolDegree }
+  \bool_if:NT \l_siunitx_angle_degree_space_bool
+    { 
+      \nobreak
+      \ensuremath { \l_siunitx_angle_arc_separator_tl } 
+    }
+  \siunitx_angle_print_direct_aux:nn {#2} { \SIUnitSymbolArcminute }
+  \bool_if:NT \l_siunitx_angle_minute_space_bool
+    { 
+      \nobreak
+      \ensuremath { \l_siunitx_angle_arc_separator_tl } 
+    }
+  \siunitx_angle_print_direct_aux:nn {#3} { \SIUnitSymbolArcsecond }
 }
-\cs_new_nopar:Npn \siunitx_angle_print_arc_aux:nn #1#2 {
-  \prop_if_empty:cF { l_siunitx_angle_ #1 _prop }
+\cs_new_nopar:Npn \siunitx_angle_print_direct_aux:nn #1#2 {
+  \tl_if_empty:nF {#1}
     {
-      \prop_set_eq:Nc \l_siunitx_number_in_prop 
-        { l_siunitx_angle_ #1 _prop }
-      \tl_set:Nn \l_siunitx_unit_tl {#2}  
-      \siunitx_angle_print_decimal_aux:  
+      \tl_set:Nn \l_siunitx_unit_tl {#2}
+      \siunitx_print:nn { number } { \ensuremath {#1} }
+      \siunitx_unit_output_print:
     }
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\siunitx_angle_print_decimal:}
-%\begin{macro}[aux]{\siunitx_angle_print_decimal_aux:}
-% Printing a decimal angle is again very much a simplified version of
-% the number printer. The only odd item here is that when angles are
-% being printed in the \enquote{astronomy} style, the construction has
-% to be carried out by a dedicated routine.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_angle_print_decimal: {
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \tl_set:Nn \l_siunitx_unit_tl { \SIUnitSymbolDegree }
-      \siunitx_number_process:
-      \siunitx_angle_print_decimal_aux:
-    } 
-} 
-\cs_new_nopar:Npn \siunitx_angle_print_decimal_aux: {
-  \siunitx_number_format:
-  \siunitx_number_output_colour:
-  \bool_if:NTF \l_siunitx_angle_astronomy_bool
-    { \siunitx_angle_print_astronomy: }
-    { \siunitx_number_output_single: }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_angle_rescan:n}
-% To avoid any issues with active \texttt{;} tokens in the input, a 
-% simple search and replace is employed.
-%    \begin{macrocode}
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\; }
-  \char_make_active:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_new:Npn \siunitx_angle_rescan:n #1 
-    {
-      \tl_set:Nn \l_siunitx_angle_arg_tl {#1}
-      \tl_replace_all_in:Nnn \l_siunitx_angle_arg_tl { @ } { ; }
-    }
-}
-%\end{macro}
-%
+% 
 %\subsection{Creating unit macros}
 %
 % Unit macros and related support are created here. To avoid cluttering
@@ -9867,8 +9894,43 @@ This work consists of the file  siunitx.dtx
   allowzeroexp   .meta:n    = { retain-zero-exponent    = #1          },
   allowzeroexp   .default:n = { true                                  },
 %  angformat & List & Conversion of angle format \\
-%  anglesep & List or literal & Space between angle components \\
-%  astroang & Boolean & Astronomy-style angles \\
+  angelsep       .choice: ,
+  angelsep / 
+    cdot         .code:n    = 
+      { arc-separator         = { } \cdot { }                         },
+  angelsep / 
+    comma        .code:n    = { arc-separator           = { {,} }     },
+  angelsep / 
+    fullstop     .code:n    = { arc-separator           = { { . } }   },
+  angelsep / 
+    med          .code:n    = { arc-separator           = \:          },
+  angelsep / 
+    medium       .code:n    = { arc-separator           = \:          },
+  angelsep / 
+    none         .code:n    = { arc-separator           =             },
+  angelsep / 
+    period       .code:n    = { arc-separator           = { { . } }   },
+  angelsep / 
+    space        .code:n    = { arc-separator           = \text { ~ } },
+  angelsep / 
+    stop         .code:n    = { arc-separator           = { { . } }   },
+  angelsep / 
+    thick        .code:n    = { arc-separator           = \;          },
+  angelsep / 
+    thin         .code:n    = { arc-separator           = \,          },
+  angelsep / 
+    tightcdot    .code:n    = 
+      { arc-separator           = \bgroup \cdot \egroup               },
+  angelsep / 
+    tighttimes  .code:n     =
+      { arc-separator           = \bgroup \times \egroup              },
+  angelsep / 
+    times        .code:n    = { arc-separator           = \times      },
+  angelsep / 
+    unknown      .code:n    = { arc-separator           = #1          },
+  astroang       .meta:n    = 
+    { angle-symbol-over-decimal = #1                                  },
+  astroang       .default:n = { true                                  },     
   closeerr       .meta:n    = { close-bracket           = #1          },
   closefrac      .meta:n    = { close-bracket           = #1          },
   closerange     .meta:n    = { close-bracket           = #1          },
