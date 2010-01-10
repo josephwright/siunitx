@@ -1701,9 +1701,9 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \sisetup{quotient-mode = fraction}
 %  \num{1 / 1}
-%  \num[fraction-function=\dfrac]{1 / 2} 
-%  \num[fraction-function=\sfrac]{1 / 3} 
-%  \num[fraction-function=\tfrac]{1 / 4} 
+%  \num[fraction-function = \dfrac]{1 / 2} 
+%  \num[fraction-function = \sfrac]{1 / 3} 
+%  \num[fraction-function = \tfrac]{1 / 4} 
 %\end{LaTeXdemo}
 %
 %\subsection{Angles}
@@ -10049,13 +10049,25 @@ This work consists of the file  siunitx.dtx
   fixsf / 
     true         .meta:n    = { round-mode              = figures     },
   fixsf          .default:n = { true                                  },
-%  fraction & List & Method used when setting \opt{per=frac} \\
+  fraction       .choice: ,
+  fraction /
+    frac         .meta:n    = { fraction-function       = \frac       },
+  fraction /
+    nice         .meta:n    = { fraction-function       = \frac       },
+  fraction /
+    sfrac        .meta:n    = { fraction-function       = \sfrac      },
+  fraction /
+    ugly         .meta:n    = 
+      { 
+        fraction-function       = \frac ,
+        per-mode                = symbol-or-fraction
+      },
   inlinebold     .meta:n    = { detect-inline-bold      = #1          },
 %  load & Modules & Modules to load \\
 %  locale & Modules & Locale to follow \\
 %  loctolang & Special & Associate locale with \pkg{babel}
 %    language \\
-%  log & List & Amount of data added to log \\
+  log            .code:n    =,
   mathOmega      .meta:n    = { math-ohm                = #1          },
   mathcelsius    .meta:n    = { math-celsius            = #1          },
   mathdegree     .meta:n    = { math-degree             = #1          },
@@ -10084,7 +10096,7 @@ This work consists of the file  siunitx.dtx
     { math-tt                 = \exp_not:c {#1}                       },
   negcolor       .meta:n    = { negative-color          = #1          },
   negcolour      .meta:n    = { negative-colour         = #1          },
-%  noload & Modules & Modules not to load \\
+  noload         .code:n    = ,
   numaddn        .meta:n    = { input-symbols           = #1          },
   numcloseerr    .meta:n    = { input-close-uncertainty = #1          },
   numdecimal     .meta:n    = { input-decimal-markers   = #1          },
@@ -10106,8 +10118,97 @@ This work consists of the file  siunitx.dtx
   openerr        .meta:n    = { open-bracket            = #1          },
   openfrac       .meta:n    = { open-bracket            = #1          },
   openrange      .meta:n    = { open-bracket            = #1          },
-%  padangle & List & Add zeros to blank parts of angles  \\
-%  padnumber & List & Add zeros to blank parts of numbers \\
+  padangle       .choice: ,
+  padangle /
+    all          .meta:n    =
+      {
+        add-arc-degree-zero = true,
+        add-arc-minute-zero = true,
+        add-arc-second-zero = true
+      },
+    both         .meta:n    =
+      {
+        add-arc-degree-zero = true,
+        add-arc-minute-zero = true,
+        add-arc-second-zero = true
+      },
+  padangle /
+    false        .meta:n    =
+      {
+        add-arc-degree-zero = false,
+        add-arc-minute-zero = false,
+        add-arc-second-zero = false
+      },
+  padangle /
+    large        .meta:n    =
+      {
+        add-arc-degree-zero = true,
+        add-arc-minute-zero = true,
+        add-arc-second-zero = false
+      },
+  padangle /
+    none         .meta:n    =
+      {
+        add-arc-degree-zero = false,
+        add-arc-minute-zero = false,
+        add-arc-second-zero = false
+      },
+  padangle /
+    small         .meta:n    =
+      {
+        add-arc-degree-zero = false,
+        add-arc-minute-zero = true,
+        add-arc-second-zero = true
+      },
+    true         .meta:n    =
+      {
+        add-arc-degree-zero = true,
+        add-arc-minute-zero = true,
+        add-arc-second-zero = true
+      },
+  padnumber      .choice: ,
+  padnumber /
+    all          .meta:n    =
+      {
+        add-decimal-zero = true,
+        add-integer-zero = true
+      },
+  padnumber /
+    both          .meta:n    =
+      {
+        add-decimal-zero = true,
+        add-integer-zero = true
+      },
+  padnumber /
+    false         .meta:n    =
+      {
+        add-decimal-zero = false,
+        add-integer-zero = false
+      },
+  padnumber /
+    leading        .meta:n    =
+      {
+        add-decimal-zero = true,
+        add-integer-zero = false
+      },
+  padnumber /
+    none         .meta:n    =
+      {
+        add-decimal-zero = false,
+        add-integer-zero = false
+      },
+  padnumber /
+    trailing         .meta:n    =
+      {
+        add-decimal-zero = false,
+        add-integer-zero = true
+      },
+  padnumber /
+    true          .meta:n    =
+      {
+        add-decimal-zero = true,
+        add-integer-zero = true
+      },
   per           .choice: ,
   per /
     fraction     .code:n    = { per-mode                = fraction    },
@@ -10115,17 +10216,30 @@ This work consists of the file  siunitx.dtx
     reciprocal   .code:n    = { per-mode                = reciprocal  },
   per /
     slash        .code:n    = { per-mode                = symbol      },
-%  prefixbase & List or literal & Base used when making prefixes \\
-%   & & numerical \\
-%  prefixproduct & List or literal & Product sign for prefixes \\
+  prefixbase     .code:n    = ,
+  prefixproduct  .code:n    = ,
   prefixsymbolic .meta:n    = { prefixes-as-symbols     = #1          },
   prefixsymbolic .default:n = { true                                  },
   prespace       .meta:n    = { space-before-unit       = #1          },
   prespace       .default:n = { true                                  },
   redefsymbols   .meta:n    = { redefine-symbols        = #1          },
-  redefsumbols   .default:n = { true                                  },
-%  repeatunits & List & Repeat units with separated errors, \\
-%   & &  products and in ranges \\
+  redefsymbols   .default:n = { true                                  },
+  repeatunits    .choice: ,
+  repeatunits /
+    false        .meta:n    = 
+      { 
+        repeat-units          = false,
+        unit-product-to-power = false                   
+      },
+  repeatunits /
+    power        .meta:n    = 
+      { 
+        repeat-units          = false,
+        unit-product-to-power = true                   
+      },
+  repeatunits /
+    true         .meta:n    = { repeat-units = true                   },
+  repeatunits    .default:n = { true                                  },
   retainplus     .meta:n    = { retain-explicit-plus    = #1          },
   retainplus     .default:n = { true                                  },
   seperr         .meta:n    = { separate-uncertainty    = #1          },
@@ -10146,8 +10260,7 @@ This work consists of the file  siunitx.dtx
   stickyper      .meta:n    = { sticky-per              = #1          },
   stickyper      .default:n = { true                                  },
 %  strict & Boolean & Obey the rules strictly \\       
-%  strictarc & Boolean & Require exactly zero or \\
-%   & & two semi-colons \\
+  strictarc      .code:n    = ,
 %  tabalign & List & Positioning of all column data \\
 %  tabalignexp & Boolean & Alignment of exponents in tables \\
 %  tabautofit & Boolean & Switch for rounding numbers to \\
@@ -10180,10 +10293,13 @@ This work consists of the file  siunitx.dtx
   tightpm        .meta:n    = { tight-spacing           = #1          },
   tightpm        .default:n = { true                                  },
   tophrase       .meta:n    = { range-phrase            = #1          },
-%  trapambigerr & Boolean & Check for ambiguous errors \\
-%  trapambigfrac & Boolean & Check for ambiguous fractions \\
-%  trapambigrange & Boolean & Check for ambiguous ranges \\
-  unitcolor      .meta:n    = { unit-color              = #1          },
+  trapambigerr   .meta:n    = { use-brackets            = #1          },
+  trapambigerr   .default:n = { true                                  },
+  trapambigfrac  .meta:n    = { use-brackets            = #1          },
+  trapambigfrac  .default:n = { true                                  },
+  trapambigrange .meta:n    = { use-brackets            = #1          },
+  trapambigrange .default:n = { true                                  },
+  unitcolor      .meta:n    = { unit-colour             = #1          },
   unitcolour     .meta:n    = { unit-colour             = #1          },
   unitmathrm     .meta:x    = 
     { unit-math-rm            = \exp_not:c {#1}                       },
