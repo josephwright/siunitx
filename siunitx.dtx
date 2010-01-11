@@ -9247,6 +9247,9 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { starting-quotient-token } 
   {Misplaced quotient token.}
   {A number cannot begin with a quotient token.}
+\msg_new:nnnn { siunitx } { unknown-configuration-file } 
+  {Unknown configuration '#1'.}
+  {The configuration file 'siunitx-#1.cfg'  was not found.}
 %    \end{macrocode}
 %    
 %\subsection{Design-level macros}
@@ -9868,11 +9871,12 @@ This work consists of the file  siunitx.dtx
     \siunitx_load_configuration_aux:n
 }
 \cs_new:Npn \siunitx_load_configuration_aux:n #1 {
-   \file_if_exist:nT { siunitx- #1 .cfg }
+   \file_if_exist:nTF { siunitx- #1 .cfg }
     { 
       \@onefilewithoptions { siunitx- #1 } [ ] [ ] 
         \c_siunitx_configuration_ext_tl  
     }
+    { \msg_error:nx { unknown-configuration-file } {#1} }
 }
 \tl_new:Nn \c_siunitx_configuration_ext_tl { cfg }
 %    \end{macrocode}
