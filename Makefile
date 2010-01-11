@@ -82,16 +82,18 @@ CLEAN = \
 # File building: default actions                               #
 ################################################################
 
+PDFSETTINGS=\AtBeginDocument{\DisableImplementation} \pdfminorversion=5\relax  \pdfobjcompresslevel=2\relax
+
 %.pdf: %.dtx
 	NAME=`basename $< .dtx` ; \
 	echo "Typesetting $$NAME" ; \
-	pdflatex -draftmode -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
+	pdflatex -draftmode -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
 	if [ $$? = 0 ] ; then  \
 	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo &> /dev/null ; \
 	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
-	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
+	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
 	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
-	  pdflatex -interaction=nonstopmode "\AtBeginDocument{\DisableImplementation} \input $<" &> /dev/null ; \
+	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
 	else \
 	  echo "  Compilation failed" ; \
 	fi ; \
