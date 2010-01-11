@@ -82,7 +82,7 @@ CLEAN = \
 # File building: default actions                               #
 ################################################################
 
-PDFSETTINGS=\AtBeginDocument{\DisableImplementation} \pdfminorversion=5\relax  \pdfobjcompresslevel=2\relax
+PDFSETTINGS=\AtBeginDocument{\DisableImplementation} \pdfminorversion=5  \pdfobjcompresslevel=2
 
 %.pdf: %.dtx
 	NAME=`basename $< .dtx` ; \
