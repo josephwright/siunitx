@@ -77,12 +77,19 @@ CLEAN = \
 	sty \
 	txt \
 	zip 
+
+################################################################
+# PDF Settings                                                 #
+################################################################
+
+PDFSETTINGS = \
+	\AtBeginDocument{\DisableImplementation} \
+	\pdfminorversion=5  \
+	\pdfobjcompresslevel=2
 	
 ################################################################
 # File building: default actions                               #
 ################################################################
-
-PDFSETTINGS=\AtBeginDocument{\DisableImplementation} \pdfminorversion=5  \pdfobjcompresslevel=2
 
 %.pdf: %.dtx
 	NAME=`basename $< .dtx` ; \
