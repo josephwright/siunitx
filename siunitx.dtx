@@ -1505,7 +1505,7 @@ This work consists of the file  siunitx.dtx
 %  \num{1234} \\
 %  \num[group-four-digits = true]{1234} \\
 %  \num{12345} \\
-%  \num[group-separator = {{,}}]{12345} \\
+%  \num[group-separator = {,}]{12345} \\
 %  \num[group-separator = \text{~}]{12345} 
 %\end{LaTeXdemo} 
 % Grouping can be activated separately for the integer and decimal
@@ -1531,7 +1531,7 @@ This work consists of the file  siunitx.dtx
 % \opt{copy-decimal-marker} option.
 %\begin{LaTeXdemo}
 %  \num{1.23} \\
-%  \num[output-decimal-marker = {{,}}]{1.23} \\
+%  \num[output-decimal-marker = {,}]{1.23} \\
 %  \num{1+2i} \\
 %  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i} \\
 %  \num[output-complex-root = j]{1+2i} \\
@@ -2429,6 +2429,29 @@ This work consists of the file  siunitx.dtx
 % Notice that these names capitalise the unit name (to make reading 
 % the macro name easier!).\footnote{The function 
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
+% 
+%\section{International support}
+%
+%\DescribeOption{locale}
+% \pkg{siunitx} allows the user to switch between the typographic
+% conventions of different (geographical) areas by using 
+% \enquote{locales}. The \opt{locale} option is used to switch to
+% a different locale. 
+%\begin{LaTeXdemo}
+%  \SI{1.234}{\metre} \\
+%  \SI[locale = DE]{6.789}{\metre}
+%\end{LaTeXdemo}
+% Currently, the pre-defined locales are the United Kingdom (\opt{UK}),
+% United States of America (\opt{US}), Germany (\opt{DE}) and South 
+% Africa (\opt{ZA}). 
+% 
+%\DescribeOption{declare-locale}
+% Creating and modifying locales is carried out using the key--value
+% interface. New locales must first be declared using the 
+% \opt{create-locale} option. This will create two new keys, one
+% to define the locale, and a second to modify it.
+%\begin{LaTeXdemo}
+%\end{LaTeXdemo}
 % 
 %\section{Usage tips}   
 % 
@@ -5283,6 +5306,17 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
+%\begin{macro}{\l_siunitx_group_sep_tl}
+%\begin{macro}{\l_siunitx_output_decimal_tl}
+% A couple of variables are declared here, as they need a little more
+% work than just storage.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_group_sep_tl
+\tl_new:N \l_siunitx_output_decimal_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_bracket_close_tl}
 %\begin{macro}{\l_siunitx_complex_after_bool}
 %\begin{macro}{\l_siunitx_output_decimal_copy_bool}
@@ -5291,12 +5325,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_group_decimal_bool}
 %\begin{macro}{\l_siunitx_group_four_bool}
 %\begin{macro}{\l_siunitx_group_integer_bool}
-%\begin{macro}{\l_siunitx_group_sep_tl}
 %\begin{macro}{\l_siunitx_negative_colour_tl}
 %\begin{macro}{\l_siunitx_bracket_open_tl}
 %\begin{macro}{\l_siunitx_output_uncert_close_tl}
 %\begin{macro}{\l_siunitx_output_complex_tl}
-%\begin{macro}{\l_siunitx_output_decimal_tl}
 %\begin{macro}{\l_siunitx_output_uncert_open_tl}
 %\begin{macro}{\l_siunitx_uncert_sep_bool}
 %\begin{macro}{\l_siunitx_tight_bool}
@@ -5319,14 +5351,20 @@ This work consists of the file  siunitx.dtx
     },
   group-four-digits         .bool_set:N = \l_siunitx_group_four_bool,
   group-integer-digits      .bool_set:N = \l_siunitx_group_integer_bool,
-  group-separator           .tl_set:N   = \l_siunitx_group_sep_tl,
+  group-separator           .code:n     = 
+    {
+      \tl_set:Nn \l_siunitx_group_sep_tl { {#1} }
+    },
   negative-color            .meta:n     = { negative-colour = #1 },
   negative-colour           .tl_set:N   = \l_siunitx_negative_colour_tl,
   open-bracket              .tl_set:N   = \l_siunitx_bracket_open_tl, 
   output-close-uncertainty  .tl_set:N   = 
     \l_siunitx_output_uncert_close_tl,
   output-complex-root       .tl_set:N   = \l_siunitx_output_complex_tl,
-  output-decimal-marker     .tl_set:N   = \l_siunitx_output_decimal_tl,
+  output-decimal-marker     .code:n     = 
+    {
+      \tl_set:Nn \l_siunitx_output_decimal_tl { {#1} }
+    },
   output-open-uncertainty   .tl_set:N   = 
     \l_siunitx_output_uncert_open_tl, 
   separate-uncertainty      .bool_set:N = \l_siunitx_uncert_sep_bool,
@@ -5351,8 +5389,6 @@ This work consists of the file  siunitx.dtx
   use-brackets              = true
 }
 %    \end{macrocode}
-%\end{macro} 
-%\end{macro} 
 %\end{macro} 
 %\end{macro} 
 %\end{macro} 
@@ -9126,6 +9162,90 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{International support}
+%
+% Setting up locales for customised settings is a bit more complex 
+% than the other keys-based tasks. The idea here is that each locale
+% needed is first declared using \texttt{create-locale}, and is then
+% set up using \cs{locale-\meta{name}}
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  declare-locale .code:n = 
+    {
+      \keys_define:nn { siunitx }
+        {
+          locale- #1 -append .code:n   = 
+            { 
+              \clist_put_right:cn { l_siunitx_locale_ #1 _clist } {##1}
+            },
+          locale- #1 -set    .tl_set:c = 
+            { l_siunitx_locale_ #1 _clist } ,
+        }
+      \siunitx_option_deactivate:n { locale- #1 -append }
+      \siunitx_option_deactivate:n { locale- #1 -set }
+    },
+  locale .code:n =
+    {
+      \cs_if_exist:cTF { l_siunitx_locale_ #1 _clist }
+        { \keys_set:nv { siunitx } { l_siunitx_locale_ #1 _clist } }
+        { \msg_error:nnx { siunitx } { unknown-locale } {#1} }
+    }
+}
+\siunitx_option_deactivate:n { declare-locale }
+%    \end{macrocode}
+%  
+% With the mechanisms in place, the locales themselves can be
+% created.
+%    \begin{macrocode}
+\keys_set:nn { siunitx } {
+  declare-locale = DE ,
+  locale-DE-set  =
+    { 
+      exponent-product      = \cdot,
+      group-four-digits     = false,
+      group-separator       = \,,
+      inter-unit-separator  = \cdot,
+      number-unit-separator = \,,
+      output-decimal-marker = { , },
+      range-phrase          = { ~ bis ~ }
+    },
+  declare-locale = UK ,
+  locale-UK-set  =
+    { 
+      exponent-product      = \times,
+      group-four-digits     = false,
+      group-separator       = \,,
+      inter-unit-separator  = \,,
+      number-unit-separator = \,,
+      output-decimal-marker = .,
+      range-phrase          = { ~ to ~ },
+    },
+  declare-locale = US ,
+  locale-US-set  =
+    { 
+      exponent-product      = \times,
+      group-four-digits     = false,
+      group-separator       = \,,
+      inter-unit-separator  = \,,
+      number-unit-separator = \,,
+      output-decimal-marker = .,
+      range-phrase          = { ~ to ~ },
+    },    
+  declare-locale = ZA ,
+  locale-ZA-set  =
+    { 
+      exponent-product      = \times,
+      group-four-digits     = false,
+      group-separator       = \,,
+      inter-unit-separator  = \cdot,
+      number-unit-separator = \,,
+      output-decimal-marker = { , },
+      range-phrase          = { ~ to ~ },
+
+    },
+}
+%    \end{macrocode}
+%
 %\subsection{Messages}
 %
 % Lots of messages, all of them together in one block to make life
@@ -9250,6 +9370,9 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { unknown-configuration-file } 
   {Unknown configuration '#1'.}
   {The configuration file 'siunitx-#1.cfg'  was not found.}
+\msg_new:nnnn { siunitx } { unknown-locale } 
+  {Unknown locale '#1'.}
+  {No locale called '#1' has been defined.}
 %    \end{macrocode}
 %    
 %\subsection{Design-level macros}
@@ -9989,9 +10112,9 @@ This work consists of the file  siunitx.dtx
     cdot         .code:n    = 
       { group-separator       = { } \cdot { }                         },
   digitsep / 
-    comma        .code:n    = { group-separator         = { {,} }     },
+    comma        .code:n    = { group-separator         = { , }       },
   digitsep / 
-    fullstop     .code:n    = { group-separator         = { { . } }   },
+    fullstop     .code:n    = { group-separator         = .           },
   digitsep / 
     med          .code:n    = { group-separator         = \:          },
   digitsep / 
@@ -9999,11 +10122,11 @@ This work consists of the file  siunitx.dtx
   digitsep / 
     none         .code:n    = { group-separator         =             },
   digitsep / 
-    period       .code:n    = { group-separator         = { { . } }   },
+    period       .code:n    = { group-separator         = .           },
   digitsep / 
     space        .code:n    = { group-separator         = \text { ~ } },
   digitsep / 
-    stop         .code:n    = { group-separator         = { { . } }   },
+    stop         .code:n    = { group-separator         = .           },
   digitsep / 
     thick        .code:n    = { group-separator         = \;          },
   digitsep / 
@@ -10088,7 +10211,6 @@ This work consists of the file  siunitx.dtx
       },
   inlinebold     .meta:n    = { detect-inline-bold      = #1          },
 %  load & Modules & Modules to load \\
-%  locale & Modules & Locale to follow \\
 %  loctolang & Special & Associate locale with \pkg{babel}
 %    language \\
   log            .code:n    =,
@@ -10439,6 +10561,16 @@ This work consists of the file  siunitx.dtx
   xspace         .meta:n    = { use-xspace               = #1         },
   xpace          .default:n = { true                                  }
 } 
+%    \end{macrocode}
+%
+% A minor additional key-setting task as version 1 uses the name 
+% \enquote{USA} for the US locale.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  locale-USA        .meta:n = { locale-US },
+  locale-USA-append .meta:n = { locale-US-append = {#1} }
+  locale-USA-set    .meta:n = { locale-US-set    = {#1} }
+}
 %    \end{macrocode}
 %    
 %\begin{macro}{\newunit}
