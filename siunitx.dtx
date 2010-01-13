@@ -254,12 +254,14 @@ This work consists of the file  siunitx.dtx
 %          decibel,
 %          degree,
 %          DeclareBinaryPrefix,
+%          DeclareSILocale,
 %          DeclareSIPostPower,
 %          DeclareSIPrefix,
 %          DeclareSIPrePower,
 %          DeclareSIQualifier,
 %          DeclareSIUnit,
 %          DeclareSIUnitWithOptions,
+%          EditSILocale,
 %          farad,
 %          gram,
 %          gray,
@@ -2445,12 +2447,39 @@ This work consists of the file  siunitx.dtx
 % United States of America (\opt{US}), Germany (\opt{DE}) and South 
 % Africa (\opt{ZA}). 
 % 
-%\DescribeOption{declare-locale}
-% Creating and modifying locales is carried out using the key--value
-% interface. New locales must first be declared using the 
-% \opt{create-locale} option. This will create two new keys, one
-% to define the locale, and a second to modify it.
-%\begin{LaTeXdemo}
+%\DescribeMacro{\DeclareSILocale}
+%\begin{syntax}
+%  \cs{DeclareSILocale}\marg{locale}\marg{settings}
+%\end{syntax}
+%\DescribeMacro{\EditSILocale}
+%\begin{syntax}
+%  \cs{EditSILocale}\marg{locale}\marg{settings}
+%\end{syntax}
+% Two preamble-only functions are available to set up locales. First,
+% a locale can be declared (clearing any previous definition) using
+% \cs{DeclareSILocale}. For example, the defition of the German locale
+% is given below.
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSILocale{DE}{
+%    exponent-product      = \cdot,
+%    group-four-digits     = false,
+%    group-separator       = \,,
+%    inter-unit-separator  = \cdot,
+%    number-unit-separator = \,,
+%    output-decimal-marker = {,},
+%    range-phrase          = { bis }
+%  }
+%\end{LaTeXdemo}
+% Alternatively, locales can be editing to add new settings to them
+% while retaining the existing ones, using the \cs{EditSILocale}.
+% This can be usefully employed for adjustment of the standard
+% locales, which may not always match the requirements of the user.
+% For example, to always group four digit numbers, but otherwise use
+% the standard German locale, the editing command woudl read as 
+% follows.
+% function. 
+%\begin{LaTeXdemo}[code only]
+%  \EditSILocale{DE}{group-four-digits = true}
 %\end{LaTeXdemo}
 % 
 %\section{Usage tips}   
@@ -9164,85 +9193,97 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{International support}
 %
-% Setting up locales for customised settings is a bit more complex 
-% than the other keys-based tasks. The idea here is that each locale
-% needed is first declared using \texttt{create-locale}, and is then
-% set up using \cs{locale-\meta{name}}
+%\begin{macro}{\DeclareSILocale}
+%\begin{macro}{\EditSILocale}
+% Locales data is saved as a comma-separated list. Declaring a 
+% locale should get rid of any existing data, whereas adding to one
+% is a simple \enquote{put right} operation.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \DeclareSILocale #1#2 {
+  \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
+  \cs_if_exist:cTF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
+    { \clist_clear:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
+    { \clist_new:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
+  \clist_put_right:cn { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
+    {#2}
+}
+\cs_new_protected_nopar:Npn \EditSILocale #1#2 {
+  \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
+  \cs_if_exist:cF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
+    { \clist_new:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
+  \clist_put_right:cn { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
+    {#2}
+}
+\@onlypreamble \DeclareSILocale
+\@onlypreamble \EditSILocale
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%  
+%\begin{macro}{\l_siunitx_locale_DE_clist}
+%\begin{macro}{\l_siunitx_locale_UK_clist}
+%\begin{macro}{\l_siunitx_locale_US_clist}
+%\begin{macro}{\l_siunitx_locale_ZA_clist}
+% The standard locales can now be created.
+%    \begin{macrocode}
+\DeclareSILocale { DE } {
+  exponent-product      = \cdot,
+  group-four-digits     = false,
+  group-separator       = \,,
+  inter-unit-separator  = \cdot,
+  number-unit-separator = \,,
+  output-decimal-marker = { , },
+  range-phrase          = { ~ bis ~ }
+}
+\DeclareSILocale { UK } {
+  exponent-product      = \times,
+  group-four-digits     = false,
+  group-separator       = \,,
+  inter-unit-separator  = \,,
+  number-unit-separator = \,,
+  output-decimal-marker = .,
+  range-phrase          = { ~ to ~ },
+}
+\DeclareSILocale { UK } {
+  exponent-product      = \times,
+  group-four-digits     = false,
+  group-separator       = \,,
+  inter-unit-separator  = \,,
+  number-unit-separator = \,,
+  output-decimal-marker = .,
+  range-phrase          = { ~ to ~ },
+}   
+\DeclareSILocale { ZA } {
+  exponent-product      = \times,
+  group-four-digits     = false,
+  group-separator       = \,,
+  inter-unit-separator  = \cdot,
+  number-unit-separator = \,,
+  output-decimal-marker = { , },
+  range-phrase          = { ~ to ~ },
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+% The only key needed to set a locale is \opt{locale} itself, which
+% simply loads the comma-list and then applies it. Locale names are
+% always in upper case, so there is less worry about case than with
+% other settings.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  declare-locale .code:n = 
-    {
-      \keys_define:nn { siunitx }
-        {
-          locale- #1 -append .code:n   = 
-            { 
-              \clist_put_right:cn { l_siunitx_locale_ #1 _clist } {##1}
-            },
-          locale- #1 -set    .tl_set:c = 
-            { l_siunitx_locale_ #1 _clist } ,
-        }
-      \siunitx_option_deactivate:n { locale- #1 -append }
-      \siunitx_option_deactivate:n { locale- #1 -set }
-    },
   locale .code:n =
     {
-      \cs_if_exist:cTF { l_siunitx_locale_ #1 _clist }
-        { \keys_set:nv { siunitx } { l_siunitx_locale_ #1 _clist } }
+      \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
+      \cs_if_exist:cTF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
+        { 
+          \keys_set:nv { siunitx } 
+            { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
+        }
         { \msg_error:nnx { siunitx } { unknown-locale } {#1} }
     }
-}
-\siunitx_option_deactivate:n { declare-locale }
-%    \end{macrocode}
-%  
-% With the mechanisms in place, the locales themselves can be
-% created.
-%    \begin{macrocode}
-\keys_set:nn { siunitx } {
-  declare-locale = DE ,
-  locale-DE-set  =
-    { 
-      exponent-product      = \cdot,
-      group-four-digits     = false,
-      group-separator       = \,,
-      inter-unit-separator  = \cdot,
-      number-unit-separator = \,,
-      output-decimal-marker = { , },
-      range-phrase          = { ~ bis ~ }
-    },
-  declare-locale = UK ,
-  locale-UK-set  =
-    { 
-      exponent-product      = \times,
-      group-four-digits     = false,
-      group-separator       = \,,
-      inter-unit-separator  = \,,
-      number-unit-separator = \,,
-      output-decimal-marker = .,
-      range-phrase          = { ~ to ~ },
-    },
-  declare-locale = US ,
-  locale-US-set  =
-    { 
-      exponent-product      = \times,
-      group-four-digits     = false,
-      group-separator       = \,,
-      inter-unit-separator  = \,,
-      number-unit-separator = \,,
-      output-decimal-marker = .,
-      range-phrase          = { ~ to ~ },
-    },    
-  declare-locale = ZA ,
-  locale-ZA-set  =
-    { 
-      exponent-product      = \times,
-      group-four-digits     = false,
-      group-separator       = \,,
-      inter-unit-separator  = \cdot,
-      number-unit-separator = \,,
-      output-decimal-marker = { , },
-      range-phrase          = { ~ to ~ },
-
-    },
 }
 %    \end{macrocode}
 %
