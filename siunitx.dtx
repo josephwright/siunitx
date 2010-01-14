@@ -2432,56 +2432,6 @@ This work consists of the file  siunitx.dtx
 % the macro name easier!).\footnote{The function 
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
 % 
-%\section{International support}
-%
-%\DescribeOption{locale}
-% \pkg{siunitx} allows the user to switch between the typographic
-% conventions of different (geographical) areas by using 
-% \enquote{locales}. The \opt{locale} option is used to switch to
-% a different locale. 
-%\begin{LaTeXdemo}
-%  \SI{1.234}{\metre} \\
-%  \SI[locale = DE]{6.789}{\metre}
-%\end{LaTeXdemo}
-% Currently, the pre-defined locales are the United Kingdom (\opt{UK}),
-% United States of America (\opt{US}), Germany (\opt{DE}) and South 
-% Africa (\opt{ZA}). 
-% 
-%\DescribeMacro{\DeclareSILocale}
-%\begin{syntax}
-%  \cs{DeclareSILocale}\marg{locale}\marg{settings}
-%\end{syntax}
-%\DescribeMacro{\EditSILocale}
-%\begin{syntax}
-%  \cs{EditSILocale}\marg{locale}\marg{settings}
-%\end{syntax}
-% Two preamble-only functions are available to set up locales. First,
-% a locale can be declared (clearing any previous definition) using
-% \cs{DeclareSILocale}. For example, the defition of the German locale
-% is given below.
-%\begin{LaTeXdemo}[code only]
-%  \DeclareSILocale{DE}{
-%    exponent-product      = \cdot,
-%    group-four-digits     = false,
-%    group-separator       = \,,
-%    inter-unit-separator  = \cdot,
-%    number-unit-separator = \,,
-%    output-decimal-marker = {,},
-%    range-phrase          = { bis }
-%  }
-%\end{LaTeXdemo}
-% Alternatively, locales can be editing to add new settings to them
-% while retaining the existing ones, using the \cs{EditSILocale}.
-% This can be usefully employed for adjustment of the standard
-% locales, which may not always match the requirements of the user.
-% For example, to always group four digit numbers, but otherwise use
-% the standard German locale, the editing command woudl read as 
-% follows.
-% function. 
-%\begin{LaTeXdemo}[code only]
-%  \EditSILocale{DE}{group-four-digits = true}
-%\end{LaTeXdemo}
-% 
 %\section{Usage tips}   
 % 
 %\subsection{Ensuring text or maths output}
@@ -9191,102 +9141,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\subsection{International support}
-%
-%\begin{macro}{\DeclareSILocale}
-%\begin{macro}{\EditSILocale}
-% Locales data is saved as a comma-separated list. Declaring a 
-% locale should get rid of any existing data, whereas adding to one
-% is a simple \enquote{put right} operation.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \DeclareSILocale #1#2 {
-  \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
-  \cs_if_exist:cTF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
-    { \clist_clear:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
-    { \clist_new:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
-  \clist_put_right:cn { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
-    {#2}
-}
-\cs_new_protected_nopar:Npn \EditSILocale #1#2 {
-  \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
-  \cs_if_exist:cF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
-    { \clist_new:c { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } }
-  \clist_put_right:cn { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
-    {#2}
-}
-\@onlypreamble \DeclareSILocale
-\@onlypreamble \EditSILocale
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%  
-%\begin{macro}{\l_siunitx_locale_DE_clist}
-%\begin{macro}{\l_siunitx_locale_UK_clist}
-%\begin{macro}{\l_siunitx_locale_US_clist}
-%\begin{macro}{\l_siunitx_locale_ZA_clist}
-% The standard locales can now be created.
-%    \begin{macrocode}
-\DeclareSILocale { DE } {
-  exponent-product      = \cdot,
-  group-four-digits     = false,
-  group-separator       = \,,
-  inter-unit-separator  = \cdot,
-  number-unit-separator = \,,
-  output-decimal-marker = { , },
-  range-phrase          = { ~ bis ~ }
-}
-\DeclareSILocale { UK } {
-  exponent-product      = \times,
-  group-four-digits     = false,
-  group-separator       = \,,
-  inter-unit-separator  = \,,
-  number-unit-separator = \,,
-  output-decimal-marker = .,
-  range-phrase          = { ~ to ~ },
-}
-\DeclareSILocale { UK } {
-  exponent-product      = \times,
-  group-four-digits     = false,
-  group-separator       = \,,
-  inter-unit-separator  = \,,
-  number-unit-separator = \,,
-  output-decimal-marker = .,
-  range-phrase          = { ~ to ~ },
-}   
-\DeclareSILocale { ZA } {
-  exponent-product      = \times,
-  group-four-digits     = false,
-  group-separator       = \,,
-  inter-unit-separator  = \cdot,
-  number-unit-separator = \,,
-  output-decimal-marker = { , },
-  range-phrase          = { ~ to ~ },
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%
-% The only key needed to set a locale is \opt{locale} itself, which
-% simply loads the comma-list and then applies it. Locale names are
-% always in upper case, so there is less worry about case than with
-% other settings.
-%    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  locale .code:n =
-    {
-      \tl_to_uppercase:n { \tl_set:Nn \l_siunitx_tmpa_tl {#1} }
-      \cs_if_exist:cTF { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist }
-        { 
-          \keys_set:nv { siunitx } 
-            { l_siunitx_locale_ \l_siunitx_tmpa_tl _clist } 
-        }
-        { \msg_error:nnx { siunitx } { unknown-locale } {#1} }
-    }
-}
-%    \end{macrocode}
-%
 %\subsection{Messages}
 %
 % Lots of messages, all of them together in one block to make life
@@ -9411,9 +9265,6 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { unknown-configuration-file } 
   {Unknown configuration '#1'.}
   {The configuration file 'siunitx-#1.cfg'  was not found.}
-\msg_new:nnnn { siunitx } { unknown-locale } 
-  {Unknown locale '#1'.}
-  {No locale called '#1' has been defined.}
 %    \end{macrocode}
 %    
 %\subsection{Design-level macros}
@@ -10252,6 +10103,7 @@ This work consists of the file  siunitx.dtx
       },
   inlinebold     .meta:n    = { detect-inline-bold      = #1          },
 %  load & Modules & Modules to load \\
+%  locale
 %  loctolang & Special & Associate locale with \pkg{babel}
 %    language \\
   log            .code:n    =,
@@ -10602,12 +10454,6 @@ This work consists of the file  siunitx.dtx
   xspace         .meta:n    = { use-xspace               = #1         },
   xpace          .default:n = { true                                  }
 } 
-%    \end{macrocode}
-%
-% The US locale was called USA in version one.
-%    \begin{macrocode}
-\clist_new:N \l_siunitx_locale_USA_clist
-\clist_set_eq:NN \l_siunitx_locale_USA_clist \l_siunitx_locale_US_clist
 %    \end{macrocode}
 %    
 %\begin{macro}{\newunit}
