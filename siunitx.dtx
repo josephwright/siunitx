@@ -8547,6 +8547,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_number_valid_tl}
+% As the \texttt{S} column has to make a judgement about tokens which
+% can be part of a number, there is a need to have a list of valid
+% tokens.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_valid_tl
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_table_collect_pre_bool}
 %\begin{macro}{\l_siunitx_table_collect_post_bool}
 % Flags for having found a number in an \texttt{S} column.
@@ -8606,18 +8615,18 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_table_collect_expand:N #1 {
   \siunitx_if_tl:NTF #1 
     {
-      \toks_use:N \siunitx_table_collect_pre_toks
-      \toks_clear:N \siunitx_table_collect_pre_toks
+      \toks_use:N \l_siunitx_table_collect_pre_toks
+      \toks_clear:N \l_siunitx_table_collect_pre_toks
       \cs_set_nopar:Npx \siunitx_table_collect_next: 
         { \exp_not:N \siunitx_table_collect_get: \exp_not:V #1 }
     }
     {
-      \bool_if:NTF \siunitx_table_collect_pre_bool
-        { \toks_put_right:Nn \siunitx_table_collect_pre_toks {#1} }
+      \bool_if:NTF \l_siunitx_table_collect_pre_bool
+        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks {#1} }
         {
-          \bool_set_true:N \siunitx_table_collect_post_bool
-          \bool_set_false:N \siunitx_table_collect_pre_bool 
-          \toks_put_right:Nn \siunitx_table_collect_post_toks {#1}
+          \bool_set_true:N \l_siunitx_table_collect_post_bool
+          \bool_set_false:N \l_siunitx_table_collect_pre_bool 
+          \toks_put_right:Nn \l_siunitx_table_collect_post_toks {#1}
         }
     }
 }
@@ -8677,6 +8686,18 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Npn \siunitx_table_collect_init_S: {
   \siunitx_number_in_init:
+  \tl_set:Nx \l_siunitx_number_valid_tl 
+    {
+      \exp_not:V \l_siunitx_input_complex_tl
+      \exp_not:V \l_siunitx_input_decimal_tl
+      \exp_not:V \l_siunitx_input_digit_tl
+      \exp_not:V \l_siunitx_input_exponent_tl
+      \exp_not:V \l_siunitx_input_ignore_tl
+      \exp_not:V \l_siunitx_input_uncert_close_tl
+      \exp_not:V \l_siunitx_input_uncert_open_tl
+      \exp_not:V \l_siunitx_input_sign_tl
+      \exp_not:V \l_siunitx_input_symbol_tl   
+    }
   \bool_set_true:N \l_siunitx_table_collect_pre_bool
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
@@ -8923,25 +8944,58 @@ This work consists of the file  siunitx.dtx
 % output then print it. Most of the formatting is done elsewhere, so
 % most of the work here is in printing.
 % 
+%\begin{macro}{\l_siunitx_table_decimal_int}
+%\begin{macro}{\l_siunitx_table_exponent_int}
+%\begin{macro}{\l_siunitx_table_integer_int}
+%\begin{macro}{\l_siunitx_table_uncert_int}
+%\begin{macro}{\l_siunitx_table_sign_exponent_bool}
+%\begin{macro}{\l_siunitx_table_sign_manitssa_bool}
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  table-align-numbers .choice:,
-  table-align-numbers / centre .code:n =
-    { },
-  table-align-numbers / center .code:n =,
-  table-align-numbers / centre-decimal-marker .code:n =,
-  table-align-numbers / center-decimal-marker .code:n = ,
-  table-align-numbers / left .code:n =,
-  table-align-numbers / right .code:n =,
-  table-number-format .code:n = 
-    {
-    },
-  table-number-format .value_required:
+  table-align-numbers       .choice:,
+  table-align-numbers / 
+    centre                  .code:n     = ,
+  table-align-numbers / 
+    center                  .code:n     = ,
+  table-align-numbers / 
+    centre-decimal-marker   .code:n     = ,
+  table-align-numbers / 
+    center-decimal-marker   .code:n     = ,
+  table-align-numbers / 
+    left                    .code:n     = ,
+  table-align-numbers / 
+    right                   .code:n     = ,
+  table-figures-decimal     .int_set:N  = \l_siunitx_table_decimal_int ,
+  table-figures-exponent    .int_set:N  = \l_siunitx_table_exponent_int,
+  table-figures-integer     .int_set:N  = \l_siunitx_table_integer_int ,
+  table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int  ,
+  table-sign-exponent       .bool_set:N = 
+    \l_siunitx_table_sign_exponent_bool,
+  table-sign-manitssa       .bool_set:N = 
+    \l_siunitx_table_sign_mantissa_bool
 }
 \keys_set:nn { siunitx } {
-  table-align-numbers = centre-decimal-marker
+  table-align-numbers   = centre-decimal-marker,
+  table-figures-decimal = 2,
+  table-figures-integer = 3
 }
 %    \end{macrocode} 
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\siunitx_table_print_S:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S: {
+  \toks_show:N \l_siunitx_table_collect_pre_toks
+  \toks_show:N \l_siunitx_table_collect_toks
+  \toks_show:N \l_siunitx_table_collect_post_toks
+}
+%    \end{macrocode}
+%\end{macro}
 %
 %\subsection{Direct printing in \texttt{S} columns}
 %
