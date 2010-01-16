@@ -1204,16 +1204,6 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{maths-rm = \mathtt}%
 %  \SI{99}{\metre} 
 %\end{LaTeXdemo}
-% This can be used to good effect to change all output from 
-% \pkg{siunitx} without needing to detect the font.  For example, 
-% when creating \pkg{beamer} presentations the settings
-%\begin{LaTeXdemo}[code only]
-%  \sisetup{
-%    maths-rm = \mathsf,
-%    text-rm  = \sffamily
-%  }
-%\end{LaTeXdemo}
-% given all output in sans serif font without font detection.
 % 
 %\DescribeOption{colour} 
 % The colour of printed output can be set using the \opt{colour} 
@@ -3300,6 +3290,35 @@ This work consists of the file  siunitx.dtx
   text-tt     = \ttfamily,
 }
 %    \end{macrocode}
+%    
+%\begin{macro}{\siunitx_detect_default_family:}
+% Some packages (for example \pkg{cmbright}) and classes
+% (for example \pkg{beamer}) set the default family to be something
+% other than serif family. A one-off detection will make life easier
+% all round.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_detect_default_family: {
+  \tl_set:Nx \l_siunitx_tmpa_tl { \familydefault }
+  \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
+    {
+      \keys_set:nn { siunitx } 
+        {
+          maths-rm = \mathsf,
+          text-rm  = \sffamily
+        }
+    }
+  \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_texttt_tl 
+    {
+      \keys_set:nn { siunitx } 
+        {
+          maths-rm = \mathtt,
+          text-rm  = \ttfamily
+        }
+    }
+}
+\AtBeginDocument { \siunitx_detect_default_family: }
+%    \end{macrocode}
+%\end{macro}
 %    
 %\subsection{Output control}
 %
