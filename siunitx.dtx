@@ -5662,13 +5662,15 @@ This work consists of the file  siunitx.dtx
           \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal-marker }
             \l_siunitx_tmpb_tl
           \tl_set:Nx \l_siunitx_tmpb_tl { { \l_siunitx_tmpb_tl } } 
-          \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
-            \l_siunitx_tmpb_tl
         }  
         {
-          \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
-            \l_siunitx_output_decimal_tl
+          \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_output_decimal_tl 
         }
+      \tl_set:Nx \l_siunitx_tmpb_tl 
+        { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } }
+      \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl 
+      \prop_put:NnV \l_siunitx_number_out_prop { #1 -decimal-marker }
+        \l_siunitx_tmpb_tl
       \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -decimal }
         {
           \prop_get:NnN \l_siunitx_number_out_prop { #1 -decimal }
