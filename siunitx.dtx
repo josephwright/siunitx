@@ -8644,7 +8644,6 @@ This work consists of the file  siunitx.dtx
         { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks {#1} }
         {
           \bool_set_true:N \l_siunitx_table_collect_post_bool
-          \bool_set_false:N \l_siunitx_table_collect_pre_bool 
           \toks_put_right:Nn \l_siunitx_table_collect_post_toks {#1}
         }
     }
@@ -8835,19 +8834,11 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Table printing: general code}
 %
-%\begin{macro}{\c_siunitx_zero_dim}
-% A zero dimension, for use in alignments.
-%    \begin{macrocode}
-\dim_new:N \c_siunitx_zero_dim
-\dim_set:Nn \c_siunitx_zero_dim { \c_zero pt }
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\c_siunitx_one_fill_skip}
 % A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
 \skip_new:N \c_siunitx_one_fill_skip
-\skip_set:Nn \c_siunitx_one_fill_skip { \c_siunitx_zero_dim plus 1 fill}
+\skip_set:Nn \c_siunitx_one_fill_skip { \c_zero_skip plus 1 fill}
 %    \end{macrocode}
 %\end{macro}
 %
@@ -8862,17 +8853,17 @@ This work consists of the file  siunitx.dtx
   \@ifpackageloaded { colortbl }
     { 
       \skip_set:Nn \c_siunitx_table_correction_skip 
-        { \c_siunitx_zero_dim plus -0.5 fill } 
+        { \c_zero_skip plus -0.5 fill } 
     }
     { 
       \skip_set:Nn \c_siunitx_table_correction_skip 
-        { \c_siunitx_zero_dim } 
+        { \c_zero_skip } 
     }
 }
 \AtBeginDocument { \siunitx_colortbl_check: }
 \cs_new_nopar:Npn \siunitx_table_colortbl_correction: {
   \skip_horizontal:n { \c_siunitx_table_correction_skip }
-  \tex_kern:D \c_siunitx_zero_dim
+  \tex_kern:D \c_zero_skip
 }
 %    \end{macrocode}
 %\end{macro}
@@ -8889,11 +8880,11 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_table_align_left:n #1 {
   \siunitx_table_colortbl_correction:
   \skip_horizontal:n {#1}
-  \tex_kern:D \c_siunitx_zero_dim
+  \tex_kern:D \c_zero_skip
 }
 \cs_new_nopar:Npn \siunitx_table_align_right:n #1 {
   \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
-  \tex_kern:D \c_siunitx_zero_dim
+  \tex_kern:D \c_zero_skip
   \siunitx_table_colortbl_correction:
 }
 %    \end{macrocode}
@@ -8920,22 +8911,22 @@ This work consists of the file  siunitx.dtx
   table-align-units / center .code:n =
     { 
       \skip_set:Nn \l_siunitx_table_unit_align_skip 
-        { \c_siunitx_zero_dim plus 0.5 fill } 
+        { \c_zero_skip plus 0.5 fill } 
     },
   table-align-units / centre .code:n =
     { 
       \skip_set:Nn \l_siunitx_table_unit_align_skip 
-        { \c_siunitx_zero_dim plus 0.5 fill } 
+        { \c_zero_skip plus 0.5 fill } 
     },
   table-align-units / left   .code:n =
     { 
       \skip_set:Nn \l_siunitx_table_unit_align_skip 
-        { \c_siunitx_zero_dim } 
+        { \c_zero_skip } 
     },
   table-align-units / right  .code:n =
     { 
       \skip_set:Nn \l_siunitx_table_unit_align_skip 
-        { \c_siunitx_zero_dim plus 1 fill } 
+        { \c_zero_skip plus 1 fill } 
     },
 }
 \keys_set:nn { siunitx } {
@@ -8962,6 +8953,16 @@ This work consists of the file  siunitx.dtx
 % output then print it. Most of the formatting is done elsewhere, so
 % most of the work here is in printing.
 % 
+%\begin{macro}{\l_siunitx_table_text_align_skip}
+%\begin{macro}{\l_siunitx_table_number_align_skip}
+% Skips for aligning text and numbers.
+%    \begin{macrocode}
+\skip_new:N \l_siunitx_table_number_align_skip
+\skip_new:N \l_siunitx_table_text_align_skip
+%    \end{macrocode}
+%\end{macro}
+%\end{macro} 
+% 
 %\begin{macro}{\l_siunitx_table_decimal_int}
 %\begin{macro}{\l_siunitx_table_exponent_int}
 %\begin{macro}{\l_siunitx_table_integer_int}
@@ -8983,6 +8984,31 @@ This work consists of the file  siunitx.dtx
     left                    .code:n     = ,
   table-align-numbers / 
     right                   .code:n     = ,
+  table-align-text .choice:,
+  table-align-text / 
+    center                  .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_text_align_skip 
+        { \c_zero_skip plus 0.5 fill } 
+    },
+  table-align-text / 
+    centre                  .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_text_align_skip 
+        { \c_zero_skip plus 0.5 fill } 
+    },
+  table-align-text / 
+    left                    .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_text_align_skip 
+        { \c_zero_skip } 
+    },
+  table-align-text / 
+    right                   .code:n =
+    { 
+      \skip_set:Nn \l_siunitx_table_text_align_skip 
+        { \c_zero_skip plus 1 fill } 
+    },
   table-figures-decimal     .int_set:N  = \l_siunitx_table_decimal_int ,
   table-figures-exponent    .int_set:N  = \l_siunitx_table_exponent_int,
   table-figures-integer     .int_set:N  = \l_siunitx_table_integer_int ,
@@ -9008,9 +9034,19 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_S:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S: {
-  \toks_show:N \l_siunitx_table_collect_pre_toks
-  \toks_show:N \l_siunitx_table_collect_toks
-  \toks_show:N \l_siunitx_table_collect_post_toks
+  \bool_if:NTF \l_siunitx_table_collect_pre_bool
+    { 
+      \siunitx_table_align_left:n { \l_siunitx_table_text_align_skip }
+      \siunitx_unit_output:Vn \l_siunitx_table_collect_toks { }
+      \siunitx_table_align_right:n { \l_siunitx_table_text_align_skip }
+    }
+    { \siunitx_table_print_S_aux: }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_aux:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_aux: {
 }
 %    \end{macrocode}
 %\end{macro}
