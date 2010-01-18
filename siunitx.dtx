@@ -6928,7 +6928,7 @@ This work consists of the file  siunitx.dtx
     }
   \hbox_set:Nn \l_siunitx_angle_unit_box
     {
-      \siunitx_print:nn { unit } { \l_siunitx_unit_tl }
+      \siunitx_print:nV { unit } \l_siunitx_unit_tl
       \tex_hskip:D -\scriptspace
     }  
   \siunitx_angle_print_astronomy_aux:n { marker }
@@ -8956,6 +8956,27 @@ This work consists of the file  siunitx.dtx
 % output then print it. Most of the formatting is done elsewhere, so
 % most of the work here is in printing.
 % 
+%\begin{macro}{\l_siunitx_table_centre_decimal_bool}
+% A switch for the basic \enquote{decimal marker in the middle}
+% mode.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_table_centre_decimal_bool
+%    \end{macrocode}
+%\end{macro}
+% 
+%\begin{macro}{\l_siunitx_table_decimal_box}
+%\begin{macro}{\l_siunitx_table_integer_box}
+%\begin{macro}{\l_siunitx_table_marker_box}
+% Everything here is a paste-up job: it needs a lot of boxes.
+%    \begin{macrocode}
+\box_new:N \l_siunitx_table_decimal_box
+\box_new:N \l_siunitx_table_integer_box
+\box_new:N \l_siunitx_table_marker_box
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+% 
 %\begin{macro}{\l_siunitx_table_text_align_skip}
 %\begin{macro}{\l_siunitx_table_number_align_skip}
 % Skips for aligning text and numbers.
@@ -8977,17 +8998,47 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   table-align-numbers       .choice:,
   table-align-numbers / 
-    centre                  .code:n     = ,
+    centre                  .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip plus 0.5 fill } 
+        \bool_set_false:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-numbers / 
-    center                  .code:n     = ,
+    center                  .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip plus 0.5 fill } 
+        \bool_set_false:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-numbers / 
-    centre-decimal-marker   .code:n     = ,
+    centre-decimal-marker   .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip plus 0.5 fill } 
+        \bool_set_true:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-numbers / 
-    center-decimal-marker   .code:n     = ,
+    center-decimal-marker   .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip plus 0.5 fill } 
+        \bool_set_true:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-numbers / 
-    left                    .code:n     = ,
+    left                    .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip } 
+        \bool_set_false:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-numbers / 
-    right                   .code:n     = ,
+    right                   .code:n     = 
+      {
+        \skip_set:Nn \l_siunitx_table_number_align_skip 
+          { \c_zero_skip plus 1 fill } 
+        \bool_set_false:N \l_siunitx_table_centre_decimal_bool
+      },
   table-align-text .choice:,
   table-align-text / 
     center                  .code:n =
@@ -9072,10 +9123,69 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_process:
       \siunitx_number_format:
       \siunitx_number_output_colour:
+      \bool_if:NTF \l_siunitx_table_centre_decimal_bool
+        { \siunitx_table_print_S_centred: }
+        { \siunitx_table_print_S_not_centred: }
     }
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_print_S_centred:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred: {
+  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-integer }
+    {
+       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
+         \l_siunitx_tmpa_tl
+       \hbox_set:Nn \l_siunitx_table_integer_box  
+         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+    }
+    { \box_clear:N \l_siunitx_table_integer_box }
+  \hbox_set:Nn \l_siunitx_table_marker_box
+    {
+      \siunitx_print:nn { number } 
+        { \ensuremath { { \l_siunitx_output_decimal_tl } } }
+    }
+  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-decimal }
+    {
+       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
+         \l_siunitx_tmpa_tl
+       \hbox_set:Nn \l_siunitx_table_decimal_box  
+         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+    }
+    { 
+      \hbox_set_to_wd:Nnn \l_siunitx_table_marker_box
+        { \box_wd:N \l_siunitx_table_marker_box }
+        { \tex_hfil:D }
+      \box_clear:N \l_siunitx_table_decimal_box   
+    }
+  \dim_compare:nNnTF 
+    { \box_wd:N \l_siunitx_table_integer_box } 
+    > 
+    { \box_wd:N\l_siunitx_table_decimal_box }  
+    { 
+      \hbox_set_to_wd:Nnn \l_siunitx_table_decimal_box
+        { \box_wd:N \l_siunitx_table_integer_box }
+        { 
+          \hbox_unpack_clear:N \l_siunitx_table_decimal_box 
+          \tex_hfil:D
+        }
+    }
+    { 
+      \hbox_set_to_wd:Nnn \l_siunitx_table_integer_box
+        { \box_wd:N \l_siunitx_table_decimal_box }
+        { 
+          \tex_hfil:D
+          \hbox_unpack_clear:N \l_siunitx_table_integer_box 
+        }
+    }
+  \box_use:N \l_siunitx_table_integer_box
+  \box_use:N \l_siunitx_table_marker_box
+  \box_use:N \l_siunitx_table_decimal_box
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Direct printing in \texttt{S} columns}
