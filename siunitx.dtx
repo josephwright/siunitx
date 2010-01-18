@@ -6125,6 +6125,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 % 
 %\begin{macro}{\siunitx_number_output:n}
+%\begin{macro}{\siunitx_number_output:V}
 % The number output system simply sets up for the combined number and
 % unit system.
 %    \begin{macrocode}
@@ -6133,7 +6134,9 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \l_siunitx_preunit_tl  
   \siunitx_combined_output:n {#1}
 }
+\cs_generate_variant:Nn \siunitx_number_output:n { V }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_output_bracket:}
@@ -8967,6 +8970,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_exponent_int}
 %\begin{macro}{\l_siunitx_table_integer_int}
 %\begin{macro}{\l_siunitx_table_uncert_int}
+%\begin{macro}{\l_siunitx_table_pasre_only_bool}
 %\begin{macro}{\l_siunitx_table_sign_exponent_bool}
 %\begin{macro}{\l_siunitx_table_sign_manitssa_bool}
 %    \begin{macrocode}
@@ -9013,6 +9017,8 @@ This work consists of the file  siunitx.dtx
   table-figures-exponent    .int_set:N  = \l_siunitx_table_exponent_int,
   table-figures-integer     .int_set:N  = \l_siunitx_table_integer_int ,
   table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int  ,
+  table-parse-only          .bool_set:N = 
+    \l_siunitx_table_parse_only_bool,
   table-sign-exponent       .bool_set:N = 
     \l_siunitx_table_sign_exponent_bool,
   table-sign-manitssa       .bool_set:N = 
@@ -9029,6 +9035,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_table_print_S:}
@@ -9040,15 +9047,35 @@ This work consists of the file  siunitx.dtx
       \siunitx_unit_output:Vn \l_siunitx_table_collect_toks { }
       \siunitx_table_align_right:n { \l_siunitx_table_text_align_skip }
     }
-    { \siunitx_table_print_S_aux: }
+    { 
+      \siunitx_table_align_left:n { \l_siunitx_table_number_align_skip }
+      \siunitx_table_print_S_aux: 
+      \siunitx_table_align_right:n 
+        { \l_siunitx_table_number_align_skip }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_table_print_S_aux:}
+%\begin{macro}[aux]{\siunitx_table_print_S_aux:}
+%\begin{macro}[aux]{\siunitx_table_print_S_full:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_aux: {
+  \bool_if:NTF \l_siunitx_table_parse_only_bool 
+    { \siunitx_number_output:V \l_siunitx_table_collect_toks }
+    { \siunitx_table_print_S_full: }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_full: {
+  \bool_set_false:N \l_siunitx_error_bool
+  \siunitx_number_in_parse:V \l_siunitx_table_collect_toks 
+  \bool_if:NF \l_siunitx_error_bool 
+    {
+      \siunitx_number_process:
+      \siunitx_number_format:
+      \siunitx_number_output_colour:
+    }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Direct printing in \texttt{S} columns}
