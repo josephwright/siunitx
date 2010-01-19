@@ -9154,40 +9154,34 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_S_centred:}
 % When centring the decimal marker, the logic is relatively simple.
 % First, box up the integer part of the number, the entire number and
-% the decimal marker itself.  Then, choose the appropriate path based
-% on whether the output has a decimal marker at all.
+% the decimal marker itself.  There is then a measurement to see
+% which part of the number is bigger: before or after the decimal
+% marker. Based on that, a path is chosen.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_centred: {
   \siunitx_table_print_S_box_integer:
   \siunitx_table_print_S_box_marker:
   \siunitx_table_print_S_box_result:
-  \prop_if_in:NnTF \l_siunitx_number_out_prop 
-    { mantissa-decimal-marker }
-    { \siunitx_table_print_S_centred_std: }
-    { \siunitx_table_print_S_centred_no_marker: }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_table_print_S_centred_std:}
-%\begin{macro}[aux]{\siunitx_table_print_S_centred_integer:}
-%\begin{macro}[aux]{\siunitx_table_print_S_centred_decimal:}
-% If there is a decimal marker, calculate whether the integer part or
-% the rest of the number is wider, and choose a branch accordingly.
-% The make a box to pad the shorter side out to the same length as
-% the longer one, and print two boxes.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_centred_std: {
   \dim_set:Nn \l_siunitx_table_dummy_dim
+    {  \l_siunitx_table_result_dim  - \l_siunitx_table_integer_dim }
+  \prop_if_in:NnT \l_siunitx_number_out_prop 
+    { mantissa-decimal-marker }
     {
-        \l_siunitx_table_result_dim
-      - \l_siunitx_table_integer_dim
-      - \l_siunitx_table_marker_dim
+      \dim_set:Nn \l_siunitx_table_dummy_dim
+        { \l_siunitx_table_dummy_dim - \l_siunitx_table_marker_dim }
     }
   \dim_compare:nNnTF
     { \l_siunitx_table_integer_dim } > { \l_siunitx_table_dummy_dim }
     { \siunitx_table_print_S_centred_integer: }
     { \siunitx_table_print_S_centred_decimal: }
 }
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_integer:}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_decimal:}
+% Actually printing the content is a case of calculating a suitable
+% filler box, then printing it and the content.
+%    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_centred_integer: {
   \dim_set:Nn \l_siunitx_table_dummy_dim
     { \l_siunitx_table_integer_dim - \l_siunitx_table_dummy_dim }
@@ -9206,23 +9200,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_table_print_S_centred_no_marker:}
-% If there is no marker, everything is before the decimal position.
-% There is a need to allow space for the marker, so that alignment
-% with other cells is correct.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_centred_no_marker: {
-  \dim_set:Nn \l_siunitx_table_dummy_dim
-    { \l_siunitx_table_result_dim + \l_siunitx_table_marker_dim }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
-    { \l_siunitx_table_dummy_dim } { \tex_hfil:D }
-  \box_use:N \l_siunitx_table_result_box
-  \box_use:N \l_siunitx_table_dummy_box
-}
-
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
