@@ -8966,15 +8966,32 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 % 
-%\begin{macro}{\l_siunitx_table_decimal_box}
+%\begin{macro}{\l_siunitx_table_dummy_box}
 %\begin{macro}{\l_siunitx_table_integer_box}
 %\begin{macro}{\l_siunitx_table_marker_box}
-% Everything here is a paste-up job: it needs a lot of boxes.
+%\begin{macro}{\l_siunitx_table_result_box}
 %    \begin{macrocode}
-\box_new:N \l_siunitx_table_decimal_box
+\box_new:N \l_siunitx_table_dummy_box
 \box_new:N \l_siunitx_table_integer_box
 \box_new:N \l_siunitx_table_marker_box
+\box_new:N \l_siunitx_table_result_box
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%\end{macro} 
+%
+%\begin{macro}{\l_siunitx_table_dummy_dim}
+%\begin{macro}{\l_siunitx_table_integer_dim}
+%\begin{macro}{\l_siunitx_table_marker_dim}
+%\begin{macro}{\l_siunitx_table_result_dim}
+%    \begin{macrocode}
+\dim_new:N \l_siunitx_table_dummy_dim
+\dim_new:N \l_siunitx_table_integer_dim
+\dim_new:N \l_siunitx_table_marker_dim
+\dim_new:N \l_siunitx_table_result_dim
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro} 
@@ -9135,58 +9152,135 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_print_S_centred:}
+% When centring the decimal marker, the logic is relatively simple.
+% First, box up the integer part of the number, the entire number and
+% the decimal marker itself.  Then, choose the appropriate path based
+% on whether the output has a decimal marker at all.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_centred: {
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-integer }
-    {
-       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
-         \l_siunitx_tmpa_tl
-       \hbox_set:Nn \l_siunitx_table_integer_box  
-         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-    { \box_clear:N \l_siunitx_table_integer_box }
-  \hbox_set:Nn \l_siunitx_table_marker_box
-    {
-      \siunitx_print:nn { number } 
-        { \ensuremath { { \l_siunitx_output_decimal_tl } } }
-    }
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa-decimal }
-    {
-       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
-         \l_siunitx_tmpa_tl
-       \hbox_set:Nn \l_siunitx_table_decimal_box  
-         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-    { 
-      \hbox_set_to_wd:Nnn \l_siunitx_table_marker_box
-        { \box_wd:N \l_siunitx_table_marker_box }
-        { \tex_hfil:D }
-      \box_clear:N \l_siunitx_table_decimal_box   
-    }
-  \dim_compare:nNnTF 
-    { \box_wd:N \l_siunitx_table_integer_box } 
-    > 
-    { \box_wd:N\l_siunitx_table_decimal_box }  
-    { 
-      \hbox_set_to_wd:Nnn \l_siunitx_table_decimal_box
-        { \box_wd:N \l_siunitx_table_integer_box }
-        { 
-          \hbox_unpack_clear:N \l_siunitx_table_decimal_box 
-          \tex_hfil:D
-        }
-    }
-    { 
-      \hbox_set_to_wd:Nnn \l_siunitx_table_integer_box
-        { \box_wd:N \l_siunitx_table_decimal_box }
-        { 
-          \tex_hfil:D
-          \hbox_unpack_clear:N \l_siunitx_table_integer_box 
-        }
-    }
-  \box_use:N \l_siunitx_table_integer_box
-  \box_use:N \l_siunitx_table_marker_box
-  \box_use:N \l_siunitx_table_decimal_box
+  \siunitx_table_print_S_centred_box_integer:
+  \siunitx_table_print_S_centred_box_marker:
+  \siunitx_table_print_S_centred_box_result:
+  \prop_if_in:NnTF \l_siunitx_number_out_prop 
+    { mantissa-decimal-marker }
+    { \siunitx_table_print_S_centred_std: }
+    { \siunitx_table_print_S_centred_no_marker: }
 }
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_box_integer:}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_box_marker:}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_box_result:}
+% The boxing-up code is all quite obvious, with some safety checks
+% so that there are no quarks about. For the integer part, there
+% may be a sign to worry about. In all case, the resulting box is
+% measured: the other code is easier to read with a dimension rather
+% than box widths.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_box_integer: {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-sign }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-sign }
+        \l_siunitx_tmpa_tl
+    }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-integer }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
+        \l_siunitx_tmpb_tl
+    }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  \hbox_set:Nn \l_siunitx_table_integer_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \dim_set:Nn \l_siunitx_table_integer_dim
+    { \box_wd:N \l_siunitx_table_integer_box }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_box_marker: {
+  \prop_if_in:NnTF \l_siunitx_number_out_prop 
+    { mantissa-decimal-marker }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop 
+        { mantissa-decimal-marker } \l_siunitx_tmpa_tl
+    }
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { 
+          \exp_not:N \ensuremath 
+            { \exp_not:V \l_siunitx_output_decimal_tl }
+        }
+    }
+  \hbox_set:Nn \l_siunitx_table_marker_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \dim_set:Nn \l_siunitx_table_marker_dim
+    { \box_wd:N \l_siunitx_table_marker_box }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_box_result: {
+  \prop_get:NnN \l_siunitx_number_out_prop { result }
+    \l_siunitx_tmpa_tl
+  \hbox_set:Nn \l_siunitx_table_result_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \dim_set:Nn \l_siunitx_table_result_dim
+    { \box_wd:N \l_siunitx_table_result_box }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_std:}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_integer:}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_decimal:}
+% If there is a decimal marker, calculate whether the integer part or
+% the rest of the number is wider, and choose a branch accordingly.
+% The make a box to pad the shorter side out to the same length as
+% the longer one, and print two boxes.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_std: {
+  \dim_set:Nn \l_siunitx_table_dummy_dim
+    {
+        \l_siunitx_table_result_dim
+      - \l_siunitx_table_integer_dim
+      - \l_siunitx_table_marker_dim
+    }
+  \dim_compare:nNnTF
+    { \l_siunitx_table_integer_dim } > { \l_siunitx_table_dummy_dim }
+    { \siunitx_table_print_S_centred_integer: }
+    { \siunitx_table_print_S_centred_decimal: }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_integer: {
+  \dim_set:Nn \l_siunitx_table_dummy_dim
+    { \l_siunitx_table_integer_dim - \l_siunitx_table_dummy_dim }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
+    { \l_siunitx_table_dummy_dim } { \tex_hfil:D }
+  \box_use:N \l_siunitx_table_result_box
+  \box_use:N \l_siunitx_table_dummy_box
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_decimal: {
+  \dim_set:Nn \l_siunitx_table_dummy_dim
+    { \l_siunitx_table_dummy_dim - \l_siunitx_table_integer_dim }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
+    { \l_siunitx_table_dummy_dim } { \tex_hfil:D }
+  \box_use:N \l_siunitx_table_dummy_box
+  \box_use:N \l_siunitx_table_result_box
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}[aux]{\siunitx_table_print_S_centred_no_marker:}
+% If there is no marker, everything is before the decimal position.
+% There is a need to allow space for the marker, so that alignment
+% with other cells is correct.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_centred_no_marker: {
+  \dim_set:Nn \l_siunitx_table_dummy_dim
+    { \l_siunitx_table_result_dim + \l_siunitx_table_marker_dim }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
+    { \l_siunitx_table_dummy_dim } { \tex_hfil:D }
+  \box_use:N \l_siunitx_table_result_box
+  \box_use:N \l_siunitx_table_dummy_box
+}
+
 %    \end{macrocode}
 %\end{macro}
 %
