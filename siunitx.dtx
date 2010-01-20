@@ -10242,12 +10242,18 @@ This work consists of the file  siunitx.dtx
     \siunitx_load_configuration_aux:n
 }
 \cs_new:Npn \siunitx_load_configuration_aux:n #1 {
-   \file_if_exist:nTF { siunitx- #1 . \c_siunitx_configuration_ext_tl }
-    { 
-      \@onefilewithoptions { siunitx- #1 } [ ] [ ] 
-        \c_siunitx_configuration_ext_tl  
+  \tl_if_empty:nF {#1}
+    {
+      \file_if_exist:nTF 
+        { siunitx- #1 . \c_siunitx_configuration_ext_tl }
+        { 
+          \@onefilewithoptions { siunitx- #1 } [ ] [ ] 
+          \c_siunitx_configuration_ext_tl  
+        }
+        { 
+          \msg_error:nnx { siunitx } { unknown-configuration-file } {#1}
+        }
     }
-    { \msg_error:nx { unknown-configuration-file } {#1} }
 }
 \tl_new:Nn \c_siunitx_configuration_ext_tl { cfg }
 %    \end{macrocode}
