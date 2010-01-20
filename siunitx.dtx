@@ -1097,45 +1097,45 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
 %      detect-all           & Meta   & \meta{none} \\
-%      detect-bold          & Switch & false    \\ 
-%      detect-display-maths & Switch & false    \\
-%      detect-family        & Switch & false    \\
-%      detect-inline-bold   & Choice & text     \\
-%      detect-italic        & Switch & false    \\
-%      detect-mode          & Switch & false    \\
+%      detect-display-maths & Switch & false       \\
+%      detect-family        & Switch & false       \\
+%      detect-inline-weight & Choice & text        \\
+%      detect-italic        & Switch & false       \\
+%      detect-mode          & Switch & false       \\
 %      detect-none          & Meta   & \meta{none} \\ 
+%      detect-weight        & Switch & false       \\ 
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{detect-bold}
+%\DescribeOption{detect-weight}
 %\DescribeOption{detect-family}
 %\DescribeOption{detect-italic}
 %\DescribeOption{detect-mode}
-% The options \opt{detect-bold} and \opt{detect-italic} set detection
-% of the prevailing bold and italic states, respectively. The italic
-% state is only checked if the surrounding material is not in maths mode
-% (as maths text is always italic). Detecting the current family (roman,
-% sans serif or monospaced) is controlled by the \opt{detect-family} 
-% setting, while the current mode (text or maths) is detected using the
-% \opt{detect-mode} switch. 
+% The options \opt{detect-weight} and \opt{detect-italic} set detection
+% of the prevailing font weight and italic states, respectively. The 
+% italic state is only checked if the surrounding material is not in 
+% maths mode (as maths text is always italic). Detecting the current 
+% family (roman, sans serif or monospaced) is controlled by the 
+% \opt{detect-family} setting, while the current mode (text or maths) 
+% is detected using the \opt{detect-mode} switch. 
 % 
-%\DescribeOption{detect-inline-bold}
-% Bold detection is influenced by the value of \opt{detect-inline-bold},
-% which takes values \opt{text}, \opt{maths} and \opt{combined}.  The 
-% package can detect the local value of bold for either the surrounding 
-% text, or the surrounding inline (|$|\ldots|$|) maths. The 
-% \opt{combined} option checks both and uses bold if either test is 
-% true.
+%\DescribeOption{detect-inline-weight}
+% Font weight detection is influenced by the value of 
+% \opt{detect-inline-weight}, which takes values \opt{text}, \opt{maths} 
+% and \opt{combined}.  The package can detect the local value of font 
+% weight for either the surrounding text, or the surrounding inline 
+% (|$|\ldots|$|) maths. The \opt{combined} option checks both and uses 
+% the prevailing weight if either test is true.
 %\begin{LaTeXdemo}
 %  \sisetup{
-%    detect-bold        = true, 
-%    detect-inline-bold = maths
+%    detect-weight        = true, 
+%    detect-inline-weight = maths
 %  }%
 %  $\num{1234}$ \\
 %  { \boldmath $\num{1234}$ } \\ 
 %  { \bfseries $\num{1234}$ } \\
-%   \sisetup{detect-inline-bold = text}
+%   \sisetup{detect-inline-weight = text}
 %  { \boldmath $\num{1234}$ } \\
 %  { \bfseries $\num{1234}$ }
 %\end{LaTeXdemo} 
@@ -2835,19 +2835,19 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_detect_inline_bold_tl}
+%\begin{macro}{\l_siunitx_detect_inline_weight_tl}
 % Used by the keys, but needs to be created here.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_detect_inline_bold_tl
+\tl_new:N \l_siunitx_detect_inline_weight_tl
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_detect_bold_bool}
 %\begin{macro}{\l_siunitx_detect_display_maths_bool}
 %\begin{macro}{\l_siunitx_detect_family_bool}
-%\begin{macro}{\l_siunitx_detect_inline_bold_bool}
+%\begin{macro}{\l_siunitx_detect_inline_weight_bool}
 %\begin{macro}{\l_siunitx_detect_italic_bool}
 %\begin{macro}{\l_siunitx_detect_mode_bool}
+%\begin{macro}{\l_siunitx_detect_weight_bool}
 % Font detection is all about creating switches, with just a little
 % gloss for \texttt{detect-all} and \texttt{detect-none}.
 %    \begin{macrocode}
@@ -2856,52 +2856,56 @@ This work consists of the file  siunitx.dtx
   detect-all .default:n = true,
   detect-all / false .meta:n = 
     {
-      detect-bold   = false,
       detect-family = false,
       detect-italic = false,
-      detect-mode   = false
+      detect-mode   = false,
+      detect-weight = false
     },
   detect-all / true .meta:n = 
     {
-      detect-bold   = true,
       detect-family = true,
       detect-italic = true,
-      detect-mode   = true
+      detect-mode   = true,
+      detect-weight = false
     },
-  detect-bold          .bool_set:N = \l_siunitx_detect_bold_bool,
   detect-display-math  .bool_set:N = 
     \l_siunitx_detect_display_maths_bool,
   detect-display-maths .bool_set:N = 
     \l_siunitx_detect_display_maths_bool,
   detect-family        .bool_set:N = \l_siunitx_detect_family_bool,
-  detect-inline-bold   .choice:,
-  detect-inline-bold   .value_required:,
-  detect-inline-bold / combined  .code:n = 
-    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { combined } },
-  detect-inline-bold / math  .code:n = 
-    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { maths } },
-  detect-inline-bold / maths .code:n = 
-    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { maths } },
-  detect-inline-bold / text  .code:n = 
-    { \tl_set:Nn \l_siunitx_detect_inline_bold_tl { text } },
+  detect-inline-weight .choice:,
+  detect-inline-weight .value_required:,
+  detect-inline-weight / 
+    combined           .code:n = 
+      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { combined } },
+  detect-inline-weight / 
+    math               .code:n     = 
+      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { maths } },
+  detect-inline-weight / 
+    maths              .code:n     = 
+      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { maths } },
+  detect-inline-weight / 
+    text               .code:n     = 
+      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { text } },
   detect-italic        .bool_set:N = \l_siunitx_detect_italic_bool,
   detect-mode          .bool_set:N = \l_siunitx_detect_mode_bool,
   detect-none          .choice:,
   detect-none          .default:n = true,
   detect-none / false .meta:n = 
     {
-      detect-bold   = true,
       detect-family = true,
       detect-italic = true,
-      detect-mode   = true
+      detect-mode   = true,
+      detect-weight = true
     },
   detect-none / true .meta:n = 
     {
-      detect-bold   = false,
       detect-family = false,
       detect-italic = false,
-      detect-mode   = false
-    }
+      detect-mode   = false,
+      detect-weight   = false
+    },
+  detect-weight        .bool_set:N = \l_siunitx_detect_weight_bool
 }
 %    \end{macrocode}
 %\end{macro}
@@ -2929,12 +2933,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_font_bold:}
 %\begin{macro}{\siunitx_font_italic:}
+%\begin{macro}{\siunitx_font_weight:}
 % These could be token lists or functions!
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_font_bold: { }
 \cs_new_nopar:Npn \siunitx_font_italic: { }
+\cs_new_nopar:Npn \siunitx_font_weight: { }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -2948,8 +2952,8 @@ This work consists of the file  siunitx.dtx
   \bool_if:NF \l_siunitx_font_set_bool 
     {
       \siunitx_detect_font_init:
-      \bool_if:NT \l_siunitx_detect_bold_bool 
-        { \siunitx_detect_font_bold: }
+      \bool_if:NT \l_siunitx_detect_weight_bool 
+        { \siunitx_detect_font_weight: }
       \bool_if:NT \l_siunitx_detect_family_bool 
         { \siunitx_detect_font_family: }
       \bool_if:NT \l_siunitx_detect_italic_bool 
@@ -2966,7 +2970,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_init: {
   \bool_set_true:N \l_siunitx_font_set_bool
-  \cs_set:Npn \siunitx_font_bold: 
+  \cs_set:Npn \siunitx_font_weight: 
     {
       \unboldmath 
       \mdseries
@@ -2978,61 +2982,72 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_detect_font_bold:}
-% The bold detection code depends on whether the current text is maths
-% or text, and also the type of maths (if appropriate).  For inline 
-% maths, there is a choice of what test to apply.
+%\begin{macro}{\siunitx_detect_font_weight:}
+% The font weight detection code depends on whether the current text is 
+% maths or text, and also the type of maths (if appropriate).  For 
+% inline maths, there is a choice of what test to apply.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_detect_font_bold: {
+\cs_new_nopar:Npn \siunitx_detect_font_weight: {
   \mode_if_math:TF 
     {
       \mode_if_inner:TF 
         {
           \use:c 
             {
-              siunitx_detect_font_bold_ 
-              \l_siunitx_detect_inline_bold_tl
+              siunitx_detect_font_weight_ 
+              \l_siunitx_detect_inline_weight_tl
               :
             }
         }
         {
           \bool_if:NTF \l_siunitx_detect_display_maths_bool 
-            { \siunitx_detect_font_bold_maths: }
-            { \siunitx_detect_font_bold_text: }
+            { \siunitx_detect_font_weight_maths: }
+            { \siunitx_detect_font_weight_text: }
         }
     }
-    { \siunitx_detect_font_bold_text: }
+    { \siunitx_detect_font_weight_text: }
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_detect_font_bold_combined:}
-%\begin{macro}{\siunitx_detect_font_bold_maths:}
-%\begin{macro}{\siunitx_detect_font_bold_text:}
-% The tests for bold depend on whether the module is testing text or 
-% maths content.
+%\begin{macro}{\siunitx_detect_font_weight_combined:}
+%\begin{macro}{\siunitx_detect_font_weight_maths:}
+%\begin{macro}{\siunitx_detect_font_weight_text:}
+% The tests for font weight depend on whether the module is testing 
+% text or maths content.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_detect_font_bold_combined: {
-  \siunitx_detect_font_bold_maths:
-  \siunitx_detect_font_bold_text:
+\cs_new_nopar:Npn \siunitx_detect_font_weight_combined: {
+  \siunitx_detect_font_weight_maths:
+  \siunitx_detect_font_weight_text:
 }
-\cs_new_nopar:Npn \siunitx_detect_font_bold_maths: {
+\cs_new_nopar:Npn \siunitx_detect_font_weight_maths: {
   \tl_if_eq:nVT { bold } \math@version 
     {
-      \cs_set:Npn \siunitx_font_bold: 
+      \cs_set:Npn \siunitx_font_weight: 
         {
           \boldmath
           \bfseries
         }
     }
-}
-\cs_new_nopar:Npn \siunitx_detect_font_bold_text: {
-  \tl_if_eq:nxT { b } { \exp_args:NV \tl_head_i:n \f@series } 
+  \tl_if_eq:nVT { light } \math@version 
     {
-      \cs_set:Npn \siunitx_font_bold: 
+      \cs_set:Npn \siunitx_font_weight: 
+        { \lseries }
+    }
+}
+\cs_new_nopar:Npn \siunitx_detect_font_weight_text: {
+  \tl_set:Nx \l_siunitx_tmpa_tl { \exp_args:NV \tl_head_i:n \f@series }
+  \tl_if_eq:nVT { b } \l_siunitx_tmpa_tl 
+    {
+      \cs_set:Npn \siunitx_font_weight: 
         {
           \boldmath
           \bfseries
         }
+    }
+  \tl_if_eq:nVT { l } \l_siunitx_tmpa_tl  
+    {
+      \cs_set:Npn \siunitx_font_weight: 
+        { \lseries }
     }
 }
 %    \end{macrocode}
@@ -3398,7 +3413,7 @@ This work consists of the file  siunitx.dtx
   \text 
     {
       \siunitx_print_colour:
-      \siunitx_font_bold:
+      \siunitx_font_weight:
       \siunitx_font_italic:
       \use:c 
         { 
@@ -10442,7 +10457,7 @@ This work consists of the file  siunitx.dtx
         fraction-function       = \frac ,
         per-mode                = symbol-or-fraction
       },
-  inlinebold     .meta:n    = { detect-inline-bold      = #1          },
+  inlinebold     .meta:n    = { detect-inline-weight    = #1          },
 %  load & Modules & Modules to load \\
 %  locale
 %  loctolang & Special & Associate locale with \pkg{babel}
@@ -10489,7 +10504,7 @@ This work consists of the file  siunitx.dtx
   numsign        .meta:n    = { input-signs             = #1          },
   obeyall        .meta:n    = { detect-all              = #1          },
   obeyall        .default:n = { true                                  },
-  obeybold       .meta:n    = { detect-bold             = #1          },
+  obeybold       .meta:n    = { detect-weight           = #1          },
   obeybold       .default:n = { true                                  },
   obeyitalic     .meta:n    = { detect-italic           = #1          },
   opbeyitalic    .default:n = { true                                  },
