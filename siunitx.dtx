@@ -2742,10 +2742,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_if_tl:NTF}
-%\begin{macro}[aux]{\siunitx_if_tl_aux:w}
+%\begin{macro}{\siunitx_cs_if_tl:NT}
+%\begin{macro}{\siunitx_cs_if_tl:NTF}
+%\begin{macro}[aux]{\siunitx_cs_if_tl_aux:w}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
-% short macros only. The second test (with the \cs{cs_sto_str:N} part)
+% short macros only. The second test (with the \cs{cs_to_str:N} part)
 % is checking for \LaTeXe\ robust commands.
 %    \begin{macrocode}
 \group_begin:
@@ -2755,9 +2756,9 @@ This work consists of the file  siunitx.dtx
   { \char_set_lccode:nn { `#1 } { `#1 } } 
 \tl_to_lowercase:n {
   \group_end:
-  \prg_new_conditional:Nnn \siunitx_if_tl:N { TF } 
+  \prg_new_conditional:Nnn \siunitx_cs_if_tl:N { T , TF } 
     {
-      \exp_after:wN \siunitx_if_tl_aux:w
+      \exp_after:wN \siunitx_cs_if_tl_aux:w
         \token_to_meaning:N #1 MACRO \q_nil
           { 
             \cs_if_exist:cTF { \cs_to_str:N #1 ~ }
@@ -2766,10 +2767,11 @@ This work consists of the file  siunitx.dtx
           } 
           { \prg_return_false: }
     }
-  \cs_new_nopar:Npn \siunitx_if_tl_aux:w #1 MACRO #2 \q_nil 
+  \cs_new_nopar:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_nil 
     { \tl_if_empty:nTF {#1} }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -7331,6 +7333,27 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_protect_symbols:}
+%\begin{macro}[aux]{\siunitx_protect_symbols_aux:N}
+% There are a few unit names which may be defined by other parts of
+% \LaTeX. They need to be unexpandable, as in an \texttt{s} column
+% \TeX\ will look for \cs{omit} \emph{before} starting the internal
+% version of \cs{si} and doing a redefinition.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_protect_symbols: {
+  \tl_map_function:nN { \bar \ng \pm } \siunitx_protect_symbols_aux:N
+}
+\cs_new_nopar:Npn \siunitx_protect_symbols_aux:N #1 {
+  \cs_if_exist:NT #1 {
+    \siunitx_cs_if_tl:NT #1 
+      { \cs_set_protected_nopar:Npx #1 { \exp_not:V #1 } }
+  }
+}
+\AtBeginDocument { \siunitx_protect_symbols: }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Initial unit processing}
 %
 % The unit processor has to convert the input (which may be all macros
@@ -8676,7 +8699,7 @@ This work consists of the file  siunitx.dtx
 % Table~\ref{tab:xmpl:calc} in the user part of the documentation. 
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_table_collect_expand:N #1 {
-  \siunitx_if_tl:NTF #1 
+  \siunitx_cs_if_tl:NTF #1 
     {
       \toks_use:N \l_siunitx_table_collect_pre_toks
       \toks_clear:N \l_siunitx_table_collect_pre_toks
