@@ -2459,7 +2459,7 @@ This work consists of the file  siunitx.dtx
 % the macro name easier!).\footnote{The function 
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
 % 
-%\section{Usage tips}   
+%\section{Hints for using \pkg{siunitx}}   
 % 
 %\subsection{Ensuring text or maths output}
 %
@@ -2518,6 +2518,22 @@ This work consists of the file  siunitx.dtx
 %  \ \ text-micro \ = \SIUnitSymbolMicro \\
 %  \}
 %\end{flushleft}
+%
+%\subsection{Scaled document fonts with \texorpdfstring{\XeTeX}{XeTeX}}
+%
+% The \pkg{fontspec} package makes it possible to scale the document
+% body font. This can lead to unexpected problems with printing 
+% for \pkg{siunitx}, as some symbols will not scale while numbers
+% and text will. The problem is best avoided by forcing \pkg{siunitx}
+% to use the default maths font for all output:
+%\begin{LaTeXdemo}[code only]
+%  \sisetup{
+%    mode     = maths,
+%    maths-rm = \ensuremath
+%  }
+%\end{LaTeXdemo}
+% This will cause all \pkg{siunitx} output \emph{not} to scale at all,
+% consistent with other mathematical content.
 %
 %\subsection{Maximising performance}
 %
@@ -3152,18 +3168,18 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_number_colour_tl}
-%\begin{macro}{\siunitx_number_mathrm:}
-%\begin{macro}{\siunitx_number_mathsf:}
-%\begin{macro}{\siunitx_number_mathtt:}
+%\begin{macro}{\siunitx_number_mathrm:n}
+%\begin{macro}{\siunitx_number_mathsf:n}
+%\begin{macro}{\siunitx_number_mathtt:n}
 %\begin{macro}{\siunitx_number_textrm:}
 %\begin{macro}{\siunitx_number_textsf:}
 %\begin{macro}{\siunitx_number_texttt:}
 % The settings are actually created separately for numbers and units:
 % numbers first.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_mathrm: { }
-\cs_new_nopar:Npn \siunitx_number_mathsf: { }
-\cs_new_nopar:Npn \siunitx_number_mathtt: { }
+\cs_new:Npn \siunitx_number_mathrm:n #1 { }
+\cs_new:Npn \siunitx_number_mathsf:n #1 { }
+\cs_new:Npn \siunitx_number_mathtt:n #1 { }
 \cs_new_nopar:Npn \siunitx_number_textrm: { }
 \cs_new_nopar:Npn \siunitx_number_textsf: { }
 \cs_new_nopar:Npn \siunitx_number_texttt: { }
@@ -3171,17 +3187,17 @@ This work consists of the file  siunitx.dtx
   number-color  .meta:n   = { number-colour = #1 },
   number-colour .tl_set:N    = \l_siunitx_number_colour_tl,
   number-math-rm .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathrm: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
   number-maths-rm .code:n =
-    { \cs_set_nopar:Npn \siunitx_number_mathrm: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
   number-math-sf .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathsf: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
   number-maths-sf .code:n = 
-    { \cs_set_nopar:Npn \siunitx_number_mathsf: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
   number-math-tt .code:n  = 
-    { \cs_set_nopar:Npn \siunitx_number_mathtt: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
   number-maths-tt .code:n = 
-    { \cs_set_nopar:Npn \siunitx_number_mathtt: {#1} },
+    { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
   number-mode .choice:,
   number-mode / math .code:n = 
     { \bool_set_true:N \l_siunitx_number_maths_mode_bool },
@@ -3489,13 +3505,13 @@ This work consists of the file  siunitx.dtx
   \cs_new_nopar:Npn \siunitx_print_maths: 
     {
       \ensuremath 
-        { 
+        {
           \use:c 
             {
               siunitx_ \l_siunitx_print_type_tl _ 
-              math \l_siunitx_font_family_tl :
-            }
-          \l_siunitx_print_arg_tl 
+              math \l_siunitx_font_family_tl :n
+            } 
+              { \l_siunitx_print_arg_tl }
         }
     }
   \cs_new_nopar:Npn \siunitx_print_text: 
@@ -7351,10 +7367,13 @@ This work consists of the file  siunitx.dtx
 % There are a few unit names which may be defined by other parts of
 % \LaTeX. They need to be unexpandable, as in an \texttt{s} column
 % \TeX\ will look for \cs{omit} \emph{before} starting the internal
-% version of \cs{si} and doing a redefinition.
+% version of \cs{si} and doing a redefinition. The same is true 
+% for the \cs{color} function, which may well be the first thing in 
+% a table cell.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_protect_symbols: {
-  \tl_map_function:nN { \bar \ng \pm } \siunitx_protect_symbols_aux:N
+  \tl_map_function:nN { \bar \color \ng \pm } 
+    \siunitx_protect_symbols_aux:N
 }
 \cs_new_nopar:Npn \siunitx_protect_symbols_aux:N #1 {
   \cs_if_exist:NT #1 {
@@ -8800,12 +8819,10 @@ This work consists of the file  siunitx.dtx
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
       \bool_if:NTF \l_siunitx_table_collect_pre_bool
-        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks 
-          { {##1} } }
+        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks { {##1} } }
         {
           \bool_set_true:N \l_siunitx_table_collect_post_bool
-          \toks_put_right:Nn \l_siunitx_table_collect_post_toks 
-            { {##1} }
+          \toks_put_right:Nn \l_siunitx_table_collect_post_toks { {##1} }
         }
       \siunitx_table_collect_next:
     }
@@ -9044,28 +9061,40 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_dummy_box}
 %\begin{macro}{\l_siunitx_table_integer_box}
 %\begin{macro}{\l_siunitx_table_marker_box}
+%\begin{macro}{\l_siunitx_table_post_box}
+%\begin{macro}{\l_siunitx_table_pre_box}
 %\begin{macro}{\l_siunitx_table_result_box}
 %    \begin{macrocode}
 \box_new:N \l_siunitx_table_dummy_box
 \box_new:N \l_siunitx_table_integer_box
 \box_new:N \l_siunitx_table_marker_box
+\box_new:N \l_siunitx_table_post_box
+\box_new:N \l_siunitx_table_pre_box
 \box_new:N \l_siunitx_table_result_box
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %\end{macro} 
 %\end{macro} 
+%\end{macro} 
+%\end{macro} 
 %
 %\begin{macro}{\l_siunitx_table_dummy_dim}
 %\begin{macro}{\l_siunitx_table_integer_dim}
 %\begin{macro}{\l_siunitx_table_marker_dim}
+%\begin{macro}{\l_siunitx_table_post_dim}
+%\begin{macro}{\l_siunitx_table_pre_dim}
 %\begin{macro}{\l_siunitx_table_result_dim}
 %    \begin{macrocode}
 \dim_new:N \l_siunitx_table_dummy_dim
 \dim_new:N \l_siunitx_table_integer_dim
 \dim_new:N \l_siunitx_table_marker_dim
+\dim_new:N \l_siunitx_table_post_dim
+\dim_new:N \l_siunitx_table_pre_dim
 \dim_new:N \l_siunitx_table_result_dim
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9185,6 +9214,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_table_print_S:}
+% The main printing function does a simple test: was there anything
+% found that counts as a number. If there was, most of the detail
+% is handled elsewhere. If there is only test (such as a heading)
+% then it can be printed.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S: {
   \bool_if:NTF \l_siunitx_table_collect_pre_bool
@@ -9194,30 +9227,61 @@ This work consists of the file  siunitx.dtx
       \siunitx_table_align_right:n { \l_siunitx_table_text_align_skip }
     }
     { 
+      \siunitx_table_print_S_ends:
       \siunitx_table_align_left:n { \l_siunitx_table_number_align_skip }
+      \box_use:N \l_siunitx_table_pre_box
       \siunitx_table_print_S_aux: 
+      \box_use:N \l_siunitx_table_post_box
       \siunitx_table_align_right:n 
         { \l_siunitx_table_number_align_skip }
     }
 }
 %    \end{macrocode}
 %\end{macro}
+%\begin{macro}[aux]{\siunitx_table_print_S_ends:}
+% Here, the material before and after the numerical content is boxed up.
+% The shorter one is then re-boxed so that both sides are the same
+% length: this stops the alignment going out.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_ends: {
+  \hbox_set:Nn \l_siunitx_table_pre_box
+    { \toks_use:N \l_siunitx_table_collect_pre_toks }
+  \dim_set:Nn \l_siunitx_table_pre_dim 
+    { \box_wd:N \l_siunitx_table_pre_box }
+  \hbox_set:Nn \l_siunitx_table_post_box
+    { \toks_use:N \l_siunitx_table_collect_post_toks }
+  \dim_set:Nn \l_siunitx_table_post_dim
+    { \box_wd:N \l_siunitx_table_post_box }
+  \dim_compare:nNnTF 
+    { \l_siunitx_table_pre_dim } > { \l_siunitx_table_post_dim }
+    {
+      \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+        { \l_siunitx_table_pre_dim }
+        { 
+          \hbox_unpack_clear:N \l_siunitx_table_post_box
+          \tex_hfil:D 
+        }
+    }
+    {
+      \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+        { \l_siunitx_table_post_dim }
+        { 
+          \tex_hfil:D 
+          \hbox_unpack_clear:N \l_siunitx_table_pre_box
+        } 
+    }
+}
+%    \end{macrocode}
+%\end{macro}
 %\begin{macro}[aux]{\siunitx_table_print_S_aux:}
-%\begin{macro}[aux]{\siunitx_table_print_S_full:}
+% The auxiliary function now splits the path. If the number is only
+% being parsed, then it is printed with no more fuss. Otherwise, there
+% is a second choice based on the alignment approach.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_aux: {
   \bool_if:NTF \l_siunitx_table_parse_only_bool 
     { \siunitx_number_output:V \l_siunitx_table_collect_toks }
-    { \siunitx_table_print_S_full: }
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_full: {
-  \bool_set_false:N \l_siunitx_error_bool
-  \siunitx_number_in_parse:V \l_siunitx_table_collect_toks 
-  \bool_if:NF \l_siunitx_error_bool 
-    {
-      \siunitx_number_process:
-      \siunitx_number_format:
-      \siunitx_number_output_colour:
+    { 
       \bool_if:NTF \l_siunitx_table_centre_decimal_bool
         { \siunitx_table_print_S_centred: }
         { \siunitx_table_print_S_not_centred: }
@@ -9225,6 +9289,21 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}[aux]{\siunitx_table_print_S_parse:}
+% A modified version of the number parser for tables.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_parse: {
+  \bool_set_false:N \l_siunitx_error_bool
+  \siunitx_number_in_parse:V \l_siunitx_table_collect_toks 
+  \bool_if:NF \l_siunitx_error_bool 
+    {
+      \siunitx_number_process:
+      \siunitx_number_format:
+      \siunitx_number_output_colour:
+    }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_print_S_centred:}
@@ -9235,6 +9314,7 @@ This work consists of the file  siunitx.dtx
 % marker. Based on that, a path is chosen.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_centred: {
+  \siunitx_table_print_S_parse:
   \siunitx_table_print_S_box_integer:
   \siunitx_table_print_S_box_marker:
   \siunitx_table_print_S_box_result:
