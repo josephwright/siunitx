@@ -9362,11 +9362,24 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_S_reserved:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
+  \siunitx_table_print_S_dummy_create:
+  \siunitx_table_print_S_parse:
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_dummy_create:}
+%\begin{macro}[aux]{\siunitx_table_print_S_dummy_aux:nn}
+% A dummy value is created from the various numbers set up as
+% options. The main formatting routine is used to get everything sorted
+% out, so that there is no code copying here.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_dummy_create: {
   \prop_clear:N \l_siunitx_number_in_prop
-  \siunitx_table_print_S_part:nn { integer } { mantissa-integer }
-  \siunitx_table_print_S_part:nn { decimal } { mantissa-decimal }
-  \siunitx_table_print_S_part:nn { uncert } { mantissa-uncertainty }
-  \siunitx_table_print_S_part:nn { exponent } { exponent }
+  \siunitx_table_print_S_dummy_aux:nn { integer } { mantissa-integer }
+  \siunitx_table_print_S_dummy_aux:nn { decimal } { mantissa-decimal }
+  \siunitx_table_print_S_dummy_aux:nn { uncert } 
+    { mantissa-uncertainty }
+  \siunitx_table_print_S_dummy_aux:nn { exponent } { exponent }
   \intexpr_compare:nNnF 
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int }
     = { \c_zero }
@@ -9391,13 +9404,11 @@ This work consists of the file  siunitx.dtx
           \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign } 
             { - } 
         } 
-    }  
+    } 
   \siunitx_number_process:
-  \siunitx_number_format:
-  \siunitx_table_print_S_parse:
-  \prop_display:N \l_siunitx_number_out_prop 
+  \siunitx_number_format: 
 }
-\cs_new_nopar:Npn \siunitx_table_print_S_part:nn #1#2 {
+\cs_new_nopar:Npn \siunitx_table_print_S_dummy_aux:nn #1#2 {
   \tl_set:Nx \l_siunitx_tmpa_tl 
     { 
       \prg_replicate:nn { \int_use:c { l_siunitx_table_ #1 _int } } 
@@ -9407,6 +9418,7 @@ This work consists of the file  siunitx.dtx
     { \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
