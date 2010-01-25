@@ -9363,7 +9363,26 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
   \siunitx_table_print_S_dummy_create:
+  \siunitx_table_print_S_dummy_measure:
+  \siunitx_table_print_S_box_integer:
+  \siunitx_table_print_S_box_marker:
   \siunitx_table_print_S_parse:
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-sign }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-sign }
+        \l_siunitx_tmpa_tl
+    }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-integer }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
+        \l_siunitx_tmpb_tl
+    }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  \hbox_set_to_wd:Nnn \l_siunitx_table_integer_box 
+    { \l_siunitx_table_integer_dim }
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9419,6 +9438,12 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_dummy_measure:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_dummy_measure: {
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
