@@ -9114,9 +9114,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_exponent_int}
 %\begin{macro}{\l_siunitx_table_integer_int}
 %\begin{macro}{\l_siunitx_table_uncert_int}
-%\begin{macro}{\l_siunitx_table_pasre_only_bool}
+%\begin{macro}{\l_siunitx_table_parse_only_bool}
 %\begin{macro}{\l_siunitx_table_sign_exponent_bool}
 %\begin{macro}{\l_siunitx_table_sign_manitssa_bool}
+% As usual, set up the options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   table-align-numbers       .choice:,
@@ -9284,7 +9285,7 @@ This work consists of the file  siunitx.dtx
     { 
       \bool_if:NTF \l_siunitx_table_centre_decimal_bool
         { \siunitx_table_print_S_centred: }
-        { \siunitx_table_print_S_not_centred: }
+        { \siunitx_table_print_S_reserved: }
     }
 }
 %    \end{macrocode}
@@ -9356,6 +9357,56 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_print_S_reserved:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
+  \prop_clear:N \l_siunitx_number_in_prop
+  \siunitx_table_print_S_part:nn { integer } { mantissa-integer }
+  \siunitx_table_print_S_part:nn { decimal } { mantissa-decimal }
+  \siunitx_table_print_S_part:nn { exponent } { exponent }
+  \intexpr_compare:nNnF 
+    { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int }
+    = { \c_zero }
+    { 
+      \prop_put:Nnn \l_siunitx_number_in_prop { mantissa } 
+        { true }
+    }
+  \intexpr_compare:nT 
+    { \l_siunitx_table_decimal_int > \c_zero }
+    { 
+      \prop_put:NnV \l_siunitx_number_in_prop 
+        { mantissa-decimal-marker }
+        \l_siunitx_output_decimal_tl  
+    }
+  \bool_if:NT \l_siunitx_table_sign_mantissa_bool
+    { \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-sign } { - } } 
+  \intexpr_compare:nT 
+    { \l_siunitx_table_exponent_int > \c_zero }
+    {  
+      \bool_if:NT \l_siunitx_table_sign_exponent_bool
+        {
+          \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign } 
+            { - } 
+        } 
+    }  
+  \siunitx_number_process:
+  \siunitx_number_format:
+  % \l_siunitx_table_uncert_int
+  \prop_display:N \l_siunitx_number_out_prop 
+  \siunitx_table_print_S_parse:
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_part:nn #1#2 {
+  \tl_set:Nx \l_siunitx_tmpa_tl 
+    { 
+      \prg_replicate:nn { \int_use:c { l_siunitx_table_ #1 _int } } 
+        { 8 }
+    }
+  \tl_if_empty:NF \l_siunitx_tmpa_tl
+    { \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
