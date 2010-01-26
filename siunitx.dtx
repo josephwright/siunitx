@@ -994,6 +994,14 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Tabular material}
 %
+% Centring numbers in tabular content is handled by a new column
+% type, the \texttt{S} column. This new column type can align material
+% using a number of different strategies, with the aim of flexibility 
+% of output without needing to alter the input. The method used
+% as standard is to place the decimal marker in the number at the
+% centre of the cell and to align the material appropriately
+% (Table~\ref{tab:S:standard}).
+%
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \caption{Standard behaviour of the \texttt{S} column type}
@@ -1010,6 +1018,28 @@ This work consists of the file  siunitx.dtx
 %      5642.5    \\
 %          1.2e3 \\
 %            e4  \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+% 
+% The \texttt{S} column will attempt to automatically detect 
+% material which should be placed before or after a number, and will
+% maintain the alignment of the numerical data 
+% (Table~\ref{tab:S:extras}). If the material could be mistaken for
+% part of a number, it should be protected by braces.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Detection of surrounding material in an \texttt{S} column}
+%    \label{tab:S:extras}
+%    \centering
+%    \begin{tabular}{S}
+%    \toprule
+%      {Some Values} \\
+%    \midrule
+%      12.34 \\
+%      \color{purple} 975,31 \\
+%      44.268 \textsuperscript{\emph{a}} \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -2774,6 +2804,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_cs_if_tl:NT}
 %\begin{macro}{\siunitx_cs_if_tl:NTF}
 %\begin{macro}[aux]{\siunitx_cs_if_tl_aux:w}
+%\begin{macro}{\siunitx_cs_if_macro:NT}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
 % short macros only. The second test (with the \cs{cs_to_str:N} part)
 % is checking for \LaTeXe\ robust commands.
@@ -2798,8 +2829,16 @@ This work consists of the file  siunitx.dtx
     }
   \cs_new_nopar:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_nil 
     { \tl_if_empty:nTF {#1} }
+  \prg_new_conditional:Nnn \siunitx_cs_if_macro:N { T } 
+    {
+      \exp_after:wN \siunitx_cs_if_tl_aux:w
+        \token_to_meaning:N #1 MACRO \q_nil
+          { \prg_return_true: }
+          { \prg_return_false: }
+    }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -7377,7 +7416,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_nopar:Npn \siunitx_protect_symbols_aux:N #1 {
   \cs_if_exist:NT #1 {
-    \siunitx_cs_if_tl:NT #1 
+    \siunitx_cs_if_macro:NT #1 
       { \cs_set_protected_nopar:Npx #1 { \exp_not:V #1 } }
   }
 }
@@ -9076,6 +9115,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %\end{macro} 
 %\end{macro} 
 %\end{macro} 
@@ -9097,6 +9137,7 @@ This work consists of the file  siunitx.dtx
 \dim_new:N \l_siunitx_table_pre_dim
 \dim_new:N \l_siunitx_table_result_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9443,6 +9484,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
 %\begin{macro}[aux]{\siunitx_table_print_S_box_marker:}
@@ -9524,6 +9566,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
