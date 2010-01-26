@@ -9361,9 +9361,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_centred: {
   \siunitx_table_print_S_parse:
-  \siunitx_table_print_S_box_integer:
-  \siunitx_table_print_S_box_marker:
-  \siunitx_table_print_S_box_result:
+  \siunitx_table_print_S_measure_integer:n { mantissa }
+  \siunitx_table_print_S_measure_marker:n { mantissa }
+  \siunitx_table_print_S_measure:nn { result } { result }
   \dim_set:Nn \l_siunitx_table_dummy_dim
     {  \l_siunitx_table_result_dim  - \l_siunitx_table_integer_dim }
   \prop_if_in:NnT \l_siunitx_number_out_prop 
@@ -9503,80 +9503,39 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
-%\begin{macro}[aux]{\siunitx_table_print_S_box_marker:}
-%\begin{macro}[aux]{\siunitx_table_print_S_box_decimal:}
-%\begin{macro}[aux]{\siunitx_table_print_S_box_result:}
-%\begin{macro}[aux]{\siunitx_table_print_S_get_integer:}
-%\begin{macro}[aux]{\siunitx_table_print_S_get_marker:}
-% The boxing-up code is all quite obvious, with some safety checks
-% so that there are no quarks about. For the integer part, there
-% may be a sign to worry about. In all case, the resulting box is
-% measured: the other code is easier to read with a dimension rather
-% than box widths.
+%\begin{macro}{\siunitx_table_print_S_box:nn}
+%\begin{macro}{\siunitx_table_print_S_measure:nn}
+% The general \enquote{box up} code takes a simple approach to the 
+% content: if it's there, use it.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_box_integer: {
-  \siunitx_table_print_S_get_integer:
-  \hbox_set:Nn \l_siunitx_table_integer_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \dim_set:Nn \l_siunitx_table_integer_dim
-    { \box_wd:N \l_siunitx_table_integer_box }
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_box_marker: {
-  \siunitx_table_print_S_get_marker:
-  \hbox_set:Nn \l_siunitx_table_marker_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \dim_set:Nn \l_siunitx_table_marker_dim
-    { \box_wd:N \l_siunitx_table_marker_box }
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_box_mantissa: {
+\cs_new_nopar:Npn \siunitx_table_print_S_box:nn #1#2 {
   \tl_clear:N \l_siunitx_tmpa_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+  \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
-        \l_siunitx_tmpa_tl
+      \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
-  \hbox_set:Nn \l_siunitx_table_result_box
+  \hbox_set:cn { l_siunitx_table_ #2 _box }
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \dim_set:Nn \l_siunitx_table_result_dim
-    { \box_wd:N \l_siunitx_table_result_box }
 }
-\cs_new_nopar:Npn \siunitx_table_print_S_box_decimal: {
-  \siunitx_table_print_S_get_decimal:
-  \hbox_set:Nn \l_siunitx_table_decimal_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \dim_set:Nn \l_siunitx_table_decimal_dim
-    { \box_wd:N \l_siunitx_table_decimal_box }
+\cs_new_nopar:Npn \siunitx_table_print_S_measure:nn #1#2 {
+  \siunitx_table_print_S_box:nn {#1} {#2}
+  \dim_set:cn { l_siunitx_table_ #2 _dim }
+    { \box_wd:c { l_siunitx_table_ #2 _box } }
 }
-\cs_new_nopar:Npn \siunitx_table_print_S_box_result: {
-  \prop_get:NnN \l_siunitx_number_out_prop { result }
-    \l_siunitx_tmpa_tl
-  \hbox_set:Nn \l_siunitx_table_result_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \dim_set:Nn \l_siunitx_table_result_dim
-    { \box_wd:N \l_siunitx_table_result_box }
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_get_integer: {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \tl_clear:N \l_siunitx_tmpb_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-sign }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-sign }
-        \l_siunitx_tmpa_tl
-    }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-integer }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
-        \l_siunitx_tmpb_tl
-    }
-  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_get_marker: {
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_box_marker:n}
+%\begin{macro}{\siunitx_table_print_S_measure_maker:n}
+% For the decimal marker, there is the problem of copying the marker 
+% from the input. So the recovery code needs a bit more work.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_box_marker:n #1 {
   \prop_if_in:NnTF \l_siunitx_number_out_prop 
-    { mantissa-decimal-marker }
+    { #1 -decimal-marker }
     {
       \prop_get:NnN \l_siunitx_number_out_prop 
-        { mantissa-decimal-marker } \l_siunitx_tmpa_tl
+        { #1 -decimal-marker } \l_siunitx_tmpa_tl
     }
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
@@ -9585,20 +9544,45 @@ This work consists of the file  siunitx.dtx
             { \exp_not:V \l_siunitx_output_decimal_tl }
         }
     }
+  \hbox_set:Nn \l_siunitx_table_marker_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
 }
-\cs_new_nopar:Npn \siunitx_table_print_S_get_decimal: {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-decimal }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
-        \l_siunitx_tmpa_tl
-    }
+\cs_new_nopar:Npn \siunitx_table_print_S_measure_marker:n #1 {
+  \siunitx_table_print_S_box_marker:n {#1} 
+  \dim_set:Nn \l_siunitx_table_marker_dim
+    { \box_wd:N \l_siunitx_table_marker_box }
 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\end{macro}
-%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_box_integer:n}
+%\begin{macro}{\siunitx_table_print_S_measure_integer:n}
+% Even more complex for the integer part, as there may be a sign to 
+% allow for.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_box_integer:n #1 {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -sign }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { #1 -sign }
+        \l_siunitx_tmpa_tl
+    }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { #1 -integer }
+        \l_siunitx_tmpb_tl
+    }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  \hbox_set:Nn \l_siunitx_table_integer_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_measure_integer:n #1 {
+  \siunitx_table_print_S_box_integer:n {#1} 
+  \dim_set:Nn \l_siunitx_table_integer_dim
+    { \box_wd:N \l_siunitx_table_integer_box }
+}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
