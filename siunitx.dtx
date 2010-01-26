@@ -9409,16 +9409,33 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
   \siunitx_table_print_S_dummy_create:
   \siunitx_table_print_S_box_integer:
-  \siunitx_table_print_S_box_marker:
-  \siunitx_table_print_S_box_decimal:
+  \siunitx_table_print_S_box_mantissa:
   \siunitx_table_print_S_parse:
-  \siunitx_table_print_S_reserved_aux:nNN { integer } \tex_hfil:D { }
-  \siunitx_table_print_S_reserved_aux:nNN { marker } 
-    \tex_hss:D \tex_hss:D
-  \siunitx_table_print_S_reserved_aux:nNN { decimal } { } \tex_hfil:D
-  \box_use:N \l_siunitx_table_integer_box   
-  \box_use:N \l_siunitx_table_marker_box 
-  \box_use:N \l_siunitx_table_decimal_box 
+  \siunitx_table_print_S_get_integer:
+  \hbox_set:Nn \l_siunitx_table_integer_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
+    { 
+      \l_siunitx_table_integer_dim -
+      \box_wd:N  \l_siunitx_table_integer_box 
+    }
+    { \tex_hfil:D } 
+    \prop_display:N  \l_siunitx_number_out_prop
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
+        \l_siunitx_tmpa_tl
+      \hbox_set:Nn \l_siunitx_table_result_box
+        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+      \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+        { \l_siunitx_table_result_dim }
+        {
+          \box_use:N \l_siunitx_table_dummy_box 
+          \box_use:N \l_siunitx_table_result_box
+          \tex_hfil:D
+        }
+      \box_use:N \l_siunitx_table_result_box
+    }
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_aux:nNN #1#2#3 {
   \use:c { siunitx_table_print_S_get_ #1 : }
@@ -9511,6 +9528,18 @@ This work consists of the file  siunitx.dtx
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
   \dim_set:Nn \l_siunitx_table_marker_dim
     { \box_wd:N \l_siunitx_table_marker_box }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_box_mantissa: {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
+        \l_siunitx_tmpa_tl
+    }
+  \hbox_set:Nn \l_siunitx_table_result_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \dim_set:Nn \l_siunitx_table_result_dim
+    { \box_wd:N \l_siunitx_table_result_box }
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_box_decimal: {
   \siunitx_table_print_S_get_decimal:
