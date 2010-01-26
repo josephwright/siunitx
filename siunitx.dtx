@@ -9058,6 +9058,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 % 
+%\begin{macro}{\l_siunitx_table_decimal_box}
 %\begin{macro}{\l_siunitx_table_dummy_box}
 %\begin{macro}{\l_siunitx_table_integer_box}
 %\begin{macro}{\l_siunitx_table_marker_box}
@@ -9065,6 +9066,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_pre_box}
 %\begin{macro}{\l_siunitx_table_result_box}
 %    \begin{macrocode}
+\box_new:N \l_siunitx_table_decimal_box
 \box_new:N \l_siunitx_table_dummy_box
 \box_new:N \l_siunitx_table_integer_box
 \box_new:N \l_siunitx_table_marker_box
@@ -9079,6 +9081,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\end{macro} 
 %
+%\begin{macro}{\l_siunitx_table_decimal_dim}
 %\begin{macro}{\l_siunitx_table_dummy_dim}
 %\begin{macro}{\l_siunitx_table_integer_dim}
 %\begin{macro}{\l_siunitx_table_marker_dim}
@@ -9086,6 +9089,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_pre_dim}
 %\begin{macro}{\l_siunitx_table_result_dim}
 %    \begin{macrocode}
+\dim_new:N \l_siunitx_table_decimal_dim
 \dim_new:N \l_siunitx_table_dummy_dim
 \dim_new:N \l_siunitx_table_integer_dim
 \dim_new:N \l_siunitx_table_marker_dim
@@ -9363,20 +9367,27 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
   \siunitx_table_print_S_dummy_create:
-  \siunitx_table_print_S_dummy_measure:
   \siunitx_table_print_S_box_integer:
   \siunitx_table_print_S_box_marker:
+  \siunitx_table_print_S_box_decimal:
   \siunitx_table_print_S_parse:
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \tl_clear:N \l_siunitx_tmpb_tl
-  \siunitx_table_print_S_get_integer:
-  \hbox_set_to_wd:Nnn \l_siunitx_table_integer_box 
-    { \l_siunitx_table_integer_dim }
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \siunitx_table_print_S_get_marker:
-  \hbox_set_to_wd:Nnn \l_siunitx_table_marker_box 
-    { \l_siunitx_table_marker_dim }
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \siunitx_table_print_S_reserved_aux:nNN { integer } \tex_hfil:D { }
+  \siunitx_table_print_S_reserved_aux:nNN { marker } 
+    \tex_hss:D \tex_hss:D
+  \siunitx_table_print_S_reserved_aux:nNN { decimal } { } \tex_hfil:D
+  \box_use:N \l_siunitx_table_integer_box   
+  \box_use:N \l_siunitx_table_marker_box 
+  \box_use:N \l_siunitx_table_decimal_box 
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_aux:nNN #1#2#3 {
+  \use:c { siunitx_table_print_S_get_ #1 : }
+  \hbox_set_to_wd:cnn { l_siunitx_table_ #1 _box }
+    { \dim_use:c { l_siunitx_table_ #1 _dim } }
+    { 
+      #2
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl 
+      #3
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9432,16 +9443,10 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_dummy_measure:}
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_dummy_measure: {
-}
-%    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}[aux]{\siunitx_table_print_S_box_integer:}
 %\begin{macro}[aux]{\siunitx_table_print_S_box_marker:}
+%\begin{macro}[aux]{\siunitx_table_print_S_box_decimal:}
 %\begin{macro}[aux]{\siunitx_table_print_S_box_result:}
 %\begin{macro}[aux]{\siunitx_table_print_S_get_integer:}
 %\begin{macro}[aux]{\siunitx_table_print_S_get_marker:}
@@ -9464,6 +9469,13 @@ This work consists of the file  siunitx.dtx
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
   \dim_set:Nn \l_siunitx_table_marker_dim
     { \box_wd:N \l_siunitx_table_marker_box }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_box_decimal: {
+  \siunitx_table_print_S_get_decimal:
+  \hbox_set:Nn \l_siunitx_table_decimal_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+  \dim_set:Nn \l_siunitx_table_decimal_dim
+    { \box_wd:N \l_siunitx_table_decimal_box }
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_box_result: {
   \prop_get:NnN \l_siunitx_number_out_prop { result }
@@ -9503,7 +9515,16 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
+\cs_new_nopar:Npn \siunitx_table_print_S_get_decimal: {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-decimal }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
+        \l_siunitx_tmpa_tl
+    }
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
