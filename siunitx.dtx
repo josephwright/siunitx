@@ -9141,6 +9141,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_table_model_prop}
+% To store the model version of a number, used when reserving space.
+%    \begin{macrocode}
+\prop_new:N \l_siunitx_table_model_prop
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_table_text_align_skip}
 %\begin{macro}{\l_siunitx_table_number_align_skip}
@@ -9475,61 +9482,61 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
   \siunitx_table_print_S_model_create:
-  \siunitx_table_print_S_measure_integer:n { mantissa }
-  \siunitx_table_print_S_measure:nn { mantissa } { result }
-  \siunitx_table_print_S_measure_exponent:
-  \siunitx_table_print_S_parse:
-  \siunitx_table_print_S_box_integer:n { mantissa }
-  \hbox_set:Nn \l_siunitx_table_integer_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
-    { 
-      \l_siunitx_table_integer_dim -
-      \box_wd:N  \l_siunitx_table_integer_box 
-    }
-    { \tex_hfil:D }
-  \box_clear:N \l_siunitx_table_result_box    
-  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { mantissa }
-        \l_siunitx_tmpa_tl
-      \hbox_set:Nn \l_siunitx_table_result_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
-    { \l_siunitx_table_result_dim }
-    {
-      \box_use:N \l_siunitx_table_dummy_box 
-      \box_use:N \l_siunitx_table_result_box
-      \tex_hfil:D
-    }
-  \box_use_clear:N \l_siunitx_table_result_box
-  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
-        \l_siunitx_tmpa_tl
-      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
-        {
-          \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
-          \bool_if:NT \l_siunitx_tight_bool 
-            {  
-              \tl_set:Nx \l_siunitx_tmpb_tl 
-                { { \exp_not:V \l_siunitx_tmpb_tl } }
-             }
-          \tl_set:Nx \l_siunitx_tmpb_tl
-            { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
-          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl  
-        }
-      \hbox_set:Nn \l_siunitx_table_result_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
-    { \l_siunitx_table_exponent_dim }
-    {
-      \box_use:N \l_siunitx_table_result_box
-      \tex_hfil:D
-    }
-  \box_use:N \l_siunitx_table_result_box  
+%  \siunitx_table_print_S_measure_integer:n { mantissa }
+%  \siunitx_table_print_S_measure:nn { mantissa } { result }
+%  \siunitx_table_print_S_measure_exponent:
+%  \siunitx_table_print_S_parse:
+%  \siunitx_table_print_S_box_integer:n { mantissa }
+%  \hbox_set:Nn \l_siunitx_table_integer_box
+%    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+%  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
+%    { 
+%      \l_siunitx_table_integer_dim -
+%      \box_wd:N  \l_siunitx_table_integer_box 
+%    }
+%    { \tex_hfil:D }
+%  \box_clear:N \l_siunitx_table_result_box    
+%  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
+%    {
+%      \prop_get:NnN \l_siunitx_number_out_prop { mantissa }
+%        \l_siunitx_tmpa_tl
+%      \hbox_set:Nn \l_siunitx_table_result_box
+%        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+%    }
+%  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+%    { \l_siunitx_table_result_dim }
+%    {
+%      \box_use:N \l_siunitx_table_dummy_box 
+%      \box_use:N \l_siunitx_table_result_box
+%      \tex_hfil:D
+%    }
+%  \box_use_clear:N \l_siunitx_table_result_box
+%  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
+%    {
+%      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+%        \l_siunitx_tmpa_tl
+%      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+%        {
+%          \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
+%          \bool_if:NT \l_siunitx_tight_bool 
+%            {  
+%              \tl_set:Nx \l_siunitx_tmpb_tl 
+%                { { \exp_not:V \l_siunitx_tmpb_tl } }
+%             }
+%          \tl_set:Nx \l_siunitx_tmpb_tl
+%            { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
+%          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl  
+%        }
+%      \hbox_set:Nn \l_siunitx_table_result_box
+%        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+%    }
+%  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+%    { \l_siunitx_table_exponent_dim }
+%    {
+%      \box_use:N \l_siunitx_table_result_box
+%      \tex_hfil:D
+%    }
+%  \box_use:N \l_siunitx_table_result_box  
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_aux:nNN #1#2#3 {
   \use:c { siunitx_table_print_S_get_ #1 : }
@@ -9583,6 +9590,7 @@ This work consists of the file  siunitx.dtx
     } 
   \siunitx_number_process:
   \siunitx_number_format: 
+  \prop_set_eq:NN \l_siunitx_table_model_prop \l_siunitx_number_out_prop
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_model_aux:nn #1#2 {
   \tl_set:Nx \l_siunitx_tmpa_tl 
