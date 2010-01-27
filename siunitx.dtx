@@ -9099,6 +9099,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\l_siunitx_table_decimal_box}
 %\begin{macro}{\l_siunitx_table_dummy_box}
+%\begin{macro}{\l_siunitx_table_exponent_box}
 %\begin{macro}{\l_siunitx_table_integer_box}
 %\begin{macro}{\l_siunitx_table_marker_box}
 %\begin{macro}{\l_siunitx_table_post_box}
@@ -9107,12 +9108,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \box_new:N \l_siunitx_table_decimal_box
 \box_new:N \l_siunitx_table_dummy_box
+\box_new:N \l_siunitx_table_exponent_box
 \box_new:N \l_siunitx_table_integer_box
 \box_new:N \l_siunitx_table_marker_box
 \box_new:N \l_siunitx_table_post_box
 \box_new:N \l_siunitx_table_pre_box
 \box_new:N \l_siunitx_table_result_box
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9123,6 +9126,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_table_decimal_dim}
 %\begin{macro}{\l_siunitx_table_dummy_dim}
+%\begin{macro}{\l_siunitx_table_exponent_dim}
 %\begin{macro}{\l_siunitx_table_integer_dim}
 %\begin{macro}{\l_siunitx_table_marker_dim}
 %\begin{macro}{\l_siunitx_table_post_dim}
@@ -9131,12 +9135,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \dim_new:N \l_siunitx_table_decimal_dim
 \dim_new:N \l_siunitx_table_dummy_dim
+\dim_new:N \l_siunitx_table_exponent_dim
 \dim_new:N \l_siunitx_table_integer_dim
 \dim_new:N \l_siunitx_table_marker_dim
 \dim_new:N \l_siunitx_table_post_dim
 \dim_new:N \l_siunitx_table_pre_dim
 \dim_new:N \l_siunitx_table_result_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9410,6 +9416,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_model_create:
   \siunitx_table_print_S_measure_integer:n { mantissa }
   \siunitx_table_print_S_measure:nn { mantissa } { result }
+  \siunitx_table_print_S_measure_exponent:
   \siunitx_table_print_S_parse:
   \siunitx_table_print_S_box_integer:n { mantissa }
   \hbox_set:Nn \l_siunitx_table_integer_box
@@ -9419,22 +9426,49 @@ This work consists of the file  siunitx.dtx
       \l_siunitx_table_integer_dim -
       \box_wd:N  \l_siunitx_table_integer_box 
     }
-    { \tex_hfil:D } 
+    { \tex_hfil:D }
+  \box_clear:N \l_siunitx_table_result_box    
   \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
     {
       \prop_get:NnN \l_siunitx_number_out_prop { mantissa }
         \l_siunitx_tmpa_tl
       \hbox_set:Nn \l_siunitx_table_result_box
         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-      \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
-        { \l_siunitx_table_result_dim }
-        {
-          \box_use:N \l_siunitx_table_dummy_box 
-          \box_use:N \l_siunitx_table_result_box
-          \tex_hfil:D
-        }
-      \box_use:N \l_siunitx_table_result_box
     }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+    { \l_siunitx_table_result_dim }
+    {
+      \box_use:N \l_siunitx_table_dummy_box 
+      \box_use:N \l_siunitx_table_result_box
+      \tex_hfil:D
+    }
+  \box_use_clear:N \l_siunitx_table_result_box
+  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+        \l_siunitx_tmpa_tl
+      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+        {
+          \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
+          \bool_if:NT \l_siunitx_tight_bool 
+            {  
+              \tl_set:Nx \l_siunitx_tmpb_tl 
+                { { \exp_not:V \l_siunitx_tmpb_tl } }
+             }
+          \tl_set:Nx \l_siunitx_tmpb_tl
+            { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
+          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl  
+        }
+      \hbox_set:Nn \l_siunitx_table_result_box
+        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+    }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+    { \l_siunitx_table_exponent_dim }
+    {
+      \box_use:N \l_siunitx_table_result_box
+      \tex_hfil:D
+    }
+  \box_use:N \l_siunitx_table_result_box  
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_aux:nNN #1#2#3 {
   \use:c { siunitx_table_print_S_get_ #1 : }
@@ -9460,7 +9494,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_model_aux:nn { decimal } { mantissa-decimal }
   \siunitx_table_print_S_model_aux:nn { uncert } 
     { mantissa-uncertainty }
-  \siunitx_table_print_S_model_aux:nn { exponent } { exponent }
+  \siunitx_table_print_S_model_aux:nn { exponent } { exponent-integer }
   \intexpr_compare:nNnF 
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int }
     = { \c_zero }
@@ -9496,7 +9530,10 @@ This work consists of the file  siunitx.dtx
         { 8 }
     }
   \tl_if_empty:NF \l_siunitx_tmpa_tl
-    { \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl }
+    { 
+      \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl 
+      \prop_put:Nnn  \l_siunitx_number_in_prop {#1} { true }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9580,6 +9617,41 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_box_integer:n {#1} 
   \dim_set:Nn \l_siunitx_table_integer_dim
     { \box_wd:N \l_siunitx_table_integer_box }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_box_exponent:}
+%\begin{macro}{\siunitx_table_print_S_measure_exponent:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_box_exponent: {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
+    {
+      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+        \l_siunitx_tmpa_tl
+      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+      {
+        \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
+        \bool_if:NT \l_siunitx_tight_bool 
+          {  
+            \tl_set:Nx \l_siunitx_tmpb_tl 
+              { { \exp_not:V \l_siunitx_tmpb_tl } }
+          }
+        \tl_set:Nx \l_siunitx_tmpb_tl
+          { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
+      }
+    \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  }
+  \tl_show:N \l_siunitx_tmpa_tl
+  \hbox_set:Nn \l_siunitx_table_exponent_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_measure_exponent: {
+  \siunitx_table_print_S_box_exponent:
+  \dim_set:Nn \l_siunitx_table_exponent_dim
+    { \box_wd:N \l_siunitx_table_exponent_box }
 }
 %    \end{macrocode}
 %\end{macro}
