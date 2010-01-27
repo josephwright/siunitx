@@ -9407,7 +9407,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_S_reserved:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
-  \siunitx_table_print_S_dummy_create:
+  \siunitx_table_print_S_model_create:
   \siunitx_table_print_S_measure_integer:n { mantissa }
   \siunitx_table_print_S_measure:nn { mantissa-result } { result }
   \siunitx_table_print_S_parse:
@@ -9448,19 +9448,19 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_table_print_S_dummy_create:}
-%\begin{macro}[aux]{\siunitx_table_print_S_dummy_aux:nn}
-% A dummy value is created from the various numbers set up as
+%\begin{macro}{\siunitx_table_print_S_model_create:}
+%\begin{macro}[aux]{\siunitx_table_print_S_model_aux:nn}
+% A model value is created from the various numbers set up as
 % options. The main formatting routine is used to get everything sorted
 % out, so that there is no code copying here.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_dummy_create: {
+\cs_new_nopar:Npn \siunitx_table_print_S_model_create: {
   \prop_clear:N \l_siunitx_number_in_prop
-  \siunitx_table_print_S_dummy_aux:nn { integer } { mantissa-integer }
-  \siunitx_table_print_S_dummy_aux:nn { decimal } { mantissa-decimal }
-  \siunitx_table_print_S_dummy_aux:nn { uncert } 
+  \siunitx_table_print_S_model_aux:nn { integer } { mantissa-integer }
+  \siunitx_table_print_S_model_aux:nn { decimal } { mantissa-decimal }
+  \siunitx_table_print_S_model_aux:nn { uncert } 
     { mantissa-uncertainty }
-  \siunitx_table_print_S_dummy_aux:nn { exponent } { exponent }
+  \siunitx_table_print_S_model_aux:nn { exponent } { exponent }
   \intexpr_compare:nNnF 
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int }
     = { \c_zero }
@@ -9489,7 +9489,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process:
   \siunitx_number_format: 
 }
-\cs_new_nopar:Npn \siunitx_table_print_S_dummy_aux:nn #1#2 {
+\cs_new_nopar:Npn \siunitx_table_print_S_model_aux:nn #1#2 {
   \tl_set:Nx \l_siunitx_tmpa_tl 
     { 
       \prg_replicate:nn { \int_use:c { l_siunitx_table_ #1 _int } } 
