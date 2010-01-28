@@ -9555,12 +9555,28 @@ This work consists of the file  siunitx.dtx
       \siunitx_print:nV { number } \l_siunitx_tmpa_tl
     }
   \box_use_clear:N \l_siunitx_table_result_box
+  \intexpr_compare:nTF
+    { \l_siunitx_table_uncert_int > \c_zero }
+    { \siunitx_table_print_S_reserved_uncert: }
+    { 
+      \prop_if_in:NnT \l_siunitx_number_out_prop 
+        { mantissa-uncertainty }
+        { \msg_warning:nn { siunitx } { table-partial-number } }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_complex:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_complex: {
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_reserved_uncert:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_uncert: {
+%  \prop_display:N \l_siunitx_table_model_prop
+%  \prop_if_in:NnT
 }
 %    \end{macrocode}
 %\end{macro}
