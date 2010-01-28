@@ -9330,6 +9330,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_centred_ends:
   \box_use:N \l_siunitx_table_pre_box
   \siunitx_table_print_S_parse:
+  \prop_set_eq:NN \l_siunitx_table_model_prop \l_siunitx_number_out_prop
   \siunitx_table_print_S_measure:nn { integer } { mantissa }
   \siunitx_table_print_S_measure:nn { marker }  { mantissa }
   \siunitx_table_print_S_measure:nn { result } { }
@@ -9435,14 +9436,14 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_table_print_S_get_integer:n #1 {
   \tl_clear:N \l_siunitx_tmpa_tl
   \tl_clear:N \l_siunitx_tmpb_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -sign }
+  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 -sign }
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -sign }
+      \prop_get:NnN \l_siunitx_table_model_prop { #1 -sign }
         \l_siunitx_tmpa_tl
     }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer }
+  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 -integer }
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -integer }
+      \prop_get:NnN \l_siunitx_table_model_prop { #1 -integer }
         \l_siunitx_tmpb_tl
     }
   \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
@@ -9469,9 +9470,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_get_result:n #1 {
   \tl_clear:N \l_siunitx_tmpa_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { #1 result }
+  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 result }
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 result }
+      \prop_get:NnN \l_siunitx_table_model_prop { #1 result }
         \l_siunitx_tmpa_tl
     }
 }
