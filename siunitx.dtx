@@ -9131,13 +9131,16 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_table_integer_box}
+%\begin{macro}{\l_siunitx_table_mantissa_box}
 %\begin{macro}{\l_siunitx_table_marker_box}
 %\begin{macro}{\l_siunitx_table_result_box}
 %    \begin{macrocode}
 \dim_new:N \l_siunitx_table_integer_dim
+\dim_new:N \l_siunitx_table_mantissa_dim
 \dim_new:N \l_siunitx_table_marker_dim
 \dim_new:N \l_siunitx_table_result_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9338,12 +9341,13 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_centred_ends:
   \box_use:N \l_siunitx_table_pre_box
   \siunitx_table_print_S_parse:
-  \prop_set_eq:NN \l_siunitx_table_model_prop \l_siunitx_number_out_prop
-  \siunitx_table_print_S_measure:nn { integer } { mantissa }
-  \siunitx_table_print_S_measure:nn { marker }  { mantissa }
-  \siunitx_table_print_S_measure:nn { result } { }
-  \box_set_eq:NN \l_siunitx_table_result_box
-    \l_siunitx_tmp_box
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
+    { integer } { mantissa }
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
+    { marker }  { mantissa }
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
+    { result } { }
+  \box_set_eq:NN \l_siunitx_table_result_box \l_siunitx_tmp_box
   \dim_set:Nn \l_siunitx_table_fill_dim
     { \l_siunitx_table_result_dim - \l_siunitx_table_integer_dim }
   \prop_if_in:NnT \l_siunitx_number_out_prop 
@@ -9415,76 +9419,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_measure:nn}
-% The measuring code recovers whatever is needed into 
-% \cs{l_siunitx_tmpa_tl} (as this is internal code, that is okay).
-% The content is then boxed up and measured: if there is nothing to do,
-% a bit of time can be saved by not boxing up at all.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_measure:nn #1#2 {
-  \use:c { siunitx_table_print_S_get_ #1 :n } {#2}
-  \tl_if_empty:NTF \l_siunitx_tmpa_tl
-    { \dim_set:cn { l_siunitx_table_ #1 _dim } { \c_zero_skip } }
-    {
-      \hbox_set:Nn \l_siunitx_tmp_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-      \dim_set:cn { l_siunitx_table_ #1 _dim } 
-        { \box_wd:N \l_siunitx_tmp_box }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_integer:n}
-% Getting the integer part of a number means that the sign also has be
-% considered, even if there is no actual integer. This leas to a 
-% slightly odd approach here.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_get_integer:n #1 {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \tl_clear:N \l_siunitx_tmpb_tl
-  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 -sign }
-    {
-      \prop_get:NnN \l_siunitx_table_model_prop { #1 -sign }
-        \l_siunitx_tmpa_tl
-    }
-  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 -integer }
-    {
-      \prop_get:NnN \l_siunitx_table_model_prop { #1 -integer }
-        \l_siunitx_tmpb_tl
-    }
-  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_marker:n} 
-% The decimal marker is always going to be boxed up using the 
-% standard version, not any possible copied value. So the code can be
-% kept quite clear.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_get_marker:n #1 {
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    { 
-      \exp_not:N \ensuremath { \exp_not:V \l_siunitx_output_decimal_tl }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_result:n} 
-% Getting the result values is easy. Unlike the other parts of the 
-% recovery system, \verb|#1| here will have to include any hyphen 
-% needed, as this lets the code work for the main \texttt{result}.
-%    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_get_result:n #1 {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \prop_if_in:NnT \l_siunitx_table_model_prop { #1 result }
-    {
-      \prop_get:NnN \l_siunitx_table_model_prop { #1 result }
-        \l_siunitx_tmpa_tl
-    }
-}
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_print_S_reserved:}
@@ -9580,8 +9514,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
+% Printing the mantissa
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_mantissa: {
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop 
+    { integer } { mantissa }
+  \siunitx_table_print_S_get_integer:Nn \l_siunitx_number_out_prop 
+    { mantissa }
+  \tl_if_empty:NTF \l_siunitx_tmpa_tl
+    { \box_clear:N \l_siunitx_tmp_box }
+    {
+      \hbox_set:Nn \l_siunitx_tmp_box
+        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+    }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
+    { \l_siunitx_table_integer_dim - \box_wd:N \l_siunitx_tmp_box }
+    { \tex_hfil:D }  
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
+    { mantissa } { }
+  \siunitx_table_print_S_get_mantissa:Nn \l_siunitx_number_out_prop { }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
+    { \l_siunitx_table_mantissa_dim }
+    { 
+      \box_use:N \l_siunitx_table_fill_box
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+    }
+  \box_use_clear:N \l_siunitx_table_result_box
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9594,6 +9552,78 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_S_reserved_exponent:}
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_print_S_measure:Nnn}
+% The measuring code recovers whatever is needed into 
+% \cs{l_siunitx_tmpa_tl} (as this is internal code, that is okay).
+% The content is then boxed up and measured: if there is nothing to do,
+% a bit of time can be saved by not boxing up at all.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_measure:Nnn #1#2#3 {
+  \use:c { siunitx_table_print_S_get_ #2 :Nn } #1 {#3}
+  \tl_if_empty:NTF \l_siunitx_tmpa_tl
+    { \dim_set:cn { l_siunitx_table_ #2 _dim } { \c_zero_skip } }
+    {
+      \hbox_set:Nn \l_siunitx_tmp_box
+        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+      \dim_set:cn { l_siunitx_table_ #2 _dim } 
+        { \box_wd:N \l_siunitx_tmp_box }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_integer:Nn}
+% Getting the integer part of a number means that the sign also has be
+% considered, even if there is no actual integer. This leas to a 
+% slightly odd approach here.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_get_integer:Nn #1#2 {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \prop_if_in:NnT #1 { #2 -sign }
+    { \prop_get:NnN #1 { #2 -sign } \l_siunitx_tmpa_tl }
+  \prop_if_in:NnT \l_siunitx_table_model_prop { #2 -integer }
+    { \prop_get:NnN #1 { #2 -integer } \l_siunitx_tmpb_tl }
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_mantissa:Nn}
+% The mantissa without any uncertainty is needed by the reserved
+% space routine. 
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_get_mantissa:Nn #1#2 {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \prop_if_in:NnT #1 { mantissa }
+    { \prop_get:NnN #1 { mantissa } \l_siunitx_tmpa_tl }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_marker:Nn} 
+% The decimal marker is always going to be boxed up using the 
+% standard version, not any possible copied value. So the code can be
+% kept quite clear.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_get_marker:Nn #1#2 {
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    { 
+      \exp_not:N \ensuremath { \exp_not:V \l_siunitx_output_decimal_tl }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_result:Nn} 
+% Getting the result values is easy. Unlike the other parts of the 
+% recovery system, \verb|#1| here will have to include any hyphen 
+% needed, as this lets the code work for the main \texttt{result}.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_get_result:Nn #1#2 {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \prop_if_in:NnT #1{ #2 result }
+    { \prop_get:NnN #1 { #2 result } \l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
