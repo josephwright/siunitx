@@ -9524,8 +9524,8 @@ This work consists of the file  siunitx.dtx
     { integer } { mantissa }
   \siunitx_table_print_S_get_integer:Nn \l_siunitx_number_out_prop 
     { mantissa }
-  \tl_if_empty:NTF \l_siunitx_tmpa_tl
-    { \box_clear:N \l_siunitx_tmp_box }
+  \box_clear:N \l_siunitx_tmp_box
+  \tl_if_empty:NF \l_siunitx_tmpa_tl
     {
       \hbox_set:Nn \l_siunitx_tmp_box
         { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
@@ -9558,16 +9558,22 @@ This work consists of the file  siunitx.dtx
 %  {\siunitx_table_print_S_reserved_exponent_product_aux_i:}
 %\begin{macro}[aux]
 %  {\siunitx_table_print_S_reserved_exponent_product_aux_ii:}
+% Most of the code for the exponent is concerned with getting the
+% product sign correct.Other than that, the exponent result is quite
+% easy to handle: just print it with some filling.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
   \siunitx_table_print_S_reserved_exponent_product:   
   \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop 
     { exponent } { }
   \siunitx_table_print_S_get_exponent:Nn \l_siunitx_number_out_prop { }
-%  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-%    {
-%    }
-%    { \tex_hfil:D }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+    { \l_siunitx_table_exponent_dim }
+    {
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+      \tex_hfil:D
+    }
+  \box_use_clear:N \l_siunitx_table_result_box 
 }
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_exponent_product: {
   \tl_clear:N \l_siunitx_tmpa_tl
@@ -9578,7 +9584,7 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \l_siunitx_table_model_prop { complex-result }
         { \siunitx_table_print_S_reserved_exponent_product_aux_i: }
     }
- \box_use:N \l_siunitx_table_result_box
+ \box_use_clear:N \l_siunitx_table_result_box
 }
 \cs_new_nopar:Npn 
   \siunitx_table_print_S_reserved_exponent_product_aux_i: {
@@ -9589,7 +9595,7 @@ This work consists of the file  siunitx.dtx
         { { \exp_not:V \l_siunitx_tmpa_tl } }
     }
   \tl_set:Nx \l_siunitx_tmpa_tl
-    { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpa_tl } }
+    { \exp_not:N \ensuremath { { } \exp_not:V \l_siunitx_tmpa_tl { } } }
   \hbox_set:Nn \l_siunitx_table_result_box
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
   \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent-result }
@@ -9653,7 +9659,7 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \l_siunitx_tmpb_tl
   \prop_if_in:NnT #1 { #2 -sign }
     { \prop_get:NnN #1 { #2 -sign } \l_siunitx_tmpa_tl }
-  \prop_if_in:NnT \l_siunitx_table_model_prop { #2 -integer }
+  \prop_if_in:NnT #1 { #2 -integer }
     { \prop_get:NnN #1 { #2 -integer } \l_siunitx_tmpb_tl }
   \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
 }
