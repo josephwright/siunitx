@@ -9158,7 +9158,9 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-% 
+%
+%\begin{macro}{\l_siunitx_table_complex_decimal_int}
+%\begin{macro}{\l_siunitx_table_complex_integer_int} 
 %\begin{macro}{\l_siunitx_table_decimal_int}
 %\begin{macro}{\l_siunitx_table_exponent_int}
 %\begin{macro}{\l_siunitx_table_integer_int}
@@ -9237,6 +9239,10 @@ This work consists of the file  siunitx.dtx
       \skip_set:Nn \l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 1 fill } 
     },
+  table-figures-complex-decimal
+    .int_set:N  = \l_siunitx_table_complex_decimal_int ,  
+  table-figures-complex-integer
+    .int_set:N  = \l_siunitx_table_complex_integer_int ,  
   table-figures-decimal     .int_set:N  = \l_siunitx_table_decimal_int ,
   table-figures-exponent    .int_set:N  = \l_siunitx_table_exponent_int,
   table-figures-integer     .int_set:N  = \l_siunitx_table_integer_int ,
@@ -9255,6 +9261,8 @@ This work consists of the file  siunitx.dtx
   table-figures-integer = 3
 }
 %    \end{macrocode} 
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9480,74 +9488,37 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_print_S_reserved:}
+% Sorting out a number with reserved space means checking each part
+% in turn. After sorting out the ends, a model number is constructed,
+% and this is then used by the various sub-routines to get the spacing
+% correct.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved: {
+  \siunitx_table_print_S_reserved_ends:
+  \box_use:N \l_siunitx_table_pre_box
   \siunitx_table_print_S_model_create:
-%  \siunitx_table_print_S_measure_integer:n { mantissa }
-%  \siunitx_table_print_S_measure:nn { mantissa } { result }
-%  \siunitx_table_print_S_measure_exponent:
-%  \siunitx_table_print_S_parse:
-%  \siunitx_table_print_S_box_integer:n { mantissa }
-%  \hbox_set:Nn \l_siunitx_table_integer_box
-%    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-%  \hbox_set_to_wd:Nnn \l_siunitx_table_dummy_box 
-%    { 
-%      \l_siunitx_table_integer_dim -
-%      \box_wd:N  \l_siunitx_table_integer_box 
-%    }
-%    { \tex_hfil:D }
-%  \box_clear:N \l_siunitx_table_result_box    
-%  \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
-%    {
-%      \prop_get:NnN \l_siunitx_number_out_prop { mantissa }
-%        \l_siunitx_tmpa_tl
-%      \hbox_set:Nn \l_siunitx_table_result_box
-%        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-%    }
-%  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
-%    { \l_siunitx_table_result_dim }
-%    {
-%      \box_use:N \l_siunitx_table_dummy_box 
-%      \box_use:N \l_siunitx_table_result_box
-%      \tex_hfil:D
-%    }
-%  \box_use_clear:N \l_siunitx_table_result_box
-%  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent }
-%    {
-%      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
-%        \l_siunitx_tmpa_tl
-%      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
-%        {
-%          \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
-%          \bool_if:NT \l_siunitx_tight_bool 
-%            {  
-%              \tl_set:Nx \l_siunitx_tmpb_tl 
-%                { { \exp_not:V \l_siunitx_tmpb_tl } }
-%             }
-%          \tl_set:Nx \l_siunitx_tmpb_tl
-%            { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
-%          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl  
-%        }
-%      \hbox_set:Nn \l_siunitx_table_result_box
-%        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-%    }
-%  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
-%    { \l_siunitx_table_exponent_dim }
-%    {
-%      \box_use:N \l_siunitx_table_result_box
-%      \tex_hfil:D
-%    }
-%  \box_use:N \l_siunitx_table_result_box  
-}
-\cs_new_nopar:Npn \siunitx_table_print_S_reserved_aux:nNN #1#2#3 {
-  \use:c { siunitx_table_print_S_get_ #1 : }
-  \hbox_set_to_wd:cnn { l_siunitx_table_ #1 _box }
-    { \dim_use:c { l_siunitx_table_ #1 _dim } }
+  \siunitx_table_print_S_parse: 
+  \intexpr_compare:nNnT
+    { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } 
+    > { \c_zero }
+    { \siunitx_table_print_S_reserved_mantissa: }
+  \intexpr_compare:nNnT
     { 
-      #2
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl 
-      #3
-    }
+      \l_siunitx_table_complex_integer_int + 
+      \l_siunitx_table_complex_decimal_int 
+    } 
+    > { \c_zero }
+    { \siunitx_table_print_S_reserved_complex: }
+  \intexpr_compare:nT
+    { \l_siunitx_table_exponent_int > \c_zero }
+    { \siunitx_table_print_S_reserved_exponent: }
+  \box_use:N \l_siunitx_table_post_box
+}  
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_reserved_ends:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_ends: {
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9608,32 +9579,21 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_box_exponent:}
+%\begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_box_exponent: {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \tl_clear:N \l_siunitx_tmpb_tl
-  \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
-    {
-      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
-        \l_siunitx_tmpa_tl
-      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
-      {
-        \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
-        \bool_if:NT \l_siunitx_tight_bool 
-          {  
-            \tl_set:Nx \l_siunitx_tmpb_tl 
-              { { \exp_not:V \l_siunitx_tmpb_tl } }
-          }
-        \tl_set:Nx \l_siunitx_tmpb_tl
-          { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_tmpb_tl } } 
-      }
-    \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-  }
-  \tl_show:N \l_siunitx_tmpa_tl
-  \hbox_set:Nn \l_siunitx_table_exponent_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_mantissa: {
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_reserved_complex:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_complex: {
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_reserved_exponent:}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
 }
 %    \end{macrocode}
 %\end{macro}
