@@ -254,6 +254,7 @@ This work consists of the file  siunitx.dtx
 %          decibel,
 %          degree,
 %          DeclareBinaryPrefix,
+%          DeclareRobustCommand,
 %          DeclareSILocale,
 %          DeclareSIPostPower,
 %          DeclareSIPrefix,
@@ -287,6 +288,7 @@ This work consists of the file  siunitx.dtx
 %          numrange,
 %          pascal,
 %          per,
+%          protected,
 %          radian,
 %          raiseto,
 %          second,
@@ -2479,34 +2481,83 @@ This work consists of the file  siunitx.dtx
 % \opt{table-figures-integer} controls the space for integer digits in
 % the mantissa. If the number of figures is set to \num{0}, then no
 % space is reserved and some output will either be out of position
-% or not printed at all (although a warning will result).
+% or not printed at all (although a warning will result). Reserving
+% space for a given part of number will automatically include space
+% for any associated items (for example the \enquote{\(\times\)} symbol
+% for exponents).
+%\DescribeOption{table-sign-exponent}
+%\DescribeOption{table-sign-mantissa}
+% The second family of options are switches which govern whether
+% space is reserved for a sign: \opt{table-sign-exponent} and
+% \opt{table-sign-mantissa}. The effect of altering some of these
+% settings is shown in Table~\ref{tab:S:space}.
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
-%    \caption{Exponents in tables}
+%    \caption{Reserving space in \texttt{S} columns}
 %    \label{tab:S:space}
 %    \sisetup{
-%      table-align-numbers    = centre,
-%      table-figures-decimal  = 2,
-%      table-figures-exponent = 2,
-%      table-figures-integer  = 2
+%      table-align-numbers   = centre,
+%      table-figures-integer = 2
 %    }
 %    \centering
 %    \begin{tabular}{
+%      S
 %      S[table-align-numbers = right]
-%      S
-%      S
-%      S
+%      S[table-figures-uncertainty = 1]
+%      S[
+%        separate-uncertainty,
+%        table-figures-uncertainty = 1
+%      ]
+%      S[table-sign-mantissa]
+%      S[table-figures-exponent = 1]
 %      }
 %    \toprule
-%        {Longer values}
-%      & {Longer values}
-%      & {Longer values}
+%        {Values}
+%      & {Values}
+%      & {Values}
+%      & {Values}
+%      & {Values}
 %      & {Values} \\
 %    \midrule
-%    2.3e1    &  2.34e1  &  2.34e1  & +2.31 \\
-%    34.23e45 & 34.23e45 & 34.23e45 & 34.23 \\
-%    56.78    & 56.78    & 56.78    & -56.78 \\
-%      e34   &    e34   & 1.0e34   & +-1.0 \\
+%       2.3   &  2.3   &  2.3(5)  &  2.3(5)  &  2.3   & 2.3e8   \\
+%      34.23  & 34.23  & 34.23(4) & 34.23(4) & 34.23  & 34.23   \\
+%      56.78  & 56.78  & 56.78(3) & 56.78(3) & -56.78 & 56.78e3 \\
+%       3,76 &   3,76 &  3,76(2) & 3.76(2)  & +-3.76 &      e6  \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-align-text}
+% Cell contents which are not part of of a number can be protected
+% using braces, as illustrated. Cells which contain no numerical data
+% at all are aligned using the setting specified by the 
+% \opt{table-align-text} option, which recognises the values
+% \opt{centre}, \opt{left} and \opt{right} (Table~\ref{tab:S:text}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Aligning text in \texttt{S} columns}
+%    \label{tab:S:text}
+%    \sisetup{
+%      table-align-numbers   = centre,
+%      table-figures-integer = 4,
+%      table-figures-decimal = 4
+%    }
+%    \centering
+%    \begin{tabular}{
+%      S
+%      S[table-align-text = left]
+%      S[table-align-text = right]
+%      }
+%    \toprule
+%        {Values}
+%      & {Values}
+%      & {Values} \\
+%    \midrule
+%      992.435  &  992.435  &  992.435  \\
+%     7734.2344 & 7734.2344 & 7734.2344 \\
+%       56.7834 &   56.7834 &   56.7834 \\
+%        3,7462 &    3,7462 &    3,7462 \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -2628,6 +2679,40 @@ This work consists of the file  siunitx.dtx
 % print the material in the standard mathematics font without affecting
 % the rest of the output. In some cases, simply forcing \cs{mathnormal}
 % will suffice, but this is less reliable with non-Latin characters.
+% 
+%\subsection{Expanding content in tables}
+%
+% When processing tables, \pkg{siunitx} will expand anything stored
+% inside a macro, unless it is long or protected. \LaTeXe\ robust
+% commands are also detected and are not expanded 
+% (Table~\ref{tab:xmpl:macro}). Values which would otherwise be expanded
+% can be protected by wrapping them in a set of braces. As \TeX\ itself
+% will expand the first token in a table cell before \pkg{siunitx}
+% can act on it, using the \eTeX\ protected mechanism is the 
+% recommended course of action to prevent expansion of macros in
+% table cells.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{Values as macros in \texttt{S} columns}
+%    \label{tab:xmpl:macro}
+%    \newcommand*\myvaluea{12.34}
+%    \newcommand\myvalueb{12.34}
+%    \DeclareRobustCommand*\myvaluec{12.34}
+%    \protected\def\myvalued{12.34}
+%    \begin{tabular}{S}
+%    \toprule
+%    {Some Values} \\
+%    \midrule
+%      9 \myvaluea   \\
+%      9 \myvalueb   \\
+%      9 \myvaluec   \\
+%      9 \myvalued   \\
+%      9 {\myvaluea} \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
 % 
 %\subsection{Using units such as \si{\micro\metre\per\second} in 
 %  headings}
