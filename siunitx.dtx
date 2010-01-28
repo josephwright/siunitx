@@ -2380,10 +2380,137 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      table-align-units & Switch & centre \\
+%      table-align-numbers           & Switch    & centre \\
+%      table-align-text              & Switch    & centre \\
+%      table-align-units             & Switch    & centre \\
+%      table-figures-complex-decimal & Numerical & 0      \\
+%      table-figures-complex-integer & Numerical & 0      \\
+%      table-figures-decimal         & Numerical & 2      \\
+%      table-figures-exponent        & Numerical & 0      \\
+%      table-figures-integer         & Numerical & 3      \\
+%      table-figures-uncertainty     & Numerical & 0      \\
+%      table-parse-only              & Boolean   & false  \\
+%      table-sign-exponent           & Boolean   & false  \\
+%      table-sign-mantissa           & Boolean   & false  \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
+%
+%\DescribeOption{table-parse-only}
+% The main use of the \texttt{S} column is to control the alignment of
+% the resulting output. However, it is possible to turn off alignment
+% entirely and only use the number parser of \pkg{siunitx}. This is
+% achieved using the \opt{table-parse-only} switch, as illustrated
+% in Table~\ref{tab:S:parse}
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{Parsing without aligning in an \texttt{S} column}
+%    \label{tab:S:parse}
+%    \begin{tabular}
+%      {
+%        S
+%        S[table-parse-only]
+%      }      
+%      \toprule
+%        {Decimal-centred} &
+%        {Simple centring} \\
+%      \midrule
+%        12.345   & 12.345 \\
+%        6,78     & 6,78   \\
+%        -88.8(9) & -88.8(9) \\
+%        4.5e3    & 4.5e3  \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-align-numbers}
+% The alignment of numbers with the boundaries of the \texttt{S}
+% column is controlled using the \opt{table-align-numbers} option,
+% which takes the values \opt{centre-decimal}, \opt{centre},
+% \opt{left} and \opt{right}. The \opt{centre-decimal} places the
+% decimal marker for the number at the centre of the column. This does
+% not need any information in advance, and so is the standard setting.
+% It works best for approximately symmetrical input (equal numbers of
+% digits before and after the decimal). On the other hand, the
+% \opt{centre}, \opt{left} and \opt{right} options require space to be
+% reserved for the numbers, and then use this fixed space to align with
+% the edges of the column. The different alignment choices are 
+% illustrated in Table~\ref{tab:S:align}, which uses somewhat 
+% exaggerated column headings to show the relative position of the 
+% cell contents.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Aligning the \texttt{S} column}
+%    \label{tab:S:align}
+%    \centering
+%    \sisetup{
+%      table-figures-integer = 2,
+%      table-figures-decimal = 4
+%    }
+%    \begin{tabular}{
+%      S
+%      S[table-align-numbers = centre]
+%      S[table-align-numbers = left]
+%      S[table-align-numbers = right]
+%    }
+%    \toprule
+%    {Some Values} & {Some Values} & {Some Values} & {Some Values} \\
+%    \midrule
+%       2.3456  &  2.3456  &  2.3456 &  2.3456 \\
+%      34.2345  & 34.2345  & 34.2345 & 34.2345 \\
+%      56.7835  & 56.7835  & 56.7835 & 56.7835 \\
+%      90.473   & 90.473   & 90.473  & 90.473  \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-figures-complex-decimal}
+%\DescribeOption{table-figures-complex-integer}
+%\DescribeOption{table-figures-decimal}
+%\DescribeOption{table-figures-exponent}
+%\DescribeOption{table-figures-integer}
+%\DescribeOption{table-figures-uncertainty}
+% The space reserved by \pkg{siunitx} for a number is controlled by
+% two families of options. The first family cover the number of digits
+% allowed for in different parts of the number, for example
+% \opt{table-figures-integer} controls the space for integer digits in
+% the mantissa. If the number of figures is set to \num{0}, then no
+% space is reserved and some output will either be out of position
+% or not printed at all (although a warning will result).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Exponents in tables}
+%    \label{tab:S:space}
+%    \sisetup{
+%      table-align-numbers    = centre,
+%      table-figures-decimal  = 2,
+%      table-figures-exponent = 2,
+%      table-figures-integer  = 2
+%    }
+%    \centering
+%    \begin{tabular}{
+%      S[table-align-numbers = right]
+%      S
+%      S
+%      S
+%      }
+%    \toprule
+%        {Longer values}
+%      & {Longer values}
+%      & {Longer values}
+%      & {Values} \\
+%    \midrule
+%    2.3e1    &  2.34e1  &  2.34e1  & +2.31 \\
+%    34.23e45 & 34.23e45 & 34.23e45 & 34.23 \\
+%    56.78    & 56.78    & 56.78    & -56.78 \\
+%      e34   &    e34   & 1.0e34   & +-1.0 \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
 % 
 %\DescribeOption{table-align-units}
 % The contents of \texttt{s} columns can be centred or aligned to the
