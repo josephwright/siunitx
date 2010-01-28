@@ -5953,6 +5953,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_format_join_uncert:}
 %\begin{macro}{\siunitx_number_format_join_uncert:n}
+%\begin{macro}[aux]{\siunitx_number_format_join_uncert_pm:}
 % For adding separated uncertainties to the main part of a number.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_number_format_join_uncert: {
@@ -5968,6 +5969,8 @@ This work consists of the file  siunitx.dtx
             \l_siunitx_tmpa_tl
           \prop_get:NnN \l_siunitx_number_out_prop { #1 -uncertainty }
             \l_siunitx_tmpb_tl
+          \bool_if:NT \l_siunitx_uncert_sep_bool
+            { \siunitx_number_format_join_uncert_pm: }
           \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
           \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
             \l_siunitx_tmpa_tl
@@ -5977,7 +5980,15 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_format_copy:nn {#1} { #1 -result } }
     }
 }
+\cs_new_nopar:Npn \siunitx_number_format_join_uncert_pm: {
+  \bool_if:NTF \l_siunitx_tight_bool 
+    { \tl_put_left:Nn \l_siunitx_tmpb_tl { \ensuremath { { \pm } } } }
+    { 
+      \tl_put_left:Nn \l_siunitx_tmpb_tl { \ensuremath { { } \pm { } } }
+    }
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -6084,7 +6095,6 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
 %\begin{macro}{\siunitx_number_format_uncertainty_joined:n}
 %\begin{macro}{\siunitx_number_format_uncertainty_sep:n}
-%\begin{macro}[aux]{\siunitx_number_format_uncertainty_pm:}
 % Uncertainty output varies depending on whether there is a need to 
 % separate the error form the number in the output. 
 %    \begin{macrocode}
@@ -6123,19 +6133,10 @@ This work consists of the file  siunitx.dtx
         }
     }
     \siunitx_number_format_group:n { #1 -uncertainty }
-    \siunitx_number_format_uncertainty_pm:
     \prop_put:NnV \l_siunitx_number_out_prop { #1 -uncertainty }
       \l_siunitx_tmpa_tl
 }
-\cs_new_nopar:Npn \siunitx_number_format_uncertainty_pm: {
-  \bool_if:NTF \l_siunitx_tight_bool 
-    { \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { \pm } } } }
-    { 
-      \tl_put_left:Nn \l_siunitx_tmpa_tl { \ensuremath { { } \pm { } } }
-    }
-}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
