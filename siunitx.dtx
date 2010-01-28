@@ -9136,13 +9136,17 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_mantissa_dim}
 %\begin{macro}{\l_siunitx_table_marker_dim}
 %\begin{macro}{\l_siunitx_table_result_dim}
+%\begin{macro}{\l_siunitx_table_uncert_dim}
+% Dimensions for the various model measurements.
 %    \begin{macrocode}
 \dim_new:N \l_siunitx_table_exponent_dim
 \dim_new:N \l_siunitx_table_integer_dim
 \dim_new:N \l_siunitx_table_mantissa_dim
 \dim_new:N \l_siunitx_table_marker_dim
 \dim_new:N \l_siunitx_table_result_dim
+\dim_new:N \l_siunitx_table_uncert_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9530,22 +9534,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
-% Printing the mantissa
+%\begin{macro}[aux]{\siunitx_table_print_S_reserved_mantissa_aux:n}
+% Printing the mantissa is done by measuring the integer part of the
+% model and the real number, and padding out if necessary. Everything
+% else is straight forward.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_reserved_mantissa: {
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop 
-    { integer } { mantissa }
-  \siunitx_table_print_S_get_integer:Nn \l_siunitx_number_out_prop 
-    { mantissa }
-  \box_clear:N \l_siunitx_tmp_box
-  \tl_if_empty:NF \l_siunitx_tmpa_tl
-    {
-      \hbox_set:Nn \l_siunitx_tmp_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-    { \l_siunitx_table_integer_dim - \box_wd:N \l_siunitx_tmp_box }
-    { \tex_hfil:D }  
+  \siunitx_table_print_S_reserved_mantissa_aux:n { mantissa }
   \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
     { mantissa } { }
   \siunitx_table_print_S_get_mantissa:Nn \l_siunitx_number_out_prop { }
@@ -9556,14 +9551,21 @@ This work consists of the file  siunitx.dtx
       \siunitx_print:nV { number } \l_siunitx_tmpa_tl
     }
   \box_use_clear:N \l_siunitx_table_result_box
-  \intexpr_compare:nTF
-    { \l_siunitx_table_uncert_int > \c_zero }
-    { \siunitx_table_print_S_reserved_uncert: }
-    { 
-      \prop_if_in:NnT \l_siunitx_number_out_prop 
-        { mantissa-uncertainty }
-        { \msg_warning:nn { siunitx } { table-partial-number } }
+  \siunitx_table_print_S_reserved_uncert:n { mantissa }
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_mantissa_aux:n #1 {
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop 
+    { integer } {#1}
+  \siunitx_table_print_S_get_integer:Nn \l_siunitx_number_out_prop {#1}
+  \box_clear:N \l_siunitx_tmp_box
+  \tl_if_empty:NF \l_siunitx_tmpa_tl
+    {
+      \hbox_set:Nn \l_siunitx_tmp_box
+        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
     }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
+    { \l_siunitx_table_integer_dim - \box_wd:N \l_siunitx_tmp_box }
+    { \tex_hfil:D }  
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9573,13 +9575,56 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_table_print_S_reserved_uncert:}
+%\begin{macro}{\siunitx_table_print_S_reserved_uncert:n}
+%\begin{macro}[aux]{\siunitx_table_print_S_reserved_uncert_aux:n}
+% The uncertainty code is generalised for both real and complex parts.
+% A lot of the logic is similar to the exponent part (the \cs{pm}
+% symbol) or the mantissa (the number measuring). So some of the
+% code is shared.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_print_S_reserved_uncert: {
-%  \prop_display:N \l_siunitx_table_model_prop
-%  \prop_if_in:NnT
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_uncert:n #1 {
+  \bool_if:NT \l_siunitx_uncert_sep_bool
+    {
+      \intexpr_compare:nTF
+        { \l_siunitx_table_uncert_int > \c_zero }
+        { \siunitx_table_print_S_reserved_uncert_aux:n {#1} }
+        { 
+          \prop_if_in:NnT \l_siunitx_number_out_prop 
+            { #1 -uncertainty }
+            { \msg_warning:nn { siunitx } { table-partial-number } }
+        }
+    }        
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_uncert_aux:n #1 {
+  \siunitx_table_print_S_reserved_uncert_pm:n {#1}     
+  \siunitx_table_print_S_reserved_mantissa_aux:n { #1 -uncertainty }
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
+    { uncert } {#1}
+  \siunitx_table_print_S_get_uncert:Nn \l_siunitx_number_out_prop {#1}
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
+    { \l_siunitx_table_uncert_dim }
+    { 
+      \box_use:N \l_siunitx_table_fill_box
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+    }
+  \box_use_clear:N \l_siunitx_table_result_box
+}
+\cs_new_nopar:Npn \siunitx_table_print_S_reserved_uncert_pm:n #1 {
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \siunitx_number_format_join_uncert_pm:
+  \tl_set:Nx \l_siunitx_tmpb_tl
+    { { } \exp_not:V \l_siunitx_tmpb_tl { } }
+  \hbox_set:Nn \l_siunitx_table_result_box
+    { \siunitx_print:nV { number } \l_siunitx_tmpb_tl }
+  \prop_if_in:NnF \l_siunitx_number_out_prop { #1 -uncertainty }
+    {
+      \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
+        { \box_wd:N \l_siunitx_table_result_box } { \tex_hfil:D }
+    }
+ \box_use_clear:N \l_siunitx_table_result_box
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_exponent:}
 %\begin{macro}[aux]{\siunitx_table_print_S_reserved_exponent_product:}
@@ -9719,14 +9764,21 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_get_result:Nn} 
-% Getting the result values is easy. Unlike the other parts of the 
-% recovery system, \verb|#1| here will have to include any hyphen 
-% needed, as this lets the code work for the main \texttt{result}.
+% Getting the result values is easy. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_table_print_S_get_result:Nn #1#2 {
   \tl_clear:N \l_siunitx_tmpa_tl
-  \prop_if_in:NnT #1{ #2 result }
-    { \prop_get:NnN #1 { #2 result } \l_siunitx_tmpa_tl }
+  \prop_if_in:NnT #1 { result }
+    { \prop_get:NnN #1 { result } \l_siunitx_tmpa_tl }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_uncert:Nn} 
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_table_print_S_get_uncert:Nn #1#2 {
+  \tl_clear:N \l_siunitx_tmpa_tl
+  \prop_if_in:NnT #1{ #2 -uncertainty }
+    { \prop_get:NnN #1 { #2 -uncertainty } \l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
