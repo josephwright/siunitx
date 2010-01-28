@@ -9435,20 +9435,32 @@ This work consists of the file  siunitx.dtx
   \box_use:N \l_siunitx_table_pre_box
   \siunitx_table_print_S_model_create:
   \siunitx_table_print_S_parse: 
-  \intexpr_compare:nNnT
+  \intexpr_compare:nNnTF
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } 
     > { \c_zero }
     { \siunitx_table_print_S_reserved_mantissa: }
-  \intexpr_compare:nNnT
+    { 
+      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
+        { \msg_warning:nn { siunitx } { table-partial-number } }
+    }
+  \intexpr_compare:nNnTF
     { 
       \l_siunitx_table_complex_integer_int + 
       \l_siunitx_table_complex_decimal_int 
     } 
     > { \c_zero }
     { \siunitx_table_print_S_reserved_complex: }
-  \intexpr_compare:nT
+    { 
+      \prop_if_in:NnT \l_siunitx_number_out_prop { complex-result }
+        { \msg_warning:nn { siunitx } { table-partial-number } }
+    }
+  \intexpr_compare:nTF
     { \l_siunitx_table_exponent_int > \c_zero }
     { \siunitx_table_print_S_reserved_exponent: }
+    { 
+      \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
+        { \msg_warning:nn { siunitx } { table-partial-number } }
+    }
   \box_use:N \l_siunitx_table_post_box
 }  
 %    \end{macrocode}
@@ -10021,6 +10033,8 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { starting-quotient-token } 
   {Misplaced quotient token.}
   {A number cannot begin with a quotient token.}
+\msg_new:nnn { siunitx } { table-partial-number }
+  {S column does not print entire number \msg_line_context:.}
 \msg_new:nnnn { siunitx } { unknown-configuration-file } 
   {Unknown configuration '#1'.}
   {The configuration file 'siunitx-#1.cfg'  was not found.}
