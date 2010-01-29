@@ -5569,9 +5569,7 @@ This work consists of the file  siunitx.dtx
 }  
 \cs_new_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
   \intexpr_compare:nTF { \l_siunitx_process_places_int = \c_zero } 
-    {
-      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
-    }
+    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal } }
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal } 
         {
@@ -5583,8 +5581,8 @@ This work consists of the file  siunitx.dtx
             {
               \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal }
                 { }
-              \int_set_eq:NN \l_siunitx_round_int 
-                \l_siunitx_process_places_int
+              \int_set:Nn \l_siunitx_round_int 
+                { \l_siunitx_process_places_int }
               \siunitx_number_process_pad:n {#1}
             }
             {
