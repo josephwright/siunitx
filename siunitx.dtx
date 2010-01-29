@@ -11513,9 +11513,6 @@ This work consists of the file  siunitx.dtx
       },
   inlinebold     .meta:n    = { detect-inline-weight    = #1          },
 %  load & Modules & Modules to load \\
-%  locale
-%  loctolang & Special & Associate locale with \pkg{babel}
-%    language \\
   log            .code:n    =,
   mathOmega      .meta:n    = { math-ohm                = #1          },
   mathcelsius    .meta:n    = { math-celsius            = #1          },
@@ -11710,15 +11707,54 @@ This work consists of the file  siunitx.dtx
   stickyper      .default:n = { true                                  },
 %  strict & Boolean & Obey the rules strictly \\       
   strictarc      .code:n    = ,
-%  tabalign & List & Positioning of all column data \\
+  tabalign       .meta:n    = 
+    {
+      table-align-numbers   = #1,
+      table-align-text      = #1,
+      table-align-units     = #1
+    },
 %  tabalignexp & Boolean & Alignment of exponents in tables \\
 %  tabautofit & Boolean & Switch for rounding numbers to \\
 %   & & length given by \opt{tabformat} \\
-%  tabformat & Number & Space reserved in table for numbers \\
-%  tabnumalign & List & Alignment of |S| column numbers \\
-%  tabparseonly & Boolean & Do not align |S| columns \\
-%   & & on decimal marker \\
-%  tabtextalign & List & Positioning of text in |S| columns \\
+  tabformat      .code:n    = 
+    {
+      \number_in_parse:n {#1}
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-integer }
+        { 
+          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+            \l_siunitx_tmpa_tl
+          \int_set:Nn \l_siunitx_table_integer_int 
+            { \l_siunitx_tmpa_tl }  
+        }
+        { \int_set:Nn \l_siunitx_table_integer_int { 0 } }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-decimal }
+        { 
+          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+            \l_siunitx_tmpa_tl
+          \int_set:Nn \l_siunitx_table_decimal_int 
+            { \l_siunitx_tmpa_tl }  
+        }
+        { \int_set:Nn \l_siunitx_table_decimal_int { 0 } }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { exponent-decimal }
+        { 
+          \prop_get:NnN \l_siunitx_number_in_prop { exponent-decimal }
+            \l_siunitx_tmpa_tl
+          \int_set:Nn \l_siunitx_table_exponent_int 
+            { \l_siunitx_tmpa_tl }  
+        }
+        { \int_set:Nn \l_siunitx_table_exponent_int { 0 } }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
+        { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
+        { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { exponent-sign }        
+        { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
+        { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
+      \keys_set:nn { siunitx } { table-align-numbers = centre }  
+    },
+  tabnumalign    .meta:n    = { table-align-numbers     = #1          },
+  tabparseonly   .meta:n    = { table-parse-only        = #1          },
+  tabparseonly   .default:n = { true                                  },
+  tabtextalign   .meta:n    = { table-text-numbers      = #1          },
   tabunitalign   .meta:n    = { table-align-units       = #1          },
   textOmega      .meta:n    = { text-ohm                = #1          },
   textcelsius    .meta:n    = { text-celsius            = #1          },
