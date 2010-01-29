@@ -2690,25 +2690,28 @@ This work consists of the file  siunitx.dtx
 % will expand the first token in a table cell before \pkg{siunitx}
 % can act on it, using the \eTeX\ protected mechanism is the 
 % recommended course of action to prevent expansion of macros in
-% table cells.
+% table cells. (As is shown in the table, \TeX's expansion of
+% \LaTeXe\ robust commands can lead to unexpected results.)
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
 %    \caption{Values as macros in \texttt{S} columns}
 %    \label{tab:xmpl:macro}
-%    \newcommand*\myvaluea{12.34}
-%    \newcommand\myvalueb{12.34}
-%    \DeclareRobustCommand*\myvaluec{12.34}
-%    \protected\def\myvalued{12.34}
+%    \newcommand*\myvaluea{1234}
+%    \newcommand\myvalueb{1234}
+%    \DeclareRobustCommand*\myvaluec{1234}
+%    \protected\def\myvalued{1234}
 %    \begin{tabular}{S}
 %    \toprule
 %    {Some Values} \\
 %    \midrule
-%      9 \myvaluea   \\
-%      9 \myvalueb   \\
-%      9 \myvaluec   \\
-%      9 \myvalued   \\
-%      9 {\myvaluea} \\
+%       \myvaluea 8.8 \myvaluea  \\ % Both expanded
+%       \myvalueb 8.8 \myvalueb  \\ % First expanded by TeX
+%                                   % to numbers
+%       \myvaluec 8.8 \myvaluec  \\ % First expanded by TeX
+%                                   % but not to numbers!
+%       \myvalued 8.8 \myvalued  \\ % Neither expanded
+%      {\myvaluea 8.8 \myvaluea} \\ % Neither expanded
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
