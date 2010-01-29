@@ -2389,9 +2389,10 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      table-align-numbers           & Switch    & centre    \\
-%      table-align-text              & Switch    & centre    \\
-%      table-align-units             & Switch    & centre    \\
+%      table-align-numbers           & Choice    & centre    \\
+%      table-align-text              & Choice    & centre    \\
+%      table-align-units             & Choice    & centre    \\
+%      table-auto-round              & Boolean   & false     \\
 %      table-figures-complex-decimal & Numerical & 0         \\
 %      table-figures-complex-integer & Numerical & 0         \\
 %      table-figures-decimal         & Numerical & 2         \\
@@ -2477,6 +2478,10 @@ This work consists of the file  siunitx.dtx
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
+% Many of the other table options do not apply when 
+% \opt{table-align-numbers = centre-decimal-marker} is set, as this 
+% mode always centres the marker at the expense of any other 
+% choices.
 %
 %\DescribeOption{table-figures-complex-decimal}
 %\DescribeOption{table-figures-complex-integer}
@@ -2537,11 +2542,11 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{table-reserve-text-pre}
-%\DescribeOption{table-reserve-text-pre}
+%\DescribeOption{table-space-text-pre}
+%\DescribeOption{table-space-text-post}
 % Space for material before and after the \texttt{S} column can
 % be reserved by giving model text for the options
-% \opt{table-reserve-text-pre} and \opt{\ldots -post}.
+% \opt{table-space-text-pre} and \opt{\ldots -post}.
 % This is then used to provide the necessary gap while maintaining 
 % alignment (\cref{tab:S:ends}).
 %\begin{LaTeXdemo}[code and float]
@@ -2550,10 +2555,10 @@ This work consists of the file  siunitx.dtx
 %    \label{tab:S:ends}
 %    \centering
 %    \sisetup{
-%      table-figures-integer         = 2,
-%      table-figures-decimal         = 4,
-%      table-reserve-text-pre  = $ > $,
-%      table-reserve-text-post = 
+%      table-figures-integer = 2,
+%      table-figures-decimal = 4,
+%      table-space-text-pre  = $ > $,
+%      table-space-text-post = 
 %        \textsuperscript{\emph{a}}
 %    }
 %    \begin{tabular}{S}
@@ -2565,6 +2570,38 @@ This work consists of the file  siunitx.dtx
 %            56.7835  \\
 %      $ > $ 90.473   \\
 %    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-auto-round}
+% The contents of table cells can automatically be rounded or
+% zero-filled to the number of decimal digits given for the 
+% \opt{table-figures-decimal} option. This mode is activated using
+% the \opt{table-auto-round} switch, as illustrated in 
+% \cref{tab:S:auto}.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{The \opt{table-auto-round} option}
+%    \label{tab:S:auto}
+%    \sisetup{
+%      table-align-numbers   = centre,
+%      table-figures-integer = 1,
+%      table-figures-decimal = 3
+%    }
+%    % Notice the overfull hbox which results with
+%    % the first column
+%    \begin{tabular}{
+%      S
+%      S[table-auto-round]
+%    }
+%      \toprule
+%        {Header} & {Header} \\
+%      \midrule
+%        1.2    & 1.2    \\
+%        1.2345 & 1.2345 \\
+%      \bottomrule
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
@@ -5216,8 +5253,8 @@ This work consists of the file  siunitx.dtx
   round-mode / off     .code:n = { \tl_clear:N \l_siunitx_round_tl },
   round-mode / places  .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { places } },
-  round-figures     .tl_set:N   = \l_siunitx_process_figures_int,
-  round-places      .tl_set:N   = \l_siunitx_process_places_int,
+  round-figures     .int_set:N = \l_siunitx_process_figures_int,
+  round-places      .int_set:N = \l_siunitx_process_places_int,
 }
 \keys_set:nn { siunitx } {
   add-decimal-zero      = true,
@@ -9702,6 +9739,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_table_auto_bool}
 %\begin{macro}{\l_siunitx_table_complex_decimal_int}
 %\begin{macro}{\l_siunitx_table_complex_integer_int} 
 %\begin{macro}{\l_siunitx_table_decimal_int}
@@ -9784,6 +9822,7 @@ This work consists of the file  siunitx.dtx
       \skip_set:Nn \l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 1 fill } 
     },
+  table-auto-round          .bool_set:N = \l_siunitx_table_auto_bool,
   table-figures-complex-decimal
     .int_set:N  = \l_siunitx_table_complex_decimal_int ,  
   table-figures-complex-integer
@@ -9794,9 +9833,9 @@ This work consists of the file  siunitx.dtx
   table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int  ,
   table-parse-only          .bool_set:N = 
     \l_siunitx_table_parse_only_bool,
-  table-reserve-text-pre    .tl_set:N =
+  table-space-text-pre      .tl_set:N =
     \l_siunitx_table_pre_tl,  
-  table-reserve-text-post   .tl_set:N =
+  table-space-text-post     .tl_set:N =
     \l_siunitx_table_post_tl,  
   table-sign-exponent       .bool_set:N = 
     \l_siunitx_table_sign_exponent_bool,
@@ -9810,6 +9849,7 @@ This work consists of the file  siunitx.dtx
   table-figures-integer = 3
 }
 %    \end{macrocode} 
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9982,6 +10022,12 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_reserved_ends:
   \box_use:N \l_siunitx_table_pre_box
   \siunitx_table_print_S_model_create:
+  \bool_if:NT \l_siunitx_table_auto_bool
+    {
+      \int_set:Nn \l_siunitx_process_places_int 
+        { \l_siunitx_table_decimal_int }
+      \tl_set:Nn \l_siunitx_round_tl { places }  
+    }
   \siunitx_table_print_S_parse: 
   \intexpr_compare:nNnTF
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } 
@@ -11712,8 +11758,7 @@ This work consists of the file  siunitx.dtx
       table-align-units     = #1
     },
 %  tabalignexp & Boolean & Alignment of exponents in tables \\
-%  tabautofit & Boolean & Switch for rounding numbers to \\
-%   & & length given by \opt{tabformat} \\
+  tabautofit     .meta:n    = { table-auto-round = #1                 },
   tabformat      .code:n    = 
     {
       \number_in_parse:n {#1}
