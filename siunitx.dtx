@@ -2784,6 +2784,17 @@ This work consists of the file  siunitx.dtx
 % the macro name easier!).\footnote{The function 
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
 % 
+%\subsection{Other options}
+%
+%\DescribeOption{strict}
+% Some users will want to stick closely to the official rules for
+% typesetting units.  This could be made complicated if the options
+% for non-standards behaviour could not be turned off.  The
+% preamble-only option \opt{strict} resets package behaviour to 
+% follow the rules closely, and disables options which deviate from 
+% this.  If the package is loaded with the \opt{strict} option, all 
+% output is made using the upright serif font.
+% 
 %\section{Hints for using \pkg{siunitx}}   
 % 
 %\subsection{Ensuring text or maths output}
@@ -10863,6 +10874,8 @@ This work consists of the file  siunitx.dtx
     part.\\%
     Ranges can only contain one number in each part.%
   }
+\msg_new:nnn { siunitx } { option-not-available }
+  {Option '#1' not available in strict mode.}
 \msg_new:nnn { siunitx } { option-preamble-only }
   {Option '#1' only available in the preamble.}
 \msg_new:nnnn { siunitx } { prefix-base-mismatch }
@@ -11482,6 +11495,61 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Strict application of the rules}
+%
+%\begin{macro}{\siunitx_strict_option:n}
+%\begin{macro}[aux]{\siunitx_strict_option_aux:n}
+% When sticking to the rules closely, a few options are not available.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  strict .code:n = 
+    {
+      \keys_set:nn { siunitx } 
+        {
+          detect-italic         = false,
+          detect-mode           = false,
+          detect-weight         = false,
+          parse-numbers         = true,
+          parse-units           = true,
+          repeat-units          = true,
+          unit-product-to-power = true,
+          use-brackets          = true
+        }
+      \siunitx_strict_option:n  
+        { 
+          detect-italic         ,
+          detect-mode           ,
+          detect-weight         ,
+          parse-numbers         ,
+          parse-units           ,
+          repeat-units          ,
+          unit-product-to-power ,
+          use-brackets          
+        }
+      \keys_define:nn { siunitx }
+        {
+          per-mode / repeated-symbol .code:n =
+            { 
+              \msg_warning:nnx { siunitx } { option-not-available } 
+                {  per-mode~=~repeated-symbol }
+            }
+        }  
+    }
+}
+\siunitx_option_deactivate:n { strict }
+\cs_new_nopar:Npn \siunitx_strict_option:n #1 {
+  \clist_map_function:nN {#1} \siunitx_strict_option_aux:n 
+}
+\cs_new_nopar:Npn \siunitx_strict_option_aux:n #1 {
+  \keys_define:nn { siunitx }
+    { #1 .code:n = 
+      { \msg_warning:nnx { siunitx} { option-not-available } {#1} }
+    }  
+}
+%    \end{macrocode}
+%\end{macro}    
+%\end{macro} 
+%
 %\subsection{Loading additional configurations}
 %
 % There is only only option for loading files: keeps things simple.
@@ -11730,8 +11798,8 @@ This work consists of the file  siunitx.dtx
         per-mode                = symbol-or-fraction
       },
   inlinebold     .meta:n    = { detect-inline-weight    = #1          },
-%  load & Modules & Modules to load \\
-  log            .code:n    =,
+  log            .code:n    = ,
+  load           .code:n    = ,
   mathOmega      .meta:n    = { math-ohm                = #1          },
   mathcelsius    .meta:n    = { math-celsius            = #1          },
   mathdegree     .meta:n    = { math-degree             = #1          },
@@ -11923,7 +11991,6 @@ This work consists of the file  siunitx.dtx
     unknown      .code:n    = { per symbol              = #1          },
   stickyper      .meta:n    = { sticky-per              = #1          },
   stickyper      .default:n = { true                                  },
-%  strict & Boolean & Obey the rules strictly \\       
   strictarc      .code:n    = ,
   tabalign       .meta:n    = 
     {
@@ -11931,7 +11998,7 @@ This work consists of the file  siunitx.dtx
       table-align-text      = #1,
       table-align-units     = #1
     },
-%  tabalignexp & Boolean & Alignment of exponents in tables \\
+  tabalignexp    .code:n    = ,
   tabautofit     .meta:n    = { table-auto-round = #1                 },
   tabformat      .code:n    = 
     {
