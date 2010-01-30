@@ -3272,7 +3272,7 @@ This work consists of the file  siunitx.dtx
 %
 % Now load the support packages.
 %    \begin{macrocode}
-\RequirePackage{ amstext, array, etex, xparse }
+\RequirePackage{ amstext , array , etex , l3keys2e }
 %    \end{macrocode}
 %    
 %\begin{macro}{\siunitx_tmp:w}
@@ -8684,7 +8684,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_check_inputenc: {
   \@ifpackageloaded { inputenc }
     {
-      \clist_if_in:nVF { latin1 , latin5 , latin9 } \inputencodingname
+      \tl_set:Nn \l_siunitx_tmpa_tl { latin1 , latin5 , latin9 }
+      \clist_if_in:NVF \l_siunitx_tmpa_tl \inputencodingname 
         { 
           \cs_set_eq:NN \siunitx_unit_format_literal_extras: \scan_stop:
         }
@@ -11647,6 +11648,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}    
 %\end{macro} 
 %\end{macro} 
+%
+%    \begin{macrocode}
+\ProcessKeysOptions { siunitx }
+%    \end{macrocode}
 %    
 %    \begin{macrocode}
 %</package>
