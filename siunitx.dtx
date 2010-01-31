@@ -56,6 +56,7 @@ need the packages:
  - caption
  - cleveref
  - csquotes
+ - datatool
  - helvet
  - mathpazo
  - listings
@@ -155,8 +156,8 @@ This work consists of the file  siunitx.dtx
 %\iffalse
 \documentclass[full]{l3doc}
 
-\usepackage{amsmath,booktabs,caption,csquotes,helvet,pgfplots,siunitx}
-\usepackage{xcolor,xtab}
+\usepackage{amsmath,booktabs,caption,csquotes,datatool,helvet,pgfplots}
+\usepackage{siunitx,xcolor,xtab}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -2840,15 +2841,86 @@ This work consists of the file  siunitx.dtx
 %    \toprule
 %    {Some Values} \\
 %    \midrule
-%       \myvaluea 8.8 \myvaluea   \\ % Both expanded
-%       \myvalueb 8.8 \myvalueb   \\ % First expanded by TeX
+%       \myvaluea  8.8 \myvaluea  \\ % Both expanded
+%       \myvalueb  8.8 \myvalueb  \\ % First expanded by TeX
 %                                    % to numbers
-%       \myvaluec 8.8 \myvaluec   \\ % First expanded by TeX
+%       \myvaluec  8.8 \myvaluec  \\ % First expanded by TeX
 %                                    % but not to numbers!
-%       \myvalued 8.8 \myvalued   \\ % Neither expanded
+%       \myvalued  8.8 \myvalued  \\ % Neither expanded
 %      {\myvaluea\ 8.8 \myvaluea} \\ % Neither expanded
 %    \bottomrule
 %    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+% It is possible to use calculated values in tables. For this to
+% work, the calculation must take place before attempting to parse
+% the number. An added complication is that \TeX\ itself will
+% expand the first macro in a table cell until it finds 
+% something unexpandable. The \eTeX\ protected mechanism can be
+% used to prevent this; using the \pkg{etoolbox} package provides
+% a convenient way to apply this protection to existing functions.
+% The general approach is illustrated in \cref{tab:xmpl:calc}.
+% The macro \cs{DTLmul} is made robust inside the table using
+% the \cs{robustify} command from \pkg{etoolbox}, before 
+% constructing the table using an extra column to contain the
+% calculation.
+%\begin{LaTeXdemo}[code and float]
+%  \DTLnewdb{data}
+%  \DTLnewrow{data}\DTLnewdbentry{data}{value}{66.7012}
+%  \DTLnewrow{data}\DTLnewdbentry{data}{value}{66.0212}
+%  \DTLnewrow{data}\DTLnewdbentry{data}{value}{64.9026}
+%  \begin{table}
+%    \caption{Calculated values.}
+%    \label{tab:xmpl:calc}
+%    \centering
+%    \robustify\DTLmul
+%    \sisetup{
+%      table-align-numbers   = centre,
+%      table-figures-integer = 2,
+%      table-figures-decimal = 4
+%    }
+%    \begin{tabular}{
+%      S
+%      S[table-figures-integer = 3]
+%      @{}l
+%    }
+%      \toprule
+%      {Value} & {Doubled}  &
+%      \DTLforeach{data}{\myvalue=value}{%
+%        \DTLiffirstrow {\\ \midrule}{\\}%
+%        \myvalue & % First column
+%        \DTLmul{\myvalue}{\myvalue}{2} \myvalue % second column
+%        & }\\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\subsection{Using \pkg{siunitx} with \pkg{datatool}}
+%
+% As illustrated in \cref{tab:xmpl:calc}, \pkg{siunitx} can be used
+% to typeset data stored using \pkg{datatool}. For quickly displaying
+% the contents of tables, \pkg{datatool} offers the \cs{DTLshowtable}
+% macro. This will only work with \texttt{S} columns if number parsing
+% is turned off (\cref{tab:xmpl:datatool}).
+%\begin{LaTeXdemo}[code and float]
+%  \DTLnewdb{moredata}
+%  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{ 6.7012}
+%  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{66.0212}
+%  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{64.902 }
+%  \begin{table}
+%    \caption{Displaying a \pkg{datatool} table.}
+%    \label{tab:xmpl:datatool}
+%    \centering
+%    \sisetup{
+%      parse-numbers         = false,
+%      table-align-numbers   = centre,
+%      table-figures-integer = 2,
+%      table-figures-decimal = 4
+%    }
+%    \renewcommand*\dtlrealalign{S}
+%    \DTLdisplaydb{moredata}
 %  \end{table}
 %\end{LaTeXdemo}
 % 
