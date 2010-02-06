@@ -9367,10 +9367,28 @@ This work consists of the file  siunitx.dtx
 % Unit printing is also simple: basically a past-up job.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_range_unit:nnnn #1#2#3#4 {
-  \siunitx_unit_in:nn {#1} {#2}
-  \siunitx_range_numbers_aux:n {#3}
-  \text { \l_siunitx_range_phrase_tl }
-  \siunitx_range_numbers_aux:n {#4}
+  \bool_if:NTF \l_siunitx_number_unit_repeat_bool
+    {
+      \siunitx_unit_in:nn {#1} {#2}
+      \siunitx_range_numbers_aux:n {#3}
+      \text { \l_siunitx_range_phrase_tl }
+      \siunitx_range_numbers_aux:n {#4}
+    }
+    {
+      \bool_if:NT \l_siunitx_brackets_bool
+        {
+          \siunitx_print:nn { number } 
+            { \ensuremath { \l_siunitx_bracket_open_tl } }
+        }
+      \siunitx_range_numbers:nn {#3} {#4}
+      \bool_if:NT \l_siunitx_brackets_bool
+        {
+          \siunitx_print:nn { number } 
+            { \ensuremath { \l_siunitx_bracket_close_tl } }
+        }   
+      \siunitx_unit_output_number_sep:
+      \siunitx_unit_output:nn {#1} {#2}
+    }
 }
 %    \end{macrocode}
 %\end{macro}
