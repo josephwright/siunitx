@@ -3316,7 +3316,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %\begin{macro}{\siunitx_load_check:}
-%\begin{macro}[aux]{\siunitx_load_check_aux:n}
 % There are also a number of packages that are incompatible with
 % \pkg{siunitx}. These are all checked for next.  Some of the 
 % incompatible packages will not raise an error if loaded after 
@@ -3330,12 +3329,7 @@ This work consists of the file  siunitx.dtx
     The #1 package and siunitx are incompatible.\\%
     Use the `emulate=#1' package option when loading siunitx.%
   }
-\cs_new_nopar:Npn \siunitx_load_check: {
-  \clist_map_function:nN { SIunits, sistyle, siunits, SIstyle }
-    \siunitx_load_check_aux:n
-}
-
-\cs_new_nopar:Npn \siunitx_load_check_aux:n #1 {
+\cs_new_nopar:Npn \siunitx_load_check:n #1 {
   \group_begin:
     \@ifpackageloaded {#1} 
       { \msg_error:nnx { siunitx } { incompatible-package } {#1} } 
@@ -3343,11 +3337,13 @@ This work consists of the file  siunitx.dtx
   \group_end:
 }
 \clist_map_function:nN 
-  { SIunits, sistyle, siunits, SIstyle, unitsdef, fancyunits }
-  \siunitx_load_check_aux:n
-\AtBeginDocument { \siunitx_load_check: } 
+  { SIunits , sistyle , siunits , SIstyle , unitsdef , fancyunits }
+  \siunitx_load_check:n
+\AtBeginDocument {
+  \clist_map_function:nN { SIunits , sistyle , siunits , SIstyle }
+    \siunitx_load_check:n
+}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 % Now load the support packages.
@@ -3402,21 +3398,18 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %    
-%\begin{macro}{\siunitx_encoding_ts_one:}
 % Some of the \texttt{TS1} encoding is needed to provide symbols in 
 % text mode. If the user has not loaded the encoding themselves, it is
 % done here.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_encoding_ts_one: { 
+\AtBeginDocument { 
   \cs_if_free:cT { T@TS1 } 
     {
       \DeclareFontEncoding { TS1 } { } { } 
       \DeclareFontSubstitution { TS1 } { cmr } { m } { n } 
     }
 }
-\AtBeginDocument { \siunitx_encoding_ts_one: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}{\c_siunitx_minus_tl}
 % To allow the correct symbol to appear in text mode: this is the same
@@ -3435,18 +3428,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_omega_tl}
 % Some package redefine \cs{Omega} to be slanted and move the original
 % symbol to \cs{upOmega}. This is handled here.
 %    \begin{macrocode}
 \tl_new:Nn \c_siunitx_omega_tl { \Omega }
-\cs_new_nopar:Npn \siunitx_check_omega: {
+\AtBeginDocument {
   \cs_if_exist:NT \upOmega 
     { \tl_set:Nn \c_siunitx_omega_tl { \upOmega } }
 }
-\AtBeginDocument { \siunitx_check_omega: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_tl_put_left_maths:Nn}
 %\begin{macro}{\siunitx_tl_put_left_maths:NV}
@@ -3474,7 +3464,6 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_option_deactivate_clist}
 %\begin{macro}{\siunitx_option_deactivate:n}
-%\begin{macro}{\siunitx_options_deactivate:}
 %\begin{macro}[aux]{\siunitx_option_deactivate_aux:n}
 % Some options need to be deactivated at the start of the document.
 %    \begin{macrocode}
@@ -3482,20 +3471,18 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_option_deactivate:n #1 {
   \clist_put_right:Nn \l_siunitx_option_deactivate_clist {#1}
 }
-\cs_new_nopar:Npn \siunitx_options_deactivate: {
-  \clist_map_function:NN \l_siunitx_option_deactivate_clist
-    \siunitx_options_deactivate_aux:n
-}
-\cs_new_nopar:Npn \siunitx_options_deactivate_aux:n #1 {
+\cs_new_nopar:Npn \siunitx_option_deactivate_aux:n #1 {
   \keys_define:nn { siunitx } 
     {
       #1 .code:n = 
         { \msg_warning:nnx { siunitx } { option-preamble-only } {#1} }
     }
 }
-\AtBeginDocument { \siunitx_options_deactivate: }
+\AtBeginDocument {
+  \clist_map_function:NN \l_siunitx_option_deactivate_clist
+    \siunitx_option_deactivate_aux:n
+}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -4106,13 +4093,12 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %    
-%\begin{macro}{\siunitx_detect_default_family:}
 % Some packages (for example \pkg{cmbright}) and classes
 % (for example \pkg{beamer}) set the default family to be something
 % other than serif family. A one-off detection will make life easier
 % all round.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_detect_default_family: {
+\AtBeginDocument {
   \tl_set:Nx \l_siunitx_tmpa_tl { \familydefault }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
     {
@@ -4131,9 +4117,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\AtBeginDocument { \siunitx_detect_default_family: }
 %    \end{macrocode}
-%\end{macro}
 %    
 %\subsection{Output control}
 %
@@ -4208,7 +4192,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_print_colour:}
-%\begin{macro}{\siunitx_colour_check:}
 % The colour system checks if \pkg{color} is loaded, and only does
 % anything if it is.  This will change when \LaTeX3 proper is available:
 % there will be colour out of the box!
@@ -4222,13 +4205,11 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_nopar:Npn \siunitx_colour_check: {
+\AtBeginDocument {
   \@ifpackageloaded { color } { } 
     { \cs_set_eq:NN \siunitx_print_colour: \scan_stop: }
 }
-\AtBeginDocument { \siunitx_colour_check: }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_print_maths:}
@@ -8004,17 +7985,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro} 
 %
-%\begin{macro}{\siunitx_unit_create_check:}
 % The master control macro which occurs at the start of the document.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_unit_create_check: {
+\AtBeginDocument {
   \bool_if:NTF \l_siunitx_create_free_bool 
     { \siunitx_unit_create_functions: }
     { \siunitx_unit_create_empty_functions: }
 }
-\AtBeginDocument { \siunitx_unit_create_check: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_unit_create_empty_functions:}
 %\begin{macro}[aux]{\siunitx_unit_create_empty_functions_aux:N}
@@ -8106,8 +8084,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_protect_symbols:}
-%\begin{macro}[aux]{\siunitx_protect_symbols_aux:N}
+%\begin{macro}{\siunitx_protect_symbols:N}
 % There are a few unit names which may be defined by other parts of
 % \LaTeX. They need to be unexpandable, as in an \texttt{s} column
 % \TeX\ will look for \cs{omit} \emph{before} starting the internal
@@ -8115,19 +8092,17 @@ This work consists of the file  siunitx.dtx
 % for the \cs{color} function, which may well be the first thing in 
 % a table cell.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_protect_symbols: {
+\AtBeginDocument {
   \tl_map_function:nN { \bar \color \ng \pm } 
-    \siunitx_protect_symbols_aux:N
+    \siunitx_protect_symbols:N
 }
-\cs_new_nopar:Npn \siunitx_protect_symbols_aux:N #1 {
+\cs_new_nopar:Npn \siunitx_protect_symbols:N #1 {
   \cs_if_exist:NT #1 {
     \siunitx_cs_if_macro:NT #1 
       { \cs_set_protected_nopar:Npx #1 { \exp_not:V #1 } }
   }
 }
-\AtBeginDocument { \siunitx_protect_symbols: }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\subsection{Initial unit processing}
@@ -8741,7 +8716,6 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_unit_format_literal_extras:}
 %\begin{macro}[aux]{\siunitx_unit_format_literal_extras_aux:nN}
-%\begin{macro}{\siunitx_check_inputenc:}
 % The code here deals with characters outside the normal range that 
 % can appear in units in UTF-8 and related encodings. The idea is to
 % do a search and replace, thus avoiding any active characters.
@@ -8761,20 +8735,25 @@ This work consists of the file  siunitx.dtx
       \tl_replace_all_in:NnV \l_siunitx_unit_tl { @ } \l_siunitx_unit_tl
     }
 }
-\cs_new_nopar:Npn \siunitx_check_inputenc: {
-  \@ifpackageloaded { inputenc }
-    {
-      \tl_set:Nn \l_siunitx_tmpa_tl { latin1 , latin5 , latin9 }
-      \clist_if_in:NVF \l_siunitx_tmpa_tl \inputencodingname 
-        { 
-          \cs_set_eq:NN \siunitx_unit_format_literal_extras: \scan_stop:
-        }
-    }
-    { \cs_set_eq:NN \siunitx_unit_format_literal_extras: \scan_stop: }
+\xetex_if_engine:F {
+    \AtBeginDocument 
+      {
+        \@ifpackageloaded { inputenc }
+          {
+            \tl_set:Nn \l_siunitx_tmpa_tl { latin1 , latin5 , latin9 }
+            \clist_if_in:NVF \l_siunitx_tmpa_tl \inputencodingname 
+              { 
+                \cs_set_eq:NN \siunitx_unit_format_literal_extras: 
+                  \scan_stop:
+              }
+          }
+          { 
+            \cs_set_eq:NN \siunitx_unit_format_literal_extras:
+              \scan_stop: 
+          }
+      }  
 }
-\xetex_if_engine:F { \AtBeginDocument { \siunitx_check_inputenc: } }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -9394,8 +9373,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\subsection{Setting up tables}
-%
-%\begin{macro}{\siunitx_table_rewrite_cellspace:}
+% 
 % There is a slight problem with the \pkg{cellspace} package: it also
 % uses \texttt{S} for a column type  Here, \texttt{S} seems to make
 % more sense for \pkg{siunitx}, with \texttt{C} used for 
@@ -9403,7 +9381,7 @@ This work consists of the file  siunitx.dtx
 % rewriting code happens \cs{AtBeginDocument}. The \texttt{S} column
 % is deleted from \cs{NC@list} so that no warning appears.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_table_rewrite_cellspace: {
+\AtBeginDocument {
   \@ifpackageloaded { cellspace } 
     {
       \newcolumntype { C } [1] 
@@ -9414,9 +9392,7 @@ This work consists of the file  siunitx.dtx
       \cs_gundefine:N \NC@find@S
     } { }
 }
-\AtBeginDocument { \siunitx_table_rewrite_cellspace: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_table_rewrite_create:N}
 % The \texttt{s} and \texttt{S} column types are both created using
@@ -9740,13 +9716,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\c_siunitx_table_correction_skip}
-%\begin{macro}{\siunitx_colortbl_check:}
 %\begin{macro}{\siunitx_table_colortbl_correction:}
 % If the package \pkg{colortbl} is loaded, there is a need to allow
 % that it changes how centring is carried out.
 %    \begin{macrocode}
 \skip_new:N \c_siunitx_table_correction_skip
-\cs_new_nopar:Npn \siunitx_colortbl_check: {
+\AtBeginDocument {
   \@ifpackageloaded { colortbl }
     { 
       \skip_set:Nn \c_siunitx_table_correction_skip 
@@ -9757,13 +9732,11 @@ This work consists of the file  siunitx.dtx
         { \c_zero_skip } 
     }
 }
-\AtBeginDocument { \siunitx_colortbl_check: }
 \cs_new_nopar:Npn \siunitx_table_colortbl_correction: {
   \skip_horizontal:n { \c_siunitx_table_correction_skip }
   \tex_kern:D \c_zero_skip
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -10759,11 +10732,10 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%\begin{macro}{\siunitx_redefine_symbols:}
 % The redefinition of symbols has to do a number of checks to ensure
 % that there are no clashes.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_redefine_symbols: {
+\AtBeginDocument {
   \bool_if:NT \l_siunitx_redefine_symbols_bool 
     {
       \@ifpackageloaded { textcomp } 
@@ -10795,9 +10767,7 @@ This work consists of the file  siunitx.dtx
         } { }
     }
 }
-\AtBeginDocument { \siunitx_redefine_symbols: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\begin{macro}{\l_siunitx_angstrom_maths_tl}
 %\begin{macro}{\l_siunitx_arcminute_maths_tl}
@@ -11221,16 +11191,14 @@ This work consists of the file  siunitx.dtx
 % \pkg{hyperref}, and ensure that everything works cleanly and with
 % no unnecessary warnings.
 % 
-%\begin{macro}{\siunitx_contents_add_setup:}
-%\begin{macro}{\siunitx_contents_add:nnn}
-%\begin{macro}{\siunitx_contents_add_aux:N}
+%\begin{macro}{\siunitx_contents_add:N}
 % An updated version of \cs{addtocontents} which will ensure that
 % everything works properly. Using \cs{token_to_str:N} means that
 % there is no problem with the asynchronous nature of \TeX's writing
 % mechanism.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_contents_add_setup: {
-  \cs_set:Npn \addtocontents ##1##2
+\AtBeginDocument {
+  \cs_set:Npn \addtocontents #1#2
     {
       \protected@write \@auxout
         {
@@ -11238,18 +11206,15 @@ This work consists of the file  siunitx.dtx
           \cs_set_eq:NN \index \use_none:n  
           \cs_set_eq:NN \glossary\use_none:n
           \tl_map_function:NN \l_siunitx_declare_list_tl 
-            \siunitx_contents_add_aux:N 
+            \siunitx_contents_add:N 
         }
-        { \token_to_str:N \@writefile {##1} {##2} }
+        { \token_to_str:N \@writefile {#1} {#2} }
     }
 }
-\cs_new_nopar:Npn \siunitx_contents_add_aux:N #1 {
+\cs_new_nopar:Npn \siunitx_contents_add:N #1 {
   \cs_set_nopar:Npn #1 { \token_to_str:N #1 }
 }
-\AtBeginDocument { \siunitx_contents_add_setup: }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro} 
 % 
 %\begin{macro}{\siunitx_contents_bookmarks:}
@@ -11304,17 +11269,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_hyperref_check:}
 % A short check to get things working.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_hyperref_check: {
+\AtBeginDocument {
   \@ifpackageloaded { hyperref } 
     { \pdfstringdefDisableCommands { \siunitx_contents_bookmarks: } }
     { }
 }
-\AtBeginDocument { \siunitx_hyperref_check: }
 %    \end{macrocode}
-%\end{macro}
 %
 %\subsection{Physical units}
 %
