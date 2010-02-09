@@ -911,6 +911,14 @@ This work consists of the file  siunitx.dtx
 %  \si{\per\henry\tothe{5}} \\
 %  \si{\per\square\becquerel} 
 %\end{LaTeXdemo}
+%\DescribeMacro{\of}
+% As for generic powers, generic qualifiers are also available using
+% the \cs{of} function:
+%\begin{LaTeXdemo} 
+%  \si{\kilogram\of{metal}} \\
+%  \SI[qualifier-mode = subscript]
+%    {0.1}{\milli\mole\of{cat}\per\kilogram\of{prod}}
+%\end{LaTeXdemo}
 %
 % When using the unit macros, the package is able to validate the
 % input given. As part of this, stand-alone unit prefixes can be used
@@ -7827,7 +7835,7 @@ This work consists of the file  siunitx.dtx
 % A list of all unit and related functions.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_declare_list_tl
-\tl_set:Nn \l_siunitx_declare_list_tl { \per \raiseto \tothe }
+\tl_set:Nn \l_siunitx_declare_list_tl { \of \per \raiseto \tothe }
 %    \end{macrocode}
 %\end{macro} 
 %
@@ -7949,6 +7957,18 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\of}
+% A flexible qualifier as well.
+%    \begin{macrocode}
+\cs_new:cpn { siunitx_ \token_to_str:N \of _literal:w } #1 {
+  \text { ~ } ( #1 )
+}
+\cs_new:cpn { siunitx_ \token_to_str:N \of _function:w } #1 {
+  \siunitx_unit_parse_qualifier:n {#1}
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Creating body unit macros}
@@ -8178,6 +8198,7 @@ This work consists of the file  siunitx.dtx
   \group_begin:
     \tl_map_function:NN \l_siunitx_declare_list_tl
       \siunitx_unit_if_literal_aux:N
+    \cs_set_eq:NN \of \use_none:n  
     \cs_set_eq:NN \raiseto \use_none:n
     \cs_set_eq:NN \tothe \use_none:n
     \protected@edef \l_siunitx_tmpa_tl {#1}
