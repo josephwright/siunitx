@@ -4105,20 +4105,18 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %    
-% Some packages (for example \pkg{cmbright}) and classes
-% (for example \pkg{beamer}) set the default family to be something
-% other than serif family. A one-off detection will make life easier
+% Some packages and classes (for example \pkg{beamer}) set the default 
+% family to be something other than serif family. A one-off detection 
+% will make life easier
 % all round.
 %    \begin{macrocode}
 \AtBeginDocument {
   \tl_set:Nx \l_siunitx_tmpa_tl { \familydefault }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
     {
-      \keys_set:nn { siunitx } 
-        {
-          maths-rm = \mathsf,
-          text-rm  = \sffamily
-        }
+      \@ifpackageloaded { cmbright } { }
+        { \keys_set:nn { siunitx } { maths-rm = \mathsf } }
+      \keys_set:nn { siunitx } { text-rm  = \sffamily }
     }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_texttt_tl 
     {
