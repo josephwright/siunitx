@@ -3567,6 +3567,7 @@ This work consists of the file  siunitx.dtx
 % \pkg{fontspec} does (nasty errors arise otherwise). 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_set_maths_fam:n #1 {
+  \int_new:c { c_siunitx_math #1 _int }
   \group_begin:
     \hbox_set:Nn \l_siunitx_tmp_box 
       {
@@ -3574,10 +3575,7 @@ This work consists of the file  siunitx.dtx
           {
             \use:c { math #1 } 
               {
-                \exp_after:wN \pref_global:D 
-                \exp_after:wN \tex_chardef:D
-                \cs:w c_siunitx_math #1 _int \cs_end: 
-                  \fam \scan_stop:       
+                \int_gset:cn { c_siunitx_math #1 _int } { \fam }  
               }
           }
       }  
