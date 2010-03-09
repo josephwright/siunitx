@@ -565,9 +565,10 @@ This work consists of the file  siunitx.dtx
 % formatted.  The formatter removes \enquote{hard} spaces 
 % (\cs{,} and |~|), automatically identifies exponents (by default 
 % marked using \texttt{e}, \texttt{E}, \texttt{d} or \texttt{D}) and 
-% adds the appropriate spacing of large numbers.  A leading zero is 
-% added before a decimal marker, if needed: both \enquote{\texttt{.}} 
-% and \enquote{\texttt{,}} are recognised as decimal marker.
+% adds the appropriate spacing of large numbers.  With the standard
+% settings a leading zero is added before a decimal marker, if needed: 
+% both \enquote{\texttt{.}} and \enquote{\texttt{,}} are recognised as 
+% decimal marker.
 %\begin{LaTeXdemo}
 %  \num{123}     \\
 %  \num{1234}    \\
@@ -624,11 +625,11 @@ This work consists of the file  siunitx.dtx
 % provides full control over output format for the unit. Like the
 % \cs{num} macro, \cs{si} takes  one optional and one mandatory 
 % argument. The unit formatting system can accept two types of input. 
-% When \meta{unit} contains one or more literal items, the output is 
-% processed in the same manner as with the \pkg{SIstyle} package. Sub- 
-% and superscripts can be input without concern over maths mode, and 
-% the tokens \texttt{.} and |~| are converted into inter-unit 
-% separators.
+% When the \meta{unit} contains literal items (for example letters or
+% numbers) then \pkg{siunitx} converts \texttt{.} and |~| into
+% inter-unit separators and correctly positions sub- and superscripts
+% specified using |_| and |^|. The formatting methods will work with
+% both maths and text mode.
 %\begin{LaTeXdemo}
 %  \si{kg.m/s^2} \\
 %  \si{g_{polymer}~mol_{cat}.s^{-1}}
@@ -649,8 +650,10 @@ This work consists of the file  siunitx.dtx
 % the package allows you to define new unit macros; a large number of
 % pre-defined abbreviations are also supplied.  More importantly, by
 % defining macros for units, instead of literal values, new
-% functionality is made available.  Units may be re-defined to give
-% different output, and handling of reciprocal values can be altered.
+% functionality is made available.  By altering the settings used by the
+% package, the same input can yield a variety of different output 
+% formats. For example, the \cs{per} macro can give reciprocal powers,
+% slashes or be used to construct units as fractions.
 %
 %\DescribeMacro{\SI}
 %\begin{syntax}
@@ -670,7 +673,7 @@ This work consists of the file  siunitx.dtx
 %  \SI[per-mode=fraction]{1,345}{\coulomb\per\mole}
 %\end{LaTeXdemo}
 %
-% It is possible set up the unit macros to be available outside of
+% It is possible to set up the unit macros to be available outside of
 % the \cs{SI} and \cs{si} functions. This is not the standard behaviour
 % as there is the risk of name clashes (for example, \cs{bar} is used
 % by other packages, and several packages define \cs{degree}). Full
@@ -762,7 +765,7 @@ This work consists of the file  siunitx.dtx
 % although they are not SI units. \cref{tab:unit:accepted} lists 
 % the \enquote{accepted} units \cite{SI:4.1.T6}. Some units are 
 % fundamental physical quantities, and these are non-SI but can be used 
-% with in the SI (\cref{tab:unit:physical}, \cite{SI:4.1.T7}). 
+% within the SI (\cref{tab:unit:physical}, \cite{SI:4.1.T7}). 
 % There are also a set of non-SI units which are used in certain 
 % defined circumstances (\cref{tab:unit:other}), although they are 
 % not necessarily official sanctioned \cite{SI:4.1.T8}.
@@ -945,12 +948,12 @@ This work consists of the file  siunitx.dtx
 % they can be used. The package supplies a number of common definitions,
 % but new definitions are also possible. As the definition of a logical
 % unit should remain the same in a single document, these creation
-% functions are all preamble-only.
+% functions are all preamble-only. 
 %
 %\DescribeMacro{\DeclareSIUnit}
 %\DescribeMacro{\DeclareSIUnitWithOptions}
 %\begin{syntax}
-%  \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}
+%  \cs{DeclareSIUnit}\marg{unit}\marg{symbol}
 %  \cs{DeclareSIUnitWithOptions}\marg{unit}\marg{symbol}\marg{options}
 %\end{syntax}
 % New units are produced using the \cs{DeclareSIUnit} macro. 
@@ -975,6 +978,9 @@ This work consists of the file  siunitx.dtx
 %  \SI{67890}{\degree} \\
 %  \SI[number-unit-separator = \;]{67890}{\degree}
 %\end{LaTeXdemo}
+% The meaning of a pre-defined unit can be altered by using
+% \cs{DeclareSIUnit} after loading \pkg{siunitx}. This will overwrite
+% the original definition with the newer version.
 % 
 %\DescribeMacro{\DeclareSIPrefix}
 %\DescribeMacro{\DeclareBinaryPrefix}
@@ -1089,7 +1095,7 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
-%    \caption{Number and units in tables.}
+%    \caption{Units in tables.}
 %    \label{tab:s:demo}
 %    \begin{tabular}{s}
 %      \toprule
@@ -1375,8 +1381,8 @@ This work consists of the file  siunitx.dtx
 % a marker for the exponent: this again is taken from the range of 
 % tokens in the \opt{exponent markers} option.
 % 
-%\DescribeOption{input-ignore}
 %\DescribeOption{input-symbols}
+%\DescribeOption{input-ignore}
 % As well as \enquote{normal} digits, the package will interpret 
 % symbolic \enquote{numbers} (such as \cs{pi}) correctly if they are 
 % included in the \opt{input-symbols} list. Tokens given in the 
@@ -1656,7 +1662,7 @@ This work consists of the file  siunitx.dtx
 % \opt{separate-uncertainty} choice. If the uncertainty is given in 
 % brackets, a space may be added between the main value and the 
 % uncertainty: this is stored using the \opt{uncertainty-separator}
-% option. The opening and closing brackets used are stored 
+% option. The opening and closing brackets used are stored in 
 % \opt{output-open-uncertainty} and
 % \opt{output-close-uncertainty}, respectively.
 %\begin{LaTeXdemo}
@@ -1676,7 +1682,7 @@ This work consists of the file  siunitx.dtx
 % There are certain combinations of numerical input which can be
 % ambiguous. This can be corrected by adding brackets in the appropriate
 % place, and is controlled by the \opt{use-brackets} switch.  The 
-% opening and closing brackets used are stored \opt{open-bracket} and
+% opening and closing brackets used are stored in \opt{open-bracket} and
 % \opt{close-bracket}, respectively.
 %\begin{LaTeXdemo}
 %  \num{1+2i e10} \\
@@ -1738,7 +1744,6 @@ This work consists of the file  siunitx.dtx
 %      input-quotient     & Literal & /          \\
 %      output-product     & Maths   & \cs{times} \\
 %      output-quotient    & Maths   & /          \\
-%      product-mode       & Choice  & symbol     \\
 %      quotient-mode      & Choice  & symbol     \\
 %    \bottomrule
 %  \end{tabular}
@@ -1764,7 +1769,6 @@ This work consists of the file  siunitx.dtx
 %  \num[output-quotient = \text{ div }]{1 / 2}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{product-mode}
 %\DescribeOption{quotient-mode}
 % For quotients, there is the possibility to print output either using
 % a slash, or using the \cs{frac} macro. This is controlled by the 
@@ -1777,10 +1781,10 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{fraction-function}
 % The function used when \opt{quotient-mode = fraction} is set is 
-% determin ed by the \opt{fraction-function} option. This should
+% determined by the \opt{fraction-function} option. This should
 % be set to a function which takes two arguments, and presumably
 % creates some type of fraction. Most alternatives to the standard
-% \cs{frac} function will involve loading addition packages: the
+% \cs{frac} function will involve loading additional packages: the
 % demonstrations here need \pkg{amsmath} and 
 % \pkg{xfrac}.\footnote{If \pkg{xfrac} is not available when typesetting
 % this document, the demonstration of \cs{sfrac} will have the wrong
@@ -1795,9 +1799,9 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Angles}
 %
-% Angle processing provided by the \cs{ang} has a set of options which
-% apply in addition to the general ones set up for number processing
-% (\cref{tab:opt:ang})
+% Angle processing provided by the \cs{ang} function has a set of options 
+% which apply in addition to the general ones set up for number processing
+% (\cref{tab:opt:ang}).
 %
 %\begin{table}
 %  \centering
@@ -1878,8 +1882,9 @@ This work consists of the file  siunitx.dtx
 %\label{sec:units:creating}
 %
 % The various macro units are created at the start of the document. 
-% These can be defined only inside the \cs{si} and \cs{SI} macros, or
-% can also be made available in the document body. There are a number of
+% \pkg{siunitx} can define these such that they are only available for 
+% use within the \cs{si} and \cs{SI} functions, or can make the unit
+% macros available throughout the document body. There are a number of
 % settings which control this creation process 
 % (\cref{tab:opt:units:def}). As a result, these options all apply
 % in the preamble only.
@@ -2065,11 +2070,12 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeMacro{\bit}
 %\DescribeMacro{\byte}
-% Binary data requires the units bits and bites, and the special
-% prefixes which use powers of two rather than of ten 
-% (\cref{tab:unit:binary}) have been defined for this purpose.
-% Appropriate unit prefixes, along with the units \cs{bit} and 
-% \cs{byte} are available for use in the computing field.
+% Binary data is expressed in units of bits and bytes. These are
+% normally given prefixes which use powers of two, rather than the
+% powers of ten used by the SI prefixes. As these binary prefixes are
+% closely related to the SI prefixes, they are defined by \pkg{siunitx}
+% (\cref{tab:unit:binary}). The units \cs{bit} and \cs{byte} are
+% also available.
 %\begin{LaTeXdemo}
 %  \SI{100}{\mebi\byte} \\
 %  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
@@ -2222,6 +2228,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{per-mode}
 %\DescribeOption{per-symbol}
+%\DescribeOption{use-brackets}
 % The handling of \cs{per} is altered using the \opt{per-mode} choice
 % option.  The standard setting is \opt{reciprocal}, meaning that 
 % \cs{per} generates reciprocal powers for units.  Setting the option
@@ -2345,7 +2352,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %
 %\DescribeOption{allow-number-unit-breaks}
-% Usually, the combination of a number and unit is regards as a single
+% Usually, the combination of a number and unit is regarded as a single
 % mathematical entity which should not be split across lines. However,
 % there are cases (very long units, narrow columns, \emph{etc}.) where 
 % breaks may be needed. This can be turned on using the 
@@ -2361,7 +2368,9 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{number-unit-separator}
 % The separator between the number and unit is set using the 
-% \opt{number-unit-separator} option. 
+% \opt{number-unit-separator} option. This is always printed in maths
+% mode, and so anything which must be printed as text should be placed
+% inside a \cs{text} macro.
 %\begin{LaTeXdemo}
 %  \SI{2.67}{\farad} \\
 %  \SI[number-unit-separator=\text{~}]{2.67}{\farad} \\
@@ -2401,7 +2410,8 @@ This work consists of the file  siunitx.dtx
 %
 % Processing of material in tables obeys the same settings as described
 % for the functions already described. However, there are some settings
-% which apply only to the layout of tabular material.
+% which apply only to the layout of tabular material 
+% (\cref{tab:opt:tables}).
 % 
 %\begin{table}
 %  \centering
@@ -2413,7 +2423,8 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      table-align-numbers           & Choice  & center    \\
+%      table-align-numbers           & Choice  & 
+%        center-decimal-marker \\
 %      table-align-text              & Choice  & center    \\
 %      table-align-units             & Choice  & center    \\
 %      table-auto-round              & Switch  & false     \\
@@ -2435,7 +2446,7 @@ This work consists of the file  siunitx.dtx
 % the resulting output. However, it is possible to turn off alignment
 % entirely and only use the number parser of \pkg{siunitx}. This is
 % achieved using the \opt{table-parse-only} switch, as illustrated
-% in \cref{tab:S:parse}
+% in \cref{tab:S:parse}.
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
@@ -2553,10 +2564,10 @@ This work consists of the file  siunitx.dtx
 %      & {Values}
 %      & {Values} \\
 %    \midrule
-%       2.3   &  2.3   &  2.3(5)  &  2.3(5)  &  2.3   & 2.3e8   \\
-%      34.23  & 34.23  & 34.23(4) & 34.23(4) & 34.23  & 34.23   \\
-%      56.78  & 56.78  & 56.78(3) & 56.78(3) & -56.78 & 56.78e3 \\
-%       3,76 &   3,76 &  3,76(2) & 3.76(2)  & +-3.76 &      e6  \\
+%       2.3  &  2.3  &  2.3(5)  &  2.3(5)  &   2.3  &  2.3e8  \\
+%      34.23 & 34.23 & 34.23(4) & 34.23(4) &  34.23 & 34.23   \\
+%      56.78 & 56.78 & 56.78(3) & 56.78(3) & -56.78 & 56.78e3 \\
+%       3,76 &  3,76 &  3,76(2) &  3.76(2) & +-3.76 &      e6 \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -2656,17 +2667,18 @@ This work consists of the file  siunitx.dtx
 %      & \multicolumn{1}{c}{Some values}
 %      & \multicolumn{1}{c}{Some values} \\
 %    \midrule
-%       2.35   &  2.35   &  2.35  &  2.35  \\
-%      34.234  & 34.234  & 34.234 & 34.234 \\
-%      56.783  & 56.783  & 56.783 & 56.783 \\
-%       3,762  &   3,762 &  3,762 & 3.762  \\
+%       2.35  &    2.35  &    2.35  &   2.35   \\
+%      34.234 &   34.234 &   34.234 &  34.234  \\
+%      56.783 &   56.783 &   56.783 &  56.783  \\
+%       3,762 &    3,762 &    3,762 &   3.762  \\
+%    \sqrt{2} & \sqrt{2} & \sqrt{2} & \sqrt{2} \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{table-align-text}
-% Cell contents which are not part of of a number can be protected
+% Cell contents which are not part of a number can be protected
 % using braces, as illustrated. Cells which contain no numerical data
 % at all are aligned using the setting specified by the 
 % \opt{table-align-text} option, which recognises the values
@@ -2717,9 +2729,9 @@ This work consists of the file  siunitx.dtx
 %        s[table-align-units = left]
 %      }      
 %      \toprule
-%        \multicolumn{1}{c}{Left-aligned}  &   
-%        \multicolumn{1}{c}{Centred text}  &
-%        \multicolumn{1}{c}{Right-aligned} \\
+%        {Left-aligned}  &   
+%        {Centred text}  &
+%        {Right-aligned} \\
 %      \midrule
 %        \metre\per\second & \metre\per\second & \metre\per\second \\
 %        \kilogram         & \kilogram         & \kilogram         \\
@@ -3114,7 +3126,7 @@ This work consists of the file  siunitx.dtx
 % be separated.  With the exception of the symbols for plane angles
 % (\si{\degree}, \si{\arcminute} and \si{\arcsecond}), it is usual to 
 % have a space between the unit and the value.  This should therefore
-% be a non-breaking space between the two.
+% be a thin non-breaking space between the two.
 %\begin{LaTeXdemo}
 %  A space for \SI{10}{\percent}\\
 %  and also for \SI{100}{\degreeCelsius}\\
