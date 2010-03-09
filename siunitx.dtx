@@ -1154,12 +1154,6 @@ This work consists of the file  siunitx.dtx
 %\end{description}
 % The tables of option names use these descriptions to indicate how the
 % keys should be used.
-% 
-% In all cases, UK and US English spellings are available for both 
-% option names and for settings. Thus \opt{centre} and 
-% \opt{center} can be used for alignment options, and \opt{maths}
-% or \opt{math} is valid in the names of font options. In the rest of
-% this document, UK English spelling is used.
 %
 %\subsection{Detecting fonts}
 %
@@ -1180,7 +1174,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
 %      detect-all           & Meta   & \meta{none} \\
-%      detect-display-maths & Switch & false       \\
+%      detect-display-math  & Switch & false       \\
 %      detect-family        & Switch & false       \\
 %      detect-inline-weight & Choice & text        \\
 %      detect-italic        & Switch & false       \\
@@ -1205,7 +1199,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{detect-inline-weight}
 % Font weight detection is influenced by the value of 
-% \opt{detect-inline-weight}, which takes values \opt{text}, \opt{maths} 
+% \opt{detect-inline-weight}, which takes values \opt{text}, \opt{math} 
 % and \opt{combined}.  The package can detect the local value of font 
 % weight for either the surrounding text, or the surrounding inline 
 % (|$|\ldots|$|) maths. The \opt{combined} option checks both and uses 
@@ -1213,7 +1207,7 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \sisetup{
 %    detect-weight        = true, 
-%    detect-inline-weight = maths
+%    detect-inline-weight = math
 %  }%
 %  $\num{1234}$ \\
 %  { \boldmath $\num{1234}$ } \\ 
@@ -1223,9 +1217,9 @@ This work consists of the file  siunitx.dtx
 %  { \bfseries $\num{1234}$ }
 %\end{LaTeXdemo} 
 %
-%\DescribeOption{detect-display-maths}
+%\DescribeOption{detect-display-math}
 % The font detection system can treat displayed mathematical content
-% in two ways.  This is controlled by the \opt{detect-display-maths}
+% in two ways.  This is controlled by the \opt{detect-display-math}
 % option. When set \opt{true}, display mathematics is treated 
 % independently from the body of the document.  Thus the local 
 % \emph{maths} font is checked for matching.  In contrast, when set 
@@ -1236,11 +1230,11 @@ This work consists of the file  siunitx.dtx
 %  Some text
 %  \sisetup{
 %    detect-all,
-%    detect-display-maths = true
+%    detect-display-math = true
 %  }
 %  \[ x = \SI{1.2e3}{\kilogram\kelvin\candela} \]
 %  More text
-%  \sisetup{detect-display-maths = false}
+%  \sisetup{detect-display-math = false}
 %  \[ y = \SI{3}{\metre\second\mole} \]
 %\end{LaTeXdemo}
 %
@@ -1263,14 +1257,14 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule
-%      colour   & Literal & \meta{none}      \\
-%      maths-rm & Macro   & \cs{mathrm}   \\
-%      maths-sf & Macro   & \cs{mathsf}   \\ 
-%      maths-tt & Macro   & \cs{mathtt}   \\
-%      mode     & Choice  & maths         \\
-%      text-rm  & Macro   & \cs{rmfamily} \\
-%      text-sf  & Macro   & \cs{sffamily} \\ 
-%      text-tt  & Macro   & \cs{ttfamily} \\
+%      color   & Literal & \meta{none}   \\
+%      math-rm & Macro   & \cs{mathrm}   \\
+%      math-sf & Macro   & \cs{mathsf}   \\ 
+%      math-tt & Macro   & \cs{mathtt}   \\
+%      mode    & Choice  & math          \\
+%      text-rm & Macro   & \cs{rmfamily} \\
+%      text-sf & Macro   & \cs{sffamily} \\ 
+%      text-tt & Macro   & \cs{ttfamily} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1278,7 +1272,7 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{mode}
 % The \opt{mode} option determines whether \pkg{siunitx} uses
 % maths or text mode when printing output. The choices are 
-% \opt{maths}, \opt{math} and \opt{text}. When using maths
+% \opt{math}, \opt{math} and \opt{text}. When using maths
 % mode, text is printed using a maths font whereas in text mode a
 % text font is used.  The extent to which this is visually obvious
 % depends on the fonts in use in the document. This manual uses old
@@ -1286,26 +1280,26 @@ This work consists of the file  siunitx.dtx
 % This option has no effect if the \opt{detect-mode} switch is
 % \opt{true}.
 % 
-%\DescribeOption{maths-rm}
+%\DescribeOption{math-rm}
 %\DescribeOption{text-rm}
-%\DescribeOption{maths-sf}
-%\DescribeOption{maths-tt}
+%\DescribeOption{math-sf}
+%\DescribeOption{math-tt}
 %\DescribeOption{text-sf}
 %\DescribeOption{text-tt}
 % If font family detection is inactive, \pkg{siunitx} uses the font
-% family stored in either \opt{maths-rm} or \opt{text-rm} for
-% output. The choice of \opt{maths} or \opt{text} depends on the
+% family stored in either \opt{math-rm} or \opt{text-rm} for
+% output. The choice of \opt{math} or \opt{text} depends on the
 % \opt{mode} setting. If font family detection is active, 
 % \pkg{siunitx} may be using a sans serif or monospaced font for 
-% output. In maths mode, these are stored in \opt{maths-sf} and 
-% \opt{maths-tt}, and for text mode in \opt{text-sf} and \opt{text-tt}. 
+% output. In maths mode, these are stored in \opt{math-sf} and 
+% \opt{math-tt}, and for text mode in \opt{text-sf} and \opt{text-tt}. 
 % Notice that the detected and output font families can differ.
 %\begin{LaTeXdemo}
 %  \sisetup{detect-family}%
 %  \num{1234} \\
 %  { \sffamily \num{1234} } \\
 %  \SI{99}{\metre} \\
-%  \sisetup{maths-rm = \mathtt}%
+%  \sisetup{math-rm = \mathtt}%
 %  \SI{99}{\metre} 
 %\end{LaTeXdemo}
 % 
@@ -2773,24 +2767,24 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      maths-angstrom  & Literal & \verb=\text{\AA}=                 \\ 
-%      maths-arcminute & Literal & \verb={}^{\prime}=                \\
-%      maths-arcsecond & Literal & \verb={}^{\prime\prime}=          \\
-%      maths-celsius   & Literal & \verb={}^{\circ}=                 \\
+%      math-angstrom    & Literal & \verb=\text{\AA}=                 \\ 
+%      math-arcminute   & Literal & \verb={}^{\prime}=                \\
+%      math-arcsecond   & Literal & \verb={}^{\prime\prime}=          \\
+%      math-celsius     & Literal & \verb={}^{\circ}=                 \\
 %        & & \verb=\kern -\scriptspace \mathrm{C}= \\ 
-%      maths-degree    & Literal & \verb={}^{\circ}=                 \\
-%      maths-micro     & Literal & \meta{see text}                   \\
-%      maths-ohm       & Literal & \cs{Omega}                        \\
+%      math-degree      & Literal & \verb={}^{\circ}=                 \\
+%      math-micro       & Literal & \meta{see text}                   \\
+%      math-oh  m       & Literal & \cs{Omega}                        \\
 %      redefine-symbols & Switch & true \\
-%      text-angstrom   & Literal & \cs{AA}                           \\ 
-%      text-arcminute  & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
-%      text-arcsecond  & Literal & 
-%        \verb=\ensuremath{{}^{\prime\prime}}= \\
-%      text-celsius    & Literal &  \verb=\ensuremath{{}^{\circ}=    \\
-%        & & \verb=\kern -\scriptspace \text{C}}= \\ 
-%      text-degree     & Literal & \verb=\ensuremath{{}^{\circ}}=    \\
-%      text-micro      & Literal & \meta{see text}                   \\
-%      text-ohm        & Literal & \verb=\ensuremath{\Omega}=        \\
+%      text-angstrom    & Literal & \cs{AA}                           \\ 
+%      text-arcminute   & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
+%      text-arcsecond   & Literal & 
+%        \verb=\ensuremath{{}^{\prime\prime}}= \\ 
+%      text-celsius     & Literal &  \verb=\ensuremath{{}^{\circ}=    \\
+%        & & \verb=\ker n -\scriptspace \text{C}}= \\ 
+%      text-degree      & Literal & \verb=\ensuremath{{}^{\circ}}=    \\ 
+%      text-micro       & Literal & \meta{see text}                   \\
+%      text-ohm         & Literal & \verb=\ensuremath{\Omega}=        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2983,7 +2977,7 @@ This work consists of the file  siunitx.dtx
 %\begin{flushleft}
 %  \ttfamily
 %  \textbackslash \textcolor{blue}{sisetup}\{\\
-%  \ \ maths-micro  = \textbackslash 
+%  \ \ math-micro  = \textbackslash 
 %    \textcolor{blue}{text}\{\SIUnitSymbolMicro\}, \\
 %  \ \ text-micro \ = \SIUnitSymbolMicro \\
 %  \}
@@ -2998,8 +2992,8 @@ This work consists of the file  siunitx.dtx
 % to use the default maths font for all output:
 %\begin{LaTeXdemo}[code only]
 %  \sisetup{
-%    mode     = maths,
-%    maths-rm = \ensuremath
+%    mode    = math,
+%    math-rm = \ensuremath
 %  }
 %\end{LaTeXdemo}
 % This will cause all \pkg{siunitx} output \emph{not} to scale at all,
@@ -3450,22 +3444,22 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %
-%\begin{macro}{\siunitx_tl_put_left_maths:Nn}
-%\begin{macro}{\siunitx_tl_put_left_maths:NV}
-%\begin{macro}{\siunitx_tl_put_left_maths:cV}
-%\begin{macro}{\siunitx_tl_put_right_maths:Nn}
-%\begin{macro}{\siunitx_tl_put_right_maths:NV}
-%\begin{macro}{\siunitx_tl_put_right_maths:cV}
+%\begin{macro}{\siunitx_tl_put_left_math:Nn}
+%\begin{macro}{\siunitx_tl_put_left_math:NV}
+%\begin{macro}{\siunitx_tl_put_left_math:cV}
+%\begin{macro}{\siunitx_tl_put_right_math:Nn}
+%\begin{macro}{\siunitx_tl_put_right_math:NV}
+%\begin{macro}{\siunitx_tl_put_right_math:cV}
 % To add stuff in maths mode.
 %    \begin{macrocode}
-\cs_new:Npn \siunitx_tl_put_left_maths:Nn #1#2 {
+\cs_new:Npn \siunitx_tl_put_left_math:Nn #1#2 {
   \tl_put_left:Nn #1 { \ensuremath {#2} }
 }
-\cs_generate_variant:Nn \siunitx_tl_put_left_maths:Nn { NV, cV }
-\cs_new:Npn \siunitx_tl_put_right_maths:Nn #1#2 {
+\cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { NV, cV }
+\cs_new:Npn \siunitx_tl_put_right_math:Nn #1#2 {
   \tl_put_right:Nn #1 { \ensuremath {#2} }
 }
-\cs_generate_variant:Nn \siunitx_tl_put_right_maths:Nn { NV, cV }
+\cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV, cV }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -3558,7 +3552,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\c_siunitx_mathsf_int}
 %\begin{macro}{\c_siunitx_mathtt_int}
-%\begin{macro}{\siunitx_set_maths_fam:n}
+%\begin{macro}{\siunitx_set_math_fam:n}
 % The detection routine needs some basic data about the sans serif and
 % monospaced fonts in use.  This is collected up at the start of the 
 % document. The families used can change between here and the start of 
@@ -3566,7 +3560,7 @@ This work consists of the file  siunitx.dtx
 % using \cs{AtBeginDocument} as it has to come after anything that
 % \pkg{fontspec} does (nasty errors arise otherwise). 
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_set_maths_fam:n #1 {
+\cs_new_nopar:Npn \siunitx_set_math_fam:n #1 {
   \int_new:c { c_siunitx_math #1 _int }
   \group_begin:
     \hbox_set:Nn \l_siunitx_tmp_box 
@@ -3582,8 +3576,8 @@ This work consists of the file  siunitx.dtx
   \group_end:
 }
 \tl_put_right:Nn \document {
-  \siunitx_set_maths_fam:n { sf }
-  \siunitx_set_maths_fam:n { tt }
+  \siunitx_set_math_fam:n { sf }
+  \siunitx_set_math_fam:n { tt }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -3618,7 +3612,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_detect_display_maths_bool}
+%\begin{macro}{\l_siunitx_detect_display_math_bool}
 %\begin{macro}{\l_siunitx_detect_family_bool}
 %\begin{macro}{\l_siunitx_detect_inline_weight_bool}
 %\begin{macro}{\l_siunitx_detect_italic_bool}
@@ -3645,9 +3639,7 @@ This work consists of the file  siunitx.dtx
       detect-weight = false
     },
   detect-display-math  .bool_set:N = 
-    \l_siunitx_detect_display_maths_bool,
-  detect-display-maths .bool_set:N = 
-    \l_siunitx_detect_display_maths_bool,
+    \l_siunitx_detect_display_math_bool,
   detect-family        .bool_set:N = \l_siunitx_detect_family_bool,
   detect-inline-weight .choice:,
   detect-inline-weight .value_required:,
@@ -3656,10 +3648,7 @@ This work consists of the file  siunitx.dtx
       { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { combined } },
   detect-inline-weight / 
     math               .code:n     = 
-      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { maths } },
-  detect-inline-weight / 
-    maths              .code:n     = 
-      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { maths } },
+      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { math } },
   detect-inline-weight / 
     text               .code:n     = 
       { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { text } },
@@ -3692,12 +3681,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_font_set_bool}
-%\begin{macro}{\l_siunitx_font_maths_mode_bool}
+%\begin{macro}{\l_siunitx_font_math_mode_bool}
 % The internals of the package need a number of switches to track what
 % is happening.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_font_set_bool
-\bool_new:N \l_siunitx_font_maths_mode_bool
+\bool_new:N \l_siunitx_font_math_mode_bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -3753,7 +3742,7 @@ This work consists of the file  siunitx.dtx
     }
   \cs_set:Npn \siunitx_font_italic: { \upshape }
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \bool_set_true:N \l_siunitx_font_maths_mode_bool
+  \bool_set_true:N \l_siunitx_font_math_mode_bool
 }
 %    \end{macrocode}
 %\end{macro}
@@ -3776,8 +3765,8 @@ This work consists of the file  siunitx.dtx
             }
         }
         {
-          \bool_if:NTF \l_siunitx_detect_display_maths_bool 
-            { \siunitx_detect_font_weight_maths: }
+          \bool_if:NTF \l_siunitx_detect_display_math_bool 
+            { \siunitx_detect_font_weight_math: }
             { \siunitx_detect_font_weight_text: }
         }
     }
@@ -3786,16 +3775,16 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_detect_font_weight_combined:}
-%\begin{macro}{\siunitx_detect_font_weight_maths:}
+%\begin{macro}{\siunitx_detect_font_weight_math:}
 %\begin{macro}{\siunitx_detect_font_weight_text:}
 % The tests for font weight depend on whether the module is testing 
 % text or maths content.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_weight_combined: {
-  \siunitx_detect_font_weight_maths:
+  \siunitx_detect_font_weight_math:
   \siunitx_detect_font_weight_text:
 }
-\cs_new_nopar:Npn \siunitx_detect_font_weight_maths: {
+\cs_new_nopar:Npn \siunitx_detect_font_weight_math: {
   \tl_if_eq:nVT { bold } \math@version 
     {
       \cs_set:Npn \siunitx_font_weight: 
@@ -3837,15 +3826,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_family: {
   \siunitx_detect_font_family_text:
-  \bool_if:NT \l_siunitx_detect_display_maths_bool 
+  \bool_if:NT \l_siunitx_detect_display_math_bool 
     {  
       \mode_if_math:T 
-        { \mode_if_inner:F { \siunitx_detect_font_family_maths: } }
+        { \mode_if_inner:F { \siunitx_detect_font_family_math: } }
     }
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_detect_font_family_maths:}
+%\begin{macro}{\siunitx_detect_font_family_math:}
 %\begin{macro}{\siunitx_detect_font_family_text:}
 % The two detections routines check if the current font is sans serif or
 % monospaced.  The method used depends on whether the current maths or
@@ -3853,7 +3842,7 @@ This work consists of the file  siunitx.dtx
 % default (\texttt{rm}), as the text function is always called and may
 % have changed things.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_detect_font_family_maths: {
+\cs_new_nopar:Npn \siunitx_detect_font_family_math: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
   \intexpr_compare:nT { \fam = \c_siunitx_mathsf_int } 
     { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
@@ -3886,7 +3875,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_detect_font_mode: {
   \mode_if_math:F 
-    { \bool_set_false:N \l_siunitx_font_maths_mode_bool }
+    { \bool_set_false:N \l_siunitx_font_math_mode_bool }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -3899,19 +3888,19 @@ This work consists of the file  siunitx.dtx
 % by name, based on output type (\texttt{unit} or \texttt{value}) and
 % the family selected by the detector.
 % 
-%\begin{macro}{\l_siunitx_number_maths_mode_bool}
-%\begin{macro}{\l_siunitx_unit_maths_mode_bool}
+%\begin{macro}{\l_siunitx_number_math_mode_bool}
+%\begin{macro}{\l_siunitx_unit_math_mode_bool}
 % Most of the variables are created by the keys system: these are not.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_number_maths_mode_bool
-\bool_new:N \l_siunitx_unit_maths_mode_bool
+\bool_new:N \l_siunitx_number_math_mode_bool
+\bool_new:N \l_siunitx_unit_math_mode_bool
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_number_colour_tl}
 %\begin{macro}{\siunitx_number_mathrm:n}
-%\begin{macro}{\siunitx_number_mathsf:n}
+%\begin{macro}{\siunitx_number_mathf:n}
 %\begin{macro}{\siunitx_number_mathtt:n}
 %\begin{macro}{\siunitx_number_textrm:}
 %\begin{macro}{\siunitx_number_textsf:}
@@ -3920,7 +3909,7 @@ This work consists of the file  siunitx.dtx
 % numbers first.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_mathrm:n #1 { }
-\cs_new:Npn \siunitx_number_mathsf:n #1 { }
+\cs_new:Npn \siunitx_number_mathf:n #1 { }
 \cs_new:Npn \siunitx_number_mathtt:n #1 { }
 \cs_new_nopar:Npn \siunitx_number_textrm: { }
 \cs_new_nopar:Npn \siunitx_number_textsf: { }
@@ -3930,23 +3919,15 @@ This work consists of the file  siunitx.dtx
   number-colour .tl_set:N    = \l_siunitx_number_colour_tl,
   number-math-rm .code:n  =
     { \cs_set_nopar:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
-  number-maths-rm .code:n =
-    { \cs_set_nopar:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
   number-math-sf .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
-  number-maths-sf .code:n = 
-    { \cs_set_nopar:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
+    { \cs_set_nopar:Npn \siunitx_number_mathf:n ##1 { #1 {##1} } },
   number-math-tt .code:n  = 
-    { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
-  number-maths-tt .code:n = 
     { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
   number-mode .choice:,
   number-mode / math .code:n = 
-    { \bool_set_true:N \l_siunitx_number_maths_mode_bool },
-  number-mode / maths .code:n = 
-    { \bool_set_true:N \l_siunitx_number_maths_mode_bool },
+    { \bool_set_true:N \l_siunitx_number_math_mode_bool },
   number-mode / text .code:n =
-    { \bool_set_false:N \l_siunitx_number_maths_mode_bool },
+    { \bool_set_false:N \l_siunitx_number_math_mode_bool },
   number-text-rm .code:n  = 
     { \cs_set_nopar:Npn \siunitx_number_textrm: {#1} },
   number-text-sf .code:n  = 
@@ -3965,7 +3946,7 @@ This work consists of the file  siunitx.dtx
 %    
 %\begin{macro}{\l_siunitx_unit_colour_tl}
 %\begin{macro}{\siunitx_unit_mathrm:}
-%\begin{macro}{\siunitx_unit_mathsf:}
+%\begin{macro}{\siunitx_unit_mathf:}
 %\begin{macro}{\siunitx_unit_mathtt:}
 %\begin{macro}{\siunitx_unit_textrm:}
 %\begin{macro}{\siunitx_unit_textsf:}
@@ -3973,7 +3954,7 @@ This work consists of the file  siunitx.dtx
 % Units look exactly the same. 
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_mathrm: { }
-\cs_new_nopar:Npn \siunitx_unit_mathsf: { }
+\cs_new_nopar:Npn \siunitx_unit_mathf: { }
 \cs_new_nopar:Npn \siunitx_unit_mathtt: { }
 \cs_new_nopar:Npn \siunitx_unit_textrm: { }
 \cs_new_nopar:Npn \siunitx_unit_textsf: { }
@@ -3983,23 +3964,15 @@ This work consists of the file  siunitx.dtx
   unit-colour .tl_set:N  = \l_siunitx_unit_colour_tl,
   unit-math-rm .code:n =
     { \cs_set_nopar:Npn \siunitx_unit_mathrm: {#1} },
-  unit-maths-rm .code:n = 
-    { \cs_set_nopar:Npn \siunitx_unit_mathrm: {#1} },
   unit-math-sf .code:n = 
-    { \cs_set_nopar:Npn \siunitx_unit_mathsf: {#1} },
-  unit-maths-sf .code:n = 
-    { \cs_set_nopar:Npn \siunitx_unit_mathsf: {#1} },
+    { \cs_set_nopar:Npn \siunitx_unit_mathf: {#1} },
   unit-math-tt .code:n = 
-    { \cs_set_nopar:Npn \siunitx_unit_mathtt: {#1} },
-  unit-maths-tt .code:n = 
     { \cs_set_nopar:Npn \siunitx_unit_mathtt: {#1} },
   unit-mode .choice:,
   unit-mode / math .code:n = 
-    { \bool_set_true:N \l_siunitx_unit_maths_mode_bool },
-  unit-mode / maths .code:n = 
-    { \bool_set_true:N \l_siunitx_unit_maths_mode_bool },
+    { \bool_set_true:N \l_siunitx_unit_math_mode_bool },
   unit-mode / text .code:n = 
-    { \bool_set_false:N \l_siunitx_unit_maths_mode_bool },
+    { \bool_set_false:N \l_siunitx_unit_math_mode_bool },
   unit-text-rm .code:n = 
     { \cs_set_nopar:Npn \siunitx_unit_textrm: {#1} },
   unit-text-sf .code:n =
@@ -4035,41 +4008,21 @@ This work consists of the file  siunitx.dtx
       number-math-rm = #1,
       unit-math-rm   = #1
     },
-  maths-rm .meta:n = 
-    {
-      number-maths-rm = #1,
-      unit-maths-rm   = #1
-    },
   math-sf .meta:n = 
     {
       number-math-sf = #1,
       unit-math-sf   = #1
-    },
-  maths-sf .meta:n =  
-    {
-      number-maths-sf = #1,
-      unit-maths-sf   = #1
     },
   math-tt .meta:n = 
     {
       number-math-tt = #1,
       unit-math-tt   = #1
     },
-  maths-tt .meta:n =  
-    {
-      number-maths-tt = #1,
-      unit-maths-tt   = #1
-    },
   mode .choice:,
   mode / math .meta:n = 
     {
       number-mode = math,
       unit-mode   = math
-    },
-  mode / maths .meta:n = 
-    {
-      number-mode = maths,
-      unit-mode   = maths
     },
   mode / text .meta:n = 
     {
@@ -4093,10 +4046,10 @@ This work consists of the file  siunitx.dtx
     }
 }
 \keys_set:nn { siunitx } {
-  maths-rm    = \mathrm,
-  maths-sf    = \mathsf,
-  maths-tt    = \mathtt,
-  number-mode = maths,
+  math-rm     = \mathrm,
+  math-sf     = \mathsf,
+  math-tt     = \mathtt,
+  number-mode = math,
   text-rm     = \rmfamily,
   text-sf     = \sffamily,
   text-tt     = \ttfamily,
@@ -4113,14 +4066,14 @@ This work consists of the file  siunitx.dtx
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
     {
       \@ifpackageloaded { cmbright } { }
-        { \keys_set:nn { siunitx } { maths-rm = \mathsf } }
+        { \keys_set:nn { siunitx } { math-rm = \mathsf } }
       \keys_set:nn { siunitx } { text-rm  = \sffamily }
     }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_texttt_tl 
     {
       \keys_set:nn { siunitx } 
         {
-          maths-rm = \mathtt,
+          math-rm = \mathtt,
           text-rm  = \ttfamily
         }
     }
@@ -4164,9 +4117,9 @@ This work consists of the file  siunitx.dtx
     \siunitx_detect_font:
     \bool_if:NF \l_siunitx_detect_mode_bool 
       {
-        \bool_if:cTF { l_siunitx_ #1 _maths_mode_bool } 
-          { \bool_set_true:N \l_siunitx_font_maths_mode_bool }
-          { \bool_set_false:N \l_siunitx_font_maths_mode_bool }
+        \bool_if:cTF { l_siunitx_ #1 _math_mode_bool } 
+          { \bool_set_true:N \l_siunitx_font_math_mode_bool }
+          { \bool_set_false:N \l_siunitx_font_math_mode_bool }
       }
     \siunitx_print_aux:
   \group_end:
@@ -4191,8 +4144,8 @@ This work consists of the file  siunitx.dtx
           siunitx_ \l_siunitx_print_type_tl _  
           text \l_siunitx_font_family_tl :
         }
-      \bool_if:NTF \l_siunitx_font_maths_mode_bool 
-        { \siunitx_print_maths: }
+      \bool_if:NTF \l_siunitx_font_math_mode_bool 
+        { \siunitx_print_math: }
         { \siunitx_print_text: }
     }
 }
@@ -4220,7 +4173,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_print_maths:}
+%\begin{macro}{\siunitx_print_math:}
 %\begin{macro}{\siunitx_print_text:}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses |_| and
@@ -4236,7 +4189,7 @@ This work consists of the file  siunitx.dtx
   \char_make_active:N \!
 \tl_to_lowercase:n {
   \group_end:
-  \cs_new_nopar:Npn \siunitx_print_maths: 
+  \cs_new_nopar:Npn \siunitx_print_math: 
     {
       \ensuremath 
         {
@@ -6251,9 +6204,9 @@ This work consists of the file  siunitx.dtx
     {
       \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
-  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl 
     \l_siunitx_bracket_open_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl 
+  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl 
     \l_siunitx_bracket_close_tl
   \tl_if_eq:nnTF {#1} { result } 
   { \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl }
@@ -6315,11 +6268,11 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
   \bool_if:NTF \l_siunitx_complex_after_bool
     {
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+      \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
         \l_siunitx_output_complex_tl
     }
     {
-      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl
+      \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
         \l_siunitx_output_complex_tl
     }
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
@@ -6393,7 +6346,7 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nx \l_siunitx_tmpb_tl 
         { { \exp_not:V \l_siunitx_tmpb_tl } }
     }
-  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
     \l_siunitx_tmpb_tl
   \prop_get:NnN \l_siunitx_number_out_prop { exponent-result } 
     \l_siunitx_tmpb_tl
@@ -6436,7 +6389,7 @@ This work consists of the file  siunitx.dtx
         }
       \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
         \l_siunitx_tmpb_tl
-      \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+      \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl 
         \l_siunitx_tmpa_tl
       \prop_put:NnV \l_siunitx_number_out_prop { exponent-result }
         \l_siunitx_tmpb_tl
@@ -6554,7 +6507,7 @@ This work consists of the file  siunitx.dtx
           \tl_put_right:Nn \l_siunitx_tmpb_tl { #1 #2 #3 }
           \tl_if_empty:nF {#4} 
             {
-              \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
+              \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl 
                 \l_siunitx_group_sep_tl
               \siunitx_number_format_group_decimal_aux:NNNN #4
             }
@@ -6610,7 +6563,7 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:Nn \l_siunitx_tmpb_tl {#1#2#3}
   \quark_if_nil:nF {#4} 
     {
-      \siunitx_tl_put_right_maths:NV \l_siunitx_tmpb_tl 
+      \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl 
         \l_siunitx_group_sep_tl
       \siunitx_number_format_group_integer_aux:NNNN #4
     }
@@ -6729,7 +6682,7 @@ This work consists of the file  siunitx.dtx
                 { { \exp_not:V \l_siunitx_tmpa_tl } }
             }
           \tl_clear:N \l_siunitx_tmpb_tl
-          \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+          \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl 
             \l_siunitx_tmpa_tl
           \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign } 
             \l_siunitx_tmpb_tl        
@@ -6769,7 +6722,7 @@ This work consists of the file  siunitx.dtx
                 }
             }
           \tl_clear:N \l_siunitx_tmpb_tl
-          \siunitx_tl_put_left_maths:NV \l_siunitx_tmpb_tl 
+          \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl 
             \l_siunitx_tmpa_tl
           \prop_put:NnV \l_siunitx_number_out_prop { complex-sign } 
             \l_siunitx_tmpb_tl        
@@ -6805,11 +6758,11 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
     \l_siunitx_tmpa_tl
   \prop_del:Nn \l_siunitx_number_in_prop { #1 -uncertainty }
-  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl 
+  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl 
     \l_siunitx_output_uncert_open_tl
-  \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl
+  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
     \l_siunitx_uncert_sep_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_tmpa_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
     \l_siunitx_output_uncert_close_tl
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
   \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
@@ -7054,7 +7007,7 @@ This work consists of the file  siunitx.dtx
                   \tl_set:Nx \l_siunitx_tmpb_tl 
                     { { \exp_not:V \l_siunitx_tmpb_tl } }
                 }
-              \siunitx_tl_put_left_maths:NV \l_siunitx_tmpa_tl
+              \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
                 \l_siunitx_tmpb_tl
               \prop_put:NnV \l_siunitx_number_out_prop { exponent }
                 \l_siunitx_tmpa_tl
@@ -7206,7 +7159,7 @@ This work consists of the file  siunitx.dtx
   \bool_set_true:N \l_siunitx_number_compound_bool
   \siunitx_number_output_quotient_aux_i:
   \tl_set_eq:NN \l_siunitx_number_out_tl \l_siunitx_number_numerator_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_number_out_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_number_out_tl
     \l_siunitx_output_quotient_tl
   \tl_put_right:NV \l_siunitx_number_out_tl 
     \l_siunitx_number_denominator_tl 
@@ -8614,12 +8567,12 @@ This work consists of the file  siunitx.dtx
             { per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
           \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
             {
-              \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+              \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
                 \l_siunitx_unit_separator_tl
             }
         }
         {  
-          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+          \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
             \l_siunitx_unit_separator_tl
         }
     }
@@ -8665,7 +8618,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_unit_format_fraction_symbol: {
   \siunitx_unit_format_fraction_symbol_aux:n { denominator }
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
     \l_siunitx_per_symbol_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
@@ -8675,9 +8628,9 @@ This work consists of the file  siunitx.dtx
     {
       \bool_if:NT \l_siunitx_brackets_bool 
         {
-          \siunitx_tl_put_left_maths:cV { l_siunitx_unit_ #1 _tl }
+          \siunitx_tl_put_left_math:cV { l_siunitx_unit_ #1 _tl }
             \l_siunitx_bracket_open_tl
-          \siunitx_tl_put_right_maths:cV { l_siunitx_unit_ #1 _tl }
+          \siunitx_tl_put_right_math:cV { l_siunitx_unit_ #1 _tl }
             \l_siunitx_bracket_close_tl
         }
     }
@@ -8850,7 +8803,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_format_power_aux:n #1 {
-  \bool_if:NTF \l_siunitx_number_maths_mode_bool
+  \bool_if:NTF \l_siunitx_number_math_mode_bool
     { \siunitx_print:nn { number } {#1} }
     {
       \tl_set:Nn \l_siunitx_tmpa_tl {#1}
@@ -8873,9 +8826,9 @@ This work consists of the file  siunitx.dtx
     {
       \bool_if:NT \l_siunitx_brackets_bool 
         {
-          \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
+          \siunitx_tl_put_left_math:NV \l_siunitx_unit_current_tl 
             \l_siunitx_bracket_open_tl
-          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+          \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
             \l_siunitx_bracket_close_tl
         }
     }
@@ -8910,7 +8863,7 @@ This work consists of the file  siunitx.dtx
     { per- \int_use:N \l_siunitx_unit_int }  
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl 
     {
-      \siunitx_tl_put_left_maths:NV \l_siunitx_unit_current_tl 
+      \siunitx_tl_put_left_math:NV \l_siunitx_unit_current_tl 
         \l_siunitx_per_symbol_tl
     }   
 }
@@ -9014,10 +8967,10 @@ This work consists of the file  siunitx.dtx
     }
 } 
 \cs_new_nopar:Npn \siunitx_unit_format_qualifier_brackets: {
-  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
     \l_siunitx_bracket_open_tl
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
-  \siunitx_tl_put_right_maths:NV \l_siunitx_unit_current_tl
+  \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
     \l_siunitx_bracket_close_tl
 }
 \char_make_active:N \~
@@ -9057,7 +9010,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_if_empty:NF \l_siunitx_unit_denominator_tl
         { 
-          \siunitx_tl_put_right_maths:NV \l_siunitx_unit_tl
+          \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
             \l_siunitx_unit_separator_tl
         }
     }
@@ -10764,7 +10717,7 @@ This work consists of the file  siunitx.dtx
         {
           \keys_set:nn { siunitx } 
             {
-              maths-degree = \text { \textdegree },
+              math-degree = \text { \textdegree },
               text-degree  = \textdegree,
             }
           \@ifpackageloaded { mathptmx } { } 
@@ -10777,7 +10730,7 @@ This work consists of the file  siunitx.dtx
             { 
               \keys_set:nn { siunitx } 
                 {
-                  maths-angstrom = \text { \capitalring { A } },
+                  math-angstrom = \text { \capitalring { A } },
                   text-angstrom  = \capitalring { A }
                 }
             }
@@ -10785,19 +10738,19 @@ This work consists of the file  siunitx.dtx
       \@ifpackageloaded { upgreek } 
         {
           \keys_set:nn { siunitx } 
-            { maths-ohm = \Upomega }
+            { math-ohm = \Upomega }
         } { }
     }
 }
 %    \end{macrocode}
 %
-%\begin{macro}{\l_siunitx_angstrom_maths_tl}
-%\begin{macro}{\l_siunitx_arcminute_maths_tl}
-%\begin{macro}{\l_siunitx_arcsecond_maths_tl}
-%\begin{macro}{\l_siunitx_celsius_maths_tl}
-%\begin{macro}{\l_siunitx_degree_maths_tl}
-%\begin{macro}{\l_siunitx_micro_maths_tl}
-%\begin{macro}{\l_siunitx_ohm_maths_tl}
+%\begin{macro}{\l_siunitx_angstrom_math_tl}
+%\begin{macro}{\l_siunitx_arcminute_math_tl}
+%\begin{macro}{\l_siunitx_arcsecond_math_tl}
+%\begin{macro}{\l_siunitx_celsius_math_tl}
+%\begin{macro}{\l_siunitx_degree_math_tl}
+%\begin{macro}{\l_siunitx_micro_math_tl}
+%\begin{macro}{\l_siunitx_ohm_math_tl}
 % The symbol storage macros are created separately for maths and text
 % mode, although this is all pretty similar. The default definitions use
 % what is generally available, except for those for micro, where 
@@ -10806,29 +10759,22 @@ This work consists of the file  siunitx.dtx
 % deals with the case where \cs{mathnormal} has the wrong symbol.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  math-angstrom   .tl_set:N = \l_siunitx_angstrom_maths_tl,
-  maths-angstrom  .tl_set:N = \l_siunitx_angstrom_maths_tl,
-  math-arcminute  .tl_set:N = \l_siunitx_arcminute_maths_tl,
-  maths-arcminute .tl_set:N = \l_siunitx_arcminute_maths_tl,
-  math-arcsecond  .tl_set:N = \l_siunitx_arcsecond_maths_tl,
-  maths-arcsecond .tl_set:N = \l_siunitx_arcsecond_maths_tl,
-  math-celsius    .tl_set:N = \l_siunitx_celsius_maths_tl,
-  maths-celsius   .tl_set:N = \l_siunitx_celsius_maths_tl,
-  math-degree     .tl_set:N = \l_siunitx_degree_maths_tl,
-  maths-degree    .tl_set:N = \l_siunitx_degree_maths_tl,
-  math-micro      .tl_set:N = \l_siunitx_micro_maths_tl,
-  maths-micro     .tl_set:N = \l_siunitx_micro_maths_tl,
-  math-ohm        .tl_set:N = \l_siunitx_ohm_maths_tl,
-  maths-ohm       .tl_set:N = \l_siunitx_ohm_maths_tl,
+  math-angstrom   .tl_set:N = \l_siunitx_angstrom_math_tl,
+  math-arcminute  .tl_set:N = \l_siunitx_arcminute_math_tl,
+  math-arcsecond  .tl_set:N = \l_siunitx_arcsecond_math_tl,
+  math-celsius    .tl_set:N = \l_siunitx_celsius_math_tl,
+  math-degree     .tl_set:N = \l_siunitx_degree_math_tl,
+  math-micro      .tl_set:N = \l_siunitx_micro_math_tl,
+  math-ohm        .tl_set:N = \l_siunitx_ohm_math_tl
 }
 \keys_set:nn { siunitx } {
-  maths-angstrom  = \text { \AA },
-  maths-arcminute = { } ^ { \prime },
-  maths-arcsecond = { } ^ { \prime \prime },
-  maths-celsius   = { } ^ { \circ } \kern - \scriptspace \mathrm { C },
-  maths-degree    = { } ^ { \circ },
-  maths-micro     = \text { \c_siunitx_mu_tl },
-  maths-ohm       = \text { \ensuremath { \c_siunitx_omega_tl } },
+  math-angstrom  = \text { \AA },
+  math-arcminute = { } ^ { \prime },
+  math-arcsecond = { } ^ { \prime \prime },
+  math-celsius   = { } ^ { \circ } \kern - \scriptspace \mathrm { C },
+  math-degree    = { } ^ { \circ },
+  math-micro     = \text { \c_siunitx_mu_tl },
+  math-ohm       = \text { \ensuremath { \c_siunitx_omega_tl } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -10882,7 +10828,7 @@ This work consists of the file  siunitx.dtx
   \cs_new_protected_nopar:cpn { SIUnitSymbol #1 } 
     {
       \mode_if_math:TF 
-        { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _maths_tl } } }
+        { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _math_tl } } }
         { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _text_tl } } }
     }
 }
@@ -11831,7 +11777,7 @@ This work consists of the file  siunitx.dtx
   decimalsymbol /
     unknown      .code:n    = { output-decimal-marker   = #1          },
   debug          .code:n    = ,
-  detectdisplay  .meta:n    = { detect-display-maths    = #1          },
+  detectdisplay  .meta:n    = { detect-display-math     = #1          },
   detectdisplay  .default:n = { true                                  },
   digitsep       .choice: ,
   digitsep / 
@@ -11946,22 +11892,22 @@ This work consists of the file  siunitx.dtx
   mathringA      .meta:n    = { math-angstrom           = #1          },
   mathrm         .meta:x    = 
     { math-rm                 = \exp_not:c {#1}                       },
-  mathsOmega     .meta:n    = { maths-ohm               = #1          },
-  mathscelsius   .meta:n    = { maths-celsius           = #1          },
-  mathsdegree    .meta:n    = { maths-degree            = #1          },
+  mathsOmega     .meta:n    = { math-ohm                = #1          },
+  mathscelsius   .meta:n    = { math-celsius    .       = #1          },
+  mathsdegree    .meta:n    = { math-degree     .       = #1          },
   mathsecond     .meta:n    = { math-arcsecond          = #1          },
   mathsf         .meta:x    = 
     { math-sf                 = \exp_not:c {#1}                       },
-  mathsminute    .meta:n    = { maths-arcminute         = #1          },
-  mathsmu        .meta:n    = { maths-micro             = #1          },
-  mathsringA     .meta:n    = { maths-angstrom          = #1          },
+  mathsminute    .meta:n    = { math-arcminute          = #1          },
+  mathsmu        .meta:n    = { math-micro              = #1          },
+  mathsringA     .meta:n    = { math-angstrom           = #1          },
   mathsrm        .meta:x    = 
     { math-rm                 = \exp_not:c {#1}                       },
-  mathssecond    .meta:n    = { maths-arcsecond         = #1          },
+  mathssecond    .meta:n    = { math-arcsecond          = #1          },
   mathssf        .meta:x    = 
-    { maths-sf                = \exp_not:c {#1}                       },
+    { math-sf                 = \exp_not:c {#1}                       },
   mathstt        .meta:x    = 
-    { maths-tt                = \exp_not:c {#1}                       },
+    { math-tt                 = \exp_not:c {#1}                       },
   mathtt         .meta:x    = 
     { math-tt                 = \exp_not:c {#1}                       },
   negcolor       .meta:n    = { negative-color          = #1          },
@@ -12186,7 +12132,7 @@ This work consists of the file  siunitx.dtx
   textmode / 
     true         .meta:n    = { mode                    = text        },
   textmode / 
-    false        .meta:n    = { mode                    = maths       },
+    false        .meta:n    = { mode                    = math        },
   textmode       .default:n = { true                                  },
   textmu         .meta:n    = { text-micro              = #1          },
   textringA      .meta:n    = { text-angstrom           = #1          },
@@ -12213,11 +12159,11 @@ This work consists of the file  siunitx.dtx
   unitmathsf     .meta:x    = 
     { unit-math-sf            = \exp_not:c {#1}                       },
   unitmathsrm    .meta:x    = 
-    { unit-maths-rm           = \exp_not:c {#1}                       },
+    { unit-math-rm            = \exp_not:c {#1}                       },
   unitmathssf    .meta:x    = 
-    { unit-maths-sf           = \exp_not:c {#1}                       },
+    { unit-math-sf            = \exp_not:c {#1}                       },
   unitmathstt    .meta:x    = 
-    { unit-maths-tt           = \exp_not:c {#1}                       },
+    { unit-math-tt            = \exp_not:c {#1}                       },
   unitmathtt     .meta:x    = 
     { unit-math-tt            = \exp_not:c {#1}                       },
   unitmode       .meta:n    = { unit-mode               = #1          },
@@ -12277,11 +12223,11 @@ This work consists of the file  siunitx.dtx
   valuemathsf    .meta:x   = 
     { number-math-sf           = \exp_not:c {#1}                      },
   valuemathsrm   .meta:x   = 
-    { number-maths-rm          = \exp_not:c {#1}                      },
+    { number-math-rm           = \exp_not:c {#1}                      },
   valuemathssf   .meta:x   = 
-    { number-maths-sf          = \exp_not:c {#1}                      },
+    { number-math-sf           = \exp_not:c {#1}                      },
   valuemathstt   .meta:x   = 
-    { number-maths-tt          = \exp_not:c {#1}                      },
+    { number-math-tt           = \exp_not:c {#1}                      },
   valuemathtt    .meta:x   = 
     { number-math-tt           = \exp_not:c {#1}                      },
   valuemode      .meta:n   = { number-mode              = #1          },
