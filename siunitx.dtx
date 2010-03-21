@@ -9493,14 +9493,14 @@ This work consists of the file  siunitx.dtx
 % the result.  The collection routine tries to ensure that the 
 % typesetting part only receives real cell contents.
 % 
-%\begin{macro}{\l_siunitx_table_collect_toks}
-%\begin{macro}{\l_siunitx_table_collect_pre_toks}
-%\begin{macro}{\l_siunitx_table_collect_post_toks}
+%\begin{macro}{\l_siunitx_table_collect_tl}
+%\begin{macro}{\l_siunitx_table_collect_pre_tl}
+%\begin{macro}{\l_siunitx_table_collect_post_tl}
 % Three storage areas.
 %    \begin{macrocode}
-\toks_new:N \l_siunitx_table_collect_toks
-\toks_new:N \l_siunitx_table_collect_pre_toks
-\toks_new:N \l_siunitx_table_collect_post_toks
+\tl_new:N \l_siunitx_table_collect_tl
+\tl_new:N \l_siunitx_table_collect_pre_tl
+\tl_new:N \l_siunitx_table_collect_post_tl
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -9574,17 +9574,17 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_table_collect_expand:N #1 {
   \siunitx_cs_if_tl:NTF #1 
     {
-      \toks_use:N \l_siunitx_table_collect_pre_toks
-      \toks_clear:N \l_siunitx_table_collect_pre_toks
+      \tl_use:N \l_siunitx_table_collect_pre_tl
+      \tl_clear:N \l_siunitx_table_collect_pre_tl
       \cs_set_nopar:Npx \siunitx_table_collect_next: 
         { \exp_not:N \siunitx_table_collect_get: \exp_not:V #1 }
     }
     {
       \bool_if:NTF \l_siunitx_table_collect_pre_bool
-        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks {#1} }
+        { \tl_put_right:Nn \l_siunitx_table_collect_pre_tl {#1} }
         {
           \bool_set_true:N \l_siunitx_table_collect_post_bool
-          \toks_put_right:Nn \l_siunitx_table_collect_post_toks {#1}
+          \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1}
         }
     }
 }
@@ -9620,9 +9620,9 @@ This work consists of the file  siunitx.dtx
 % The usual spin-out of basics.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_collect_init: {
-  \toks_clear:N \l_siunitx_table_collect_toks
-  \toks_clear:N \l_siunitx_table_collect_pre_toks
-  \toks_clear:N \l_siunitx_table_collect_post_toks
+  \tl_clear:N \l_siunitx_table_collect_tl
+  \tl_clear:N \l_siunitx_table_collect_pre_tl
+  \tl_clear:N \l_siunitx_table_collect_post_tl
   \bool_set_false:N \l_siunitx_table_collect_post_bool
 }
 %    \end{macrocode}
@@ -9638,7 +9638,7 @@ This work consists of the file  siunitx.dtx
   \bool_set_false:N \l_siunitx_table_collect_pre_bool
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
-      \toks_put_right:Nn \l_siunitx_table_collect_toks { {##1} }
+      \tl_put_right:Nn \l_siunitx_table_collect_tl { {##1} }
       \siunitx_table_collect_next:
     }
 }
@@ -9660,10 +9660,10 @@ This work consists of the file  siunitx.dtx
   \cs_set:Npn \siunitx_table_collect_braced:n ##1 
     {
       \bool_if:NTF \l_siunitx_table_collect_pre_bool
-        { \toks_put_right:Nn \l_siunitx_table_collect_pre_toks { {##1} } }
+        { \tl_put_right:Nn \l_siunitx_table_collect_pre_tl { {##1} } }
         {
           \bool_set_true:N \l_siunitx_table_collect_post_bool
-          \toks_put_right:Nn \l_siunitx_table_collect_post_toks { {##1} }
+          \tl_put_right:Nn \l_siunitx_table_collect_post_tl { {##1} }
         }
       \siunitx_table_collect_next:
     }
@@ -9742,7 +9742,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_table_collect_token:N #1 { }
 \cs_new_protected:Npn \siunitx_table_collect_token_s:N #1 { 
-  \toks_put_right:Nn \l_siunitx_table_collect_toks {#1}
+  \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9755,12 +9755,12 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_table_collect_token_S:N #1 {
   \bool_if:NTF  \l_siunitx_table_collect_post_bool 
-    { \toks_put_right:Nn \l_siunitx_table_collect_post_toks {#1} }
+    { \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1} }
     {
       \tl_if_in:NnTF \l_siunitx_number_valid_tl {#1} 
         {
           \bool_set_false:N \l_siunitx_table_collect_pre_bool
-          \toks_put_right:Nn \l_siunitx_table_collect_toks {#1}
+          \tl_put_right:Nn \l_siunitx_table_collect_tl {#1}
         }
         { \siunitx_table_collect_expand:N #1 }
     }
@@ -9874,7 +9874,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_s: { 
   \siunitx_table_align_left:n { \l_siunitx_table_unit_align_skip }
-  \siunitx_unit_output:Vn \l_siunitx_table_collect_toks { }
+  \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }
   \siunitx_table_align_right:n { \l_siunitx_table_unit_align_skip }
 }
 %    \end{macrocode}
@@ -10137,7 +10137,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_table_collect_pre_bool
     { 
       \siunitx_table_align_left:n { \l_siunitx_table_text_align_skip }
-      \toks_use:N \l_siunitx_table_collect_pre_toks
+      \tl_use:N \l_siunitx_table_collect_pre_tl
       \siunitx_table_align_right:n { \l_siunitx_table_text_align_skip }
     }
     { 
@@ -10157,7 +10157,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_aux: {
   \bool_if:NTF \l_siunitx_table_parse_only_bool 
-    { \siunitx_number_output:V \l_siunitx_table_collect_toks }
+    { \siunitx_number_output:V \l_siunitx_table_collect_tl }
     { 
       \bool_if:NTF \l_siunitx_table_center_decimal_bool
         { \siunitx_table_print_S_centered: }
@@ -10172,7 +10172,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_parse: {
   \bool_set_false:N \l_siunitx_error_bool
-  \siunitx_number_in_parse:V \l_siunitx_table_collect_toks 
+  \siunitx_number_in_parse:V \l_siunitx_table_collect_tl 
   \bool_if:NF \l_siunitx_error_bool 
     {
       \siunitx_number_process:
@@ -10194,7 +10194,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_centered_ends:
   \dim_compare:nNnTF 
     { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
-    { \toks_use:N \l_siunitx_table_collect_pre_toks }
+    { \tl_use:N \l_siunitx_table_collect_pre_tl }
     { \box_use:N \l_siunitx_table_pre_box }
   \siunitx_table_print_S_parse:
   \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
@@ -10227,9 +10227,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_ends: {
   \hbox_set:Nn \l_siunitx_table_pre_box
-    { { \toks_use:N \l_siunitx_table_collect_pre_toks } }
+    { { \tl_use:N \l_siunitx_table_collect_pre_tl } }
   \hbox_set:Nn \l_siunitx_table_post_box
-    { \toks_use:N \l_siunitx_table_collect_post_toks }
+    { \tl_use:N \l_siunitx_table_collect_post_tl }
   \dim_compare:nNnTF 
     { \box_wd:N \l_siunitx_table_pre_box  } > 
     { \box_wd:N \l_siunitx_table_post_box }
@@ -10334,13 +10334,13 @@ This work consists of the file  siunitx.dtx
     { \box_wd:N \l_siunitx_tmp_box }
     { 
       \tex_hfil:D
-      { \toks_use:N \l_siunitx_table_collect_pre_toks } 
+      { \tl_use:N \l_siunitx_table_collect_pre_tl } 
     }
   \hbox_set:Nn \l_siunitx_tmp_box { \l_siunitx_table_post_tl }  
   \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
     { \box_wd:N \l_siunitx_tmp_box }
     { 
-      \toks_use:N \l_siunitx_table_collect_post_toks 
+      \tl_use:N \l_siunitx_table_collect_post_tl 
       \tex_hfil:D
     }
 }
