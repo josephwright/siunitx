@@ -3417,8 +3417,8 @@ This work consists of the file  siunitx.dtx
 % it is created here not with the other messages.
 %    \begin{macrocode}
 \msg_new:nnnn { siunitx } { incompatible-package } 
-  {Package '#1' incompatible.}
-  {The #1 package and siunitx are incompatible.}
+  { Package~'#1'~incompatible. }
+  { The~#1~package~and~siunitx~are~incompatible. }
 \cs_new_protected_nopar:Npn \siunitx_load_check:n #1 {
   \group_begin:
     \@ifpackageloaded {#1} 
@@ -4747,7 +4747,7 @@ This work consists of the file  siunitx.dtx
 % here. 
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_in_parse_error:nx #1#2 {
-  \siunitx_error:nx {#1} {#2}
+  \siunitx_error:nx {#1} { \exp_not:n {#2} }
   \tl_map_break:
 }
 \cs_generate_variant:Nn \siunitx_number_in_parse_error:nx { nV }
@@ -4839,7 +4839,7 @@ This work consists of the file  siunitx.dtx
   \tl_if_in:NnTF \l_siunitx_input_exponent_tl {#1}
     { 
       \siunitx_number_in_parse_error:nx  
-        { duplicate-exponent-token } {#1} 
+        { duplicate-exponent-token } { \token_to_str:N #1 } 
     }
     { 
       \tl_if_in:NnTF \l_siunitx_input_uncert_open_tl {#1}
@@ -5030,7 +5030,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_number_in_complex_root_bool
     { 
       \siunitx_number_in_parse_error:nx 
-        { duplicate-complex-root-token } {#1} 
+        { duplicate-complex-root-token } { \token_to_str:N #1 } 
     }
     {
       \cs_set_eq:NN \siunitx_number_in_check:n 
@@ -5096,7 +5096,8 @@ This work consists of the file  siunitx.dtx
   \bool_set_false:N \l_siunitx_number_in_first_bool
   \bool_if:NTF \l_siunitx_number_in_decimal_bool 
     { 
-      \siunitx_number_in_parse_error:nx { duplicate-decimal-token } {#1}
+      \siunitx_number_in_parse_error:nx { duplicate-decimal-token } 
+        { \token_to_str:N #1 }
     }
     {
       \bool_set_true:N \l_siunitx_number_in_decimal_bool
@@ -5160,7 +5161,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_number_in_exponent_bool
     { 
       \siunitx_number_in_parse_error:nx { duplicate-exponent-token } 
-        {#1}
+        { \token_to_str:N #1 }
     }
     {
       \cs_set_eq:NN \siunitx_number_in_parse_more:N
@@ -10997,36 +10998,36 @@ This work consists of the file  siunitx.dtx
 % easier.
 %    \begin{macrocode}
 \msg_new:nnnn { siunitx } { duplicate-complex-root-token } 
-  {Duplicate complex root token '\exp_not:n{#1}' in input.}
-  {Only one complex root token can appear in a single number.}
+  { Duplicate~complex~root~token~'#1'~in~input. }
+  { Only~one~complex~root~token~can~appear~in~a~single~number. }
 \msg_new:nnnn { siunitx } { duplicate-decimal-token } 
-  {Duplicate decimal marker token '\exp_not:n{#1}' in input.}
-  {Only one decimal marker token can appear in a single number.}
+  { Duplicate~decimal~marker~token~'#1'~in~input. }
+  { Only one decimal marker token can appear in a single number. }
 \msg_new:nnnn { siunitx } { duplicate-exponent-token } 
-  {Duplicate exponent marker token '\exp_not:n{#1}' in input.}
-  {Only one exponent marker token can appear in a single number.}
+  { Duplicate~exponent~marker~token~'#1'~in~input. }
+  { Only~one~exponent~marker~token~can~appear~in~a~single~number. }
 \msg_new:nnnn { siunitx } { duplicate-quotient-token } 
-  {Duplicate quotient token.} 
-  {Only one quotient token can appear in a single number.}
+  { Duplicate~quotient~token. } 
+  { Only~one~quotient~token~can~appear~in~a~single~number. }
 \msg_new:nnnn { siunitx } { duplicate-sticky-per } 
-  {Duplicate \token_to_str:N \per.} 
-  {%
-    When the sticky-per option is on, only one 
-    \token_to_str:N \per \\%
-    may appear in a unit.
+  { Duplicate~\token_to_str:N \per. } 
+  {
+    When~the~'sticky-per'~option~is~active,~only~one 
+    \token_to_str:N \per \\
+    may~appear~in~a~unit.
   }
 \msg_new:nnnn { siunitx } { empty-arc } 
-  {Empty degree-minute-second angle.}
-  { The angle given does not contain any numbers.}
+  { Empty~degree-minute-second~angle. }
+  { The~angle~given~does~not~contain~any~numbers. }
 \msg_new:nnnn { siunitx } { empty-uncertainty }
-  {Empty uncertainty given in '\exp_not:n{#1}'.}
-  {The number given contains an empty uncertainty, which is invalid.}
+  { Empty~uncertainty~given~in~'#1'. }
+  { The~number~given~contains~an~empty~uncertainty. }
 \msg_new:nnnn { siunitx } { ending-product-token }
-  {Misplaced product token.}
-  {A number cannot end with a product token.}
+  { Misplaced~product~token. }
+  { A~number~cannot~end~with~a~product~token. }
 \msg_new:nnnn { siunitx } { ending-quotient-token } 
-  {Misplaced quotient token.}
-  {A number cannot end with a quotient token.}
+  { Misplaced~quotient~token. }
+  { A~number~cannot~end~with~a~quotient~token. }
 \msg_new:nnnn { siunitx } { invalid-arc-format } 
   {Invalid degree-minute-second angle '\exp_not:n{#1}'.}
   {%
