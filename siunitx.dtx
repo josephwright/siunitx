@@ -11711,6 +11711,25 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Odds and ends}
+%  
+%\begin{macro}{\requiresiconfigs}
+%\begin{macro}{\requiresiconfigs}
+% Version one provides this, and it might pop up so should not 
+% cause errors.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \requiresiconfigs #1 {
+  \keys_set:nn { siunitx } { load-configurations = version-1 }
+  \clist_map_function:nN {#1} \siunitx_requireconfig:n
+}
+\cs_new_protected_nopar:Npn \siunitx_requireconfig:n #1 {
+  \tl_if_eq:nnT {#1} { synchem }
+    { \keys_set:nn { siunitx } { load-configurations = chemistry } }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Strict application of the rules}
 %
 %\begin{macro}{\siunitx_strict_option:n}
@@ -11829,6 +11848,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \ProvidesExplFile {siunitx-version-1.cfg} {\filedate} 
   {\fileversion} {siunitx: Version 1 settings}
+%    \end{macrocode}
+%    
+% The abbreviations are loaded by default be version one.   
+%    \begin{macrocode}
+\keys_set:nn {  siunitx } { load-configurations = abbreviations }
 %    \end{macrocode}
 %
 % The re-arrangements made to the code in version two, and in particular
