@@ -536,7 +536,7 @@ This work consists of the file  siunitx.dtx
 % 
 % By default, all text is typeset in the current upright, serif math
 % font.  This can be changed by setting the appropriate options: 
-% |\sisetup{detect-all}| will use the current font for typesetting.
+% "\sisetup{detect-all}" will use the current font for typesetting.
 % 
 %\section{Using the \pkg{siunitx} package}
 %
@@ -563,7 +563,7 @@ This work consists of the file  siunitx.dtx
 % takes one optional argument, \meta{options}, and one mandatory one,
 % \meta{number}.  The contents of \meta{number} are automatically 
 % formatted.  The formatter removes \enquote{hard} spaces 
-% (\cs{,} and |~|), automatically identifies exponents (by default 
+% (\cs{,} and "~"), automatically identifies exponents (by default 
 % marked using \texttt{e}, \texttt{E}, \texttt{d} or \texttt{D}) and 
 % adds the appropriate spacing of large numbers.  With the standard
 % settings a leading zero is added before a decimal marker, if needed: 
@@ -625,9 +625,9 @@ This work consists of the file  siunitx.dtx
 % \cs{num} macro, \cs{si} takes  one optional and one mandatory 
 % argument. The unit formatting system can accept two types of input. 
 % When the \meta{unit} contains literal items (for example letters or
-% numbers) then \pkg{siunitx} converts \texttt{.} and |~| into
+% numbers) then \pkg{siunitx} converts \texttt{.} and "~" into
 % inter-unit separators and correctly positions sub- and superscripts
-% specified using |_| and |^|. The formatting methods will work with
+% specified using "_" and "^". The formatting methods will work with
 % both math and text mode.
 %\begin{LaTeXdemo}
 %  \si{kg.m/s^2} \\
@@ -1207,7 +1207,7 @@ This work consists of the file  siunitx.dtx
 % \opt{detect-inline-weight}, which takes values \opt{text}, \opt{math} 
 % and \opt{combined}.  The package can detect the local value of font 
 % weight for either the surrounding text, or the surrounding inline 
-% (|$|\ldots|$|) math. The \opt{combined} option checks both and uses 
+% ("$"\ldots"$") math. The \opt{combined} option checks both and uses 
 % the prevailing weight if either test is true.
 %\begin{LaTeXdemo}
 %  \sisetup{
@@ -1589,7 +1589,7 @@ This work consists of the file  siunitx.dtx
 % that the later only applies if \opt{group-digits} is turned on.
 % The separator used between groups of digits is stored by the 
 % \opt{group separator} option.  This takes literal input and is
-% used in math mode: for a text-mode full space use |\text{~}|.
+% used in math mode: for a text-mode full space use "\text{~}".
 %\begin{LaTeXdemo}
 %  \num{12345} \\
 %  \num[group-digits = false]{12345} \\
@@ -2218,7 +2218,7 @@ This work consists of the file  siunitx.dtx
 % The separator between each unit is stored using the 
 % \opt{inter-unit-separator} option. The standard setting is a thin 
 % space: another common choice is a centered dot. To get the correct
-% spacing it is necessary to use |{}\cdot{}| in the later case.
+% spacing it is necessary to use "{}\cdot{}" in the later case.
 %\begin{LaTeXdemo}
 %  \si{\farad\squared\lumen\candela} \\
 %  \si[inter-unit-separator={}\cdot{}]{\farad\squared\lumen\candela} 
@@ -2911,7 +2911,7 @@ This work consists of the file  siunitx.dtx
 % a particular item is always printed in the desired mode. Some 
 % mathematical output does not work well in \cs{mathrm} (the standard
 % font used by \pkg{siunitx} for printing). The easiest way to solve
-% this is to use the construction |\text{\ensuremath{...}}|, which will
+% this is to use the construction "\text{\ensuremath{...}}", which will
 % print the material in the standard mathematics font without affecting
 % the rest of the output. In some cases, simply forcing \cs{mathnormal}
 % will suffice, but this is less reliable with non-Latin characters.
@@ -3256,7 +3256,7 @@ This work consists of the file  siunitx.dtx
 % consistency.
 %
 % Symbols for units formed from other units by division are indicated
-% by means of a virgule (oblique stroke, slash, |/|), a horizontal
+% by means of a virgule (oblique stroke, slash, "/"), a horizontal
 % line, or negative exponents.\footnote{Notice that a virgule and a
 % solidus are not the same symbol.}  However, to avoid ambiguity, the
 % virgule must not be repeated on the same line unless parentheses
@@ -3359,8 +3359,8 @@ This work consists of the file  siunitx.dtx
 % In most cases, adding exponent values in the body of a table is
 % less desirable than adding a fixed exponent to column headers.  An
 % example is shown in \cref{tab:good}.  The use of \cs{multicolumn} is
-% needed here due to the `|<|'; without \cs{multicolumn}, the
-% titles are followed by `\si{\kilo\gram}'!
+% needed here due to the \enquote{\texttt{<}}; without \cs{multicolumn}, 
+% the titles are followed by \enquote{\si{\kilo\gram}}!
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
@@ -4273,10 +4273,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_print_math:}
 %\begin{macro}{\_siunitx_print_text:}
 % Printing the text means replacing any awkward characters, which is
-% dependent on the output mode. The rest of the package uses |_| and
-% |^| to represent sub- and superscripts, respectively. In this way, 
+% dependent on the output mode. The rest of the package uses "_" and
+% "^" to represent sub- and superscripts, respectively. In this way, 
 % mode decisions can be delayed as long as possible.  The
-% \pkg{underscore} package may make |_| active, or more likely
+% \pkg{underscore} package may make "_" active, or more likely
 % it will be a superscript character. Both are tested for here.
 %    \begin{macrocode}
 \group_begin:
@@ -4317,7 +4317,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\_siunitx_print_text_sub_super:n}
 %\begin{macro}{\_siunitx_print_text_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
-% the appearance is the same as math mode. As |_| is a letter, there
+% the appearance is the same as math mode. As "_" is a letter, there
 % is the need to do a category-code juggle. The search and replace 
 % code for superscripts deals with the case where a literal number has
 % been given with text mode printing.
@@ -7383,7 +7383,7 @@ This work consists of the file  siunitx.dtx
 %
 % Angles are a special case of numbers for two reasons. First, there
 % is always a unit, which is known in advance. Second, there are two
-% possible input syntaxes, |\ang{1.23}| and |\ang{1;2;3}|. Both need
+% possible input syntaxes, "\ang{1.23}" and "\ang{1;2;3}". Both need
 % to be handled correctly.
 % 
 %\begin{macro}{\_l_siunitx_angle_degree_space_bool}
@@ -7554,10 +7554,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\_siunitx_angle_find_semi_colons:w}
 % The trailing \texttt{;} and \cs{q_no_value} tokens here mean that
 % there are four possible input cases, and all of them can be detected
-% using fast tests. First, if |#4| is \cs{q_no_value} then there were
+% using fast tests. First, if "#4" is \cs{q_no_value} then there were
 % no \texttt{;} in the input. Exactly one \texttt{;} will mean that
-% |#5| is \cs{q_no_value}, while exactly two \texttt{;} in the input
-% makes |#6| \cs{q_no_value}. Any more than two semi-colons means that
+% "#5" is \cs{q_no_value}, while exactly two \texttt{;} in the input
+% makes "#6" \cs{q_no_value}. Any more than two semi-colons means that
 % all of the tests are negative.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_find_semi_colons:n #1 {
@@ -8838,7 +8838,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_unit_format_literal_aux:N}
 % If the unit given contains anything which is not a unit macro, then
 % any unit macros that are there simply dump literal meanings. There is 
-% then a little work to do sorting out |~| and \texttt{.} characters at 
+% then a little work to do sorting out "~" and \texttt{.} characters at 
 % the outer level. 
 %    \begin{macrocode}
 \char_make_active:N \~
@@ -11012,7 +11012,7 @@ This work consists of the file  siunitx.dtx
 % mode, although this is all pretty similar. The default definitions use
 % what is generally available, except for those for micro, where 
 % Computer Modern does not have the appropriate symbol at all. For the 
-% math mode omega option, the |\text{\ensuremath{...}}| construction
+% math mode omega option, the "\text{\ensuremath{...}}" construction
 % deals with the case where \cs{mathnormal} has the wrong symbol.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
