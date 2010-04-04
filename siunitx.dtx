@@ -2305,7 +2305,7 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\DescribeOption{prefixes-as-symbols}
-% The unit prefixes (\cs{kilo}, \emph{etc.}) are normally given as 
+% The unit prefixes (\cs{kilo}, \emph{etc}.) are normally given as 
 % letters. However, the package can convert these into numerical powers.
 % This is controlled by the \opt{prefixes-as-symbols} switch option.
 %\begin{LaTeXdemo}
@@ -8022,7 +8022,7 @@ This work consists of the file  siunitx.dtx
       \cs_if_exist:cTF 
         { _siunitx_ \_siunitx_unit_first_token:n {#2} _function:w }
         {#2}
-        { \_siunitx_unit_parse_unit:n {#2} }
+        { \_siunitx_unit_parse_unit:Nn #1 {#2} }
     }
   \tl_if_empty:nTF {#3}
     { 
@@ -8506,14 +8506,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_unit_parse_unit:n}
+%\begin{macro}{\_siunitx_unit_parse_unit:Nn}
 %\begin{macro}[aux]{\_siunitx_unit_parse_unit_per:}
 % For units, there is a check in case a prefix is present (which will 
 % have incremented the counter). With the counter correct, simply add
 % the literal to the property list. There is also a check to see if
 % there is a \enquote{sticky} \cs{per} to think about.
 %    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_unit_parse_unit:n #1 {
+\cs_set_protected:Npn \_siunitx_unit_parse_unit:Nn #1#2 {
   \tl_set:Nx \_l_siunitx_tmpa_tl 
     { prefix- \int_use:N \_l_siunitx_unit_int }
   \prop_if_in:NVTF \_l_siunitx_unit_prop \_l_siunitx_tmpa_tl 
@@ -8525,8 +8525,11 @@ This work consists of the file  siunitx.dtx
     }
     { \int_incr:N \_l_siunitx_unit_int }
   \tl_set:Nx \_l_siunitx_tmpa_tl 
-    { symbol- \int_use:N \_l_siunitx_unit_int }
+    { unit- \int_use:N \_l_siunitx_unit_int }
   \prop_put:NVn \_l_siunitx_unit_prop \_l_siunitx_tmpa_tl {#1}
+  \tl_set:Nx \_l_siunitx_tmpa_tl 
+    { symbol- \int_use:N \_l_siunitx_unit_int }
+  \prop_put:NVn \_l_siunitx_unit_prop \_l_siunitx_tmpa_tl {#2}
   \_siunitx_unit_parse_unit_per: 
 }
 \cs_set_protected_nopar:Npn \_siunitx_unit_parse_unit_per: {
@@ -8590,6 +8593,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_l_siunitx_unit_prefix_gram_int}
+% Formatting units is complicated by the fact that the kilogram is a 
+% base unit, making conversions a little more awkward.
+%    \begin{macrocode}
+\int_new:N \_l_siunitx_unit_prefix_gram_int
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\_l_siunitx_per_auto_bool}
@@ -8829,6 +8840,7 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \_l_siunitx_unit_tl
   \tl_clear:N \_l_siunitx_unit_current_tl
   \tl_clear:N \_l_siunitx_unit_denominator_tl
+  \int_zero:N \_l_siunitx_unit_prefix_gram_int
   \tl_clear:N \_l_siunitx_unit_numerator_tl
   \int_zero:N \_l_siunitx_unit_prefix_base_int
   \int_zero:N \_l_siunitx_unit_prefix_int
@@ -9101,9 +9113,8 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \_l_siunitx_tmpa_tl { 1 } }
   \tl_set:Nx \_l_siunitx_unit_prefix_current_tl 
     {
-       \intexpr_eval:n {
-         \_l_siunitx_unit_prefix_current_tl * \_l_siunitx_tmpa_tl
-       }
+       \intexpr_eval:n 
+         { \_l_siunitx_unit_prefix_current_tl * \_l_siunitx_tmpa_tl }
     }
   \tl_set:Nx \_l_siunitx_tmpa_tl 
     { per- \int_use:N \_l_siunitx_unit_int }
