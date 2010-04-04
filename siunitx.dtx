@@ -8690,9 +8690,16 @@ This work consists of the file  siunitx.dtx
             { \tl_clear:N \_l_siunitx_number_unit_separator_tl }
         }
     }
-  \intexpr_compare:nNnT 
-    { \int_use:N \_l_siunitx_unit_int } > { 0 } 
-    { \_siunitx_unit_format_loop: }
+  \intexpr_while_do:nNnn 
+    { \int_use:N \_l_siunitx_unit_int } > { 0 }
+    {
+      \_siunitx_unit_format_prefix:
+      \_siunitx_unit_format_symbol:
+      \_siunitx_unit_format_qualifier:
+      \_siunitx_unit_format_power:
+      \_siunitx_unit_format_add:
+      \int_decr:N \_l_siunitx_unit_int
+    }  
   \bool_if:NT \_l_siunitx_per_two_parts_bool 
     {
       \bool_if:NTF \_l_siunitx_per_fraction_bool
@@ -8905,25 +8912,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\_siunitx_unit_format_loop:}
-% The unit components are examined and reconstructed. This is done on
-% a unit-by-unit basis as there is the possibility that brackets will be
-% needed to be added.
-%    \begin{macrocode}
-\cs_set_protected_nopar:Npn \_siunitx_unit_format_loop: {
-  \_siunitx_unit_format_prefix:
-  \_siunitx_unit_format_symbol:
-  \_siunitx_unit_format_qualifier:
-  \_siunitx_unit_format_power:
-  \_siunitx_unit_format_add:
-  \int_decr:N \_l_siunitx_unit_int
-  \intexpr_compare:nNnT 
-    { \int_use:N \_l_siunitx_unit_int } > { 0 } 
-    { \_siunitx_unit_format_loop: }
-} 
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\_siunitx_unit_format_power:}
