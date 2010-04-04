@@ -2308,6 +2308,8 @@ This work consists of the file  siunitx.dtx
 % The unit prefixes (\cs{kilo}, \emph{etc}.) are normally given as 
 % letters. However, the package can convert these into numerical powers.
 % This is controlled by the \opt{prefixes-as-symbols} switch option.
+% This correctly deals with the kilogram, which is a base unit even
+% though it involves a prefix.
 %\begin{LaTeXdemo}
 %  \si{\milli\litre\per\mole\deci\ampere} \\
 %  \SI{10}{\kilo\gram\squared\deci\second} \\
@@ -9066,6 +9068,12 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_unit_format_prefix_number_calc: }
     { \msg_error:nn { siunitx } { prefix-base-mismatch } }
 }
+%    \end{macrocode}
+%  The calculation for converting a unit prefix into a number is 
+%  simple unless there are grammes involved. In that case, the base unit
+%  is the kilogram and so there is some code to convert the number
+%  back correctly.  
+%    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_unit_format_prefix_number_calc: {
   \tl_set:Nx \_l_siunitx_tmpa_tl 
     { power- \int_use:N \_l_siunitx_unit_int }
@@ -9073,6 +9081,18 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_tmpa_tl
   \quark_if_no_value:NT \_l_siunitx_tmpa_tl 
     { \tl_set:Nn \_l_siunitx_tmpa_tl { 1 } }
+  \tl_set:Nx \_l_siunitx_tmpb_tl 
+    { unit- \int_use:N \_l_siunitx_unit_int }
+  \prop_get:NVN \_l_siunitx_unit_prop \_l_siunitx_tmpb_tl
+    \_l_siunitx_tmpb_tl
+  \tl_if_eq:nVT { \gram } \_l_siunitx_tmpb_tl
+    { 
+      \tl_set:Nx \_l_siunitx_unit_prefix_current_tl
+        { \intexpr_eval:n { \_l_siunitx_unit_prefix_current_tl  - 3 } } 
+      \tl_set:Nx \_l_siunitx_tmpb_tl 
+        { symbol- \int_use:N \_l_siunitx_unit_int }
+      \prop_put:NVn \_l_siunitx_unit_prop \_l_siunitx_tmpb_tl { kg }
+    }
   \tl_set:Nx \_l_siunitx_unit_prefix_current_tl 
     {
        \intexpr_eval:n 
