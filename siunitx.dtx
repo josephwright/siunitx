@@ -3516,31 +3516,31 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %
-%\begin{macro}{\c_siunitx_minus_tl}
+%\begin{macro}{\_c_siunitx_minus_tl}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}.
 %    \begin{macrocode}
-\DeclareTextSymbolDefault \c_siunitx_minus_tl { TS1 }
-\DeclareTextSymbol \c_siunitx_minus_tl { TS1 } { 61 }
+\DeclareTextSymbolDefault \_c_siunitx_minus_tl { TS1 }
+\DeclareTextSymbol \_c_siunitx_minus_tl { TS1 } { 61 }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_mu_tl}
+%\begin{macro}{\_c_siunitx_mu_tl}
 % The lack of an upright mu has to be sorted out.
 %    \begin{macrocode}
-\DeclareTextSymbol \c_siunitx_mu_tl { TS1 } { 181 }
-\DeclareTextSymbolDefault \c_siunitx_mu_tl { TS1 }
+\DeclareTextSymbol \_c_siunitx_mu_tl { TS1 } { 181 }
+\DeclareTextSymbolDefault \_c_siunitx_mu_tl { TS1 }
 %    \end{macrocode}
 %\end{macro}
 %
 % Some package redefine \cs{Omega} to be slanted and move the original
 % symbol to \cs{upOmega}. This is handled here.
 %    \begin{macrocode}
-\tl_new:N \c_siunitx_omega_tl
-\tl_set:Nn \c_siunitx_omega_tl { \Omega }
+\tl_new:N \_c_siunitx_omega_tl
+\tl_set:Nn \_c_siunitx_omega_tl { \Omega }
 \AtBeginDocument {
   \cs_if_exist:NT \upOmega 
-    { \tl_set:Nn \c_siunitx_omega_tl { \upOmega } }
+    { \tl_set:Nn \_c_siunitx_omega_tl { \upOmega } }
 }
 %    \end{macrocode}
 %
@@ -3652,8 +3652,8 @@ This work consists of the file  siunitx.dtx
 % package.  By carrying out the changes outside math mode, bold can
 % reliably be applied to math output.
 % 
-%\begin{macro}{\c_siunitx_mathsf_int}
-%\begin{macro}{\c_siunitx_mathtt_int}
+%\begin{macro}{\_c_siunitx_mathsf_int}
+%\begin{macro}{\_c_siunitx_mathtt_int}
 %\begin{macro}{\_siunitx_set_math_fam:n}
 % The detection routine needs some basic data about the sans serif and
 % monospaced fonts in use.  This is collected up at the start of the 
@@ -3663,7 +3663,7 @@ This work consists of the file  siunitx.dtx
 % \pkg{fontspec} does (nasty errors arise otherwise). 
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_set_math_fam:n #1 {
-  \int_new:c { c_siunitx_math #1 _int }
+  \int_new:c { _c_siunitx_math #1 _int }
   \group_begin:
     \hbox_set:Nn \_l_siunitx_tmp_box 
       {
@@ -3671,7 +3671,7 @@ This work consists of the file  siunitx.dtx
           {
             \use:c { math #1 } 
               {
-                \int_gset:cn { c_siunitx_math #1 _int } { \fam }  
+                \int_gset:cn { _c_siunitx_math #1 _int } { \fam }  
               }
           }
       }  
@@ -3687,8 +3687,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\_siunitx_font_set_text_fam:n}
-%\begin{macro}{\c_siunitx_textsf_tl}
-%\begin{macro}{\c_siunitx_texttt_tl}
+%\begin{macro}{\_c_siunitx_textsf_tl}
+%\begin{macro}{\_c_siunitx_texttt_tl}
 % The text families are done in a somewhat different manner: there are 
 % no issues with \cs{AtBeginDocument}, luckily. The need to define 
 % new macros here arises as \cs{sfdefault} and \cs{ttdefault} are 
@@ -3947,16 +3947,16 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected_nopar:Npn \_siunitx_detect_font_family_math: {
   \tl_set:Nn \_l_siunitx_font_family_tl { rm }
   \intexpr_compare:nNnT 
-    { \int_use:N \fam } = { \int_use:N \c_siunitx_mathsf_int } 
+    { \int_use:N \fam } = { \int_use:N \_c_siunitx_mathsf_int } 
     { \tl_set:Nn \_l_siunitx_font_family_tl { sf } }
   \intexpr_compare:nNnT 
-    { \int_use:N \fam } = { \int_use:N \c_siunitx_mathtt_int } 
+    { \int_use:N \fam } = { \int_use:N \_c_siunitx_mathtt_int } 
     { \tl_set:Nn \_l_siunitx_font_family_tl { tt } }
 }
 \cs_set_protected_nopar:Npn \_siunitx_detect_font_family_text: {
-  \tl_if_eq:NNT \f@family \c_siunitx_textsf_tl 
+  \tl_if_eq:NNT \f@family \_c_siunitx_textsf_tl 
     { \tl_set:Nn \_l_siunitx_font_family_tl { sf } }
-  \tl_if_eq:NNT \f@family \c_siunitx_texttt_tl 
+  \tl_if_eq:NNT \f@family \_c_siunitx_texttt_tl 
     { \tl_set:Nn \_l_siunitx_font_family_tl { tt } }
 }
 %    \end{macrocode}
@@ -4160,13 +4160,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \AtBeginDocument {
   \tl_set:Nx \_l_siunitx_tmpa_tl { \familydefault }
-  \tl_if_eq:NNT \_l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
+  \tl_if_eq:NNT \_l_siunitx_tmpa_tl \_c_siunitx_textsf_tl 
     {
       \@ifpackageloaded { cmbright } { }
         { \keys_set:nn { siunitx } { math-rm = \mathsf } }
       \keys_set:nn { siunitx } { text-rm  = \sffamily }
     }
-  \tl_if_eq:NNT \_l_siunitx_tmpa_tl \c_siunitx_texttt_tl 
+  \tl_if_eq:NNT \_l_siunitx_tmpa_tl \_c_siunitx_texttt_tl 
     {
       \keys_set:nn { siunitx } 
         {
@@ -4346,7 +4346,7 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected:Npn \_siunitx_print_text_super:n #1 {
   \tl_set:Nn \_l_siunitx_tmpa_tl {#1}
   \tl_replace_all_in:Nnn \_l_siunitx_tmpa_tl { - } 
-    { \c_siunitx_minus_tl }
+    { \_c_siunitx_minus_tl }
   \tl_set:Nx \_l_siunitx_tmpa_tl
     {
       \exp_not:N \ensuremath
@@ -4510,13 +4510,13 @@ This work consists of the file  siunitx.dtx
 % quickly. For most documents, this gain more than offsets any slight
 % losses with more complicated numbers.
 % 
-%\begin{macro}{\c_siunitx_number_part_complex_tl}
+%\begin{macro}{\_c_siunitx_number_part_complex_tl}
 % A couple of the comparisons needed for checking complex numbers
 % are done using stored text. To make them a little quicker, a
 % pre-stored version of the text is stored here.
 %    \begin{macrocode}
-\tl_new:N \c_siunitx_number_part_complex_tl
-\tl_set:Nn \c_siunitx_number_part_complex_tl { complex }
+\tl_new:N \_c_siunitx_number_part_complex_tl
+\tl_set:Nn \_c_siunitx_number_part_complex_tl { complex }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5323,7 +5323,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NF \_l_siunitx_number_in_value_bool 
     { 
       \tl_if_eq:NNF \_l_siunitx_number_part_tl 
-        \c_siunitx_number_part_complex_tl
+        \_c_siunitx_number_part_complex_tl
         { 
           \prop_del:NV \_l_siunitx_number_in_prop 
             \_l_siunitx_number_part_sign_tl 
@@ -5332,7 +5332,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_set_protected_nopar:Npn \_siunitx_number_in_check_full:n #1 {
   \tl_if_eq:NNF \_l_siunitx_number_part_tl 
-    \c_siunitx_number_part_complex_tl 
+    \_c_siunitx_number_part_complex_tl 
     { \_siunitx_number_in_check_short:n {#1} }
   \bool_if:NF \_l_siunitx_number_in_complex_root_bool
     { 
@@ -5691,13 +5691,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_unity_tl}
+%\begin{macro}{\_c_siunitx_unity_tl}
 %\begin{macro}{\_siunitx_number_process_mantissa:}
 % A check for the mantissa consisting only of the token \texttt{1}, when
 % an exponent is also available.
 %    \begin{macrocode}
-\tl_new:N \c_siunitx_unity_tl 
-\tl_set:Nn \c_siunitx_unity_tl { 1 }
+\tl_new:N \_c_siunitx_unity_tl 
+\tl_set:Nn \_c_siunitx_unity_tl { 1 }
 \cs_set_protected_nopar:Npn \_siunitx_number_process_mantissa: {
   \bool_if:NF \_l_siunitx_process_unity_mantissa_bool 
     {
@@ -5708,7 +5708,7 @@ This work consists of the file  siunitx.dtx
             {
               \prop_get:NnN \_l_siunitx_number_in_prop 
                 { mantissa-integer } \_l_siunitx_tmpa_tl
-              \tl_if_eq:NNT \c_siunitx_unity_tl \_l_siunitx_tmpa_tl 
+              \tl_if_eq:NNT \_c_siunitx_unity_tl \_l_siunitx_tmpa_tl 
                 { 
                   \prop_if_in:NnF \_l_siunitx_number_in_prop 
                     { mantissa-decimal-marker }
@@ -6013,18 +6013,18 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\c_siunitx_plus_tl}
+%\begin{macro}{\_c_siunitx_plus_tl}
 %\begin{macro}[aux]{\_siunitx_number_process_sign_plus:n}
 % Holding onto a plus works very much in the same way as adding a sign:
 % some quick tests and an assignment. Using a pre-defined token list is
 % a speed-related choice: very slightly faster comparison.
 %    \begin{macrocode}
-\tl_new:N \c_siunitx_plus_tl
-\tl_set:Nn \c_siunitx_plus_tl { + }
+\tl_new:N \_c_siunitx_plus_tl
+\tl_set:Nn \_c_siunitx_plus_tl { + }
 \cs_set_protected_nopar:Npn \_siunitx_number_process_sign_plus:n #1 {
   \prop_get:NnN \_l_siunitx_number_in_prop { #1 -sign } 
     \_l_siunitx_tmpa_tl
-  \tl_if_eq:NNT \c_siunitx_plus_tl \_l_siunitx_tmpa_tl 
+  \tl_if_eq:NNT \_c_siunitx_plus_tl \_l_siunitx_tmpa_tl 
     { 
       \prop_del:Nn \_l_siunitx_number_in_prop { #1 -sign } 
       \prop_put:Nnn \_l_siunitx_number_in_prop { #1 -had-sign } { true }
@@ -8987,7 +8987,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_set:Nn \_l_siunitx_tmpa_tl {#1}
       \tl_replace_all_in:Nnn \_l_siunitx_tmpa_tl { - } 
-        { \text { \c_siunitx_minus_tl } }
+        { \text { \_c_siunitx_minus_tl } }
     \_siunitx_print:nV { number } \_l_siunitx_tmpa_tl
    }
 }
@@ -9872,33 +9872,33 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Table printing: general code}
 %
-%\begin{macro}{\c_siunitx_one_fill_skip}
+%\begin{macro}{\_c_siunitx_one_fill_skip}
 % A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
-\skip_new:N \c_siunitx_one_fill_skip
-\skip_set:Nn \c_siunitx_one_fill_skip { \c_zero_skip plus 1 fill }
+\skip_new:N \_c_siunitx_one_fill_skip
+\skip_set:Nn \_c_siunitx_one_fill_skip { \c_zero_skip plus 1 fill }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_table_correction_skip}
+%\begin{macro}{\_c_siunitx_table_correction_skip}
 %\begin{macro}{\_siunitx_table_colortbl_correction:}
 % If the package \pkg{colortbl} is loaded, there is a need to allow
 % that it changes how centring is carried out.
 %    \begin{macrocode}
-\skip_new:N \c_siunitx_table_correction_skip
+\skip_new:N \_c_siunitx_table_correction_skip
 \AtBeginDocument {
   \@ifpackageloaded { colortbl }
     { 
-      \skip_set:Nn \c_siunitx_table_correction_skip 
+      \skip_set:Nn \_c_siunitx_table_correction_skip 
         { \c_zero_skip plus -0.5 fill } 
     }
     { 
-      \skip_set:Nn \c_siunitx_table_correction_skip 
+      \skip_set:Nn \_c_siunitx_table_correction_skip 
         { \c_zero_skip } 
     }
 }
 \cs_set_protected_nopar:Npn \_siunitx_table_colortbl_correction: {
-  \skip_horizontal:n { \c_siunitx_table_correction_skip }
+  \skip_horizontal:n { \_c_siunitx_table_correction_skip }
   \tex_kern:D \c_zero_skip
 }
 %    \end{macrocode}
@@ -9918,7 +9918,7 @@ This work consists of the file  siunitx.dtx
   \tex_kern:D \c_zero_skip
 }
 \cs_set_protected_nopar:Npn \_siunitx_table_align_right:n #1 {
-  \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
+  \skip_horizontal:n { \_c_siunitx_one_fill_skip - #1 }
   \tex_kern:D \c_zero_skip
   \_siunitx_table_colortbl_correction:
 }
@@ -10988,7 +10988,7 @@ This work consists of the file  siunitx.dtx
               \keys_set:nn { siunitx } 
                 {
                   math-angstrom = \text { \capitalring { A } },
-                  text-angstrom  = \capitalring { A }
+                  text-angstrom = \capitalring { A }
                 }
             }
         } { }
@@ -11030,8 +11030,8 @@ This work consists of the file  siunitx.dtx
   math-arcsecond = { } ^ { \prime \prime },
   math-celsius   = { } ^ { \circ } \kern - \scriptspace \mathrm { C },
   math-degree    = { } ^ { \circ },
-  math-micro     = \text { \c_siunitx_mu_tl },
-  math-ohm       = \text { \ensuremath { \c_siunitx_omega_tl } },
+  math-micro     = \text { \_c_siunitx_mu_tl },
+  math-ohm       = \text { \ensuremath { \_c_siunitx_omega_tl } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11066,8 +11066,8 @@ This work consists of the file  siunitx.dtx
   text-celsius   = 
     \ensuremath { { } ^ { \circ } \kern - \scriptspace \text { C } },
   text-degree    = \ensuremath { { } ^ { \circ } },
-  text-micro     = \c_siunitx_mu_tl ,
-  text-ohm       = \ensuremath { \c_siunitx_omega_tl },
+  text-micro     = \_c_siunitx_mu_tl ,
+  text-ohm       = \ensuremath { \_c_siunitx_omega_tl },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11916,7 +11916,7 @@ This work consists of the file  siunitx.dtx
 %    
 %\begin{macro}{\_siunitx_load_configuration:n}
 %\begin{macro}[aux]{\_siunitx_load_configuration_aux:n}
-%\begin{macro}{\c_siunitx_configuration_ext_tl}
+%\begin{macro}{\_c_siunitx_configuration_ext_tl}
 % Loading configuration files is made slightly complex by the need
 % to remove spaces in the file names (none of the files contain any at
 % all, so this is easy). Secondly, the LaTeX2e \cs{@onefilewithoptions}
@@ -11933,18 +11933,18 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:nF {#1}
     {
       \file_if_exist:nTF 
-        { siunitx- #1 . \c_siunitx_configuration_ext_tl }
+        { siunitx- #1 . \_c_siunitx_configuration_ext_tl }
         { 
           \@onefilewithoptions { siunitx- #1 } [ ] [ ] 
-          \c_siunitx_configuration_ext_tl  
+          \_c_siunitx_configuration_ext_tl  
         }
         { 
           \msg_error:nnx { siunitx } { unknown-configuration-file } {#1}
         }
     }
 }
-\tl_new:N \c_siunitx_configuration_ext_tl
-\tl_set:Nn \c_siunitx_configuration_ext_tl { cfg }
+\tl_new:N \_c_siunitx_configuration_ext_tl
+\tl_set:Nn \_c_siunitx_configuration_ext_tl { cfg }
 %    \end{macrocode}
 %\end{macro}    
 %\end{macro} 
