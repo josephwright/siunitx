@@ -1517,7 +1517,8 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \num{+345} \\
 %  \num[retain-explicit-plus]{+345} \\
-%  \num[explicit-sign = -]{345} 
+%  \num[explicit-sign = -]{345}     \\
+%  \num[explicit-sign = -]{+345} 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{retain-unity-mantissa}
@@ -5955,17 +5956,20 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_sign_add:n #1 {
   \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -sign } 
     {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1}
-        \l_siunitx_tmpa_tl
-      \tl_if_empty:NTF \l_siunitx_tmpa_tl 
+      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -had-sign } 
         {
-          \prop_put:NnV \l_siunitx_number_in_prop { sign } 
-            \l_siunitx_process_sign_tl 
-        }
-        {
-          \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
-            \l_siunitx_process_sign_tl
-        }
+          \prop_get:NnN \l_siunitx_number_in_prop {#1}
+            \l_siunitx_tmpa_tl
+          \tl_if_empty:NTF \l_siunitx_tmpa_tl 
+            {
+              \prop_put:NnV \l_siunitx_number_in_prop { sign } 
+                \l_siunitx_process_sign_tl 
+            }
+            {
+              \prop_put:NnV \l_siunitx_number_in_prop { #1 -sign } 
+                \l_siunitx_process_sign_tl
+            }
+        }    
     }
 }
 %    \end{macrocode}
@@ -5982,7 +5986,10 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign } 
     \l_siunitx_tmpa_tl
   \tl_if_eq:NNT \c_siunitx_plus_tl \l_siunitx_tmpa_tl 
-    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } }
+    { 
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign } 
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 -had-sign } { true }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
