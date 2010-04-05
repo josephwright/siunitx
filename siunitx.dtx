@@ -7756,6 +7756,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_parse_aux:nn #1#2 {
   \_siunitx_number_in_parse:n {#1}
+  \prop_get:NnN \_l_siunitx_number_in_prop { mantissa-sign-deleted }
+    \_l_siunitx_tmpa_tl
+  \quark_if_no_value:NF \_l_siunitx_tmpa_tl
+    { 
+      \prop_put:NnV \_l_siunitx_number_in_prop { mantissa-sign }
+        \_l_siunitx_tmpa_tl
+    }
   \_siunitx_number_process:
   \prop_set_eq:cN { _l_siunitx_angle_ #2 _prop } 
     \_l_siunitx_number_in_prop
