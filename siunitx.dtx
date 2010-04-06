@@ -7392,17 +7392,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro} 
-% 
-%\begin{macro}{\_l_siunitx_angle_to_arc_bool}
-%\begin{macro}{\_l_siunitx_angle_to_decimal_bool}
-% Switches are required for the \opt{angle-output-format} option, which
-% has to set two of them at the same time.
-%    \begin{macrocode}
-\bool_new:N \_l_siunitx_angle_to_arc_bool
-\bool_new:N \_l_siunitx_angle_to_decimal_bool
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\_l_siunitx_angle_marker_box}
 %\begin{macro}{\_l_siunitx_angle_unit_box}
@@ -7469,22 +7458,6 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_angle_astronomy_bool   ,
   arc-separator        .tl_set:N   = 
     \_l_siunitx_angle_arc_separator_tl ,
-  angle-output-format  .choice: ,
-  angle-output-format / arc .code:n =
-    {
-      \bool_set_true:N \_l_siunitx_angle_to_arc_bool
-      \bool_set_false:N \_l_siunitx_angle_to_decimal_bool
-    },
-  angle-output-format / decimal .code:n =
-    {
-      \bool_set_false:N \_l_siunitx_angle_to_arc_bool
-      \bool_set_true:N \_l_siunitx_angle_to_decimal_bool
-    },
-  angle-output-format / input .code:n =
-    {
-      \bool_set_false:N \_l_siunitx_angle_to_arc_bool
-      \bool_set_false:N \_l_siunitx_angle_to_decimal_bool
-    },
   number-angle-separator .tl_set:N = 
     \_l_siunitx_angle_unit_separator_tl 
 }
@@ -7656,12 +7629,7 @@ This work consists of the file  siunitx.dtx
   \_siunitx_angle_parse_aux:nn {#2} { minute }
   \_siunitx_angle_parse_aux:nn {#3} { second }
   \_siunitx_angle_parse_arc_sign_check:
-  \bool_if:NF \_l_siunitx_error_bool
-    {
-      \bool_if:NTF \_l_siunitx_angle_to_decimal_bool
-        { \_siunitx_angle_convert_to_decimal: }
-        { \_siunitx_angle_print: }
-    }
+  \_siunitx_angle_print: 
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7738,12 +7706,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \_l_siunitx_number_parse_bool
     {
       \_siunitx_angle_parse_aux:nn {#1} { degree }
-      \bool_if:NF \_l_siunitx_error_bool
-        {
-          \bool_if:NTF \_l_siunitx_angle_to_arc_bool
-            { \_siunitx_angle_convert_to_arc: }
-            { \_siunitx_angle_print: }
-        }
+      \_siunitx_angle_print:
     }
     { \_siunitx_angle_print_direct:nnn {#1} { } { } }
 }
