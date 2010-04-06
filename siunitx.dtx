@@ -6992,16 +6992,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\_l_siunitx_calculate_product_bool}
-%\begin{macro}{\_l_siunitx_calculate_quotient_bool}
-% Calculation mode needs some flags creating.
-%    \begin{macrocode}
-\bool_new:N \_l_siunitx_calculate_product_bool
-\bool_new:N \_l_siunitx_calculate_quotient_bool
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\begin{macro}{\_siunitx_fraction:nn}
 % The function used for fractions should be stored here.
 %    \begin{macrocode}
@@ -7021,15 +7011,9 @@ This work consists of the file  siunitx.dtx
   parse-numbers      .bool_set:N = \_l_siunitx_number_parse_bool,
   quotient-mode      .choice:,
   quotient-mode / fraction .code:n = 
-    {
-      \bool_set_false:N \_l_siunitx_calculate_quotient_bool
-      \tl_set:Nn \_l_siunitx_quotient_mode_tl { fraction }
-    },  
+    { \tl_set:Nn \_l_siunitx_quotient_mode_tl { fraction } },  
   quotient-mode / symbol .code:n = 
-    {
-      \bool_set_false:N \_l_siunitx_calculate_quotient_bool
-      \tl_set:Nn \_l_siunitx_quotient_mode_tl { symbol }
-    },
+    { \tl_set:Nn \_l_siunitx_quotient_mode_tl { symbol } },
 }
 \keys_set:nn { siunitx } {
   fraction-function = \frac,
@@ -7087,7 +7071,6 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_number_output_parse:n}
 %\begin{macro}{\_siunitx_number_output_parse:V}
 %\begin{macro}[aux]{\_siunitx_number_output_parse_aux:}
-%\begin{macro}[aux]{\_siunitx_number_output_parse_multi:}
 % The parsing system just has to check if there are multiple parts to
 % worry about.
 %    \begin{macrocode}
@@ -7097,7 +7080,10 @@ This work consists of the file  siunitx.dtx
     { 
       \tl_if_empty:NTF \_l_siunitx_number_multi_tl 
         { \_siunitx_number_output_parse_aux: }
-        { \_siunitx_number_output_parse_multi: }
+        { 
+          \use:c 
+            { _siunitx_number_output_ \_l_siunitx_number_multi_tl : } 
+        }
     }
 }
 \cs_generate_variant:Nn \_siunitx_number_output_parse:n { V }
@@ -7118,14 +7104,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_set_protected_nopar:Npn \_siunitx_number_output_parse_multi: {
-  \bool_if:cTF 
-    { _l_siunitx_calculate_ \_l_siunitx_number_multi_tl _bool } 
-    { \_siunitx_number_output_calculate: }
-    { \use:c { _siunitx_number_output_ \_l_siunitx_number_multi_tl : } }
-}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
