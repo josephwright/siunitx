@@ -1067,14 +1067,16 @@ This work consists of the file  siunitx.dtx
 % material which should be placed before or after a number, and will
 % maintain the alignment of the numerical data 
 % (\cref{tab:S:extras}). If the material could be mistaken for
-% part of a number, it should be protected by braces.
+% part of a number, it should be protected by braces. The use of
+% \cs{color} in a table cell will also be detected an will override any
+% general color applied by \pkg{siunitx}.
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \caption{Detection of surrounding material in an \texttt{S} 
 %      column.}
 %    \label{tab:S:extras}
 %    \centering
-%    \begin{tabular}{S}
+%    \begin{tabular}{S[color=orange]}
 %    \toprule
 %      {Some Values} \\
 %    \midrule
@@ -9738,19 +9740,34 @@ This work consists of the file  siunitx.dtx
 % \cref{tab:xmpl:calc} in the user part of the documentation. 
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_table_collect_expand:N #1 {
-  \_siunitx_cs_if_tl:NTF #1 
-    {
-      \tl_use:N \_l_siunitx_table_collect_pre_tl
-      \tl_clear:N \_l_siunitx_table_collect_pre_tl
-      \cs_set_nopar:Npx \_siunitx_table_collect_next: 
-        { \exp_not:N \_siunitx_table_collect_get: \exp_not:V #1 }
-    }
+  \cs_if_eq:NNTF #1 \color
     {
       \bool_if:NTF \_l_siunitx_table_collect_pre_bool
-        { \tl_put_right:Nn \_l_siunitx_table_collect_pre_tl {#1} }
+        { 
+          \tl_clear:N \_l_siunitx_number_color_tl
+          \tl_clear:N \_l_siunitx_unit_color_tl
+          \tl_put_right:Nn \_l_siunitx_table_collect_pre_tl {#1} 
+        }
         {
           \bool_set_true:N \_l_siunitx_table_collect_post_bool
           \tl_put_right:Nn \_l_siunitx_table_collect_post_tl {#1}
+        }
+    }
+    {
+      \_siunitx_cs_if_tl:NTF #1 
+        {
+          \tl_use:N \_l_siunitx_table_collect_pre_tl
+          \tl_clear:N \_l_siunitx_table_collect_pre_tl
+          \cs_set_nopar:Npx \_siunitx_table_collect_next: 
+            { \exp_not:N \_siunitx_table_collect_get: \exp_not:V #1 }
+        }
+        {
+          \bool_if:NTF \_l_siunitx_table_collect_pre_bool
+            { \tl_put_right:Nn \_l_siunitx_table_collect_pre_tl {#1} }
+            {
+              \bool_set_true:N \_l_siunitx_table_collect_post_bool
+              \tl_put_right:Nn \_l_siunitx_table_collect_post_tl {#1}
+            }
         }
     }
 }
