@@ -6401,17 +6401,29 @@ This work consists of the file  siunitx.dtx
 % brackets if needed.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_format_complex: {
-  \prop_if_in:NnT \_l_siunitx_number_out_prop { complex } 
+  \prop_if_in:NnT \_l_siunitx_number_in_prop { complex-root } 
     {
-      \_siunitx_number_format_brackets:n { complex }
-      \_siunitx_number_format_complex_aux:n { complex }
-      \prop_if_in:NnT \_l_siunitx_number_out_prop 
-        { complex-uncertainty }
-        { 
-          \_siunitx_number_format_complex_aux:n 
-            { complex-uncertainty } 
+      \prop_if_in:NnTF \_l_siunitx_number_out_prop { complex }
+        {
+          \_siunitx_number_format_brackets:n { complex }
+          \_siunitx_number_format_complex_aux:n { complex }
+          \prop_if_in:NnT \_l_siunitx_number_out_prop 
+            { complex-uncertainty }
+            { 
+              \_siunitx_number_format_complex_aux:n 
+                { complex-uncertainty } 
+            }  
         }
-      \_siunitx_number_format_join_complex:  
+        {
+          \tl_set:Nx \_l_siunitx_tmpa_tl
+            { 
+              \exp_not:N \ensuremath 
+                { \exp_not:V \_l_siunitx_output_complex_tl } 
+            }
+          \prop_put:NnV \_l_siunitx_number_out_prop { complex }
+            \_l_siunitx_tmpa_tl
+        }
+        \_siunitx_number_format_join_complex:
     }
 }
 \cs_set_protected_nopar:Npn \_siunitx_number_format_complex_aux:n #1 {
