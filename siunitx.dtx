@@ -11983,21 +11983,21 @@ This work consists of the file  siunitx.dtx
           detect-italic         = false,
           detect-mode           = false,
           detect-weight         = false,
+          multi-part-units      = bracket,
           parse-numbers         = true,
           parse-units           = true,
-          repeat-units          = true,
-          unit-product-to-power = true,
-          use-brackets          = true
+          product-units         = repeat,
+          use-brackets          = true,
         }
       \_siunitx_strict_option:n  
         { 
           detect-italic         ,
           detect-mode           ,
           detect-weight         ,
+          multi-part-units      ,
           parse-numbers         ,
           parse-units           ,
-          repeat-units          ,
-          unit-product-to-power ,
+          product-units         ,
           use-brackets          
         }
       \keys_define:nn { siunitx }
@@ -12444,17 +12444,20 @@ This work consists of the file  siunitx.dtx
   repeatunits /
     false        .meta:n    = 
       { 
-        repeat-units          = false,
-        unit-product-to-power = false                   
+        multi-part-numbers    = single,
+        product-units         = single,                  
       },
   repeatunits /
     power        .meta:n    = 
       { 
-        repeat-units          = false,
-        unit-product-to-power = true                   
+        multi-part-numbers    = repeat,
+        product-units         = power,                 
       },
   repeatunits /
-    true         .meta:n    = { repeat-units = true                   },
+      { 
+        multi-part-numbers    = repeat,
+        product-units         = repeat,                 
+      },
   repeatunits    .default:n = { true                                  },
   retainplus     .meta:n    = { retain-explicit-plus    = #1          },
   retainplus     .default:n = { true                                  },
@@ -12512,7 +12515,11 @@ This work consists of the file  siunitx.dtx
   tightpm        .meta:n    = { tight-spacing           = #1          },
   tightpm        .default:n = { true                                  },
   tophrase       .meta:n    = { range-phrase            = #1          },
-  trapambigerr   .meta:n    = { use-brackets            = #1          },
+  trapambigerr   .choice,
+  trapambigerr   
+    / false      .code:n    = { multi-part-units        = single      },
+  trapambigerr   
+    / true       .code:n    = { multi-part-units        = brackets    },
   trapambigerr   .default:n = { true                                  },
   trapambigfrac  .meta:n    = { use-brackets            = #1          },
   trapambigfrac  .default:n = { true                                  },
