@@ -2345,10 +2345,10 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      allow-number-unit-breaks & Switch & false  \\
-%      number-unit-separator    & Math   & \cs{,} \\
-%      repeat-units             & Switch & true   \\
-%      unit-product-behavior    & Choice & repeat \\
+%      allow-number-unit-breaks & Switch & false    \\
+%      multi-part-units         & Choice & brackets \\
+%      number-unit-separator    & Math   & \cs{,}   \\
+%      product-units            & Choice & repeat   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2379,31 +2379,35 @@ This work consists of the file  siunitx.dtx
 %  \SI[number-unit-separator=]{2.67}{\farad} 
 %\end{LaTeXdemo}
 %
-%\DescribeOption{repeat-units}
-% When brackets are not in use to make the meaning of number--unit
-% combinations clear, it may be necessary to repeat units to maintain
-% the mathematical meaning of the output. This is handled by the
-% \opt{repeat-units} option, which may be \opt{true} or \opt{false}.
+%\DescribeOption{multi-part-units}
+% When a number has multiple parts (such as a separate uncertainty) then
+% the unit must apply to all parts of the number. How this is shown is
+% controlled using the \opt{multi-part-units} options. The standard
+% setting is \opt{brackets}, which will place the entire numerical part
+% in brackets and use a single unit symbol. Alternative options are
+% \opt{repeat} (print the unit for each part of the number) and
+% \popt{single} (print only one unit symbol: mathematically incorrect).
 %\begin{LaTeXdemo}
-%  \SI{12.3(4)}{\kilo\gram}
-%  \sisetup{use-brackets = false}  
+%  \sisetup{separate-uncertainty}%
 %  \SI{12.3(4)}{\kilo\gram} \\
-%  \SI[repeat-units=false]{12.3(4)}{\kilo\gram}    
+%  \SI[multi-part-units = brackets]{12.3(4)}{\kilo\gram} \\
+%  \SI[multi-part-units = repeat]{12.3(4)}{\kilo\gram}   \\
+%  \SI[multi-part-units = single]{12.3(4)}{\kilo\gram}   
 %\end{LaTeXdemo}
 %
-%\DescribeOption{unit-product-behavior}
-% Repeated units, where areas or volumes are being used, can behave in
-% a variety of ways. This is controlled by the 
-% \opt{unit-product-behavior} setting, which takes the values
-% \opt{brackets}, \opt{brackets-power}, \opt{power}, \opt{repeat}
-% and \opt{single}. The standard setting is to repeat the units.
+%\DescribeOption{product-units}
+% When a product of values is given, the resulting units can be 
+% displayed in a number of ways, set using the \opt{product-units}
+% option. The standard setting is \opt{repeat}, which prints one
+% unit symbol for each numbers. Alternatives are \opt{brackets},
+% \opt{brackets-power}, \opt{power}, \opt{repeat} and \opt{single}.
 %\begin{LaTeXdemo}
 %  \SI{2 x 3 x 4}{\metre} \\ 
-%  \SI[unit-product-behavior = brackets]{2 x 3 x 4}{\metre}       \\
-%  \SI[unit-product-behavior = brackets-power]{2 x 3 x 4}{\metre} \\
-%  \SI[unit-product-behavior = power]{2 x 3 x 4}{\metre}          \\
-%  \SI[unit-product-behavior = repeat]{2 x 3 x 4}{\metre}         \\
-%  \SI[unit-product-behavior = single]{2 x 3 x 4}{\metre}
+%  \SI[product-units = brackets]{2 x 3 x 4}{\metre}       \\
+%  \SI[product-units = brackets-power]{2 x 3 x 4}{\metre} \\
+%  \SI[product-units = power]{2 x 3 x 4}{\metre}          \\
+%  \SI[product-units = repeat]{2 x 3 x 4}{\metre}         \\
+%  \SI[product-units = single]{2 x 3 x 4}{\metre}
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -3277,14 +3281,14 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 % Products and errors should show what unit applies to each value
-% given.  Thus \SI[unit-product-behavior = brackets]{2x3}{\metre} is an 
+% given.  Thus \SI[product-units = brackets]{2x3}{\metre} is an 
 % ordered set of lengths of a geometric area, whereas 
-% \SI[unit-product-behavior = single]{2x3}{\metre} is a length (and equal 
+% \SI[product-units = single]{2x3}{\metre} is a length (and equal 
 % to \SI{6}{\metre}). Thus,  \(\times\) is not a product but is a 
 % mathematical operator; in the same way, a \(2 \times 3\) matrix is not
 % a \(6\) matrix! In some areas, areas and volumes are given with 
 % separated units but a unit raised to the appropriate power: 
-% \SI[unit-product-behavior = power]{2 x 3}{\metre}. Although this does 
+% \SI[product-units = power]{2 x 3}{\metre}. Although this does 
 % display the correct overall units, it is potentially-confusing and is
 % not encouraged.
 %
@@ -7132,7 +7136,7 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_number_output_parts_aux: }
 }
 \cs_set_protected_nopar:Npn \_siunitx_number_output_parts_aux: {
-  \bool_if:NTF \_l_siunitx_number_unit_repeat_bool
+  \bool_if:NTF \_l_siunitx_multi_repeat_bool
     { 
       \prop_if_in:NnT \_l_siunitx_number_out_prop { mantissa-result }
         {
@@ -7195,7 +7199,7 @@ This work consists of the file  siunitx.dtx
 % otherwise looping will delete the units entirely!
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_output_product: {
-  \bool_if:NTF \_l_siunitx_number_unit_brackets_bool
+  \bool_if:NTF \_l_siunitx_product_brackets_bool
     { 
       \bool_if:nTF
         {
@@ -7206,7 +7210,7 @@ This work consists of the file  siunitx.dtx
         { \_siunitx_number_output_product_brackets: }
     }
     { 
-      \bool_if:NTF \_l_siunitx_number_unit_repeat_bool
+      \bool_if:NTF \_l_siunitx_product_repeat_bool
         { \_siunitx_number_output_product_aux: }
         { 
           \_siunitx_unit_output_pre_print:
@@ -9279,13 +9283,24 @@ This work consists of the file  siunitx.dtx
 % 
 % A collection of the internal parts of various user functions.
 % 
-%\begin{macro}{\_l_siunitx_number_unit_brackets_bool}
-%\begin{macro}{\_l_siunitx_number_unit_power_bool}
-%\begin{macro}{\_l_siunitx_number_unit_repeat_bool}
-% Flags for repeated units.
+%
+%\begin{macro}{\_l_siunitx_multi_brackets_bool}
+%\begin{macro}{\_l_siunitx_multi_repeat_bool}
+% Flags for multi-part numbers.
 %    \begin{macrocode}
-\bool_new:N \_l_siunitx_number_unit_brackets_bool
-\bool_new:N \_l_siunitx_number_unit_power_bool
+\bool_new:N \_l_siunitx_multi_brackets_bool
+\bool_new:N \_l_siunitx_multi_repeat_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+% 
+%\begin{macro}{\_l_siunitx_product_brackets_bool}
+%\begin{macro}{\_l_siunitx_product_power_bool}
+%\begin{macro}{\_l_siunitx_number_unit_repeat_bool}
+% Flags for product units.
+%    \begin{macrocode}
+\bool_new:N \_l_siunitx_product_brackets_bool
+\bool_new:N \_l_siunitx_product_power_bool
 \bool_new:N \_l_siunitx_number_unit_repeat_bool
 %    \end{macrocode}
 %\end{macro}
@@ -9299,51 +9314,68 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   allow-number-unit-breaks .bool_set:N = 
     \_l_siunitx_number_unit_breaks_bool,
-  number-unit-separator    .tl_set:N   = 
-    \_l_siunitx_number_unit_separator_tl,
-  repeat-units             .bool_set:N =
-     \_l_siunitx_number_unit_repeat_bool,
-  unit-product-behavior    .choice:,
-  unit-product-behavior
+  multi-part-units          .choice:,
+  multi-part-units
     / brackets       .code:n =
       {
-        \bool_set_true:N  \_l_siunitx_number_unit_brackets_bool
-        \bool_set_false:N \_l_siunitx_number_unit_power_bool
-        \bool_set_false:N \_l_siunitx_number_unit_repeat_bool
+        \bool_set_true:N  \_l_siunitx_multi_brackets_bool
+        \bool_set_false:N \_l_siunitx_multi_repeat_bool
       },
-  unit-product-behavior
-    / brackets-power .code:n =
-      {
-        \bool_set_true:N  \_l_siunitx_number_unit_brackets_bool
-        \bool_set_true:N  \_l_siunitx_number_unit_power_bool
-        \bool_set_false:N \_l_siunitx_number_unit_repeat_bool
-      },
-  unit-product-behavior
-    / power          .code:n =
-      {
-        \bool_set_false:N \_l_siunitx_number_unit_brackets_bool
-        \bool_set_true:N  \_l_siunitx_number_unit_power_bool
-        \bool_set_false:N \_l_siunitx_number_unit_repeat_bool
-      }, 
-  unit-product-behavior
+  multi-part-units
     / repeat         .code:n =
       {
-        \bool_set_false:N \_l_siunitx_number_unit_brackets_bool
-        \bool_set_false:N \_l_siunitx_number_unit_power_bool
-        \bool_set_true:N  \_l_siunitx_number_unit_repeat_bool
+        \bool_set_false:N \_l_siunitx_multi_brackets_bool
+        \bool_set_true:N  \_l_siunitx_multi_repeat_bool
       },
-  unit-product-behavior
+  multi-part-units
     / single         .code:n =
       {
-        \bool_set_false:N \_l_siunitx_number_unit_brackets_bool
-        \bool_set_false:N \_l_siunitx_number_unit_power_bool
-        \bool_set_false:N \_l_siunitx_number_unit_repeat_bool
+        \bool_set_false:N \_l_siunitx_multi_brackets_bool
+        \bool_set_false:N \_l_siunitx_multi_repeat_bool
+      },
+  number-unit-separator    .tl_set:N   = 
+    \_l_siunitx_number_unit_separator_tl,
+  product-units            .choice:,
+  product-units
+    / brackets       .code:n =
+      {
+        \bool_set_true:N  \_l_siunitx_product_brackets_bool
+        \bool_set_false:N \_l_siunitx_product_power_bool
+        \bool_set_false:N \_l_siunitx_product_repeat_bool
+      },
+  product-units
+    / brackets-power .code:n =
+      {
+        \bool_set_true:N  \_l_siunitx_product_brackets_bool
+        \bool_set_true:N  \_l_siunitx_product_power_bool
+        \bool_set_false:N \_l_siunitx_product_repeat_bool
+      },
+  product-units
+    / power          .code:n =
+      {
+        \bool_set_false:N \_l_siunitx_product_brackets_bool
+        \bool_set_true:N  \_l_siunitx_product_power_bool
+        \bool_set_false:N \_l_siunitx_product_repeat_bool
+      }, 
+  product-units
+    / repeat         .code:n =
+      {
+        \bool_set_false:N \_l_siunitx_product_brackets_bool
+        \bool_set_false:N \_l_siunitx_product_power_bool
+        \bool_set_true:N  \_l_siunitx_product_repeat_bool
+      },
+  product-units
+    / single         .code:n =
+      {
+        \bool_set_false:N \_l_siunitx_product_brackets_bool
+        \bool_set_false:N \_l_siunitx_product_power_bool
+        \bool_set_false:N \_l_siunitx_product_repeat_bool
       },
 }
 \keys_set:nn { siunitx } {
+  multi-part-units      = brackets,
   number-unit-separator = \,,
-  repeat-units          = true,
-  unit-product-behavior = repeat,
+  product-units         = repeat,
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -9454,6 +9486,8 @@ This work consists of the file  siunitx.dtx
       \_siunitx_unit_in:nn {#3} {#1} 
       \cs_set_eq:NN \_l_siunitx_pre_unit_tl \_l_siunitx_unit_tl
     }
+  \cs_set_eq:NN \_l_siunitx_brackets_bool 
+    \_l_siunitx_multi_brackets_bool  
   \_siunitx_combined_unit:nnn {#2} {#4} {#1}
   \_siunitx_combined_output:n {#2}
 }
@@ -9488,7 +9522,7 @@ This work consists of the file  siunitx.dtx
 % correctly-prepared unit stored in \cs{_l_siunitx_unit_tl}.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_combined_unit:nnn #1#2#3 {
-  \bool_if:NTF \_l_siunitx_number_unit_power_bool
+  \bool_if:NTF \_l_siunitx_product_power_bool
     {
       \_siunitx_combined_product_count:n {#1}
       \intexpr_compare:nNnTF 
