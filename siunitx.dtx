@@ -6515,8 +6515,8 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \_l_siunitx_tmpa_tl \_l_siunitx_tmpb_tl
   \prop_put:NnV \_l_siunitx_number_out_prop { result } 
     \_l_siunitx_tmpa_tl
-  \prop_put:Nnn \_l_siunitx_number_out_prop { result-bracket } 
-    { true }
+  \prop_put:Nnn \_l_siunitx_number_out_prop 
+    { result-bracket-denominator } { true }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7104,17 +7104,7 @@ This work consists of the file  siunitx.dtx
         { 
           \prop_if_in:NnTF \_l_siunitx_number_out_prop 
             { result-bracket }
-            {
-              \prop_if_in:NnTF \_l_siunitx_number_out_prop
-                { mantissa-uncertainty }
-                { \_siunitx_number_output_parts: }
-                {
-                  \prop_if_in:NnTF \_l_siunitx_number_out_prop
-                    { complex }
-                    { \_siunitx_number_output_parts: }
-                    { \_siunitx_number_output_single: }
-                }
-            }
+            { \_siunitx_number_output_parts: }
             { \_siunitx_number_output_single: }
         }
     }
@@ -7345,6 +7335,12 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_number_numerator_tl 
   \_siunitx_number_in_parse:V \_l_siunitx_number_denominator_tl
   \_siunitx_number_output_quotient_aux_ii:
+  \prop_if_in:NnT \_l_siunitx_number_out_prop
+    { result-bracket-denominator }
+    { 
+      \prop_put:Nnn \_l_siunitx_number_out_prop { result-bracket } 
+        { true }
+    }
   \_siunitx_number_output_bracket:
   \prop_get:NnN \_l_siunitx_number_out_prop { result }
     \_l_siunitx_number_denominator_tl    
