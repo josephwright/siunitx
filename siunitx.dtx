@@ -7070,7 +7070,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\_siunitx_number_output_parse:n}
 %\begin{macro}{\_siunitx_number_output_parse:V}
-%\begin{macro}[aux]{\_siunitx_number_output_parse_aux:}
+%\begin{macro}[aux]{\_siunitx_number_output_parse_aux:}\
 % The parsing system just has to check if there are multiple parts to
 % worry about.
 %    \begin{macrocode}
@@ -7087,6 +7087,11 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_generate_variant:Nn \_siunitx_number_output_parse:n { V }
+%    \end{macrocode}
+% There are a few additional tests for printing partwise, as this is
+% only needed if there are brackets to add and these are not due to
+% an exponent.
+%    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_output_parse_aux: {
   \_siunitx_number_in_parse:V \_l_siunitx_number_arg_tl 
   \bool_if:NF \_l_siunitx_error_bool 
@@ -7099,7 +7104,17 @@ This work consists of the file  siunitx.dtx
         { 
           \prop_if_in:NnTF \_l_siunitx_number_out_prop 
             { result-bracket }
-            { \_siunitx_number_output_parts: }
+            {
+              \prop_if_in:NnTF \_l_siunitx_number_out_prop
+                { mantissa-uncertainty }
+                { \_siunitx_number_output_parts: }
+                {
+                  \prop_if_in:NnTF \_l_siunitx_number_out_prop
+                    { complex }
+                    { \_siunitx_number_output_parts: }
+                    { \_siunitx_number_output_single: }
+                }
+            }
             { \_siunitx_number_output_single: }
         }
     }
@@ -7134,7 +7149,7 @@ This work consists of the file  siunitx.dtx
           \_siunitx_number_output_parts_aux:n { mantissa }
           \_siunitx_number_output_parts_aux:n { mantissa-complex }
         }
-      \prop_get:NnN \_l_siunitx_number_out_prop { exponent }
+      \prop_get:NnN \_l_siunitx_number_out_prop { exponent-result }
         \_l_siunitx_tmpa_tl  
       \quark_if_no_value:NF \_l_siunitx_tmpa_tl
         {
