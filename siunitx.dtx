@@ -1554,7 +1554,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
 %      close-bracket             & Literal & )                 \\ 
-%      complex-root-after-number & Switch  & true              \\
+%      complex-root-position     & Choice  & after-number      \\
 %      copy-decimal-marker       & Choice  & false             \\
 %      exponent-base             & Literal & 10                \\
 %      exponent-product          & Math    & \cs{times}        \\
@@ -1631,13 +1631,14 @@ This work consists of the file  siunitx.dtx
 %  \num[copy-decimal-marker]{555,555}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{complex-root-after-number}
+%\DescribeOption{complex-root-position}
 % The position of the complex root can be adjusted to place it
 % either before or after the associated numeral in a complex number
-% using the \opt{complex-root-after-number} option.
+% using the \opt{complex-root-position} option.
 %\begin{LaTeXdemo}
 %  \num{67-0.9i} \\
-%  \num[complex-root-after-number = false]{67-0.9i}
+%  \num[complex-root-position = before-number]{67-0.9i} \\
+%  \num[complex-root-position = after-number]{67-0.9i}
 %\end{LaTeXdemo}
 % 
 %\DescribeOption{exponent-base}
@@ -2386,7 +2387,7 @@ This work consists of the file  siunitx.dtx
 % setting is \opt{brackets}, which will place the entire numerical part
 % in brackets and use a single unit symbol. Alternative options are
 % \opt{repeat} (print the unit for each part of the number) and
-% \popt{single} (print only one unit symbol: mathematically incorrect).
+% \opt{single} (print only one unit symbol: mathematically incorrect).
 %\begin{LaTeXdemo}
 %  \sisetup{separate-uncertainty}%
 %  \SI{12.3(4)}{\kilo\gram} \\
@@ -6223,8 +6224,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\_l_siunitx_bracket_close_tl}
 %\begin{macro}{\_l_siunitx_complex_after_bool}
+% A setting for where complex numbers go.
+%    \begin{macrocode}
+\bool_new:N \_l_siunitx_complex_after_bool
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\_l_siunitx_bracket_close_tl}
 %\begin{macro}{\_l_siunitx_output_decimal_copy_bool}
 %\begin{macro}{\_l_siunitx_exponent_base_tl}
 %\begin{macro}{\_l_siunitx_exponent_product_tl}
@@ -6244,8 +6251,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   close-bracket             .tl_set:N   = \_l_siunitx_bracket_close_tl, 
-  complex-root-after-number .bool_set:N = 
-    \_l_siunitx_complex_after_bool,
+  complex-root-position     .choice:,
+  complex-root-position
+    / after-number          .code:n     =
+      { \bool_set_true:N \_l_siunitx_complex_after_bool } ,
+  complex-root-position
+    / before-number          .code:n     =
+      { \bool_set_false:N \_l_siunitx_complex_after_bool } ,
   copy-decimal-marker       .bool_set:N = 
     \_l_siunitx_output_decimal_copy_bool,
   exponent-base             .tl_set:N   = \_l_siunitx_exponent_base_tl,
@@ -6283,7 +6295,7 @@ This work consists of the file  siunitx.dtx
 }
 \keys_set:nn { siunitx } { % (
   close-bracket             = ),
-  complex-root-after-number = true,
+  complex-root-position     = after-number,
   copy-decimal-marker       = false,
   exponent-base             = 10,
   exponent-product          = \times,
@@ -6303,7 +6315,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\end{macro} 
 %\end{macro}
-%\end{macro} 
 %\end{macro} 
 %\end{macro} 
 %\end{macro} 
