@@ -2199,14 +2199,15 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{c}{Type} &
 %      \multicolumn{1}{c}{Default} \\
 %    \midrule ^^A (
-%      forbid-literal-units & Switch  & false      \\
-%      inter-unit-separator & Math    & \cs{,}     \\
-%      parse-units          & Switch  & true       \\
-%      per-mode             & Choice  & reciprocal \\
-%      per-symbol           & Math    & /          \\    
-%      prefixes-as-symbols  & Switch  & true       \\
-%      qualifier-mode       & Choice  & subscript  \\
-%      sticky-per           & Switch  & false      \\
+%      bracket-unit-denominator & Switch & true       \\
+%      forbid-literal-units     & Switch & false      \\
+%      inter-unit-separator     & Math   & \cs{,}     \\
+%      parse-units              & Switch & true       \\
+%      per-mode                 & Choice & reciprocal \\
+%      per-symbol               & Math   & /          \\    
+%      prefixes-as-symbols      & Switch & true       \\
+%      qualifier-mode           & Choice & subscript  \\
+%      sticky-per               & Switch & false      \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2229,7 +2230,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{per-mode}
 %\DescribeOption{per-symbol}
-%\DescribeOption{use-brackets}
+%\DescribeOption{bracket-unit-denominator}
 % The handling of \cs{per} is altered using the \opt{per-mode} choice
 % option.  The standard setting is \opt{reciprocal}, meaning that 
 % \cs{per} generates reciprocal powers for units.  Setting the option
@@ -2253,15 +2254,15 @@ This work consists of the file  siunitx.dtx
 % two parts of a unit by setting \opt{per-mode} to \opt{symbol}; the 
 % symbol used is stored using the setting \opt{per-symbol}. This method
 % for displaying units can be ambiguous, and so brackets are added 
-% unless \opt{use-brackets} is set to \opt{false}. The output
+% unless \opt{bracket-unit-denominator} is set to \opt{false}. The output
 % for \opt{per-symbol} is always made in math mode, and so 
 % \cs{text} will be needed to print textual information.
 %\begin{LaTeXdemo}
-%  \sisetup{per-mode=symbol}%
+%  \sisetup{per-mode = symbol}%
 %  \si{\joule\per\mole\per\kelvin} \\
 %  \si{\metre\per\second\squared} \\
-%  \si[per-symbol=\text{~div~}]{\joule\per\mole\per\kelvin} \\
-%  \si[use-brackets=false]{\joule\per\mole\per\kelvin}
+%  \si[per-symbol = \text{~div~}]{\joule\per\mole\per\kelvin} \\
+%  \si[bracket-unit-denominator = false]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
 % The often-requested (but mathematically invalid) 
 % \opt{repeated-symbol} option is also available to repeat the symbol 
@@ -8655,11 +8656,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\_l_siunitx_unit_denominator_bracket_bool}
 %\begin{macro}{\_l_siunitx_unit_separator_tl}
 %\begin{macro}{\_l_siunitx_per_symbol_tl}
 % At this stage, output formatting options are created.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  bracket-unit-denominator .bool_set:N 
+    = \_l_siunitx_unit_denominator_bracket_bool,
   inter-unit-separator .tl_set:N = \_l_siunitx_unit_separator_tl ,
   per-mode             .choice:,
   per-mode / fraction .code:n = 
@@ -8716,12 +8720,14 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \_l_siunitx_qualifier_mode_tl { subscript } },
 }
 \keys_set:nn { siunitx } {
-  inter-unit-separator = \,,
-  per-mode             = reciprocal,
-  per-symbol           = /,
-  qualifier-mode       = subscript
+  bracket-unit-denominator = true,
+  inter-unit-separator     = \,,
+  per-mode                 = reciprocal,
+  per-symbol               = /,
+  qualifier-mode           = subscript
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -8858,7 +8864,7 @@ This work consists of the file  siunitx.dtx
   \intexpr_compare:nNnT 
     { \int_use:c { _l_siunitx_unit_ #1 _int } } > { 1 }
     {
-      \bool_if:NT \_l_siunitx_brackets_bool 
+      \bool_if:NT \_l_siunitx_unit_denominator_bracket_bool 
         {
           \_siunitx_tl_put_left_math:cV { _l_siunitx_unit_ #1 _tl }
             \_l_siunitx_bracket_open_tl
