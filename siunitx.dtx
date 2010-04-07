@@ -1220,7 +1220,7 @@ This work consists of the file  siunitx.dtx
 % \opt{detect-inline-weight}, which takes values \opt{text}, \opt{math} 
 % and \opt{combined}.  The package can detect the local value of font 
 % weight for either the surrounding text, or the surrounding inline 
-% ("$"\ldots"$") math. The \opt{combined} option checks both and uses 
+% ("$" \ldots "$") math. The \opt{combined} option checks both and uses 
 % the prevailing weight if either test is true.
 %\begin{LaTeXdemo}
 %  \sisetup{
@@ -1462,37 +1462,34 @@ This work consists of the file  siunitx.dtx
 %      retain-unity-mantissa & Switch  & true     \\
 %      retain-zero-exponent  & Switch  & false    \\
 %      round-mode            & Choice  & off      \\
-%      round-figures         & Integer & 2        \\
-%      round-places          & Integer & 2        \\
+%      round-precision       & Integer & 2        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
 %
 %\DescribeOption{round-mode}
-%\DescribeOption{round-figures}
-%\DescribeOption{round-places}
+%\DescribeOption{round-precision}
 % The \pkg{siunitx} package can round numerical input to a fixed
 % number of significant figures or decimal places. This is controlled by
 % the \opt{round-mode} option, which takes the choices \opt{off},
 % \opt{figures} and \opt{places}. When rounding is turned on, the
-% number of figures to use is determined by the \opt{round-figures}
-% and \opt{round-places} option: both of these options require a 
-% number. No rounding will take place if the number contains an
-% uncertainty component.
+% number of digits used (either decimal places or significant figures)
+% is set using the \opt{round-precision} option. No rounding will take
+% place if the number contains an uncertainty component.
 %\begin{LaTeXdemo}
 %  \num{1.23456} \\
 %  \num{14.23} \\
 %  \num{0.12345(9)} \\
 %  \sisetup{
-%    round-mode   = places,
-%    round-places = 3
+%    round-mode      = places,
+%    round-precision = 3
 %  }%
 %  \num{1.23456} \\
 %  \num{14.23} \\
 %  \num{0.12345(9)} \\
 %  \sisetup{
-%    round-mode    = figures,
-%    round-figures = 3
+%    round-mode      = figures,
+%    round-precision = 3
 %  }%
 %  \num{1.23456} \\
 %  \num{14.23} \\
@@ -5464,8 +5461,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_l_siunitx_process_plus_tl}
 %\begin{macro}{\_l_siunitx_unity_mantissa_tl}
 %\begin{macro}{\_l_siunitx_process_zero_exponent_bool}
-%\begin{macro}{\_l_siunitx_process_figures_int}
-%\begin{macro}{\_l_siunitx_process_places_int}
+%\begin{macro}{\_l_siunitx_process_precision_int}
 % First, the options are set up.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
@@ -5483,18 +5479,15 @@ This work consists of the file  siunitx.dtx
   round-mode / off     .code:n = { \tl_clear:N \_l_siunitx_round_tl },
   round-mode / places  .code:n = 
     { \tl_set:Nn \_l_siunitx_round_tl { places } },
-  round-figures     .int_set:N = \_l_siunitx_process_figures_int,
-  round-places      .int_set:N = \_l_siunitx_process_places_int,
+  round-precision      .int_set:N = \_l_siunitx_process_precision_int,
 }
 \keys_set:nn { siunitx } {
   add-decimal-zero      = true,
   add-integer-zero      = true,
   retain-unity-mantissa = true, 
-  round-figures         = 2,
-  round-places          = 2
+  round-precision       = 2,
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5579,7 +5572,7 @@ This work consists of the file  siunitx.dtx
       \bool_set_false:N \_l_siunitx_round_bool
       \intexpr_compare:nNnTF 
         { \int_use:N \_l_siunitx_round_int } > 
-          { \int_use:N \_l_siunitx_process_figures_int }
+          { \int_use:N \_l_siunitx_process_precision_int }
         { \_siunitx_number_process_figures_round: }
         { \_siunitx_number_process_figures_pad:n {#1} }
       \_siunitx_number_process_round_tidy:n {#1}
@@ -5654,7 +5647,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_process_figures_round: {
   \int_set:Nn \_l_siunitx_round_int 
-    { \_l_siunitx_round_int - \_l_siunitx_process_figures_int }
+    { \_l_siunitx_round_int - \_l_siunitx_process_precision_int }
   \tl_if_empty:NF \_l_siunitx_round_decimal_in_tl 
     { \_siunitx_number_process_figures_round_loop: }
   \tl_if_empty:NF \_l_siunitx_round_integer_in_tl 
@@ -5732,7 +5725,7 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \_l_siunitx_number_in_prop { #1 -decimal }
     \_l_siunitx_round_decimal_in_tl
   \int_set:Nn \_l_siunitx_round_int 
-    { \_l_siunitx_process_figures_int - \_l_siunitx_round_int }
+    { \_l_siunitx_process_precision_int - \_l_siunitx_round_int }
   \_siunitx_number_process_pad:n {#1}
 }
 %    \end{macrocode}
@@ -5808,7 +5801,7 @@ This work consists of the file  siunitx.dtx
 }  
 \cs_set_protected_nopar:Npn \_siunitx_number_process_places_aux_i:n #1 {
   \intexpr_compare:nNnTF 
-    { \int_use:N \_l_siunitx_process_places_int } = { 0 } 
+    { \int_use:N \_l_siunitx_process_precision_int } = { 0 } 
     { \prop_del:Nn \_l_siunitx_number_in_prop { #1 -decimal } }
     {
       \prop_get:NnN \_l_siunitx_number_in_prop { #1 -decimal }
@@ -5823,7 +5816,7 @@ This work consists of the file  siunitx.dtx
               \prop_put:Nnn \_l_siunitx_number_in_prop { #1 -decimal }
                 { }
               \int_set:Nn \_l_siunitx_round_int 
-                { \_l_siunitx_process_places_int }
+                { \_l_siunitx_process_precision_int }
               \_siunitx_number_process_pad:n {#1}
             }
             {
@@ -5844,7 +5837,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn 
   \_siunitx_number_process_places_aux_ii:n #1 {
-  \int_sub:Nn \_l_siunitx_round_int { \_l_siunitx_process_places_int }
+  \int_sub:Nn \_l_siunitx_round_int 
+    { \_l_siunitx_process_precision_int }
   \intexpr_compare:nNnTF 
     { \int_use:N \_l_siunitx_round_int } < { 0 } 
     {
@@ -10580,7 +10574,7 @@ This work consists of the file  siunitx.dtx
   \_siunitx_table_print_S_model_create:
   \bool_if:NT \_l_siunitx_table_auto_bool
     {
-      \int_set:Nn \_l_siunitx_process_places_int 
+      \int_set:Nn \_l_siunitx_process_precision_int 
         { \_l_siunitx_table_decimal_int }
       \tl_set:Nn \_l_siunitx_round_tl { places }  
     }
@@ -12283,8 +12277,8 @@ This work consists of the file  siunitx.dtx
     unknown      .code:n    = { group-separator         = #1          },
   dp             .meta:n    = 
     { 
-      round-mode   = places,
-      round-places = #1,
+      round-mode      = places,
+      round-precision = #1,
     },
   emulate        .code:n    = ,
   errspace       .choice: ,
@@ -12535,8 +12529,8 @@ This work consists of the file  siunitx.dtx
   sepfour        .default:n = { true                                  },
   sf             .meta:n    = 
     { 
-      round-mode   = figures,
-      round-places = #1,
+      round-mode      = figures,
+      round-precision = #1,
     },
   sign           .meta:n    = { explicit-sign           = #1          },
   slash          .choice: ,
