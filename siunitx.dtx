@@ -7417,7 +7417,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
+%\end{macro} 
 %
 %\subsection{Angles}
 %
@@ -7486,18 +7486,18 @@ This work consists of the file  siunitx.dtx
 % The angle-specific options are created here.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  add-arc-degree-zero  .bool_set:N = 
-    \_l_siunitx_angle_degree_zero_bool , 
-  add-arc-minute-zero  .bool_set:N = 
-    \_l_siunitx_angle_minute_zero_bool , 
-  add-arc-second-zero  .bool_set:N = 
-    \_l_siunitx_angle_second_zero_bool ,
+  add-arc-degree-zero       .bool_set:N = 
+    \_l_siunitx_angle_degree_zero_bool  , 
+  add-arc-minute-zero       .bool_set:N = 
+    \_l_siunitx_angle_minute_zero_bool  , 
+  add-arc-second-zero       .bool_set:N = 
+    \_l_siunitx_angle_second_zero_bool  ,
   angle-symbol-over-decimal .bool_set:N = 
-    \_l_siunitx_angle_astronomy_bool   ,
-  arc-separator        .tl_set:N   = 
-    \_l_siunitx_angle_arc_separator_tl ,
-  number-angle-separator .tl_set:N = 
-    \_l_siunitx_angle_unit_separator_tl 
+    \_l_siunitx_angle_astronomy_bool    ,
+  arc-separator             .tl_set:N   = 
+    \_l_siunitx_angle_arc_separator_tl  ,
+  number-angle-separator    .tl_set:N   = 
+    \_l_siunitx_angle_unit_separator_tl , 
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7515,7 +7515,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_output:n #1 {
   \_siunitx_angle_init:
-  \_siunitx_angle_rescan:n {#1}
+  \_siunitx_angle_rescan:Nn \_l_siunitx_angle_arg_tl {#1}
   \_siunitx_angle_find_semi_colons:V \_l_siunitx_angle_arg_tl
 }
 %    \end{macrocode}
@@ -7531,26 +7531,25 @@ This work consists of the file  siunitx.dtx
   \prop_clear:N \_l_siunitx_angle_minute_prop
   \prop_clear:N \_l_siunitx_angle_second_prop
   \tl_clear:N \_l_siunitx_preunit_tl 
-  \tl_clear:N \_l_siunitx_angle_arc_sign_tl
   \tl_set_eq:NN \_l_siunitx_number_unit_separator_tl 
     \_l_siunitx_angle_unit_separator_tl
 }
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_angle_rescan:n}
-% To avoid any issues with active \texttt{;} tokens in the input, a 
-% simple search and replace is employed.
+%\begin{macro}{\_siunitx_angle_rescan:Nn}
+% Converts active semi-colons into normal ones, saving the result in
+% a token list.
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\; }
   \char_make_active:N \@
 \tl_to_lowercase:n {
   \group_end:
-  \cs_set_protected:Npn \_siunitx_angle_rescan:n #1 
+  \cs_set_protected:Npn \_siunitx_angle_rescan:Nn #1#2
     {
-      \tl_set:Nn \_l_siunitx_angle_arg_tl {#1}
-      \tl_replace_all_in:Nnn \_l_siunitx_angle_arg_tl { @ } { ; }
+      \tl_set:Nn #1 {#2}
+      \tl_replace_all_in:Nnn #1 { @ } { ; }
     }
 }
 %    \end{macrocode}
@@ -7569,11 +7568,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_find_semi_colons:n #1 {
   \_siunitx_angle_find_semi_colons:w #1 ; ; ; 
-    \q_no_value \q_no_value \q_no_value \q_nil
+    \q_no_value \q_no_value \q_no_value \q_stop
 }
 \cs_generate_variant:Nn \_siunitx_angle_find_semi_colons:n { V }
 \cs_set_protected:Npn \_siunitx_angle_find_semi_colons:w 
-  #1 ; #2 ; #3 ; #4#5#6#7 \q_nil {
+  #1 ; #2 ; #3 ; #4#5#6#7 \q_stop {
   \quark_if_no_value:NTF #4
     { \_siunitx_angle_parse_decimal:n {#1} }
     {
@@ -7995,6 +7994,145 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Time periods}
+%
+% Time periods are very similar to angles, and so a lot of the
+% code here is almost the same as the above. The differences show
+% up in the variation of the number of parts to a number and so
+% on. Some of the angle functions are designed to be general enough
+% to also work for time periods.
+% 
+%\begin{macro}{\_l_siunitx_time_day_space_bool}
+%\begin{macro}{\_l_siunitx_time_hour_space_bool}
+%\begin{macro}{\_l_siunitx_time_minute_space_bool}
+% Flags to indicate which parts of a time period are present and 
+% therefore need space allowing.
+%    \begin{macrocode}
+\bool_new:N \_l_siunitx_time_day_space_bool
+\bool_new:N \_l_siunitx_time_hour_space_bool
+\bool_new:N \_l_siunitx_time_minute_space_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro} 
+%
+%\begin{macro}{\_l_siunitx_time_day_prop}
+%\begin{macro}{\_l_siunitx_time_hour_prop}
+%\begin{macro}{\_l_siunitx_time_minute_prop}
+%\begin{macro}{\_l_siunitx_time_second_prop}
+% Four parts to a time period, and so four storage areas for 
+% generalising the code.
+%    \begin{macrocode}
+\prop_new:N \_l_siunitx_time_day_prop
+\prop_new:N \_l_siunitx_time_hour_prop
+\prop_new:N \_l_siunitx_time_minute_prop
+\prop_new:N \_l_siunitx_time_second_prop
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_l_siunitx_time_arg_tl}
+% Used to store the complete time argument.
+%    \begin{macrocode}
+\tl_new:N \_l_siunitx_time_arg_tl
+%    \end{macrocode}
+%\end{macro} 
+% 
+%\begin{macro}{\_l_siunitx_time_day_zero_bool}
+%\begin{macro}{\_l_siunitx_time_hour_zero_bool}
+%\begin{macro}{\_l_siunitx_time_minute_zero_bool}
+%\begin{macro}{\_l_siunitx_time_second_zero_bool}
+%\begin{macro}{\_l_siunitx_time_separator_tl}
+%\begin{macro}{\_l_siunitx_time_astronomy_bool}
+% Time period specific options: very similar to those for angles.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  add-time-day-zero        .bool_set:N = 
+    \_l_siunitx_time_day_zero_bool    , 
+  add-time-hour-zero       .bool_set:N = 
+    \_l_siunitx_time_hour_zero_bool   , 
+  add-time-minute-zero     .bool_set:N = 
+    \_l_siunitx_time_minute_zero_bool , 
+  add-time-second-zero     .bool_set:N = 
+    \_l_siunitx_time_second_zero_bool ,
+  time-symbol-over-decimal .bool_set:N = 
+    \_l_siunitx_time_astronomy_bool   ,
+  time-separator           .tl_set:N   = 
+    \_l_siunitx_time_separator_tl     ,
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_siunitx_time_output:n}
+% Much the same idea as for angles: set up and then search for
+% semi-colons.
+%    \begin{macrocode}
+\cs_set_protected:Npn \_siunitx_time_output:n #1 {
+  \_siunitx_time_init:
+  \_siunitx_angle_rescan:Nn \_l_siunitx_time_arg_tl {#1}
+  \_siunitx_time_find_semi_colons:V \_l_siunitx_angle_arg_tl
+}
+%    \end{macrocode}
+%\end{macro} 
+%
+%\begin{macro}{\_siunitx_time_init:}
+% The usual separation of initial storage resets.
+%    \begin{macrocode}
+\cs_set_protected_nopar:Npn \_siunitx_time_init: {
+  \bool_set_false:N \_l_siunitx_time_day_space_bool
+  \bool_set_false:N \_l_siunitx_time_hour_space_bool
+  \bool_set_false:N \_l_siunitx_time_minute_space_bool
+  \prop_clear:N \_l_siunitx_time_day_prop
+  \prop_clear:N \_l_siunitx_time_hour_prop
+  \prop_clear:N \_l_siunitx_time_minute_prop
+  \prop_clear:N \_l_siunitx_time_second_prop
+  \tl_clear:N \_l_siunitx_preunit_tl 
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\_siunitx_time_find_semi_colons:n}
+%\begin{macro}{\_siunitx_time_find_semi_colons:V}
+%\begin{macro}[aux]{\_siunitx_time_find_semi_colons:w}
+% The aim here is slightly different to the case for angles.
+%    \begin{macrocode}
+\cs_set_protected:Npn \_siunitx_time_find_semi_colons:n #1 {
+  \_siunitx_angle_find_semi_colons:w #1 ; ; ; ; 
+    \q_no_value \q_no_value \q_no_value \q_no_value \q_stop
+}
+\cs_set_protected:Npn \_siunitx_time_find_semi_colons:w 
+  #1 ; #2 ; #3 ; #4 ; #5#6#7#8#9 \q_stop {
+  \quark_if_no_value:NTF #4
+    { \_siunitx_angle_parse_decimal:n {#1} }
+    {
+      \quark_if_no_value:NTF #5
+        {
+          \_siunitx_error:nV { invalid-arc-format } 
+            \_l_siunitx_angle_arg_tl
+        }
+        {  
+          \quark_if_no_value:NTF #6
+            { \_siunitx_angle_parse_arc:nnn {#1} {#2} {#3} }
+            { 
+              \_siunitx_error:nV { invalid-arc-format } 
+                \_l_siunitx_angle_arg_tl 
+            }
+        }
+    }
+}
+\cs_generate_variant:Nn \_siunitx_time_find_semi_colons:n { V }
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 % 
