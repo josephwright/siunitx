@@ -2362,6 +2362,7 @@ This work consists of the file  siunitx.dtx
 %      multi-part-units         & Choice & brackets \\
 %      number-unit-separator    & Math   & \cs{,}   \\
 %      product-units            & Choice & repeat   \\
+%      range-units              & Choice & repeat     \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2421,6 +2422,18 @@ This work consists of the file  siunitx.dtx
 %  \SI[product-units = power]{2 x 3 x 4}{\metre}          \\
 %  \SI[product-units = repeat]{2 x 3 x 4}{\metre}         \\
 %  \SI[product-units = single]{2 x 3 x 4}{\metre}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{range-units}
+% The \opt{range-units} option determines how the \cs{SIrange}
+% function displays units. The standard setting is \opt{repeat}, 
+% where both parts of the range have a unit. Alternatives are
+% \opt{brackets} and \opt{single}.
+%\begin{LaTeXdemo}
+%  \SIrange{2}{4}{\degreeCelsius} \\ 
+%  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = single]{2}{4}{\degreeCelsius} \\
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -9671,7 +9684,7 @@ This work consists of the file  siunitx.dtx
 % Unit printing is also simple: basically a past-up job.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_range_unit:nnnn #1#2#3#4 {
-  \bool_if:NTF \_l_siunitx_number_unit_repeat_bool
+  \bool_if:NTF \_l_siunitx_range_repeat_bool
     {
       \_siunitx_unit_in:nn {#1} {#2}
       \_siunitx_range_numbers_aux:n {#3}
@@ -9679,13 +9692,13 @@ This work consists of the file  siunitx.dtx
       \_siunitx_range_numbers_aux:n {#4}
     }
     {
-      \bool_if:NT \_l_siunitx_brackets_bool
+      \bool_if:NT \_l_siunitx_range_brackets_bool
         {
           \_siunitx_print:nn { number } 
             { \ensuremath { \_l_siunitx_bracket_open_tl } }
         }
       \_siunitx_range_numbers:nn {#3} {#4}
-      \bool_if:NT \_l_siunitx_brackets_bool
+      \bool_if:NT \_l_siunitx_range_brackets_bool
         {
           \_siunitx_print:nn { number } 
             { \ensuremath { \_l_siunitx_bracket_close_tl } }
@@ -12581,7 +12594,11 @@ This work consists of the file  siunitx.dtx
   trapambigerr   .default:n = { true                                  },
   trapambigfrac  .meta:n    = { use-brackets            = #1          },
   trapambigfrac  .default:n = { true                                  },
-  trapambigrange .meta:n    = { use-brackets            = #1          },
+  trapambigrange .choice,
+  trapambigrange  
+    / false      .code:n    = { range                   = single      },
+  trapambigrange   
+    / true       .code:n    = { range-units             = brackets    },
   trapambigrange .default:n = { true                                  },
   unitcolor      .meta:n    = { unit-color              = #1          },
   unitcolour     .meta:n    = { unit-color              = #1          },
