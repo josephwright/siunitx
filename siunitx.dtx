@@ -4687,6 +4687,8 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:nF {#1} 
     { 
       \_siunitx_number_in_init:
+      \cs_set_eq:NN \_siunitx_number_in_parse_more:N
+        \_siunitx_number_in_parse_mantissa_aux:N
       \_siunitx_number_in_parse_aux:n {#1} 
     }
 }
@@ -4738,11 +4740,9 @@ This work consists of the file  siunitx.dtx
 % carried out at the start of each part of a number, and so is called
 % from a few places.
 %    \begin{macrocode}
-\cs_set_protected_nopar:Npn \_siunitx_number_in_init: {  
+\cs_set_protected_nopar:Npn \_siunitx_number_in_init: {
   \cs_set_eq:NN \_siunitx_number_in_parse_loop:N 
-    \_siunitx_number_in_parse_mantissa:N
-  \cs_set_eq:NN \_siunitx_number_in_parse_more:N
-    \_siunitx_number_in_parse_mantissa_aux:N
+    \_siunitx_number_in_parse_mantissa:N  
   \cs_set_eq:NN \_siunitx_number_in_check:n 
     \_siunitx_number_in_check_short:n
   \tl_clear:N \_l_siunitx_number_parsed_tl
@@ -4825,37 +4825,37 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_number_in_parse_angle:N}
+%\begin{macro}{\_siunitx_number_in_parse_restricted:N}
 % When parsing numbers for the \cs{ang} function, no extended input 
 % is permitted at all.
 %    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_number_in_parse_angle:N #1 {
+\cs_set_protected:Npn \_siunitx_number_in_parse_restricted:N #1 {
   \tl_if_in:NnTF \_l_siunitx_input_exponent_tl {#1}
     { 
       \_siunitx_number_in_parse_error:nx  
-        { invalid-token-in-angle } {#1} 
+        { restricted-number } {#1} 
     }
     { 
       \tl_if_in:NnTF \_l_siunitx_input_uncert_open_tl {#1}
         { 
           \_siunitx_number_in_parse_error:nV 
-            { invalid-token-in-angle } \_l_siunitx_number_arg_tl 
+            { restricted-number } \_l_siunitx_number_arg_tl 
         }
         {
           \tl_if_in:NnTF \_l_siunitx_input_uncert_close_tl {#1}
             { 
               \_siunitx_number_in_parse_error:nV 
-                { invalid-token-in-angle } \_l_siunitx_number_arg_tl
+                { restricted-number } \_l_siunitx_number_arg_tl
             }
             {
               \tl_if_in:NnTF \_l_siunitx_input_complex_tl {#1}
                 {
                   \_siunitx_number_in_parse_error:nV 
-                    { invalid-token-in-angle } \_l_siunitx_number_arg_tl
+                    { restricted-number } \_l_siunitx_number_arg_tl
                 }
                 {
                   \_siunitx_number_in_parse_error:nx 
-                    { invalid-token-in-number } {#1} 
+                    { restricted-number } {#1} 
                 }
             }
         }
@@ -7533,6 +7533,8 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \_l_siunitx_preunit_tl 
   \tl_set_eq:NN \_l_siunitx_number_unit_separator_tl 
     \_l_siunitx_angle_unit_separator_tl
+  \cs_set_eq:NN \_siunitx_number_in_parse_more:N 
+    \_siunitx_number_in_parse_restricted:N 
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7817,7 +7819,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_parse_aux:nn #1#2 {
   \prop_clear:N \_l_siunitx_number_in_prop
-  \_siunitx_number_in_parse:n {#1}
+  \tl_if_empty:nF {#1} 
+    { 
+      \_siunitx_number_in_init:
+      \_siunitx_number_in_parse_aux:n {#1} 
+    }
   \prop_get:NnN \_l_siunitx_number_in_prop { mantissa-sign-deleted }
     \_l_siunitx_tmpa_tl
   \quark_if_no_value:NF \_l_siunitx_tmpa_tl
@@ -11416,6 +11422,14 @@ This work consists of the file  siunitx.dtx
 \msg_set:nnnn { siunitx } { qualifier-before-unit } 
   { Qualifier~before~unit. }
   { Unit~qualifiers~have~to~follow~after~units,~not~before~them. }
+\msg_set:nnnn { siunitx } { restricted-number } 
+  { Token~'#1'~forbidden~in~restricted~numerical~input. }
+  { 
+    The~current~input~must~be~a~real~number~and~cannot~contain: \\
+    \c_space_tl -~an~exponent; \\
+    \c_space_tl -~an~uncertainty; \\
+    \c_space_tl -~a~complex~part.
+  }
 \msg_set:nnnn { siunitx } { starting-product-token } 
   { Misplaced~product~token. }
   { A~number~cannot~begin~with~a~product~token. }
