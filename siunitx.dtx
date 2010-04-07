@@ -7568,7 +7568,7 @@ This work consists of the file  siunitx.dtx
 % all of the tests are negative.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_angle_find_semi_colons:n #1 {
-  \_siunitx_angle_find_semi_colons:w #1  ; ; ; 
+  \_siunitx_angle_find_semi_colons:w #1 ; ; ; 
     \q_no_value \q_no_value \q_no_value \q_nil
 }
 \cs_generate_variant:Nn \_siunitx_angle_find_semi_colons:n { V }
@@ -7578,7 +7578,10 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_angle_parse_decimal:n {#1} }
     {
       \quark_if_no_value:NTF #5
-        { \_siunitx_angle_parse_arc:nnn {#1} {#2} { } }
+        {
+          \_siunitx_error:nV { invalid-arc-format } 
+            \_l_siunitx_angle_arg_tl
+        }
         {  
           \quark_if_no_value:NTF #6
             { \_siunitx_angle_parse_arc:nnn {#1} {#2} {#3} }
@@ -11338,10 +11341,8 @@ This work consists of the file  siunitx.dtx
 \msg_set:nnnn { siunitx } { invalid-arc-format } 
   { Invalid~degree-minute-second angle~'#1'. }
   {
-    Angles~given~in~degree-minute-second~format~should~contain~one~or~
-    two~';'\\
+    Angles~given~in~degree-minute-second~format~should~contain~two~';'\\
     symbols~to~divide~up~the~parts~of~the~input.\\
-    The~given~input~contains~more~than~two~';'~symbols.
   }
 \msg_set:nnnn { siunitx } { invalid-number } 
   { Invalid~numerical~input~'#1'. }
