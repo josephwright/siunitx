@@ -7469,13 +7469,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\_l_siunitx_angle_arg_tl}
-% Used to store the complete angle argument.
-%    \begin{macrocode}
-\tl_new:N \_l_siunitx_angle_arg_tl
-%    \end{macrocode}
-%\end{macro} 
 % 
 %\begin{macro}{\_l_siunitx_angle_degree_zero_bool}
 %\begin{macro}{\_l_siunitx_angle_minute_zero_bool}
@@ -7507,16 +7500,25 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_angle_output:n}
-% The main output routine for angles does very little. The rescanning
-% function is called to make sure that any \texttt{;} tokens in the
-% input are not active. After than, the input is passed to the system
-% to search for semi-colons.
+%\begin{macro}{\_siunitx_angle_output:nnn}
+% The input will have been split up by \pkg{xparse}, and so the various
+% possible inputs can be picked up. To keep to a minimal route through
+% the code, a decimal angle is simply treated like an arc, but with
+% any zero-filling disabled.
 %    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_angle_output:n #1 {
+\cs_set_protected:Npn \_siunitx_angle_output:nnn #1#2#3 {
   \_siunitx_angle_init:
-  \_siunitx_angle_rescan:Nn \_l_siunitx_angle_arg_tl {#1}
-  \_siunitx_angle_find_semi_colons:V \_l_siunitx_angle_arg_tl
+  \IfNoValueTF {#2}
+    { 
+      \bool_set_false:N \_l_siunitx_angle_minute_zero_bool
+      \bool_set_false:N \_l_siunitx_angle_second_zero_bool
+      \_siunitx_angle_parse:nnn {#1} { } { }
+    }
+    {
+      \IfNoValueTF {#3}
+        { \_siunitx_error:nn { invalid-arc-format } { #1 ; #2 } }
+        { \_siunitx_angle_parse:nnn {#1} {#2} {#3} }
+    }
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -7539,71 +7541,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_angle_rescan:Nn}
-% Converts active semi-colons into normal ones, saving the result in
-% a token list.
-%    \begin{macrocode}
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\; }
-  \char_make_active:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_set_protected:Npn \_siunitx_angle_rescan:Nn #1#2
-    {
-      \tl_set:Nn #1 {#2}
-      \tl_replace_all_in:Nnn #1 { @ } { ; }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\_siunitx_angle_find_semi_colons:n}
-%\begin{macro}{\_siunitx_angle_find_semi_colons:V}
-%\begin{macro}[aux]{\_siunitx_angle_find_semi_colons:w}
-% The trailing \texttt{;} and \cs{q_no_value} tokens here mean that
-% there are four possible input cases, and all of them can be detected
-% using fast tests. First, if "#4" is \cs{q_no_value} then there were
-% no \texttt{;} in the input. Exactly one \texttt{;} will mean that
-% "#5" is \cs{q_no_value}, while exactly two \texttt{;} in the input
-% makes "#6" \cs{q_no_value}. Any more than two semi-colons means that
-% all of the tests are negative.
-%    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_angle_find_semi_colons:n #1 {
-  \_siunitx_angle_find_semi_colons:w #1 ; ; ; 
-    \q_no_value \q_no_value \q_no_value \q_stop
-}
-\cs_generate_variant:Nn \_siunitx_angle_find_semi_colons:n { V }
-\cs_set_protected:Npn \_siunitx_angle_find_semi_colons:w 
-  #1 ; #2 ; #3 ; #4#5#6#7 \q_stop {
-  \quark_if_no_value:NTF #4
-    { \_siunitx_angle_parse_decimal:n {#1} }
-    {
-      \quark_if_no_value:NTF #5
-        {
-          \_siunitx_error:nV { invalid-arc-format } 
-            \_l_siunitx_angle_arg_tl
-        }
-        {  
-          \quark_if_no_value:NTF #6
-            { \_siunitx_angle_parse_arc:nnn {#1} {#2} {#3} }
-            { 
-              \_siunitx_error:nV { invalid-arc-format } 
-                \_l_siunitx_angle_arg_tl 
-            }
-        }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\_siunitx_angle_parse_arc:nnn}
+%\begin{macro}{\_siunitx_angle_parse:nnn}
 % The main function for dealing with arcs simply does a basic sanity
 % check then hands off to either a full parser or to print without
 % any further work.
 %    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_angle_parse_arc:nnn #1#2#3 {
+\cs_set_protected:Npn \_siunitx_angle_parse:nnn #1#2#3 {
   \tl_if_empty:nTF { #1#2#3 }
     { \_siunitx_error:n { empty-arc } }
     {
@@ -7794,23 +7737,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\_siunitx_angle_parse_decimal:n}
-% For decimal input, there is a single piece of parsing to be done.
-% Following that, either the conversion code or the printing routine can
-% be called. On the other hand, if parsing is turned off then there is a
-% direct call to the printing system.
-%    \begin{macrocode}
-\cs_set_protected:Npn \_siunitx_angle_parse_decimal:n #1 {
-  \bool_if:NTF \_l_siunitx_number_parse_bool
-    {
-      \_siunitx_angle_parse_aux:nn {#1} { degree }
-      \_siunitx_angle_print:
-    }
-    { \_siunitx_angle_print_direct:nnn {#1} { } { } }
-}
-%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}[aux]{\_siunitx_angle_parse_aux:nn}
@@ -11504,11 +11430,11 @@ This work consists of the file  siunitx.dtx
 % The \cs{ang} function does very little beyond setting the local
 % keys and passing on the input.
 %    \begin{macrocode}
-\NewDocumentCommand \ang { o m } {
+\NewDocumentCommand \ang { o > { \SplitArgument { 2 } { ; } } m } {
   \group_begin:
     \IfNoValueF {#1} 
       { \keys_set:nn { siunitx } {#1} }
-    \_siunitx_angle_output:n {#2}
+    \_siunitx_angle_output:nnn #2
   \group_end:
 }
 %    \end{macrocode}
