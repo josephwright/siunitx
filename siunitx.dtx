@@ -7653,15 +7653,15 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_angle_arc_direct_aux_iii:nnn {#1} {#2} {#3} }  
 }
 \cs_set_protected:Npn \_siunitx_angle_arc_direct_aux_iii:nnn #1#2#3 {
-  \tl_if_empty:nTF {#2}
+  \tl_if_empty:nF {#1}
+    {
+      \tl_if_empty:nF {#2#3}
+        { \bool_set_true:N \_l_siunitx_angle_degree_space_bool }
+    }
+  \tl_if_empty:nF {#2}
     {
       \tl_if_empty:nF {#3}
-        { \bool_set_true:N \_l_siunitx_angle_degree_space_bool } 
-    }
-    { 
-      \bool_set_true:N \_l_siunitx_angle_degree_space_bool
-      \tl_if_empty:nF {#3}
-        { \bool_set_true:N \_l_siunitx_angle_minute_space_bool } 
+        { \bool_set_true:N \_l_siunitx_angle_minute_space_bool }
     }
   \_siunitx_angle_print_direct:nnn {#1} {#2} {#3}
 }
@@ -7690,13 +7690,15 @@ This work consists of the file  siunitx.dtx
   \_siunitx_angle_parse_aux:nn {#3} { second }
   \_siunitx_angle_arc_check_sign:
   \_siunitx_angle_arc_zero_fill:
-  \prop_if_empty:NTF \_l_siunitx_angle_minute_prop
+  \prop_if_empty:NF \_l_siunitx_angle_degree_prop
     {
+      \prop_if_empty:NF \_l_siunitx_angle_minute_prop
+        { \bool_set_true:N \_l_siunitx_angle_degree_space_bool } 
       \prop_if_empty:NF \_l_siunitx_angle_second_prop
         { \bool_set_true:N \_l_siunitx_angle_degree_space_bool } 
     }
-    { 
-      \bool_set_true:N \_l_siunitx_angle_degree_space_bool
+  \prop_if_empty:NF \_l_siunitx_angle_minute_prop
+    {
       \prop_if_empty:NF \_l_siunitx_angle_second_prop
         { \bool_set_true:N \_l_siunitx_angle_minute_space_bool } 
     }
