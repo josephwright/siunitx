@@ -3148,6 +3148,16 @@ This work consists of the file  siunitx.dtx
 %  ]{7.3}{\Hz} 
 %\end{LaTeXdemo}
 %
+%\subsection{Transferring settings to \pkg{pgf}}
+%
+%\DescribeMacro{\SendSettingsToPgf}
+% The numerical engine in the \pkg{pgf} package has settings similar
+% to those in \pkg{siunitx}. To enable working with both packages
+% easily, the macro \cs{SendSettingsToPgf} is available. It will
+% set some commonly-used numerical formatting options in \pkg{pgf}
+% to the current values used by \pkg{siunitx} to make using the 
+% two packages together more convenient for end users.
+%
 %\section{Correct application of (SI) units}
 %
 % Consistent and logical units are a necessity for scientific work,
@@ -11221,6 +11231,74 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Working with other packages}
+%
+%\begin{macro}{\_l_siunitx_pgf_link_clist}
+%\begin{macro}{\_siunitx_pgf_link:}
+% Here, the settings used by \pkg{siunitx} are translated into those for
+% \pkg{pgf}. Things could be done more efficiently, but the logic would 
+% be more difficult to follow.
+%    \begin{macrocode}
+\clist_new:N \_l_siunitx_pgf_link_clist
+\cs_set_protected_nopar:Npn \_siunitx_pgf_link: {
+  \clist_clear:N \_l_siunitx_pgf_link_clist
+  \tl_if_eq:VnT \_l_siunitx_round_tl { figure }
+    {
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist { fixed }
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { fixed~zerofill = true }
+    }
+  \clist_put_right:Nx \_l_siunitx_pgf_link_clist
+    { precision = \int_use:N \_l_siunitx_process_precision_int }
+  \clist_put_right:Nx \_l_siunitx_pgf_link_clist
+    { 
+      set~decimal~separator = 
+        { \exp_not:V \_l_siunitx_output_decimal_tl } 
+    }  
+  \clist_put_right:Nx \_l_siunitx_pgf_link_clist
+    { 
+      set~thousands~separator = 
+        { \exp_not:V \_l_siunitx_group_sep_tl} 
+    }  
+  \bool_if:NTF \_l_siunitx_group_four_bool
+    { 
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { min~exponent~for~1000~sep = 4 }
+    }
+    { 
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { min~exponent~for~1000~sep = 999 }
+    }
+  \bool_if:NTF \_l_siunitx_process_integer_zero_bool
+    { 
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { skip~0. = false }
+    }
+    {
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { skip~0. = true }
+    } 
+  \tl_if_eq:VnTF \_l_siunitx_process_sign_tl { + }
+    { 
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { showpos = true }
+    }
+    {
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { showpos = false }
+    } 
+  \cs_set_nopar:Npx \_siunitx_tmp:w
+    {
+      \exp_not:N \pgfkeys 
+        { /pgf/number~format }
+        { \exp_not:V \_l_siunitx_pgf_link_clist }
+    }  
+  \_siunitx_tmp:w  
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Messages}
 %
 % Lots of messages, all of them together in one block to make life
@@ -11410,6 +11488,14 @@ This work consists of the file  siunitx.dtx
 \@onlypreamble \DeclareSIUnit
 \@onlypreamble \DeclareSIUnitWithOptions
 %    \end{macrocode}
+%    
+%\begin{macro}{\SendSettingsToPgf}
+% A settings transfer function.
+%    \begin{macrocode}
+\cs_set_protected_nopar:Npn \SendSettingsToPgf { \_siunitx_pgf_link: }
+\@onlypreamble \SendSettingsToPgf
+%    \end{macrocode}
+%\end{macro}
 %
 %\subsection{Document macros}
 %
@@ -11946,11 +12032,11 @@ This work consists of the file  siunitx.dtx
 %\subsection{Odds and ends}
 %  
 %\begin{macro}{\requiresiconfigs}
-%\begin{macro}{\requiresiconfigs}
+%\begin{macro}{\_siunitx_requireconfig:n}
 % Version one provides this, and it might pop up so should not 
 % cause errors.
 %    \begin{macrocode}
-\cs_set_protected_nopar:Npn \requiresiconfigs #1 {
+\NewDocumentCommand \requiresiconfigs { m } {
   \keys_set:nn { siunitx } { load-configurations = version-1 }
   \clist_map_function:nN {#1} \_siunitx_requireconfig:n
 }
