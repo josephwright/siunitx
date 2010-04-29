@@ -146,6 +146,7 @@ ctan: tds
 	cd $(CTANDIR) ; \
 	zip -ll -q -r -X $(PACKAGE).zip .
 	cp $(CTANDIR)/$(PACKAGE).zip ./
+	rm -rf $(CTANROOT)
 	
 doc: $(foreach FILE,$(DTXFILES),$(FILE).pdf)
 	
@@ -183,6 +184,7 @@ tds: doc
 	cd $(TDSDIR) ; \
 	zip -ll -q -r -X $(PACKAGE).tds.zip .
 	cp $(TDSDIR)/$(PACKAGE).tds.zip ./
+	rm -rf $(TDSDIR)
 	
 unpack: 
 	echo "Unpacking files"
