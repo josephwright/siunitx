@@ -10375,7 +10375,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_aux: {
   \bool_if:NTF \_l_siunitx_table_parse_only_bool 
-    { \_siunitx_number_output:V \_l_siunitx_table_collect_tl }
+    { 
+      \tl_use:N \_l_siunitx_table_collect_pre_tl
+      \_siunitx_number_output:V \_l_siunitx_table_collect_tl 
+      \tl_use:N \_l_siunitx_table_collect_post_tl
+    }
     { 
       \bool_if:NTF \_l_siunitx_table_center_decimal_bool
         { \_siunitx_table_print_S_centered: }
