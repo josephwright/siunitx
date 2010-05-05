@@ -10164,8 +10164,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\_l_siunitx_table_auto_bool}
-%\begin{macro}{\_l_siunitx_table_complex_decimal_int}
-%\begin{macro}{\_l_siunitx_table_complex_integer_int} 
 %\begin{macro}{\_l_siunitx_table_decimal_int}
 %\begin{macro}{\_l_siunitx_table_exponent_int}
 %\begin{macro}{\_l_siunitx_table_integer_int}
@@ -10232,11 +10230,7 @@ This work consists of the file  siunitx.dtx
       \skip_set:Nn \_l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 1 fill } 
     },
-  table-auto-round          .bool_set:N = \_l_siunitx_table_auto_bool,
-  table-figures-complex-decimal
-    .int_set:N  = \_l_siunitx_table_complex_decimal_int ,  
-  table-figures-complex-integer
-    .int_set:N  = \_l_siunitx_table_complex_integer_int ,  
+  table-auto-round          .bool_set:N = \_l_siunitx_table_auto_bool,  
   table-figures-decimal     .int_set:N  = \_l_siunitx_table_decimal_int,
   table-figures-exponent    .int_set:N  = 
     \_l_siunitx_table_exponent_int,
@@ -10260,8 +10254,6 @@ This work consists of the file  siunitx.dtx
   table-figures-integer = 3
 }
 %    \end{macrocode} 
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -10307,10 +10299,6 @@ This work consists of the file  siunitx.dtx
       \_siunitx_table_format_convert:nn { mantissa-decimal } { decimal }
       \_siunitx_table_format_convert:nn { mantissa-uncertainty }
         { uncert }
-      \_siunitx_table_format_convert:nn { complex-integer } 
-        { complex_integer }
-      \_siunitx_table_format_convert:nn { complex-decimal } 
-        { complex_decimal }
       \_siunitx_table_format_convert:nn { exponent-integer } 
         { exponent }
       \prop_if_in:NnTF \_l_siunitx_number_in_prop { mantissa-sign }
@@ -10509,17 +10497,8 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \_l_siunitx_number_out_prop { mantissa-result }
         { \msg_warning:nn { siunitx } { table-partial-number } }
     }
-  \intexpr_compare:nNnTF
-    { 
-      \int_use:N \_l_siunitx_table_complex_integer_int 
-        + \int_use:N \_l_siunitx_table_complex_decimal_int 
-    } 
-      > { 0 }
-    { \_siunitx_table_print_S_reserved_complex: }
-    { 
-      \prop_if_in:NnT \_l_siunitx_number_out_prop { complex-result }
-        { \msg_warning:nn { siunitx } { table-partial-number } }
-    }
+  \prop_if_in:NnT \_l_siunitx_number_out_prop { complex-result }
+    { \msg_warning:nn { siunitx } { table-partial-number } }
   \intexpr_compare:nNnTF
     { \int_use:N \_l_siunitx_table_exponent_int } > { 0 }
     { \_siunitx_table_print_S_reserved_exponent: }
@@ -10655,12 +10634,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\begin{macro}{\_siunitx_table_print_S_reserved_complex:}
-%    \begin{macrocode}
-\cs_set_protected_nopar:Npn \_siunitx_table_print_S_reserved_complex: {
-}
-%    \end{macrocode}
-%\end{macro}
+%
 %\begin{macro}{\_siunitx_table_print_S_reserved_uncert:n}
 %\begin{macro}[aux]{\_siunitx_table_print_S_reserved_uncert_aux:n}
 % The uncertainty code is generalised for both real and complex parts.
