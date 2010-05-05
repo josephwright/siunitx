@@ -2418,22 +2418,23 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      table-alignment               & Choice  & \m{none}  \\
-%      table-auto-round              & Switch  & false     \\
-%      table-figures-decimal         & Integer & 2         \\
-%      table-figures-exponent        & Integer & 0         \\
-%      table-figures-integer         & Integer & 3         \\
-%      table-figures-uncertainty     & Integer & 0         \\
-%      table-format                  & Special & \m{none}  \\
-%      table-number-alignment        & Choice  & 
+%      table-align-text-post     & Switch  & false     \\
+%      table-alignment           & Choice  & \m{none}  \\
+%      table-auto-round          & Switch  & false     \\
+%      table-figures-decimal     & Integer & 2         \\
+%      table-figures-exponent    & Integer & 0         \\
+%      table-figures-integer     & Integer & 3         \\
+%      table-figures-uncertainty & Integer & 0         \\
+%      table-format              & Special & \m{none}  \\
+%      table-number-alignment    & Choice  & 
 %        center-decimal-marker \\
-%      table-parse-only              & Switch  & false     \\
-%      table-space-text-pre          & Literal & \m{empty} \\
-%      table-space-text-post         & Literal & \m{empty} \\
-%      table-sign-exponent           & Switch  & false     \\
-%      table-sign-mantissa           & Switch  & false     \\
-%      table-text-alignment          & Choice  & center    \\
-%      table-unit-alignment          & Choice  & center    \\
+%      table-parse-only          & Switch  & false     \\
+%      table-space-text-pre      & Literal & \m{empty} \\
+%      table-space-text-post     & Literal & \m{empty} \\
+%      table-sign-exponent       & Switch  & false     \\
+%      table-sign-mantissa       & Switch  & false     \\
+%      table-text-alignment      & Choice  & center    \\
+%      table-unit-alignment      & Choice  & center    \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -10146,6 +10147,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\_l_siunitx_table_gap_dim}
+% This is used to work out the potential gap between a number and
+% any following material.
+%    \begin{macrocode}
+\dim_new:N \_l_siunitx_table_gap_dim
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\_l_siunitx_table_model_prop}
 % To store the model version of a number, used when reserving space.
 %    \begin{macrocode}
@@ -10163,6 +10172,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\_l_siunitx_table_align_post_bool}
 %\begin{macro}{\_l_siunitx_table_auto_bool}
 %\begin{macro}{\_l_siunitx_table_decimal_int}
 %\begin{macro}{\_l_siunitx_table_exponent_int}
@@ -10176,6 +10186,8 @@ This work consists of the file  siunitx.dtx
 % As usual, set up the options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  table-align-text-post       .bool_set:N 
+    = \_l_siunitx_table_align_post_bool,
   table-number-alignment      .choice:,
   table-number-alignment / 
     center                  .code:n     = 
@@ -10254,6 +10266,7 @@ This work consists of the file  siunitx.dtx
   table-figures-integer  = 3
 }
 %    \end{macrocode} 
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -10380,7 +10393,10 @@ This work consists of the file  siunitx.dtx
 % First, box up the integer part of the number, the entire number and
 % the decimal marker itself.  There is then a measurement to see
 % which part of the number is bigger: before or after the decimal
-% marker. Based on that, a path is chosen.
+% marker. Based on that, a path is chosen. The two then come back
+% together to print any material after the number: the filling 
+% space needed will be equal to the correction required to place notes,
+% \emph{etc}.~flush with the number.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_centered: {
   \_siunitx_table_print_S_centered_ends:
@@ -10408,7 +10424,15 @@ This work consists of the file  siunitx.dtx
     { \_l_siunitx_table_integer_dim } > { \_l_siunitx_table_fill_dim }
     { \_siunitx_table_print_S_centered_integer: }
     { \_siunitx_table_print_S_centered_decimal: }
-  \box_use:N \_l_siunitx_table_post_box
+  \bool_if:NTF \_l_siunitx_table_align_post_bool
+    { \box_use:N \_l_siunitx_table_post_box }
+    { 
+      \dim_set:Nn \_l_siunitx_table_fill_dim
+        { - \dim_use:N \_l_siunitx_table_fill_dim }
+      \skip_horizontal:N \_l_siunitx_table_fill_dim
+      \box_use:N \_l_siunitx_table_post_box
+      \box_use:N \_l_siunitx_table_fill_box
+    }  
 }
 %    \end{macrocode}
 %\end{macro}
@@ -10476,6 +10500,7 @@ This work consists of the file  siunitx.dtx
 % correct.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_reserved: {
+  \dim_zero:N \_l_siunitx_table_gap_dim
   \_siunitx_table_print_S_reserved_ends:
   \box_use:N \_l_siunitx_table_pre_box
   \_siunitx_table_print_S_model_create:
@@ -10506,7 +10531,18 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \_l_siunitx_number_out_prop { exponent-result }
         { \msg_warning:nn { siunitx } { table-partial-number } }
     }
-  \box_use:N \_l_siunitx_table_post_box
+  \bool_if:NTF \_l_siunitx_table_align_post_bool
+    { \box_use:N \_l_siunitx_table_post_box }
+    { 
+     % \hbox_set_to_wd:Nnn \_l_siunitx_table_fill_box
+     %   { \dim_use:N \_l_siunitx_table_gap_dim }
+     %   { \tex_hfil:D }
+     % \dim_set:Nn \_l_siunitx_table_gap_dim
+     %   { - \dim_use:N \_l_siunitx_table_gap_dim }
+     % \skip_horizontal:N \_l_siunitx_table_gap_dim
+      \box_use:N \_l_siunitx_table_post_box
+     % \box_use:N \_l_siunitx_table_fill_box
+    }  
 }  
 %    \end{macrocode}
 %\end{macro}
@@ -10604,7 +10640,7 @@ This work consists of the file  siunitx.dtx
   \_siunitx_table_print_S_measure:Nnn \_l_siunitx_table_model_prop
     { mantissa } { }
   \_siunitx_table_print_S_get_mantissa:Nn 
-    \_l_siunitx_number_out_prop { }
+    \_l_siunitx_number_out_prop { } 
   \hbox_set_to_wd:Nnn \_l_siunitx_table_result_box
     { \_l_siunitx_table_mantissa_dim }
     { 
