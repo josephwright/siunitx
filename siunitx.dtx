@@ -2418,22 +2418,22 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      table-align                   & Choice  & \m{none}  \\
-%      table-align-numbers           & Choice  & 
-%        center-decimal-marker \\
-%      table-align-text              & Choice  & center    \\
-%      table-align-units             & Choice  & center    \\
+%      table-alignment               & Choice  & \m{none}  \\
 %      table-auto-round              & Switch  & false     \\
 %      table-figures-decimal         & Integer & 2         \\
 %      table-figures-exponent        & Integer & 0         \\
 %      table-figures-integer         & Integer & 3         \\
 %      table-figures-uncertainty     & Integer & 0         \\
 %      table-format                  & Special & \m{none}  \\
+%      table-number-alignment        & Choice  & 
+%        center-decimal-marker \\
 %      table-parse-only              & Switch  & false     \\
 %      table-space-text-pre          & Literal & \m{empty} \\
 %      table-space-text-post         & Literal & \m{empty} \\
 %      table-sign-exponent           & Switch  & false     \\
 %      table-sign-mantissa           & Switch  & false     \\
+%      table-text-alignment          & Choice  & center    \\
+%      table-unit-alignment          & Choice  & center    \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2467,9 +2467,9 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{table-align-numbers}
+%\DescribeOption{table-number-alignment}
 % The alignment of numbers with the boundaries of the \texttt{S}
-% column is controlled using the \opt{table-align-numbers} option,
+% column is controlled using the \opt{table-number-alignment} option,
 % which takes the values \opt{center-decimal-marker}, \opt{center},
 % \opt{left} and \opt{right}. The \opt{center-decimal-marker} places the
 % decimal marker for the number at the center of the column. This does
@@ -2493,9 +2493,9 @@ This work consists of the file  siunitx.dtx
 %    }
 %    \begin{tabular}{
 %      S
-%      S[table-align-numbers = center]
-%      S[table-align-numbers = left]
-%      S[table-align-numbers = right]
+%      S[table-number-alignment = center]
+%      S[table-number-alignment = left]
+%      S[table-number-alignment = right]
 %    }
 %    \toprule
 %    {Some Values} & {Some Values} & {Some Values} & {Some Values} \\
@@ -2509,7 +2509,7 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 % Many of the other table options do not apply when 
-% \opt{table-align-numbers = center-decimal-marker} is set, as this 
+% \opt{table-number-alignment = center-decimal-marker} is set, as this 
 % mode always centres the marker at the expense of any other 
 % choices.
 %
@@ -2538,13 +2538,13 @@ This work consists of the file  siunitx.dtx
 %    \caption{Reserving space in \texttt{S} columns.}
 %    \label{tab:S:space}
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 2
+%      table-number-alignment = center,
+%      table-figures-integer  = 2
 %    }
 %    \centering
 %    \begin{tabular}{
 %      S
-%      S[table-align-numbers = right]
+%      S[table-number-alignment = right]
 %      S[table-figures-uncertainty = 1]
 %      S[
 %        separate-uncertainty,
@@ -2613,7 +2613,7 @@ This work consists of the file  siunitx.dtx
 % It is important to note that any parts of a number \emph{not} 
 % specified in the table format argument are set to be absent (the
 % number of figures is set to zero). Setting the \opt{table-format}
-% option also resets \opt{table-align-numbers} to \opt{center}
+% option also resets \opt{table-number-alignment} to \opt{center}
 % (\cref{tab:S:format}).
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
@@ -2656,11 +2656,11 @@ This work consists of the file  siunitx.dtx
 %    \label{tab:S:ends}
 %    \centering
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 2,
-%      table-figures-decimal = 4,
-%      table-space-text-pre  = $ > $,
-%      table-space-text-post = 
+%      table-number-alignment = center,
+%      table-figures-integer  = 2,
+%      table-figures-decimal  = 4,
+%      table-space-text-pre   = $ > $,
+%      table-space-text-post  = 
 %        \textsuperscript{\emph{a}}
 %    }
 %    \begin{tabular}{S}
@@ -2688,9 +2688,9 @@ This work consists of the file  siunitx.dtx
 %    \caption{The \opt{table-auto-round} option.}
 %    \label{tab:S:auto}
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 1,
-%      table-figures-decimal = 3
+%      table-number-alignment = center,
+%      table-figures-integer  = 1,
+%      table-figures-decimal  = 3
 %    }
 %    % Notice the overfull hbox which results with
 %    % the first column
@@ -2728,9 +2728,9 @@ This work consists of the file  siunitx.dtx
 %    \centering
 %    \begin{tabular}{
 %      S
-%      S[table-align-numbers = center]
-%      S[table-align-numbers = right]
-%      S[table-align-numbers = left]
+%      S[table-number-alignment = center]
+%      S[table-number-alignment = right]
+%      S[table-number-alignment = left]
 %      }
 %    \toprule
 %        \multicolumn{1}{c}{Some values}
@@ -2748,26 +2748,26 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{table-align-text}
+%\DescribeOption{table-text-alignment}
 % Cell contents which are not part of a number can be protected
 % using braces, as illustrated. Cells which contain no numerical data
 % at all are aligned using the setting specified by the 
-% \opt{table-align-text} option, which recognises the values
+% \opt{table-text-alignment} option, which recognises the values
 % \opt{center}, \opt{left} and \opt{right} (\cref{tab:S:text}).
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \caption{Aligning text in \texttt{S} columns.}
 %    \label{tab:S:text}
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 4,
-%      table-figures-decimal = 4
+%      table-number-alignment = center,
+%      table-figures-integer  = 4,
+%      table-figures-decimal  = 4
 %    }
 %    \centering
 %    \begin{tabular}{
 %      S
-%      S[table-align-text = left]
-%      S[table-align-text = right]
+%      S[table-text-alignment = left]
+%      S[table-text-alignment = right]
 %      }
 %    \toprule
 %        {Values}
@@ -2783,9 +2783,9 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 % 
-%\DescribeOption{table-align-units}
+%\DescribeOption{table-unit-alignment}
 % The contents of \texttt{s} columns can be centred or aligned to the
-% left or right using the \opt{table-align-units} option. As for the
+% left or right using the \opt{table-unit-alignment} option. As for the
 % other alignment options, this recognises the choices \opt{center},
 % \opt{left} and \opt{right}. 
 %\begin{LaTeXdemo}[code and float]
@@ -2795,9 +2795,9 @@ This work consists of the file  siunitx.dtx
 %    \label{tab:s:align}
 %    \begin{tabular}
 %      {
-%        s[table-align-units = right]
+%        s[table-unit-alignment = right]
 %        s
-%        s[table-align-units = left]
+%        s[table-unit-alignment = left]
 %      }      
 %      \toprule
 %        {Left-aligned}  &   
@@ -2811,11 +2811,11 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{table-align}
-% The three table alignment options (\opt{table-align-numbers}, 
-% \opt{table-align-text} and \opt{table-align-units}) can be set to the
-% same value using the \opt{table-align} option. This will set all
-% three alignment options to the same value (one of \opt{center}, 
+%\DescribeOption{table-alignment}
+% The three table alignment options (\opt{table-number-alignment}, 
+% \opt{table-text-alignment} and \opt{table-unit-alignment}) can be set 
+% to the same value using the \opt{table-alignment} option. This will 
+% set all three alignment options to the same value (one of \opt{center}, 
 % \opt{right} or \opt{left}).
 % 
 %\subsection{Symbols}
@@ -2991,9 +2991,9 @@ This work consists of the file  siunitx.dtx
 %    \centering
 %    \robustify\DTLmul
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 2,
-%      table-figures-decimal = 4
+%      table-number-alignment = center,
+%      table-figures-integer  = 2,
+%      table-figures-decimal  = 4
 %    }
 %    \begin{tabular}{
 %      S
@@ -3029,10 +3029,10 @@ This work consists of the file  siunitx.dtx
 %    \label{tab:xmpl:datatool}
 %    \centering
 %    \sisetup{
-%      parse-numbers         = false,
-%      table-align-numbers   = center,
-%      table-figures-integer = 2,
-%      table-figures-decimal = 4
+%      parse-numbers          = false,
+%      table-number-alignment = center,
+%      table-figures-integer  = 2,
+%      table-figures-decimal  = 4
 %    }
 %    \renewcommand*\dtlrealalign{S}
 %    \DTLdisplaydb{moredata}
@@ -3334,9 +3334,9 @@ This work consists of the file  siunitx.dtx
 %    \caption{An example of table labelling.}
 %    \label{tab:xmpl:unitless}
 %    \sisetup{
-%      table-align-numbers   = center,
-%      table-figures-integer = 1,
-%      table-figures-decimal = 4
+%      table-number-alignment = center,
+%      table-figures-integer  = 1,
+%      table-figures-decimal  = 4
 %    }
 %    \begin{tabular}{cS}
 %      \toprule
@@ -3388,7 +3388,7 @@ This work consists of the file  siunitx.dtx
 %    \centering
 %    \caption{Good and bad columns.}
 %    \label{tab:good}
-%    \sisetup{table-align-numbers = center}
+%    \sisetup{table-number-alignment = center}
 %    \begin{tabular}{
 %      c
 %      S[
@@ -10037,30 +10037,30 @@ This work consists of the file  siunitx.dtx
 % 
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  table-align-units .choice:,
-  table-align-units / center .code:n =
+  table-unit-alignment .choice:,
+  table-unit-alignment / center .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_unit_align_skip 
         { \c_zero_skip plus 0.5 fill } 
     },
-  table-align-units / center .code:n =
+  table-unit-alignment / center .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_unit_align_skip 
         { \c_zero_skip plus 0.5 fill } 
     },
-  table-align-units / left   .code:n =
+  table-unit-alignment / left   .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_unit_align_skip 
         { \c_zero_skip } 
     },
-  table-align-units / right  .code:n =
+  table-unit-alignment / right  .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_unit_align_skip 
         { \c_zero_skip plus 1 fill } 
     },
 }
 \keys_set:nn { siunitx } {
-  table-align-units = center
+  table-unit-alignment = center
 }
 %    \end{macrocode}
 % 
@@ -10176,55 +10176,55 @@ This work consists of the file  siunitx.dtx
 % As usual, set up the options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  table-align-numbers       .choice:,
-  table-align-numbers / 
+  table-number-alignment      .choice:,
+  table-number-alignment / 
     center                  .code:n     = 
       {
         \skip_set:Nn \_l_siunitx_table_number_align_skip 
           { \c_zero_skip plus 0.5 fill } 
         \bool_set_false:N \_l_siunitx_table_center_decimal_bool
       },
-  table-align-numbers / 
+  table-number-alignment / 
     center-decimal-marker   .code:n     = 
       {
         \skip_set:Nn \_l_siunitx_table_number_align_skip 
           { \c_zero_skip plus 0.5 fill } 
         \bool_set_true:N \_l_siunitx_table_center_decimal_bool
       },
-  table-align-numbers / 
+  table-number-alignment / 
     left                    .code:n     = 
       {
         \skip_set:Nn \_l_siunitx_table_number_align_skip 
           { \c_zero_skip } 
         \bool_set_false:N \_l_siunitx_table_center_decimal_bool
       },
-  table-align-numbers / 
+  table-number-alignment / 
     right                   .code:n     = 
       {
         \skip_set:Nn \_l_siunitx_table_number_align_skip 
           { \c_zero_skip plus 1 fill } 
         \bool_set_false:N \_l_siunitx_table_center_decimal_bool
       },
-  table-align-text .choice:,
-  table-align-text / 
+  table-text-alignment .choice:,
+  table-text-alignment / 
     center                  .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 0.5 fill } 
     },
-  table-align-text / 
+  table-text-alignment / 
     center                  .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 0.5 fill } 
     },
-  table-align-text / 
+  table-text-alignment / 
     left                    .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_text_align_skip 
         { \c_zero_skip } 
     },
-  table-align-text / 
+  table-text-alignment / 
     right                   .code:n =
     { 
       \skip_set:Nn \_l_siunitx_table_text_align_skip 
@@ -10248,10 +10248,10 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_table_sign_mantissa_bool
 }
 \keys_set:nn { siunitx } {
-  table-align-numbers   = center-decimal-marker,
-  table-align-text      = center,
-  table-figures-decimal = 2,
-  table-figures-integer = 3
+  table-number-alignment = center-decimal-marker,
+  table-text-alignment   = center,
+  table-figures-decimal  = 2,
+  table-figures-integer  = 3
 }
 %    \end{macrocode} 
 %\end{macro}
@@ -10268,11 +10268,11 @@ This work consists of the file  siunitx.dtx
 % A meta-choice for all table alignment is also provided.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
-  table-align .meta:n = 
+  table-alignment .meta:n = 
     {
-      table-align-numbers = #1,
-      table-align-text    = #1,
-      table-align-units   = #1
+      table-number-alignment = #1,
+      table-text-alignment   = #1,
+      table-unit-alignment   = #1
     }
 }
 %    \end{macrocode}
@@ -10307,7 +10307,7 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnTF \_l_siunitx_number_in_prop { exponent-sign }        
         { \bool_set_true:N \_l_siunitx_table_sign_mantissa_bool }
         { \bool_set_false:N \_l_siunitx_table_sign_mantissa_bool }
-      \keys_set:nn { siunitx } { table-align-numbers = center }  
+      \keys_set:nn { siunitx } { table-number-alignment = center }  
     },
 }
 %    \end{macrocode}
@@ -12519,18 +12519,18 @@ This work consists of the file  siunitx.dtx
   strictarc      .code:n    = ,
   tabalign       .meta:n    = 
     {
-      table-align-numbers   = #1,
-      table-align-text      = #1,
-      table-align-units     = #1
+      table-number-alignment  = #1,
+      table-text-alignment    = #1,
+      table-unit-alignment    = #1
     },
   tabalignexp    .code:n    = ,
   tabautofit     .meta:n    = { table-auto-round        = #1          },
   tabformat      .meta:n    = { table-format            = #1          },
-  tabnumalign    .meta:n    = { table-align-numbers     = #1          },
+  tabnumalign    .meta:n    = { table-number-alignment  = #1          },
   tabparseonly   .meta:n    = { table-parse-only        = #1          },
   tabparseonly   .default:n = { true                                  },
   tabtextalign   .meta:n    = { table-text-numbers      = #1          },
-  tabunitalign   .meta:n    = { table-align-units       = #1          },
+  tabunitalign   .meta:n    = { table-unit-alignment    = #1          },
   textOmega      .meta:n    = { text-ohm                = #1          },
   textcelsius    .meta:n    = { text-celsius            = #1          },
   textdegree     .meta:n    = { text-degree             = #1          },
