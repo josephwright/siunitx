@@ -534,9 +534,9 @@ This work consists of the file  siunitx.dtx
 %
 % Simple lists and ranges of numbers can be handled.
 %\begin{LaTeXdemo}
-%  \numlist{{10}{20}{30}}                    \\
-%  \SIlist{{0.13}{0.67}{0.80}}{\milli\metre} \\
-%  \numrange{10}{20}                         \\
+%  \numlist{10;20;30}                    \\
+%  \SIlist{0.13;0.67;0.80}{\milli\metre} \\
+%  \numrange{10}{20}                     \\
 %  \SIrange{0.13}{0.67}{\milli\metre}
 %\end{LaTeXdemo}
 % 
@@ -598,7 +598,7 @@ This work consists of the file  siunitx.dtx
 % Each \meta{number} is given within the list of \meta{numbers} within
 % a brace pair, as the list can have a flexible length.
 %\begin{LaTeXdemo}
-%  \numlist{{10}{30}{50}{70}}
+%  \numlist{10;30;50;70}
 %\end{LaTeXdemo}
 %
 %\DescribeMacro{\numrange}
@@ -704,7 +704,7 @@ This work consists of the file  siunitx.dtx
 % function. The behaviour of this function is similar to \cs{numlist},
 % but with the addition of a unit to each number.
 %\begin{LaTeXdemo}
-%  \SIlist{{10}{30}{45}}{\metre}
+%  \SIlist{10;30;45}{\metre}
 %\end{LaTeXdemo}
 % 
 %\DescribeMacro{\SIrange}
@@ -1758,13 +1758,13 @@ This work consists of the file  siunitx.dtx
 % spaces needed should be included in the option settings: none are
 % added within the code.
 %\begin{LaTeXdemo}
-%  \numlist{{0.1}{0.2}{0.3}}                              \\
-%  \numlist[list-separator = {; }]{{0.1}{0.2}{0.3}}       \\
-%  \numlist[list-final-separator = {, }]{{0.1}{0.2}{0.3}} \\
+%  \numlist{0.1;0.2;0.3}                              \\
+%  \numlist[list-separator = {; }]{0.1;0.2;0.3}       \\
+%  \numlist[list-final-separator = {, }]{0.1;0.2;0.3} \\
 %  \numlist[
 %    list-separator       = { and },
 %    list-final-separator = { and finally }
-%  ]{{0.1}{0.2}{0.3}}
+%  ]{0.1;0.2;0.3}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{range-phrase}
@@ -2465,10 +2465,10 @@ This work consists of the file  siunitx.dtx
 % be printed with a unit. Alternatives are \opt{brackets} and 
 % \opt{single}.
 %\begin{LaTeXdemo}
-%  \SIlist{{2}{4}{6}{8}}{\tesla} \\ 
-%  \SIlist[list-units = brackets]{{2}{4}{6}{8}}{\tesla} \\
-%  \SIlist[list-units = repeat]{{2}{4}{6}{8}}{\tesla} \\
-%  \SIlist[list-units = single]{{2}{4}{6}{8}}{\tesla} \\
+%  \SIlist{2;4;6;8}{\tesla} \\ 
+%  \SIlist[list-units = brackets]{2;4;6;8}{\tesla} \\
+%  \SIlist[list-units = repeat]{2;4;6;8}{\tesla} \\
+%  \SIlist[list-units = single]{2;4;6;8}{\tesla} \\
 %  \SIrange{2}{4}{\degreeCelsius} \\ 
 %  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
 %  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
@@ -9645,6 +9645,37 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\_siunitx_list_map:nN}
+%\begin{macro}[aux]{\_siunitx_list_map_aux:Nw}
+% A function to map to a list separated by ";" tokens (with an
+% unknown number of entries). This is based on \cs{clist_map_inline:nn}
+% but sanitises category codes and does not need to be nesting-safe.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_lccode:nn { `\@ } { `\; }
+  \char_make_active:N \@
+\tl_to_lowercase:n {
+  \group_end:
+  \cs_set_protected:Npn \_siunitx_list_map:nN #1#2 
+    {
+      \tl_set:Nn \_l_siunitx_tmpa_tl {#1}
+      \tl_replace_all_in:Nnn \_l_siunitx_tmpa_tl { @ } { ; }
+      \tl_if_empty:NF \_l_siunitx_tmpa_tl
+        {
+          \exp_last_unbraced:NNV \_siunitx_list_map_aux:Nw #2
+            \_l_siunitx_tmpa_tl ; \q_recursion_tail ; \q_recursion_stop
+        }
+    }
+}
+\cs_set:Npn \_siunitx_list_map_aux:Nw #1#2 ; {
+  \quark_if_recursion_tail_stop:n {#2} 
+  #1 {#2}
+  \_siunitx_list_map_aux:Nw #1
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\begin{macro}{\_siunitx_list_numbers:n}
 %\begin{macro}{\_siunitx_list_numbers_aux_i:n}
 %\begin{macro}{\_siunitx_list_numbers_aux_ii:n}
@@ -9662,7 +9693,7 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected:Npn \_siunitx_list_numbers_aux_i:n #1 {  
   \tl_clear:N \_l_siunitx_list_tl
   \tl_clear:N \_l_siunitx_list_current_tl
-  \tl_map_function:nN {#1} \_siunitx_list_numbers_aux_ii:n    
+  \_siunitx_list_map:nN {#1} \_siunitx_list_numbers_aux_ii:n    
   \tl_put_right:NV \_l_siunitx_list_tl 
     \_l_siunitx_list_separator_final_tl  
   \tl_put_right:NV \_l_siunitx_list_tl \_l_siunitx_list_current_tl
