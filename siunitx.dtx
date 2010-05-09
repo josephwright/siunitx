@@ -1,4 +1,4 @@
-La% \iffalse meta-comment
+% \iffalse meta-comment
 % !TeX program = pdfLaTeX
 %<*internal>
 \iffalse
@@ -296,6 +296,7 @@ This work consists of the file  siunitx.dtx
 %          milli,
 %          mole,
 %          num,
+%          numlist,
 %          numrange,
 %          of,
 %          pascal,
@@ -310,6 +311,7 @@ This work consists of the file  siunitx.dtx
 %          si,
 %          SI,
 %          sievert,
+%          SIlist,
 %          SIrange,
 %          sisetup,
 %          SIUnitSymbolDegree,
@@ -496,7 +498,9 @@ This work consists of the file  siunitx.dtx
 %  \item \cs{num}\oarg{options}\marg{number}
 %  \item \cs{si}\oarg{options}\marg{unit}
 %  \item \cs{SI}\oarg{options}\marg{value}\oarg{pre-unit}\marg{unit}
-%  \item \cs{numrange}\oarg{options}\marg{number1}\marg{number2}
+%  \item \cs{numlist}\oarg{options}\marg{numbers}
+%  \item \cs{numrange}\oarg{options}\marg{numbers}\marg{number2}
+%  \item \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
 %  \item \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}^^A
 %    \marg{unit}
 %  \item \cs{ang}\oarg{options}\marg{angle}
@@ -528,9 +532,11 @@ This work consists of the file  siunitx.dtx
 %    {\kilogram\metre\per\ampere\per\second}      
 %\end{LaTeXdemo}
 %
-% Simple ranges of numbers can be handled.
+% Simple lists and ranges of numbers can be handled.
 %\begin{LaTeXdemo}
-%  \numrange{10}{20}  \\
+%  \numlist{{10}{20}{30}}                    \\
+%  \SIlist{{0.13}{0.67}{0.80}}{\milli\metre} \\
+%  \numrange{10}{20}                         \\
 %  \SIrange{0.13}{0.67}{\milli\metre}
 %\end{LaTeXdemo}
 % 
@@ -583,6 +589,17 @@ This work consists of the file  siunitx.dtx
 % have a performance overhead (only obvious with very large amounts
 % of numerical input). The parser understands a range of input syntaxes,
 % as demonstrated above.
+% 
+%\DescribeMacro{\numlist}
+%\begin{syntax}
+%  \cs{numlist}\oarg{options}\marg{numbers}
+%\end{syntax}
+% Lists of numbers may be processed using the \cs{numlist} function.
+% Each \meta{number} is given within the list of \meta{numbers} within
+% a brace pair, as the list can have a flexible length.
+%\begin{LaTeXdemo}
+%  \numlist{{10}{30}{50}{70}}
+%\end{LaTeXdemo}
 %
 %\DescribeMacro{\numrange}
 %\begin{syntax}
@@ -678,6 +695,17 @@ This work consists of the file  siunitx.dtx
 % by other packages, and several packages define \cs{degree}). Full
 % details of using \enquote{stand alone} units are found in 
 % \cref{sec:units:creating}.
+% 
+%\DescribeMacro{\SIlist}
+%\begin{syntax}
+%  \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit} 
+%\end{syntax}
+% Lists of numbers with units can be handled using the \cs{SIlist}
+% function. The behaviour of this function is similar to \cs{numlist},
+% but with the addition of a unit to each number.
+%\begin{LaTeXdemo}
+%  \SIlist{{10}{30}{45}}{\metre}
+%\end{LaTeXdemo}
 % 
 %\DescribeMacro{\SIrange}
 %\begin{syntax}
@@ -1700,6 +1728,45 @@ This work consists of the file  siunitx.dtx
 %  \num[tight-spacing = true]{1 \pm 2i e3} 
 %\end{LaTeXdemo}
 %
+% Lists and ranges of numbers have a small number of specialised
+% options, which apply on to these more unusual input forms 
+% (\cref{tab:opt:num:list}).
+%
+%\begin{table}
+%  \centering
+%  \caption{Output options for lists and ranges of numbers.}
+%  \label{tab:opt:num:list}
+%  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+%    \toprule
+%      \multicolumn{1}{l}{Option name} & 
+%      Type &
+%      \multicolumn{1}{l}{Default} \\
+%    \midrule 
+%      list-final-separator & Literal & \verb*= and =  \\
+%      list-separator       & Literal & \verb*=, =     \\
+%      range-phrase         & Literal & \verb*= to =   \\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+%
+%\DescribeOption{list-final-separator}
+%\DescribeOption{list-separator}
+% Lists of numbers are printed with a separator between each item,
+% which is stored using the \opt{list-separator} option. The
+% separator before the last item of a list may be different, and
+% is therefore set using the \opt{list-final-separator} option. Any
+% spaces needed should be included in the option settings: none are
+% added within the code.
+%\begin{LaTeXdemo}
+%  \numlist{{0.1}{0.2}{0.3}}                              \\
+%  \numlist[list-separator = {; }]{{0.1}{0.2}{0.3}}       \\
+%  \numlist[list-final-separator = {, }]{{0.1}{0.2}{0.3}} \\
+%  \numlist[
+%    list-separator       = { and },
+%    list-final-separator = { and finally }
+%  ]{{0.1}{0.2}{0.3}}
+%\end{LaTeXdemo}
+%
 %\DescribeOption{range-phrase}
 % Ranges of numbers can be given as input. These will have an 
 % appropriate word or symbol inserted between the two entries: this
@@ -2324,10 +2391,11 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
 %      allow-number-unit-breaks & Switch & false    \\
+%      list-units               & Choice & repeat   \\
 %      multi-part-units         & Choice & brackets \\
 %      number-unit-separator    & Math   & \cs{,}   \\
 %      product-units            & Choice & repeat   \\
-%      range-units              & Choice & repeat     \\
+%      range-units              & Choice & repeat   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2389,16 +2457,22 @@ This work consists of the file  siunitx.dtx
 %  \SI[product-units = single]{2 x 3 x 4}{\metre}
 %\end{LaTeXdemo}
 %
+%\DescribeOption{list-units}
 %\DescribeOption{range-units}
-% The \opt{range-units} option determines how the \cs{SIrange}
-% function displays units. The standard setting is \opt{repeat}, 
-% where both parts of the range have a unit. Alternatives are
-% \opt{brackets} and \opt{single}.
+% The \opt{list-units} and \opt{range-units} options determines how 
+% the \cs{SIlist} and\cs{SIrange} function displays units, respectively.
+% The standard setting for both is \opt{repeat}, where each number will
+% be printed with a unit. Alternatives are \opt{brackets} and 
+% \opt{single}.
 %\begin{LaTeXdemo}
+%  \SIlist{{2}{4}{6}{8}}{\tesla} \\ 
+%  \SIlist[list-units = brackets]{{2}{4}{6}{8}}{\tesla} \\
+%  \SIlist[list-units = repeat]{{2}{4}{6}{8}}{\tesla} \\
+%  \SIlist[list-units = single]{{2}{4}{6}{8}}{\tesla} \\
 %  \SIrange{2}{4}{\degreeCelsius} \\ 
 %  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
 %  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
-%  \SIrange[range-units = single]{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = single]{2}{4}{\degreeCelsius}
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -9513,6 +9587,134 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\subsection{Lists of numbers}
+%
+%\begin{macro}{\_l_siunitx_list_brackets_bool}
+%\begin{macro}{\_l_siunitx_list_repeat_bool}
+% For storing the behaviour of list items with respect to units.
+%    \begin{macrocode}
+\bool_new:N \_l_siunitx_list_brackets_bool
+\bool_new:N \_l_siunitx_list_repeat_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_l_siunitx_list_current_tl}
+%\begin{macro}{\_l_siunitx_list_tl}
+% Two token list variables used to store the list for output.
+%    \begin{macrocode}
+\tl_new:N \_l_siunitx_list_current_tl
+\tl_new:N \_l_siunitx_list_tl
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_l_siunitx_list_separator_tl}
+%\begin{macro}{\_l_siunitx_list_separator_final_tl}
+% Settings for lists.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  list-final-separator .tl_set:N = \_l_siunitx_list_separator_final_tl,
+  list-separator       .tl_set:N = \_l_siunitx_list_separator_tl,
+  list-units           .choice:,
+  list-units
+    / brackets .code:n   =
+      {
+        \bool_set_true:N  \_l_siunitx_list_brackets_bool
+        \bool_set_false:N \_l_siunitx_list_repeat_bool
+      },
+  list-units  
+    / repeat .code:n   =
+      {
+        \bool_set_false:N \_l_siunitx_list_brackets_bool
+        \bool_set_true:N  \_l_siunitx_list_repeat_bool
+      },
+  list-units  
+    / single .code:n   =
+      {
+        \bool_set_false:N \_l_siunitx_list_brackets_bool
+        \bool_set_false:N \_l_siunitx_list_repeat_bool
+      },
+}
+\keys_set:nn { siunitx } {
+  list-final-separator = { ~ and ~ },
+  list-separator       = { , ~ },
+  list-units           = repeat,
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_siunitx_list_numbers:n}
+%\begin{macro}{\_siunitx_list_numbers_aux_i:n}
+%\begin{macro}{\_siunitx_list_numbers_aux_ii:n}
+% Lists of numbers are handled in a very simple fashion. The input
+% list is traversed, and the items are simply placed on a list for
+% output. This uses the internal function \cs{_siunitx_number_output:n}
+% for speed, but does not make any other optimisation. The output list
+% also adds the relevant separators.
+%    \begin{macrocode}
+\cs_set_protected:Npn \_siunitx_list_numbers:n #1 {
+  \tl_clear:N \_l_siunitx_unit_tl
+  \tl_clear:N \_l_siunitx_preunit_tl
+  \_siunitx_list_numbers_aux_i:n {#1}
+}
+\cs_set_protected:Npn \_siunitx_list_numbers_aux_i:n #1 {  
+  \tl_clear:N \_l_siunitx_list_tl
+  \tl_clear:N \_l_siunitx_list_current_tl
+  \tl_map_function:nN {#1} \_siunitx_list_numbers_aux_ii:n    
+  \tl_put_right:NV \_l_siunitx_list_tl 
+    \_l_siunitx_list_separator_final_tl  
+  \tl_put_right:NV \_l_siunitx_list_tl \_l_siunitx_list_current_tl
+  \tl_use:N \_l_siunitx_list_tl 
+}
+\cs_set_protected:Npn \_siunitx_list_numbers_aux_ii:n #1 {
+  \tl_if_empty:NTF \_l_siunitx_list_tl
+    { \tl_set_eq:NN \_l_siunitx_list_tl \_l_siunitx_list_current_tl }
+    { 
+        \tl_put_right:NV \_l_siunitx_list_tl 
+          \_l_siunitx_list_separator_tl
+        \tl_put_right:NV \_l_siunitx_list_tl \_l_siunitx_list_current_tl
+    }
+  \tl_set:Nn \_l_siunitx_list_current_tl 
+    { \_siunitx_combined_output:n {#1} }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_siunitx_list_units:nnn}
+% For a list of items with units, the method is to first parse the 
+% unit when repeating (to save time), then to use the number loop above
+% for the actual work. On the other hand, when the unit is only printed
+% once life is easier as the normal unit printer can operate.
+%    \begin{macrocode}
+\cs_set_protected:Npn \_siunitx_list_units:nnn #1#2#3 {
+  \bool_if:NTF \_l_siunitx_list_repeat_bool
+    {
+      \_siunitx_unit_in:nn {#2} {#3}
+      \_siunitx_list_numbers_aux_i:n {#1}
+    }
+    {
+      \bool_if:NT \_l_siunitx_list_brackets_bool
+        {
+          \_siunitx_print:nn { number } 
+            { \ensuremath { \_l_siunitx_bracket_open_tl } }
+        }
+      \_siunitx_list_numbers:n {#1}
+      \bool_if:NT \_l_siunitx_list_brackets_bool
+        {
+          \_siunitx_print:nn { number } 
+            { \ensuremath { \_l_siunitx_bracket_close_tl } }
+        }   
+      \_siunitx_unit_output_number_sep:
+      \_siunitx_unit_output:nn {#2} {#3}
+    }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\subsection{Ranges}
 %
 %\begin{macro}{\_l_siunitx_range_brackets_bool}
@@ -11523,6 +11725,19 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\numlist}
+% Lists of numbers are trivially easy to work with.
+%    \begin{macrocode}
+\NewDocumentCommand \numlist { o m } {
+  \group_begin:
+    \IfNoValueF {#1}
+      { \keys_set:nn { siunitx } {#1} }
+    \_siunitx_list_numbers:n {#2}
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\numrange}
 % A very simple approach is taken here: this is not intended for 
 % anything complicated.
@@ -11555,10 +11770,23 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\SIlist}
 %\begin{macro}{\SIrange}
-% Printing unit ranges is a lot less complex than printing single 
-% numbers with units, as we insist that everything is kept simple.
+% Lists and range of values are handled in a very similar way.
+% Everything is kept relatively simple, and so there is not too much
+% complexity. In theory the two could be combined together, but 
+% the differences between the two make this less desirable.
 %    \begin{macrocode}
+\NewDocumentCommand \SIlist { o m m } {
+  \group_begin:
+    \IfNoValueTF {#1}
+      { \_siunitx_list_units:nnn {#2} {#3} { }  }
+      {
+        \keys_set:nn { siunitx } {#1}
+        \_siunitx_list_units:nnn {#2} {#3} {#1} 
+      }
+  \group_end:
+}
 \NewDocumentCommand \SIrange { o m m m } {
   \group_begin:
     \IfNoValueTF {#1}
@@ -11570,6 +11798,7 @@ This work consists of the file  siunitx.dtx
   \group_end:
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\SI}
