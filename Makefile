@@ -58,6 +58,7 @@ UNPACK   = $(DTX)
 AUXFILES = \
 	aux  \
 	cmds \
+	dvi  \
 	glo  \
 	gls  \
 	hd   \
