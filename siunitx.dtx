@@ -9645,37 +9645,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_list_map:nN}
-%\begin{macro}[aux]{\_siunitx_list_map_aux:Nw}
-% A function to map to a list separated by ";" tokens (with an
-% unknown number of entries). This is based on \cs{clist_map_inline:nn}
-% but sanitises category codes and does not need to be nesting-safe.
-%    \begin{macrocode}
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\; }
-  \char_make_active:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_set_protected:Npn \_siunitx_list_map:nN #1#2 
-    {
-      \tl_set:Nn \_l_siunitx_tmpa_tl {#1}
-      \tl_replace_all_in:Nnn \_l_siunitx_tmpa_tl { @ } { ; }
-      \tl_if_empty:NF \_l_siunitx_tmpa_tl
-        {
-          \exp_last_unbraced:NNV \_siunitx_list_map_aux:Nw #2
-            \_l_siunitx_tmpa_tl ; \q_recursion_tail ; \q_recursion_stop
-        }
-    }
-}
-\cs_set:Npn \_siunitx_list_map_aux:Nw #1#2 ; {
-  \quark_if_recursion_tail_stop:n {#2} 
-  #1 {#2}
-  \_siunitx_list_map_aux:Nw #1
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\begin{macro}{\_siunitx_list_numbers:n}
 %\begin{macro}{\_siunitx_list_numbers_aux_i:n}
 %\begin{macro}{\_siunitx_list_numbers_aux_ii:n}
@@ -9693,7 +9662,7 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected:Npn \_siunitx_list_numbers_aux_i:n #1 {  
   \tl_clear:N \_l_siunitx_list_tl
   \tl_clear:N \_l_siunitx_list_current_tl
-  \_siunitx_list_map:nN {#1} \_siunitx_list_numbers_aux_ii:n    
+  \tl_map_function:nN {#1} \_siunitx_list_numbers_aux_ii:n    
   \tl_put_right:NV \_l_siunitx_list_tl 
     \_l_siunitx_list_separator_final_tl  
   \tl_put_right:NV \_l_siunitx_list_tl \_l_siunitx_list_current_tl
@@ -11759,7 +11728,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\numlist}
 % Lists of numbers are trivially easy to work with.
 %    \begin{macrocode}
-\NewDocumentCommand \numlist { o m } {
+\NewDocumentCommand \numlist { o > { \SplitList { ; } } m } {
   \group_begin:
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
@@ -11808,7 +11777,7 @@ This work consists of the file  siunitx.dtx
 % complexity. In theory the two could be combined together, but 
 % the differences between the two make this less desirable.
 %    \begin{macrocode}
-\NewDocumentCommand \SIlist { o m m } {
+\NewDocumentCommand \SIlist { o > { \SplitList { ; } } m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \_siunitx_list_units:nnn {#2} {#3} { }  }
