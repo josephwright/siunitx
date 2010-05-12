@@ -3651,12 +3651,12 @@ This work consists of the file  siunitx.dtx
 % To add stuff in math mode.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_tl_put_left_math:Nn #1#2 {
-  \tl_put_left:Nn #1 { \ensuremath {#2} }
+  \tl_put_left:Nn #1 { \_siunitx_ensuremath:n {#2} }
 }
 \cs_generate_variant:Nn \_siunitx_tl_put_left_math:Nn { NV }
 \cs_generate_variant:Nn \_siunitx_tl_put_left_math:Nn { cV }
 \cs_set_protected:Npn \_siunitx_tl_put_right_math:Nn #1#2 {
-  \tl_put_right:Nn #1 { \ensuremath {#2} }
+  \tl_put_right:Nn #1 { \_siunitx_ensuremath:n {#2} }
 }
 \cs_generate_variant:Nn \_siunitx_tl_put_right_math:Nn { NV }
 \cs_generate_variant:Nn \_siunitx_tl_put_right_math:Nn { cV }
@@ -3746,6 +3746,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\_siunitx_ensuremath:n}
+% A copy is made of \cs{ensuremath}: if \pkg{tex4ht} is in use, it
+% is possible to deactivate this to give nicer looking conversion to
+% other formats.
+%    \begin{macrocode}
+\cs_set_eq:NN \_siunitx_ensuremath:n \ensuremath
+\AtBeginDocument {
+  \@ifpackageloaded { tex4ht }
+    { 
+      \cs_set_eq:NN \_siunitx_ensuremath:n \use:n 
+      \keys_set:nn { siunitx } { mode = text }
+    }
+    { }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Font detection}
@@ -6516,7 +6533,7 @@ This work consists of the file  siunitx.dtx
         {
           \tl_set:Nx \_l_siunitx_tmpa_tl
             { 
-              \exp_not:N \ensuremath 
+              \exp_not:N \_siunitx_ensuremath:n 
                 { \exp_not:V \_l_siunitx_output_complex_tl } 
             }
           \prop_put:NnV \_l_siunitx_number_out_prop { complex }
@@ -6684,7 +6701,10 @@ This work consists of the file  siunitx.dtx
             \_l_siunitx_output_decimal_tl
         }
       \tl_set:Nx \_l_siunitx_tmpb_tl 
-        { \exp_not:N \ensuremath { \exp_not:V \_l_siunitx_tmpb_tl } }
+        { 
+          \exp_not:N \_siunitx_ensuremath:n 
+            { \exp_not:V \_l_siunitx_tmpb_tl } 
+        }
       \tl_put_right:NV \_l_siunitx_tmpa_tl \_l_siunitx_tmpb_tl 
       \prop_put:NnV \_l_siunitx_number_out_prop { #1 -decimal-marker }
         \_l_siunitx_tmpb_tl
@@ -6893,10 +6913,13 @@ This work consists of the file  siunitx.dtx
 }
 \cs_set_protected_nopar:Npn \_siunitx_number_format_join_uncert_pm: {
   \bool_if:NTF \_l_siunitx_tight_bool 
-    { \tl_put_left:Nn \_l_siunitx_tmpb_tl { \ensuremath { { \pm } } } }
     { 
       \tl_put_left:Nn \_l_siunitx_tmpb_tl 
-        { \ensuremath { { } \pm { } } }
+        { \_siunitx_ensuremath:n { { \pm } } } 
+    }
+    { 
+      \tl_put_left:Nn \_l_siunitx_tmpb_tl 
+        { \_siunitx_ensuremath:n { { } \pm { } } }
     }
 }
 %    \end{macrocode}
@@ -7267,10 +7290,13 @@ This work consists of the file  siunitx.dtx
    \prop_if_in:NnT \_l_siunitx_number_out_prop { #1 -uncertainty } 
      { 
         \bool_if:NTF \_l_siunitx_tight_bool 
-          { \_siunitx_print:nn { number } { \ensuremath { { \pm } } } }
           { 
             \_siunitx_print:nn { number } 
-              { \ensuremath { { } \pm { } } } 
+              { \_siunitx_ensuremath:n { { \pm } } } 
+          }
+          { 
+            \_siunitx_print:nn { number } 
+              { \_siunitx_ensuremath:n { { } \pm { } } } 
           }
        \_siunitx_number_output_parts_print:n { #1 -uncertainty } 
      }
@@ -7329,7 +7355,7 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected_nopar:Npn \_siunitx_number_output_product_brackets: {
   \_siunitx_unit_output_pre_print:
   \_siunitx_print:nn { number } 
-    { \ensuremath { \_l_siunitx_bracket_open_tl } }
+    { \_siunitx_ensuremath:n { \_l_siunitx_bracket_open_tl } }
   \nobreak
   \tl_set_eq:NN \_l_siunitx_unit_saved_tl \_l_siunitx_unit_tl
   \tl_clear:N \_l_siunitx_pre_unit_tl
@@ -7338,7 +7364,7 @@ This work consists of the file  siunitx.dtx
   \nobreak
   \tl_set_eq:NN \_l_siunitx_unit_tl \_l_siunitx_unit_saved_tl
   \_siunitx_print:nn { number } 
-    { \ensuremath { \_l_siunitx_bracket_close_tl } }
+    { \_siunitx_ensuremath:n { \_l_siunitx_bracket_close_tl } }
   \_siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -7358,13 +7384,17 @@ This work consists of the file  siunitx.dtx
         {  
           \bool_if:NTF \_l_siunitx_tight_bool
             {
-              \_siunitx_print:nn  { number } 
-                { \ensuremath { \_l_siunitx_output_product_tl } }
+              \_siunitx_print:nn { number } 
+                { 
+                  \_siunitx_ensuremath:n 
+                    { \_l_siunitx_output_product_tl } 
+                }
             }    
             {
               \_siunitx_print:nn  { number } 
                 { 
-                  \ensuremath { { } \_l_siunitx_output_product_tl { } }
+                  \_siunitx_ensuremath:n 
+                    { { } \_l_siunitx_output_product_tl { } }
                 }
             } 
           \_siunitx_number_output_parse:V \_l_siunitx_number_next_tl  
@@ -7829,13 +7859,13 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \_l_siunitx_angle_degree_space_bool
     { 
       \nobreak
-      \ensuremath { \_l_siunitx_angle_arc_separator_tl } 
+      \_siunitx_ensuremath:n { \_l_siunitx_angle_arc_separator_tl } 
     }
   \_siunitx_angle_print_aux:nn { minute } { \SIUnitSymbolArcminute }
   \bool_if:NT \_l_siunitx_angle_minute_space_bool
     { 
       \nobreak
-      \ensuremath { \_l_siunitx_angle_arc_separator_tl } 
+      \_siunitx_ensuremath:n { \_l_siunitx_angle_arc_separator_tl } 
     }
   \_siunitx_angle_print_aux:nn { second } { \SIUnitSymbolArcsecond }
 }
@@ -7890,7 +7920,7 @@ This work consists of the file  siunitx.dtx
   \hbox_set:Nn \_l_siunitx_angle_marker_box
     {
       \_siunitx_print:nn { number } 
-        { \ensuremath { { \_l_siunitx_output_decimal_tl } } }
+        { \_siunitx_ensuremath:n { { \_l_siunitx_output_decimal_tl } } }
     }
   \hbox_set:Nn \_l_siunitx_angle_unit_box
     {
@@ -7961,13 +7991,13 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \_l_siunitx_angle_degree_space_bool
     { 
       \nobreak
-      \ensuremath { \_l_siunitx_angle_arc_separator_tl } 
+      \_siunitx_ensuremath:n { \_l_siunitx_angle_arc_separator_tl } 
     }
   \_siunitx_angle_print_direct_aux:nn {#2} { \SIUnitSymbolArcminute }
   \bool_if:NT \_l_siunitx_angle_minute_space_bool
     { 
       \nobreak
-      \ensuremath { \_l_siunitx_angle_arc_separator_tl } 
+      \_siunitx_ensuremath:n { \_l_siunitx_angle_arc_separator_tl } 
     }
   \_siunitx_angle_print_direct_aux:nn {#3} { \SIUnitSymbolArcsecond }
 }
@@ -7975,7 +8005,7 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:nF {#1}
     {
       \tl_set:Nn \_l_siunitx_unit_tl {#2}
-      \_siunitx_print:nn { number } { \ensuremath {#1} }
+      \_siunitx_print:nn { number } { \_siunitx_ensuremath:n {#1} }
       \_siunitx_unit_output_print:
     }
 }
@@ -8230,7 +8260,10 @@ This work consists of the file  siunitx.dtx
               \bool_if:NT \_l_siunitx_create_prespace_bool 
                 {
                   \exp_not:n 
-                    { \ensuremath { \_l_siunitx_number_unit_sep_tl } }
+                    { 
+                      \_siunitx_ensuremath:n 
+                        { \_l_siunitx_number_unit_sep_tl } 
+                    }
                 }
               \exp_not:n { \_siunitx_unit_in:nn {#1} { } }
               \bool_if:NT \_l_siunitx_create_xspace_bool 
@@ -8254,7 +8287,8 @@ This work consists of the file  siunitx.dtx
                     {
                       \exp_not:n 
                         { 
-                          \ensuremath { \_l_siunitx_number_unit_sep_tl }
+                          \_siunitx_ensuremath:n 
+                            { \_l_siunitx_number_unit_sep_tl }
                         }
                     }
                   \SI {####1} { \exp_not:N #1 }
@@ -8919,7 +8953,7 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nn \_l_siunitx_unit_tl {#1}
   \tl_set:Nx \_l_siunitx_tmpa_tl 
     {
-      \exp_not:N \ensuremath
+      \exp_not:N \_siunitx_ensuremath:n
         { \exp_not:V \_l_siunitx_unit_separator_tl }
     }
   \tl_replace_all_in:NnV \_l_siunitx_unit_tl { . } 
@@ -9435,8 +9469,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_unit_output_number_sep: {
   \bool_if:NTF \_l_siunitx_number_unit_breaks_bool 
-    { \allowbreak } { \nobreak }
-  \ensuremath { \_l_siunitx_number_unit_separator_tl }
+    { \allowbreak } { \nobreak }    
+  \_siunitx_ensuremath:n { \_l_siunitx_number_unit_separator_tl }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9529,7 +9563,7 @@ This work consists of the file  siunitx.dtx
     }
     {
       \_siunitx_unit_output_pre_print:
-      \_siunitx_print:nn { number } { \ensuremath {#1} }
+      \_siunitx_print:nn { number } { \_siunitx_ensuremath:n {#1} }
       \_siunitx_unit_output_print:
     }
 }
@@ -9700,13 +9734,13 @@ This work consists of the file  siunitx.dtx
       \bool_if:NT \_l_siunitx_list_brackets_bool
         {
           \_siunitx_print:nn { number } 
-            { \ensuremath { \_l_siunitx_bracket_open_tl } }
+            { \_siunitx_ensuremath:n { \_l_siunitx_bracket_open_tl } }
         }
       \_siunitx_list_numbers:n {#1}
       \bool_if:NT \_l_siunitx_list_brackets_bool
         {
           \_siunitx_print:nn { number } 
-            { \ensuremath { \_l_siunitx_bracket_close_tl } }
+            { \_siunitx_ensuremath:n { \_l_siunitx_bracket_close_tl } }
         }   
       \_siunitx_unit_output_number_sep:
       \_siunitx_unit_output:nn {#2} {#3}
@@ -9804,13 +9838,13 @@ This work consists of the file  siunitx.dtx
       \bool_if:NT \_l_siunitx_range_brackets_bool
         {
           \_siunitx_print:nn { number } 
-            { \ensuremath { \_l_siunitx_bracket_open_tl } }
+            { \_siunitx_ensuremath:n { \_l_siunitx_bracket_open_tl } }
         }
       \_siunitx_range_numbers:nn {#3} {#4}
       \bool_if:NT \_l_siunitx_range_brackets_bool
         {
           \_siunitx_print:nn { number } 
-            { \ensuremath { \_l_siunitx_bracket_close_tl } }
+            { \_siunitx_ensuremath:n { \_l_siunitx_bracket_close_tl } }
         }   
       \_siunitx_unit_output_number_sep:
       \_siunitx_unit_output:nn {#1} {#2}
@@ -10974,7 +11008,8 @@ This work consists of the file  siunitx.dtx
     }
   \tl_set:Nx \_l_siunitx_tmpa_tl
     { 
-      \exp_not:N \ensuremath { { } \exp_not:V \_l_siunitx_tmpa_tl { } }
+      \exp_not:N \_siunitx_ensuremath:n 
+        { { } \exp_not:V \_l_siunitx_tmpa_tl { } }
     }
   \hbox_set:Nn \_l_siunitx_table_result_box
     { \_siunitx_print:nV { number } \_l_siunitx_tmpa_tl }
@@ -11069,7 +11104,7 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_get_marker:Nn #1#2 {
   \tl_set:Nx \_l_siunitx_tmpa_tl
     { 
-      \exp_not:N \ensuremath 
+      \exp_not:N \_siunitx_ensuremath:n 
         { \exp_not:V \_l_siunitx_output_decimal_tl }
     }
 }
@@ -11128,7 +11163,7 @@ This work consists of the file  siunitx.dtx
   \cs_set_eq:NN \_siunitx_table_print: 
     \_siunitx_table_direct_centered_end:
   \hbox_set:Nn \_l_siunitx_tmp_box 
-    { \ensuremath { \_l_siunitx_output_decimal_tl } }
+    { \_siunitx_ensuremath:n { \_l_siunitx_output_decimal_tl } }
   \hbox_set_to_wd:Nnn \_l_siunitx_table_post_box 
     { \box_wd:N \_l_siunitx_tmp_box }
     { \tex_hfil:D }  
@@ -11198,7 +11233,7 @@ This work consists of the file  siunitx.dtx
     { \prg_replicate:nn { \_l_siunitx_table_integer_int } { 8 } } 
   \hbox_set:Nn \_l_siunitx_tmp_box 
     { 
-      \ensuremath 
+      \_siunitx_ensuremath:n 
         { 
           \bool_if:NT \_l_siunitx_table_sign_mantissa_bool { - }
           \_l_siunitx_tmpa_tl 
@@ -11210,7 +11245,7 @@ This work consists of the file  siunitx.dtx
     { \prg_replicate:nn { \_l_siunitx_table_decimal_int } { 8 } }
   \hbox_set:Nn \_l_siunitx_tmp_box 
     { 
-      \ensuremath 
+      \_siunitx_ensuremath:n 
         { 
           \_l_siunitx_output_decimal_tl
           \_l_siunitx_tmpa_tl
