@@ -10747,7 +10747,10 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_reserved: {
   \dim_zero:N \_l_siunitx_table_gap_dim
   \_siunitx_table_print_S_reserved_ends:
-  \box_use:N \_l_siunitx_table_pre_box
+  \dim_compare:nNnTF 
+    { \box_wd:N \_l_siunitx_table_pre_box } = { \c_zero_skip }
+    { \tl_use:N \_l_siunitx_table_collect_pre_tl }
+    { \box_use:N \_l_siunitx_table_pre_box }
   \_siunitx_table_print_S_model_create:
   \bool_if:NT \_l_siunitx_table_auto_bool
     {
