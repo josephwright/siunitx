@@ -2908,6 +2908,23 @@ This work consists of the file  siunitx.dtx
 % this.  If the package is loaded with the \opt{strict} option, all 
 % output is made using the upright serif font.
 % 
+%\subsection{Local configurations}
+% 
+% The \pkg{siunitx} package will check for a local configuration file
+% \file{siunitx.cfg} during package loading.  This occurs before
+% applying any setting given in the optional argument to 
+% \cs{usepackage}.  A typical configuration file may include 
+% settings (using \cs{sisetup}) and locally-defined units, for
+% example
+%\begin{LaTeXdemo}[code only]
+%  \ProvidesFile{siunitx.cfg}
+%  \sisetup{
+%    output-decimal-marker = {,},
+%    per-mode              = symbol,
+%  }
+%  \DeclareSIUnit\torr{torr}
+%\end{LaTeXdemo} 
+% 
 %\section{Hints for using \pkg{siunitx}}   
 % 
 %\subsection{Ensuring text or math output}
@@ -12379,7 +12396,17 @@ This work consists of the file  siunitx.dtx
 %\end{macro}    
 %\end{macro} 
 %\end{macro} 
+% 
+% Load any local configuration file.  
+%    \begin{macrocode}
+\file_if_exist:nT { siunitx . \_c_siunitx_configuration_ext_tl }
+  { 
+    \@onefilewithoptions { siunitx } [ ] [ ]
+      \_c_siunitx_configuration_ext_tl  
+  }
+%    \end{macrocode}
 %
+% Finally apply the settings given at load time.
 %    \begin{macrocode}
 \ProcessKeysOptions { siunitx }
 %    \end{macrocode}
