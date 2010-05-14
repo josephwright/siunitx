@@ -115,12 +115,7 @@ This work consists of the file  siunitx.dtx
 \generate{  
   \file{siunitx-abbreviations.cfg}
     {\from{\jobname.dtx}{config,abbreviations}}
-  \file{siunitx-astronomy.cfg}{\from{\jobname.dtx}{config,astronomy}}
   \file{siunitx-binary.cfg}{\from{\jobname.dtx}{config,binary}}
-  \file{siunitx-chemical-engineering.cfg}
-    {\from{\jobname.dtx}{config,chemical-engineering}}
-  \file{siunitx-chemistry.cfg}{\from{\jobname.dtx}{config,chemistry}}
-  \file{siunitx-geophysics.cfg}{\from{\jobname.dtx}{config,geophysics}}
   \file{siunitx-version-1.cfg}{\from{\jobname.dtx}{config,version-1}}
 }
 %</install>
@@ -176,11 +171,7 @@ This work consists of the file  siunitx.dtx
   load-configurations = 
     {
       abbreviations,
-      astronomy,
       binary,
-      chemical-engineering,
-      chemistry,
-      geophysics
     }
 }
 \DeclareSIPrePower\quartic{4}
@@ -2004,18 +1995,16 @@ This work consists of the file  siunitx.dtx
 %\subsection{Loading additional units}
 %
 %\DescribeOption{load-configurations}
-% There are a number of additional unit definitions supplied with
-% \pkg{siunitx} that are not loaded as standard. Some of these are 
-% specialist units for certain subject areas, others are not 
-% accepted with the SI and some are for the users convenience.
-% A comma-separated list of configurations to load should be
-% given as the argument to the \opt{load-configurations} option.
+% \pkg{siunitx} includes a set of configuration files which are intended
+% to make life easier for the user. The files are loaded using the
+% \opt{load-configurations} option, which accepts a comma-separated of
+% file names.
 % 
-% The first group of add-on units are those which provide 
-% convenient abbreviations (\cref{tab:unit:abbr}). The standard
-% \pkg{siunitx} settings only create these abbreviations within the
-% scope of the \cs{si} and \cs{SI} functions, meaning that no clashes
-% should occur (for example with the standard \cs{pm} symbol). 
+% The first configuration file provides a number of convenient 
+% abbreviations for the SI units (\cref{tab:unit:abbr}). The 
+% standard \pkg{siunitx} settings only create these abbreviations within
+% the scope of the \cs{si} and \cs{SI} functions, meaning that no 
+% clashes should occur (for example with the standard \cs{pm} symbol). 
 % 
 %\begin{center} 
 %  \tablecaption{Abbreviated units \endgraf
@@ -2156,73 +2145,12 @@ This work consists of the file  siunitx.dtx
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
-% 
-% Units for specialist areas are given in 
-% \cref{tab:unit:astro,tab:unit:chemeng,tab:unit:chem,tab:unit:geophys}. 
-% These are not SI units, but are defined here as they are in common 
-% usage in the subject areas concerned.
-% 
-%\begin{table}
-%  \caption{Astronomy-related units \protect \\
-%    (\opt{load-configurations=astronomy}).}
-%  \label{tab:unit:astro}
-%  \centering
-%  \begin{tabular}{lll}
-%    \toprule
-%      Unit & Macro & Symbol \\
-%    \midrule
-%      \DescribeUnit{parsec}  \\ 
-%      \DescribeUnit{lightyear}  \\
-%    \bottomrule
-%  \end{tabular}
-%\end{table}
-% 
-%\begin{table}
-%  \caption{Chemical engineering units \protect \\
-%    (\opt{load-configurations=chemical-engineering}).}
-%  \label{tab:unit:chemeng}
-%  \centering
-%  \begin{tabular}{lll}
-%    \toprule
-%      Unit & Macro & Symbol \\
-%    \midrule
-%      \DescribeNamedUnit{gram-mole}{gmol} \\
-%      \DescribeNamedUnit{kilogram-mole}{kgmol} \\
-%      \DescribeNamedUnit{pound-mole}{lbmol} \\
-%    \bottomrule
-%  \end{tabular}
-%\end{table}
-% 
-%\begin{table}
-%  \caption{Chemistry-related units \protect \\
-%    (\opt{load-configurations=chemistry}).}
-%  \label{tab:unit:chem}
-%  \centering
-%  \begin{tabular}{lll}
-%    \toprule
-%      Unit & Macro & Symbol \\
-%    \midrule
-%      \DescribeUnit{molar}  \\ 
-%      \SpecialUsageIndex{\Molar}^^A 
-%         & \cs{Molar} & \si{\Molar} \\
-%      \DescribeUnit{torr}  \\
-%    \bottomrule
-%  \end{tabular}
-%\end{table}
 %
-%\begin{table}
-%  \caption{Geophysics-related units \protect \\
-%    (\opt{load-configurations=geophysics}).}
-%  \label{tab:unit:geophys}
-%  \centering
-%  \begin{tabular}{lll}
-%    \toprule
-%      Unit & Macro & Symbol \\
-%    \midrule
-%      \DescribeUnit{gon}  \\ 
-%    \bottomrule
-%  \end{tabular}
-%\end{table}
+% A configuration file is also included which will use settings
+% and define macros as defined by version 1 of \pkg{siunitx}: this
+% can be accessed with the option \opt{load-configurations = version-1}.
+% This is intended to allow easy transition to version 2: users
+% should update their source to use the new interfaces and functions.
 %
 %\subsection{Using units}
 %
@@ -3498,6 +3426,39 @@ This work consists of the file  siunitx.dtx
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
+%
+%\subsection{Why are there no \enquote{specialist} units in version 2 of
+%  \pkg{siunitx}?}
+%
+% Users upgrading from version 1 of \pkg{siunitx} will notice that
+% the various  \enquote{specialist} units available in version 1 are
+% no longer provided as loadable options.\footnote{They are included
+% in the loaded configuration file \opt{version-1}, but this is intended
+% purely to ease transition to version 2.} These are not included in
+% version 2 as the criteria for inclusion of such units are far from
+% clear, and it is difficult to justify providing clearly non-SI 
+% units in the package. Users are encouraged 
+% 
+% For reference, appropriate definitions for the units which where 
+% provided in version 1 are as follows.
+%\begin{LaTeXdemo}[code only]
+%  % Astronomy
+%  \DeclareSIUnit\parse{pc}
+%  \DeclareSIUnit\lightyear{ly}
+%  
+%  % Chemical engineering
+%  \DeclareSIUnit\gmol{g\text{-}mol}
+%  \DeclareSIUnit\kgmol{kg\text{-}mol}
+%  \DeclareSIUnit\lbmol{lb\text{-}mol}
+%  
+%  % Chemistry
+%  \DeclareSIUnit\molar{\mole\per\cubic\deci\metre}
+%  \DeclareSIUnit\Molar{\textsc{m}}
+%  \DeclareSIUnit\torr{torr}
+%  
+%  % Geophysics
+%  \DeclareSIUnit\gon{gon}
+%\end{LaTeXdemo} 
 %
 %\section{Thanks}
 %
@@ -13188,6 +13149,51 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\parsec}
+%\begin{macro}{\lightyear}
+% A few units for astronomy that version 1 provided.
+%    \begin{macrocode}
+\DeclareSIUnit \parsec    { pc }
+\DeclareSIUnit \lightyear { ly }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%    
+%\begin{macro}{\gmol}
+%\begin{macro}{\kgmol}
+%\begin{macro}{\lbmol}
+% Slightly odd chemical engineering units, again provided in version 1.
+%    \begin{macrocode}
+\DeclareSIUnit \gmol  { g  \text { - } mol }
+\DeclareSIUnit \kgmol { kg \text { - } mol }
+\DeclareSIUnit \lbmol { lb \text { - } mol }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\molar}
+%\begin{macro}{\Molar}
+%\begin{macro}{\torr}
+% A few common units for chemistry from version 1. \cs{molar} is 
+% simply a handy abbreviation: \cs{Molar} is common but rather 
+% questionable.
+%    \begin{macrocode}
+\DeclareSIUnit \molar { \mole \per \cubic \deci \metre }
+\DeclareSIUnit \Molar { \textsc { m } }
+\DeclareSIUnit \torr  { Torr }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%    
+%\begin{macro}{\gon}
+% A single unit for geophysics that version 1 included.
+%    \begin{macrocode}
+\DeclareSIUnit \gon    { gon }
+%    \end{macrocode}
+%\end{macro}
+%
 %    \begin{macrocode}
 %</version-1>
 %    \end{macrocode}
@@ -13399,110 +13405,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 %</abbreviations>
 %    \end{macrocode}   
-%    
-%\subsection{Additional units for astronomy}
-%
-%    \begin{macrocode}
-%<*astronomy>
-%    \end{macrocode}  
-%    
-%    \begin{macrocode}
-\ProvidesExplFile {siunitx-astronomy.cfg} {2010/04/28} 
-  {2.0beta} {siunitx: Units for astronomy}
-%    \end{macrocode}
-%    
-%\begin{macro}{\parsec}
-%\begin{macro}{\lightyear}
-% A few units for astronomy.
-%    \begin{macrocode}
-\DeclareSIUnit \parsec    { pc }
-\DeclareSIUnit \lightyear { ly }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%    
-%    \begin{macrocode}
-%</astronomy>
-%    \end{macrocode}
-%    
-%\subsection{Additional units for chemical engineering}
-%
-%    \begin{macrocode}
-%<*chemical-engineering>
-%    \end{macrocode}  
-%    
-%    \begin{macrocode}
-\ProvidesExplFile {siunitx-chemical-engineering.cfg} {2010/04/28} 
-  {2.0beta} {siunitx: Units for chemical engineering}
-%    \end{macrocode}
-%    
-%\begin{macro}{\gmol}
-%\begin{macro}{\kgmol}
-%\begin{macro}{\lbmol}
-% Slightly odd chemical engineering units.
-%    \begin{macrocode}
-\DeclareSIUnit \gmol  { g  \text { - } mol }
-\DeclareSIUnit \kgmol { kg \text { - } mol }
-\DeclareSIUnit \lbmol { lb \text { - } mol }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%    
-%    \begin{macrocode}
-%</chemical-engineering>
-%    \end{macrocode} 
-%    
-%\subsection{Additional units for chemistry}
-%
-%    \begin{macrocode}
-%<*chemistry>
-%    \end{macrocode}  
-%    
-%    \begin{macrocode}
-\ProvidesExplFile {siunitx-chemistry.cfg} {2010/04/28} 
-  {2.0beta} {siunitx: Units for chemistry}
-%    \end{macrocode}
-%    
-%\begin{macro}{\molar}
-%\begin{macro}{\Molar}
-%\begin{macro}{\torr}
-% A few common units for chemistry. \cs{molar} is simply a handy 
-% abbreviation: \cs{Molar} is common but rather questionable. 
-%    \begin{macrocode}
-\DeclareSIUnit \molar { \mole \per \cubic \deci \metre }
-\DeclareSIUnit \Molar { \textsc { m } }
-\DeclareSIUnit \torr  { Torr }
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%    
-%    \begin{macrocode}
-%</chemistry>
-%    \end{macrocode}
-%    
-%\subsection{Additional units for geophysics}
-%
-%    \begin{macrocode}
-%<*geophysics>
-%    \end{macrocode}  
-%    
-%    \begin{macrocode}
-\ProvidesExplFile {siunitx-geophysics.cfg} {2010/04/28} 
-  {2.0beta} {siunitx: Units for geophysics}
-%    \end{macrocode}
-%    
-%\begin{macro}{\gon}
-% A single unit for geophysics.
-%    \begin{macrocode}
-\DeclareSIUnit \gon    { gon }
-%    \end{macrocode}
-%\end{macro}
-%    
-%    \begin{macrocode}
-%</geophysics>
-%    \end{macrocode} 
 %    
 %\subsection{Binary units}
 %
