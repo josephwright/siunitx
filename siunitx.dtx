@@ -10835,16 +10835,16 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_table_print_S_reserved_mantissa: }
     { 
       \prop_if_in:NnT \_l_siunitx_number_out_prop { mantissa-result }
-        { \msg_warning:nn { siunitx } { table-partial-number } }
+        { \msg_error:nn { siunitx } { table-partial-number } }
     }
   \prop_if_in:NnT \_l_siunitx_number_out_prop { complex-result }
-    { \msg_warning:nn { siunitx } { table-partial-number } }
+    { \msg_error:nn { siunitx } { table-partial-number } }
   \intexpr_compare:nNnTF
     { \int_use:N \_l_siunitx_table_exponent_int } > { 0 }
     { \_siunitx_table_print_S_reserved_exponent: }
     { 
       \prop_if_in:NnT \_l_siunitx_number_out_prop { exponent-result }
-        { \msg_warning:nn { siunitx } { table-partial-number } }
+        { \msg_error:nn { siunitx } { table-partial-number } }
     }
   \bool_if:NTF \_l_siunitx_table_align_post_bool
     { \box_use:N \_l_siunitx_table_post_box }
@@ -11003,7 +11003,7 @@ This work consists of the file  siunitx.dtx
         { 
           \prop_if_in:NnT \_l_siunitx_number_out_prop 
             { #1 -uncertainty }
-            { \msg_warning:nn { siunitx } { table-partial-number } }
+            { \msg_error:nn { siunitx } { table-partial-number } }
         }
     }        
 }
@@ -11739,8 +11739,12 @@ This work consists of the file  siunitx.dtx
 \msg_set:nnnn { siunitx } { starting-quotient-token } 
   { Misplaced~quotient~token. }
   { A~number~cannot~begin~with~a~quotient~token. }
-\msg_set:nnn { siunitx } { table-partial-number }
+\msg_set:nnnn { siunitx } { table-partial-number }
   { S~column~does~not~print~entire~number~\msg_line_context:. }
+  { 
+    You~did~not~reserve~space~for~all~of~the~parts~of~the~number~in~
+    the~input.
+  }
 \msg_set:nnnn { siunitx } { unknown-configuration-file } 
   { Unknown~configuration~'#1'. }
   { The~configuration~file~'siunitx-#1.cfg'~was~not~found. }
