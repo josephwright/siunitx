@@ -8943,6 +8943,11 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\_siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\_siunitx_unit_format_symbol:}
+%\begin{macro}[aux]{\_siunitx_unit_format_symbol_aux:}
+%\begin{macro}[aux]{\_siunitx_unit_format_symbol_aux_alt:}
+% When making (\emph{psuedo}-)fractions there is a check to place a
+% \( 1 \) in the numerator is it's blank. For symbol mode, this is
+% only done if there is no number. Then some construction work.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_unit_format_fraction: {
   \intexpr_compare:nNnTF 
@@ -8975,6 +8980,7 @@ This work consists of the file  siunitx.dtx
     { \exp_not:N \ensuremath { \exp_not:V \_l_siunitx_unit_tl } }
 } 
 \cs_set_protected_nopar:Npn \_siunitx_unit_format_fraction_symbol: {
+  \_siunitx_unit_format_fraction_symbol_aux:
   \intexpr_compare:nNnT 
     { \int_use:N \_l_siunitx_unit_denominator_int } > { 1 }
     {
@@ -8991,7 +8997,16 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_per_symbol_tl
   \tl_put_right:NV \_l_siunitx_unit_tl \_l_siunitx_unit_denominator_tl
 }
+\cs_set_protected_nopar:Npn \_siunitx_unit_format_fraction_symbol_aux: {
+}
+\cs_set_protected_nopar:Npn 
+  \_siunitx_unit_format_fraction_symbol_aux_alt: {
+  \tl_if_empty:NT \_l_siunitx_unit_numerator_tl 
+    { \tl_set:Nn \_l_siunitx_unit_numerator_tl { 1 } }
+}
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9520,6 +9535,8 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected:Npn \_siunitx_unit_output:nn #1#2 {
   \cs_set_eq:NN \_siunitx_unit_format_symbol_aux: 
     \_siunitx_unit_format_symbol_aux_alt:
+  \cs_set_eq:NN \_siunitx_unit_format_fraction_symbol_aux: 
+    \_siunitx_unit_format_fraction_symbol_aux_alt:
   \_siunitx_unit_in:nn {#1} {#2}
   \intexpr_compare:nNnF 
     { \int_use:N\_l_siunitx_unit_prefix_int } = { 0 } 
