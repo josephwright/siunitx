@@ -8943,7 +8943,6 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\_siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\_siunitx_unit_format_symbol:}
-%\begin{macro}[aux]{\_siunitx_unit_format_symbol_aux:n}
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_unit_format_fraction: {
   \intexpr_compare:nNnTF 
@@ -8976,28 +8975,23 @@ This work consists of the file  siunitx.dtx
     { \exp_not:N \ensuremath { \exp_not:V \_l_siunitx_unit_tl } }
 } 
 \cs_set_protected_nopar:Npn \_siunitx_unit_format_fraction_symbol: {
-  \_siunitx_unit_format_fraction_symbol_aux:n { denominator }
+  \intexpr_compare:nNnT 
+    { \int_use:N \_l_siunitx_unit_denominator_int } > { 1 }
+    {
+      \bool_if:NT \_l_siunitx_unit_denominator_bracket_bool 
+        {
+          \_siunitx_tl_put_left_math:NV \_l_siunitx_unit_denominator_tl
+            \_l_siunitx_bracket_open_tl
+          \_siunitx_tl_put_right_math:NV \_l_siunitx_unit_denominator_tl
+            \_l_siunitx_bracket_close_tl
+        }
+    }
   \tl_set_eq:NN \_l_siunitx_unit_tl \_l_siunitx_unit_numerator_tl
   \_siunitx_tl_put_right_math:NV \_l_siunitx_unit_tl
     \_l_siunitx_per_symbol_tl
   \tl_put_right:NV \_l_siunitx_unit_tl \_l_siunitx_unit_denominator_tl
 }
-\cs_set_protected_nopar:Npn 
-  \_siunitx_unit_format_fraction_symbol_aux:n #1 {
-  \intexpr_compare:nNnT 
-    { \int_use:c { _l_siunitx_unit_ #1 _int } } > { 1 }
-    {
-      \bool_if:NT \_l_siunitx_unit_denominator_bracket_bool 
-        {
-          \_siunitx_tl_put_left_math:cV { _l_siunitx_unit_ #1 _tl }
-            \_l_siunitx_bracket_open_tl
-          \_siunitx_tl_put_right_math:cV { _l_siunitx_unit_ #1 _tl }
-            \_l_siunitx_bracket_close_tl
-        }
-    }
-} 
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
