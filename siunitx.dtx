@@ -10840,16 +10840,25 @@ This work consists of the file  siunitx.dtx
     { \_siunitx_table_print_S_reserved_mantissa: }
     { 
       \prop_if_in:NnT \_l_siunitx_number_out_prop { mantissa-result }
-        { \msg_error:nn { siunitx } { table-partial-number } }
+        { 
+          \msg_error:nnx { siunitx } { table-partial-number } 
+            { a~mantissa }
+        }
     }
   \prop_if_in:NnT \_l_siunitx_number_out_prop { complex-result }
-    { \msg_error:nn { siunitx } { table-partial-number } }
+    { 
+      \msg_error:nnx { siunitx } { table-partial-number } 
+        { a~complex }
+    }
   \intexpr_compare:nNnTF
     { \int_use:N \_l_siunitx_table_exponent_int } > { 0 }
     { \_siunitx_table_print_S_reserved_exponent: }
     { 
       \prop_if_in:NnT \_l_siunitx_number_out_prop { exponent-result }
-        { \msg_error:nn { siunitx } { table-partial-number } }
+        { 
+          \msg_error:nnx { siunitx } { table-partial-number } 
+            { an~exponent }
+        }
     }
   \bool_if:NTF \_l_siunitx_table_align_post_bool
     { \box_use:N \_l_siunitx_table_post_box }
@@ -11008,7 +11017,10 @@ This work consists of the file  siunitx.dtx
         { 
           \prop_if_in:NnT \_l_siunitx_number_out_prop 
             { #1 -uncertainty }
-            { \msg_error:nn { siunitx } { table-partial-number } }
+            { 
+              \msg_error:nn { siunitx } { table-partial-number } 
+                { an~uncertainty }
+            }
         }
     }        
 }
@@ -11744,10 +11756,11 @@ This work consists of the file  siunitx.dtx
   { Misplaced~quotient~token. }
   { A~number~cannot~begin~with~a~quotient~token. }
 \msg_set:nnnn { siunitx } { table-partial-number }
-  { S~column~does~not~print~entire~number~\msg_line_context:. }
+  { Part~of~number~lost~in~S~column~\msg_line_context:. }
   { 
-    You~did~not~reserve~space~for~all~of~the~parts~of~the~number~in~
-    the~input.
+    The~number~read~here~seems~to~contain~#1~part but \\
+    no~space~was~reserved~to~print~it: \\
+    this~part~of~the~number~will~be~missing~in~the~output.
   }
 \msg_set:nnnn { siunitx } { unknown-configuration-file } 
   { Unknown~configuration~'#1'. }
