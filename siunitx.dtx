@@ -6693,7 +6693,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_siunitx_number_format_final_combined:}
 % When there is both a mantissa and an exponent, the mantissa is
 % combined with the product sign before adding the exponent part on.
-% The combined result is then stored.
+% The combined result is then stored. The marker
+% \texttt{result-bracket-exponent} indicates that the number needs
+% brackets due to the exponent part, but not in other cases.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_format_final_combined: {
   \_siunitx_number_format_brackets:n { mantissa }
@@ -6713,7 +6715,7 @@ This work consists of the file  siunitx.dtx
   \prop_put:NnV \_l_siunitx_number_out_prop { result } 
     \_l_siunitx_tmpa_tl
   \prop_put:Nnn \_l_siunitx_number_out_prop 
-    { result-bracket-denominator } { true }
+    { result-bracket-exponent } { true }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7546,7 +7548,7 @@ This work consists of the file  siunitx.dtx
   \_siunitx_number_in_parse:V \_l_siunitx_number_denominator_tl
   \_siunitx_number_output_quotient_aux_ii:
   \prop_if_in:NnT \_l_siunitx_number_out_prop
-    { result-bracket-denominator }
+    { result-bracket-exponent }
     { 
       \prop_put:Nnn \_l_siunitx_number_out_prop { result-bracket } 
         { true }
