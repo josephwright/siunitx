@@ -5731,9 +5731,11 @@ This work consists of the file  siunitx.dtx
       \intexpr_compare:nNnTF 
         { \int_use:N \_l_siunitx_round_int } > 
           { \int_use:N \_l_siunitx_process_precision_int }
-        { \_siunitx_number_process_figures_round: }
+        { 
+          \_siunitx_number_process_figures_round: 
+          \_siunitx_number_process_round_tidy:n {#1}
+        }
         { \_siunitx_number_process_figures_pad:n {#1} }
-      \_siunitx_number_process_round_tidy:n {#1}
     }
     {
       \prop_put:Nnn \_l_siunitx_number_in_prop { #1 -integer } { 0 }
@@ -5931,14 +5933,17 @@ This work consists of the file  siunitx.dtx
 \cs_set_protected_nopar:Npn \_siunitx_number_process_pad:n #1 {
   \prop_get:NnN \_l_siunitx_number_in_prop { #1 -decimal } 
     \_l_siunitx_tmpa_tl
-  \intexpr_while_do:nNnn
-    { \int_use:N \_l_siunitx_round_int } > { 0 } 
+  \quark_if_no_value:NF \_l_siunitx_tmpa_tl
     {
-      \tl_put_right:Nn \_l_siunitx_tmpa_tl { 0 }
-      \int_decr:N \_l_siunitx_round_int
+      \intexpr_while_do:nNnn
+        { \int_use:N \_l_siunitx_round_int } > { 0 } 
+        {
+          \tl_put_right:Nn \_l_siunitx_tmpa_tl { 0 }
+          \int_decr:N \_l_siunitx_round_int
+        }
+      \prop_put:NnV \_l_siunitx_number_in_prop { #1 -decimal } 
+        \_l_siunitx_tmpa_tl
     }
-  \prop_put:NnV \_l_siunitx_number_in_prop { #1 -decimal } 
-    \_l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7830,7 +7835,7 @@ This work consists of the file  siunitx.dtx
     }
   \_siunitx_number_process:
   \prop_set_eq:cN { _l_siunitx_angle_ #2 _prop } 
-    \_l_siunitx_number_in_prop
+    \_l_siunitx_number_in_prop 
 }
 %    \end{macrocode}
 % Only the highest-order part of an arc can have a sign. This is checked
