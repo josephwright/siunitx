@@ -7319,13 +7319,17 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % There are a few additional tests for printing partwise, as this is
 % only needed if there are brackets to add and these are not due to
-% an exponent.
+% an exponent. The test for an exponent is needed as this must force
+% the units to come at the end of the number, and there then have to 
+% be brackets in the output if there are any separate parts.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_number_output_parse_aux: {
   \_siunitx_number_in_parse:V \_l_siunitx_number_arg_tl 
   \bool_if:NF \_l_siunitx_error_bool 
     {
       \_siunitx_number_process:
+      \prop_if_in:NnT \_l_siunitx_number_in_prop { exponent }
+        { \bool_set_true:N \_l_siunitx_brackets_bool }
       \_siunitx_number_format:
       \_siunitx_number_output_color:
       \bool_if:NTF \_l_siunitx_brackets_bool
