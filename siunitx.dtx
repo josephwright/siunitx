@@ -1567,7 +1567,8 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{l}{Option name} & 
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
-%    \midrule ^^A (
+%    \midrule 
+%      brackets-numbers          & Switch  & true              \\ ^^A (
 %      close-bracket             & Literal & )                 \\ 
 %      complex-root-position     & Choice  & after-number      \\
 %      copy-decimal-marker       & Choice  & false             \\
@@ -1589,7 +1590,6 @@ This work consists of the file  siunitx.dtx
 %      separate-uncertainty      & Switch  & false             \\
 %      tight-spacing             & Switch  & false             \\
 %      uncertainty-separator     & Math    & \meta{none}       \\
-%      use-brackets              & Switch  & true              \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1699,17 +1699,19 @@ This work consists of the file  siunitx.dtx
 %  \num[separate-uncertainty]{8.2(13)}
 %\end{LaTeXdemo}
 %
-%\DescribeOption{use-brackets}
+%\DescribeOption{bracket-numbers}
 %\DescribeOption{open-bracket}
 %\DescribeOption{close-bracket}
 % There are certain combinations of numerical input which can be
 % ambiguous. This can be corrected by adding brackets in the appropriate
-% place, and is controlled by the \opt{use-brackets} switch.  The 
+% place, and is controlled by the \opt{bracket-numbers} switch.  The 
 % opening and closing brackets used are stored in \opt{open-bracket} and
-% \opt{close-bracket}, respectively.
+% \opt{close-bracket}, respectively. Note that \opt{bracket-numbers}
+% only applies to numbers without units: for numbers with units
+% see the \opt{multi-part-units} option.
 %\begin{LaTeXdemo}
 %  \num{1+2i e10} \\
-%  \num[use-brackets = false]{1+2i e10} \\
+%  \num[bracket-numbers = false]{1+2i e10} \\
 %  \sisetup{
 %    open-bracket  = \{,
 %    close-bracket = \},
@@ -2462,7 +2464,8 @@ This work consists of the file  siunitx.dtx
 % The standard setting for both is \opt{repeat}, where each number will
 % be printed with a unit. Alternatives are \opt{brackets} and 
 % \opt{single}. Any brackets needed on individual numbers within a 
-% product are controlled by the \opt{use-brackets} option.
+% product are controlled by the \opt{bracket-numbers} option
+% (\emph{i.e}.~they are treated as pure numbers).
 % These options do not affect the application of brackets for each
 % number within the list or range: they only sets those around the
 % entire group.
@@ -6422,6 +6425,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\_l_siunitx_brackets_bool}
 %\begin{macro}{\_l_siunitx_bracket_close_tl}
 %\begin{macro}{\_l_siunitx_output_decimal_copy_bool}
 %\begin{macro}{\_l_siunitx_exponent_base_tl}
@@ -6437,10 +6441,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_l_siunitx_uncert_sep_bool}
 %\begin{macro}{\_l_siunitx_tight_bool}
 %\begin{macro}{\_l_siunitx_uncert_sep_tl}
-%\begin{macro}{\_l_siunitx_brackets_bool}
 % Lots of settings, some used only for numbers, some more widely.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  bracket-numbers           .bool_set:N = \_l_siunitx_brackets_bool,
   close-bracket             .tl_set:N   = \_l_siunitx_bracket_close_tl, 
   complex-root-position     .choice:,
   complex-root-position
@@ -6482,9 +6486,9 @@ This work consists of the file  siunitx.dtx
   separate-uncertainty      .bool_set:N = \_l_siunitx_uncert_sep_bool,
   tight-spacing             .bool_set:N = \_l_siunitx_tight_bool,
   uncertainty-separator     .tl_set:N   = \_l_siunitx_uncert_sep_tl,
-  use-brackets              .bool_set:N = \_l_siunitx_brackets_bool,
 }
-\keys_set:nn { siunitx } { % (
+\keys_set:nn { siunitx } { 
+  bracket=numbers           = true, % (
   close-bracket             = ),
   complex-root-position     = after-number,
   copy-decimal-marker       = false,
@@ -6498,7 +6502,6 @@ This work consists of the file  siunitx.dtx
   output-complex-root       = \mathrm { i },
   output-decimal-marker     = .,
   output-open-uncertainty   = (, % )
-  use-brackets              = true
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -12449,6 +12452,7 @@ This work consists of the file  siunitx.dtx
     {
       \keys_set:nn { siunitx } 
         {
+          bracket-numbers       = true,
           detect-italic         = false,
           detect-mode           = false,
           detect-weight         = false,
@@ -12456,10 +12460,10 @@ This work consists of the file  siunitx.dtx
           parse-numbers         = true,
           parse-units           = true,
           product-units         = repeat,
-          use-brackets          = true,
         }
       \_siunitx_strict_option:n  
         { 
+          bracket-numbers       ,
           detect-italic         ,
           detect-mode           ,
           detect-weight         ,
@@ -12467,7 +12471,6 @@ This work consists of the file  siunitx.dtx
           parse-numbers         ,
           parse-units           ,
           product-units         ,
-          use-brackets          
         }
       \keys_define:nn { siunitx }
         {
@@ -13001,7 +13004,7 @@ This work consists of the file  siunitx.dtx
   trapambigerr   
     / true       .meta:n    = { multi-part-units        = brackets    },
   trapambigerr   .default:n = { true                                  },
-  trapambigfrac  .meta:n    = { use-brackets            = #1          },
+  trapambigfrac  .meta:n    = { bracket-numbers         = #1          },
   trapambigfrac  .default:n = { true                                  },
   trapambigrange .choice: ,
   trapambigrange  
