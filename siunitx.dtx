@@ -11627,16 +11627,25 @@ This work consists of the file  siunitx.dtx
   \clist_put_right:Nx \_l_siunitx_pgf_link_clist
     { 
       set~thousands~separator = 
-        { \exp_not:V \_l_siunitx_group_sep_tl} 
+        { \exp_not:V \_l_siunitx_group_sep_tl } 
     }  
   \bool_if:NTF \_l_siunitx_group_four_bool
     { 
       \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
-        { min~exponent~for~1000~sep = 4 }
+        { min~exponent~for~1000~sep = 3 }
     }
     { 
       \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
-        { min~exponent~for~1000~sep = 999 }
+        { min~exponent~for~1000~sep = 4 }
+    }
+  \bool_if:nF
+    {  
+      \_l_siunitx_group_decimal_bool ||
+      \_l_siunitx_group_integer_bool  
+    }  
+    {
+      \clist_put_right:Nn \_l_siunitx_pgf_link_clist 
+        { min~exponent~for~1000~sep = 999 } 
     }
   \bool_if:NTF \_l_siunitx_process_integer_zero_bool
     { 
