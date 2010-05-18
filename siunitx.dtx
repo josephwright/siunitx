@@ -3258,6 +3258,16 @@ This work consists of the file  siunitx.dtx
 %  ...
 %\end{LaTeXdemo} 
 %
+%\subsection{Using \pkg{siunitx} with the \pkg{cellspace} package}
+%
+% Both \pkg{siunitx} and \pkg{cellspace} use the letter \texttt{S} for a 
+% new column type. This obviously leads to a problem. If both are 
+% loaded, \pkg{siunitx} will retain the \texttt{S} column, and moves the
+% functionality of \pkg{cellspace} to the letter \texttt{C}. This 
+% allows the normal use of \pkg{cellspace} with standard column types:
+% it does \emph{not} work with the \pkg{siunitx} \texttt{S} or 
+% \texttt{s} columns.
+%
 %\section{Correct application of (SI) units}
 %
 % Consistent and logical units are a necessity for scientific work,
@@ -6654,6 +6664,7 @@ This work consists of the file  siunitx.dtx
         }
         \_siunitx_number_format_join_complex:
     }
+    \prop_display:N  \_l_siunitx_number_out_prop
 }
 \cs_set_protected_nopar:Npn \_siunitx_number_format_complex_aux:n #1 {
   \prop_get:NnN \_l_siunitx_number_out_prop {#1} \_l_siunitx_tmpa_tl
@@ -9995,14 +10006,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \AtBeginDocument {
   \@ifpackageloaded { cellspace } 
-    {
-      \newcolumntype { C } [1] 
-        { > { \bcolumn ##1 \@nil } ##1 < { \ecolumn } }
-      \cs_set:Npn \_siunitx_tmp:w ##1 \NC@do S ##2 \q_stop 
-        { \toks_set:Nn \NC@list { ##1 ##2 } }
-      \exp_after:wN \_siunitx_tmp:w \toks_use:N \NC@list \q_stop
-      \cs_gundefine:N \NC@find@S
-    } { }
+      {
+        \newcolumntype { C } [1] 
+          { > { \bcolumn #1 \@nil } #1 < { \ecolumn } }
+        \cs_set:Npn \_siunitx_tmp:w #1 \NC@do S #2 \q_stop 
+          { \toks_set:Nn \NC@list { #1 #2 } }
+        \exp_last_unbraced:NV \_siunitx_tmp:w \NC@list \q_stop
+        \cs_gundefine:N \NC@find@S
+      }
+      { }
 }
 %    \end{macrocode}
 %
