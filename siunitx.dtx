@@ -6560,7 +6560,7 @@ This work consists of the file  siunitx.dtx
     {
       \prop_clear:N \_l_siunitx_number_out_prop
       \_siunitx_number_format_reassemble:
-      \_siunitx_number_format_complex:   
+      \_siunitx_number_format_complex:  
       \_siunitx_number_format_sign:n { mantissa }
       \_siunitx_number_format_sign:n { exponent }
       \_siunitx_number_format_color:
@@ -6646,6 +6646,7 @@ This work consists of the file  siunitx.dtx
         {
           \_siunitx_number_format_brackets:n { complex }
           \_siunitx_number_format_complex_aux:n { complex }
+          \_siunitx_number_format_complex_aux:n { complex-result }
           \prop_if_in:NnT \_l_siunitx_number_out_prop 
             { complex-uncertainty }
             { 
@@ -6994,9 +6995,14 @@ This work consists of the file  siunitx.dtx
     {
       \_siunitx_number_format_brackets:n { mantissa }
       \prop_get:NnN \_l_siunitx_number_out_prop { mantissa-result } 
-        \_l_siunitx_tmpa_tl
-      \prop_get:NnN \_l_siunitx_number_out_prop { complex }
+        \_l_siunitx_tmpa_tl 
+      \prop_get:NnN \_l_siunitx_number_out_prop { complex-result }
         \_l_siunitx_tmpb_tl
+      \quark_if_no_value:NT \_l_siunitx_tmpb_tl
+        {
+          \prop_get:NnN \_l_siunitx_number_out_prop { complex }
+            \_l_siunitx_tmpb_tl
+        }  
       \tl_put_right:NV \_l_siunitx_tmpa_tl \_l_siunitx_tmpb_tl
       \prop_put:NnV \_l_siunitx_number_out_prop { mantissa-result } 
         \_l_siunitx_tmpa_tl
@@ -7078,6 +7084,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\_siunitx_number_format_sign:n}
 %\begin{macro}{\_siunitx_number_format_sign_complex:}
+%\begin{macro}[aux]{\_siunitx_number_format_sign_complex:n}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 % In the complex number case, there is a need for a correction to get
 % the right formatting in text mode. For speed reasons, this is done in
@@ -7116,8 +7123,12 @@ This work consists of the file  siunitx.dtx
       }
     }
 }
-\cs_set_protected_nopar:Npn \_siunitx_number_format_sign_complex:  {
-  \prop_if_in:NnT \_l_siunitx_number_out_prop { complex } 
+\cs_set_protected_nopar:Npn \_siunitx_number_format_sign_complex: {
+  \_siunitx_number_format_sign_complex:n { complex }
+  \_siunitx_number_format_sign_complex:n { complex-result }
+}
+\cs_set_protected_nopar:Npn \_siunitx_number_format_sign_complex:n #1  {
+  \prop_if_in:NnT \_l_siunitx_number_out_prop {#1} 
     {
       \prop_get:NnN \_l_siunitx_number_in_prop { complex-sign } 
         \_l_siunitx_tmpa_tl
@@ -7140,15 +7151,16 @@ This work consists of the file  siunitx.dtx
             \_l_siunitx_tmpa_tl
           \prop_put:NnV \_l_siunitx_number_out_prop { complex-sign } 
             \_l_siunitx_tmpb_tl        
-          \prop_get:NnN \_l_siunitx_number_out_prop { complex } 
+          \prop_get:NnN \_l_siunitx_number_out_prop {#1} 
             \_l_siunitx_tmpa_tl   
           \tl_put_left:NV \_l_siunitx_tmpa_tl \_l_siunitx_tmpb_tl      
-          \prop_put:NnV \_l_siunitx_number_out_prop { complex } 
+          \prop_put:NnV \_l_siunitx_number_out_prop {#1} 
             \_l_siunitx_tmpa_tl 
       }
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
