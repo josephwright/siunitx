@@ -282,6 +282,7 @@ This work consists of the file  siunitx.dtx
 %          midrule,
 %          milli,
 %          mole,
+%          NewDocumentCommand,
 %          num,
 %          numlist,
 %          numrange,
@@ -2509,7 +2510,7 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      table-align-text-post     & Switch  & false     \\
+%      table-align-text-post     & Switch  & true      \\
 %      table-alignment           & Choice  & \m{none}  \\
 %      table-auto-round          & Switch  & false     \\
 %      table-figures-decimal     & Integer & 2         \\
@@ -2547,7 +2548,7 @@ This work consists of the file  siunitx.dtx
 %        S[table-parse-only]
 %      }      
 %      \toprule
-%        {Decimal-centered} &
+%        {Decimal-centred} &
 %        {Simple centring} \\
 %      \midrule
 %        12.345   & 12.345   \\
@@ -2564,7 +2565,7 @@ This work consists of the file  siunitx.dtx
 % column is controlled using the \opt{table-number-alignment} option,
 % which takes the values \opt{center-decimal-marker}, \opt{center},
 % \opt{left} and \opt{right}. The \opt{center-decimal-marker} places the
-% decimal marker for the number at the center of the column. This does
+% decimal marker for the number at the centre of the column. This does
 % not need any information in advance, and so is the standard setting.
 % It works best for approximately symmetrical input (equal numbers of
 % digits before and after the decimal). On the other hand, the
@@ -2763,6 +2764,43 @@ This work consists of the file  siunitx.dtx
 %            34.2345  \textsuperscript{\emph{a}}\\
 %            56.7835  \\
 %      $ > $ 90.473   \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-align-text-post}
+% Note markers are often given in tables after the numerical content. It
+% may be desirable for these to close up to the numbers. Whether this 
+% takes place is controlled by the \opt{table-align-text-post} 
+% option (\cref{tab:S:notes}).\footnote{Currently, closing up material 
+% to numbers is only supported for simple real numbers. A more 
+% extended method, including a second option for text before numbers, 
+% is planned for \pkg{siunitx} v2.1.}
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Closing notes up to text.}
+%    \label{tab:S:notes}
+%    \NewDocumentCommand\NoteMark{m}{%
+%      \textsuperscript{\emph{#1}}%
+%    }
+%    \centering
+%    \sisetup{
+%      table-number-alignment = center,
+%      table-figures-integer  = 2,
+%      table-figures-decimal  = 4,
+%    }
+%    \begin{tabular}{
+%      S
+%      S[table-align-text-post = false]
+%    }
+%    \toprule
+%      {Values}             & {Values} \\
+%    \midrule
+%       2.3456              & 2.3456 \\
+%      34.234  \NoteMark{a} & 34.234 \NoteMark{a} \\
+%      56.78   \NoteMark{b} & 56.78  \NoteMark{b} \\
+%      90.4    \NoteMark{c} & 90.4   \NoteMark{c} \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -10642,6 +10680,7 @@ This work consists of the file  siunitx.dtx
     \_l_siunitx_table_sign_mantissa_bool
 }
 \keys_set:nn { siunitx } {
+  table-align-text-post  = true,
   table-number-alignment = center-decimal-marker,
   table-text-alignment   = center,
   table-figures-decimal  = 2,
