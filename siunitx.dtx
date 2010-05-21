@@ -10510,6 +10510,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\_l_siunitx_table_decimal_dim}
 %\begin{macro}{\_l_siunitx_table_exponent_dim}
 %\begin{macro}{\_l_siunitx_table_integer_dim}
 %\begin{macro}{\_l_siunitx_table_mantissa_dim}
@@ -10518,6 +10519,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\_l_siunitx_table_uncert_dim}
 % Dimensions for the various model measurements.
 %    \begin{macrocode}
+\dim_new:N \_l_siunitx_table_decimal_dim
 \dim_new:N \_l_siunitx_table_exponent_dim
 \dim_new:N \_l_siunitx_table_integer_dim
 \dim_new:N \_l_siunitx_table_mantissa_dim
@@ -10525,6 +10527,7 @@ This work consists of the file  siunitx.dtx
 \dim_new:N \_l_siunitx_table_result_dim
 \dim_new:N \_l_siunitx_table_uncert_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -10925,14 +10928,14 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \_l_siunitx_table_align_post_bool
     { \box_use:N \_l_siunitx_table_post_box }
     { 
-     % \hbox_set_to_wd:Nnn \_l_siunitx_table_fill_box
-     %   { \dim_use:N \_l_siunitx_table_gap_dim }
-     %   { \tex_hfil:D }
-     % \dim_set:Nn \_l_siunitx_table_gap_dim
-     %   { - \dim_use:N \_l_siunitx_table_gap_dim }
-     % \skip_horizontal:N \_l_siunitx_table_gap_dim
+      \hbox_set_to_wd:Nnn \_l_siunitx_table_fill_box
+        { \dim_use:N \_l_siunitx_table_gap_dim }
+        { \tex_hfil:D }
+      \dim_set:Nn \_l_siunitx_table_gap_dim
+        { - \dim_use:N \_l_siunitx_table_gap_dim }
+      \skip_horizontal:N \_l_siunitx_table_gap_dim
       \box_use:N \_l_siunitx_table_post_box
-     % \box_use:N \_l_siunitx_table_fill_box
+      \box_use:N \_l_siunitx_table_fill_box
     }  
 }  
 %    \end{macrocode}
@@ -11057,6 +11060,21 @@ This work consists of the file  siunitx.dtx
   \hbox_set_to_wd:Nnn \_l_siunitx_table_fill_box
     { \_l_siunitx_table_integer_dim - \box_wd:N \_l_siunitx_tmp_box }
     { \tex_hfil:D }  
+  \_siunitx_table_print_S_measure:Nnn \_l_siunitx_table_model_prop 
+    { decimal } {#1}
+  \box_clear:N \_l_siunitx_tmp_box
+  \_siunitx_table_print_S_get_decimal:Nn 
+    \_l_siunitx_number_out_prop {#1}
+  \tl_if_empty:NF \_l_siunitx_tmpa_tl
+    {
+      \hbox_set:Nn \_l_siunitx_tmp_box
+        { \_siunitx_print:nV { number } \_l_siunitx_tmpa_tl }
+    }
+  \dim_set:Nn \_l_siunitx_table_gap_dim
+    { 
+      \dim_use:N \_l_siunitx_table_decimal_dim - 
+      \box_wd:N \_l_siunitx_tmp_box 
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11131,6 +11149,7 @@ This work consists of the file  siunitx.dtx
 % easy to handle: just print it with some filling.
 %    \begin{macrocode}
 \cs_set_protected_nopar:Npn \_siunitx_table_print_S_reserved_exponent: {
+  \dim_zero:N \_l_siunitx_table_gap_dim
   \_siunitx_table_print_S_reserved_exponent_product:   
   \_siunitx_table_print_S_measure:Nnn \_l_siunitx_table_model_prop 
     { exponent } { }
@@ -11211,6 +11230,17 @@ This work consists of the file  siunitx.dtx
       \dim_set:cn { _l_siunitx_table_ #2 _dim } 
         { \box_wd:N \_l_siunitx_tmp_box }
     }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\_siunitx_table_print_S_get_decimal:Nn}
+% Grabbing the decimal part is a simple operation.
+%    \begin{macrocode}
+\cs_set_protected_nopar:Npn 
+  \_siunitx_table_print_S_get_decimal:Nn #1#2 {
+  \prop_get:NnN #1 { #2 -decimal } \_l_siunitx_tmpa_tl
+  \quark_if_no_value:NT \_l_siunitx_tmpa_tl
+    { \tl_clear:N \_l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
