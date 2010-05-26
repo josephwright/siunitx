@@ -8846,13 +8846,16 @@ This work consists of the file  siunitx.dtx
 % \cs{keys_set:nn}  is needed to allow the local overriding of settings.
 %    \begin{macrocode}
 \cs_set_protected:Npn \_siunitx_unit_parse_options:nn #1#2 {
-  \cs_if_free:cF 
-    { _l_siunitx_ \_siunitx_unit_first_token:n {#1} _options_tl }
+  \tl_if_single:nT {#1}
     {
-      \keys_set:nv { siunitx } 
+      \cs_if_free:cF 
         { _l_siunitx_ \_siunitx_unit_first_token:n {#1} _options_tl }
-      \keys_set:nn { siunitx } {#2}
-    }
+        {
+          \keys_set:nv { siunitx } 
+            { _l_siunitx_ \_siunitx_unit_first_token:n {#1} _options_tl }
+          \keys_set:nn { siunitx } {#2}
+        }
+  }      
 }
 %    \end{macrocode}
 %\end{macro}
