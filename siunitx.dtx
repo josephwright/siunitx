@@ -13247,9 +13247,13 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\provideunit}
 % The functions for creating units from version one are easy to create.
 %    \begin{macrocode}
-\cs_set_eq:NN \newunit     \DeclareSIUnit
-\cs_set_eq:NN \renewunit   \DeclareSIUnit
-\cs_set_eq:NN \provideunit \DeclareSIUnit
+\NewDocumentCommand \newunit { o m m } {
+  \IfNoValueTF {#1}
+    { \_siunitx_declare_unit:Nnn #2 {#3} { } }
+    { \_siunitx_declare_unit:Nnn #2 {#3} {#1} }
+}
+\cs_set_eq:NN \renewunit   \newunit
+\cs_set_eq:NN \provideunit \newunit
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
