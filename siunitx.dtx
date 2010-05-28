@@ -170,6 +170,7 @@ This work consists of the file  siunitx.dtx
       binary,
     }
 }
+\DeclareSIUnit{\KWH}{kWh}
 \DeclareSIPrePower\quartic{4}
 \DeclareSIPostPower\tothefourth{4}
 \DeclareSIQualifier\polymer{pol}
@@ -309,7 +310,8 @@ This work consists of the file  siunitx.dtx
 %          text,
 %          toprule,
 %          tothe,
-%          volt
+%          volt,
+%          kWh,
 %        }
 %    }^^A 
 %}
@@ -3304,6 +3306,46 @@ This work consists of the file  siunitx.dtx
 % allows the normal use of \pkg{cellspace} with standard column types:
 % it does \emph{not} work with the \pkg{siunitx} \texttt{S} or 
 % \texttt{s} columns.
+% 
+%\subsection{Special considerations for the \cs{kWh} unit}
+%
+% The \file{abbreviations} configuration file provides the unit 
+% \cs{kWh}, which is set up with no spacing between the 
+% \enquote{\si{\kilo\watt}} and the \enquote{\si{\hour}} unit to give 
+% \enquote{\si{\kWh}}. However, this only applies when the unit is given
+% on its own: combinations will follow the normal rules
+%\begin{LaTeXdemo}
+%  \si{\kWh} \\
+%  \si{\kWh\per\metre} 
+%\end{LaTeXdemo} 
+% This is because the unit \cs{kWh} is defined so that it can still be
+% varied by altering \cs{kilo}, \cs{watt} and \cs{hour}, and so that
+% the prefix can still be turned into a number. However, some users
+% may prefer to have a non-flexible macro which never adds a space.
+% This can be achieved by redefining \cs{kWh} with \cs{DeclareSIUnit},
+% by added an alternative definition
+%\begin{LaTeXdemo}[code only]
+%  \DeclareSIUnit\kWh{kWh}
+%  \DeclareSIUnit\KWH{kWh}
+%\end{LaTeXdemo} 
+% or of course by using literal unit input.
+%\begin{LaTeXdemo}
+%  \si{\KWH\per\metre}\\
+%  \si{kWh.m^{-1}}
+%\end{LaTeXdemo}
+% 
+% Another point to notice is that the \cs{per} macro applies to
+% the next unit, and not an entire unit combination. Thus in
+%\begin{LaTeXdemo}
+%  \si{\candela\per\kWh}
+%\end{LaTeXdemo}
+% \cs{per} applies to the watts but not to the hours. In this case,
+% the units need to be written out in full or the \opt{sticky-per}
+% option should be used.
+%\begin{LaTeXdemo}
+%  \si{\candela\per\kilo\watt\per\hour} \\
+%  \si[sticky-per]{\candela\per\kWh}
+%\end{LaTeXdemo}
 %
 %\section{Correct application of (SI) units}
 %
