@@ -3872,6 +3872,7 @@ This work consists of the file  siunitx.dtx
 \_siunitx_tmp:w { closeerr }
 \_siunitx_tmp:w { closrfrac }
 \_siunitx_tmp:w { closerange }
+\_siunitx_tmp:w { colour }
 \_siunitx_tmp:w { colorall }
 \_siunitx_tmp:w { colourall }
 \_siunitx_tmp:w { colorneg }
@@ -3897,6 +3898,7 @@ This work consists of the file  siunitx.dtx
 \_siunitx_tmp:w { inlinebold }
 \_siunitx_tmp:w { log }
 \_siunitx_tmp:w { load }
+\_siunitx_tmp:w { loctolang }
 \_siunitx_tmp:w { mathOmega }
 \_siunitx_tmp:w { mathcelsius }
 \_siunitx_tmp:w { mathdegree }
@@ -12921,8 +12923,16 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}   
 \keys_define:nn { siunitx } {
   addsign        .choice: ,
+  addsign /
+    all          .meta:n    = { explicit-sign           = +           },
+  addsign /
+    exp          .meta:n    = { explicit-sign           = +           },
   addsign / 
     false        .meta:n    = { explicit-sign           =             },
+  addsign /
+    mant         .meta:n    = { explicit-sign           = +           },
+  addsign / 
+    none         .meta:n    = { explicit-sign           =             },
   addsign /
     true         .meta:n    = { explicit-sign           = +           },
   addsign        .default:n = { true                                  },  
@@ -12974,6 +12984,7 @@ This work consists of the file  siunitx.dtx
   closeerr       .meta:n    = { close-bracket           = #1          },
   closefrac      .meta:n    = { close-bracket           = #1          },
   closerange     .meta:n    = { close-bracket           = #1          },
+  colour         .code:n    = { color                   = #1          },
   colorall       .code:n    = ,
   colourall      .code:n    = ,
   colorneg       .code:n    = ,
@@ -13064,6 +13075,7 @@ This work consists of the file  siunitx.dtx
     two          .meta:n    = { exponent-base           = 2           }, 
   expbase /
     unknown      .meta:n    = { exponent-base           = #1          }, 
+  expproduct     .choice: ,  
   expproduct / 
     cdot         .meta:n    = 
       { exponent-product        = { } \cdot { }                       },
@@ -13105,6 +13117,7 @@ This work consists of the file  siunitx.dtx
   inlinebold     .meta:n    = { detect-inline-weight    = #1          },
   log            .code:n    = ,
   load           .code:n    = ,
+  loctolang      .code:n    = ,
   mathOmega      .meta:n    = { math-ohm                = #1          },
   mathcelsius    .meta:n    = { math-celsius            = #1          },
   mathdegree     .meta:n    = { math-degree             = #1          },
@@ -13246,7 +13259,9 @@ This work consists of the file  siunitx.dtx
         add-decimal-zero = true,
         add-integer-zero = true
       },
-  per           .choice: ,
+  per            .choice: ,
+  per /
+    frac         .meta:n    = { per-mode                = fraction    },
   per /
     fraction     .meta:n    = { per-mode                = fraction    },
   per / 
@@ -13301,20 +13316,66 @@ This work consists of the file  siunitx.dtx
   stickyper      .meta:n    = { sticky-per              = #1          },
   stickyper      .default:n = { true                                  },
   strictarc      .code:n    = ,
-  tabalign       .meta:n    = 
+  tabalign       .code:n    = 
     {
-      table-number-alignment  = #1,
-      table-text-alignment    = #1,
-      table-unit-alignment    = #1
+      \tl_if_eq:nnTF {#1} { centre }
+        {
+          \keys_set:nn { siunitx }
+            {
+              table-number-alignment  = center,
+              table-text-alignment    = center,
+              table-unit-alignment    = center,
+            }  
+        }
+        {
+          \keys_set:nn { siunitx }
+            {
+              table-number-alignment  = #1,
+              table-text-alignment    = #1,
+              table-unit-alignment    = #1,
+            }  
+        }  
     },
   tabalignexp    .code:n    = ,
   tabautofit     .meta:n    = { table-auto-round        = #1          },
   tabformat      .meta:n    = { table-format            = #1          },
-  tabnumalign    .meta:n    = { table-number-alignment  = #1          },
+  tabnumalign    .code:n    = 
+    {
+      \tl_if_eq:nnTF {#1} { centre }
+        { \keys_set:nn { siunitx } { table-number-alignment = center } }
+        { 
+          \tl_if_eq:nnTF {#1} { centredecimal }
+            {
+              \keys_set:nn { siunitx } 
+                { table-number-alignment = center-decimal-marker } 
+            }
+            {
+              \tl_if_eq:nnTF {#1} { centerdecimal }
+                {
+                  \keys_set:nn { siunitx } 
+                    { table-number-alignment = center-decimal-marker } 
+                }    
+                {
+                  \keys_set:nn { siunitx } 
+                    { table-number-alignment = #1 } 
+                }    
+            }
+        }
+    },
   tabparseonly   .meta:n    = { table-parse-only        = #1          },
   tabparseonly   .default:n = { true                                  },
-  tabtextalign   .meta:n    = { table-text-numbers      = #1          },
-  tabunitalign   .meta:n    = { table-unit-alignment    = #1          },
+  tabtextalign   .code:n    = 
+    {
+      \tl_if_eq:nnTF {#1} { centre }
+        { \keys_set:nn { siunitx } { table-text-alignment = center } }
+        { \keys_set:nn { siunitx } { table-text-alignment = #1 } }
+    },
+  tabunitalign   .code:n    = 
+    {
+      \tl_if_eq:nnTF {#1} { centre }
+        { \keys_set:nn { siunitx } { table-unit-alignment = center } }
+        { \keys_set:nn { siunitx } { table-unit-alignment = #1 } }
+    },
   textOmega      .meta:n    = { text-ohm                = #1          },
   textcelsius    .meta:n    = { text-celsius            = #1          },
   textdegree     .meta:n    = { text-degree             = #1          },
