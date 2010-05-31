@@ -4034,6 +4034,22 @@ This work consists of the file  siunitx.dtx
         }  
     }
 }
+\AtBeginDocument {
+  \keys_define:nn { siunitx } {
+    unknown .code:n = 
+      { 
+        \seq_if_in:NVTF \_c_siunitx_old_options_seq \l_keys_key_tl
+          {
+            \msg_error:nnx { siunitx } { version-1-option } 
+              { \exp_not:V \l_keys_key_tl }          
+          }
+          {
+            \msg_error:nnx { siunitx } { unknown-option } 
+              { \exp_not:V \l_keys_key_tl } 
+          }  
+      }
+}
+}
 %    \end{macrocode}
 %\end{macro}
 %
@@ -12138,10 +12154,14 @@ This work consists of the file  siunitx.dtx
     The~option~file~'#1'~is~not~known~by~siunitx: \\
     perhaps~it~is~spelled~incorrectly.
   }
-\msg_set:nnn { siunitx } { version-1-option } 
-  {
-    Version~1~option~'#1'~detected: \\
-    loading~compatibility~code.
+\msg_set:nnnn { siunitx } { version-1-option } 
+  { Version~1~option~'#1'~detected. }
+  { 
+    Use: \\
+    \c_space_tl \c_space_tl 
+    \token_to_str:N \usepackage[load-configurations = version-1]
+    \token_to_str:N { siunitx \token_to_str:N } \\
+    in~the~preamble~to~load~the~appropriate~code.
   }
 %    \end{macrocode}
 %    
