@@ -13553,7 +13553,7 @@ This work consists of the file  siunitx.dtx
   valuesep / 
     unknown      .meta:n    = { number-unit-separator    = #1         },
   xspace         .meta:n    = { use-xspace               = #1         },
-  xpace          .default:n = { true                                  }
+  xpace          .default:n = { true                                  },
 } 
 %    \end{macrocode}
 %  
@@ -13654,9 +13654,11 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\providequalifier}
 % The functions for creating qualifiers are easy to create again.
 %    \begin{macrocode}
-\cs_set_eq:NN \newqualifier     \DeclareSIQualifier
-\cs_set_eq:NN \renewqualifier   \DeclareSIQualifier
-\cs_set_eq:NN \providequalifier \DeclareSIQualifier
+\cs_set_protected_nopar:Npn \newqualifier #1#2 {
+  \_siunitx_declare_qualifier:Nn #1 {#2}
+}
+\cs_set_eq:NN \renewqualifier   \newqualifier
+\cs_set_eq:NN \providequalifier \newqualifier
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
