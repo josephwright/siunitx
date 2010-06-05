@@ -4264,10 +4264,11 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\_siunitx_cs_if_tl:NT}
-%\begin{macro}{\_siunitx_cs_if_tl:NTF}
+%\begin{macro}{\_siunitx_cs_if_tl_p:N}
+%\begin{macro}[TF]{\_siunitx_cs_if_tl:N}
 %\begin{macro}[aux]{\_siunitx_cs_if_tl_aux:w}
-%\begin{macro}{\_siunitx_cs_if_macro:NT}
+%\begin{macro}{\_siunitx_cs_if_macro_p:N}
+%\begin{macro}[TF]{\_siunitx_cs_if_macro:NT}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
 % short macros only. The second test (with the \cs{cs_to_str:N} part)
 % is checking for LaTeX2e robust commands.
@@ -4279,7 +4280,7 @@ This work consists of the file  siunitx.dtx
   { \char_set_lccode:nn { `#1 } { `#1 } } 
 \tl_to_lowercase:n {
   \group_end:
-  \prg_new_conditional:Nnn \_siunitx_cs_if_tl:N { T , TF } 
+  \prg_set_conditional:Npnn \_siunitx_cs_if_tl:N #1 { T , F, TF , p } 
     {
       \exp_after:wN \_siunitx_cs_if_tl_aux:w
         \token_to_meaning:N #1 MACRO \q_nil
@@ -4292,7 +4293,8 @@ This work consists of the file  siunitx.dtx
     }
   \cs_set_nopar:Npn \_siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_nil 
     { \tl_if_empty:nTF {#1} }
-  \prg_new_conditional:Nnn \_siunitx_cs_if_macro:N { T } 
+  \prg_set_conditional:Npnn \_siunitx_cs_if_macro:N #1 
+    { T , F , TF , p } 
     {
       \exp_after:wN \_siunitx_cs_if_tl_aux:w
         \token_to_meaning:N #1 MACRO \q_nil
@@ -4301,6 +4303,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -8530,7 +8533,7 @@ This work consists of the file  siunitx.dtx
     { \_l_siunitx_angle_marker_dim }
     {
       \tex_hss:D
-      \hbox_unpack_clear:N \_l_siunitx_angle_marker_box
+      \hbox_unpack:N \_l_siunitx_angle_marker_box
       \tex_hss:D
     }
   \box_use:N \_l_siunitx_angle_marker_box
@@ -8540,7 +8543,7 @@ This work consists of the file  siunitx.dtx
     { \_l_siunitx_angle_unit_dim } 
     {
       \tex_hss:D
-      \hbox_unpack_clear:N \_l_siunitx_angle_marker_box
+      \hbox_unpack:N \_l_siunitx_angle_marker_box
       \tex_hss:D
     }
   \box_use:N \_l_siunitx_angle_marker_box
@@ -11259,7 +11262,7 @@ This work consists of the file  siunitx.dtx
       \hbox_set_to_wd:Nnn \_l_siunitx_table_post_box
         { \box_wd:N \_l_siunitx_table_pre_box }
         { 
-          \hbox_unpack_clear:N \_l_siunitx_table_post_box
+          \hbox_unpack:N \_l_siunitx_table_post_box
           \tex_hfil:D 
         }
     }
@@ -11268,7 +11271,7 @@ This work consists of the file  siunitx.dtx
         { \box_wd:N \_l_siunitx_table_post_box }
         { 
           \tex_hfil:D 
-          \hbox_unpack_clear:N \_l_siunitx_table_pre_box
+          \hbox_unpack:N \_l_siunitx_table_pre_box
         } 
     }
 }
