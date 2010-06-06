@@ -12922,25 +12922,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\subsection{Odds and ends}
-%  
-%\begin{macro}{\requiresiconfigs}
-%\begin{macro}{\_siunitx_requireconfig:n}
-% Version one provides this, and it might pop up so should not 
-% cause errors.
-%    \begin{macrocode}
-\NewDocumentCommand \requiresiconfigs { m } {
-  \keys_set:nn { siunitx } { load-configurations = version-1 }
-  \clist_map_function:nN {#1} \_siunitx_requireconfig:n
-}
-\cs_set_protected_nopar:Npn \_siunitx_requireconfig:n #1 {
-  \tl_if_eq:nnT {#1} { synchem }
-    { \keys_set:nn { siunitx } { load-configurations = chemistry } }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\subsection{Strict application of the rules}
 %
 %\begin{macro}{\_siunitx_strict_option:n}
@@ -14026,6 +14007,23 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
+%  
+%\begin{macro}{\requiresiconfigs}
+%\begin{macro}{\_siunitx_requireconfig:n}
+% Version one provides this, and it might pop up so should not 
+% cause errors.
+%    \begin{macrocode}
+\NewDocumentCommand \requiresiconfigs { m } {
+  \keys_set:nn { siunitx } { load-configurations = version-1 }
+  \clist_map_function:nN {#1} \_siunitx_requireconfig:n
+}
+\cs_set_protected_nopar:Npn \_siunitx_requireconfig:n #1 {
+  \tl_if_eq:nnT {#1} { synchem }
+    { \keys_set:nn { siunitx } { load-configurations = chemistry } }
+}
+%    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
