@@ -8666,10 +8666,9 @@ This work consists of the file  siunitx.dtx
   \cs_set:cpn { _siunitx_ \token_to_str:N #1 _literal:w } {#2}
   \cs_set:cpn { _siunitx_ \token_to_str:N #1 _function:w } 
     {
-      \cs_if_exist:cTF 
-        { _siunitx_ \_siunitx_unit_first_token:n {#2} _function:w }
-        {#2}
+      \_siunitx_unit_if_literal:nTF {#2}
         { \_siunitx_unit_parse_unit:Nn #1 {#2} }
+        {#2}
     }
   \tl_if_empty:nTF {#3}
     { 
@@ -9518,6 +9517,8 @@ This work consists of the file  siunitx.dtx
   \int_zero:N \_l_siunitx_unit_prefix_int
   \int_zero:N \_l_siunitx_unit_denominator_int
   \int_zero:N \_l_siunitx_unit_numerator_int
+  \tl_map_function:NN \_l_siunitx_declare_list_tl
+    \_siunitx_unit_print_literal_aux:N
 } 
 %    \end{macrocode}
 %\end{macro}
