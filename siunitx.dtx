@@ -3360,6 +3360,44 @@ This work consists of the file  siunitx.dtx
 %  \si[sticky-per]{\candela\per\kWh}
 %\end{LaTeXdemo}
 %
+%\subsection{Adding items after the last column of a tabular}
+%
+% When using the \pkg{array} package \enquote{\texttt{<}} construct
+% to insert material after an \texttt{S} or \texttt{s} column, the 
+% spacing will be wrong. This is due to the way that LaTeX constructs
+% tables at a low level. The incorrect spacing can be avoided by using
+% the TeX \cs{cr} primitive to end the table rows instead 
+% (\cref{tab:cr}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Correcting spacing in last \texttt{S} column}
+%    \label{tab:cr}
+%    \hfil
+%    \begin{tabular}{S<{\,\si{\kg}}S<{\,\si{\kg}}}
+%      \toprule
+%      \multicolumn{1}{c}{Long header} &
+%        \multicolumn{1}{c}{Long header} \\
+%      \midrule
+%      1.23 & 1.23 \\
+%      4.56 & 4.56 \\
+%      7.8  & 7.8  \\
+%      \bottomrule
+%    \end{tabular}
+%    \hfil
+%    \begin{tabular}{S<{\,\si{\kg}}S<{\,\si{\kg}}}
+%      \toprule
+%      \multicolumn{1}{c}{Long header} &
+%        \multicolumn{1}{c}{Long header} \\
+%      \midrule
+%      1.23 & 1.23 \cr
+%      4.56 & 4.56 \cr
+%      7.8  & 7.8  \cr
+%      \bottomrule
+%    \end{tabular}
+%    \hfil
+%  \end{table}
+%\end{LaTeXdemo}
+%
 %\section{Information for those upgrading from version 1}
 %
 % The key--value control system of \pkg{siunitx} has been completely
