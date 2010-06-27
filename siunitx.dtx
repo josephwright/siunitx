@@ -418,6 +418,15 @@ This work consists of the file  siunitx.dtx
 %  configuration file}
 %\changes{v2.0c}{2010/06/07}{Mixed literal and macro units now print
 %  more reliably}
+%\changes{v2.0d}{2010/06/10}{Document special case situations for last
+%  cell in table row}
+%\changes{v2.0d}{2010/06/10}{Fix error in \opt{table-format} option
+%  concerning exponent signs}
+%\changes{v2.0e}{2010/06/20}{Correct behaviour of \cs{pm} in numbers
+%  when \texttt{abbreviations} configuration is loaded: problem 
+%  introduced in v2.0c}
+%\changes{v2.0f}{2010/06/27}{Fix issue with spacing of multiplication
+%  sign in text mode}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1602,7 +1611,6 @@ This work consists of the file  siunitx.dtx
 %      output-complex-root       & Math    & \verb=\mathrm{i}= \\
 %      output-decimal-marker     & Math    & .                 \\
 %      output-open-uncertainty   & Literal & (                 \\ ^^A )
-%      range-phrase              & Literal & \verb*= to =      \\
 %      separate-uncertainty      & Switch  & false             \\
 %      tight-spacing             & Switch  & false             \\
 %      uncertainty-separator     & Math    & \meta{none}       \\
@@ -3915,7 +3923,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/06/07} {2.0c}
+\ProvidesExplPackage {siunitx} {2010/06/27} {2.0f}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -7217,11 +7225,14 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_brackets:n { mantissa }
   \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
     \l_siunitx_tmpa_tl
-  \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
-  \bool_if:NT \l_siunitx_tight_bool 
+  \bool_if:NTF \l_siunitx_tight_bool 
     {  
       \tl_set:Nx \l_siunitx_tmpb_tl 
         { { \exp_not:V \l_siunitx_tmpb_tl } }
+    }
+    {  
+      \tl_set:Nx \l_siunitx_tmpb_tl 
+        { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
     }
   \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
     \l_siunitx_tmpb_tl
@@ -7881,12 +7892,16 @@ This work consists of the file  siunitx.dtx
         {
           \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
             {
-              \tl_set_eq:NN \l_siunitx_tmpb_tl 
-                \l_siunitx_exponent_product_tl
-              \bool_if:NT \l_siunitx_tight_bool 
+              \bool_if:NTF \l_siunitx_tight_bool 
                 {  
                   \tl_set:Nx \l_siunitx_tmpb_tl 
-                    { { \exp_not:V \l_siunitx_tmpb_tl } }
+                    { { \exp_not:V \l_siunitx_exponent_product_tl } }
+                }
+                {  
+                  \tl_set:Nx \l_siunitx_tmpb_tl 
+                    {
+                      { } \exp_not:V \l_siunitx_exponent_product_tl { }
+                    }
                 }
               \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
                 \l_siunitx_tmpb_tl
@@ -8965,7 +8980,11 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\siunitx_unit_in:nn}
 %\begin{macro}{\siunitx_unit_in:Vn}
+%\begin{macro}{\siunitx_pm:}
 % The master function does a very simple checks then hands off. 
+% The definition of \cs{pm} needs to be saved here so that it can
+% safely be used as an abbreviation for picometre and also in numbers
+% for \( \pm \).
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_in:nn #1#2 {
   \bool_if:NTF \l_siunitx_unit_parse_bool 
@@ -8991,15 +9010,19 @@ This work consists of the file  siunitx.dtx
                         }
                     }
                 }
+              \cs_set_eq:NN \siunitx_pm: \pm  
               \siunitx_unit_parse:nn {#1} {#2}
-              \siunitx_unit_format:            
+              \siunitx_unit_format:
+              \cs_set_eq:NN \pm \siunitx_pm:        
             }
       }
   }
   { \siunitx_unit_format_literal:n {#1} }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { V }
+\cs_new_nopar:Npn \siunitx_pm: { }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -9079,14 +9102,12 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_parse_init:
   \siunitx_unit_parse_options:nn {#1} {#2}
   #1
-  \cs_set_eq:NN \pm \siunitx_pm:
 }
 %    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_init:}
 %\begin{macro}[aux]{\siunitx_unit_parse_init_aux:N}
-%\begin{macro}{\siunitx_pm:}
 % As always, the initialisation is a separate routine to make life a
 % little clearer. The definition of \cs{pm} is saved here as it
 % is used by units and numbers.
@@ -9095,16 +9116,13 @@ This work consists of the file  siunitx.dtx
   \prop_clear:N \l_siunitx_unit_prop
   \int_zero:N \l_siunitx_unit_int
   \bool_set_false:N \l_siunitx_per_bool
-  \cs_set_eq:NN \siunitx_pm: \pm
   \tl_map_function:NN \l_siunitx_declare_list_tl 
     \siunitx_unit_parse_init_aux:N
 }
 \cs_new_protected:Npn \siunitx_unit_parse_init_aux:N #1 {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
 }
-\cs_new_protected_nopar:Npn \siunitx_pm: { }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -11168,8 +11186,8 @@ This work consists of the file  siunitx.dtx
         { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
         { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
       \prop_if_in:NnTF \l_siunitx_number_in_prop { exponent-sign }        
-        { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
-        { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
+        { \bool_set_true:N \l_siunitx_table_sign_exponent_bool }
+        { \bool_set_false:N \l_siunitx_table_sign_exponent_bool }
       \keys_set:nn { siunitx } { table-number-alignment = center }  
     },
 }
@@ -13089,7 +13107,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/07} {2.0c} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/27} {2.0f} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14079,7 +14097,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/07} {2.0c}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/27} {2.0f}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14287,7 +14305,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/06/07} {2.0c}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/06/27} {2.0f}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
