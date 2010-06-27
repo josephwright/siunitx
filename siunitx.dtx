@@ -7223,11 +7223,14 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_brackets:n { mantissa }
   \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result } 
     \l_siunitx_tmpa_tl
-  \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
-  \bool_if:NT \l_siunitx_tight_bool 
+  \bool_if:NTF \l_siunitx_tight_bool 
     {  
       \tl_set:Nx \l_siunitx_tmpb_tl 
         { { \exp_not:V \l_siunitx_tmpb_tl } }
+    }
+    {  
+      \tl_set:Nx \l_siunitx_tmpb_tl 
+        { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
     }
   \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
     \l_siunitx_tmpb_tl
@@ -7887,12 +7890,16 @@ This work consists of the file  siunitx.dtx
         {
           \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
             {
-              \tl_set_eq:NN \l_siunitx_tmpb_tl 
-                \l_siunitx_exponent_product_tl
-              \bool_if:NT \l_siunitx_tight_bool 
+              \bool_if:NTF \l_siunitx_tight_bool 
                 {  
                   \tl_set:Nx \l_siunitx_tmpb_tl 
-                    { { \exp_not:V \l_siunitx_tmpb_tl } }
+                    { { \exp_not:V \l_siunitx_exponent_product_tl } }
+                }
+                {  
+                  \tl_set:Nx \l_siunitx_tmpb_tl 
+                    {
+                      { } \exp_not:V \l_siunitx_exponent_product_tl { }
+                    }
                 }
               \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
                 \l_siunitx_tmpb_tl
