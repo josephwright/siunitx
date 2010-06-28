@@ -6987,7 +6987,17 @@ This work consists of the file  siunitx.dtx
   open-bracket              .tl_set:N   = \l_siunitx_bracket_open_tl, 
   output-close-uncertainty  .tl_set:N   = 
     \l_siunitx_output_uncert_close_tl,
-  output-complex-root       .tl_set:N   = \l_siunitx_output_complex_tl,
+  output-complex-root       .code:n     =
+    { 
+      \tl_set:Nn \l_siunitx_output_complex_tl
+        { 
+          \use:c 
+            {
+              siunitx_ \l_siunitx_print_type_tl _ 
+              math \l_siunitx_font_family_tl :n
+            }  {#1} 
+        }
+    },
   output-decimal-marker     .code:n     = 
     {
       \tl_set:Nn \l_siunitx_output_decimal_tl { {#1} }
@@ -7144,6 +7154,7 @@ This work consists of the file  siunitx.dtx
           \prop_put:NnV \l_siunitx_number_out_prop { complex }
             \l_siunitx_tmpa_tl
         }
+
         \siunitx_number_format_join_complex:
     }
 }
@@ -7152,7 +7163,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_complex_after_bool
     {
       \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-        \l_siunitx_output_complex_tl
+         \l_siunitx_output_complex_tl
     }
     {
       \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
