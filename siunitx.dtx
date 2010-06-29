@@ -140,10 +140,10 @@ This work consists of the file  siunitx.dtx
 \RequirePackage{expl3}
 %</driver|package>
 %<*driver>
-\documentclass[full]{l3doc}
+\documentclass[german,french,english,UKenglish]{l3doc}
 
-\usepackage{amsmath,booktabs,caption,csquotes,datatool,helvet,pgfplots}
-\usepackage{siunitx,xcolor,xtab}
+\usepackage{amsmath,babel,booktabs,caption,csquotes,datatool,helvet}
+\usepackage{pgfplots,siunitx,xcolor,xtab}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -295,6 +295,7 @@ This work consists of the file  siunitx.dtx
 %          raiseto,
 %          robustify,
 %          second,
+%          selectlanguage,
 %          SendSettingsToPgf,
 %          si,
 %          SI,
@@ -310,6 +311,7 @@ This work consists of the file  siunitx.dtx
 %          text,
 %          toprule,
 %          tothe,
+%          translate,
 %          volt,
 %          kWh,
 %        }
@@ -433,6 +435,8 @@ This work consists of the file  siunitx.dtx
 %  option}
 %\changes{v2.0g}{2010/06/28}{Improve handling of complex root token}
 %\changes{v2.0g}{2010/06/28}{Introduce localisation for text values}
+%\changes{v2.0h}{2010/06/29}{Actually get localisation into the 
+%  code}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -3084,6 +3088,40 @@ This work consists of the file  siunitx.dtx
 % units may safely be created in the configuration file even when also
 % included in individual LaTeX document headers.
 % 
+%\section{Localisation}
+% 
+% The \pkg{translator} package provides a structured framework for 
+% localisation of words and phrases, and is part of the larger
+% \pkg{beamer} bundle. The \pkg{translator} package provides the
+% \cs{translate} macro, which will provide appropriate translations 
+% based on the current \pkg{babel} or \pkg{polyglossia} language 
+% setting.
+% 
+% If \pkg{translator} is available, \pkg{siunitx} will load it and alter 
+% the standard settings for the \opt{list-final-separator} and 
+% \opt{range-phrase} options to read:
+%\begin{LaTeXdemo}[code only]
+%  \sisetup{
+%    list-final-separator = { \translate{and} },
+%    range-phrase         = { \translate{to (numerical range)} },
+%  }
+%\end{LaTeXdemo} 
+% If the current language is known to the \pkg{translator} package
+% then the result will be localised text. The preamble for this manual
+% loads English, French and German as options, and also loads the
+% \pkg{babel} package:
+%\begin{LaTeXdemo}
+%  % In English by default
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
+%  \selectlanguage{french}%
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
+%  \selectlanguage{german}%
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
+%\end{LaTeXdemo} 
+% 
 %\section{Hints for using \pkg{siunitx}}   
 % 
 %\subsection{Ensuring text or math output}
@@ -3929,7 +3967,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/06/28} {2.0g}
+\ProvidesExplPackage {siunitx} {2010/06/29} {2.0h}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -13060,6 +13098,32 @@ This work consists of the file  siunitx.dtx
 %\end{macro}    
 %\end{macro} 
 %
+ 	
+
+%\subsection{Localisation}
+%
+% Localisation makes use of the \pkg{translator} package. This only
+% happens if it is available, and is transparent to the user.
+%    \begin{macrocode}
+\file_if_exist:nT { translator.sty } 
+  {
+    \RequirePackage { translator }
+    \usedictionary { translator-basic-dictionary }
+    \providetranslation [ to = English ] 
+      { to~(numerical~range) } { to }
+    \providetranslation [ to = French ]  
+      { to~(numerical~range) } { \`a }
+    \providetranslation [ to = German ]  
+      { to~(numerical~range) } { bis }
+    \sisetup 
+      {
+        list-final-separator = { ~ \translate { and } ~ },
+        range-phrase         = 
+          { ~ \translate { to~(numerical~range) } ~ },
+      }  
+  }
+%    \end{macrocode}
+%
 %\subsection{Loading additional configurations}
 %
 % There is only only option for loading files: keeps things simple.
@@ -13131,7 +13195,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/28} {2.0g} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/29} {2.0h} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14121,7 +14185,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/28} {2.0g}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/29} {2.0h}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14329,7 +14393,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/06/28} {2.0g}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/06/29} {2.0h}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
