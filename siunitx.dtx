@@ -439,6 +439,9 @@ This work consists of the file  siunitx.dtx
 %  code}
 %\changes{v2.0i}{2010/06/29}{Correct behaviour of \cs{of} function
 %  so it actually works (bug introduced in v2.0d)}
+%\changes{v2.0j}{2010/06/30}{Correct \cs{hartree} unit appearance}
+%\changes{v2.0j}{2010/06/30}{Ensure symbols specified in 
+%  \opt{input-symbols} are always printed in math mode}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1439,9 +1442,10 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{input-ignore}
 % As well as \enquote{normal} digits, the package will interpret 
 % symbolic \enquote{numbers} (such as \cs{pi}) correctly if they are 
-% included in the \opt{input-symbols} list. Tokens given in the 
-% \opt{input-ignore} list are totally passed over by \pkg{siunitx}: 
-% they will be removed from the input with no further processing.
+% included in the \opt{input-symbols} list. Symbols are always
+% printed in math mode. Tokens given in the \opt{input-ignore} list 
+% are totally passed over by \pkg{siunitx}: they will be removed from 
+% the input with no further processing.
 % 
 %\DescribeOption{input-open-uncertainty}
 %\DescribeOption{input-close-uncertainty} 
@@ -3969,7 +3973,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/06/29} {2.0i}
+\ProvidesExplPackage {siunitx} {2010/06/30} {2.0j}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -5674,7 +5678,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_in_parse_mantissa:N #1 {
   \tl_if_in:NnTF \l_siunitx_input_digit_tl {#1}
-    { \siunitx_number_in_digit:N #1 }
+    { \siunitx_number_in_digit:n {#1} }
     {
       \tl_if_in:NnTF \l_siunitx_input_decimal_tl {#1}
         { \siunitx_number_in_decimal:N #1 }
@@ -5686,7 +5690,7 @@ This work consists of the file  siunitx.dtx
                 { 
                   \prop_put:Nnn \l_siunitx_number_in_prop { symbolic } 
                     { true }
-                  \siunitx_number_in_digit:N #1
+                  \siunitx_number_in_digit:n { \ensuremath {#1} }
                 }
                 { 
                   \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
@@ -5729,7 +5733,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_in_parse_uncert:N #1 {
   \tl_if_in:NnTF \l_siunitx_input_digit_tl {#1}
-    { \siunitx_number_in_digit:N #1 }
+    { \siunitx_number_in_digit:n {#1} }
     {
       \tl_if_in:NnTF \l_siunitx_input_decimal_tl {#1}
         { 
@@ -5749,7 +5753,7 @@ This work consists of the file  siunitx.dtx
                 { 
                   \prop_put:Nnn \l_siunitx_number_in_prop { symbolic }
                     { true }
-                  \siunitx_number_in_digit:N #1
+                  \siunitx_number_in_digit:n {#1}
                 }
                 { 
                   \tl_if_in:NnF \l_siunitx_input_ignore_tl {#1}
@@ -5918,13 +5922,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_in_digit:N}
+%\begin{macro}{\siunitx_number_in_digit:n}
 % For digits, only in an uncertainty can the value be stored
 % directly. Otherwise, there is a need to see if the value is non-zero.
 % This is used to drop leading zeros and to validate any sign (as zero
 % is unsigned).
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_in_digit:N #1 {
+\cs_new_protected:Npn \siunitx_number_in_digit:n #1 {
   \bool_set_false:N \l_siunitx_number_in_first_bool
   \bool_if:NTF \l_siunitx_number_in_uncert_bool
     { \tl_put_right:Nn \l_siunitx_number_parsed_tl {#1} }
@@ -13198,7 +13202,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/29} {2.0i} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/06/30} {2.0j} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14188,7 +14192,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/29} {2.0i}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/06/30} {2.0j}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14396,7 +14400,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/06/29} {2.0i}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/06/30} {2.0j}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
