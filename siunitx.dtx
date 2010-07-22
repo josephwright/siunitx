@@ -448,6 +448,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.0l}{2010/07/07}{Further adjustments to \pkg{babel} support}
 %\changes{v2.0m}{2010/07/09}{Re-introduce \opt{locale} option}
 %\changes{v2.0n}{2010/07/15}{More abbreviated units}
+%\changes{v2.0o}{2010/07/21}{Extend \opt{detect-italic} option
+%  to other shapes, renaming as \opt{detect-shape} as a result}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1241,9 +1243,9 @@ This work consists of the file  siunitx.dtx
 %      detect-display-math  & Switch & false       \\
 %      detect-family        & Switch & false       \\
 %      detect-inline-weight & Choice & text        \\
-%      detect-italic        & Switch & false       \\
 %      detect-mode          & Switch & false       \\
 %      detect-none          & Meta   & \meta{none} \\ 
+%      detect-shape         & Switch & false       \\
 %      detect-weight        & Switch & false       \\ 
 %    \bottomrule
 %  \end{tabular}
@@ -1251,12 +1253,14 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{detect-weight}
 %\DescribeOption{detect-family}
-%\DescribeOption{detect-italic}
+%\DescribeOption{detect-shape}
 %\DescribeOption{detect-mode}
-% The options \opt{detect-weight} and \opt{detect-italic} set detection
-% of the prevailing font weight and italic states, respectively. The 
-% italic state is only checked if the surrounding material is not in 
-% math mode (as math text is always italic). Detecting the current 
+% The options \opt{detect-weight} and \opt{detect-shape} set detection
+% of the prevailing font weight and font shape states, respectively. The 
+% font shape state is only checked if the surrounding material is not in 
+% math mode (as math text is always italic). The \opt{detect-shape}
+% option is an extension of the older \opt{detect-italic} option, which
+% is retained for backward compatibility. Detecting the current 
 % family (roman, sans serif or monospaced) is controlled by the 
 % \opt{detect-family} setting, while the current mode (text or math) 
 % is detected using the \opt{detect-mode} switch. 
@@ -1265,7 +1269,7 @@ This work consists of the file  siunitx.dtx
 % For convenience, all of the preceding options can be turned on or
 % off in one go using the \opt{detect-all} and \opt{detect-none}
 % options.  As the names indicate, \opt{detect-all} sets all
-% of \opt{detect-weight}, \opt{detect-family}, \opt{detect-italic}
+% of \opt{detect-weight}, \opt{detect-family}, \opt{detect-shape}
 % and \opt{detect-mode} to \texttt{true}, while \opt{detect-none}
 % sets all of them to \texttt{false}.
 % 
@@ -3674,7 +3678,7 @@ This work consists of the file  siunitx.dtx
 %    obeyall        & detect-all                \\
 %    obeybold       & detect-weight             \\
 %    obeyfamily     & detect-family             \\
-%    obeyitalic     & detect-italic             \\
+%    obeyitalic     & detect-shape              \\
 %    obeymode       & detect-mode               \\
 %    openerr        & open-bracket              \\
 %    openfrac       & open-bracket              \\
@@ -4112,7 +4116,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/07/15} {2.0n}
+\ProvidesExplPackage {siunitx} {2010/07/21} {2.0o}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -4635,7 +4639,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_detect_display_math_bool}
 %\begin{macro}{\l_siunitx_detect_family_bool}
 %\begin{macro}{\l_siunitx_detect_inline_weight_bool}
-%\begin{macro}{\l_siunitx_detect_italic_bool}
+%\begin{macro}{\l_siunitx_detect_shape_bool}
 %\begin{macro}{\l_siunitx_detect_mode_bool}
 %\begin{macro}{\l_siunitx_detect_weight_bool}
 % Font detection is all about creating switches, with just a little
@@ -4647,15 +4651,15 @@ This work consists of the file  siunitx.dtx
   detect-all / false .meta:n = 
     {
       detect-family = false,
-      detect-italic = false,
       detect-mode   = false,
+      detect-shape  = false,
       detect-weight = false
     },
   detect-all / true .meta:n = 
     {
       detect-family = true,
-      detect-italic = true,
       detect-mode   = true,
+      detect-shape  = true,
       detect-weight = true
     },
   detect-display-math  .bool_set:N = 
@@ -4672,24 +4676,25 @@ This work consists of the file  siunitx.dtx
   detect-inline-weight / 
     text               .code:n     = 
       { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { text } },
-  detect-italic        .bool_set:N = \l_siunitx_detect_italic_bool,
+  detect-italic        .bool_set:N = \l_siunitx_detect_shape_bool,
   detect-mode          .bool_set:N = \l_siunitx_detect_mode_bool,
   detect-none          .choice:,
   detect-none          .default:n = true,
   detect-none / false .meta:n = 
     {
       detect-family = true,
-      detect-italic = true,
       detect-mode   = true,
+      detect-shape  = true,
       detect-weight = true
     },
   detect-none / true .meta:n = 
     {
       detect-family = false,
-      detect-italic = false,
       detect-mode   = false,
-      detect-weight   = false
+      detect-shape  = false,
+      detect-weight = false
     },
+  detect-shape         .bool_set:N = \l_siunitx_detect_shape_bool,
   detect-weight        .bool_set:N = \l_siunitx_detect_weight_bool
 }
 %    \end{macrocode}
@@ -4718,11 +4723,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_font_italic:}
+%\begin{macro}{\siunitx_font_shape:}
 %\begin{macro}{\siunitx_font_weight:}
 % These could be token lists or functions!
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_font_italic: { }
+\cs_new_nopar:Npn \siunitx_font_shape: { }
 \cs_new_nopar:Npn \siunitx_font_weight: { }
 %    \end{macrocode}
 %\end{macro}
@@ -4741,8 +4746,8 @@ This work consists of the file  siunitx.dtx
         { \siunitx_detect_font_weight: }
       \bool_if:NT \l_siunitx_detect_family_bool 
         { \siunitx_detect_font_family: }
-      \bool_if:NT \l_siunitx_detect_italic_bool 
-        { \siunitx_detect_font_italic: }
+      \bool_if:NT \l_siunitx_detect_shape_bool 
+        { \siunitx_detect_font_shape: }
       \bool_if:NT \l_siunitx_detect_mode_bool 
         { \siunitx_detect_font_mode: }
     }
@@ -4760,7 +4765,7 @@ This work consists of the file  siunitx.dtx
       \unboldmath 
       \mdseries
     }
-  \cs_set:Npn \siunitx_font_italic: { \upshape }
+  \cs_set:Npn \siunitx_font_shape: { \upshape }
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
   \bool_set_true:N \l_siunitx_font_math_mode_bool
 }
@@ -4879,12 +4884,14 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_detect_font_italic:}
-% The italic test uses \cs{f@shape} as a handy indicator.
+%\begin{macro}{\siunitx_detect_font_shape:}
+% The shape test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_italic: {
+\cs_new_protected_nopar:Npn \siunitx_detect_font_shape: {
   \tl_if_eq:nVT { it } \f@shape 
     { \cs_set_nopar:Npn \siunitx_font_italic: { \itshape } }
+  \tl_if_eq:nVT { sl } \f@shape 
+    { \cs_set_nopar:Npn \siunitx_font_italic: { \slshape } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5150,8 +5157,8 @@ This work consists of the file  siunitx.dtx
   \text 
     {
       \siunitx_print_color:
+      \siunitx_font_shape:
       \siunitx_font_weight:
-      \siunitx_font_italic:
       \use:c 
         { 
           siunitx_ \l_siunitx_print_type_tl _  
@@ -13201,8 +13208,8 @@ This work consists of the file  siunitx.dtx
       \keys_set:nn { siunitx } 
         {
           bracket-numbers       = true,
-          detect-italic         = false,
           detect-mode           = false,
+          detect-shape          = false,
           detect-weight         = false,
           multi-part-units      = bracket,
           parse-numbers         = true,
@@ -13211,14 +13218,15 @@ This work consists of the file  siunitx.dtx
         }
       \siunitx_strict_option:n  
         { 
-          bracket-numbers       ,
-          detect-italic         ,
-          detect-mode           ,
-          detect-weight         ,
-          multi-part-units      ,
-          parse-numbers         ,
-          parse-units           ,
-          product-units         ,
+          bracket-numbers  ,
+          detect-italic    ,
+          detect-mode      ,
+          detect-shape     ,
+          detect-weight    ,
+          multi-part-units ,
+          parse-numbers    ,
+          parse-units      ,
+          product-units    ,
         }
       \keys_define:nn { siunitx }
         {
@@ -13381,7 +13389,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/07/15} {2.0n} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/07/21} {2.0o} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -13638,7 +13646,7 @@ This work consists of the file  siunitx.dtx
   obeybold       .default:n = { true                                  },
   obeyfamily     .meta:n    = { detect-family           = #1          },
   obeyfamily     .default:n = { true                                  },
-  obeyitalic     .meta:n    = { detect-italic           = #1          },
+  obeyitalic     .meta:n    = { detect-shape            = #1          },
   obeyitalic     .default:n = { true                                  },
   obeymode       .meta:n    = { detect-mode             = #1          },
   obeymode       .default:n = { true                                  },
@@ -14370,7 +14378,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/07/15} {2.0n}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/07/21} {2.0o}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14659,7 +14667,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/07/15} {2.0n}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/07/21} {2.0o}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
