@@ -452,6 +452,8 @@ This work consists of the file  siunitx.dtx
 %  to other shapes, renaming as \opt{detect-shape} as a result}
 %\changes{v2.0p}{2010/07/28}{Actually get change from v2.0o working}
 %\changes{v2.0q}{2010/07/29}{Errors with free-standing unit code fixed}
+%\changes{v2.0q}{2010/07/29}{Deal with bad definition of \cs{color}
+%  by \pkg{textpos} package}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -9159,6 +9161,8 @@ This work consists of the file  siunitx.dtx
 % a table cell.
 %    \begin{macrocode}
 \AtBeginDocument {
+  \cs_if_eq:NNT \color \use_none:n
+    { \cs_set_protected:Npn \color #1 { } }
   \tl_map_function:nN { \bar \color \ng \pm } 
     \siunitx_protect_symbols:N
 }
