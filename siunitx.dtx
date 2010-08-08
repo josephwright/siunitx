@@ -456,6 +456,8 @@ This work consists of the file  siunitx.dtx
 %  by \pkg{textpos} package}
 %\changes{v2.0r}{2010/08/02}{Error in definition for old 
 %  \opt{decimalsymbol} option corrected}
+%\changes{v2.0s}{2010/08/08}{Correct errors in rounding code when 
+%  precision requested is zero decimal places}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -4122,7 +4124,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/08/02} {2.0r}
+\ProvidesExplPackage {siunitx} {2010/08/08} {2.0s}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -6696,7 +6698,32 @@ This work consists of the file  siunitx.dtx
 }  
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
   \intexpr_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 } 
-    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal } }
+    { 
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+        \l_siunitx_tmpa_tl
+      \quark_if_no_value:NF \l_siunitx_tmpa_tl
+        {
+          \intexpr_compare:nNnT 
+            { \exp_args:NV \tl_head:n \l_siunitx_tmpa_tl } > { 4 }
+            {
+              \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+                \l_siunitx_tmpa_tl
+              \quark_if_no_value:NTF \l_siunitx_tmpa_tl  
+                {
+                  \prop_put:Nnn \l_siunitx_number_in_prop 
+                    { #1 -integer } { 1 }
+                }
+                {
+                  \tl_set:Nx \l_siunitx_tmpa_tl  
+                    { \intexpr_eval:n { \l_siunitx_tmpa_tl + 1 } }
+                  \prop_put:NnV \l_siunitx_number_in_prop 
+                    { #1 -integer } \l_siunitx_tmpa_tl  
+                }
+            }
+        } 
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal } 
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker } 
+    }
     {
       \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_tmpa_tl
@@ -6841,7 +6868,6 @@ This work consists of the file  siunitx.dtx
     { \siunitx_number_process_round_decimal_aux: }
   \tl_set:Nx \l_siunitx_round_decimal_in_tl 
     { \exp_args:NV \tl_tail:n \l_siunitx_round_decimal_in_tl }
-
   \int_decr:N \l_siunitx_round_int
 }
 \cs_new_protected_nopar:Npn 
@@ -13399,7 +13425,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/02} {2.0r} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/08} {2.0s} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14390,7 +14416,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/08/02} {2.0r}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/08/08} {2.0s}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14679,7 +14705,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/08/02} {2.0r}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/08/08} {2.0s}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
