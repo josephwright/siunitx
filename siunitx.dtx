@@ -142,8 +142,8 @@ This work consists of the file  siunitx.dtx
 %<*driver>
 \documentclass[german,french,english,UKenglish]{l3doc}
 
-\usepackage{amsmath,babel,booktabs,caption,csquotes,datatool,helvet}
-\usepackage{pgfplots,siunitx,xcolor,xtab}
+\usepackage{amsmath,babel,booktabs,caption,colortbl,csquotes,datatool}
+\usepackage{helvet,pgfplots,siunitx,xcolor,xtab}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -230,6 +230,7 @@ This work consists of the file  siunitx.dtx
 %      language     = [LaTeX]{TeX},
 %      moretexcs    = 
 %        {
+%          addto,
 %          ampere,
 %          ang,
 %          angstrom,
@@ -295,6 +296,7 @@ This work consists of the file  siunitx.dtx
 %          radian,
 %          raiseto,
 %          robustify,
+%          rowcolor,
 %          second,
 %          selectlanguage,
 %          SendSettingsToPgf,
@@ -458,6 +460,8 @@ This work consists of the file  siunitx.dtx
 %  \opt{decimalsymbol} option corrected}
 %\changes{v2.0s}{2010/08/08}{Correct errors in rounding code when 
 %  precision requested is zero decimal places}
+%\changes{v2.0s}{2010/08/12}{Document how to do mixed bold and normal
+%  numbers in tables}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -3220,6 +3224,7 @@ This work consists of the file  siunitx.dtx
 % prevent TeX including more space around the \( > \).
 % 
 %\subsection{Expanding content in tables}
+%\label{sec:expanding}
 %
 % When processing tables, \pkg{siunitx} will expand anything stored
 % inside a macro, unless it is long or protected. LaTeX2e robust
@@ -3526,17 +3531,17 @@ This work consists of the file  siunitx.dtx
 % Usually, numbers in a table should be given with the units in the
 % column heading. However, there are cases where a series of data are
 % best presented in a table but have different units. There are two
-% ways to do this (\cref{tab:mixed}). The first is to place the units in 
-% the first column of the table, which makes sense if there are several 
-% related items in the table. The second method is to generate two 
-% columns, one for numbers and a second for units, and then to format 
-% these to give the visual effect of a single column. The later effect 
-% is most appropriate when only one set of numbers are presented in a 
-% table. 
+% ways to do this (\cref{tab:xmpl:mixed}). The first is to place the  
+% units in the first column of the table, which makes sense if there 
+% are several related items in the table. The second method is to 
+% generate two columns, one for numbers and a second for units, and then
+% to format these to give the visual effect of a single column. The 
+% later effect is most appropriate when only one set of numbers are 
+% presented in a table. 
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \caption{Tables where numbers have different units}
-%    \label{tab:mixed}
+%    \label{tab:xmpl:mixed}
 %    \hfil
 %    \begin{tabular}
 %      {
@@ -3566,7 +3571,33 @@ This work consists of the file  siunitx.dtx
 %    \hfil
 %  \end{table}
 %\end{LaTeXdemo}
-% 
+%
+%\subsection{Tables with heading rows}
+%
+% A common format for tables is to make the heading row visually
+% distinct using a background colour and bold text. If numbers appear
+% in such a heading row within an \texttt{S} column then getting the
+% appearance right can be challenging. The best approach is to 
+% make the \cs{bfseries} macro \enquote{robust} (as demonstrated in
+% \cref{sec:expanding}), then to use this macro to make the heading
+% cells bold. This approach is illustrated in \cref{tab:xmpl:headers},
+% along with the use of \cs{rowcolor} to provide a background colour.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Header row in a table}
+%    \label{tab:xmpl:headers}
+%    \robustify\bfseries
+%    \centering
+%    \begin{tabular}
+%      {S[detect-weight,table-format = 3.3]}
+%      \rowcolor[gray]{0.9}
+%      \bfseries 123.456 \\
+%       23.45  \\
+%      123.4   \\
+%        3.456 \\
+%    \end{tabular}  
+%  \end{table}
+%\end{LaTeXdemo}
 %
 %\subsection{Associating a locale with a \pkg{babel} language}
 %
@@ -4124,7 +4155,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/08/08} {2.0s}
+\ProvidesExplPackage {siunitx} {2010/08/12} {2.0s}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -13425,7 +13456,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/08} {2.0s} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/12} {2.0s} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14416,7 +14447,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/08/08} {2.0s}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/08/12} {2.0s}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14705,7 +14736,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/08/08} {2.0s}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/08/12} {2.0s}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
