@@ -142,8 +142,8 @@ This work consists of the file  siunitx.dtx
 %<*driver>
 \documentclass[german,french,english,UKenglish]{l3doc}
 
-\usepackage{amsmath,babel,booktabs,caption,csquotes,datatool,helvet}
-\usepackage{pgfplots,siunitx,xcolor,xtab}
+\usepackage{amsmath,babel,booktabs,caption,colortbl,csquotes,datatool}
+\usepackage{helvet,pgfplots,siunitx,xcolor,xtab}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -230,6 +230,7 @@ This work consists of the file  siunitx.dtx
 %      language     = [LaTeX]{TeX},
 %      moretexcs    = 
 %        {
+%          addto,
 %          ampere,
 %          ang,
 %          angstrom,
@@ -295,6 +296,7 @@ This work consists of the file  siunitx.dtx
 %          radian,
 %          raiseto,
 %          robustify,
+%          rowcolor,
 %          second,
 %          selectlanguage,
 %          SendSettingsToPgf,
@@ -450,6 +452,18 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.0n}{2010/07/15}{More abbreviated units}
 %\changes{v2.0o}{2010/07/21}{Extend \opt{detect-italic} option
 %  to other shapes, renaming as \opt{detect-shape} as a result}
+%\changes{v2.0p}{2010/07/28}{Actually get change from v2.0o working}
+%\changes{v2.0q}{2010/07/29}{Errors with free-standing unit code fixed}
+%\changes{v2.0q}{2010/07/29}{Deal with bad definition of \cs{color}
+%  by \pkg{textpos} package}
+%\changes{v2.0r}{2010/08/02}{Error in definition for old 
+%  \opt{decimalsymbol} option corrected}
+%\changes{v2.0s}{2010/08/08}{Correct errors in rounding code when 
+%  precision requested is zero decimal places}
+%\changes{v2.0s}{2010/08/12}{Document how to do mixed bold and normal
+%  numbers in tables}
+%\changes{v2.0t}{2010/08/24}{Replace \cs{exp_afer:wN} in code for
+%  \cs{per} with \cs{exp_after:wN}}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -3212,6 +3226,7 @@ This work consists of the file  siunitx.dtx
 % prevent TeX including more space around the \( > \).
 % 
 %\subsection{Expanding content in tables}
+%\label{sec:expanding}
 %
 % When processing tables, \pkg{siunitx} will expand anything stored
 % inside a macro, unless it is long or protected. LaTeX2e robust
@@ -3518,17 +3533,17 @@ This work consists of the file  siunitx.dtx
 % Usually, numbers in a table should be given with the units in the
 % column heading. However, there are cases where a series of data are
 % best presented in a table but have different units. There are two
-% ways to do this (\cref{tab:mixed}). The first is to place the units in 
-% the first column of the table, which makes sense if there are several 
-% related items in the table. The second method is to generate two 
-% columns, one for numbers and a second for units, and then to format 
-% these to give the visual effect of a single column. The later effect 
-% is most appropriate when only one set of numbers are presented in a 
-% table. 
+% ways to do this (\cref{tab:xmpl:mixed}). The first is to place the  
+% units in the first column of the table, which makes sense if there 
+% are several related items in the table. The second method is to 
+% generate two columns, one for numbers and a second for units, and then
+% to format these to give the visual effect of a single column. The 
+% later effect is most appropriate when only one set of numbers are 
+% presented in a table. 
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \caption{Tables where numbers have different units}
-%    \label{tab:mixed}
+%    \label{tab:xmpl:mixed}
 %    \hfil
 %    \begin{tabular}
 %      {
@@ -3558,7 +3573,33 @@ This work consists of the file  siunitx.dtx
 %    \hfil
 %  \end{table}
 %\end{LaTeXdemo}
-% 
+%
+%\subsection{Tables with heading rows}
+%
+% A common format for tables is to make the heading row visually
+% distinct using a background colour and bold text. If numbers appear
+% in such a heading row within an \texttt{S} column then getting the
+% appearance right can be challenging. The best approach is to 
+% make the \cs{bfseries} macro \enquote{robust} (as demonstrated in
+% \cref{sec:expanding}), then to use this macro to make the heading
+% cells bold. This approach is illustrated in \cref{tab:xmpl:headers},
+% along with the use of \cs{rowcolor} to provide a background colour.
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Header row in a table}
+%    \label{tab:xmpl:headers}
+%    \robustify\bfseries
+%    \centering
+%    \begin{tabular}
+%      {S[detect-weight,table-format = 3.3]}
+%      \rowcolor[gray]{0.9}
+%      \bfseries 123.456 \\
+%       23.45  \\
+%      123.4   \\
+%        3.456 \\
+%    \end{tabular}  
+%  \end{table}
+%\end{LaTeXdemo}
 %
 %\subsection{Associating a locale with a \pkg{babel} language}
 %
@@ -4116,7 +4157,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/07/21} {2.0o}
+\ProvidesExplPackage {siunitx} {2010/08/24} {2.0t}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -4889,9 +4930,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_shape: {
   \tl_if_eq:nVT { it } \f@shape 
-    { \cs_set_nopar:Npn \siunitx_font_italic: { \itshape } }
+    { \cs_set_nopar:Npn \siunitx_font_shape: { \itshape } }
   \tl_if_eq:nVT { sl } \f@shape 
-    { \cs_set_nopar:Npn \siunitx_font_italic: { \slshape } }
+    { \cs_set_nopar:Npn \siunitx_font_shape: { \slshape } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6690,7 +6731,32 @@ This work consists of the file  siunitx.dtx
 }  
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
   \intexpr_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 } 
-    { \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal } }
+    { 
+      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
+        \l_siunitx_tmpa_tl
+      \quark_if_no_value:NF \l_siunitx_tmpa_tl
+        {
+          \intexpr_compare:nNnT 
+            { \exp_args:NV \tl_head:n \l_siunitx_tmpa_tl } > { 4 }
+            {
+              \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+                \l_siunitx_tmpa_tl
+              \quark_if_no_value:NTF \l_siunitx_tmpa_tl  
+                {
+                  \prop_put:Nnn \l_siunitx_number_in_prop 
+                    { #1 -integer } { 1 }
+                }
+                {
+                  \tl_set:Nx \l_siunitx_tmpa_tl  
+                    { \intexpr_eval:n { \l_siunitx_tmpa_tl + 1 } }
+                  \prop_put:NnV \l_siunitx_number_in_prop 
+                    { #1 -integer } \l_siunitx_tmpa_tl  
+                }
+            }
+        } 
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal } 
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker } 
+    }
     {
       \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_tmpa_tl
@@ -6835,7 +6901,6 @@ This work consists of the file  siunitx.dtx
     { \siunitx_number_process_round_decimal_aux: }
   \tl_set:Nx \l_siunitx_round_decimal_in_tl 
     { \exp_args:NV \tl_tail:n \l_siunitx_round_decimal_in_tl }
-
   \int_decr:N \l_siunitx_round_int
 }
 \cs_new_protected_nopar:Npn 
@@ -9104,10 +9169,12 @@ This work consists of the file  siunitx.dtx
                   \exp_not:n 
                     { 
                       \siunitx_ensuremath:n 
-                        { \l_siunitx_number_unit_sep_tl } 
+                        { \l_siunitx_number_unit_separator_tl } 
                     }
                 }
-              \exp_not:n { \siunitx_unit_output:nn {#1} { } }
+              \group_begin:  
+                \exp_not:n { \siunitx_unit_output:nn {#1} { } }
+              \group_end:  
               \bool_if:NT \l_siunitx_create_xspace_bool 
                 { \exp_not:N \xspace }
             }
@@ -9130,7 +9197,7 @@ This work consists of the file  siunitx.dtx
                       \exp_not:n 
                         { 
                           \siunitx_ensuremath:n 
-                            { \l_siunitx_number_unit_sep_tl }
+                            { \l_siunitx_number_unit_separator_tl }
                         }
                     }
                   \SI {####1} { \exp_not:N #1 }
@@ -9155,6 +9222,8 @@ This work consists of the file  siunitx.dtx
 % a table cell.
 %    \begin{macrocode}
 \AtBeginDocument {
+  \cs_if_eq:NNT \color \use_none:n
+    { \cs_set_protected:Npn \color #1 { } }
   \tl_map_function:nN { \bar \color \ng \pm } 
     \siunitx_protect_symbols:N
 }
@@ -13389,7 +13458,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/07/21} {2.0o} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/24} {2.0t} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -13480,7 +13549,9 @@ This work consists of the file  siunitx.dtx
   decimalsymbol /
     cdot         .meta:n    = 
       { output-decimal-marker   = { } \cdot { }                       }, 
-  decimalsymbol 
+  decimalsymbol /
+    comma        .meta:n    = { output-decimal-marker   = { { , } }   }, 
+  decimalsymbol /
     fullstop     .meta:n    = { output-decimal-marker   = { { . } }   }, 
   decimalsymbol /
     period       .meta:n    = { output-decimal-marker   = { { . } }   },
@@ -14378,7 +14449,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/07/21} {2.0o}  
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2010/08/12} {2.0s}  
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -14667,7 +14738,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/07/21} {2.0o}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/08/24} {2.0t}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
