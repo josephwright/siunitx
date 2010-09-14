@@ -464,6 +464,8 @@ This work consists of the file  siunitx.dtx
 %  numbers in tables}
 %\changes{v2.0t}{2010/08/24}{Replace \cs{exp_afer:wN} in code for
 %  \cs{per} with \cs{exp_after:wN}}
+%\changes{v2.0u}{2010/09/14}{Fix second possible issue with 
+%  \pkg{textpos} package and \cs{color}}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -9224,6 +9226,9 @@ This work consists of the file  siunitx.dtx
 \AtBeginDocument {
   \cs_if_eq:NNT \color \use_none:n
     { \cs_set_protected:Npn \color #1 { } }
+  \cs_set_nopar:Npn \siunitx_tmp:w #1 { }
+  \cs_if_eq:NNT \color \siunitx_tmp:w
+    { \cs_set_protected:Npn \color #1 { } }  
   \tl_map_function:nN { \bar \color \ng \pm } 
     \siunitx_protect_symbols:N
 }
