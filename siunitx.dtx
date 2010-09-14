@@ -466,6 +466,8 @@ This work consists of the file  siunitx.dtx
 %  \cs{per} with \cs{exp_after:wN}}
 %\changes{v2.0u}{2010/09/14}{Fix second possible issue with 
 %  \pkg{textpos} package and \cs{color}}
+%\changes{v2.0u}{2010/09/14}{Prevent infinite loop if \cs{SI} function
+%  is used with an empty number}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -8417,7 +8419,9 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
-  \siunitx_print:nV { number } \l_siunitx_number_out_tl
+  \quark_if_no_value:NTF \l_siunitx_number_out_tl
+    { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+    { \siunitx_print:nV { number } \l_siunitx_number_out_tl }
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
