@@ -83,10 +83,7 @@ CLEAN = \
 # PDF Settings                                                 #
 ################################################################
 
-PDFSETTINGS = \
-	\AtBeginDocument{\DisableImplementation} \
-	\pdfminorversion=5  \
-	\pdfobjcompresslevel=2
+PDFSETTINGS = \AtBeginDocument{\DisableImplementation} 
 	
 ################################################################
 # File building: default actions                               #
@@ -158,8 +155,7 @@ localinstall: unpack
 	rm -rf $$TEXMFHOME/tex/$(PACKAGEROOT)/* ; \
 	mkdir -p $$TEXMFHOME/tex/$(PACKAGEROOT)/config/ ; \
 	cp *.cfg $$TEXMFHOME/tex/$(PACKAGEROOT)/config/ ; \
-	cp *.sty $$TEXMFHOME/tex/$(PACKAGEROOT)/ ; \
-	texhash &> /dev/null
+	cp *.sty $$TEXMFHOME/tex/$(PACKAGEROOT)/ 
 	
 tds: doc
 	echo "Creating TDS archive"
