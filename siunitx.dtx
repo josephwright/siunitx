@@ -466,6 +466,8 @@ This work consists of the file  siunitx.dtx
 %  \cs{per} with \cs{exp_after:wN}}
 %\changes{v2.0u}{2010/09/14}{Fix second possible issue with 
 %  \pkg{textpos} package and \cs{color}}
+%\changes{v2.0u}{2010/09/14}{Prevent infinite loop if \cs{SI} function
+%  is used with an empty number}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -4159,7 +4161,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/08/24} {2.0t}
+\ProvidesExplPackage {siunitx} {2010/09/14} {2.0u}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -8417,7 +8419,9 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
-  \siunitx_print:nV { number } \l_siunitx_number_out_tl
+  \quark_if_no_value:NTF \l_siunitx_number_out_tl
+    { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+    { \siunitx_print:nV { number } \l_siunitx_number_out_tl }
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -9019,7 +9023,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_first_token:n #1 {
-  \exp_after:wN \token_to_str:N \tl_head_i:w #1 \q_nil
+  \exp_after:wN \token_to_str:N \tl_head:w #1 \q_nil
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -13463,7 +13467,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/24} {2.0t} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/09/14} {2.0u} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14743,7 +14747,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/08/24} {2.0t}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/09/14} {2.0u}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
