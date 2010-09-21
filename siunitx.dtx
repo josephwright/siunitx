@@ -4853,7 +4853,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_detect_font_weight_text:
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_math: {
-  \tl_if_eq:nVT { bold } \math@version 
+  \str_if_eq:nVT { bold } \math@version 
     {
       \cs_set:Npn \siunitx_font_weight: 
         {
@@ -4861,7 +4861,7 @@ This work consists of the file  siunitx.dtx
           \bfseries
         }
     }
-  \tl_if_eq:nVT { light } \math@version 
+  \str_if_eq:nVT { light } \math@version 
     {
       \cs_set:Npn \siunitx_font_weight: 
         { \lseries }
@@ -4869,7 +4869,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_text: {
   \tl_set:Nx \l_siunitx_tmpa_tl { \exp_args:NV \tl_head:n \f@series }
-  \tl_if_eq:nVT { b } \l_siunitx_tmpa_tl 
+  \str_if_eq:nVT { b } \l_siunitx_tmpa_tl 
     {
       \cs_set:Npn \siunitx_font_weight: 
         {
@@ -4877,7 +4877,7 @@ This work consists of the file  siunitx.dtx
           \bfseries
         }
     }
-  \tl_if_eq:nVT { l } \l_siunitx_tmpa_tl  
+  \str_if_eq:nVT { l } \l_siunitx_tmpa_tl  
     {
       \cs_set:Npn \siunitx_font_weight: 
         { \lseries }
@@ -4931,9 +4931,9 @@ This work consists of the file  siunitx.dtx
 % The shape test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_shape: {
-  \tl_if_eq:nVT { it } \f@shape 
+  \str_if_eq:nVT { it } \f@shape 
     { \cs_set_nopar:Npn \siunitx_font_shape: { \itshape } }
-  \tl_if_eq:nVT { sl } \f@shape 
+  \str_if_eq:nVT { sl } \f@shape 
     { \cs_set_nopar:Npn \siunitx_font_shape: { \slshape } }
 }
 %    \end{macrocode}
@@ -6124,11 +6124,11 @@ This work consists of the file  siunitx.dtx
       \bool_if:NTF \l_siunitx_number_in_decimal_bool
         {
           \tl_put_right:Nn \l_siunitx_number_parsed_tl {#1}
-          \tl_if_eq:nnF {#1} { 0 } 
+          \str_if_eq:nnF {#1} { 0 } 
             { \bool_set_true:N \l_siunitx_number_in_value_bool }
         }
         {
-          \tl_if_eq:nnTF {#1} { 0 } 
+          \str_if_eq:nnTF {#1} { 0 } 
             { 
               \prop_put:NVn \l_siunitx_number_in_prop 
                 \l_siunitx_number_part_tl { true }
@@ -7350,7 +7350,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_bracket_open_tl
   \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl 
     \l_siunitx_bracket_close_tl
-  \tl_if_eq:nnTF {#1} { result } 
+  \str_if_eq:nnTF {#1} { result } 
     { \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl }
     {
       \prop_put:NnV \l_siunitx_number_out_prop { #1 -result } 
@@ -7376,7 +7376,7 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
   \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
-      \tl_if_eq:nVT { - } \l_siunitx_tmpa_tl 
+      \str_if_eq:nVT { - } \l_siunitx_tmpa_tl 
         {
            \prop_put:NnV \l_siunitx_number_out_prop { color } 
              \l_siunitx_negative_color_tl
@@ -9019,7 +9019,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_first_token:n #1 {
-  \exp_after:wN \token_to_str:N \tl_head_i:w #1 \q_nil
+  \exp_after:wN \token_to_str:N \tl_head:w #1 \q_stop
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -9708,7 +9708,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_format_init:
   \intexpr_compare:nNnT { \l_siunitx_unit_int } = { 1 } 
     { 
-      \tl_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
+      \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
         {
           \prop_if_in:NnT \l_siunitx_unit_prop { per-1 }
             { \tl_clear:N \l_siunitx_number_unit_separator_tl }
@@ -9760,7 +9760,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_add_aux:n #1 {
   \tl_if_empty:cF { l_siunitx_unit #1 _tl } 
     {
-      \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+      \str_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
         {
           \tl_set:Nx \l_siunitx_tmpa_tl 
             { per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
@@ -9979,10 +9979,10 @@ This work consists of the file  siunitx.dtx
 % in text mode so that negative signs get printed correctly.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_power_aux: {
-  \tl_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+  \str_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
     { \siunitx_unit_format_power_repeat: }
     { \siunitx_unit_format_power_per: }
-  \tl_if_eq:nVF { 1 } \l_siunitx_tmpa_tl 
+  \str_if_eq:nVF { 1 } \l_siunitx_tmpa_tl 
     {
       \siunitx_unit_format_power_brackets:
       \tl_put_right:Nx \l_siunitx_unit_current_tl 
@@ -10112,7 +10112,7 @@ This work consists of the file  siunitx.dtx
     { unit- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpb_tl
     \l_siunitx_tmpb_tl
-  \tl_if_eq:nVT { \gram } \l_siunitx_tmpb_tl
+  \str_if_eq:nVT { \gram } \l_siunitx_tmpb_tl
     { 
       \tl_set:Nx \l_siunitx_unit_prefix_current_tl
         { \intexpr_eval:n { \l_siunitx_unit_prefix_current_tl  - 3 } } 
@@ -12280,7 +12280,7 @@ This work consists of the file  siunitx.dtx
               \@ifpackageloaded { fourier } { }
                 { \keys_set:nn { siunitx } { text-ohm = \textohm } } 
             }
-          \tl_if_eq:nVT { OT1 } \encodingdefault 
+          \str_if_eq:nVT { OT1 } \encodingdefault 
             { 
               \keys_set:nn { siunitx } 
                 {
@@ -12425,7 +12425,7 @@ This work consists of the file  siunitx.dtx
 \clist_new:N \l_siunitx_pgf_link_clist
 \cs_new_protected_nopar:Npn \siunitx_pgf_link: {
   \clist_clear:N \l_siunitx_pgf_link_clist
-  \tl_if_eq:VnT \l_siunitx_round_tl { figure }
+  \str_if_eq:VnT \l_siunitx_round_tl { figure }
     {
       \clist_put_right:Nn \l_siunitx_pgf_link_clist { fixed }
       \clist_put_right:Nn \l_siunitx_pgf_link_clist 
@@ -12470,7 +12470,7 @@ This work consists of the file  siunitx.dtx
       \clist_put_right:Nn \l_siunitx_pgf_link_clist 
         { skip~0. = true }
     } 
-  \tl_if_eq:VnTF \l_siunitx_process_sign_tl { + }
+  \str_if_eq:VnTF \l_siunitx_process_sign_tl { + }
     { 
       \clist_put_right:Nn \l_siunitx_pgf_link_clist 
         { showpos = true }
@@ -13880,7 +13880,7 @@ This work consists of the file  siunitx.dtx
   strictarc      .code:n    = ,
   tabalign       .code:n    = 
     {
-      \tl_if_eq:nnTF {#1} { centre }
+      \str_if_eq:nnTF {#1} { centre }
         { \keys_set:nn { siunitx } { table-alignment = center } }
         { \keys_set:nn { siunitx } { table-alignment = #1 } }  
     },
@@ -13890,16 +13890,16 @@ This work consists of the file  siunitx.dtx
   tabformat      .meta:n    = { table-format            = #1          },
   tabnumalign    .code:n    = 
     {
-      \tl_if_eq:nnTF {#1} { centre }
+      \str_if_eq:nnTF {#1} { centre }
         { \keys_set:nn { siunitx } { table-number-alignment = center } }
         { 
-          \tl_if_eq:nnTF {#1} { centredecimal }
+          \str_if_eq:nnTF {#1} { centredecimal }
             {
               \keys_set:nn { siunitx } 
                 { table-number-alignment = center-decimal-marker } 
             }
             {
-              \tl_if_eq:nnTF {#1} { centerdecimal }
+              \str_if_eq:nnTF {#1} { centerdecimal }
                 {
                   \keys_set:nn { siunitx } 
                     { table-number-alignment = center-decimal-marker } 
@@ -13915,13 +13915,13 @@ This work consists of the file  siunitx.dtx
   tabparseonly   .default:n = { true                                  },
   tabtextalign   .code:n    = 
     {
-      \tl_if_eq:nnTF {#1} { centre }
+      \str_if_eq:nnTF {#1} { centre }
         { \keys_set:nn { siunitx } { table-text-alignment = center } }
         { \keys_set:nn { siunitx } { table-text-alignment = #1 } }
     },
   tabunitalign   .code:n    = 
     {
-      \tl_if_eq:nnTF {#1} { centre }
+      \str_if_eq:nnTF {#1} { centre }
         { \keys_set:nn { siunitx } { table-unit-alignment = center } }
         { \keys_set:nn { siunitx } { table-unit-alignment = #1 } }
     },
@@ -14436,7 +14436,7 @@ This work consists of the file  siunitx.dtx
   \clist_map_function:nN {#1} \siunitx_requireconfig:n
 }
 \cs_new_protected_nopar:Npn \siunitx_requireconfig:n #1 {
-  \tl_if_eq:nnT {#1} { synchem }
+  \str_if_eq:nnT {#1} { synchem }
     { \keys_set:nn { siunitx } { load-configurations = chemistry } }
 }
 %    \end{macrocode}
