@@ -466,6 +466,8 @@ This work consists of the file  siunitx.dtx
 %  \cs{per} with \cs{exp_after:wN}}
 %\changes{v2.0u}{2010/09/14}{Fix second possible issue with 
 %  \pkg{textpos} package and \cs{color}}
+%\changes{v2.0u}{2010/09/14}{Prevent infinite loop if \cs{SI} function
+%  is used with an empty number}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -4159,7 +4161,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2010/08/24} {2.0t}
+\ProvidesExplPackage {siunitx} {2010/09/14} {2.0u}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %    
@@ -4566,7 +4568,7 @@ This work consists of the file  siunitx.dtx
   \prg_new_conditional:Npnn \siunitx_cs_if_tl:N #1 { T , F, TF , p } 
     {
       \exp_after:wN \siunitx_cs_if_tl_aux:w
-        \token_to_meaning:N #1 MACRO \q_nil
+        \token_to_meaning:N #1 MACRO \q_stop
           { 
             \cs_if_exist:cTF { \cs_to_str:N #1 ~ }
               { \prg_return_false: }
@@ -4574,13 +4576,13 @@ This work consists of the file  siunitx.dtx
           } 
           { \prg_return_false: }
     }
-  \cs_new_nopar:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_nil 
+  \cs_new_nopar:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_stop 
     { \tl_if_empty:nTF {#1} }
   \prg_new_conditional:Npnn \siunitx_cs_if_macro:N #1 
     { T , F , TF , p } 
     {
       \exp_after:wN \siunitx_cs_if_tl_aux:w
-        \token_to_meaning:N #1 MACRO \q_nil
+        \token_to_meaning:N #1 MACRO \q_stop
           { \prg_return_true: }
           { \prg_return_false: }
     }
@@ -7629,13 +7631,13 @@ This work consists of the file  siunitx.dtx
     {
       \exp_after:wN \siunitx_number_format_group_four_aux:NNNNNNw
         \l_siunitx_tmpa_tl \q_no_value \q_no_value \q_no_value
-        \q_no_value \q_no_value \q_nil
+        \q_no_value \q_no_value \q_stop
         { \siunitx_number_format_copy:n {#1 - #2} }
         { \siunitx_number_format_group_four_aux:nn {#1} {#2} }       
     }
 }
 \cs_new_protected:Npn \siunitx_number_format_group_four_aux:NNNNNNw 
-  #1#2#3#4#5#6 \q_nil {
+  #1#2#3#4#5#6 \q_stop {
   \quark_if_no_value:NTF #5
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_group_four_aux:nn 
@@ -8417,7 +8419,9 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
-  \siunitx_print:nV { number } \l_siunitx_number_out_tl
+  \quark_if_no_value:NTF \l_siunitx_number_out_tl
+    { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+    { \siunitx_print:nV { number } \l_siunitx_number_out_tl }
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -13463,7 +13467,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2010/08/24} {2.0t} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2010/09/14} {2.0u} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -14743,7 +14747,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2010/08/24} {2.0t}
+\ProvidesExplFile {siunitx-binary.cfg} {2010/09/14} {2.0u}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
