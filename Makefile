@@ -140,10 +140,10 @@ ctan: tds
 	  cp -f $$I.txt $(CTANDIR)/; \
 	  mv $(CTANDIR)/$$I.txt $(CTANDIR)/$$I ; \
 	done ; \
-	cp $(PACKAGE).tds.zip $(CTANDIR)/ 
-	cd $(CTANDIR) ; \
+	cp $(PACKAGE).tds.zip $(CTANROOT)/ 
+	cd $(CTANROOT) ; \
 	zip -ll -q -r -X $(PACKAGE).zip .
-	cp $(CTANDIR)/$(PACKAGE).zip ./
+	cp $(CTANROOT)/$(PACKAGE).zip ./
 	rm -rf $(CTANROOT)
 	
 doc: $(foreach FILE,$(DTXFILES),$(FILE).pdf)
