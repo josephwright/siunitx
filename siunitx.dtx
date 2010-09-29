@@ -9223,11 +9223,12 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_protect_symbols:N}
 % There are a few unit names which may be defined by other parts of
-% LaTeX. They need to be unexpandable, as in an \texttt{s} column
+% LaTeX. They need to be unexpandable, as in an \texttt{S} column
 % TeX will look for \cs{omit} \emph{before} starting the internal
 % version of \cs{si} and doing a redefinition. The same is true 
 % for the \cs{color} function, which may well be the first thing in 
-% a table cell.
+% a table cell. The same is true for \cs{array@row@rst}, from REV\TeX,
+% which otherwise gives an error.
 %    \begin{macrocode}
 \AtBeginDocument {
   \cs_if_eq:NNT \color \use_none:n
@@ -9235,7 +9236,7 @@ This work consists of the file  siunitx.dtx
   \cs_set_nopar:Npn \siunitx_tmp:w #1 { }
   \cs_if_eq:NNT \color \siunitx_tmp:w
     { \cs_set_protected:Npn \color #1 { } }  
-  \tl_map_function:nN { \bar \color \ng \pm } 
+  \tl_map_function:nN { \bar \color \ng \pm \array@row@rst } 
     \siunitx_protect_symbols:N
 }
 \tl_put_right:Nn \document { \siunitx_protect_symbols:N \fg }
