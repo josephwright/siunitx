@@ -476,6 +476,8 @@ This work consists of the file  siunitx.dtx
 %  and converting prefixes to numbers}
 %\changes{v2.0y}{2010/10/09}{Error with \opt{tight-spacing} option
 %  and exponents corrected}
+%\changes{v2.1}{2010/10/02}{New \opt{copy-complex-root} option for
+%  moving input complex root to output}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1646,27 +1648,28 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule 
-%      bracket-numbers           & Switch  & true              \\ ^^A (
-%      close-bracket             & Literal & )                 \\ 
-%      complex-root-position     & Choice  & after-number      \\
-%      copy-decimal-marker       & Choice  & false             \\
-%      exponent-base             & Literal & 10                \\
-%      exponent-product          & Math    & \cs{times}        \\
-%      group-decimal-digits      & Switch  & true              \\
-%      group-digits              & Switch  & true              \\
-%      group-four-digits         & Switch  & false             \\
-%      group-integer-digits      & Switch  & true              \\
-%      group-separator           & Math    & \cs{,}            \\
-%      negative-color            & Literal & \meta{none}       \\
-%      open-bracket              & Literal & (                 
+%      bracket-numbers          & Switch  & true              \\ ^^A (
+%      close-bracket            & Literal & )                 \\ 
+%      complex-root-position    & Choice  & after-number      \\
+%      copy-complex-root        & Choice  & false             \\
+%      copy-decimal-marker      & Choice  & false             \\
+%      exponent-base            & Literal & 10                \\
+%      exponent-product         & Math    & \cs{times}        \\
+%      group-decimal-digits     & Switch  & true              \\
+%      group-digits             & Switch  & true              \\
+%      group-four-digits        & Switch  & false             \\
+%      group-integer-digits     & Switch  & true              \\
+%      group-separator          & Math    & \cs{,}            \\
+%      negative-color           & Literal & \meta{none}       \\
+%      open-bracket             & Literal & (                 
 %        \\ ^^A ) (
-%      output-close-uncertainty  & Literal & )                 \\ 
-%      output-complex-root       & Math    & \verb=\mathrm{i}= \\
-%      output-decimal-marker     & Math    & .                 \\
-%      output-open-uncertainty   & Literal & (                 \\ ^^A )
-%      separate-uncertainty      & Switch  & false             \\
-%      tight-spacing             & Switch  & false             \\
-%      uncertainty-separator     & Math    & \meta{none}       \\
+%      output-close-uncertainty & Literal & )                 \\ 
+%      output-complex-root      & Math    & \verb=\mathrm{i}= \\
+%      output-decimal-marker    & Math    & .                 \\
+%      output-open-uncertainty  & Literal & (                 \\ ^^A )
+%      separate-uncertainty     & Switch  & false             \\
+%      tight-spacing            & Switch  & false             \\
+%      uncertainty-separator    & Math    & \meta{none}       \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1705,21 +1708,24 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{output-complex-root}
 %\DescribeOption{output-decimal-marker}
+%\DescribeOption{copy-complex-root}
 %\DescribeOption{copy-decimal-marker}
 % The decimal marker used in output is set using the 
 % \opt{output-decimal-marker} option. This can differ from the input 
 % marker, as can the root of $\sqrt{-1}$, which is stored in the 
 % \opt{output-complex-root} option. The later is always in math mode, 
 % but the standard setting uses \cs{mathrm} to give an upright 
-% \enquote{i}: this can easily be altered. The decimal marker from
-% the input can be used in the output by setting the
-% \opt{copy-decimal-marker} option.
+% \enquote{i}: this can easily be altered. The complex root or decimal
+% marker from the input can be used in the output by setting the
+% \opt{copy-complex-root} and \opt{copy-decimal-marker} options,
+% respectively.
 %\begin{LaTeXdemo}
 %  \num{1.23} \\
 %  \num[output-decimal-marker = {,}]{1.23} \\
 %  \num{1+2i} \\
 %  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i} \\
 %  \num[output-complex-root = j]{1+2i} \\
+%  \num[copy-complex-root]{1+2j} \\
 %  \num[copy-decimal-marker]{555,555}
 %\end{LaTeXdemo}
 %
@@ -4923,9 +4929,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_family_math: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
-  \intexpr_compare:nNnT { \fam } = { \c_siunitx_mathsf_int } 
+  \int_compare:nNnT { \fam } = { \c_siunitx_mathsf_int } 
     { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
-  \intexpr_compare:nNnT { \fam } = { \c_siunitx_mathtt_int } 
+  \int_compare:nNnT { \fam } = { \c_siunitx_mathtt_int } 
     { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_family_text: {
@@ -6490,7 +6496,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpa_tl
   \quark_if_no_value:NF \l_siunitx_tmpa_tl 
     {
-      \intexpr_compare:nNnF { \l_siunitx_tmpa_tl } = { 0 } 
+      \int_compare:nNnF { \l_siunitx_tmpa_tl } = { 0 } 
         { \bool_set_true:N \l_siunitx_tmp_bool }
     }
 }
@@ -6515,7 +6521,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_round_bool 
     {
       \bool_set_false:N \l_siunitx_round_bool
-      \intexpr_compare:nNnTF 
+      \int_compare:nNnTF 
         { \l_siunitx_round_int } > 
           { \l_siunitx_process_precision_int }
         { 
@@ -6569,7 +6575,7 @@ This work consists of the file  siunitx.dtx
   \tl_put_left:cV { l_siunitx_round_ #1 _out_tl } \l_siunitx_tmp_int
   \bool_if:NF \l_siunitx_round_bool 
     {
-      \intexpr_compare:nNnF { \l_siunitx_tmp_int } = { 0 }
+      \int_compare:nNnF { \l_siunitx_tmp_int } = { 0 }
         { \bool_set_true:N \l_siunitx_round_bool }
     }
   \bool_if:NT \l_siunitx_round_bool 
@@ -6624,22 +6630,22 @@ This work consists of the file  siunitx.dtx
 % to be included.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_figures_integer: {
-  \intexpr_compare:nNnT { \l_siunitx_round_int } > { 0 } 
+  \int_compare:nNnT { \l_siunitx_round_int } > { 0 } 
     { \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 0 } }
-  \intexpr_compare:nNnF { \l_siunitx_round_int } > { 1 } 
+  \int_compare:nNnF { \l_siunitx_round_int } > { 1 } 
     {
       \int_set:Nn \l_siunitx_tmp_int 
         { \exp_args:NV \tl_head:n \l_siunitx_round_integer_in_tl }
       \bool_if:NT \l_siunitx_round_bool
         { \int_incr:N \l_siunitx_tmp_int }
       \bool_set_false:N \l_siunitx_round_bool
-      \intexpr_compare:nNnTF { \l_siunitx_round_int } = { 1 }
+      \int_compare:nNnTF { \l_siunitx_round_int } = { 1 }
         {
-          \intexpr_compare:nNnT { \l_siunitx_tmp_int } > { 4 }
+          \int_compare:nNnT { \l_siunitx_tmp_int } > { 4 }
             { \bool_set_true:N \l_siunitx_round_bool }
         }
         {
-          \intexpr_compare:nNnT { \l_siunitx_tmp_int } > { 10 } 
+          \int_compare:nNnT { \l_siunitx_tmp_int } > { 10 } 
             {
               \bool_set_true:N \l_siunitx_round_bool
               \int_zero:N \l_siunitx_tmp_int
@@ -6716,7 +6722,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpa_tl
   \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
-      \intexpr_while_do:nNnn { \l_siunitx_round_int } > { 0 } 
+      \int_while_do:nNnn { \l_siunitx_round_int } > { 0 } 
         {
           \tl_put_right:Nn \l_siunitx_tmpa_tl { 0 }
           \int_decr:N \l_siunitx_round_int
@@ -6743,13 +6749,13 @@ This work consists of the file  siunitx.dtx
     }
 }  
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
-  \intexpr_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 } 
+  \int_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 } 
     { 
       \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
         \l_siunitx_tmpa_tl
       \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
-          \intexpr_compare:nNnT 
+          \int_compare:nNnT 
             { \exp_args:NV \tl_head:n \l_siunitx_tmpa_tl } > { 4 }
             {
               \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
@@ -6761,7 +6767,7 @@ This work consists of the file  siunitx.dtx
                 }
                 {
                   \tl_set:Nx \l_siunitx_tmpa_tl  
-                    { \intexpr_eval:n { \l_siunitx_tmpa_tl + 1 } }
+                    { \int_eval:n { \l_siunitx_tmpa_tl + 1 } }
                   \prop_put:NnV \l_siunitx_number_in_prop 
                     { #1 -integer } \l_siunitx_tmpa_tl  
                 }
@@ -6777,7 +6783,7 @@ This work consists of the file  siunitx.dtx
         {
           \tl_if_empty:NT \l_siunitx_tmpa_tl 
             { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-          \intexpr_compare:nNnTF { \l_siunitx_tmpa_tl } = { 0 } 
+          \int_compare:nNnTF { \l_siunitx_tmpa_tl } = { 0 } 
             {
               \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal }
                 { }
@@ -6805,7 +6811,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_places_aux_ii:n #1 {
   \int_sub:Nn \l_siunitx_round_int 
     { \l_siunitx_process_precision_int }
-  \intexpr_compare:nNnTF { \l_siunitx_round_int } < { 0 } 
+  \int_compare:nNnTF { \l_siunitx_round_int } < { 0 } 
     {
       \int_set:Nn \l_siunitx_round_int { - \l_siunitx_round_int }
       \siunitx_number_process_pad:n {#1}
@@ -6874,7 +6880,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \l_siunitx_round_bool
     { \int_incr:N \l_siunitx_tmp_int }
   \bool_set_false:N \l_siunitx_round_bool
-  \intexpr_compare:nNnT { \l_siunitx_tmp_int } = { 10 } 
+  \int_compare:nNnT { \l_siunitx_tmp_int } = { 10 } 
     {
       \int_zero:N \l_siunitx_tmp_int
       \bool_set_true:N \l_siunitx_round_bool 
@@ -6910,7 +6916,7 @@ This work consists of the file  siunitx.dtx
 % complicated!
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_round_decimal: {
-  \intexpr_compare:nNnF { \l_siunitx_round_int } > { 1 } 
+  \int_compare:nNnF { \l_siunitx_round_int } > { 1 } 
     { \siunitx_number_process_round_decimal_aux: }
   \tl_set:Nx \l_siunitx_round_decimal_in_tl 
     { \exp_args:NV \tl_tail:n \l_siunitx_round_decimal_in_tl }
@@ -6923,13 +6929,13 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \l_siunitx_round_bool 
     { \int_incr:N \l_siunitx_tmp_int }
   \bool_set_false:N \l_siunitx_round_bool
-  \intexpr_compare:nNnTF { \l_siunitx_round_int } = { 1 } 
+  \int_compare:nNnTF { \l_siunitx_round_int } = { 1 } 
     {
-      \intexpr_compare:nNnT { \l_siunitx_tmp_int } > { 4 } 
+      \int_compare:nNnT { \l_siunitx_tmp_int } > { 4 } 
         { \bool_set_true:N \l_siunitx_round_bool }
     }
     {
-      \intexpr_compare:nNnT { \l_siunitx_tmp_int } = { 10 } 
+      \int_compare:nNnT { \l_siunitx_tmp_int } = { 10 } 
         {
           \bool_set_true:N \l_siunitx_round_bool
           \int_zero:N \l_siunitx_tmp_int
@@ -7065,7 +7071,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_uncertainty_count:nn {#1} { uncertainty }
   \tl_clear:N \l_siunitx_uncertainty_decimal_tl
   \tl_clear:N \l_siunitx_uncertainty_integer_tl
-  \intexpr_compare:nNnTF 
+  \int_compare:nNnTF 
     { \l_siunitx_process_uncertainty_int } >
       { \l_siunitx_process_decimal_int } 
     { \siunitx_number_process_uncertainty_separate: }
@@ -7097,7 +7103,7 @@ This work consists of the file  siunitx.dtx
 % Uncertainty is short: add zeros.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_uncertainty_pad: {
-  \intexpr_while_do:nNnn
+  \int_while_do:nNnn
     { \l_siunitx_process_uncertainty_int } <
       { \l_siunitx_process_decimal_int }
     {
@@ -7120,7 +7126,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected:Npn 
   \siunitx_number_process_uncertainty_separate_aux:N #1 {
-  \intexpr_compare:nNnTF 
+  \int_compare:nNnTF 
     { \l_siunitx_process_uncertainty_int } >
       { \l_siunitx_process_decimal_int } 
     { \tl_put_right:Nn \l_siunitx_uncertainty_integer_tl {#1} }
@@ -7211,6 +7217,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_brackets_bool}
 %\begin{macro}{\l_siunitx_bracket_close_tl}
+%\begin{macro}{\l_siunitx_output_complex_copy_bool}
 %\begin{macro}{\l_siunitx_output_decimal_copy_bool}
 %\begin{macro}{\l_siunitx_exponent_base_tl}
 %\begin{macro}{\l_siunitx_exponent_product_tl}
@@ -7237,6 +7244,8 @@ This work consists of the file  siunitx.dtx
   complex-root-position
     / before-number          .code:n     =
       { \bool_set_false:N \l_siunitx_complex_after_bool } ,
+  copy-complex-root         .bool_set:N = 
+    \l_siunitx_output_complex_copy_bool,
   copy-decimal-marker       .bool_set:N = 
     \l_siunitx_output_decimal_copy_bool,
   exponent-base             .tl_set:N   = \l_siunitx_exponent_base_tl,
@@ -7260,17 +7269,7 @@ This work consists of the file  siunitx.dtx
   open-bracket              .tl_set:N   = \l_siunitx_bracket_open_tl, 
   output-close-uncertainty  .tl_set:N   = 
     \l_siunitx_output_uncert_close_tl,
-  output-complex-root       .code:n     =
-    { 
-      \tl_set:Nn \l_siunitx_output_complex_tl
-        { 
-          \use:c 
-            {
-              siunitx_ \l_siunitx_print_type_tl _ 
-              math \l_siunitx_font_family_tl :n
-            }  {#1} 
-        }
-    },
+  output-complex-root       .tl_set:N   = \l_siunitx_output_complex_tl ,
   output-decimal-marker     .code:n     = 
     {
       \tl_set:Nn \l_siunitx_output_decimal_tl { {#1} }
@@ -7303,6 +7302,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\end{macro} 
 %\end{macro}
+%\end{macro}
 %\end{macro} 
 %\end{macro} 
 %\end{macro} 
@@ -7324,7 +7324,7 @@ This work consists of the file  siunitx.dtx
     {
       \prop_clear:N \l_siunitx_number_out_prop
       \siunitx_number_format_reassemble:
-      \siunitx_number_format_complex:  
+      \siunitx_number_format_complex:
       \siunitx_number_format_sign:n { mantissa }
       \siunitx_number_format_sign:n { exponent }
       \siunitx_number_format_color:
@@ -7400,6 +7400,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_format_complex:}
 %\begin{macro}[aux]{\siunitx_number_format_complex_aux:n}
+%\begin{macro}[aux]{\siunitx_number_format_complex_aux:}
 % The real and complex parts of each number are reassembled, with 
 % brackets if needed.
 %    \begin{macrocode}
@@ -7422,29 +7423,51 @@ This work consists of the file  siunitx.dtx
           \tl_set:Nx \l_siunitx_tmpa_tl
             { 
               \exp_not:N \siunitx_ensuremath:n 
-                { \exp_not:V \l_siunitx_output_complex_tl } 
+                { \exp_not:V \l_siunitx_tmpa_tl } 
             }
           \prop_put:NnV \l_siunitx_number_out_prop { complex }
             \l_siunitx_tmpa_tl
         }
-
         \siunitx_number_format_join_complex:
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_complex_aux:n #1 {
-  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \siunitx_number_format_complex_aux:
+  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
   \bool_if:NTF \l_siunitx_complex_after_bool
     {
-      \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-         \l_siunitx_output_complex_tl
+      \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl 
+        \l_siunitx_tmpa_tl
     }
     {
-      \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-        \l_siunitx_output_complex_tl
+      \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl 
+        \l_siunitx_tmpa_tl
     }
-  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+}
+\cs_new_protected_nopar:Npn \siunitx_number_format_complex_aux: {
+  \tl_set:Nn \l_siunitx_tmpa_tl
+    {
+      \use:c 
+        {
+          siunitx_ \l_siunitx_print_type_tl _ 
+          math \l_siunitx_font_family_tl :n
+        }
+    }
+  \bool_if:NTF \l_siunitx_output_complex_copy_bool
+    { 
+      \prop_get:NnN \l_siunitx_number_in_prop { complex-root } 
+        \l_siunitx_tmpb_tl
+      \tl_put_right:Nx \l_siunitx_tmpa_tl 
+        { { \exp_not:V \l_siunitx_tmpb_tl } }
+    }
+    {
+      \tl_put_right:Nx \l_siunitx_tmpa_tl 
+        { { \exp_not:V \l_siunitx_output_complex_tl } }
+    }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -9455,7 +9478,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_parse_power_before:n #1 {
   \tl_set:Nx \l_siunitx_tmpa_tl 
-    { power- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
+    { power- \int_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 \cs_new_protected:Npn \siunitx_unit_parse_power_after:n #1 {
@@ -9494,7 +9517,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_parse_per: {
   \tl_set:Nx \l_siunitx_tmpa_tl 
-    {  per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
+    {  per- \int_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
   \bool_if:NT \l_siunitx_sticky_per_bool
     { \cs_set_eq:NN \per \siunitx_unit_parse_per_error: }
@@ -9720,7 +9743,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format: {
   \siunitx_unit_format_init:
-  \intexpr_compare:nNnT { \l_siunitx_unit_int } = { 1 } 
+  \int_compare:nNnT { \l_siunitx_unit_int } = { 1 } 
     { 
       \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
         {
@@ -9728,7 +9751,7 @@ This work consists of the file  siunitx.dtx
             { \tl_clear:N \l_siunitx_number_unit_separator_tl }
         }
     }
-  \intexpr_while_do:nNnn { \l_siunitx_unit_int } > { 0 }
+  \int_while_do:nNnn { \l_siunitx_unit_int } > { 0 }
     {
       \siunitx_unit_format_prefix:
       \siunitx_unit_format_symbol:
@@ -9777,7 +9800,7 @@ This work consists of the file  siunitx.dtx
       \str_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
         {
           \tl_set:Nx \l_siunitx_tmpa_tl 
-            { per- \intexpr_eval:n { \l_siunitx_unit_int + 1 } }
+            { per- \int_eval:n { \l_siunitx_unit_int + 1 } }
           \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
             {
               \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
@@ -9805,7 +9828,7 @@ This work consists of the file  siunitx.dtx
 % only done if there is no number. Then some construction work.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_fraction: {
-  \intexpr_compare:nNnTF { \l_siunitx_unit_denominator_int } > { 0 } 
+  \int_compare:nNnTF { \l_siunitx_unit_denominator_int } > { 0 } 
     {
       \use:c 
         { siunitx_unit_format_fraction_ \l_siunitx_per_mode_tl : }
@@ -9835,7 +9858,7 @@ This work consists of the file  siunitx.dtx
 } 
 \cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_symbol: {
   \siunitx_unit_format_fraction_symbol_aux:
-  \intexpr_compare:nNnT { \l_siunitx_unit_denominator_int } > { 1 }
+  \int_compare:nNnT { \l_siunitx_unit_denominator_int } > { 1 }
     {
       \bool_if:NT \l_siunitx_unit_denominator_bracket_bool 
         {
@@ -10099,12 +10122,12 @@ This work consists of the file  siunitx.dtx
     { prefix-base- \int_use:N \l_siunitx_unit_int }
  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
    \l_siunitx_tmpa_tl
-  \intexpr_compare:nNnT { \l_siunitx_unit_prefix_base_int } = { 0 } 
+  \int_compare:nNnT { \l_siunitx_unit_prefix_base_int } = { 0 } 
     {
       \int_set:Nn \l_siunitx_unit_prefix_base_int 
         { \l_siunitx_tmpa_tl }
     }
-  \intexpr_compare:nNnTF 
+  \int_compare:nNnTF 
     { \l_siunitx_unit_prefix_base_int } = { \l_siunitx_tmpa_tl }
     { \siunitx_unit_format_prefix_number_calc: }
     { \msg_error:nn { siunitx } { prefix-base-mismatch } }
@@ -10129,14 +10152,14 @@ This work consists of the file  siunitx.dtx
   \str_if_eq:nVT { \gram } \l_siunitx_tmpb_tl
     { 
       \tl_set:Nx \l_siunitx_unit_prefix_current_tl
-        { \intexpr_eval:n { \l_siunitx_unit_prefix_current_tl  - 3 } } 
+        { \int_eval:n { \l_siunitx_unit_prefix_current_tl  - 3 } } 
       \tl_set:Nx \l_siunitx_tmpb_tl 
         { symbol- \int_use:N \l_siunitx_unit_int }
       \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpb_tl { kg }
     }
   \tl_set:Nx \l_siunitx_unit_prefix_current_tl 
     {
-       \intexpr_eval:n 
+       \int_eval:n 
          { \l_siunitx_unit_prefix_current_tl * \l_siunitx_tmpa_tl }
     }
   \tl_set:Nx \l_siunitx_tmpa_tl 
@@ -10264,7 +10287,7 @@ This work consists of the file  siunitx.dtx
   \msg_error:nn { siunitx } { prefix-only }
 }
 \cs_new_protected_nopar:Npn \siunitx_unit_format_symbol_aux_alt: {
-  \intexpr_compare:nNnTF { \l_siunitx_unit_int } = { 1 }
+  \int_compare:nNnTF { \l_siunitx_unit_int } = { 1 }
     { 
       \prop_del:Nn \l_siunitx_unit_prop { prefix-1 }
       \prop_del:Nn \l_siunitx_unit_prop { prefix-base-1 }
@@ -10390,7 +10413,7 @@ This work consists of the file  siunitx.dtx
   \cs_set_eq:NN \siunitx_unit_format_fraction_symbol_aux: 
     \siunitx_unit_format_fraction_symbol_aux_alt:
   \siunitx_unit_in:nn {#1} {#2}
-  \intexpr_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 } 
+  \int_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 } 
     { 
       \tl_set:Nx \l_siunitx_tmpa_tl 
         {
@@ -10431,7 +10454,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_unit_output_print: {
-  \intexpr_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 } 
+  \int_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 } 
     { 
       \tl_set:Nx \l_siunitx_tmpa_tl 
         {
@@ -10523,7 +10546,7 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_product_power_bool
     {
       \siunitx_combined_product_count:n {#1}
-      \intexpr_compare:nNnTF { \l_siunitx_number_product_int } > { 0 } 
+      \int_compare:nNnTF { \l_siunitx_number_product_int } > { 0 } 
         {
           \int_incr:N \l_siunitx_number_product_int
           \tl_set:Nn \l_siunitx_tmpa_tl {#2}
@@ -11685,7 +11708,7 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nn \l_siunitx_round_tl { places }  
     }
   \siunitx_table_print_S_parse: 
-  \intexpr_compare:nNnTF
+  \int_compare:nNnTF
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } >
       { 0 }
     { \siunitx_table_print_S_reserved_mantissa: }
@@ -11701,7 +11724,7 @@ This work consists of the file  siunitx.dtx
       \msg_error:nnx { siunitx } { table-partial-number } 
         { a~complex }
     }
-  \intexpr_compare:nNnTF { \l_siunitx_table_exponent_int } > { 0 }
+  \int_compare:nNnTF { \l_siunitx_table_exponent_int } > { 0 }
     { \siunitx_table_print_S_reserved_exponent: }
     { 
       \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
@@ -11760,14 +11783,14 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_model_aux:nn { uncert } 
     { mantissa-uncertainty }
   \siunitx_table_print_S_model_aux:nn { exponent } { exponent-integer }
-  \intexpr_compare:nNnF 
+  \int_compare:nNnF 
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } =
       { 0 }
     { 
       \prop_put:Nnn \l_siunitx_number_in_prop { mantissa } 
         { true }
     }
-  \intexpr_compare:nNnT { \l_siunitx_table_decimal_int } > { 0 }
+  \int_compare:nNnT { \l_siunitx_table_decimal_int } > { 0 }
     { 
       \prop_put:NnV \l_siunitx_number_in_prop 
         { mantissa-decimal-marker }
@@ -11775,7 +11798,7 @@ This work consists of the file  siunitx.dtx
     }
   \bool_if:NT \l_siunitx_table_sign_mantissa_bool
     { \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-sign } { - } }
-  \intexpr_compare:nNnT { \l_siunitx_table_exponent_int } > { 0 }
+  \int_compare:nNnT { \l_siunitx_table_exponent_int } > { 0 }
     {  
       \bool_if:NT \l_siunitx_table_sign_exponent_bool
         {
@@ -11871,7 +11894,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_table_print_S_reserved_uncert:n #1 {
   \bool_if:NT \l_siunitx_uncert_sep_bool
     {
-      \intexpr_compare:nNnTF { \l_siunitx_table_uncert_int } > { 0 }
+      \int_compare:nNnTF { \l_siunitx_table_uncert_int } > { 0 }
         { \siunitx_table_print_S_reserved_uncert_aux:n {#1} }
         { 
           \prop_if_in:NnT \l_siunitx_number_out_prop 
