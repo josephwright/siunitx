@@ -481,6 +481,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.1}{2010/10/12}{New \opt{table-align-exponent} and
 %  \opt{table-align-uncertainty} options for additional choices of 
 %  table formatting}
+%\changes{v2.1}{2010/10/12}{New \opt{power-font} option for controlling
+% whether superscript powers are treated as numbers or units.}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -2362,7 +2364,8 @@ This work consists of the file  siunitx.dtx
 %      inter-unit-separator     & Math   & \cs{,}     \\
 %      parse-units              & Switch & true       \\
 %      per-mode                 & Choice & reciprocal \\
-%      per-symbol               & Math   & /          \\    
+%      per-symbol               & Math   & /          \\
+%      power-font               & Choice & number     \\    
 %      prefixes-as-symbols      & Switch & true       \\
 %      qualifier-mode           & Choice & subscript  \\
 %      sticky-per               & Switch & false      \\
@@ -2452,6 +2455,17 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \si{\pascal\per\gray\henry} \\
 %  \si[sticky-per]{\pascal\per\gray\henry}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{power-font}
+% The font used for the powers in units can be typeset using the
+% current number or unit font. This may be of use when the font used
+% for numbers and units are very different, for example when the 
+% \pkg{euler} package is loaded.
+%\begin{LaTeXdemo}
+%  \sisetup{unit-mode = text}%
+%  \si{\metre\per\second\squared} \\
+%  \si[power-font = unit]{\metre\per\second\squared}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{qualifier-mode}
@@ -9697,6 +9711,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_per_auto_bool}
 %\begin{macro}{\l_siunitx_per_fraction_bool}
 %\begin{macro}{\l_siunitx_per_mode_tl}
+%\begin{macro}{\l_siunitx_power_number_bool}
 %\begin{macro}{\l_siunitx_qualifier_mode_tl}
 %\begin{macro}{\l_siunitx_per_two_parts_bool}
 % For saving settings.
@@ -9704,9 +9719,11 @@ This work consists of the file  siunitx.dtx
 \bool_new:N \l_siunitx_per_auto_bool
 \bool_new:N \l_siunitx_per_fraction_bool
 \tl_new:N \l_siunitx_per_mode_tl
+\bool_new:N \l_siunitx_power_number_bool
 \bool_new:N \l_siunitx_two_parts_bool
 \tl_new:N \l_siunitx_qualifier_mode_tl
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -9768,6 +9785,11 @@ This work consists of the file  siunitx.dtx
       \bool_set_true:N \l_siunitx_per_two_parts_bool
     },
   per-symbol           .tl_set:N  = \l_siunitx_per_symbol_tl,
+  power-font           .choice:,
+  power-font / number  .code:n    = 
+    { \bool_set_true:N \l_siunitx_power_number_bool },
+  power-font / unit    .code:n    = 
+    { \bool_set_false:N \l_siunitx_power_number_bool },
   qualifier-mode       .choice:,
   qualifier-mode / brackets .code:n = 
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets } },
@@ -9781,6 +9803,7 @@ This work consists of the file  siunitx.dtx
   inter-unit-separator     = \,,
   per-mode                 = reciprocal,
   per-symbol               = /,
+  power-font               = number,
   qualifier-mode           = subscript
 }
 %    \end{macrocode}
@@ -10064,6 +10087,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}[aux]{\siunitx_unit_format_power_aux:}
 %\begin{macro}[aux]{\siunitx_unit_format_power_aux:n}
+%\begin{macro}[aux]{\siunitx_unit_format_power_aux:nn}
 % The auxiliary function needs to make sure that the printing routine
 % prints the power as a number, not as text: the two modes may be
 % different. A search and replace function is needed for superscripts
@@ -10087,16 +10111,22 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_format_power_aux:n #1 {
-  \bool_if:NTF \l_siunitx_number_math_mode_bool
-    { \siunitx_print:nn { number } {#1} }
+  \bool_if:NTF \l_siunitx_power_number_bool
+    { \siunitx_unit_format_power_aux:nn { number } {#1} }
+    { \siunitx_unit_format_power_aux:nn { unit } {#1} }
+}
+\cs_new_protected:Npn \siunitx_unit_format_power_aux:nn #1#2 {
+  \bool_if:cTF { l_siunitx_ #1 _math_mode_bool }
+    { \siunitx_print:nn {#1} {#2} }
     {
-      \tl_set:Nn \l_siunitx_tmpa_tl {#1}
+      \tl_set:Nn \l_siunitx_tmpa_tl {#2}
       \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - } 
         { \text { \c_siunitx_minus_tl } }
-    \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+      \siunitx_print:nV {#1} \l_siunitx_tmpa_tl
    }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\begin{macro}[aux]{\siunitx_unit_format_power_brackets:}
