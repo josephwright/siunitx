@@ -478,6 +478,9 @@ This work consists of the file  siunitx.dtx
 %  and exponents corrected}
 %\changes{v2.1}{2010/10/02}{New \opt{copy-complex-root} option for
 %  moving input complex root to output}
+%\changes{v2.1}{2010/10/12}{New \opt{table-align-exponent} and
+%  \opt{table-align-uncertainty} options for additional choices of 
+%  table formatting}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -2626,7 +2629,9 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
+%      table-align-exponent      & Switch  & true      \\
 %      table-align-text-post     & Switch  & true      \\
+%      table-align-uncertainty   & Switch  & true      \\
 %      table-alignment           & Choice  & \m{none}  \\
 %      table-auto-round          & Switch  & false     \\
 %      table-figures-decimal     & Integer & 2         \\
@@ -2881,6 +2886,52 @@ This work consists of the file  siunitx.dtx
 %            56.7835  \\
 %      $ > $ 90.473   \\
 %    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{table-align-exponent}
+%\DescribeOption{table-align-uncertainty}
+% When printing exponents in tables, there is a choice of aligning 
+% the exponent parts or having these close up to the mantissa. This
+% is controlled by the \opt{table-align-exponent} option 
+% (\cref{tab:align:exp}). Similarly, uncertainty parts which are printed
+% separately from the mantissa can be aligned or closed up. This is
+% set by the \opt{table-align-uncertainty} option 
+% (\cref{tab:align:uncert}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{The \opt{table-align-exponent} option}
+%    \label{tab:align:exp}
+%    \sisetup{table-format = 1.3e2, table-number-alignment = center}
+%    \begin{tabular}{SS[table-align-exponent = false]}
+%      \toprule
+%        {Header} & {Header} \\
+%      \midrule
+%        1.2e3    & 1.2e3    \\
+%        1.234e56 & 1.234e56 \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{The \opt{table-align-uncertainty} option}
+%    \label{tab:align:uncert}
+%    \sisetup{
+%      separate-uncertainty,
+%      table-format = 1.3(1), 
+%      table-number-alignment = center,
+%    }
+%    \begin{tabular}{SS[table-align-uncertainty = false]}
+%      \toprule
+%        {Header} & {Header} \\
+%      \midrule
+%        1.2(1)   & 1.2(3)    \\
+%        1.234(5) & 1.234(5) \\
+%      \bottomrule
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
@@ -3764,10 +3815,12 @@ This work consists of the file  siunitx.dtx
 %    stickyper      & sticky-per                \\
 %    strict         & strict                    \\
 %    tabalign       & table-alignment           \\
+%    tabalignexp    & table-align-exponent      \\
 %    tabautofit     & table-auto-round          \\
 %    tabformat      & table-format              \\
 %    tabnumalign    & table-number-alignment    \\
 %    tabparseonly   & table-parse-only          \\
+%    tabexpalign    & table-align-exponent      \\
 %    tabtextalign   & table-text-alignment      \\
 %    tabunitalign   & table-unit-alignment      \\
 %    textcelsius    & text-celsius              \\
@@ -4434,6 +4487,7 @@ This work consists of the file  siunitx.dtx
 \siunitx_tmp:w { tabalign }
 \siunitx_tmp:w { tabalignexp }
 \siunitx_tmp:w { tabautofit }
+\siunitx_tmp:w { tabexpalign }
 \siunitx_tmp:w { tabformat }
 \siunitx_tmp:w { tabnumalign }
 \siunitx_tmp:w { tabparseonly }
@@ -11360,6 +11414,14 @@ This work consists of the file  siunitx.dtx
 \prop_new:N \l_siunitx_table_model_prop
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_table_space_dim}
+% This dim is used to keep a track of how much space might need to be
+% deleted if exponents are not being aligned.
+%    \begin{macrocode}
+\dim_new:N \l_siunitx_table_space_dim
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_table_text_align_skip}
 %\begin{macro}{\l_siunitx_table_number_align_skip}
@@ -11371,7 +11433,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_table_align_exp_bool}
 %\begin{macro}{\l_siunitx_table_align_post_bool}
+%\begin{macro}{\l_siunitx_table_align_uncert_bool}
 %\begin{macro}{\l_siunitx_table_auto_bool}
 %\begin{macro}{\l_siunitx_table_decimal_int}
 %\begin{macro}{\l_siunitx_table_exponent_int}
@@ -11385,8 +11449,12 @@ This work consists of the file  siunitx.dtx
 % As usual, set up the options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  table-align-exponent        .bool_set:N
+    = \l_siunitx_table_align_exp_bool,
   table-align-text-post       .bool_set:N 
     = \l_siunitx_table_align_post_bool,
+  table-align-uncertainty     .bool_set:N
+    = \l_siunitx_table_align_uncert_bool,
   table-number-alignment      .choice:,
   table-number-alignment / 
     center                  .code:n     = 
@@ -11453,13 +11521,17 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_table_sign_mantissa_bool
 }
 \keys_set:nn { siunitx } {
-  table-align-text-post  = true,
-  table-number-alignment = center-decimal-marker,
-  table-text-alignment   = center,
-  table-figures-decimal  = 2,
-  table-figures-integer  = 3
+  table-align-exponent    = true,
+  table-align-text-post   = true,
+  table-align-uncertainty = true,
+  table-number-alignment  = center-decimal-marker,
+  table-text-alignment    = center,
+  table-figures-decimal   = 2,
+  table-figures-integer   = 3
 }
 %    \end{macrocode} 
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -11695,6 +11767,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved: {
   \dim_zero:N \l_siunitx_table_gap_dim
+  \dim_zero:N \l_siunitx_table_space_dim
   \siunitx_table_print_S_reserved_ends:
   \dim_compare:nNnTF 
     { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
@@ -11830,19 +11903,29 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_table_print_S_reserved_mantissa_aux:n}
 % Printing the mantissa is done by measuring the integer part of the
 % model and the real number, and padding out if necessary. Everything
-% else is straight forward.
+% else is straight forward. The reason for the two box setting
+% operations here is to allow the amount of empty space left after
+% the decimal marker to be measured: this is needed if exponents are
+% not being aligned.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa: {
   \siunitx_table_print_S_reserved_mantissa_aux:n { mantissa }
   \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
     { mantissa } { }
   \siunitx_table_print_S_get_mantissa:Nn 
-    \l_siunitx_number_out_prop { } 
+    \l_siunitx_number_out_prop { }
+  \dim_set:Nn \l_siunitx_table_space_dim { \l_siunitx_table_mantissa_dim }
+  \hbox_set:Nn \l_siunitx_table_result_box
+    {
+      \box_use:N \l_siunitx_table_fill_box
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+    }
+  \dim_sub:Nn \l_siunitx_table_space_dim 
+    { \box_wd:N \l_siunitx_table_result_box }
   \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
     { \l_siunitx_table_mantissa_dim }
     { 
-      \box_use:N \l_siunitx_table_fill_box
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+      \box_use:N \l_siunitx_table_result_box
       \tex_hfil:D
     }
   \box_use:N \l_siunitx_table_result_box
@@ -11921,6 +12004,11 @@ This work consists of the file  siunitx.dtx
       \tex_hfil:D
     }
   \box_use:N \l_siunitx_table_result_box
+  \bool_if:NF \l_siunitx_table_align_uncert_bool
+    {
+      \tex_hskip:D \l_siunitx_table_space_dim
+      \dim_zero:N \l_siunitx_table_space_dim
+    }  
 }
 \cs_new_protected_nopar:Npn 
   \siunitx_table_print_S_reserved_uncert_pm:n #1 {
@@ -11935,6 +12023,9 @@ This work consists of the file  siunitx.dtx
       \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
         { \box_wd:N \l_siunitx_table_result_box } { \tex_hfil:D }
     }
+
+  \bool_if:NF \l_siunitx_table_align_uncert_bool
+    { \tex_hskip:D -\l_siunitx_table_space_dim }  
  \box_use:N \l_siunitx_table_result_box
 }
 %    \end{macrocode}
@@ -11947,7 +12038,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]
 %  {\siunitx_table_print_S_reserved_exponent_product_aux_ii:}
 % Most of the code for the exponent is concerned with getting the
-% product sign correct.Other than that, the exponent result is quite
+% product sign correct. Other than that, the exponent result is quite
 % easy to handle: just print it with some filling.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
@@ -11964,6 +12055,8 @@ This work consists of the file  siunitx.dtx
       \tex_hfil:D
     }
   \box_use:N \l_siunitx_table_result_box 
+  \bool_if:NF \l_siunitx_table_align_exp_bool
+    { \tex_hskip:D \l_siunitx_table_space_dim }  
 }
 \cs_new_protected_nopar:Npn 
   \siunitx_table_print_S_reserved_exponent_product: {
@@ -11975,7 +12068,9 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \l_siunitx_table_model_prop { complex-result }
         { \siunitx_table_print_S_reserved_exponent_product_aux_i: }
     }
- \box_use:N \l_siunitx_table_result_box
+  \bool_if:NF \l_siunitx_table_align_exp_bool
+    { \tex_hskip:D -\l_siunitx_table_space_dim }  
+  \box_use:N \l_siunitx_table_result_box
 }
 \cs_new_protected_nopar:Npn 
   \siunitx_table_print_S_reserved_exponent_product_aux_i: {
@@ -13922,9 +14017,10 @@ This work consists of the file  siunitx.dtx
         { \keys_set:nn { siunitx } { table-alignment = center } }
         { \keys_set:nn { siunitx } { table-alignment = #1 } }  
     },
-  tabalignexp    .code:n    = ,
+  tabalignexp    .code:n    = { table-align-exponent    = #1          },
   tabautofit     .meta:n    = { table-auto-round        = #1          },
   tabautofit     .default:n = { true                                  },
+  tabexpalign    .code:n    = { table-align-exponent    = #1          },
   tabformat      .meta:n    = { table-format            = #1          },
   tabnumalign    .code:n    = 
     {
