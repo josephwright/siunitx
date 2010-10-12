@@ -482,7 +482,9 @@ This work consists of the file  siunitx.dtx
 %  \opt{table-align-uncertainty} options for additional choices of 
 %  table formatting}
 %\changes{v2.1}{2010/10/12}{New \opt{power-font} option for controlling
-% whether superscript powers are treated as numbers or units.}
+% whether superscript powers are treated as numbers or units}
+%\changes{v2.1}{2010/10/12}{New \opt{force-scientific-notation} option
+% for to use exponent form for numbers in all cases}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1547,14 +1549,15 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      add-decimal-zero      & Switch  & true     \\
-%      add-integer-zero      & Switch  & true     \\
-%      explicit-sign         & Literal & \m{none} \\
-%      retain-explicit-plus  & Switch  & false    \\
-%      retain-unity-mantissa & Switch  & true     \\
-%      retain-zero-exponent  & Switch  & false    \\
-%      round-mode            & Choice  & off      \\
-%      round-precision       & Integer & 2        \\
+%      add-decimal-zero          & Switch  & true     \\
+%      add-integer-zero          & Switch  & true     \\
+%      explicit-sign             & Literal & \m{none} \\
+%      force-scientific-notation & Switch  & false    \\
+%      retain-explicit-plus      & Switch  & false    \\
+%      retain-unity-mantissa     & Switch  & true     \\
+%      retain-zero-exponent      & Switch  & false    \\
+%      round-mode                & Choice  & off      \\
+%      round-precision           & Integer & 2        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1633,6 +1636,19 @@ This work consists of the file  siunitx.dtx
 %  \num[retain-unity-mantissa = false]{1e4} \\
 %  \num{444e0} \\
 %  \num[retain-zero-exponent = true]{444e0} 
+%\end{LaTeXdemo}
+%
+%\DescribeOption{force-scientific-notation}
+% Input can be converted into scientific notation, a function controlled
+% by the \opt{force-scientific-notation} option. This is particularly
+% intended for use with other options in tables, but is applicable to
+% all numerical input.
+%\begin{LaTeXdemo}
+%  \num{0.001} \\
+%  \num{1200}  \\
+%  \sisetup{force-scientific-notation}%
+%  \num{0.001} \\
+%  \num{1200} 
 %\end{LaTeXdemo}
 %
 %\subsection{Printing numbers}
@@ -6474,10 +6490,19 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_process_fp}
+% A \texttt{fp} for forcing scientific notation and related functions
+% which use the floating point unit.
+%    \begin{macrocode}
+\fp_new:N \l_siunitx_process_fp
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_process_decimal_zero_bool}
 %\begin{macro}{\l_siunitx_process_integer_zero_bool}
 %\begin{macro}{\l_siunitx_process_sign_tl}
+%\begin{macro}{\l_siunitx_process_scientific_bool}
 %\begin{macro}{\l_siunitx_process_plus_tl}
 %\begin{macro}{\l_siunitx_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
@@ -6488,6 +6513,8 @@ This work consists of the file  siunitx.dtx
   add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
   add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
+  force-scientific-notation .bool_set:N 
+   = \l_siunitx_process_scientific_bool,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool_set:N = 
     \l_siunitx_process_unity_mantissa_bool,
@@ -6515,6 +6542,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_number_process:}
 % Post-processing is a series of small tasks.
@@ -6526,6 +6554,7 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } 
     {
       \siunitx_number_process_exponent:
+      \siunitx_number_process_scientific:
       \siunitx_number_process_uncertainty:
       \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
         { \siunitx_number_process_round: }
@@ -7025,6 +7054,105 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_round_decimal_out_tl
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siuntix_number_process_scientific:}
+%\begin{macro}[aux]{\siuntix_number_process_scientific_aux:w}
+%\begin{macro}[aux]{\siunitx_number_process_scientific_zeros:NNNNNNNNN}
+% Conversions to scientific format are quite hard work. As there is 
+% already a floating-point unit in \pkg{expl3} this is handed off to 
+% be done there. That does limit the number of decimal places available,
+% but the pay-off is that the low-level code is very fast. So this
+% seems worth it. Of course, to get the data back out again there is
+% a low-level parsing of the format of an \texttt{fp} variable.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_process_scientific: {
+  \bool_if:NT \l_siunitx_process_scientific_bool
+    {
+      \prop_if_in:NnF \l_siunitx_number_in_prop { complex } 
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+            \l_siunitx_tmpa_tl
+          \quark_if_no_value:NT \l_siunitx_tmpa_tl
+            { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
+          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+            \l_siunitx_tmpb_tl
+          \quark_if_no_value:NT \l_siunitx_tmpb_tl
+            { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+          \tl_set:Nx \l_siunitx_tmpa_tl
+            { \l_siunitx_tmpa_tl . \l_siunitx_tmpb_tl }
+          \prop_get:NnN \l_siunitx_number_in_prop { exponent }
+            \l_siunitx_tmpb_tl
+          \quark_if_no_value:NT \l_siunitx_tmpb_tl
+            { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+          \tl_set:Nx \l_siunitx_tmpa_tl
+            { \l_siunitx_tmpa_tl e \l_siunitx_tmpb_tl }
+          \fp_set:Nn \l_siunitx_process_fp { \l_siunitx_tmpa_tl }
+          \exp_after:wN \siunitx_number_process_scientific_aux:w
+            \l_siunitx_process_fp \q_stop
+        }
+    }
+}
+%    \end{macrocode}
+% Reading the data back from the \texttt{fp} variable, the first token
+% will always be a \texttt{+}, and so ignored. 
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_scientific_aux:w #1#2 . #3 e #4 \q_stop {
+  \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-integer } {#2}
+  \tl_set:Nx \l_siunitx_tmp_tl 
+    { \siunitx_number_process_scientific_zeros:NNNNNNNNN #3 }
+  \prop_put:NnV \l_siunitx_number_in_prop { mantissa-decimal } 
+    \l_siunitx_tmp_tl
+  \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa-decimal-marker }
+    {
+      \prop_put:Nnn \l_siunitx_number_in_prop 
+        { mantissa-decimal-marker } { . } 
+    }
+  \prop_put:Nnn \l_siunitx_number_in_prop { exponent } { true }
+  \prop_put:Nnn \l_siunitx_number_in_prop { exponent-integer } {#4}
+}
+%    \end{macrocode}
+% There are a fixed number of digits here, so a nested test is the
+% easiest wway to deal with trimming off trailing zeros.
+%    \begin{macrocode}
+\cs_new_nopar:Npn \siunitx_number_process_scientific_zeros:NNNNNNNNN
+  #1#2#3#4#5#6#7#8#9 {
+  \int_compare:nNnTF {#9} = { 0 }
+   {
+     \int_compare:nNnTF {#8} = { 0 }
+       {
+         \int_compare:nNnTF {#7} = { 0 }
+           {
+             \int_compare:nNnTF {#6} = { 0 }
+               {
+                 \int_compare:nNnTF {#5} = { 0 }
+                   {
+                     \int_compare:nNnTF {#4} = { 0 }
+                       { 
+                         \int_compare:nNnTF {#3} = { 0 }
+                           {
+                             \int_compare:nNnTF {#2} = { 0 }
+                               { #1 }
+                               { #1#2 }
+                           }
+                           { #1#2#3 }
+                       }
+                       { #1#2#3#4 }
+                   }
+                   { #1#2#3#4#5 }
+               }
+               { #1#2#3#4#5#6 }
+           }
+           { #1#2#3#4#5#6#7 }
+       }
+       { #1#2#3#4#5#6#7#8 }
+   }
+   { #1#2#3#4#5#6#7#8#9 }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_sign:}
