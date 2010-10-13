@@ -482,7 +482,7 @@ This work consists of the file  siunitx.dtx
 %  table formatting}
 %\changes{v2.1}{2010/10/12}{New \opt{power-font} option for controlling
 % whether superscript powers are treated as numbers or units}
-%\changes{v2.1}{2010/10/12}{New \opt{force-scientific-notation} option
+%\changes{v2.1}{2010/10/13}{New \opt{scientific-notation} option
 % for to use exponent form for numbers in all cases}
 %  
 %\begin{abstract}
@@ -1548,15 +1548,16 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      add-decimal-zero          & Switch  & true     \\
-%      add-integer-zero          & Switch  & true     \\
-%      explicit-sign             & Literal & \m{none} \\
-%      force-scientific-notation & Switch  & false    \\
-%      retain-explicit-plus      & Switch  & false    \\
-%      retain-unity-mantissa     & Switch  & true     \\
-%      retain-zero-exponent      & Switch  & false    \\
-%      round-mode                & Choice  & off      \\
-%      round-precision           & Integer & 2        \\
+%      add-decimal-zero             & Switch  & true     \\
+%      add-integer-zero             & Switch  & true     \\
+%      explicit-sign                & Literal & \m{none} \\
+%      retain-explicit-plus         & Switch  & false    \\
+%      retain-unity-mantissa        & Switch  & true     \\
+%      retain-zero-exponent         & Switch  & false    \\
+%      round-mode                   & Choice  & off      \\
+%      round-precision              & Integer & 2        \\
+%      scientific-notation          & Switch  & false    \\
+%      scientific-notation-exponent & Integer & 0        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1637,17 +1638,25 @@ This work consists of the file  siunitx.dtx
 %  \num[retain-zero-exponent = true]{444e0} 
 %\end{LaTeXdemo}
 %
-%\DescribeOption{force-scientific-notation}
-% Input can be converted into scientific notation, a function controlled
-% by the \opt{force-scientific-notation} option. This is particularly
-% intended for use with other options in tables, but is applicable to
-% all numerical input.
+%\DescribeOption{scientific-notation}
+%\DescribeOption{scientific-notation-exponent}
+% Numbers can be converted to scientific notation by the package. This
+% is controlled by the \opt{scientific-notation} option, which takes
+% choices \opt{false}, \opt{true} and \opt{fixed}. In the later case,
+% the exponent value used will be set by the 
+% \opt{scientific-notation-exponent} option.
 %\begin{LaTeXdemo}
 %  \num{0.001} \\
 %  \num{1200}  \\
-%  \sisetup{force-scientific-notation}%
+%  \sisetup{scientific-notation = true}%
 %  \num{0.001} \\
-%  \num{1200} 
+%  \num{1200}  \\
+%  \sisetup{
+%    scientific-notation          = fixed,
+%    scientific-notation-exponent = 1
+%  }%
+%  \num{0.001} \\
+%  \num{1200}  \\
 %\end{LaTeXdemo}
 %
 %\subsection{Printing numbers}
@@ -6497,17 +6506,25 @@ This work consists of the file  siunitx.dtx
 \fp_new:N \l_siunitx_process_fp
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\l_siunitx_process_fixed_bool}
+%\begin{macro}{\l_siunitx_process_scientific_bool}
+% Settings for the scientific notation system.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_process_fixed_bool
+\bool_new:N \l_siunitx_process_scientific_bool
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 % 
 %\begin{macro}{\l_siunitx_process_decimal_zero_bool}
 %\begin{macro}{\l_siunitx_process_integer_zero_bool}
 %\begin{macro}{\l_siunitx_process_sign_tl}
-%\begin{macro}{\l_siunitx_process_fixed_int}
-%\begin{macro}{\l_siunitx_process_fixed_bool}
-%\begin{macro}{\l_siunitx_process_scientific_bool}
 %\begin{macro}{\l_siunitx_process_plus_tl}
 %\begin{macro}{\l_siunitx_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
 %\begin{macro}{\l_siunitx_process_precision_int}
+%\begin{macro}{\l_siunitx_process_fixed_int}
 % First, the options are set up.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
@@ -6515,9 +6532,6 @@ This work consists of the file  siunitx.dtx
   add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
   exponent-value    .int_set:N  = \l_siunitx_process_fixed_int,
-  fixed-exponent    .bool_set:N = \l_siunitx_process_fixed_bool,
-  force-scientific-notation .bool_set:N 
-   = \l_siunitx_process_scientific_bool,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool_set:N = 
     \l_siunitx_process_unity_mantissa_bool,
@@ -6530,6 +6544,27 @@ This work consists of the file  siunitx.dtx
   round-mode / places  .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { places } },
   round-precision      .int_set:N = \l_siunitx_process_precision_int,
+  scientific-notation .choice: ,
+  scientific-notation
+    / false           .code:n = 
+    {
+      \bool_set_false:N \l_siunitx_process_fixed_bool
+      \bool_set_false:N \l_siunitx_process_scientific_bool
+    },
+  scientific-notation
+    / fixed           .code:n = 
+    {
+      \bool_set_true:N  \l_siunitx_process_fixed_bool
+      \bool_set_false:N \l_siunitx_process_scientific_bool
+    },
+  scientific-notation
+    / true           .code:n = 
+    {
+      \bool_set_false:N \l_siunitx_process_fixed_bool
+      \bool_set_true:N \l_siunitx_process_scientific_bool
+    },
+  scientific-notation-exponent .int_set:N = 
+    \l_siunitx_process_fixed_int
 }
 \keys_set:nn { siunitx } {
   add-decimal-zero      = true,
@@ -6538,8 +6573,6 @@ This work consists of the file  siunitx.dtx
   round-precision       = 2,
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
