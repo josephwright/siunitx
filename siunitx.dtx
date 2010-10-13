@@ -6501,6 +6501,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_decimal_zero_bool}
 %\begin{macro}{\l_siunitx_process_integer_zero_bool}
 %\begin{macro}{\l_siunitx_process_sign_tl}
+%\begin{macro}{\l_siunitx_process_fixed_int}
+%\begin{macro}{\l_siunitx_process_fixed_bool}
 %\begin{macro}{\l_siunitx_process_scientific_bool}
 %\begin{macro}{\l_siunitx_process_plus_tl}
 %\begin{macro}{\l_siunitx_unity_mantissa_tl}
@@ -6512,6 +6514,8 @@ This work consists of the file  siunitx.dtx
   add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
   add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
+  exponent-value    .int_set:N  = \l_siunitx_process_fixed_int,
+  fixed-exponent    .bool_set:N = \l_siunitx_process_fixed_bool,
   force-scientific-notation .bool_set:N 
    = \l_siunitx_process_scientific_bool,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
@@ -6542,6 +6546,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%\end{macro}
+%\end{macro}
 %
 %\begin{macro}{\siunitx_number_process:}
 % Post-processing is a series of small tasks.
@@ -6553,7 +6559,12 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic } 
     {
       \siunitx_number_process_exponent:
-      \siunitx_number_process_scientific:
+      \bool_if:NTF \l_siunitx_process_fixed_bool
+        { \siunitx_number_process_fixed: }
+        {
+          \bool_if:NT \l_siunitx_process_scientific_bool
+            { \siunitx_number_process_scientific: }
+        }    
       \siunitx_number_process_uncertainty:
       \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
         { \siunitx_number_process_round: }
@@ -6772,6 +6783,128 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_pad:n {#1}
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_fixed:}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_aux:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_large:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_large_aux:w}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_small:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_small_aux:w}
+% When working to a fixed exponent value, the idea is to use the stack
+% to do the work. First, there is some set up to do.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed: {
+  \prop_if_in:NnF \l_siunitx_number_in_prop { complex } 
+    {
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+        \l_siunitx_tmpa_tl
+      \quark_if_no_value:NT \l_siunitx_tmpa_tl
+        { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+        \l_siunitx_tmpb_tl
+      \quark_if_no_value:NT \l_siunitx_tmpb_tl
+        { \tl_clear:N \l_siunitx_tmpb_tl }
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { { \l_siunitx_tmpa_tl } { \l_siunitx_tmpb_tl } }
+      \prop_get:NnN \l_siunitx_number_in_prop { exponent }
+        \l_siunitx_tmpb_tl
+      \quark_if_no_value:NT \l_siunitx_tmpb_tl
+        { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
+      \exp_after:wN  \siunitx_number_process_fixed_aux:nnn 
+        \l_siunitx_tmpa_tl
+    }
+}         
+%    \end{macrocode}
+% The main loop checks to see which way to adjust the exponent then 
+% does the work.
+%    \begin{macrocode}        
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_fixed_aux:nnn #1#2#3 {
+  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
+    {
+      \int_compare:nNnTF {#3} > { \l_siunitx_process_fixed_int }
+        { \siunitx_number_process_fixed_large:nnn {#1} {#2} {#3} }
+        {
+          \int_compare:nNnTF {#3} < { \l_siunitx_process_fixed_int }
+            { \siunitx_number_process_fixed_small:nnn {#1} {#2} {#3} }
+            {
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-integer } {#1}
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-decimal } {#2}
+              \prop_put:Nnn \l_siunitx_number_in_prop { exponent } 
+                { true }
+              \prop_put:NnV \l_siunitx_number_in_prop 
+                { exponent-integer }
+                \l_siunitx_process_fixed_int
+              \prop_if_in:NnF \l_siunitx_number_in_prop 
+                { mantissa-decimal-marker }
+                {
+                  \prop_put:Nnn \l_siunitx_number_in_prop 
+                    { mantissa-decimal-marker } { . } 
+                }
+            }
+        }    
+    } 
+}
+%    \end{macrocode}
+% Simple stack-based manipulation of the input for number which are 
+% either too big or too small. 
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_fixed_large:nnn #1#2#3 {
+  \cs_set_protected_nopar:Npn 
+    \siunitx_number_process_fixed_large_aux:w ##1##2 \q_stop
+      {
+        \tl_if_empty:nTF {##2}
+          {
+            \siunitx_number_process_fixed_aux:nnn { #1 ##1 } { 0 } 
+              { #3 - 1 }
+          }  
+          {
+            \siunitx_number_process_fixed_aux:nnn { #1 ##1 } { ##2 } 
+              { #3 - 1 }
+          }
+      }
+  \siunitx_number_process_fixed_large_aux:w #2 \q_stop
+}
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:w 
+  { }
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_fixed_small:nnn #1#2#3 {
+  \cs_set_protected_nopar:Npn 
+    \siunitx_number_process_fixed_small_aux:w ##1##2 \q_stop ##3
+      {
+        \tl_if_empty:nTF {##2}
+          {
+            \tl_if_empty:nTF {##3}
+              {
+                \siunitx_number_process_fixed_aux:nnn { 0 } { ##1 #2 }
+                  { #3 + 1 }
+              }
+              {
+                \siunitx_number_process_fixed_aux:nnn {##3} { ##1 #2 }
+                  { #3 + 1 }
+              }
+          }  
+          {
+            \siunitx_number_process_fixed_small_aux:w ##2 \q_stop 
+              { ##3 ##1 }
+          }
+      }
+  \siunitx_number_process_fixed_small_aux:w #1 \q_stop { }
+}
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_small_aux:w
+  { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\c_siunitx_unity_tl}
@@ -7066,30 +7199,27 @@ This work consists of the file  siunitx.dtx
 % a low-level parsing of the format of an \texttt{fp} variable.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_scientific: {
-  \bool_if:NT \l_siunitx_process_scientific_bool
+  \prop_if_in:NnF \l_siunitx_number_in_prop { complex } 
     {
-      \prop_if_in:NnF \l_siunitx_number_in_prop { complex } 
-        {
-          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
-            \l_siunitx_tmpa_tl
-          \quark_if_no_value:NT \l_siunitx_tmpa_tl
-            { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
-            \l_siunitx_tmpb_tl
-          \quark_if_no_value:NT \l_siunitx_tmpb_tl
-            { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
-          \tl_set:Nx \l_siunitx_tmpa_tl
-            { \l_siunitx_tmpa_tl . \l_siunitx_tmpb_tl }
-          \prop_get:NnN \l_siunitx_number_in_prop { exponent }
-            \l_siunitx_tmpb_tl
-          \quark_if_no_value:NT \l_siunitx_tmpb_tl
-            { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
-          \tl_set:Nx \l_siunitx_tmpa_tl
-            { \l_siunitx_tmpa_tl e \l_siunitx_tmpb_tl }
-          \fp_set:Nn \l_siunitx_process_fp { \l_siunitx_tmpa_tl }
-          \exp_after:wN \siunitx_number_process_scientific_aux:w
-            \l_siunitx_process_fp \q_stop
-        }
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+        \l_siunitx_tmpa_tl
+      \quark_if_no_value:NT \l_siunitx_tmpa_tl
+        { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+        \l_siunitx_tmpb_tl
+      \quark_if_no_value:NT \l_siunitx_tmpb_tl
+        { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { \l_siunitx_tmpa_tl . \l_siunitx_tmpb_tl }
+      \prop_get:NnN \l_siunitx_number_in_prop { exponent }
+        \l_siunitx_tmpb_tl
+      \quark_if_no_value:NT \l_siunitx_tmpb_tl
+        { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { \l_siunitx_tmpa_tl e \l_siunitx_tmpb_tl }
+      \fp_set:Nn \l_siunitx_process_fp { \l_siunitx_tmpa_tl }
+        \exp_after:wN \siunitx_number_process_scientific_aux:w
+        \l_siunitx_process_fp \q_stop
     }
 }
 %    \end{macrocode}
