@@ -6786,7 +6786,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_fixed:}
-%\begin{macro}[aux]{\siunitx_number_process_fixed_aux:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_aux_i:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_fixed_aux_ii:nnn}
 %\begin{macro}[aux]{\siunitx_number_process_fixed_large:nnn}
 %\begin{macro}[aux]{\siunitx_number_process_fixed_large_aux:w}
 %\begin{macro}[aux]{\siunitx_number_process_fixed_small:nnn}
@@ -6813,7 +6814,7 @@ This work consists of the file  siunitx.dtx
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
       \tl_set:Nx \l_siunitx_tmpa_tl
         { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
-      \exp_after:wN  \siunitx_number_process_fixed_aux:nnn 
+      \exp_after:wN  \siunitx_number_process_fixed_aux_i:nnn 
         \l_siunitx_tmpa_tl
     }
 }         
@@ -6822,33 +6823,34 @@ This work consists of the file  siunitx.dtx
 % does the work.
 %    \begin{macrocode}        
 \cs_new_protected_nopar:Npn 
-  \siunitx_number_process_fixed_aux:nnn #1#2#3 {
-  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
+  \siunitx_number_process_fixed_aux_i:nnn #1#2#3 {
+  \prop_put:Nnn \l_siunitx_number_in_prop { exponent } 
+    { true }
+  \prop_put:NnV \l_siunitx_number_in_prop 
+    { exponent-integer } \l_siunitx_process_fixed_int
+  \prop_if_in:NnF \l_siunitx_number_in_prop 
+    { mantissa-decimal-marker }
     {
-      \int_compare:nNnTF {#3} > { \l_siunitx_process_fixed_int }
-        { \siunitx_number_process_fixed_large:nnn {#1} {#2} {#3} }
+      \prop_put:Nnn \l_siunitx_number_in_prop 
+        { mantissa-decimal-marker } { . } 
+    }
+  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
+    { \siunitx_number_process_fixed_aux_ii:nnn {#1} {#2} {#3} }
+}
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_fixed_aux_ii:nnn #1#2#3 {
+  \int_compare:nNnTF {#3} > { \l_siunitx_process_fixed_int }
+    { \siunitx_number_process_fixed_large:nnn {#1} {#2} {#3} }
+    {
+      \int_compare:nNnTF {#3} < { \l_siunitx_process_fixed_int }
+        { \siunitx_number_process_fixed_small:nnn {#1} {#2} {#3} }
         {
-          \int_compare:nNnTF {#3} < { \l_siunitx_process_fixed_int }
-            { \siunitx_number_process_fixed_small:nnn {#1} {#2} {#3} }
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop
-                { mantissa-integer } {#1}
-              \prop_put:Nnn \l_siunitx_number_in_prop
-                { mantissa-decimal } {#2}
-              \prop_put:Nnn \l_siunitx_number_in_prop { exponent } 
-                { true }
-              \prop_put:NnV \l_siunitx_number_in_prop 
-                { exponent-integer }
-                \l_siunitx_process_fixed_int
-              \prop_if_in:NnF \l_siunitx_number_in_prop 
-                { mantissa-decimal-marker }
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop 
-                    { mantissa-decimal-marker } { . } 
-                }
-            }
-        }    
-    } 
+          \prop_put:Nnn \l_siunitx_number_in_prop
+            { mantissa-integer } {#1}
+          \prop_put:Nnn \l_siunitx_number_in_prop
+            { mantissa-decimal } {#2}
+        }
+    }    
 }
 %    \end{macrocode}
 % Simple stack-based manipulation of the input for number which are 
@@ -6861,11 +6863,11 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty:nTF {##2}
           {
-            \siunitx_number_process_fixed_aux:nnn { #1 ##1 } { 0 } 
+            \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 } { 0 } 
               { #3 - 1 }
           }  
           {
-            \siunitx_number_process_fixed_aux:nnn { #1 ##1 } { ##2 } 
+            \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 } { ##2 } 
               { #3 - 1 }
           }
       }
@@ -6882,12 +6884,12 @@ This work consists of the file  siunitx.dtx
           {
             \tl_if_empty:nTF {##3}
               {
-                \siunitx_number_process_fixed_aux:nnn { 0 } { ##1 #2 }
-                  { #3 + 1 }
+                \siunitx_number_process_fixed_aux_ii:nnn { 0 } 
+                  { ##1 #2 } { #3 + 1 }
               }
               {
-                \siunitx_number_process_fixed_aux:nnn {##3} { ##1 #2 }
-                  { #3 + 1 }
+                \siunitx_number_process_fixed_aux_ii:nnn {##3}
+                  { ##1 #2 } { #3 + 1 }
               }
           }  
           {
@@ -6900,6 +6902,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_fixed_small_aux:w
   { }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
