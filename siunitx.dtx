@@ -484,7 +484,7 @@ This work consists of the file  siunitx.dtx
 % whether superscript powers are treated as numbers or units}
 %\changes{v2.1}{2010/10/13}{New \opt{scientific-notation} option
 % for to use exponent form for numbers in all cases}
-%\changes{v2.1}{2010/10/13}{New \opt{stable-omit-exponent} option
+%\changes{v2.1}{2010/10/13}{New \opt{table-omit-exponent} option
 % for simplifying tables}
 %  
 %\begin{abstract}
@@ -2964,7 +2964,6 @@ This work consists of the file  siunitx.dtx
 %    \sisetup{
 %      separate-uncertainty,
 %      table-format = 1.3(1), 
-%      table-number-alignment = center,
 %    }
 %    \begin{tabular}{SS[table-align-uncertainty = false]}
 %      \toprule
@@ -2981,30 +2980,28 @@ This work consists of the file  siunitx.dtx
 % In cases where data cover a range of values, printing using a fixed
 % exponent in a table may make presentation clearer. In these cases,
 % omitting the exponent value from the table is useful. The package
-% offers the \opt{table-omit-exponent} option to do this; this
-% automatically sets \opt{scientific-notation = fixed} for the table
-% column.
+% offers the \opt{table-omit-exponent} option to do this
+% (\cref{tab:exp:omit}); this automatically sets 
+% \opt{scientific-notation = fixed} for the table column.
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
 %    \caption{The \opt{table-omit-exponent} option}
 %    \label{tab:exp:omit}
 %    \begin{tabular}{
+%      S[table-format = 1.1e1]
 %      S[
-%        table-format=2e1,
-%        table-number-alignment = center
-%      ]
-%      S[
-%        table-format=2e1,
-%        table-number-alignment = center
+%        fixed-exponent      = 3,
+%        table-format        = 2.1,
+%        table-omit-exponent
 %      ]
 %    }
 %      \toprule
-%        {Header} & {Header} \\
+%        {Header} & {Header / \num{e3}} \\
 %      \midrule
-%        12e3 & 12e3 \\
-%         3e2 &  3e2 \\
-%         1e4 &  1e4 \\
+%        1.2e3 & 1.2e3 \\
+%         3e2  &   3e2 \\
+%       1.0e4  & 1.0e4 \\
 %      \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -6941,7 +6938,9 @@ This work consists of the file  siunitx.dtx
               { #3 - 1 }
           }
       }
-  \siunitx_number_process_fixed_large_aux:w #2 \q_stop
+  \tl_if_empty:nTF {#2}    
+    { \siunitx_number_process_fixed_aux_ii:nnn { #1 0 } { } { #3 - 1 } }
+    { \siunitx_number_process_fixed_large_aux:w #2 \q_stop }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:w 
   { }
