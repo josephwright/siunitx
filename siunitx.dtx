@@ -484,6 +484,8 @@ This work consists of the file  siunitx.dtx
 % whether superscript powers are treated as numbers or units}
 %\changes{v2.1}{2010/10/13}{New \opt{scientific-notation} option
 % for to use exponent form for numbers in all cases}
+%\changes{v2.1}{2010/10/13}{New \opt{stable-omit-exponent} option
+% for simplifying tables}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1639,12 +1641,12 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\DescribeOption{scientific-notation}
-%\DescribeOption{scientific-notation-exponent}
+%\DescribeOption{fixed-exponent}
 % Numbers can be converted to scientific notation by the package. This
 % is controlled by the \opt{scientific-notation} option, which takes
 % choices \opt{false}, \opt{true} and \opt{fixed}. In the later case,
-% the exponent value used will be set by the 
-% \opt{scientific-notation-exponent} option.
+% the exponent value used will be set by the \opt{fixed-exponent}
+% option.
 %\begin{LaTeXdemo}
 %  \num{0.001} \\
 %  \num{1200}  \\
@@ -1652,8 +1654,8 @@ This work consists of the file  siunitx.dtx
 %  \num{0.001} \\
 %  \num{1200}  \\
 %  \sisetup{
-%    scientific-notation          = fixed,
-%    scientific-notation-exponent = 1
+%    fixed-exponent      = 2,
+%    scientific-notation = fixed,
 %  }%
 %  \num{0.001} \\
 %  \num{1200}  \\
@@ -6520,18 +6522,18 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_decimal_zero_bool}
 %\begin{macro}{\l_siunitx_process_integer_zero_bool}
 %\begin{macro}{\l_siunitx_process_sign_tl}
+%\begin{macro}{\l_siunitx_process_fixed_int}
 %\begin{macro}{\l_siunitx_process_plus_tl}
 %\begin{macro}{\l_siunitx_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
 %\begin{macro}{\l_siunitx_process_precision_int}
-%\begin{macro}{\l_siunitx_process_fixed_int}
 % First, the options are set up.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
   add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
-  exponent-value    .int_set:N  = \l_siunitx_process_fixed_int,
+  fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool_set:N = 
     \l_siunitx_process_unity_mantissa_bool,
@@ -6563,8 +6565,6 @@ This work consists of the file  siunitx.dtx
       \bool_set_false:N \l_siunitx_process_fixed_bool
       \bool_set_true:N \l_siunitx_process_scientific_bool
     },
-  scientific-notation-exponent .int_set:N = 
-    \l_siunitx_process_fixed_int
 }
 \keys_set:nn { siunitx } {
   add-decimal-zero      = true,
