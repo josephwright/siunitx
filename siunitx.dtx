@@ -1648,17 +1648,20 @@ This work consists of the file  siunitx.dtx
 % the exponent value used will be set by the \opt{fixed-exponent}
 % option.
 %\begin{LaTeXdemo}
-%  \num{0.001} \\
-%  \num{1200}  \\
+%  \num{0.001}   \\
+%  \num{0.00100} \\
+%  \num{1200}    \\
 %  \sisetup{scientific-notation = true}%
-%  \num{0.001} \\
-%  \num{1200}  \\
+%  \num{0.001}   \\
+%  \num{0.00100} \\
+%  \num{1200}    \\
 %  \sisetup{
 %    fixed-exponent      = 2,
 %    scientific-notation = fixed,
 %  }%
-%  \num{0.001} \\
-%  \num{1200}  \\
+%  \num{0.001}   \\
+%  \num{0.00100} \\
+%  \num{1200}
 %\end{LaTeXdemo}
 %
 %\subsection{Printing numbers}
@@ -6905,10 +6908,16 @@ This work consists of the file  siunitx.dtx
         {
           \prop_put:Nnn \l_siunitx_number_in_prop
             { mantissa-integer } {#1}
-          \prop_put:Nnn \l_siunitx_number_in_prop
-            { mantissa-decimal } {#2}
-          \tl_if_blank:nF {#2}
+          \tl_if_empty:nTF {#2}
             {
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { mantissa-decimal }
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { mantissa-decimal-marker }
+            }
+            {
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-decimal } {#2}
               \prop_if_in:NnF \l_siunitx_number_in_prop 
                 { mantissa-decimal-marker }
                 {
@@ -7260,15 +7269,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siuntix_number_process_scientific:}
-%\begin{macro}[aux]{\siuntix_number_process_scientific_aux:w}
-%\begin{macro}[aux]{\siunitx_number_process_scientific_zeros:NNNNNNNNN}
-% Conversions to scientific format are quite hard work. As there is 
-% already a floating-point unit in \pkg{expl3} this is handed off to 
-% be done there. That does limit the number of decimal places available,
-% but the pay-off is that the low-level code is very fast. So this
-% seems worth it. Of course, to get the data back out again there is
-% a low-level parsing of the format of an \texttt{fp} variable.
+%\begin{macro}{\siunitx_number_process_scientific:}
+%\begin{macro}[aux]{\siunitx_number_process_scientific_aux_i:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_scientific_aux_ii:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_scientific_large:nnn}
+%\begin{macro}[aux]{\siunitx_number_process_scientific_small:wn}
+% Converting a number to scientific form is done such that the number
+% of places involved is unchanged. The first step is to skip any
+% complex-number containing input and to recover the stored data.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_scientific: {
   \prop_if_in:NnF \l_siunitx_number_in_prop { complex } 
@@ -7280,78 +7288,98 @@ This work consists of the file  siunitx.dtx
       \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
         \l_siunitx_tmpb_tl
       \quark_if_no_value:NT \l_siunitx_tmpb_tl
-        { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+        { \tl_clear:N \l_siunitx_tmpb_tl }
       \tl_set:Nx \l_siunitx_tmpa_tl
-        { \l_siunitx_tmpa_tl . \l_siunitx_tmpb_tl }
-      \prop_get:NnN \l_siunitx_number_in_prop { exponent }
+        { { \l_siunitx_tmpa_tl } { \l_siunitx_tmpb_tl } }
+      \prop_get:NnN \l_siunitx_number_in_prop { exponent-integer }
         \l_siunitx_tmpb_tl
       \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
       \tl_set:Nx \l_siunitx_tmpa_tl
-        { \l_siunitx_tmpa_tl e \l_siunitx_tmpb_tl }
-      \fp_set:Nn \l_siunitx_process_fp { \l_siunitx_tmpa_tl }
-        \exp_after:wN \siunitx_number_process_scientific_aux:w
-        \l_siunitx_process_fp \q_stop
+        { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
+      \exp_after:wN \siunitx_number_process_scientific_aux_i:nnn 
+        \l_siunitx_tmpa_tl
     }
+}         
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_scientific_aux_i:nnn #1#2#3 {
+  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
+    { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
 }
 %    \end{macrocode}
-% Reading the data back from the \texttt{fp} variable, the first token
-% will always be a \texttt{+}, and so ignored. 
+% The code here works on a loop, standardising the mantissa into the
+% range \( 1 \le x < 10 \). 
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn 
-  \siunitx_number_process_scientific_aux:w #1#2 . #3 e #4 \q_stop {
-  \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-integer } {#2}
-  \tl_set:Nx \l_siunitx_tmp_tl 
-    { \siunitx_number_process_scientific_zeros:NNNNNNNNN #3 }
-  \prop_put:NnV \l_siunitx_number_in_prop { mantissa-decimal } 
-    \l_siunitx_tmp_tl
-  \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa-decimal-marker }
+  \siunitx_number_process_scientific_aux_ii:nnn #1#2#3 {
+  \int_compare:nNnTF {#1} > { 9 }
+    { \siunitx_number_process_scientific_large:nnn {#1} {#2} {#3} }
     {
-      \prop_put:Nnn \l_siunitx_number_in_prop 
-        { mantissa-decimal-marker } { . } 
-    }
-  \prop_put:Nnn \l_siunitx_number_in_prop { exponent } { true }
-  \prop_put:Nnn \l_siunitx_number_in_prop { exponent-integer } {#4}
+      \int_compare:nNnTF {#1} > { 0 }
+        {
+          \prop_put:Nnn \l_siunitx_number_in_prop
+            { mantissa-integer } {#1}
+
+          \tl_if_empty:nTF {#2}
+            {
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { mantissa-decimal }
+              \prop_del:Nn \l_siunitx_number_in_prop 
+                { mantissa-decimal-marker }
+            }
+            {
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-decimal } {#2}
+              \prop_if_in:NnF \l_siunitx_number_in_prop 
+                { mantissa-decimal-marker }
+                {
+                  \prop_put:Nnn \l_siunitx_number_in_prop 
+                    { mantissa-decimal-marker } { . } 
+                }
+            }
+          \int_compare:nNnF {#3} = { 0 }
+            {
+              \int_set:Nn \l_siunitx_tmp_int {#3}
+              \prop_put:Nnn \l_siunitx_number_in_prop { exponent } 
+                { true }
+              \prop_put:NnV \l_siunitx_number_in_prop 
+                { exponent-integer } \l_siunitx_tmp_int
+            }
+        }      
+        {
+          \siunitx_number_process_scientific_small:wn
+            #2 \q_stop {#3}
+        }
+    }    
 }
 %    \end{macrocode}
-% There are a fixed number of digits here, so a nested test is the
-% easiest wway to deal with trimming off trailing zeros.
+% The fastest way to find the smallest digit of the integer part is
+% using some mathematics. This does limit the range of the input, but
+% in real cases this should not be an issue.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_number_process_scientific_zeros:NNNNNNNNN
-  #1#2#3#4#5#6#7#8#9 {
-  \int_compare:nNnTF {#9} = { 0 }
-   {
-     \int_compare:nNnTF {#8} = { 0 }
-       {
-         \int_compare:nNnTF {#7} = { 0 }
-           {
-             \int_compare:nNnTF {#6} = { 0 }
-               {
-                 \int_compare:nNnTF {#5} = { 0 }
-                   {
-                     \int_compare:nNnTF {#4} = { 0 }
-                       { 
-                         \int_compare:nNnTF {#3} = { 0 }
-                           {
-                             \int_compare:nNnTF {#2} = { 0 }
-                               { #1 }
-                               { #1#2 }
-                           }
-                           { #1#2#3 }
-                       }
-                       { #1#2#3#4 }
-                   }
-                   { #1#2#3#4#5 }
-               }
-               { #1#2#3#4#5#6 }
-           }
-           { #1#2#3#4#5#6#7 }
-       }
-       { #1#2#3#4#5#6#7#8 }
-   }
-   { #1#2#3#4#5#6#7#8#9 }
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_scientific_large:nnn #1#2#3 {
+  \int_set:Nn \l_siunitx_tmp_int { #1 / 10 }
+  \tl_set:Nx \l_siunitx_tmpa_tl { \int_use:N \l_siunitx_tmp_int }
+  \int_set:Nn \l_siunitx_tmp_int { #1 - 10 * \l_siunitx_tmp_int }
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    { 
+      { \l_siunitx_tmpa_tl } { \int_use:N \l_siunitx_tmp_int #2 } 
+      { #3 + 1 }
+    }
+  \exp_after:wN \siunitx_number_process_scientific_aux_ii:nnn
+    \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
+% For small numbers, the important digit is easy to find.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_scientific_small:wn #1#2 \q_stop #3 {
+   \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} { #3 - 1 }
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
