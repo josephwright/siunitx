@@ -486,6 +486,8 @@ This work consists of the file  siunitx.dtx
 % for to use exponent form for numbers in all cases}
 %\changes{v2.1}{2010/10/13}{New \opt{table-omit-exponent} option
 % for simplifying tables}
+%\changes{v2.1}{2010/10/25}{New \opt{round-integer-to-decimal} option
+% to convert integers to decimals on rounding}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1556,6 +1558,7 @@ This work consists of the file  siunitx.dtx
 %      retain-explicit-plus         & Switch  & false    \\
 %      retain-unity-mantissa        & Switch  & true     \\
 %      retain-zero-exponent         & Switch  & false    \\
+%      round-integer-to-decimal     & Switch  & false    \\
 %      round-mode                   & Choice  & off      \\
 %      round-precision              & Integer & 2        \\
 %      scientific-notation          & Switch  & false    \\
@@ -1566,6 +1569,7 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{round-mode}
 %\DescribeOption{round-precision}
+%\DescribeOption{round-integer-to-decimal}
 % The \pkg{siunitx} package can round numerical input to a fixed
 % number of significant figures or decimal places. This is controlled by
 % the \opt{round-mode} option, which takes the choices \opt{off},
@@ -1591,6 +1595,17 @@ This work consists of the file  siunitx.dtx
 %  \num{1.23456} \\
 %  \num{14.23} \\
 %  \num{0.12345(9)}
+%\end{LaTeXdemo}
+% The standard settings for \pkg{siunitx} do not add a decimal part
+% if none was given in the input. The \opt{round-integer-to-decimal}
+% option can be used to allow this conversion as part of the rounding
+% process.
+%\begin{LaTeXdemo}
+%  \num[round-mode = figures]{1} \\
+%  \num[round-mode = places]{1} \\
+%  \sisetup{round-integer-to-decimal}
+%  \num[round-mode = figures]{1} \\
+%  \num[round-mode = places]{1}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{add-decimal-zero}
@@ -6558,8 +6573,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_sign_tl}
 %\begin{macro}{\l_siunitx_process_fixed_int}
 %\begin{macro}{\l_siunitx_process_plus_tl}
-%\begin{macro}{\l_siunitx_unity_mantissa_tl}
+%\begin{macro}{\l_siunitx_process_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
+%\begin{macro}{\l_siunitx_process_int_to_dec_bool}
 %\begin{macro}{\l_siunitx_process_precision_int}
 % First, the options are set up.
 %    \begin{macrocode}
@@ -6573,6 +6589,8 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_process_unity_mantissa_bool,
   retain-zero-exponent .bool_set:N =
     \l_siunitx_process_zero_exponent_bool,
+  round-integer-to-decimal .bool_set:N = 
+    \l_siunitx_process_int_to_dec_bool,
   round-mode        .choice: ,
   round-mode / figures .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { figures } },
@@ -6607,6 +6625,7 @@ This work consists of the file  siunitx.dtx
   round-precision       = 2,
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -7062,7 +7081,7 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 } 
     { 
       \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal } 
-        \l_siunitx_tmpa_tl
+        \l_siunitx_tmpa_tl  
       \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \int_compare:nNnT 
@@ -7207,6 +7226,21 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_round: {
   \tl_if_empty:NF \l_siunitx_round_tl 
     {
+      \bool_if:NT \l_siunitx_process_int_to_dec_bool
+        {
+          \prop_if_in:NnF \l_siunitx_number_in_prop 
+            { mantissa-decimal }
+            {
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-decimal } { 0 }
+            }
+          \prop_if_in:NnF \l_siunitx_number_in_prop 
+            { mantissa-decimal-marker }
+            {
+              \prop_put:Nnn \l_siunitx_number_in_prop
+                { mantissa-decimal-marker } { . }
+            }
+        }
       \cs_set_nopar:Npx \siunitx_tmp:w 
         {
           \exp_not:N \clist_map_function:nN 
