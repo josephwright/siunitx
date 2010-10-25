@@ -488,6 +488,8 @@ This work consists of the file  siunitx.dtx
 % for simplifying tables}
 %\changes{v2.1}{2010/10/25}{New \opt{round-integer-to-decimal} option
 % to convert integers to decimals on rounding}
+%\changes{v2.1}{2010/10/25}{New \opt{input-relations} option
+% for relations between numbers}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1466,7 +1468,10 @@ This work consists of the file  siunitx.dtx
 %      input-exponent-markers  & Literal & dDeE             \\
 %      input-ignore            & Literal & \meta{none}      \\
 %      input-open-uncertainty  & Literal & (                \\ ^^A ) 
-%      input-protect-tokens    & Literal & \verb=\mp\pi\pm= \\
+%      input-protect-tokens    & Literal & 
+%        \cs{ge}\cs{gg}\cs{le}\cs{ll}\cs{mp}\cs{pi}\cs{pm} \\
+%      input-relations         & Literal & 
+%        <=>\cs{ge}\cs{gg}\cs{le}\cs{ll} \\
 %      input-signs             & Literal & +-\cs{pm}\cs{mp} \\
 %      input-symbols           & Literal & \cs{pi}          \\
 %      parse-numbers           & Switch  & true             \\
@@ -1496,6 +1501,10 @@ This work consists of the file  siunitx.dtx
 % are totally passed over by \pkg{siunitx}: they will be removed from 
 % the input with no further processing.
 % 
+%\DescribeOption{input-relations}
+% In addition to signs, \pkg{siunitx} can recognise relations, such
+% as \texttt{<}. These have to occur as the first token of a number.
+% 
 %\DescribeOption{input-open-uncertainty}
 %\DescribeOption{input-close-uncertainty} 
 % In some fields, it is common to give the uncertainty in a value 
@@ -1516,7 +1525,7 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo} 
 % 
 %\DescribeOption{input-protect-tokens}
-% Some symbols can be problematic under expansion in LaTeX2e. To allow 
+% Some symbols can be problematic under expansion in \LaTeXe. To allow 
 % these to be used in input without issue, the package can protect these
 % tokens while expanding input. Symbols to be protected in this way 
 % should be listed in \opt{input-protect-tokens}.
@@ -5720,6 +5729,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_input_ignore_tl}
 %\begin{macro}{\l_siunitx_input_uncert_open_tl}
 %\begin{macro}{\l_siunitx_input_protect_tl}
+%\begin{macro}{\l_siunitx_input_relation_tl}
 %\begin{macro}{\l_siunitx_input_sign_tl}
 %\begin{macro}{\l_siunitx_input_symbol_tl}
 % The various tokens to check against when parsing are all set up here.
@@ -5735,6 +5745,7 @@ This work consists of the file  siunitx.dtx
   input-ignore            .tl_set:N = \l_siunitx_input_ignore_tl,
   input-open-uncertainty  .tl_set:N = \l_siunitx_input_uncert_open_tl, 
   input-protect-tokens    .tl_set:N = \l_siunitx_input_protect_tl,
+  input-relations         .tl_set:N = \l_siunitx_input_relation_tl,
   input-signs             .tl_set:N = \l_siunitx_input_sign_tl,
   input-symbols           .tl_set:N = \l_siunitx_input_symbol_tl,
 }
@@ -5745,11 +5756,13 @@ This work consists of the file  siunitx.dtx
   input-digits            = 0123456789,
   input-exponent-markers  = dDeE,
   input-open-uncertainty  = (, % )
-  input-protect-tokens    = \mp\pi\pm,
+  input-protect-tokens    = \ge\gg\le\ll\mp\pi\pm,
+  input-relations         = <=>\ge\gg\le\ll,
   input-signs             = +-\mp\pm,
   input-symbols           = \pi,
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5791,6 +5804,7 @@ This work consists of the file  siunitx.dtx
     }
     {#1}
   \siunitx_number_in_sign_replace:N \l_siunitx_number_arg_tl
+  \siunitx_number_in_parse_relation:N \l_siunitx_number_arg_tl
   \tl_map_function:NN \l_siunitx_number_arg_tl 
     \siunitx_number_in_parse_loop:N
   \tl_if_empty:NF \l_siunitx_number_parsed_tl
@@ -5881,6 +5895,10 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_in_sign_replace:N #1 {
   \tl_replace_all_in:Nnn #1 { -+ } { \mp }
   \tl_replace_all_in:Nnn #1 { +- } { \pm }
+  \tl_replace_all_in:Nnn #1 { << } { \ll }
+  \tl_replace_all_in:Nnn #1 { <= } { \le }
+  \tl_replace_all_in:Nnn #1 { >> } { \gg }
+  \tl_replace_all_in:Nnn #1 { >= } { \ge }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5908,6 +5926,27 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_in_parse_loop:N #1 { }
 \cs_new_protected:Npn \siunitx_number_in_parse_more:N #1 { }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_in_parse_relation:N}
+%\begin{macro}[aux]{\siunitx_number_in_parse_relation:w}
+% The idea here is that a relation with be the very first token in the
+% input, or it is not valid. So the test for a relation can be very
+% simple and hopefully efficient.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_in_parse_relation:N #1 {
+  \exp_after:wN \siunitx_number_in_parse_relation:w #1 \q_stop #1
+}
+\cs_new_protected:Npn \siunitx_number_in_parse_relation:w 
+  #1#2 \q_stop #3 {
+  \tl_if_in:NnT \l_siunitx_input_relation_tl {#1}
+    {
+      \prop_put:Nnn \l_siunitx_number_in_prop { relation } {#1}
+      \tl_set:Nn #3 {#2}
+    }
+}
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7976,6 +8015,37 @@ This work consists of the file  siunitx.dtx
       \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
         { true }
       \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
+    }
+  \prop_get:NnN \l_siunitx_number_in_prop { relation }
+    \l_siunitx_tmpa_tl 
+  \quark_if_no_value:NF \l_siunitx_tmpa_tl
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { \exp_not:N \ensuremath { { \exp_not:V \l_siunitx_tmpa_tl } } }
+      \prop_put:NnV \l_siunitx_number_out_prop { relation }
+        \l_siunitx_tmpa_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { result }
+        \l_siunitx_tmpb_tl 
+      \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+      \prop_put:Nnn \l_siunitx_number_out_prop { result }
+        \l_siunitx_tmpb_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
+        \l_siunitx_tmpb_tl 
+      \quark_if_no_value:NTF \l_siunitx_tmpb_tl
+        {
+           \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+             \quark_if_no_value:NF \l_siunitx_tmpb_tl
+               {
+                 \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+                 \prop_put:Nnn \l_siunitx_number_out_prop 
+                   { exponent-result }  \l_siunitx_tmpb_tl
+               }  
+        }
+        {
+          \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+          \prop_put:Nnn \l_siunitx_number_out_prop { mantissa-result }
+            \l_siunitx_tmpb_tl
+        }
     }
 }
 %    \end{macrocode}
