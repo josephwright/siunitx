@@ -6989,7 +6989,10 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 % Simple stack-based manipulation of the input for number which are 
-% either too big or too small. 
+% either too big or too small. There are a couple of checks needed to
+% deal with cases where there is no decimal part and where there are
+% leading zeros to dispose of. There is also a check to avoid adding
+% an additional zero to the decimal part of the number.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn 
   \siunitx_number_process_fixed_large:nnn #1#2#3 {
@@ -6998,12 +7001,27 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty:nTF {##2}
           {
-            \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 } { 0 } 
-              { #3 - 1 }
+            \int_compare:nNnTF 
+              { #3 - 1 } = { \l_siunitx_process_fixed_int }
+              {
+                \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 }
+                  { } { #3 - 1 }
+              }
+              {
+                \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 }
+                  { 0 } { #3 - 1 }
+              }
           }  
           {
-            \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 } { ##2 } 
-              { #3 - 1 }
+            \int_compare:nNnTF {#1} = { 0 }
+              {
+                \siunitx_number_process_fixed_aux_ii:nnn {##1} {##2} 
+                  { #3 - 1 }
+              }
+              {
+                \siunitx_number_process_fixed_aux_ii:nnn { #1 ##1 }
+                  {##2} { #3 - 1 }
+              }
           }
       }
   \tl_if_empty:nTF {#2}    
@@ -12010,7 +12028,7 @@ This work consists of the file  siunitx.dtx
   table-parse-only          .bool_set:N = 
     \l_siunitx_table_parse_only_bool,
   table-relation       .bool_set:N =
-    \l_siunitx_table_relation_bool
+    \l_siunitx_table_relation_bool,
   table-space-text-pre      .tl_set:N =
     \l_siunitx_table_pre_tl,  
   table-space-text-post     .tl_set:N =
