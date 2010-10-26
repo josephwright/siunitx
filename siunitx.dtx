@@ -489,7 +489,9 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.1}{2010/10/25}{New \opt{round-integer-to-decimal} option
 % to convert integers to decimals on rounding}
 %\changes{v2.1}{2010/10/26}{New \opt{input-comparators} option
-% for relations between numbers}
+% for numbers greater than, less than and so on}
+%\changes{v2.1}{2010/10/26}{New \opt{table-comparator} option
+% for reserving space for comparators in tables}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -2708,6 +2710,7 @@ This work consists of the file  siunitx.dtx
 %      table-align-uncertainty   & Switch  & true      \\
 %      table-alignment           & Choice  & \m{none}  \\
 %      table-auto-round          & Switch  & false     \\
+%      table-comparator          & Switch  & false     \\
 %      table-figures-decimal     & Integer & 2         \\
 %      table-figures-exponent    & Integer & 0         \\
 %      table-figures-integer     & Integer & 3         \\
@@ -2858,6 +2861,37 @@ This work consists of the file  siunitx.dtx
 %    \end{tabular}
 %  \end{table}
 %\end{LaTeXdemo}
+%\DescribeOption{table-comparator}
+% Space can also be reserved in a table for a comparator (greater than,
+% less than, and so forth). This is activated using the 
+% \opt{table-comparator} switch (\cref{tab:S:comparators}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \caption{Reserving space for comparators in \texttt{S} columns.}
+%    \label{tab:S:comparators}
+%    \sisetup{
+%      table-number-alignment = center,
+%      table-figures-integer  = 2,
+%      table-figures-decimal  = 2,
+%      table-figures-exponent = 2,
+%    }
+%    \centering
+%    \begin{tabular}{
+%      S
+%      S[table-comparator = true]
+%      }
+%    \toprule
+%        {Values}
+%      & {Values} \\
+%    \midrule
+%       2.3  & <   2.3e8  \\
+%      34.23 & =  34.23   \\
+%      56.78 & >= 56.78e3 \\
+%       3,76 & \gg     e6 \\
+%    \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
 % The table-printing code will omit any part of a number which has no
 % space reserved, placing a warning in the \LaTeX\ log. This means that
 % uncertainties and exponents will not be printed if no space is reserved 
@@ -2945,11 +2979,10 @@ This work consists of the file  siunitx.dtx
 %    \label{tab:S:ends}
 %    \centering
 %    \sisetup{
-%      input-comparators      = ,
 %      table-number-alignment = center,
 %      table-figures-integer  = 2,
 %      table-figures-decimal  = 4,
-%      table-space-text-pre   = $ > $,
+%      table-space-text-pre   = now~,
 %      table-space-text-post  = 
 %        \textsuperscript{\emph{a}}
 %    }
@@ -2957,10 +2990,10 @@ This work consists of the file  siunitx.dtx
 %    \toprule
 %    {Values} \\
 %    \midrule
-%             2.3456  \\
-%            34.2345  \textsuperscript{\emph{a}}\\
-%            56.7835  \\
-%      $ > $ 90.473   \\
+%            2.3456  \\
+%           34.2345  \textsuperscript{\emph{a}}\\
+%           56.7835  \\
+%      now~ 90.473   \\
 %    \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -5747,7 +5780,7 @@ This work consists of the file  siunitx.dtx
 \keys_set:nn { siunitx } { % (
   input-close-uncertainty = ),
   input-complex-roots     = ij,
-  input-comparators       = <{=}>\ge\gg\le\ll,
+  input-comparators       = {<=>\ge\gg\le\ll},
   input-decimal-markers   = {.,},
   input-digits            = 0123456789,
   input-exponent-markers  = dDeE,
@@ -5938,7 +5971,7 @@ This work consists of the file  siunitx.dtx
   #1#2 \q_stop #3 {
   \tl_if_in:NnT \l_siunitx_input_comparator_tl {#1}
     {
-      \prop_put:Nnn \l_siunitx_number_in_prop { relation } {#1}
+      \prop_put:Nnn \l_siunitx_number_in_prop { comparator } {#1}
       \tl_set:Nn #3 {#2}
     }
 }
@@ -8030,10 +8063,10 @@ This work consists of the file  siunitx.dtx
         { true }
       \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
     }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { relation } 
+  \prop_if_in:NnT \l_siunitx_number_out_prop { comparator } 
     {
       \siunitx_number_format_brackets:n { result }
-      \prop_get:NnN \l_siunitx_number_out_prop { relation }
+      \prop_get:NnN \l_siunitx_number_out_prop { comparator }
         \l_siunitx_tmpa_tl
       \prop_get:NnN \l_siunitx_number_out_prop { result }
         \l_siunitx_tmpb_tl
@@ -8401,7 +8434,7 @@ This work consists of the file  siunitx.dtx
 % to be added to the result, of course.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_format_relation: {
-  \prop_get:NnN \l_siunitx_number_in_prop { relation }
+  \prop_get:NnN \l_siunitx_number_in_prop { comparator }
     \l_siunitx_tmpa_tl
   \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
@@ -8410,7 +8443,7 @@ This work consists of the file  siunitx.dtx
           \exp_not:N \ensuremath
             { { \exp_not:V \l_siunitx_tmpa_tl } }
         }
-      \prop_put:NnV \l_siunitx_number_out_prop { relation }
+      \prop_put:NnV \l_siunitx_number_out_prop { comparator }
         \l_siunitx_tmpa_tl
     }  
 }
@@ -11882,6 +11915,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_table_comparator_dim}
 %\begin{macro}{\l_siunitx_table_decimal_dim}
 %\begin{macro}{\l_siunitx_table_exponent_dim}
 %\begin{macro}{\l_siunitx_table_integer_dim}
@@ -11891,6 +11925,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_uncert_dim}
 % Dimensions for the various model measurements.
 %    \begin{macrocode}
+\dim_new:N \l_siunitx_table_comparator_dim
 \dim_new:N \l_siunitx_table_decimal_dim
 \dim_new:N \l_siunitx_table_exponent_dim
 \dim_new:N \l_siunitx_table_integer_dim
@@ -11899,6 +11934,7 @@ This work consists of the file  siunitx.dtx
 \dim_new:N \l_siunitx_table_result_dim
 \dim_new:N \l_siunitx_table_uncert_dim
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -11945,12 +11981,12 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_align_uncert_bool}
 %\begin{macro}{\l_siunitx_table_omit_exp_bool}
 %\begin{macro}{\l_siunitx_table_auto_bool}
+%\begin{macro}{\l_siunitx_table_comparator_bool}
 %\begin{macro}{\l_siunitx_table_decimal_int}
 %\begin{macro}{\l_siunitx_table_exponent_int}
 %\begin{macro}{\l_siunitx_table_integer_int}
 %\begin{macro}{\l_siunitx_table_uncert_int}
 %\begin{macro}{\l_siunitx_table_parse_only_bool}
-%\begin{macro}{\l_siunitx_table_relation_bool}
 %\begin{macro}{\l_siunitx_table_pre_tl}
 %\begin{macro}{\l_siunitx_table_post_tl}
 %\begin{macro}{\l_siunitx_table_sign_exponent_bool}
@@ -12013,7 +12049,9 @@ This work consists of the file  siunitx.dtx
       \skip_set:Nn \l_siunitx_table_text_align_skip 
         { \c_zero_skip plus 1 fill } 
     },
-  table-auto-round          .bool_set:N = \l_siunitx_table_auto_bool,  
+  table-auto-round          .bool_set:N = \l_siunitx_table_auto_bool,
+  table-comparator          .bool_set:N =
+    \l_siunitx_table_comparator_bool,  
   table-figures-decimal     .int_set:N  = \l_siunitx_table_decimal_int,
   table-figures-exponent    .int_set:N  = 
     \l_siunitx_table_exponent_int,
@@ -12021,8 +12059,6 @@ This work consists of the file  siunitx.dtx
   table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int ,
   table-parse-only          .bool_set:N = 
     \l_siunitx_table_parse_only_bool,
-  table-relation       .bool_set:N =
-    \l_siunitx_table_relation_bool,
   table-space-text-pre      .tl_set:N =
     \l_siunitx_table_pre_tl,  
   table-space-text-post     .tl_set:N =
@@ -12094,9 +12130,9 @@ This work consists of the file  siunitx.dtx
         { uncert }
       \siunitx_table_format_convert:nn { exponent-integer } 
         { exponent }
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { relation }
-        { \bool_set_true:N \l_siunitx_table_relation_bool }
-        { \bool_set_false:N \l_siunitx_table_relation_bool }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { comparator }
+        { \bool_set_true:N \l_siunitx_table_comparator_bool }
+        { \bool_set_false:N \l_siunitx_table_comparator_bool }
       \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
         { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
         { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
@@ -12305,6 +12341,15 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nn \l_siunitx_round_tl { places }  
     }
   \siunitx_table_print_S_parse:
+  \bool_if:NTF \l_siunitx_table_comparator_bool
+    { \siunitx_table_print_S_reserved_comparator: }
+    {
+      \prop_if_in:NnT \l_siunitx_number_out_prop { comparator }
+        { 
+          \msg_error:nnx { siunitx } { table-partial-number } 
+            { a~comparator }
+        }
+    }
   \int_compare:nNnTF
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } >
       { 0 }
@@ -12375,8 +12420,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_model_create: {
   \prop_clear:N \l_siunitx_number_in_prop
-  \bool_if:NT \l_siunitx_table_relation_bool
-    { \prop_put:Nnn \l_siunitx_number_in_prop { relation } { < } }
+  \bool_if:NT \l_siunitx_table_comparator_bool
+    { \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { \ll } }
   \siunitx_table_print_S_model_aux:nn { integer } { mantissa-integer }
   \siunitx_table_print_S_model_aux:nn { decimal } { mantissa-decimal }
   \siunitx_table_print_S_model_aux:nn { uncert } 
@@ -12424,6 +12469,24 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_reserved_reserved_comparator:}
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_comparator:
+  {  
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop 
+    { comparator } { }
+  \siunitx_table_print_S_get_comparator:Nn 
+    \l_siunitx_number_out_prop { }
+  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box 
+    { \l_siunitx_table_comparator_dim }
+    {
+      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
+      \tex_hfil:D
+    }
+  \box_use:N \l_siunitx_table_result_box  
+}
+%    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
 %\begin{macro}[aux]{\siunitx_table_print_S_reserved_mantissa_aux:n}
@@ -12653,6 +12716,17 @@ This work consists of the file  siunitx.dtx
       \dim_set:cn { l_siunitx_table_ #2 _dim } 
         { \box_wd:N \l_siunitx_tmp_box }
     }
+}
+%    \end{macrocode}
+%\end{macro}
+%\begin{macro}{\siunitx_table_print_S_get_comparator:Nn}
+% Getting the comparator part is quite easy.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_table_print_S_get_comparator:Nn #1#2 {
+  \prop_get:NnN #1 { comparator } \l_siunitx_tmpa_tl
+  \quark_if_no_value:NT \l_siunitx_tmpa_tl
+    { \tl_clear:N \l_siunitx_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
