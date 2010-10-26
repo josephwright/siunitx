@@ -4704,14 +4704,17 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\prop_del:cn}
+%\begin{macro}{\prop_put:Nno}
 %\begin{macro}{\prop_put:cnV}
 %\begin{macro}{\tl_replace_all_in:NnV}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \prop_del:Nn { c }
+\cs_generate_variant:Nn \prop_put:Nnn { Nno }
 \cs_generate_variant:Nn \prop_put:Nnn { cnV }
 \cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -7825,6 +7828,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_format_complex:
       \siunitx_number_format_sign:n { mantissa }
       \siunitx_number_format_sign:n { exponent }
+      \siunitx_number_format_relation:
       \siunitx_number_format_color:
       \siunitx_number_format_final:
     }
@@ -8015,6 +8019,17 @@ This work consists of the file  siunitx.dtx
       \prop_put:Nnn \l_siunitx_number_out_prop { result-bracket } 
         { true }
       \prop_del:Nn \l_siunitx_number_out_prop { mantissa-bracket } 
+    }
+  \prop_if_in:NnT \l_siunitx_number_out_prop { relation } 
+    {
+      \siunitx_number_format_brackets:n { result }
+      \prop_get:NnN \l_siunitx_number_out_prop { relation }
+        \l_siunitx_tmpa_tl
+      \prop_get:NnN \l_siunitx_number_out_prop { result }
+        \l_siunitx_tmpb_tl
+      \tl_put_right:No \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl }
+      \prop_put:Nno \l_siunitx_number_out_prop { result }
+        \l_siunitx_tmpa_tl      
     }
 }
 %    \end{macrocode}
@@ -8367,6 +8382,27 @@ This work consists of the file  siunitx.dtx
     }
   \prop_if_in:NnT \l_siunitx_number_in_prop { exponent } 
     { \siunitx_number_format_group:n { exponent } }
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_format_relation:}
+% A simple check and copy operation for a relation: this will still need
+% to be added to the result, of course.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_format_relation: {
+  \prop_get:NnN \l_siunitx_number_in_prop { relation }
+    \l_siunitx_tmpa_tl
+  \quark_if_no_value:NF \l_siunitx_tmpa_tl
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { 
+          \exp_not:N \ensuremath
+            { { \exp_not:o { \l_siunitx_tmpa_tl } } }
+        }
+      \prop_put:Nno \l_siunitx_number_out_prop { relation }
+        { \l_siunitx_tmpa_tl }
+    }  
 }
 %    \end{macrocode}
 %\end{macro}
