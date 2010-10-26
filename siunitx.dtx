@@ -8396,7 +8396,7 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nx \l_siunitx_tmpa_tl
         { 
           \exp_not:N \ensuremath
-            { { \exp_not:o { \l_siunitx_tmpa_tl } } }
+            { { \exp_not:V \l_siunitx_tmpa_tl } }
         }
       \prop_put:NnV \l_siunitx_number_out_prop { relation }
         \l_siunitx_tmpa_tl
@@ -11938,6 +11938,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_table_integer_int}
 %\begin{macro}{\l_siunitx_table_uncert_int}
 %\begin{macro}{\l_siunitx_table_parse_only_bool}
+%\begin{macro}{\l_siunitx_table_relation_bool}
 %\begin{macro}{\l_siunitx_table_pre_tl}
 %\begin{macro}{\l_siunitx_table_post_tl}
 %\begin{macro}{\l_siunitx_table_sign_exponent_bool}
@@ -12008,6 +12009,8 @@ This work consists of the file  siunitx.dtx
   table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int ,
   table-parse-only          .bool_set:N = 
     \l_siunitx_table_parse_only_bool,
+  table-relation       .bool_set:N =
+    \l_siunitx_table_relation_bool
   table-space-text-pre      .tl_set:N =
     \l_siunitx_table_pre_tl,  
   table-space-text-post     .tl_set:N =
@@ -12027,6 +12030,7 @@ This work consists of the file  siunitx.dtx
   table-figures-integer   = 3
 }
 %    \end{macrocode} 
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -12078,6 +12082,9 @@ This work consists of the file  siunitx.dtx
         { uncert }
       \siunitx_table_format_convert:nn { exponent-integer } 
         { exponent }
+      \prop_if_in:NnTF \l_siunitx_number_in_prop { relation }
+        { \bool_set_true:N \l_siunitx_table_relation_bool }
+        { \bool_set_false:N \l_siunitx_table_relation_bool }
       \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
         { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
         { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
@@ -12285,7 +12292,7 @@ This work consists of the file  siunitx.dtx
         { \l_siunitx_table_decimal_int }
       \tl_set:Nn \l_siunitx_round_tl { places }  
     }
-  \siunitx_table_print_S_parse: 
+  \siunitx_table_print_S_parse:
   \int_compare:nNnTF
     { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } >
       { 0 }
@@ -12356,6 +12363,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_model_create: {
   \prop_clear:N \l_siunitx_number_in_prop
+  \bool_if:NT \l_siunitx_table_relation_bool
+    { \prop_put:Nnn \l_siunitx_number_in_prop { relation } { < } }
   \siunitx_table_print_S_model_aux:nn { integer } { mantissa-integer }
   \siunitx_table_print_S_model_aux:nn { decimal } { mantissa-decimal }
   \siunitx_table_print_S_model_aux:nn { uncert } 
