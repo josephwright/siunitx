@@ -6620,14 +6620,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_process_fp}
-% A \texttt{fp} for forcing scientific notation and related functions
-% which use the floating point unit.
-%    \begin{macrocode}
-\fp_new:N \l_siunitx_process_fp
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\l_siunitx_process_fixed_bool}
 %\begin{macro}{\l_siunitx_process_scientific_bool}
 % Settings for the scientific notation system.
@@ -6662,7 +6654,10 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_process_zero_exponent_bool,
   round-integer-to-decimal .bool_set:N = 
     \l_siunitx_process_int_to_dec_bool,
-%  round-minimum     .fp_set:N = \l_siunitx_process_round_min_fp,
+  round-minimum     .code:n   = 
+    {
+      \tl_set:Nn \l_siunitx_process_round_min_tl {#1}
+    },  
   round-mode        .choice: ,
   round-mode / figures .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { figures } },
@@ -7166,7 +7161,18 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
     {
       \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty } 
-        { \siunitx_number_process_places_aux_i:n {#1} }
+        {
+          \prop_get:NnN \l_siunitx_number_in_prop
+            { exponent-integer } \l_siunitx_tmpa_tl
+          \quark_if_no_value:NF \l_siunitx_tmpa_tl
+            {
+              \int_set:Nn \l_siunitx_process_precision_int
+                { 
+                  \l_siunitx_process_precision_int + \l_siunitx_tmpa_tl
+                }
+            } 
+          \siunitx_number_process_places_aux_i:n {#1}
+        }
     }
 }  
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
@@ -12500,6 +12506,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_reserved_reserved_comparator:}
+% Space for a comparator is pretty easy: it has to be at the start of
+% the output so there is not so much to worry about.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_comparator:
   {  
