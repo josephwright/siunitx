@@ -492,6 +492,8 @@ This work consists of the file  siunitx.dtx
 % for numbers greater than, less than and so on}
 %\changes{v2.1}{2010/10/26}{New \opt{table-comparator} option
 % for reserving space for comparators in tables}
+%\changes{v2.1}{2010/10/27}{New \opt{round-minimum} option
+% to set a floor for rounding numbers downward}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1590,7 +1592,6 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{round-mode}
 %\DescribeOption{round-precision}
-%\DescribeOption{round-integer-to-decimal}
 % The \pkg{siunitx} package can round numerical input to a fixed
 % number of significant figures or decimal places. This is controlled by
 % the \opt{round-mode} option, which takes the choices \opt{off},
@@ -1617,6 +1618,7 @@ This work consists of the file  siunitx.dtx
 %  \num{14.23} \\
 %  \num{0.12345(9)}
 %\end{LaTeXdemo}
+%\DescribeOption{round-integer-to-decimal}
 % The standard settings for \pkg{siunitx} do not add a decimal part
 % if none was given in the input. The \opt{round-integer-to-decimal}
 % option can be used to allow this conversion as part of the rounding
@@ -1627,6 +1629,20 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{round-integer-to-decimal}
 %  \num[round-mode = figures]{1} \\
 %  \num[round-mode = places]{1}
+%\end{LaTeXdemo}
+%\DescribeOption{round-minimum}
+% There are cases in which rounding will result in a zero value. It
+% may be desirable to show such results as below a threshold value. This
+% can be achieved by setting \opt{round-minimum} to the threshold value.
+% There will be no effect when rounding to a number of significant
+% figures as it is not possible to obtain the value zero in these cases.
+%\begin{LaTeXdemo}
+%  \sisetup{round-mode = places}
+%  \num{0.0055} \\
+%  \num{0.0045} \\
+%  \sisetup{round-minimum = 0.01}%
+%  \num{0.0055} \\
+%  \num{0.0045}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{add-decimal-zero}
@@ -6638,7 +6654,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
 %\begin{macro}{\l_siunitx_process_int_to_dec_bool}
-%\begin{macro}{\l_siunitx_process_round_min_bool}
+%\begin{macro}{\l_siunitx_process_round_min_tl}
 %\begin{macro}{\l_siunitx_process_precision_int}
 % First, the options are set up.
 %    \begin{macrocode}
@@ -6654,10 +6670,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_process_zero_exponent_bool,
   round-integer-to-decimal .bool_set:N = 
     \l_siunitx_process_int_to_dec_bool,
-  round-minimum     .code:n   = 
-    {
-      \tl_set:Nn \l_siunitx_process_round_min_tl {#1}
-    },  
+  round-minimum     .tl_set:N  = \l_siunitx_process_round_min_tl,
   round-mode        .choice: ,
   round-mode / figures .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { figures } },
@@ -7379,33 +7392,45 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\siunitx_number_process_round_tidy:n}
-% To put data back again.
+%\begin{macro}[aux]{\siunitx_number_process_round_tidy_aux:w}
+% To put data back again: there is a check to see if the number has been
+% rounded to zero and a minimal value has been requested.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_round_tidy:n #1 {
-%  \fp_compare:nNnTF 
-%    { \l_siunitx_round_integer_out_tl . \l_siunitx_round_decimal_out_tl } 
-%      < { \l_siunitx_process_round_min_fp }
-%    {
-%      \tl_set:Nx \l_siunitx_tmpa_tl
-%        { \fp_to_tl:N \l_siunitx_process_round_min_fp }
-%      \exp_after:wN \siunitx_number_process_round_tidy_aux_i:w
-%        \l_siunitx_tmpa_tl e 0 \q_stop {#1}
-%    }
-%    {  
+  \int_compare:nNnTF
+    {
+      \l_siunitx_round_integer_out_tl + \l_siunitx_round_decimal_out_tl
+    } 
+      = { 0 }
+    {
+      \fp_compare:nNnTF { \l_siunitx_process_round_min_tl } = { 0 }
+        {
+          \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+          \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
+            \l_siunitx_round_decimal_out_tl
+        }
+        {
+          \exp_last_unbraced:NV \siunitx_number_process_round_tidy_aux:w
+            \l_siunitx_process_round_min_tl . . \q_stop {#1}
+        }
+    }
+    {  
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
         \l_siunitx_round_integer_out_tl
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_round_decimal_out_tl
-%     }
+     }
 }
 \cs_new_protected_nopar:Npn
-  \siunitx_number_process_round_tidy_aux:w 
-  #1 . #2 e #3 . #4 \q_stop #5 {
-%  \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
-%  \prop_put:Nnn \l_siunitx_number_in_prop { #5 -integer } {#1}
-%  \prop_put:Nnn \l_siunitx_number_in_prop { #5 -decimal } {#2}
+  \siunitx_number_process_round_tidy_aux:w #1 . #2 . #3 \q_stop #4 {
+  \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
+  \prop_put:Nnn \l_siunitx_number_in_prop { #4 -integer } {#1}
+  \tl_if_empty:nTF {#2}
+    { \prop_del:Nn \l_siunitx_number_in_prop { #4 -decimal } }
+    { \prop_put:Nnn \l_siunitx_number_in_prop { #4 -decimal } {#2} }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_scientific:}
