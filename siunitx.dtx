@@ -1577,6 +1577,7 @@ This work consists of the file  siunitx.dtx
 %      retain-unity-mantissa        & Switch  & true     \\
 %      retain-zero-exponent         & Switch  & false    \\
 %      round-integer-to-decimal     & Switch  & false    \\
+%      round-minimum                & Literal & 0        \\
 %      round-mode                   & Choice  & off      \\
 %      round-precision              & Integer & 2        \\
 %      scientific-notation          & Switch  & false    \\
@@ -6643,6 +6644,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_process_unity_mantissa_tl}
 %\begin{macro}{\l_siunitx_process_zero_exponent_bool}
 %\begin{macro}{\l_siunitx_process_int_to_dec_bool}
+%\begin{macro}{\l_siunitx_process_round_min_bool}
 %\begin{macro}{\l_siunitx_process_precision_int}
 % First, the options are set up.
 %    \begin{macrocode}
@@ -6658,6 +6660,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_process_zero_exponent_bool,
   round-integer-to-decimal .bool_set:N = 
     \l_siunitx_process_int_to_dec_bool,
+  round-minimum     .fp_set:N = \l_siunitx_process_round_min_fp,
   round-mode        .choice: ,
   round-mode / figures .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { figures } },
@@ -6692,6 +6695,7 @@ This work consists of the file  siunitx.dtx
   round-precision       = 2,
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -6767,8 +6771,9 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_figures:n}
 %\begin{macro}[aux]{\siunitx_number_process_figures_aux:n}
 %\begin{macro}[aux]{\siunitx_number_process_figures_init:n}
-% Rather than count figures to start with, a completely different 
-% approach is used here.
+% The approach here is to find how many digits there are in each part
+% of the number, working out which are significant. The next stage is 
+% reconstruction of the number.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_figures:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
@@ -7380,10 +7385,17 @@ This work consists of the file  siunitx.dtx
 % To put data back again.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_round_tidy:n #1 {
-  \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
-    \l_siunitx_round_integer_out_tl
-  \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
-    \l_siunitx_round_decimal_out_tl
+  \fp_compare:nNnTF 
+    { \l_siunitx_round_integer_out_tl . \l_siunitx_round_decimal_out_tl } 
+      < { \l_siunitx_process_round_min_fp }
+    {
+    }
+    {  
+      \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
+        \l_siunitx_round_integer_out_tl
+      \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
+        \l_siunitx_round_decimal_out_tl
+     }
 }
 %    \end{macrocode}
 %\end{macro}
