@@ -6662,7 +6662,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_process_zero_exponent_bool,
   round-integer-to-decimal .bool_set:N = 
     \l_siunitx_process_int_to_dec_bool,
-  round-minimum     .fp_set:N = \l_siunitx_process_round_min_fp,
+%  round-minimum     .fp_set:N = \l_siunitx_process_round_min_fp,
   round-mode        .choice: ,
   round-mode / figures .code:n = 
     { \tl_set:Nn \l_siunitx_round_tl { figures } },
@@ -7387,21 +7387,21 @@ This work consists of the file  siunitx.dtx
 % To put data back again.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_round_tidy:n #1 {
-  \fp_compare:nNnTF 
-    { \l_siunitx_round_integer_out_tl . \l_siunitx_round_decimal_out_tl } 
-      < { \l_siunitx_process_round_min_fp }
-    {
+%  \fp_compare:nNnTF 
+%    { \l_siunitx_round_integer_out_tl . \l_siunitx_round_decimal_out_tl } 
+%      < { \l_siunitx_process_round_min_fp }
+%    {
 %      \tl_set:Nx \l_siunitx_tmpa_tl
 %        { \fp_to_tl:N \l_siunitx_process_round_min_fp }
 %      \exp_after:wN \siunitx_number_process_round_tidy_aux_i:w
 %        \l_siunitx_tmpa_tl e 0 \q_stop {#1}
-    }
-    {  
+%    }
+%    {  
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
         \l_siunitx_round_integer_out_tl
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_round_decimal_out_tl
-     }
+%     }
 }
 \cs_new_protected_nopar:Npn
   \siunitx_number_process_round_tidy_aux:w 
