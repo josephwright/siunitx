@@ -7389,6 +7389,10 @@ This work consists of the file  siunitx.dtx
     { \l_siunitx_round_integer_out_tl . \l_siunitx_round_decimal_out_tl } 
       < { \l_siunitx_process_round_min_fp }
     {
+%      \tl_set:Nx \l_siunitx_tmpa_tl
+%        { \fp_to_tl:N \l_siunitx_process_round_min_fp }
+%      \exp_after:wN \siunitx_number_process_round_tidy_aux_i:w
+%        \l_siunitx_tmpa_tl e 0 \q_stop {#1}
     }
     {  
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
@@ -7396,6 +7400,13 @@ This work consists of the file  siunitx.dtx
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_round_decimal_out_tl
      }
+}
+\cs_new_protected_nopar:Npn
+  \siunitx_number_process_round_tidy_aux:w 
+  #1 . #2 e #3 . #4 \q_stop #5 {
+%  \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
+%  \prop_put:Nnn \l_siunitx_number_in_prop { #5 -integer } {#1}
+%  \prop_put:Nnn \l_siunitx_number_in_prop { #5 -decimal } {#2}
 }
 %    \end{macrocode}
 %\end{macro}
