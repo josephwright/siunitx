@@ -7501,7 +7501,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn 
   \siunitx_number_process_scientific_large:nnn #1#2#3 {
-  \int_set:Nn \l_siunitx_tmp_int { #1 / 10 }
+  \int_set:Nn \l_siunitx_tmp_int { \int_div_truncate:nn {#1} { 10 } }
   \tl_set:Nx \l_siunitx_tmpa_tl { \int_use:N \l_siunitx_tmp_int }
   \int_set:Nn \l_siunitx_tmp_int { #1 - 10 * \l_siunitx_tmp_int }
   \tl_set:Nx \l_siunitx_tmpa_tl
@@ -7509,7 +7509,7 @@ This work consists of the file  siunitx.dtx
       { \l_siunitx_tmpa_tl } { \int_use:N \l_siunitx_tmp_int #2 } 
       { #3 + 1 }
     }
-  \exp_after:wN \siunitx_number_process_scientific_aux_ii:nnn
+  \exp_last_unbraced:NV \siunitx_number_process_scientific_aux_ii:nnn
     \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
