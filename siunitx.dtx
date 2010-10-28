@@ -4778,8 +4778,8 @@ This work consists of the file  siunitx.dtx
   \group_end:
   \prg_new_conditional:Npnn \siunitx_cs_if_tl:N #1 { T , F, TF , p } 
     {
-      \exp_after:wN \siunitx_cs_if_tl_aux:w
-        \token_to_meaning:N #1 MACRO \q_stop
+      \exp_last_unbraced:No \siunitx_cs_if_tl_aux:w
+        { \token_to_meaning:N #1 MACRO \q_stop }
           { 
             \cs_if_exist:cTF { \cs_to_str:N #1 ~ }
               { \prg_return_false: }
@@ -4792,8 +4792,8 @@ This work consists of the file  siunitx.dtx
   \prg_new_conditional:Npnn \siunitx_cs_if_macro:N #1 
     { T , F , TF , p } 
     {
-      \exp_after:wN \siunitx_cs_if_tl_aux:w
-        \token_to_meaning:N #1 MACRO \q_stop
+      \exp_last_unbraced:No \siunitx_cs_if_tl_aux:w
+        { \token_to_meaning:N #1 MACRO \q_stop }
           { \prg_return_true: }
           { \prg_return_false: }
     }
@@ -5637,7 +5637,8 @@ This work consists of the file  siunitx.dtx
           \tl_set:Nn \l_siunitx_number_next_tl {##2}
           \tl_set:Nn \l_siunitx_number_multi_tl { product }      
         }
-      \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
+      \exp_last_unbraced:NV \siunitx_tmp:w \l_siunitx_number_arg_tl 
+        \q_stop
       \tl_if_empty:NT \l_siunitx_number_arg_tl
         { \siunitx_error:n { starting-product-token } }
       \tl_if_empty:NT \l_siunitx_number_next_tl 
@@ -5667,7 +5668,8 @@ This work consists of the file  siunitx.dtx
           \tl_set:Nn \l_siunitx_number_denominator_tl {##2}     
           \tl_set:Nn \l_siunitx_number_multi_tl { quotient } 
         }
-      \exp_after:wN \siunitx_tmp:w \l_siunitx_number_arg_tl \q_stop
+      \exp_last_unbraced:NV \siunitx_tmp:w \l_siunitx_number_arg_tl 
+        \q_stop
       \tl_if_empty:NT \l_siunitx_number_numerator_tl 
         { \siunitx_error:n { starting-quotient-token } }
       \tl_if_empty:NT \l_siunitx_number_denominator_tl
@@ -5981,7 +5983,8 @@ This work consists of the file  siunitx.dtx
 % simple and hopefully efficient.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_in_parse_relation:N #1 {
-  \exp_after:wN \siunitx_number_in_parse_relation:w #1 \q_stop #1
+  \exp_last_unbraced:NV \siunitx_number_in_parse_relation:w
+    #1 \q_stop #1
 }
 \cs_new_protected:Npn \siunitx_number_in_parse_relation:w 
   #1#2 \q_stop #3 {
@@ -6980,7 +6983,7 @@ This work consists of the file  siunitx.dtx
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
       \tl_set:Nx \l_siunitx_tmpa_tl
         { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
-      \exp_after:wN  \siunitx_number_process_fixed_aux_i:nnn 
+      \exp_last_unbraced:NV \siunitx_number_process_fixed_aux_i:nnn 
         \l_siunitx_tmpa_tl
     }
 }         
@@ -7459,7 +7462,7 @@ This work consists of the file  siunitx.dtx
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
       \tl_set:Nx \l_siunitx_tmpa_tl
         { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
-      \exp_after:wN \siunitx_number_process_scientific_aux_i:nnn 
+      \exp_last_unbraced:NV \siunitx_number_process_scientific_aux_i:nnn
         \l_siunitx_tmpa_tl
     }
 }         
@@ -8260,7 +8263,8 @@ This work consists of the file  siunitx.dtx
   \bool_if:NTF \l_siunitx_group_four_bool 
     { \siunitx_number_format_group_four_aux:nn {#1} {#2} }
     {
-      \exp_after:wN \siunitx_number_format_group_four_aux:NNNNNNw
+      \exp_last_unbraced:NV
+        \siunitx_number_format_group_four_aux:NNNNNNw
         \l_siunitx_tmpa_tl \q_no_value \q_no_value \q_no_value
         \q_no_value \q_no_value \q_stop
         { \siunitx_number_format_copy:n {#1 - #2} }
@@ -8291,7 +8295,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_format_group_decimal: {
   \tl_if_empty:NF \l_siunitx_tmpa_tl 
     { 
-      \exp_after:wN \siunitx_number_format_group_decimal_aux:NNNN 
+      \exp_last_unbraced:NV
+        \siunitx_number_format_group_decimal_aux:NNNN 
         \l_siunitx_tmpa_tl { } { } { }
     }
 }
@@ -9675,7 +9680,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_first_token:n #1 {
-  \exp_after:wN \token_to_str:N \tl_head:w #1 \q_stop
+  \exp_last_unbraced:No \token_to_str:N { \tl_head:w #1 \q_stop }
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -10715,7 +10720,8 @@ This work consists of the file  siunitx.dtx
             {
               \cs_set:Npn \siunitx_tmp:w ##1 - ##2 \q_stop 
                 { \tl_set:Nn \l_siunitx_tmpa_tl {##2} }
-              \exp_after:wN \siunitx_tmp:w \l_siunitx_tmpa_tl \q_stop
+              \exp_last_unbraced:NV \siunitx_tmp:w 
+                \l_siunitx_tmpa_tl \q_stop
             }
             { \tl_put_left:Nn \l_siunitx_tmpa_tl { - } }
         }
@@ -10871,8 +10877,8 @@ This work consists of the file  siunitx.dtx
   \group_end:
   \cs_set_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript: 
     {
-      \tl_put_right:No \l_siunitx_unit_current_tl 
-        { \exp_after:wN @ \exp_after:wN { \l_siunitx_tmpa_tl } }
+      \tl_put_right:Nx \l_siunitx_unit_current_tl 
+        { @ { \exp_not:V \l_siunitx_tmpa_tl } }
     }
 }
 %    \end{macrocode}
