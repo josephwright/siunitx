@@ -4437,7 +4437,6 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_error:nxx}
 %\begin{macro}{\siunitx_error:nx}
 %\begin{macro}{\siunitx_error:n}
-%\begin{macro}{\siunitx_error:nV}
 % General-purpose functions for throwing errors.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_error_bool
@@ -4451,9 +4450,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_error:n #1 {
   \siunitx_error:nxx {#1} { } { }
 }
-\cs_generate_variant:Nn \siunitx_error:nx { nV }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5069,7 +5066,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_detect_font_weight_text:
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_math: {
-  \str_if_eq:nVT { bold } \math@version 
+  \str_if_eq:VnT \math@version { bold }
     {
       \cs_set:Npn \siunitx_font_weight: 
         {
@@ -5077,7 +5074,7 @@ This work consists of the file  siunitx.dtx
           \bfseries
         }
     }
-  \str_if_eq:nVT { light } \math@version 
+  \str_if_eq:VnT \math@version { light } 
     {
       \cs_set:Npn \siunitx_font_weight: 
         { \lseries }
@@ -5085,7 +5082,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_text: {
   \tl_set:Nx \l_siunitx_tmpa_tl { \exp_args:NV \tl_head:n \f@series }
-  \str_if_eq:nVT { b } \l_siunitx_tmpa_tl 
+  \str_if_eq:VnT \l_siunitx_tmpa_tl { b }
     {
       \cs_set:Npn \siunitx_font_weight: 
         {
@@ -5093,7 +5090,7 @@ This work consists of the file  siunitx.dtx
           \bfseries
         }
     }
-  \str_if_eq:nVT { l } \l_siunitx_tmpa_tl  
+  \str_if_eq:VnT \l_siunitx_tmpa_tl { l }
     {
       \cs_set:Npn \siunitx_font_weight: 
         { \lseries }
@@ -5147,9 +5144,9 @@ This work consists of the file  siunitx.dtx
 % The shape test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_shape: {
-  \str_if_eq:nVT { it } \f@shape 
+  \str_if_eq:VnT \f@shape { it }
     { \cs_set_nopar:Npn \siunitx_font_shape: { \itshape } }
-  \str_if_eq:nVT { sl } \f@shape 
+  \str_if_eq:VnT \f@shape { sl }
     { \cs_set_nopar:Npn \siunitx_font_shape: { \slshape } }
 }
 %    \end{macrocode}
@@ -6567,7 +6564,8 @@ This work consists of the file  siunitx.dtx
     { 
       \prop_get:NnN \l_siunitx_number_in_prop { complex-sign } 
         \l_siunitx_tmpa_tl
-      \siunitx_error:nV { misplaced-sign-token } \l_siunitx_tmpa_tl
+      \siunitx_error:nx { misplaced-sign-token } 
+        { \exp_not:V \l_siunitx_tmpa_tl }
     }
   \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign } 
     \l_siunitx_tmpa_tl
@@ -7977,7 +7975,7 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
   \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
-      \str_if_eq:nVT { - } \l_siunitx_tmpa_tl 
+      \str_if_eq:VnT \l_siunitx_tmpa_tl { - }
         {
            \prop_put:NnV \l_siunitx_number_out_prop { color } 
              \l_siunitx_negative_color_tl
@@ -10428,7 +10426,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_add_aux:n #1 {
   \tl_if_empty:cF { l_siunitx_unit #1 _tl } 
     {
-      \str_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+      \str_if_eq:VnTF \l_siunitx_per_mode_tl { repeat }
         {
           \tl_set:Nx \l_siunitx_tmpa_tl 
             { per- \int_eval:n { \l_siunitx_unit_int + 1 } }
@@ -10648,10 +10646,10 @@ This work consists of the file  siunitx.dtx
 % in text mode so that negative signs get printed correctly.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_power_aux: {
-  \str_if_eq:nVTF { repeat } \l_siunitx_per_mode_tl 
+  \str_if_eq:VnTF \l_siunitx_per_mode_tl { repeat }
     { \siunitx_unit_format_power_repeat: }
     { \siunitx_unit_format_power_per: }
-  \str_if_eq:nVF { 1 } \l_siunitx_tmpa_tl 
+  \str_if_eq:VnF \l_siunitx_tmpa_tl { 1 }
     {
       \siunitx_unit_format_power_brackets:
       \tl_put_right:Nx \l_siunitx_unit_current_tl 
@@ -10787,7 +10785,7 @@ This work consists of the file  siunitx.dtx
     { unit- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpb_tl
     \l_siunitx_tmpb_tl
-  \str_if_eq:nVT { \gram } \l_siunitx_tmpb_tl
+  \str_if_eq:VnT \l_siunitx_tmpb_tl { \gram }
     { 
       \tl_set:Nx \l_siunitx_unit_prefix_current_tl
         { \int_eval:n { \l_siunitx_unit_prefix_current_tl  - 3 } } 
@@ -13064,7 +13062,7 @@ This work consists of the file  siunitx.dtx
               \@ifpackageloaded { fourier } { }
                 { \keys_set:nn { siunitx } { text-ohm = \textohm } } 
             }
-          \str_if_eq:nVT { OT1 } \encodingdefault 
+          \str_if_eq:VnT \encodingdefault { OT1 }
             { 
               \keys_set:nn { siunitx } 
                 {
