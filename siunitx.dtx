@@ -7419,8 +7419,15 @@ This work consists of the file  siunitx.dtx
     {  
       \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
         \l_siunitx_round_integer_out_tl
-      \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
-        \l_siunitx_round_decimal_out_tl
+      \tl_if_empty:NTF \l_siunitx_round_decimal_out_tl
+        {
+          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
+        }
+        {
+          \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
+            \l_siunitx_round_decimal_out_tl
+        }    
      }
 }
 \cs_new_protected_nopar:Npn
