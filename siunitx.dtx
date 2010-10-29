@@ -5081,7 +5081,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_text: {
-  \tl_set:Nx \l_siunitx_tmpa_tl { \exp_args:NV \tl_head:n \f@series }
+  \tl_set:Nx \l_siunitx_tmpa_tl { \tl_head:V \f@series }
   \str_if_eq:VnT \l_siunitx_tmpa_tl { b }
     {
       \cs_set:Npn \siunitx_font_weight: 
@@ -6845,9 +6845,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn 
   \siunitx_number_process_figures_count_aux:n #1 {
   \int_set:Nn \l_siunitx_tmp_int 
-    { \exp_args:Nv \tl_head:n { l_siunitx_round_ #1 _in_tl } }
+    { \tl_head:v { l_siunitx_round_ #1 _in_tl } }
   \tl_set:cx { l_siunitx_round_ #1 _in_tl } 
-    { \exp_args:Nv \tl_tail:n { l_siunitx_round_ #1 _in_tl } }
+    { \tl_tail:v { l_siunitx_round_ #1 _in_tl } }
   \tl_put_left:cV { l_siunitx_round_ #1 _out_tl } \l_siunitx_tmp_int
   \bool_if:NF \l_siunitx_round_bool 
     {
@@ -6911,7 +6911,7 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnF { \l_siunitx_round_int } > { 1 } 
     {
       \int_set:Nn \l_siunitx_tmp_int 
-        { \exp_args:NV \tl_head:n \l_siunitx_round_integer_in_tl }
+        { \tl_head:V \l_siunitx_round_integer_in_tl }
       \bool_if:NT \l_siunitx_round_bool
         { \int_incr:N \l_siunitx_tmp_int }
       \bool_set_false:N \l_siunitx_round_bool
@@ -6932,7 +6932,7 @@ This work consists of the file  siunitx.dtx
     }   
   \int_decr:N \l_siunitx_round_int
   \tl_set:Nx \l_siunitx_round_integer_in_tl 
-    { \exp_args:NV \tl_tail:n \l_siunitx_round_integer_in_tl }
+    { \tl_tail:V \l_siunitx_round_integer_in_tl }
   \tl_if_empty:NF \l_siunitx_round_integer_in_tl 
     { \siunitx_number_process_figures_integer: }
 }
@@ -7186,7 +7186,7 @@ This work consists of the file  siunitx.dtx
       \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \int_compare:nNnT 
-            { \exp_args:NV \tl_head:n \l_siunitx_tmpa_tl } > { 4 }
+            { \tl_head:V \l_siunitx_tmpa_tl } > { 4 }
             {
               \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
                 \l_siunitx_tmpa_tl
@@ -7304,9 +7304,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn 
   \siunitx_number_process_places_integer:n #1 {
   \int_set:Nn \l_siunitx_tmp_int 
-    { \exp_args:NV \tl_head:n \l_siunitx_round_integer_in_tl }
+    { \tl_head:V \l_siunitx_round_integer_in_tl }
   \tl_set:Nx \l_siunitx_round_integer_in_tl 
-    { \exp_args:NV \tl_tail:n \l_siunitx_round_integer_in_tl }
+    { \tl_tail:V \l_siunitx_round_integer_in_tl }
   \bool_if:NT \l_siunitx_round_bool
     { \int_incr:N \l_siunitx_tmp_int }
   \bool_set_false:N \l_siunitx_round_bool
@@ -7364,13 +7364,13 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnF { \l_siunitx_round_int } > { 1 } 
     { \siunitx_number_process_round_decimal_aux: }
   \tl_set:Nx \l_siunitx_round_decimal_in_tl 
-    { \exp_args:NV \tl_tail:n \l_siunitx_round_decimal_in_tl }
+    { \tl_tail:V \l_siunitx_round_decimal_in_tl }
   \int_decr:N \l_siunitx_round_int
 }
 \cs_new_protected_nopar:Npn 
   \siunitx_number_process_round_decimal_aux: {
   \int_set:Nn \l_siunitx_tmp_int 
-    { \exp_args:NV \tl_head:n \l_siunitx_round_decimal_in_tl }
+    { \tl_head:V \l_siunitx_round_decimal_in_tl }
   \bool_if:NT \l_siunitx_round_bool 
     { \int_incr:N \l_siunitx_tmp_int }
   \bool_set_false:N \l_siunitx_round_bool
