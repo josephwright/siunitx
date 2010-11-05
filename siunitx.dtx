@@ -496,6 +496,8 @@ This work consists of the file  siunitx.dtx
 % to set a floor for rounding numbers downward}
 %\changes{v2.1a}{2010/11/05}{Ensure that output of list separators is
 % in text mode}
+%\changes{v2.1a}{2010/11/05}{Print prefixes correctly in text mode
+%  when converting to numerical value}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -11103,8 +11105,14 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nx \l_siunitx_tmpa_tl 
         {
           \bool_if:NTF \l_siunitx_tight_bool 
-            { { \exp_not:V \l_siunitx_exponent_product_tl } }    
-            { { } \exp_not:V \l_siunitx_exponent_product_tl { } }        
+            {
+              \exp_not:N \ensuremath
+                { { \exp_not:V \l_siunitx_exponent_product_tl } }
+            }    
+            { 
+              \exp_not:N \ensuremath
+                { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
+            }        
           \int_use:N \l_siunitx_unit_prefix_base_int
           ^ { \int_use:N \l_siunitx_unit_prefix_int }
         }
