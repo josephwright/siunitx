@@ -500,6 +500,8 @@ This work consists of the file  siunitx.dtx
 %  when converting to numerical value}
 %\changes{v2.1b}{2010/11/05}{Bug in printing code for complex part with
 %  no number fixed}
+%\changes{v2.1b}{2010/11/05}{Bug in hyphen printing when detecting mode
+%  sorted}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -5156,7 +5158,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_mode: {
   \mode_if_math:F 
-    { \bool_set_false:N \l_siunitx_font_math_mode_bool }
+    { 
+      \bool_set_false:N \l_siunitx_font_math_mode_bool
+      \bool_set_false:N \l_siunitx_number_math_mode_bool
+      \bool_set_false:N \l_siunitx_unit_math_mode_bool
+    }
 }
 %    \end{macrocode}
 %\end{macro}
