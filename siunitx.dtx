@@ -494,6 +494,8 @@ This work consists of the file  siunitx.dtx
 % for reserving space for comparators in tables}
 %\changes{v2.1}{2010/10/27}{New \opt{round-minimum} option
 % to set a floor for rounding numbers downward}
+%\changes{v2.1a}{2010/11/05}{Ensure that output of list separators is
+% in text mode}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1934,7 +1936,7 @@ This work consists of the file  siunitx.dtx
 % separator before the last item of a list may be different, and
 % is therefore set using the \opt{list-final-separator} option. Any
 % spaces needed should be included in the option settings: none are
-% added within the code.
+% added within the code. These two items are printed in text mode.
 %\begin{LaTeXdemo}
 %  \numlist{0.1;0.2;0.3}                              \\
 %  \numlist[list-separator = {; }]{0.1;0.2;0.3}       \\
@@ -11302,9 +11304,12 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_list_numbers_aux_i:n #1 {  
   \tl_clear:N \l_siunitx_list_tl
   \tl_clear:N \l_siunitx_list_current_tl
-  \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n    
-  \tl_put_right:NV \l_siunitx_list_tl 
-    \l_siunitx_list_separator_final_tl  
+  \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n   
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    {
+      \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_final_tl }
+    } 
+  \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
   \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
   \tl_use:N \l_siunitx_list_tl 
 }
@@ -11312,8 +11317,9 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:NTF \l_siunitx_list_tl
     { \tl_set_eq:NN \l_siunitx_list_tl \l_siunitx_list_current_tl }
     { 
-        \tl_put_right:NV \l_siunitx_list_tl 
-          \l_siunitx_list_separator_tl
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_tl } }
+        \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
         \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
     }
   \tl_set:Nn \l_siunitx_list_current_tl 
