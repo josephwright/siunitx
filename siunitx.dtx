@@ -506,6 +506,8 @@ This work consists of the file  siunitx.dtx
 %  unit even when it is permitted}
 %\changes{v2.1c}{2010/11/11}{Allow line breaks within lists (this
 %  was prevented by fix introduced in v2.1a)}
+%\changes{v2.1c}{2010/11/11}{New \opt{fast-math} setting for the 
+%  \opt{mode} option: use with care}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1404,13 +1406,16 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{mode}
 % The \opt{mode} option determines whether \pkg{siunitx} uses
-% math or text mode when printing output. The choices are \opt{math} and
-% \opt{text}. When using math mode, text is printed using a math font 
-% whereas in text mode a text font is used.  The extent to which this is 
-% visually obvious depends on the fonts in use in the document. This 
-% manual uses old style (lower-case) figures in text mode to highlight 
-% the differences. This option has no effect if the \opt{detect-mode} 
-% switch is \opt{true}.
+% math or text mode when printing output. The choices are 
+% \opt{fast-math}, \opt{math} and \opt{text}. When using math mode, text 
+% is printed using a math font whereas in text mode a text font is used.
+% The extent to which this is visually obvious depends on the fonts in 
+% use in the document. This manual uses old style (lower-case) figures
+% in text mode to highlight the differences. This option has no effect
+% if the \opt{detect-mode} switch is \opt{true}. The \opt{fast-math}
+% setting turns off any font control at all and uses the math font
+% directly. This may lead to bold output if \cs{boldmath} is currently
+% active, but is much faster than the font-controlled version.
 % 
 %\DescribeOption{math-rm}
 %\DescribeOption{math-sf}
@@ -3635,11 +3640,15 @@ This work consists of the file  siunitx.dtx
 % Both the number and unit parsers require significant effort in
 % terms of \TeX\ programming. For input that does not require 
 % such processing, the maximum performance for \pkg{siunitx} can
-% therefore be obtained by turning off both systems:
+% therefore be obtained by turning off both systems. At the same time,
+% dropping any attempt at font control using the \opt{fast-math}
+% setting for output will also make compilation faster: note that this
+% may be affected by any prevailing \cs{boldmath} instruction.
 %\begin{LaTeXdemo}
 %  \SI{7.3}{\Hz} \\
 %  \SI[parse-units = false]{7.3}{\Hz} \\
 %  \SI[
+%    mode          = fast-math,
 %    parse-numbers = false,
 %    parse-units   = false
 %  ]{7.3}{\Hz} 
@@ -5179,13 +5188,19 @@ This work consists of the file  siunitx.dtx
 % by name, based on output type (\texttt{unit} or \texttt{value}) and
 % the family selected by the detector.
 % 
+%\begin{macro}{\l_siunitx_number_fast_math_bool}
 %\begin{macro}{\l_siunitx_number_math_mode_bool}
+%\begin{macro}{\l_siunitx_unit_fast_math_bool}
 %\begin{macro}{\l_siunitx_unit_math_mode_bool}
 % Most of the variables are created by the keys system: these are not.
 %    \begin{macrocode}
+\bool_new:N \l_siunitx_number_fast_math_bool
 \bool_new:N \l_siunitx_number_math_mode_bool
+\bool_new:N \l_siunitx_unit_fast_math_bool
 \bool_new:N \l_siunitx_unit_math_mode_bool
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -5214,10 +5229,21 @@ This work consists of the file  siunitx.dtx
   number-math-tt .code:n  = 
     { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
   number-mode .choice:,
+  number-mode / fast-math .code:n = 
+    { 
+      \bool_set_true:N \l_siunitx_number_fast_math_bool 
+      \bool_set_true:N \l_siunitx_number_math_mode_bool 
+    },
   number-mode / math .code:n = 
-    { \bool_set_true:N \l_siunitx_number_math_mode_bool },
-  number-mode / text .code:n =
-    { \bool_set_false:N \l_siunitx_number_math_mode_bool },
+    { 
+      \bool_set_false:N \l_siunitx_number_fast_math_bool
+      \bool_set_true:N  \l_siunitx_number_math_mode_bool 
+    },
+  number-mode / text .code:n = 
+    { 
+      \bool_set_false:N \l_siunitx_number_fast_math_bool
+      \bool_set_false:N \l_siunitx_number_math_mode_bool
+    },
   number-text-rm .code:n  = 
     { \cs_set_nopar:Npn \siunitx_number_textrm: {#1} },
   number-text-sf .code:n  = 
@@ -5258,10 +5284,21 @@ This work consists of the file  siunitx.dtx
   unit-math-tt .code:n = 
     { \cs_set_nopar:Npn \siunitx_unit_mathtt:n ##1 { #1 {##1} } },
   unit-mode .choice:,
+  unit-mode / fast-math .code:n = 
+    { 
+      \bool_set_true:N \l_siunitx_unit_fast_math_bool 
+      \bool_set_true:N \l_siunitx_unit_math_mode_bool 
+    },
   unit-mode / math .code:n = 
-    { \bool_set_true:N \l_siunitx_unit_math_mode_bool },
+    { 
+      \bool_set_false:N \l_siunitx_unit_fast_math_bool 
+      \bool_set_true:N  \l_siunitx_unit_math_mode_bool 
+    },
   unit-mode / text .code:n = 
-    { \bool_set_false:N \l_siunitx_unit_math_mode_bool },
+    { 
+      \bool_set_false:N \l_siunitx_unit_fast_math_bool
+      \bool_set_false:N \l_siunitx_unit_math_mode_bool
+    },
   unit-text-rm .code:n = 
     { \cs_set_nopar:Npn \siunitx_unit_textrm: {#1} },
   unit-text-sf .code:n =
@@ -5303,6 +5340,11 @@ This work consists of the file  siunitx.dtx
       unit-math-tt   = #1
     },
   mode .choice:,
+  mode / fast-math .meta:n = 
+    {
+      number-mode = fast-math,
+      unit-mode   = fast-math
+    },
   mode / math .meta:n = 
     {
       number-mode = math,
@@ -5398,14 +5440,21 @@ This work consists of the file  siunitx.dtx
   \group_begin:
     \tl_set:Nn \l_siunitx_print_type_tl {#1}
     \tl_set:Nn \l_siunitx_print_arg_tl {#2}
-    \siunitx_detect_font:
-    \bool_if:NF \l_siunitx_detect_mode_bool 
+    \bool_if:cTF { l_siunitx_ #1 _fast_math_bool } 
       {
-        \bool_if:cTF { l_siunitx_ #1 _math_mode_bool } 
-          { \bool_set_true:N \l_siunitx_font_math_mode_bool }
-          { \bool_set_false:N \l_siunitx_font_math_mode_bool }
+        \siunitx_print_color:
+        \ensuremath {#2}
       }
-    \siunitx_print_aux:
+      {
+        \siunitx_detect_font:
+        \bool_if:NF \l_siunitx_detect_mode_bool 
+          {
+            \bool_if:cTF { l_siunitx_ #1 _math_mode_bool } 
+              { \bool_set_true:N \l_siunitx_font_math_mode_bool }
+              { \bool_set_false:N \l_siunitx_font_math_mode_bool }
+          }
+        \siunitx_print_aux:
+      }
   \group_end:
 }
 \cs_generate_variant:Nn \siunitx_print:nn { nV }
