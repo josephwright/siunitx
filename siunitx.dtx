@@ -502,6 +502,10 @@ This work consists of the file  siunitx.dtx
 %  no number fixed}
 %\changes{v2.1b}{2010/11/05}{Bug in hyphen printing when detecting mode
 %  sorted}
+%\changes{v2.1c}{2010/11/11}{Discourage line break between number and
+%  unit even when it is permitted}
+%\changes{v2.1c}{2010/11/11}{Allow line breaks within lists (this
+%  was prevented by fix introduced in v2.1a)}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -11323,7 +11327,9 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n   
   \tl_set:Nx \l_siunitx_tmpa_tl
     {
+      \exp_not:N \allowbreak
       \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_final_tl }
+      \exp_not:N \allowbreak
     } 
   \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
   \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
@@ -11334,7 +11340,11 @@ This work consists of the file  siunitx.dtx
     { \tl_set_eq:NN \l_siunitx_list_tl \l_siunitx_list_current_tl }
     { 
       \tl_set:Nx \l_siunitx_tmpa_tl
-        { \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_tl } }
+        {
+          \exp_not:N \allowbreak
+          \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_tl }
+          \exp_not:N \allowbreak
+        }
         \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
         \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
     }
