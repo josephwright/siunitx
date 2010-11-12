@@ -1411,11 +1411,12 @@ This work consists of the file  siunitx.dtx
 % is printed using a math font whereas in text mode a text font is used.
 % The extent to which this is visually obvious depends on the fonts in 
 % use in the document. This manual uses old style (lower-case) figures
-% in text mode to highlight the differences. This option has no effect
-% if the \opt{detect-mode} switch is \opt{true}. The \opt{fast-math}
+% in text mode to highlight the differences. The \opt{fast-math}
 % setting turns off any font control at all and uses the math font
 % directly. This may lead to bold output if \cs{boldmath} is currently
-% active, but is much faster than the font-controlled version.
+% active, but is much faster than the font-controlled version. The
+% setting of the \opt{mode} option has no effect if the
+% \opt{detect-mode} switch is \opt{true}. 
 % 
 %\DescribeOption{math-rm}
 %\DescribeOption{math-sf}
@@ -5431,6 +5432,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_print:nn}
 %\begin{macro}{\siunitx_print:nV}
+%\begin{macro}[aux]{\siunitx_print_aux_i:}
+%\begin{macro}[aux]{\siunitx_print_aux_ii:}
 % The main printing function does everything inside a group, as 
 % there are category code and definition changes to make. First, set
 % the fonts.  Then move on to printing mode, before moving to actual
@@ -5440,33 +5443,36 @@ This work consists of the file  siunitx.dtx
   \group_begin:
     \tl_set:Nn \l_siunitx_print_type_tl {#1}
     \tl_set:Nn \l_siunitx_print_arg_tl {#2}
-    \bool_if:cTF { l_siunitx_ #1 _fast_math_bool } 
+    \bool_if:cTF { l_siunitx_ #1 _fast_math_bool }
       {
-        \siunitx_print_color:
-        \ensuremath {#2}
-      }
-      {
-        \siunitx_detect_font:
-        \bool_if:NF \l_siunitx_detect_mode_bool 
+        \bool_if:NTF \l_siunitx_detect_mode_bool 
+          { \siunitx_print_aux_i: }
           {
-            \bool_if:cTF { l_siunitx_ #1 _math_mode_bool } 
-              { \bool_set_true:N \l_siunitx_font_math_mode_bool }
-              { \bool_set_false:N \l_siunitx_font_math_mode_bool }
-          }
-        \siunitx_print_aux:
-      }
+            \siunitx_print_color:
+            \ensuremath { \mathrm {#2} }
+          } 
+      }    
+      { \siunitx_print_aux_i: }   
   \group_end:
 }
 \cs_generate_variant:Nn \siunitx_print:nn { nV }
+\cs_new_protected:Npn \siunitx_print_aux_i: {
+  \siunitx_detect_font:
+  \bool_if:NF \l_siunitx_detect_mode_bool 
+    {
+      \bool_if:cTF 
+        { l_siunitx_ \l_siunitx_print_type_tl _math_mode_bool }
+        { \bool_set_true:N \l_siunitx_font_math_mode_bool }
+        { \bool_set_false:N \l_siunitx_font_math_mode_bool }
+   }
+  \siunitx_print_aux_ii:
+}
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_print_aux:}
 % The various font changes are set up, then the correct printing
 % function is called. Everything is inside \cs{text} as this allows 
 % proper setting of the various mode settings.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_print_aux: {
+\cs_new_protected_nopar:Npn \siunitx_print_aux_ii: {
   \text 
     {
       \siunitx_print_color:
@@ -5483,6 +5489,9 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_print_color:}
