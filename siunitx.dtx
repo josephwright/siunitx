@@ -172,8 +172,9 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit{\KWH}{kWh}
 \DeclareSIPrePower\quartic{4}
 \DeclareSIPostPower\tothefourth{4}
-\DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
+\DeclareSIQualifier\isotropic{i}
+\DeclareSIQualifier\polymer{pol}
 %\DisableImplementation
 \begin{document}
   \DocInput{\jobname.dtx}
@@ -234,6 +235,7 @@ This work consists of the file  siunitx.dtx
 %          ang,
 %          angstrom,
 %          becquerel,
+%          bel,
 %          bit,
 %          bottomrule,
 %          byte,
@@ -2564,15 +2566,19 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{qualifier-mode}
 % Unit qualifiers can be printed in three different formats, set by the
 % \opt{qualifier-mode} option. The standard setting is \opt{subscript},
-% while the options \opt{brackets} and \opt{space} are also possible.
-% With the last settings, powers can lead to ambiguity and are 
+% while the options \opt{brackets}, \opt{space} and \opt{text} are also
+% possible. With the last settings, powers can lead to ambiguity and are
 % automatically detected and brackets added as appropriate.
 %\begin{LaTeXdemo}
 %  \si{\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
-%  \si[qualifier-mode=brackets]
+%  \si[qualifier-mode = brackets]
 %    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
-%  \si[qualifier-mode=space]
-%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} 
+%  \si[qualifier-mode = subscript]
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
+%  \si[qualifier-mode = space]
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour}  \\
+%  \si[qualifier-mode = text]
+%    {\deci\bel\isotropic} 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{prefixes-as-symbols}
@@ -10370,6 +10376,8 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { space } },
   qualifier-mode / subscript .code:n = 
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { subscript } },
+  qualifier-mode / text      .code:n = 
+    { \tl_set:Nn \l_siunitx_qualifier_mode_tl { text } },
 }
 \keys_set:nn { siunitx } {
   bracket-unit-denominator = true,
@@ -10852,7 +10860,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_format_qualifier_brackets:}
 %\begin{macro}{\siunitx_unit_format_qualifier_space:}
 %\begin{macro}{\siunitx_unit_format_qualifier_subscript:}
-% Three methods for showing qualifiers, each with its own sub-function.
+%\begin{macro}{\siunitx_unit_format_qualifier_text:}
+% Four methods for showing qualifiers, each with its own sub-function.
 % For the \texttt{space} methods, a warning is set in the property list
 % as if there is a power then some brackets will be needed.
 %    \begin{macrocode}
@@ -10897,7 +10906,11 @@ This work consists of the file  siunitx.dtx
         { @ { \exp_not:V \l_siunitx_tmpa_tl } }
     }
 }
+\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_text: {
+  \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
