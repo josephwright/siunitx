@@ -506,10 +506,11 @@ This work consists of the file  siunitx.dtx
 %  sorted}
 %\changes{v2.1c}{2010/11/11}{Discourage line break between number and
 %  unit even when it is permitted}
-%\changes{v2.1c}{2010/11/11}{Allow line breaks within lists (this
-%  was prevented by fix introduced in v2.1a)}
 %\changes{v2.1c}{2010/11/13}{New \opt{qualifier-mode = text}
 %  choice}
+%\changes{v2.1c}{2010/11/14}{After reviewing internals, \cs{numlist},
+%  \cs{numrange}, \cs{SIlist} and \cs{SIrange} are documented as
+%  requiring text mode due to issues with spacing and line breaks}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -693,7 +694,12 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 % Lists of numbers may be processed using the \cs{numlist} function.
 % Each \meta{number} is given within the list of \meta{numbers} within
-% a brace pair, as the list can have a flexible length.
+% a brace pair, as the list can have a flexible length. This function
+% should be used in text mode, a common feature of all of the list and 
+% range functions provided by \pkg{siunitx}.\footnote{The reason for
+% this restriction is that the separators between items may involve
+% text-mode spaces which must be able to vanish at line breaks. It is
+% not possible to achieve this effect from inside math mode.}
 %\begin{LaTeXdemo}
 %  \numlist{10;30;50;70}
 %\end{LaTeXdemo}
@@ -704,7 +710,8 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 % Simple ranges of numbers can be handled using the \cs{numrange}
 % function. This acts in the same way as \cs{num}, but inserts a 
-% phrase or other text between the two entries. 
+% phrase or other text between the two entries. This function should
+% be used in text mode.
 %\begin{LaTeXdemo}
 %  \numrange{10}{30}
 %\end{LaTeXdemo}
@@ -799,7 +806,8 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 % Lists of numbers with units can be handled using the \cs{SIlist}
 % function. The behaviour of this function is similar to \cs{numlist},
-% but with the addition of a unit to each number.
+% but with the addition of a unit to each number.  This function should
+% be used in text mode.
 %\begin{LaTeXdemo}
 %  \SIlist{10;30;45}{\metre}
 %\end{LaTeXdemo}
@@ -810,7 +818,8 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 % Ranges of numbers with units can be handled using the \cs{SIrange}
 % function. The behaviour of this function is similar to \cs{numrange},
-% but with the addition of a unit to each number.
+% but with the addition of a unit to each number.  This function should
+% be used in text mode.
 %\begin{LaTeXdemo}
 %  \SIrange{10}{30}{\metre}
 %\end{LaTeXdemo}
@@ -11340,13 +11349,7 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \l_siunitx_list_tl
   \tl_clear:N \l_siunitx_list_current_tl
   \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n   
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    {
-      \exp_not:N \allowbreak
-      \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_final_tl }
-      \exp_not:N \allowbreak
-    } 
-  \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
+  \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_final_tl
   \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
   \tl_use:N \l_siunitx_list_tl 
 }
@@ -11354,14 +11357,8 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:NTF \l_siunitx_list_tl
     { \tl_set_eq:NN \l_siunitx_list_tl \l_siunitx_list_current_tl }
     { 
-      \tl_set:Nx \l_siunitx_tmpa_tl
-        {
-          \exp_not:N \allowbreak
-          \exp_not:N \text { \exp_not:V \l_siunitx_list_separator_tl }
-          \exp_not:N \allowbreak
-        }
-        \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_tmpa_tl
-        \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
+      \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_tl
+      \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
     }
   \tl_set:Nn \l_siunitx_list_current_tl 
     { \siunitx_combined_output:n {#1} }
@@ -11453,7 +11450,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_range_numbers:nn #1#2 {
   \siunitx_range_numbers_aux:n {#1}
-  \text { \l_siunitx_range_phrase_tl }
+  \tl_use:N \l_siunitx_range_phrase_tl
   \siunitx_range_numbers_aux:n {#2}
 }
 \cs_new_protected:Npn \siunitx_range_numbers_aux:n #1 {
