@@ -506,13 +506,17 @@ This work consists of the file  siunitx.dtx
 %  sorted}
 %\changes{v2.1c}{2010/11/11}{Discourage line break between number and
 %  unit even when it is permitted}
-%\changes{v2.1c}{2010/11/13}{New \opt{qualifier-mode = text}
-%  choice}
+%\changes{v2.1c}{2010/11/13}{New \opt{text} choice for
+%  \opt{qualifier-mode} option}
 %\changes{v2.1c}{2010/11/14}{After reviewing internals, \cs{numlist},
 %  \cs{numrange}, \cs{SIlist} and \cs{SIrange} are documented as
 %  requiring text mode due to issues with spacing and line breaks}
 %\changes{v2.1c}{2010/11/14}{Auto-detect math mode in tables and
 %  correct output accordingly}
+%\changes{v2.1d}{2010/11/14}{Apply unit options when
+%  \opt{free-standing-units} is active}
+%\changes{v2.1d}{2010/11/14}{Error with definition of version 1 option
+%  \opt{xspace} corrected}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -9862,6 +9866,13 @@ This work consists of the file  siunitx.dtx
         {
           \ProvideDocumentCommand \exp_not:N #1 { } 
             {
+              \exp_not:N \cs_if_free:NF
+                \exp_not:c { l_siunitx_ \token_to_str:N #1 _options_tl }
+                {
+                  \keys_set:nV { siunitx } 
+                    \exp_not:c 
+                      { l_siunitx_ \token_to_str:N #1 _options_tl }
+                }
               \bool_if:NT \l_siunitx_create_prespace_bool 
                 {
                   \exp_not:n 
@@ -9887,6 +9898,13 @@ This work consists of the file  siunitx.dtx
         {
           \ProvideDocumentCommand \exp_not:N #1 { o } 
             {
+              \exp_not:N \cs_if_free:cF
+                \exp_not:c { l_siunitx_ \token_to_str:N #1 _options_tl }
+                {
+                  \keys_set:nV { siunitx } 
+                    \exp_not:c 
+                      { l_siunitx_ \token_to_str:N #1 _options_tl }
+                }
               \exp_not:N \IfNoValueTF {####1} 
                 { \exp_not:n { \siunitx_unit_output:nn {#1} { } } }
                 {
