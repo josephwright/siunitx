@@ -511,6 +511,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.1c}{2010/11/14}{After reviewing internals, \cs{numlist},
 %  \cs{numrange}, \cs{SIlist} and \cs{SIrange} are documented as
 %  requiring text mode due to issues with spacing and line breaks}
+%\changes{v2.1c}{2010/11/14}{Auto-detect math mode in tables and
+%  correct output accordingly}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -11584,6 +11586,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_table_math_bool}
+% A flag used inside the table cell to track math mode: there is
+% a need to do things by hand as otherwise the grouping goes 
+% wrong.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_table_math_bool
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_table_collect_pre_bool}
 %\begin{macro}{\l_siunitx_table_collect_post_bool}
 % Flags for having found a number in an \texttt{S} column.
@@ -11634,6 +11645,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_collect_expand:N}
+%\begin{macro}[aux]{\siunitx_table_collect_expand_math:N}
 % The idea here is to expand content if possible.  There are a few 
 % things to note. Only macros which are not long or protected are
 % expanded. There is the possibility that the macro may need the
@@ -11664,7 +11676,10 @@ This work consists of the file  siunitx.dtx
         }
         {
           \bool_if:NTF \l_siunitx_table_collect_pre_bool
-            { \tl_put_right:Nn \l_siunitx_table_collect_pre_tl {#1} }
+            { 
+              \tl_put_right:Nn \l_siunitx_table_collect_pre_tl {#1} 
+              \siunitx_table_collect_expand_math:N #1
+            }
             {
               \bool_set_true:N \l_siunitx_table_collect_post_bool
               \tl_put_right:Nn \l_siunitx_table_collect_post_tl {#1}
@@ -11673,6 +11688,29 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+% There is a need to keep a track of math mode, so that there are no
+% disasters when the tokens are boxed up later. The ideal is to know
+% the math state of the collected tokens so that appropriate 
+% steps can be taken to insert math shift tokens later.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_table_collect_expand_math:N #1 {
+  \token_if_math_shift:NTF #1
+    {
+      \bool_if:NTF \l_siunitx_table_math_bool
+        { \bool_set_false:N \l_siunitx_table_math_bool }
+        { \bool_set_true:N \l_siunitx_table_math_bool }
+    }
+    {
+      \cs_if_eq:NNTF #1 \( % \)
+        { \bool_set_true:N \l_siunitx_table_math_bool }
+        { % \(
+          \cs_if_eq:NNT #1 \)
+            { \bool_set_false:N \l_siunitx_table_math_bool }
+        }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_collect_get:}
@@ -11709,6 +11747,7 @@ This work consists of the file  siunitx.dtx
   \tl_clear:N \l_siunitx_table_collect_pre_tl
   \tl_clear:N \l_siunitx_table_collect_post_tl
   \bool_set_false:N \l_siunitx_table_collect_post_bool
+  \bool_set_false:N \l_siunitx_table_math_bool
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -12323,6 +12362,7 @@ This work consists of the file  siunitx.dtx
     { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
     { \tl_use:N \l_siunitx_table_collect_pre_tl }
     { \box_use:N \l_siunitx_table_pre_box }
+  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
   \siunitx_table_print_S_parse:
   \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
     { integer } { mantissa }
@@ -12343,6 +12383,7 @@ This work consists of the file  siunitx.dtx
     { \l_siunitx_table_integer_dim } > { \l_siunitx_table_fill_dim }
     { \siunitx_table_print_S_centered_integer: }
     { \siunitx_table_print_S_centered_decimal: }
+  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }  
   \bool_if:NTF \l_siunitx_table_align_post_bool
     { \box_use:N \l_siunitx_table_post_box }
     { 
@@ -12362,9 +12403,25 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_ends: {
   \hbox_set:Nn \l_siunitx_table_pre_box
-    { { \tl_use:N \l_siunitx_table_collect_pre_tl } }
+    { 
+      { 
+        \tl_use:N \l_siunitx_table_collect_pre_tl
+        \bool_if:NT \l_siunitx_table_math_bool 
+          { 
+            \scan_stop:
+            \c_math_shift_token 
+          }
+      } 
+    }
   \hbox_set:Nn \l_siunitx_table_post_box
-    { \tl_use:N \l_siunitx_table_collect_post_tl }
+    { 
+      \bool_if:NT \l_siunitx_table_math_bool 
+        { 
+          \c_math_shift_token
+          \scan_stop:
+        }
+      \tl_use:N \l_siunitx_table_collect_post_tl 
+    }
   \dim_compare:nNnTF 
     { \box_wd:N \l_siunitx_table_pre_box  } > 
     { \box_wd:N \l_siunitx_table_post_box }
@@ -12425,7 +12482,10 @@ This work consists of the file  siunitx.dtx
   \dim_compare:nNnTF 
     { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
     { \tl_use:N \l_siunitx_table_collect_pre_tl }
-    { \box_use:N \l_siunitx_table_pre_box }
+    {
+      \box_use:N \l_siunitx_table_pre_box 
+      \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    }
   \siunitx_table_print_S_model_create:
   \bool_if:NT \l_siunitx_table_auto_bool
     {
@@ -12468,6 +12528,7 @@ This work consists of the file  siunitx.dtx
             { an~exponent }
         }
     }
+  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }  
   \bool_if:NTF \l_siunitx_table_align_post_bool
     { \box_use:N \l_siunitx_table_post_box }
     { 
@@ -12488,7 +12549,15 @@ This work consists of the file  siunitx.dtx
 % created spaces.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_ends: {
-  \hbox_set:Nn \l_siunitx_tmp_box { \l_siunitx_table_pre_tl }
+  \hbox_set:Nn \l_siunitx_tmp_box 
+    { 
+      \l_siunitx_table_pre_tl
+      \bool_if:NT \l_siunitx_table_math_bool 
+        { 
+          \scan_stop:
+          \c_math_shift_token
+        }
+    }
   \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
     { \box_wd:N \l_siunitx_tmp_box }
     { 
@@ -12499,6 +12568,11 @@ This work consists of the file  siunitx.dtx
   \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
     { \box_wd:N \l_siunitx_tmp_box }
     { 
+      \bool_if:NT \l_siunitx_table_math_bool 
+        { 
+          \c_math_shift_token
+          \scan_stop:
+        }
       \tl_use:N \l_siunitx_table_collect_post_tl 
       \tex_hfil:D
     }
