@@ -523,6 +523,8 @@ This work consists of the file  siunitx.dtx
 %  \pkg{fontspec} package}
 %\changes{v2.1f}{2010/11/24}{Typo in definition for
 %  \opt{unit-optional-argument} implementation corrected}
+%\changes{v2.1g}{2010/12/21}{Checks on the versions of \pkg{expl3} and
+%  \pkg{xparse} installed}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -4410,6 +4412,37 @@ This work consists of the file  siunitx.dtx
 \ProvidesExplPackage {siunitx} {2010/11/24} {2.1f}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
+% 
+% Various problems pop up if the support files are too old. First,
+% a check on \pkg{expl3}. There is also a check on \pkg{xparse}, but
+% that comes a bit later. If the version of \pkg{expl3} is \emph{really}
+% old then the message system may not be in place at all: there is a 
+% back up for that case.
+%    \begin{macrocode}
+\cs_if_exist:NTF \msg_set:nnnn
+  {
+    \msg_set:nnnn { siunitx } { support-outdated } 
+      { Support~package~#1~too~old. }
+      {
+        Please~install~an~up~to~date~version~of~#1. \\
+        Loading~siunitx~will~abort!
+      }
+  }
+  {
+    \PackageError { siunitx } { Support~package~expl3~too~old. }
+      {
+        Please~install~an~up~to~date~version~of~expl3. \\
+        Loading~siunitx~will~abort!
+      }
+    \tex_endinput:D  
+  }
+\@ifpackagelater { expl3 } { 2010/11/13 } 
+  { }
+  {
+    \msg_error:nnx { siunitx } { support-outdated } { expl3 }
+    \tex_endinput:D
+  }
+%    \end{macrocode}
 %    
 %\begin{macro}{\siunitx_load_check:}
 % There are also a number of packages that are incompatible with
@@ -4438,6 +4471,18 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%
+% The version of \pkg{xparse} available is checked to avoid any weird
+% errors.
+%    \begin{macrocode}
+\RequirePackage{ xparse }
+\@ifpackagelater { xparse } { 2010/10/13 } 
+  { }
+  {
+    \msg_error:nnx { siunitx } { support-outdated } { xparse }
+    \tex_endinput:D
+  }
+%    \end{macrocode}
 %
 % Now load the support packages.
 %    \begin{macrocode}
