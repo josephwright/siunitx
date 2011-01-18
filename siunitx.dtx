@@ -525,6 +525,7 @@ This work consists of the file  siunitx.dtx
 %  \opt{unit-optional-argument} implementation corrected}
 %\changes{v2.1g}{2010/12/21}{Checks on the versions of \pkg{expl3} and
 %  \pkg{xparse} installed}
+%\changes{v2.1h}{2011/01/18}{Detect AMS display-like environments}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1384,7 +1385,10 @@ This work consists of the file  siunitx.dtx
 % independently from the body of the document.  Thus the local 
 % \emph{math} font is checked for matching.  In contrast, when set 
 % \opt{false}, display material is treated with the current running 
-% text font.
+% text font.\footnote{Here, \enquote{display} math means either typeset
+% in \TeX's display math mode or using the AMS display-like
+% environments. Simply using \cs{displaystyle} will not make otherwise
+% in line math be detected as display math.}
 %\begin{LaTeXdemo}
 %  \sffamily
 %  Some text
@@ -2557,7 +2561,11 @@ This work consists of the file  siunitx.dtx
 % to depend on the surrounding environment. Setting the option to
 % \opt{symbol-or-fraction}, causes the same behaviour as
 % \opt{symbol} when the surroundings are in line, and the same 
-% behaviour as \opt{fraction} when in a display context.
+% behaviour as \opt{fraction} when in a display context.\footnote{Here,
+% \enquote{display} means either typeset in \TeX's display math mode or
+% using the AMS display-like environments. Simply using 
+% \cs{displaystyle} will not make otherwise in line math be detected as
+% display material.}
 %\begin{LaTeXdemo}
 %  \sisetup{per-mode = symbol-or-fraction}%
 %  \( \si{\joule\per\mole\per\kelvin} \) 
@@ -4904,6 +4912,39 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_if_display_math_p:}
+%\begin{macro}[TF]{\siunitx_if_display_math:}
+% The AMS display environments are not actually in display mode, so
+% there needs to be some code to pick this up.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \siunitx_if_display_math: { T , F ,  TF , p } 
+  {
+    \mode_if_inner:TF
+      { \prg_return_false: }
+      { \prg_return_true: }
+}
+\AtBeginDocument {
+  \cs_if_exist:NT \if@display
+    {
+      \prg_set_conditional:Npnn \siunitx_if_display_math: 
+        { T , F ,  TF , p } 
+        {
+          \mode_if_inner:TF
+            { 
+              \if@display
+                \prg_return_true:
+              \tex_else:D
+                \prg_return_false:
+              \tex_fi:D
+            }
+            { \prg_return_true: }
+        }    
+    }    
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
 %\subsection{Font detection}
 %
 % A number of controls and tests are needed to control the font used
@@ -5118,7 +5159,12 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight: {
   \mode_if_math:TF 
     {
-      \mode_if_inner:TF 
+      \siunitx_if_display_math:TF
+        {
+          \bool_if:NTF \l_siunitx_detect_display_math_bool 
+            { \siunitx_detect_font_weight_math: }
+            { \siunitx_detect_font_weight_text: }
+        }
         {
           \use:c 
             {
@@ -5126,11 +5172,6 @@ This work consists of the file  siunitx.dtx
               \l_siunitx_detect_inline_weight_tl
               :
             }
-        }
-        {
-          \bool_if:NTF \l_siunitx_detect_display_math_bool 
-            { \siunitx_detect_font_weight_math: }
-            { \siunitx_detect_font_weight_text: }
         }
     }
     { \siunitx_detect_font_weight_text: }
@@ -5189,10 +5230,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_family: {
   \siunitx_detect_font_family_text:
-  \bool_if:NT \l_siunitx_detect_display_math_bool 
-    {  
-      \mode_if_math:T 
-        { \mode_if_inner:F { \siunitx_detect_font_family_math: } }
+  \mode_if_math:T
+    {
+      \bool_if:NT \l_siunitx_detect_display_math_bool
+        {
+          \siunitx_if_display_math:T
+            { \siunitx_detect_font_family_math: }
+        }
     }
 }
 %    \end{macrocode}
@@ -10065,10 +10109,10 @@ This work consists of the file  siunitx.dtx
               \bool_if:NT \l_siunitx_per_auto_bool
                 {
                   \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
-                  \mode_if_inner:F
-                    { 
-                      \mode_if_math:T 
-                        { 
+                  \mode_if_math:T
+                    {
+                      \siunitx_if_display_math:T
+                        {
                           \tl_set:Nn \l_siunitx_per_mode_tl 
                             { fraction }
                         }
