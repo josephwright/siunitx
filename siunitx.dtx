@@ -10106,18 +10106,6 @@ This work consists of the file  siunitx.dtx
                 { \siunitx_unit_format_literal:n {#1} }
             }
             {
-              \bool_if:NT \l_siunitx_per_auto_bool
-                {
-                  \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
-                  \mode_if_math:T
-                    {
-                      \siunitx_if_display_math:T
-                        {
-                          \tl_set:Nn \l_siunitx_per_mode_tl 
-                            { fraction }
-                        }
-                    }
-                }
               \cs_set_eq:NN \siunitx_pm: \pm  
               \siunitx_unit_parse:nn {#1} {#2}
               \siunitx_unit_format:
@@ -10498,6 +10486,7 @@ This work consists of the file  siunitx.dtx
       \bool_set_true:N \l_siunitx_per_auto_bool
       \bool_set_true:N \l_siunitx_per_fraction_bool
       \bool_set_true:N \l_siunitx_per_two_parts_bool
+      \tl_set:Nn \l_siunitx_per_mode_tl { symbol }
     },
   per-symbol           .tl_set:N  = \l_siunitx_per_symbol_tl,
   power-font           .choice:,
@@ -10615,7 +10604,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\siunitx_unit_format_fraction:}
 %\begin{macro}[aux]{\siunitx_unit_format_symbol:}
-%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux:}
+%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux_i:}
+%\begin{macro}[aux]{\siunitx_unit_format_symbol_aux_ii:}
 %\begin{macro}[aux]{\siunitx_unit_format_symbol_aux_alt:}
 % When making (\emph{psuedo}-)fractions there is a check to place a
 % \( 1 \) in the numerator is it's blank. For symbol mode, this is
@@ -10650,8 +10640,54 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nx \l_siunitx_unit_tl 
     { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_tl } }
 } 
+%    \end{macrocode}
+% For the \opt{symbol} setting, there is a need to deal with the
+% possible \opt{symbol-or-fraction} choice. That is achieved by
+% setting up both the \opt{fraction} and \opt{symbol} output.
+% In the automatic mode, both cases are combined inside a 
+% \cs{tex_mathchoice:D}, with appropriate protection, before sending
+% everything through for printing.
+%    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_symbol: {
-  \siunitx_unit_format_fraction_symbol_aux:
+  \bool_if:NTF \l_siunitx_per_auto_bool
+    { 
+      \mode_if_math:TF
+        {
+          \group_begin:
+            \siunitx_unit_format_fraction_fraction:
+          \exp_args:NNNV \group_end:
+          \tl_set:Nn \l_siunitx_tmpa_tl \l_siunitx_unit_tl
+          \group_begin:
+            \siunitx_unit_format_fraction_symbol_aux_i:
+          \exp_args:NNNV \group_end:
+          \tl_set:Nn \l_siunitx_tmpb_tl \l_siunitx_unit_tl
+          \tl_set:Nx \l_siunitx_tmpb_tl
+            {
+              \siunitx_print:nn { unit } 
+                { \exp_not:V \l_siunitx_tmpb_tl }
+            }
+          \tl_set:Nx \l_siunitx_unit_tl
+            {
+              \exp_not:N \ensuremath {
+                \tex_mathchoice:D
+                  { \exp_not:V \l_siunitx_tmpa_tl }
+                  { \exp_not:V \l_siunitx_tmpb_tl }
+                  { \exp_not:V \l_siunitx_tmpb_tl }
+                  { \exp_not:V \l_siunitx_tmpb_tl }
+                }
+            }
+        }
+        { \siunitx_unit_format_fraction_symbol_aux_i: }
+    }
+    { \siunitx_unit_format_fraction_symbol_aux_i: }
+}
+%    \end{macrocode}
+% For a normal symbol, the two parts of the input are arranged either
+% side of the symbol itself in math mode.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_unit_format_fraction_symbol_aux_i: {
+  \siunitx_unit_format_fraction_symbol_aux_ii:
   \int_compare:nNnT { \l_siunitx_unit_denominator_int } > { 1 }
     {
       \bool_if:NT \l_siunitx_unit_denominator_bracket_bool 
@@ -10667,14 +10703,15 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_per_symbol_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_symbol_aux: {
-}
+\cs_new_protected_nopar:Npn 
+  \siunitx_unit_format_fraction_symbol_aux_ii: { }
 \cs_new_protected_nopar:Npn 
   \siunitx_unit_format_fraction_symbol_aux_alt: {
   \tl_if_empty:NT \l_siunitx_unit_numerator_tl 
     { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -11217,7 +11254,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_unit_output:nn #1#2 {
   \cs_set_eq:NN \siunitx_unit_format_symbol_aux: 
     \siunitx_unit_format_symbol_aux_alt:
-  \cs_set_eq:NN \siunitx_unit_format_fraction_symbol_aux: 
+  \cs_set_eq:NN \siunitx_unit_format_fraction_symbol_aux_ii: 
     \siunitx_unit_format_fraction_symbol_aux_alt:
   \siunitx_unit_in:nn {#1} {#2}
   \int_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 } 
@@ -11242,7 +11279,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep: {
   \bool_if:NTF \l_siunitx_number_unit_breaks_bool 
-    { \penalty \binoppenalty } { \nobreak }    
+    { \penalty \binoppenalty } { \nobreak }
   \siunitx_ensuremath:n { \l_siunitx_number_unit_separator_tl }
 }
 %    \end{macrocode}
