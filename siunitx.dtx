@@ -4928,37 +4928,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_if_display_math_p:}
-%\begin{macro}[TF]{\siunitx_if_display_math:}
-% The AMS display environments are not actually in display mode, so
-% there needs to be some code to pick this up.
+%\begin{macro}{\l_siunitx_display_math_bool}
+% To test for display math, a flag is added to the start of every
+% display environment.
 %    \begin{macrocode}
-\prg_new_conditional:Npnn \siunitx_if_display_math: { T , F ,  TF , p } 
-  {
-    \mode_if_inner:TF
-      { \prg_return_false: }
-      { \prg_return_true: }
-}
-\AtBeginDocument {
-  \cs_if_exist:NT \if@display
-    {
-      \prg_set_conditional:Npnn \siunitx_if_display_math: 
-        { T , F ,  TF , p } 
-        {
-          \mode_if_inner:TF
-            { 
-              \if@display
-                \prg_return_true:
-              \tex_else:D
-                \prg_return_false:
-              \tex_fi:D
-            }
-            { \prg_return_true: }
-        }    
-    }    
-}
+\bool_new:N \l_siunitx_display_math_bool
+\toks_put_right:Nn \tex_everydisplay:D 
+  { \bool_set_true:N \l_siunitx_display_math_bool }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\subsection{Font detection}
@@ -5175,7 +5152,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight: {
   \mode_if_math:TF 
     {
-      \siunitx_if_display_math:TF
+      \bool_if:NTF \l_siunitx_display_math_bool
         {
           \bool_if:NTF \l_siunitx_detect_display_math_bool 
             { \siunitx_detect_font_weight_math: }
@@ -5248,9 +5225,9 @@ This work consists of the file  siunitx.dtx
   \siunitx_detect_font_family_text:
   \mode_if_math:T
     {
-      \bool_if:NT \l_siunitx_detect_display_math_bool
+      \bool_if:NT \l_siunitx_display_math_bool
         {
-          \siunitx_if_display_math:T
+          \bool_if:NT \l_siunitx_detect_display_math_bool
             { \siunitx_detect_font_family_math: }
         }
     }
