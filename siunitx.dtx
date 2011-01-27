@@ -10411,6 +10411,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\l_siunitx_omit_unit_space_bool}
+% Needed to omit the space between a number an a unit when printing
+% symbols and when there is no numerator unit.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_omit_unit_space_bool
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\l_siunitx_per_auto_bool}
 %\begin{macro}{\l_siunitx_per_fraction_bool}
 %\begin{macro}{\l_siunitx_per_mode_tl}
@@ -10531,7 +10539,7 @@ This work consists of the file  siunitx.dtx
       \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
         {
           \prop_if_in:NnT \l_siunitx_unit_prop { per-1 }
-            { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+            { \bool_set_true:N \l_siunitx_omit_unit_space_bool }
         }
     }
   \int_while_do:nNnn { \l_siunitx_unit_int } > { 0 }
@@ -10680,7 +10688,6 @@ This work consists of the file  siunitx.dtx
           }
       }
       { \siunitx_unit_format_fraction_symbol: }
-  }
 }
 %    \end{macrocode}
 % For a normal symbol, the two parts of the input are arranged either
@@ -10704,7 +10711,7 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
 \cs_new_protected_nopar:Npn 
-  \siunitx_unit_format_fraction_symbol_aux_ii: { }
+  \siunitx_unit_format_fraction_symbol_aux: { }
 \cs_new_protected_nopar:Npn 
   \siunitx_unit_format_fraction_symbol_aux_alt: {
   \tl_if_empty:NT \l_siunitx_unit_numerator_tl 
@@ -10722,6 +10729,7 @@ This work consists of the file  siunitx.dtx
 % The normal initialisation stuff.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_init: {
+  \bool_set_false:N \l_siunitx_omit_unit_space_bool
   \tl_clear:N \l_siunitx_unit_tl
   \tl_clear:N \l_siunitx_unit_current_tl
   \tl_clear:N \l_siunitx_unit_denominator_tl
@@ -11275,14 +11283,38 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{\siunitx_unit_output_number_sep:}
-% For printing the number separator.
+%\begin{macro}{\siunitx_unit_output_number_sep_aux:}
+% For printing the number separator. The \cs{tex_mathchoice:D} code
+% deals with the \opt{symbol-or-fraction} setting for \opt{per-mode},
+% as in that case omission of the space between a number and unit
+% depends on the current math style.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep: {
   \bool_if:NTF \l_siunitx_number_unit_breaks_bool 
     { \penalty \binoppenalty } { \nobreak }
-  \siunitx_ensuremath:n { \l_siunitx_number_unit_separator_tl }
+  \bool_if:NTF \l_siunitx_per_auto_bool
+    {
+      \mode_if_math:TF
+        {
+          \ensuremath
+            {
+              \tex_mathchoice:D
+                { \l_siunitx_number_unit_separator_tl } 
+                { \siunitx_unit_output_number_sep_aux: }
+                { \siunitx_unit_output_number_sep_aux: }
+                { \siunitx_unit_output_number_sep_aux: }
+            }
+        }
+        { \siunitx_unit_output_number_sep_aux: }
+    }
+    { \siunitx_unit_output_number_sep_aux: }
+}
+\cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep_aux: {
+  \bool_if:NF \l_siunitx_omit_unit_space_bool
+    { \siunitx_ensuremath:n { \l_siunitx_number_unit_separator_tl } }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_output_pre_print:}
