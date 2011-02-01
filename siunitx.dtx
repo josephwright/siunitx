@@ -10796,22 +10796,25 @@ This work consists of the file  siunitx.dtx
     }
 }
 \xetex_if_engine:F {
-    \AtBeginDocument 
-      {
-        \@ifpackageloaded { inputenc }
-          {
-            \tl_set:Nn \l_siunitx_tmpa_tl { latin1 , latin5 , latin9 }
-            \clist_if_in:NVF \l_siunitx_tmpa_tl \inputencodingname 
-              { 
-                \cs_set_eq:NN \siunitx_unit_format_literal_extras: 
-                  \scan_stop:
-              }
-          }
-          { 
-            \cs_set_eq:NN \siunitx_unit_format_literal_extras:
-              \scan_stop: 
-          }
-      }  
+  \luatex_if_engine:F 
+    {
+      \AtBeginDocument 
+        {
+          \cs_if_exist:NTF \inputencodingname
+            {
+              \tl_set:Nn \l_siunitx_tmpa_tl { latin1 , latin5 , latin9 }
+              \clist_if_in:NVF \l_siunitx_tmpa_tl \inputencodingname 
+                { 
+                  \cs_set_eq:NN \siunitx_unit_format_literal_extras: 
+                    \scan_stop:
+                }
+            }
+            { 
+              \cs_set_eq:NN \siunitx_unit_format_literal_extras:
+                \scan_stop: 
+            }
+        }  
+    }  
 }
 %    \end{macrocode}
 %\end{macro}
