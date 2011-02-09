@@ -533,6 +533,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.1k}{2011/02/09}{Remove \opt{combined} choice for option
 %  \opt{detect-inline-weight}}
 %\changes{v2.1k}{2011/02/09}{New option \opt{detect-inline-family}}
+%\changes{v2.1k}{2011/02/09}{Bug fix when printing superscript minus
+%  signs and using \pkg{fontspec} package}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -4577,6 +4579,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %\begin{macro}{\c_siunitx_minus_tl}
+%\begin{macro}{\c_siunitx_minus_int}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
 % then the real character can be used.
@@ -4585,11 +4588,16 @@ This work consists of the file  siunitx.dtx
 \DeclareTextSymbol \c_siunitx_minus_tl { TS1 } { 61 }
 \AtBeginDocument {
   \@ifpackageloaded { fontspec }
-    { \tl_set:Nx \c_siunitx_minus_tl { \char 8722 } }
+    { 
+      \int_const:Nn \c_siunitx_minus_int { 8722 }
+      \tl_set:Nn \c_siunitx_minus_tl { \char \c_siunitx_minus_int }
+    }
     { }
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
 %
 %\begin{macro}{\c_siunitx_mu_tl}
 % The lack of an upright mu has to be sorted out. The same consideration
@@ -10781,7 +10789,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpa_tl
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } 
     \l_siunitx_tmpa_tl
-  \siunitx_unit_format_literal_extras:  
+  \siunitx_unit_format_literal_extras: 
 }
 \cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1 {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
