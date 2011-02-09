@@ -530,6 +530,9 @@ This work consists of the file  siunitx.dtx
 % \opt{per-mode} setting \opt{symbol-or-fraction}}
 %\changes{v2.1j}{2011/02/01}{Allow for loading of \pkg{inputenc} package
 %  with no options}
+%\changes{v2.1k}{2011/02/09}{Remove \opt{combined} choice for option
+%  \opt{detect-inline-weight}}
+%\changes{v2.1k}{2011/02/09}{New option \opt{detect-inline-family}}
 %  
 %\begin{abstract}
 % Typesetting values with units requires care to ensure that the
@@ -1331,6 +1334,7 @@ This work consists of the file  siunitx.dtx
 %      detect-all           & Meta   & \meta{none} \\
 %      detect-display-math  & Switch & false       \\
 %      detect-family        & Switch & false       \\
+%      detect-inline-family & Choice & text        \\
 %      detect-inline-weight & Choice & text        \\
 %      detect-mode          & Switch & false       \\
 %      detect-none          & Meta   & \meta{none} \\ 
@@ -1362,24 +1366,33 @@ This work consists of the file  siunitx.dtx
 % and \opt{detect-mode} to \texttt{true}, while \opt{detect-none}
 % sets all of them to \texttt{false}.
 % 
+%\DescribeOption{detect-inline-family}
 %\DescribeOption{detect-inline-weight}
-% Font weight detection is influenced by the value of 
-% \opt{detect-inline-weight}, which takes values \opt{text}, \opt{math} 
-% and \opt{combined}.  The package can detect the local value of font 
-% weight for either the surrounding text, or the surrounding inline 
-% ("$" \ldots "$") math. The \opt{combined} option checks both and uses 
-% the prevailing weight if either test is true.
+% When \pkg{siunitx} macros are used in in-line math, the detection
+% of font weight and font family can be tuned using the
+% \opt{detect-inline-family} and \opt{detect-inline-weight} options.
+% Both of these take the choices \opt{text} and \opt{math}.
 %\begin{LaTeXdemo}
+%  \sisetup{
+%    detect-family        = true, 
+%    detect-inline-family = math
+%  }%
+%  $\num{1234}$ \\
+%  { \sffamily $\num{1234}$ } \\ 
+%  $ \mathsf { \num{1234}} $  \\
+%   \sisetup{detect-inline-family = text}
+%  { \sffamily $\num{1234}$ } \\ 
+%  $ \mathsf { \num{1234} } $ \\
 %  \sisetup{
 %    detect-weight        = true, 
 %    detect-inline-weight = math
 %  }%
-%  $\num{1234}$ \\
-%  { \boldmath $\num{1234}$ } \\ 
-%  { \bfseries $\num{1234}$ } \\
+%  $\num{5678}$ \\
+%  { \boldmath $\num{5678}$ } \\ 
+%  { \bfseries $\num{5678}$ } \\
 %   \sisetup{detect-inline-weight = text}
-%  { \boldmath $\num{1234}$ } \\
-%  { \bfseries $\num{1234}$ }
+%  { \boldmath $\num{5678}$ } \\
+%  { \bfseries $\num{5678}$ }
 %\end{LaTeXdemo} 
 %
 %\DescribeOption{detect-display-math}
@@ -5010,7 +5023,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\l_siunitx_detect_display_math_bool}
 %\begin{macro}{\l_siunitx_detect_family_bool}
-%\begin{macro}{\l_siunitx_detect_inline_weight_bool}
+%\begin{macro}{\l_siunitx_detect_inline_family_tl}
+%\begin{macro}{\l_siunitx_detect_inline_weight_tl}
 %\begin{macro}{\l_siunitx_detect_shape_bool}
 %\begin{macro}{\l_siunitx_detect_mode_bool}
 %\begin{macro}{\l_siunitx_detect_weight_bool}
@@ -5037,11 +5051,16 @@ This work consists of the file  siunitx.dtx
   detect-display-math  .bool_set:N = 
     \l_siunitx_detect_display_math_bool,
   detect-family        .bool_set:N = \l_siunitx_detect_family_bool,
+  detect-inline-family .choice:,
+  detect-inline-family .value_required:,
+  detect-inline-family / 
+    math               .code:n     = 
+      { \tl_set:Nn \l_siunitx_detect_inline_family_tl { math } },
+  detect-inline-family / 
+    text               .code:n     = 
+      { \tl_set:Nn \l_siunitx_detect_inline_family_tl { text } },
   detect-inline-weight .choice:,
   detect-inline-weight .value_required:,
-  detect-inline-weight / 
-    combined           .code:n = 
-      { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { combined } },
   detect-inline-weight / 
     math               .code:n     = 
       { \tl_set:Nn \l_siunitx_detect_inline_weight_tl { math } },
@@ -5069,7 +5088,12 @@ This work consists of the file  siunitx.dtx
   detect-shape         .bool_set:N = \l_siunitx_detect_shape_bool,
   detect-weight        .bool_set:N = \l_siunitx_detect_weight_bool
 }
+\keys_set:nn { siunitx } {
+  detect-inline-family = text ,
+  detect-inline-weight = text ,
+}
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -5171,16 +5195,11 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_detect_font_weight_combined:}
 %\begin{macro}{\siunitx_detect_font_weight_math:}
 %\begin{macro}{\siunitx_detect_font_weight_text:}
 % The tests for font weight depend on whether the module is testing 
 % text or math content.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_weight_combined: {
-  \siunitx_detect_font_weight_math:
-  \siunitx_detect_font_weight_text:
-}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_math: {
   \str_if_eq:VnT \math@version { bold }
     {
@@ -5191,10 +5210,7 @@ This work consists of the file  siunitx.dtx
         }
     }
   \str_if_eq:VnT \math@version { light } 
-    {
-      \cs_set:Npn \siunitx_font_weight: 
-        { \lseries }
-    }
+    { \cs_set:Npn \siunitx_font_weight: { \lseries } }
 }
 \cs_new_protected_nopar:Npn \siunitx_detect_font_weight_text: {
   \tl_set:Nx \l_siunitx_tmpa_tl { \tl_head:V \f@series }
@@ -5207,13 +5223,9 @@ This work consists of the file  siunitx.dtx
         }
     }
   \str_if_eq:VnT \l_siunitx_tmpa_tl { l }
-    {
-      \cs_set:Npn \siunitx_font_weight: 
-        { \lseries }
-    }
+    { \cs_set:Npn \siunitx_font_weight: { \lseries } }
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -5222,15 +5234,24 @@ This work consists of the file  siunitx.dtx
 % display math there are two options, and so a second test may be made.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_detect_font_family: {
-  \siunitx_detect_font_family_text:
-  \mode_if_math:T
+  \mode_if_math:TF 
     {
-      \bool_if:NT \l_siunitx_display_math_bool
+      \bool_if:NTF \l_siunitx_display_math_bool
         {
-          \bool_if:NT \l_siunitx_detect_display_math_bool
+          \bool_if:NTF \l_siunitx_detect_display_math_bool 
             { \siunitx_detect_font_family_math: }
+            { \siunitx_detect_font_weight_text: }
+        }
+        {
+          \use:c 
+            {
+              siunitx_detect_font_family_ 
+              \l_siunitx_detect_inline_family_tl
+              :
+            }
         }
     }
+    { \siunitx_detect_font_weight_text: }
 }
 %    \end{macrocode}
 %\end{macro}
