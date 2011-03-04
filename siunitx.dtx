@@ -11,15 +11,17 @@ Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
 ----------------------------------------------------------------
 
-Typesetting values with units requires care to ensure that the
-combined mathematical meaning of the value plus unit combination
-is clear.  In particular, the SI units system lays down a
-consistent set of units with rules on how these are to be used.
-However, different countries and publishers have differing
+Physical quantities have both numbers and units, and each
+physical quantity should be expressed as the product of a number
+and a unit. Typesetting physical quantities requires care to
+ensure that the combined mathematical meaning of the number-unit
+combination is clear.  In particular, the SI units system lays
+down a consistent set of units with rules on how these are to be
+used. However, different countries and publishers have differing
 conventions on the exact appearance of numbers (and units).
 
 The siunitx package provides a set of tools for authors to 
-typeset numbers and units in a consistent way.  The package has
+typeset quantities in a consistent way.  The package has
 an extended set of configuration options which make it possible 
 to follow varying typographic conventions with the same input
 syntax.  The package includes automated processing of numbers
@@ -539,15 +541,17 @@ This work consists of the file  siunitx.dtx
 % in v2.1k corrected}
 %  
 %\begin{abstract}
-% Typesetting values with units requires care to ensure that the
-% combined mathematical meaning of the value plus unit combination is
+% Physical quantities have both numbers and units, and each physical
+% quantity should be expressed as the product of a number and a unit.
+% Typesetting physical quantities requires care to ensure that the
+% combined mathematical meaning of the number--unit combination is
 % clear.  In particular, the SI units system lays down a consistent
 % set of units with rules on how these are to be used.  However,
 % different countries and publishers have differing conventions on
 % the exact appearance of numbers (and units).
 %
 % The \pkg{siunitx} package provides a set of tools for authors
-% to typeset numbers and units in a consistent way.  The package has an
+% to typeset quantities in a consistent way.  The package has an
 % extended set of configuration options which make it possible to 
 % follow varying typographic conventions with the same input syntax.  
 % The package includes automated processing of numbers and units, and
@@ -570,7 +574,7 @@ This work consists of the file  siunitx.dtx
 % ensure that no loss of meaning occurs in printed matter.
 %
 % \pkg{siunitx} aims to provide a unified method for \LaTeX\ users to
-% typeset units and values correctly and easily.  The design
+% typeset numbers and units correctly and easily.  The design
 % philosophy of \pkg{siunitx} is to follow the agreed rules by 
 % default, but to allow variation through option settings.  In this way,
 % users can use \pkg{siunitx} to follow the requirements of 
@@ -621,7 +625,7 @@ This work consists of the file  siunitx.dtx
 %\begin{itemize}
 %  \item \cs{num}\oarg{options}\marg{number}
 %  \item \cs{si}\oarg{options}\marg{unit}
-%  \item \cs{SI}\oarg{options}\marg{value}\oarg{pre-unit}\marg{unit}
+%  \item \cs{SI}\oarg{options}\marg{number}\oarg{pre-unit}\marg{unit}
 %  \item \cs{numlist}\oarg{options}\marg{numbers}
 %  \item \cs{numrange}\oarg{options}\marg{numbers}\marg{number2}
 %  \item \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
@@ -632,7 +636,7 @@ This work consists of the file  siunitx.dtx
 %\end{itemize}
 % plus the \texttt{S} and \texttt{s} column types for decimal 
 % alignments and units in tables.  These macros are designed for 
-% typesetting units and values with control of appearance and with 
+% typesetting numbers and units with control of appearance and with 
 % intelligent processing.
 % 
 % Numbers are processed with understanding of exponents, complex numbers
@@ -795,7 +799,7 @@ This work consists of the file  siunitx.dtx
 % it does use meaning rather than appearance for input. However, the
 % package allows you to define new unit macros; a large number of
 % pre-defined abbreviations are also supplied.  More importantly, by
-% defining macros for units, instead of literal values, new
+% defining macros for units, instead of literal input, new
 % functionality is made available.  By altering the settings used by the
 % package, the same input can yield a variety of different output 
 % formats. For example, the \cs{per} macro can give reciprocal powers,
@@ -805,9 +809,10 @@ This work consists of the file  siunitx.dtx
 %\begin{syntax}
 %  \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}
 %\end{syntax}
-% Very often, numbers and values are given together. Mathematically, 
-% these form a single entity, and should be separated by a non-breaking
-% space. The \cs{SI} macro combines the functionality of \cs{num} and
+% Very often, numbers and units are given together. Formally, the
+% value of a quantity is the product of the number and the unit, the
+% space being regarded as a multiplication sign \cite{SI:5.3.3}. The
+% \cs{SI} macro combines the functionality of \cs{num} and
 % \cs{si}, and makes this both possible and easy. The \meta{number} and 
 % \meta{unit} arguments work exactly like those for the \cs{num} and 
 % \cs{si} macros, respectively. \meta{preunit} is a unit to be typeset 
@@ -1108,7 +1113,7 @@ This work consists of the file  siunitx.dtx
 %  \cs{DeclareSIUnitWithOptions}\marg{unit}\marg{symbol}\marg{options}
 %\end{syntax}
 % New units are produced using the \cs{DeclareSIUnit} macro. 
-% \meta{symbol} can contain literal values, other units, multiple
+% \meta{symbol} can contain literal input, other units, multiple
 % prefixes, powers and \cs{per}, although literal text should not be
 % intermixed with unit macros. Units can be created with options
 % using the \cs{DeclareSIUnitWithOptions} function, where the 
@@ -1584,7 +1589,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\DescribeOption{input-open-uncertainty}
 %\DescribeOption{input-close-uncertainty} 
-% In some fields, it is common to give the uncertainty in a value 
+% In some fields, it is common to give the uncertainty in a number 
 % in brackets after the main part of the number, for example 
 % \enquote{\num{1.234(5)}}. The opening and closing symbols used for 
 % this type of input are set as \opt{input-open-uncertainty} and 
@@ -1695,11 +1700,12 @@ This work consists of the file  siunitx.dtx
 %  \num[round-mode = places]{1}
 %\end{LaTeXdemo}
 %\DescribeOption{round-minimum}
-% There are cases in which rounding will result in a zero value. It
-% may be desirable to show such results as below a threshold value. This
-% can be achieved by setting \opt{round-minimum} to the threshold value.
-% There will be no effect when rounding to a number of significant
-% figures as it is not possible to obtain the value zero in these cases.
+% There are cases in which rounding will result in the number reaching
+% zero. It may be desirable to show such results as below a threshold
+% value. This can be achieved by setting \opt{round-minimum} to the
+% threshold value. There will be no effect when rounding to a number of
+% significant figures as it is not possible to obtain the value zero in
+% these cases.
 %\begin{LaTeXdemo}
 %  \sisetup{round-mode = places}
 %  \num{0.0055} \\
@@ -1905,11 +1911,11 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{uncertainty-separator}
 %\DescribeOption{output-open-uncertainty}
 %\DescribeOption{output-close-uncertainty}
-% When input is given including an uncertainty in a value, it can be 
+% When input is given including an uncertainty in a number, it can be 
 % printed either with the uncertainty in brackets or as a separate 
 % number. This behaviour is controlled by the 
 % \opt{separate-uncertainty} choice. If the uncertainty is given in 
-% brackets, a space may be added between the main value and the 
+% brackets, a space may be added between the main number and the 
 % uncertainty: this is stored using the \opt{uncertainty-separator}
 % option. The opening and closing brackets used are stored in 
 % \opt{output-open-uncertainty} and
@@ -2744,7 +2750,7 @@ This work consists of the file  siunitx.dtx
 % when a unit is present.
 %
 %\DescribeOption{product-units}
-% When a product of values is given, the resulting units can be 
+% When a product of quantities is given, the resulting units can be 
 % displayed in a number of ways, set using the \opt{product-units}
 % option. The standard setting is \opt{repeat}, which prints one
 % unit symbol for each numbers. Alternatives are \opt{brackets},
@@ -4123,7 +4129,7 @@ This work consists of the file  siunitx.dtx
 %
 % \pkg{siunitx} takes account of the information given here, so far as 
 % is possible.  Thus the package defaults follow the recommendations
-% made for typesetting units and values.  Spacing and so forth is
+% made for typesetting numbers and units.  Spacing and so forth is
 % handled in such a way as to make implementing the rules
 % (relatively) easy.
 %
@@ -4197,7 +4203,7 @@ This work consists of the file  siunitx.dtx
 % and the unit should be printed.  Firstly, the two parts should not
 % be separated.  With the exception of the symbols for plane angles
 % (\si{\degree}, \si{\arcminute} and \si{\arcsecond}), it is usual to 
-% have a space between the unit and the value.  This should therefore
+% have a space between the unit and the number.  This should therefore
 % be a thin non-breaking space between the two.
 %\begin{LaTeXdemo}
 %  A space for \SI{10}{\percent}\\
@@ -4253,7 +4259,7 @@ This work consists of the file  siunitx.dtx
 %  \si[per-mode = symbol]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
 %
-% Products and errors should show what unit applies to each value
+% Products and errors should show what unit applies to each number
 % given.  Thus \SI[product-units = brackets]{2x3}{\metre} is an 
 % ordered set of lengths of a geometric area, whereas 
 % \SI[product-units = single]{2x3}{\metre} is a length (and equal 
@@ -4266,10 +4272,10 @@ This work consists of the file  siunitx.dtx
 % not encouraged.
 %
 % Care must be taken when writing ranges of numbers.  For purely
-% numerical values, it is common to use a en-dash between values, for
-% example \enquote{see pages 1--5}.  On the other hand, values with 
-% units could be misinterpret as negative values if written in this 
-% way. As the unit--value combination is a single mathematical entity, 
+% numerical values, it is common to use a en-dash to show a range, for
+% example \enquote{see pages 1--5}.  On the other hand, physical 
+% quantities could be misinterpret as negative values if written in this 
+% way. As the unit--number combination is a single mathematical entity, 
 % writing the values with an en-dash followed by a single unit is also
 % incorrect.  As a result, using the word \enquote{to} is strongly
 % recommended.
@@ -4286,7 +4292,7 @@ This work consists of the file  siunitx.dtx
 % poor.\footnote{For example, for an acceleration \(a\), the expression
 % \([a]\) is the dimensions of \(a\), \emph{i.e.}~length per time 
 % squared in this case.}  Much better is to show division of all 
-% values by the unit, which leaves the entries as unitless ratios.  
+% quantities by the unit, which leaves the entries as unitless ratios.  
 % This is illustrated in \cref{tab:xmpl:unitless} and 
 % \cref{fig:xmpl:unitless}.
 %\begin{LaTeXdemo}[code and float]
@@ -15956,6 +15962,10 @@ This work consists of the file  siunitx.dtx
 %  \bibitem{SI:4.1.T8}
 %    \emph{Other non-SI units},
 %    \url{http://www.bipm.org/en/si/si_brochure/chapter4/table8.html}.
+%    
+%  \bibitem{SI:5.3.3}
+%    \emph{Formatting the value of a quantity},
+%    \url{http://www.bipm.org/en/si/si_brochure/chapter5/5-3-2.html#5-3-3}.
 %      
 %\end{thebibliography}
 %
