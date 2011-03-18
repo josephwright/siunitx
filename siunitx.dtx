@@ -539,6 +539,8 @@ This work consists of the file  siunitx.dtx
 %  signs and using \pkg{fontspec} package}
 %\changes{v2.1l}{2011/02/10}{Error in font family detection introduced
 % in v2.1k corrected}
+%\changes{v2.1m}{2011/03/18}{Avoid expansion of erroneous literal
+%  units when these are forbidden}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -10133,7 +10135,10 @@ This work consists of the file  siunitx.dtx
           \siunitx_unit_if_literal:nTF {#1} 
             {
               \bool_if:NTF \l_siunitx_unit_forbid_literal_bool 
-                { \msg_error:nnx { siunitx } { literal-unit } {#1} }
+                {
+                  \msg_error:nnx { siunitx } { literal-unit }
+                    { \exp_not:n {#1} }
+                }
                 { \siunitx_unit_format_literal:n {#1} }
             }
             {
