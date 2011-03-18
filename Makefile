@@ -92,13 +92,13 @@ PDFSETTINGS = \AtBeginDocument{\DisableImplementation}
 %.pdf: %.dtx
 	NAME=`basename $< .dtx` ; \
 	echo "Typesetting $$NAME" ; \
-	pdflatex -draftmode -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
+	pdflatex -draftmode -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
 	if [ $$? = 0 ] ; then  \
-	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo &> /dev/null ; \
-	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
-	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
-	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx &> /dev/null ; \
-	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" &> /dev/null ; \
+	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo > /dev/null ; \
+	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
+	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
+	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
+	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
 	else \
 	  echo "  Compilation failed" ; \
 	fi ; \
@@ -186,5 +186,5 @@ tds: doc
 unpack: 
 	echo "Unpacking files"
 	for I in $(UNPACK) ; do \
-	  tex $$I &> /dev/null ; \
+	  tex $$I > /dev/null ; \
 	done
