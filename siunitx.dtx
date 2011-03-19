@@ -541,6 +541,8 @@ This work consists of the file  siunitx.dtx
 % in v2.1k corrected}
 %\changes{v2.1m}{2011/03/18}{Avoid expansion of erroneous literal
 %  units when these are forbidden}
+%\changes{v2.1m}{2011/03/19}{Ensure some output occurs in all cases
+%  when \opt{round-precision = 0} and \opt{round-mode = places}}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -7348,7 +7350,7 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl  
       \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
-          \int_compare:nNnT 
+          \int_compare:nNnTF 
             { \tl_head:V \l_siunitx_tmpa_tl } > { 4 }
             {
               \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
@@ -7363,6 +7365,13 @@ This work consists of the file  siunitx.dtx
                     { \int_eval:n { \l_siunitx_tmpa_tl + 1 } }
                   \prop_put:NnV \l_siunitx_number_in_prop 
                     { #1 -integer } \l_siunitx_tmpa_tl  
+                }
+            }
+            {
+              \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer }
+                { 
+                  \prop_put:Nnn \l_siunitx_number_in_prop 
+                    { #1 -integer } { 0 }
                 }
             }
         } 
