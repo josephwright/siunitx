@@ -547,8 +547,6 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.1m}{2011/03/20}{Ensure some output occurs in all cases
 %  when \opt{round-precision} is set to \opt{0} and \opt{round-mode}
 %  is set to \opt{places}}
-%\changes{v2.2}{2011/03/20}{Add new \cs{tablenum} macro to allow
-%  complex table alignments}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -789,7 +787,7 @@ This work consists of the file  siunitx.dtx
 % argument. The unit formatting system can accept two types of input. 
 % When the \meta{unit} contains literal items (for example letters or
 % numbers) then \pkg{siunitx} converts \texttt{.} and "~" into
-% inter-unit separators and correctly positions sub- and superscripts
+% inter-unit product and correctly positions sub- and superscripts
 % specified using "_" and "^". The formatting methods will work with
 % both math and text mode.
 %\begin{LaTeXdemo}
@@ -1139,12 +1137,12 @@ This work consists of the file  siunitx.dtx
 % This is declared in the package as:
 %\begin{LaTeXdemo}[code only]
 %  \DeclareSIUnitWithOptions\degree{\SIUnitSymbolDegree}
-%    {number-unit-separator={}}
+%    {number-unit-product={}}
 %\end{LaTeXdemo}
 % The spacing can still be altered at point of use:
 %\begin{LaTeXdemo}
 %  \SI{67890}{\degree} \\
-%  \SI[number-unit-separator = \;]{67890}{\degree}
+%  \SI[number-unit-product = \;]{67890}{\degree}
 %\end{LaTeXdemo}
 % The meaning of a pre-defined unit can be altered by using
 % \cs{DeclareSIUnit} after loading \pkg{siunitx}. This will overwrite
@@ -1261,6 +1259,8 @@ This work consists of the file  siunitx.dtx
 %\begin{syntax}
 %  \cs{tablenum}\oarg{options}\marg{number}
 %\end{syntax}
+%\changes{v2.2}{2011/03/20}{Add new \cs{tablenum} macro to allow
+%  complex table alignments}
 % Within more complex tables, aligned numbers may be desirable within 
 % the argument of \cs{multicolumn} or 
 % \cs{multirow}.\footnote{Provided by the \pkg{multirow} package} The 
@@ -2174,19 +2174,19 @@ This work consists of the file  siunitx.dtx
 %      add-arc-second-zero       & Switch & false        \\ 
 %      angle-symbol-over-decimal & Switch & false        \\
 %      arc-separator             & Math   & false        \\
-%      number-angle-separator    & Math   & \meta{empty} \\
+%      number-angle-product      & Math   & \meta{empty} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{number-angle-separator}
+%\DescribeOption{number-angle-product}
 % The separator between the number and angle symbol (degrees, minutes
-% or seconds) can be set using the \opt{number-angle-separator}
-% option, independent of the related \opt{number-unit-separator}
+% or seconds) can be set using the \opt{number-angle-product}
+% option, independent of the related \opt{number-unit-product}
 % option used by the \cs{SI} function.
 %\begin{LaTeXdemo}
 %  \ang{2.67} \\
-%  \ang[number-angle-separator = \,]{2.67}
+%  \ang[number-angle-product = \,]{2.67}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{arc-separator}
@@ -2566,7 +2566,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      bracket-unit-denominator & Switch & true       \\
 %      forbid-literal-units     & Switch & false      \\
-%      inter-unit-separator     & Math   & \cs{,}     \\
+%      inter-unit-product       & Math   & \cs{,}     \\
 %      parse-units              & Switch & true       \\
 %      per-mode                 & Choice & reciprocal \\
 %      per-symbol               & Math   & /          \\
@@ -2584,14 +2584,14 @@ This work consists of the file  siunitx.dtx
 % accomplished by setting the \opt{forbid-literal-units} switch. With 
 % this option enabled, only macro-based units can be used in a document.
 % 
-%\DescribeOption{inter-unit-separator} 
+%\DescribeOption{inter-unit-product} 
 % The separator between each unit is stored using the 
-% \opt{inter-unit-separator} option. The standard setting is a thin 
+% \opt{inter-unit-product} option. The standard setting is a thin 
 % space: another common choice is a centred dot. To get the correct
 % spacing it is necessary to use "{}\cdot{}" in the later case.
 %\begin{LaTeXdemo}
 %  \si{\farad\squared\lumen\candela} \\
-%  \si[inter-unit-separator={}\cdot{}]{\farad\squared\lumen\candela} 
+%  \si[inter-unit-product={}\cdot{}]{\farad\squared\lumen\candela} 
 %\end{LaTeXdemo} 
 % 
 %\DescribeOption{per-mode}
@@ -2741,7 +2741,7 @@ This work consists of the file  siunitx.dtx
 %      allow-number-unit-breaks & Switch & false    \\
 %      list-units               & Choice & repeat   \\
 %      multi-part-units         & Choice & brackets \\
-%      number-unit-separator    & Math   & \cs{,}   \\
+%      number-unit-product      & Math   & \cs{,}   \\
 %      product-units            & Choice & repeat   \\
 %      range-units              & Choice & repeat   \\
 %    \bottomrule
@@ -2763,15 +2763,15 @@ This work consists of the file  siunitx.dtx
 %  \end{minipage}    
 %\end{LaTeXdemo}
 %
-%\DescribeOption{number-unit-separator}
-% The separator between the number and unit is set using the 
-% \opt{number-unit-separator} option. This is always printed in math
+%\DescribeOption{number-unit-product}
+% The product symbol between the number and unit is set using the 
+% \opt{number-unit-product} option. This is always printed in math
 % mode, and so anything which must be printed as text should be placed
 % inside a \cs{text} macro.
 %\begin{LaTeXdemo}
 %  \SI{2.67}{\farad} \\
-%  \SI[number-unit-separator=\text{~}]{2.67}{\farad} \\
-%  \SI[number-unit-separator=]{2.67}{\farad} 
+%  \SI[number-unit-product = \text{~}]{2.67}{\farad} \\
+%  \SI[number-unit-product = ]{2.67}{\farad} 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{multi-part-units}
@@ -3961,7 +3961,9 @@ This work consists of the file  siunitx.dtx
 %  \addto\extrasgerman{\sisetup{locale = DE}}
 %\end{LaTeXdemo}
 %
-%\section{Information for those upgrading from version 1}
+%\section{Information for those upgrading}
+%
+%\subsection{Upgrading from version  1}
 %
 % The key--value control system of \pkg{siunitx} has been completely
 % rewritten for version 2, and at the same time some of the macros
@@ -4126,8 +4128,8 @@ This work consists of the file  siunitx.dtx
 %    unitmathstt    & unit-math-tt              \\
 %    unitmathtt     & unit-math-tt              \\
 %    unitmode       & unit-mode                 \\
-%    unitsep        & inter-unit-separator      \\
-%    unitspace      & inter-unit-separator      \\
+%    unitsep        & inter-unit-product        \\
+%    unitspace      & inter-unit-product        \\
 %    valuecolor     & value-color               \\
 %    valuecolour    & value-color               \\
 %    valuemathrm    & value-math-rm             \\
@@ -4137,7 +4139,7 @@ This work consists of the file  siunitx.dtx
 %    valuemathstt   & value-math-tt             \\
 %    valuemathtt    & value-math-tt             \\
 %    valuemode      & value-mode                \\
-%    valuesep       & number-unit-separator     \\
+%    valuesep       & number-unit-product       \\
 %    xspace         & use-xspace                \\
 %  \end{xtabular}
 %\end{center}
@@ -4155,6 +4157,32 @@ This work consists of the file  siunitx.dtx
 % Emulation of older packages is no longer offered (it was intended
 % to help with the transition form earlier packages), and so the
 % \opt{emulate} option no longer applies.
+% 
+%\subsection{Upgrading from version 2.0 or 2.1}
+%
+% User feedback on \pkg{siunitx} means that over time some renaming
+% takes place. The following functions and options have been depreciated
+% in version 2.2. They are therefore available in version 2.2, but
+% should be replaced in new or updated documents with the successor
+% names.
+% 
+%\DescribeOption{angle-unit-separator}
+%\DescribeOption{inter-unit-separator}
+%\DescribeOption{number-unit-separator}
+%\changes{v2.2}{2011/03/20}{Renamed \opt{angle-unit-separator} option
+%  to \opt{angle-unit-product}}
+%\changes{v2.2}{2011/03/20}{Renamed \opt{inter-unit-separator} option
+%  to \opt{inter-unit-product}}
+%\changes{v2.2}{2011/03/20}{Renamed \opt{number-unit-separator} option
+%  to \opt{number-unit-product}}
+% These options have been replaced by the options
+%\begin{itemize}
+%  \item \opt{angle-unit-product}
+%  \item \opt{inter-unit-product}
+%  \item \opt{number-unit-product}
+%\end{itemize}
+% as these items are formally products, and the new option names
+% emphasise this.
 %
 %\section{Correct application of (SI) units}
 %
@@ -4217,7 +4245,7 @@ This work consists of the file  siunitx.dtx
 % \SI{1}{\milli\degreeCelsius}. 
 %
 % It is important to note that the kilogram is the only SI unit with
-% a prefix as part of its name and symbol.  Only  single prefix may
+% a prefix as part of its name and symbol. Only single prefix may
 % be used, and so in the case of the kilogram prefix names are used
 % with the unit name \enquote{gram} and the prefix symbols are used with
 % the unit symbol \si{\gram}.  For example 
@@ -4254,10 +4282,11 @@ This work consists of the file  siunitx.dtx
 % As explained earlier, a number--unit combination is a single
 % mathematical entity.  This has implications for how both the number
 % and the unit should be printed.  Firstly, the two parts should not
-% be separated.  With the exception of the symbols for plane angles
-% (\si{\degree}, \si{\arcminute} and \si{\arcsecond}), it is usual to 
-% have a space between the unit and the number.  This should therefore
-% be a thin non-breaking space between the two.
+% be separated: a quantity is a product of the number and the unit. 
+% With the exception of the symbols for plane angles (\si{\degree},
+% \si{\arcminute} and \si{\arcsecond}), the \textsc{bipm}
+% specifies either a space or half-height (centred) dot should be 
+% used \cite{BIPM}. 
 %\begin{LaTeXdemo}
 %  A space for \SI{10}{\percent}\\
 %  and also for \SI{100}{\degreeCelsius}\\
@@ -4286,16 +4315,18 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \( \si{\metre\second} = \text{metre second} \) \\
 %  \( \si{\milli\second} = \text{millisecond}  \) \\
-%  \sisetup{inter-unit-separator = { } \cdot { } }
+%  \sisetup{inter-unit-product = { } \cdot { } }
 %  \( \si{\metre\second} = \text{metre second} \) \\
 %  \( \si{\milli\second} = \text{millisecond}  \)
 %\end{LaTeXdemo}
-% There are some circumstances under which it is permissible to omit
+% There are some circumstances under which it is common practice to omit
 % any spaces.  The classic example is \si{\kWh}, where
-% \enquote{\si[inter-unit-separator = \,]{\kWh}} does not add any 
+% \enquote{\si[inter-unit-product = \,]{\kWh}} does not add any 
 % useful information. If using such a unit repeatedly, users of 
 % \pkg{siunitx} are advised to create a custom unit to ensure 
-% consistency.
+% consistency. It is important to note that while this is common
+% practice, it is \emph{not} allowed by the \textsc{bipm}
+% \cite{BIPM}.
 %
 % Symbols for units formed from other units by division are indicated
 % by means of a virgule (oblique stroke, slash, "/"), a horizontal
@@ -9306,7 +9337,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
   \quark_if_no_value:NTF \l_siunitx_number_out_tl
-    { \tl_clear:N \l_siunitx_number_unit_separator_tl }
+    { \tl_clear:N \l_siunitx_number_unit_product_tl }
     { \siunitx_print:nV { number } \l_siunitx_number_out_tl }
   \siunitx_unit_output_print:
 }
@@ -9370,7 +9401,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_angle_second_zero_bool}
 %\begin{macro}{\l_siunitx_angle_arc_separator_tl}
 %\begin{macro}{\l_siunitx_angle_astronomy_bool}
-%\begin{macro}{\l_siunitx_angle_unit_separator_tl}
+%\begin{macro}{\l_siunitx_angle_unit_product_tl}
 % The angle-specific options are created here.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
@@ -9384,8 +9415,10 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_angle_astronomy_bool    ,
   arc-separator             .tl_set:N   = 
     \l_siunitx_angle_arc_separator_tl  ,
+  number-angle-product      .tl_set:N   = 
+    \l_siunitx_angle_unit_product_tl , 
   number-angle-separator    .tl_set:N   = 
-    \l_siunitx_angle_unit_separator_tl , 
+    \l_siunitx_angle_unit_product_tl , 
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9439,8 +9472,8 @@ This work consists of the file  siunitx.dtx
   \prop_clear:N \l_siunitx_angle_minute_prop
   \prop_clear:N \l_siunitx_angle_second_prop
   \tl_clear:N \l_siunitx_preunit_tl 
-  \tl_set_eq:NN \l_siunitx_number_unit_separator_tl 
-    \l_siunitx_angle_unit_separator_tl
+  \tl_set_eq:NN \l_siunitx_number_unit_product_tl 
+    \l_siunitx_angle_unit_product_tl
   \cs_set_eq:NN \siunitx_number_in_parse_more:N 
     \siunitx_number_in_parse_restricted:N 
 }
@@ -10070,7 +10103,7 @@ This work consists of the file  siunitx.dtx
                     \exp_not:n 
                       { 
                         \siunitx_ensuremath:n 
-                          { \l_siunitx_number_unit_separator_tl } 
+                          { \l_siunitx_number_unit_product_tl } 
                       }
                   }
                 \exp_not:n { \siunitx_unit_output:nn {#1} { } }
@@ -10107,7 +10140,7 @@ This work consists of the file  siunitx.dtx
                         \exp_not:n 
                           { 
                             \siunitx_ensuremath:n 
-                              { \l_siunitx_number_unit_separator_tl }
+                              { \l_siunitx_number_unit_product_tl }
                           }
                       }  
                     \exp_not:n { \siunitx_unit_output:nn {#1} { } } 
@@ -10536,14 +10569,15 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_unit_denominator_bracket_bool}
-%\begin{macro}{\l_siunitx_unit_separator_tl}
+%\begin{macro}{\l_siunitx_unit_product_tl}
 %\begin{macro}{\l_siunitx_per_symbol_tl}
 % At this stage, output formatting options are created.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   bracket-unit-denominator .bool_set:N 
     = \l_siunitx_unit_denominator_bracket_bool,
-  inter-unit-separator .tl_set:N = \l_siunitx_unit_separator_tl ,
+  inter-unit-product   .tl_set:N = \l_siunitx_unit_product_tl ,
+  inter-unit-separator .tl_set:N = \l_siunitx_unit_product_tl ,
   per-mode             .choice:,
   per-mode / fraction .code:n = 
     {
@@ -10608,7 +10642,7 @@ This work consists of the file  siunitx.dtx
 }
 \keys_set:nn { siunitx } {
   bracket-unit-denominator = true,
-  inter-unit-separator     = \,,
+  inter-unit-product       = \,,
   per-mode                 = reciprocal,
   per-symbol               = /,
   power-font               = number,
@@ -10689,12 +10723,12 @@ This work consists of the file  siunitx.dtx
           \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl 
             {
               \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
-                \l_siunitx_unit_separator_tl
+                \l_siunitx_unit_product_tl
             }
         }
         {  
           \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
-            \l_siunitx_unit_separator_tl
+            \l_siunitx_unit_product_tl
         }
     }
   \tl_put_left:cV { l_siunitx_unit #1 _tl } \l_siunitx_unit_current_tl
@@ -10855,7 +10889,7 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nx \l_siunitx_tmpa_tl 
     {
       \exp_not:N \siunitx_ensuremath:n
-        { \exp_not:V \l_siunitx_unit_separator_tl }
+        { \exp_not:V \l_siunitx_unit_product_tl }
     }
   \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } 
     \l_siunitx_tmpa_tl
@@ -11206,7 +11240,7 @@ This work consists of the file  siunitx.dtx
       \tl_if_empty:NF \l_siunitx_unit_denominator_tl
         { 
           \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
-            \l_siunitx_unit_separator_tl
+            \l_siunitx_unit_product_tl
         }
     }
     \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
@@ -11278,7 +11312,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 % 
 %\begin{macro}{\l_siunitx_number_unit_breaks_bool}
-%\begin{macro}{\l_siunitx_number_unit_separator_tl}
+%\begin{macro}{\l_siunitx_number_unit_product_tl}
 % Options for printing units or units with numbers.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
@@ -11303,8 +11337,10 @@ This work consists of the file  siunitx.dtx
         \bool_set_false:N \l_siunitx_multi_brackets_bool
         \bool_set_false:N \l_siunitx_multi_repeat_bool
       },
+  number-unit-product      .tl_set:N   = 
+    \l_siunitx_number_unit_product_tl,
   number-unit-separator    .tl_set:N   = 
-    \l_siunitx_number_unit_separator_tl,
+    \l_siunitx_number_unit_product_tl,
   product-units            .choice:,
   product-units
     / brackets       .code:n =
@@ -11343,9 +11379,9 @@ This work consists of the file  siunitx.dtx
       },
 }
 \keys_set:nn { siunitx } {
-  multi-part-units      = brackets,
-  number-unit-separator = \,,
-  product-units         = repeat,
+  multi-part-units    = brackets,
+  number-unit-product = \,,
+  product-units       = repeat,
 }
 %    \end{macrocode}
 %\end{macro} 
@@ -11396,7 +11432,7 @@ This work consists of the file  siunitx.dtx
           \ensuremath
             {
               \tex_mathchoice:D
-                { \l_siunitx_number_unit_separator_tl } 
+                { \l_siunitx_number_unit_product_tl } 
                 { \siunitx_unit_output_number_sep_aux: }
                 { \siunitx_unit_output_number_sep_aux: }
                 { \siunitx_unit_output_number_sep_aux: }
@@ -11408,7 +11444,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep_aux: {
   \bool_if:NF \l_siunitx_omit_unit_space_bool
-    { \siunitx_ensuremath:n { \l_siunitx_number_unit_separator_tl } }
+    { \siunitx_ensuremath:n { \l_siunitx_number_unit_product_tl } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -14347,14 +14383,14 @@ This work consists of the file  siunitx.dtx
 % Non-SI, but accepted for general use.
 %    \begin{macrocode}
 \DeclareSIUnitWithOptions \arcmin { \arcminute } 
-  { number-unit-separator = }
+  { number-unit-product = }
 \DeclareSIUnitWithOptions \arcminute { \SIUnitSymbolArcminute } 
-  { number-unit-separator = }
+  { number-unit-product = }
 \DeclareSIUnitWithOptions \arcsecond { \SIUnitSymbolArcsecond } 
-  { number-unit-separator = }
+  { number-unit-product = }
 \DeclareSIUnit \day { d }
 \DeclareSIUnitWithOptions \degree { \SIUnitSymbolDegree } 
-  { number-unit-separator = }
+  { number-unit-product = }
 \DeclareSIUnit \hectare { ha }
 \DeclareSIUnit \hour    { h }
 \DeclareSIUnit \litre   { l }
@@ -14545,21 +14581,21 @@ This work consists of the file  siunitx.dtx
     DE   .meta:n = 
       {
         exponent-product      = \cdot  ,
-        inter-unit-separator  = { \, } ,
+        inter-unit-product    = { \, } ,
         output-decimal-marker = { , }  ,
       },
   locale /
     FR   .meta:n = 
       {
         exponent-product      = \times ,
-        inter-unit-separator  = { \, } ,
+        inter-unit-product    = { \, } ,
         output-decimal-marker = { , }  ,
       },
   locale /
     UK   .meta:n = 
       {
         exponent-product      = \times ,
-        inter-unit-separator  = \,     ,
+        inter-unit-product    = \,     ,
         output-decimal-marker = .      ,
       },
   locale /
@@ -14570,7 +14606,7 @@ This work consists of the file  siunitx.dtx
     ZA   .meta:n = 
       {
         exponent-product      = \times ,
-        inter-unit-separator  = \cdot  ,
+        inter-unit-product    = \cdot  ,
         output-decimal-marker = { , }  ,
       },
 }
@@ -15188,52 +15224,52 @@ This work consists of the file  siunitx.dtx
   unitsep        .choice: ,
   unitsep / 
     cdot         .meta:n    = 
-      { inter-unit-separator    = { } \cdot { }                       },
+      { inter-unit-product      = { } \cdot { }                       },
   unitsep / 
-    comma        .meta:n    = { inter-unit-separator    = { {,} }     },
+    comma        .meta:n    = { inter-unit-product      = { {,} }     },
   unitsep / 
-    fullstop     .meta:n    = { inter-unit-separator    = { { . } }   },
+    fullstop     .meta:n    = { inter-unit-product      = { { . } }   },
   unitsep / 
-    med          .meta:n    = { inter-unit-separator    = \:          },
+    med          .meta:n    = { inter-unit-product      = \:          },
   unitsep / 
-    medium       .meta:n    = { inter-unit-separator    = \:          },
+    medium       .meta:n    = { inter-unit-product      = \:          },
   unitsep / 
-    none         .meta:n    = { inter-unit-separator    =             },
+    none         .meta:n    = { inter-unit-product      =             },
   unitsep / 
-    period       .meta:n    = { inter-unit-separator    = { { . } }   },
+    period       .meta:n    = { inter-unit-product      = { { . } }   },
   unitsep / 
-    space        .meta:n    = { inter-unit-separator    = \text { ~ } },
+    space        .meta:n    = { inter-unit-product      = \text { ~ } },
   unitsep / 
-    stop         .meta:n    = { inter-unit-separator    = { { . } }   },
+    stop         .meta:n    = { inter-unit-product      = { { . } }   },
   unitsep / 
-    thick        .meta:n    = { inter-unit-separator    = \;          },
+    thick        .meta:n    = { inter-unit-product      = \;          },
   unitsep / 
-    thin         .meta:n    = { inter-unit-separator    = \,          },
+    thin         .meta:n    = { inter-unit-product      = \,          },
   unitsep / 
     tightcdot    .meta:n    =
-      { inter-unit-separator    = \bgroup \cdot \egroup               },
+      { inter-unit-product      = \bgroup \cdot \egroup               },
   unitsep / 
     tighttimes   .meta:n    =
-      { inter-unit-separator    = \bgroup \times \egroup              },
+      { inter-unit-product      = \bgroup \times \egroup              },
   unitsep / 
-    times        .meta:n   = { inter-unit-separator     = \times      },
+    times        .meta:n   = { inter-unit-product       = \times      },
   unitsep / 
-    unknown      .meta:n   = { inter-unit-separator     = #1          },
+    unknown      .meta:n   = { inter-unit-product       = #1          },
   unitspace      .choice: ,
   unitspace / 
-    med          .meta:n   = { inter-unit-separator     = \:          },
+    med          .meta:n   = { inter-unit-product       = \:          },
   unitspace / 
-    medium       .meta:n   = { inter-unit-separator     = \:          },
+    medium       .meta:n   = { inter-unit-product       = \:          },
   unitspace / 
-    none         .meta:n   = { inter-unit-separator     =             },
+    none         .meta:n   = { inter-unit-product       =             },
   unitspace / 
-    space        .meta:n   = { inter-unit-separator     = \text { ~ } },
+    space        .meta:n   = { inter-unit-product       = \text { ~ } },
   unitspace / 
-    thick        .meta:n   = { inter-unit-separator     = \;          },
+    thick        .meta:n   = { inter-unit-product       = \;          },
   unitspace / 
-    thin         .meta:n   = { inter-unit-separator     = \,          },
+    thin         .meta:n   = { inter-unit-product       = \,          },
   unitspace / 
-    unknown      .meta:n   = { inter-unit-separator     = #1          },
+    unknown      .meta:n   = { inter-unit-product       = #1          },
   valuecolor     .meta:n   = { number-color             = #1          },
   valuecolour    .meta:n   = { number-color             = #1          },
   valuemathrm    .meta:x   = 
@@ -15252,37 +15288,37 @@ This work consists of the file  siunitx.dtx
   valuesep        .choice: ,
   valuesep / 
     cdot         .meta:n    = 
-      { number-unit-separator   = { } \cdot { }                       },
+      { number-unit-product     = { } \cdot { }                       },
   valuesep / 
-    comma        .meta:n    = { number-unit-separator   = { {,} }     },
+    comma        .meta:n    = { number-unit-product     = { {,} }     },
   valuesep / 
-    fullstop     .meta:n    = { number-unit-separator   = { { . } }   },
+    fullstop     .meta:n    = { number-unit-product     = { { . } }   },
   valuesep / 
-    med          .meta:n    = { number-unit-separator   = \:          },
+    med          .meta:n    = { number-unit-product     = \:          },
   valuesep / 
-    medium       .meta:n    = { number-unit-separator   = \:          },
+    medium       .meta:n    = { number-unit-product     = \:          },
   valuesep / 
-    none         .meta:n    = { number-unit-separator   =             },
+    none         .meta:n    = { number-unit-product     =             },
   valuesep / 
-    period       .meta:n    = { number-unit-separator   = { { . } }   },
+    period       .meta:n    = { number-unit-product     = { { . } }   },
   valuesep / 
-    space        .meta:n    = { number-unit-separator   = \text { ~ } },
+    space        .meta:n    = { number-unit-product     = \text { ~ } },
   valuesep / 
-    stop         .meta:n    = { number-unit-separator   = { { . } }   },
+    stop         .meta:n    = { number-unit-product     = { { . } }   },
   valuesep / 
-    thick        .meta:n    = { number-unit-separator   = \;          },
+    thick        .meta:n    = { number-unit-product     = \;          },
   valuesep / 
-    thin         .meta:n    = { number-unit-separator   = \,          },
+    thin         .meta:n    = { number-unit-product     = \,          },
   valuesep / 
     tightcdot    .meta:n    = 
-      { number-unit-separator    = \bgroup \cdot \egroup              },
+      { number-unit-product      = \bgroup \cdot \egroup              },
   valuesep / 
     tighttimes   .meta:n    =
-      { number-unit-separator    = \bgroup \times \egroup             },
+      { number-unit-product      = \bgroup \times \egroup             },
   valuesep / 
-    times        .meta:n    = { number-unit-separator    = \times     },
+    times        .meta:n    = { number-unit-product      = \times     },
   valuesep / 
-    unknown      .meta:n    = { number-unit-separator    = #1         },
+    unknown      .meta:n    = { number-unit-product      = #1         },
   xspace         .meta:n    = { use-xspace               = #1         },
   xspace         .default:n = { true                                  },
 } 
@@ -15828,7 +15864,7 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \GeV { \giga  \electronvolt }
 \DeclareSIUnit \TeV { \tera  \electronvolt }
 \DeclareSIUnitWithOptions \kWh { \kilo \watt \hour }
-  { inter-unit-separator = }
+  { inter-unit-product = }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
