@@ -14063,6 +14063,23 @@ This work consists of the file  siunitx.dtx
 \cs_new_eq:NN \SIrange \qtyrange
 %    \end{macrocode}
 %\end{macro}
+%
+%\begin{macro}{\SI}
+% The main \cs{SI} function follows the same pattern as the previous
+% ones.
+%    \begin{macrocode}
+\NewDocumentCommand \SI { o m o m } {
+  \group_begin:
+    \IfNoValueTF {#1}
+      { \siunitx_combined:nnnn { } {#2} {#3} {#4} }
+      {
+        \keys_set:nn { siunitx } {#1}
+        \siunitx_combined:nnnn {#1} {#2} {#3} {#4}
+      }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
 % 
 %\begin{macro}{\sisetup}
 % The set up macro simply moves to the correct path and executes 
