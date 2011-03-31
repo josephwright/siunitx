@@ -4618,14 +4618,21 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %\begin{macro}{\siunitx_tmp:w}
-%\begin{macro}{\l_siunitx_tmp_bool}
-%\begin{macro}{\l_siunitx_tmp_box}
-%\begin{macro}{\l_siunitx_tmp_int}
-%\begin{macro}{\l_siunitx_tmpa_tl}
-%\begin{macro}{\l_siunitx_tmpb_tl}
-% Scratch items.
+% A scratch function.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_tmp:w { }
+%    \end{macrocode}
+%\end{macro}
+%    
+%\begin{macro}{
+%  \l_siunitx_tmp_bool ,
+%  \l_siunitx_tmp_box  ,
+%  \l_siunitx_tmp_int  ,
+%  \l_siunitx_tmpa_tl  ,
+%  \l_siunitx_tmpb_tl  ,
+%}
+% Scratch variables.
+%    \begin{macrocode}
 \bool_new:N \l_siunitx_tmp_bool
 \box_new:N \l_siunitx_tmp_box
 \int_new:N \l_siunitx_tmp_int
@@ -4633,19 +4640,15 @@ This work consists of the file  siunitx.dtx
 \tl_new:N \l_siunitx_tmpb_tl
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
+%\begin{macro}{
+%  \siunitx_error:nxx ,
+%  \siunitx_error:nx  ,
+%  \siunitx_error:n   ,
+%}
 %\begin{macro}{\l_siunitx_error_bool}
-%\begin{macro}{\siunitx_error:nxx}
-%\begin{macro}{\siunitx_error:nx}
-%\begin{macro}{\siunitx_error:n}
 % General-purpose functions for throwing errors.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_error_bool
 \cs_new_protected:Npn \siunitx_error:nxx #1#2#3 {
   \bool_set_true:N \l_siunitx_error_bool
   \msg_error:nnxx { siunitx } {#1} {#2} {#3}
@@ -4656,9 +4659,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_error:n #1 {
   \siunitx_error:nxx {#1} { } { }
 }
+\bool_new:N \l_siunitx_error_bool
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %    
@@ -4675,8 +4677,10 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %
-%\begin{macro}{\c_siunitx_minus_tl}
-%\begin{macro}{\c_siunitx_minus_int}
+%\begin{macro}{
+%  \c_siunitx_minus_tl  ,
+%  \c_siunitx_minus_int ,
+%}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
 % then the real character can be used.
@@ -4693,8 +4697,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%
 %
 %\begin{macro}{\c_siunitx_mu_tl}
 % The lack of an upright mu has to be sorted out. The same consideration
@@ -4710,6 +4712,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\c_siunitx_omega_tl}
 % Some package redefine \cs{Omega} to be slanted and move the original
 % symbol to \cs{upOmega}. This is handled here.
 %    \begin{macrocode}
@@ -4720,13 +4723,16 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \c_siunitx_omega_tl { \upOmega } }
 }
 %    \end{macrocode}
+%\end{macro}
 %
-%\begin{macro}{\siunitx_tl_put_left_math:Nn}
-%\begin{macro}{\siunitx_tl_put_left_math:NV}
-%\begin{macro}{\siunitx_tl_put_left_math:cV}
-%\begin{macro}{\siunitx_tl_put_right_math:Nn}
-%\begin{macro}{\siunitx_tl_put_right_math:NV}
-%\begin{macro}{\siunitx_tl_put_right_math:cV}
+%\begin{macro}{
+%  \siunitx_tl_put_left_math:Nn  ,
+%  \siunitx_tl_put_left_math:NV  ,
+%  \siunitx_tl_put_left_math:cV  ,
+%  \siunitx_tl_put_right_math:Nn ,
+%  \siunitx_tl_put_right_math:NV ,
+%  \siunitx_tl_put_right_math:cV ,
+%}
 % To add stuff in math mode.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_tl_put_left_math:Nn #1#2 {
@@ -4740,11 +4746,6 @@ This work consists of the file  siunitx.dtx
 \cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV }
 \cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { cV }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\c_siunitx_old_options_seq}
@@ -4946,12 +4947,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_option_deactivate_clist}
 %\begin{macro}{\siunitx_option_deactivate:n}
 %\begin{macro}[aux]{\siunitx_option_deactivate_aux:n}
+%\begin{macro}{\l_siunitx_option_deactivate_clist}
 % Some options need to be deactivated at the start of the document.
 %    \begin{macrocode}
-\clist_new:N \l_siunitx_option_deactivate_clist
 \cs_new_protected_nopar:Npn \siunitx_option_deactivate:n #1 {
   \clist_put_right:Nn \l_siunitx_option_deactivate_clist {#1}
 }
@@ -4966,14 +4966,17 @@ This work consists of the file  siunitx.dtx
   \clist_map_function:NN \l_siunitx_option_deactivate_clist
     \siunitx_option_deactivate_aux:n
 }
+\clist_new:N \l_siunitx_option_deactivate_clist
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\prop_del:cn}
-%\begin{macro}{\prop_put:cnV}
-%\begin{macro}{\tl_replace_all_in:NnV}
+%\begin{macro}{
+%  \prop_del:cn           ,
+%  \prop_put:cnV          ,
+%  \tl_replace_all_in:NnV ,
+%}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \prop_del:Nn { c }
@@ -4981,14 +4984,12 @@ This work consists of the file  siunitx.dtx
 \cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\siunitx_cs_if_tl_p:N}
-%\begin{macro}[TF]{\siunitx_cs_if_tl:N}
+%\begin{macro}[pTF]{
+%  \siunitx_cs_if_tl:N    ,
+%  \siunitx_cs_if_macro:N ,
+%}
 %\begin{macro}[aux]{\siunitx_cs_if_tl_aux:w}
-%\begin{macro}{\siunitx_cs_if_macro_p:N}
-%\begin{macro}[TF]{\siunitx_cs_if_macro:N}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
 % short macros only. The second test (with the \cs{cs_to_str:N} part)
 % is checking for \LaTeXe\ robust commands.
@@ -5023,9 +5024,6 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
@@ -5064,9 +5062,11 @@ This work consists of the file  siunitx.dtx
 % package.  By carrying out the changes outside math mode, bold can
 % reliably be applied to math output.
 % 
-%\begin{macro}{\c_siunitx_mathsf_int}
-%\begin{macro}{\c_siunitx_mathtt_int}
 %\begin{macro}{\siunitx_set_math_fam:n}
+%\begin{macro}{
+%  \c_siunitx_mathsf_int ,
+%  \c_siunitx_mathtt_int ,
+%}
 % The detection routine needs some basic data about the sans serif and
 % monospaced fonts in use.  This is collected up at the start of the 
 % document. The families used can change between here and the start of 
@@ -5096,11 +5096,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_font_set_text_fam:n}
-%\begin{macro}{\c_siunitx_textsf_tl}
-%\begin{macro}{\c_siunitx_texttt_tl}
+%\begin{macro}{
+%  \c_siunitx_textsf_tl ,
+%  \c_siunitx_texttt_tl ,
+%}
 % The text families are done in a somewhat different manner: there are 
 % no issues with \cs{AtBeginDocument}, luckily. The need to define 
 % new macros here arises as \cs{sfdefault} and \cs{ttdefault} are 
@@ -5117,7 +5118,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\l_siunitx_detect_inline_weight_tl}
 % Used by the keys, but needs to be created here.
@@ -5126,13 +5126,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_detect_display_math_bool}
-%\begin{macro}{\l_siunitx_detect_family_bool}
-%\begin{macro}{\l_siunitx_detect_inline_family_tl}
-%\begin{macro}{\l_siunitx_detect_inline_weight_tl}
-%\begin{macro}{\l_siunitx_detect_shape_bool}
-%\begin{macro}{\l_siunitx_detect_mode_bool}
-%\begin{macro}{\l_siunitx_detect_weight_bool}
+%\begin{macro}{
+%  \l_siunitx_detect_display_math_bool ,
+%  \l_siunitx_detect_family_bool       ,
+%  \l_siunitx_detect_inline_family_tl  ,
+%  \l_siunitx_detect_inline_weight_tl  ,
+%  \l_siunitx_detect_shape_bool        ,
+%  \l_siunitx_detect_mode_bool         ,
+%  \l_siunitx_detect_weight_bool       ,
+%}
 % Font detection is all about creating switches, with just a little
 % gloss for \texttt{detect-all} and \texttt{detect-none}.
 %    \begin{macrocode}
@@ -5199,22 +5201,17 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\l_siunitx_font_set_bool}
-%\begin{macro}{\l_siunitx_font_math_mode_bool}
+%\begin{macro}{
+%  \l_siunitx_font_set_bool       ,
+%  \l_siunitx_font_math_mode_bool ,
+%}
 % The internals of the package need a number of switches to track what
 % is happening.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_font_set_bool
 \bool_new:N \l_siunitx_font_math_mode_bool
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_font_family_tl}
@@ -5224,14 +5221,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_font_shape:}
-%\begin{macro}{\siunitx_font_weight:}
+%\begin{macro}{
+%  \siunitx_font_shape:  ,
+%  \siunitx_font_weight: ,
+%}
 % These could be token lists or functions!
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_font_shape: { }
 \cs_new_nopar:Npn \siunitx_font_weight: { }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_detect_font:}
@@ -5300,8 +5298,10 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_detect_font_weight_math:}
-%\begin{macro}{\siunitx_detect_font_weight_text:}
+%\begin{macro}{
+%  \siunitx_detect_font_weight_math: ,
+%  \siunitx_detect_font_weight_text: ,
+%}
 % The tests for font weight depend on whether the module is testing 
 % text or math content.
 %    \begin{macrocode}
@@ -5332,7 +5332,6 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\siunitx_detect_font_family:}
 % Family detection usually picks up the surrounding text.  However, for
@@ -5360,8 +5359,10 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\siunitx_detect_font_family_math:}
-%\begin{macro}{\siunitx_detect_font_family_text:}
+%\begin{macro}{
+%  \siunitx_detect_font_family_math: ,
+%  \siunitx_detect_font_family_text: ,
+%}
 % The two detections routines check if the current font is sans serif or
 % monospaced.  The method used depends on whether the current math or
 % text font is of interest. The math detection routine re-applies the 
@@ -14024,7 +14025,7 @@ This work consists of the file  siunitx.dtx
 % function as well as setting them here. This is used so that options
 % set for a unit can be overridden on a one-off basis.
 %    \begin{macrocode}
-\NewDocumentCommand \si { o m } {
+\NewDocumentCommand \unit { o m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_unit_output:nn {#2} { } }
@@ -14034,6 +14035,7 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
+\cs_new_eq:NN \si \unit
 %    \end{macrocode}
 %\end{macro}
 %
