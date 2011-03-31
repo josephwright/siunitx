@@ -190,19 +190,19 @@ This work consists of the file  siunitx.dtx
 %^^A Some short cuts for the tables
 %\NewDocumentCommand\DescribePrefix{m}{^^A
 %  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
-%    #1 & \cs{#1} & \expandafter\si\expandafter{\csname #1\endcsname} 
+%    #1 & \cs{#1} & \expandafter\unit\expandafter{\csname #1\endcsname} 
 %}
 %\NewDocumentCommand\DescribeUnit{m}{^^A
 %  \expandafter\SpecialUsageIndex\expandafter{\csname #1\endcsname}^^A
 %  #1 &
 %  \cs{#1} &
-%  \expandafter\si\expandafter{\csname #1\endcsname}
+%  \expandafter\unit\expandafter{\csname #1\endcsname}
 %}
 %\NewDocumentCommand\DescribeNamedUnit{mm}{^^A
 %  \expandafter\SpecialUsageIndex\expandafter{\csname #2\endcsname}^^A
 %  #1 &
 %  \cs{#2} &
-%  \expandafter\si\expandafter{\csname #2\endcsname}
+%  \expandafter\unit\expandafter{\csname #2\endcsname}
 %}
 %
 %^^A For creating examples with nice highlighting of code, and so
@@ -278,6 +278,7 @@ This work consists of the file  siunitx.dtx
 %          kibi,
 %          kilo,
 %          kilogram,
+%          kWh,
 %          litre,
 %          lumen,
 %          lux,
@@ -305,7 +306,6 @@ This work consists of the file  siunitx.dtx
 %          second,
 %          selectlanguage,
 %          SendSettingsToPgf,
-%          si,
 %          SI,
 %          sievert,
 %          SIlist,
@@ -321,8 +321,8 @@ This work consists of the file  siunitx.dtx
 %          toprule,
 %          tothe,
 %          translate,
+%          unit,
 %          volt,
-%          kWh,
 %        }
 %    }^^A 
 %}
@@ -572,7 +572,7 @@ This work consists of the file  siunitx.dtx
 %\begin{itemize}
 %  \item \cs{ang}\oarg{options}\marg{angle}
 %  \item \cs{num}\oarg{options}\marg{number}
-%  \item \cs{si}\oarg{options}\marg{unit}
+%  \item \cs{unit}\oarg{options}\marg{unit}
 %  \item \cs{SI}\oarg{options}\marg{number}\oarg{pre-unit}\marg{unit}
 %  \item \cs{numlist}\oarg{options}\marg{numbers}
 %  \item \cs{numrange}\oarg{options}\marg{numbers}\marg{number2}
@@ -600,11 +600,11 @@ This work consists of the file  siunitx.dtx
 % or as macro-based units. In the later case, different formatting is
 % possible.
 %\begin{LaTeXdemo}
-%  \si{kg.m.s^{-1}}                \\
-%  \si{\kilogram\metre\per\second} \\
-%  \si[per-mode=symbol]
+%  \unit{kg.m.s^{-1}}                \\
+%  \unit{\kilogram\metre\per\second} \\
+%  \unit[per-mode=symbol]
 %    {\kilogram\metre\per\second}  \\
-%  \si[per-mode=symbol]
+%  \unit[per-mode=symbol]
 %    {\kilogram\metre\per\ampere\per\second}      
 %\end{LaTeXdemo}
 %
@@ -717,13 +717,15 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Units}
 %
-%\DescribeMacro{\si}
+%\DescribeMacro{\unit}
+%\changes{v2.2}{2011/03/31}{Renamed \cs{si} to \cs{unit}: old name
+%  depreciated but still available}
 %\begin{syntax}
-%  \cs{si}\oarg{options}\marg{unit}
+%  \cs{unit}\oarg{options}\marg{unit}
 %\end{syntax}
-% The symbol for a unit can be typeset using the \cs{si} macro: this 
+% The symbol for a unit can be typeset using the \cs{unit} macro: this 
 % provides full control over output format for the unit. Like the
-% \cs{num} macro, \cs{si} takes  one optional and one mandatory 
+% \cs{num} macro, \cs{unit} takes  one optional and one mandatory 
 % argument. The unit formatting system can accept two types of input. 
 % When the \meta{unit} contains literal items (for example letters or
 % numbers) then \pkg{siunitx} converts \texttt{.} and "~" into
@@ -731,19 +733,19 @@ This work consists of the file  siunitx.dtx
 % specified using "_" and "^". The formatting methods will work with
 % both math and text mode.
 %\begin{LaTeXdemo}
-%  \si{kg.m/s^2} \\
-%  \si{g_{polymer}~mol_{cat}.s^{-1}}
+%  \unit{kg.m/s^2} \\
+%  \unit{g_{polymer}~mol_{cat}.s^{-1}}
 %\end{LaTeXdemo}
-% The second operation mode for the \cs{si} macro is an 
+% The second operation mode for the \cs{unit} macro is an 
 % \enquote{interpreted} system, Here, each unit, SI multiple prefix and 
 % power is given a macro name.  These are entered in a method very 
 % similar to the reading of the unit name in English.
 %\begin{LaTeXdemo}
-%  \si{\kilo\gram\metre\per\square\second} \\
-%  \si{\gram\per\cubic\centi\metre}        \\
-%  \si{\square\volt\cubic\lumen\per\farad} \\
-%  \si{\metre\squared\per\gray\cubic\lux}  \\
-%  \si{\henry\second}                      
+%  \unit{\kilo\gram\metre\per\square\second} \\
+%  \unit{\gram\per\cubic\centi\metre}        \\
+%  \unit{\square\volt\cubic\lumen\per\farad} \\
+%  \unit{\metre\squared\per\gray\cubic\lux}  \\
+%  \unit{\henry\second}                      
 %\end{LaTeXdemo}
 % On its own, this is less convenient than the direct method, although
 % it does use meaning rather than appearance for input. However, the
@@ -763,9 +765,9 @@ This work consists of the file  siunitx.dtx
 % value of a quantity is the product of the number and the unit, the
 % space being regarded as a multiplication sign \cite{SI:5.3.3}. The
 % \cs{SI} macro combines the functionality of \cs{num} and
-% \cs{si}, and makes this both possible and easy. The \meta{number} and 
-% \meta{unit} arguments work exactly like those for the \cs{num} and 
-% \cs{si} macros, respectively. \meta{preunit} is a unit to be typeset 
+% \cs{unit}, and makes this both possible and easy. The \meta{number}
+% and \meta{unit} arguments work exactly like those for the \cs{num} and
+% \cs{unit} macros, respectively. \meta{preunit} is a unit to be typeset
 % \emph{before} the numerical value (most likely to be a currency).
 %\begin{LaTeXdemo}
 %  \SI[mode=text]{1.23}{J.mol^{-1}.K^{-1}}          \\
@@ -775,10 +777,10 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 % It is possible to set up the unit macros to be available outside of
-% the \cs{SI} and \cs{si} functions. This is not the standard behaviour
-% as there is the risk of name clashes (for example, \cs{bar} is used
-% by other packages, and several packages define \cs{degree}). Full
-% details of using \enquote{stand alone} units are found in 
+% the \cs{SI} and \cs{unit} functions. This is not the standard
+% behaviour as there is the risk of name clashes (for example, \cs{bar}
+% is used by other packages, and several packages define \cs{degree}).
+% Full details of using \enquote{stand alone} units are found in 
 % \cref{sec:units:creating}.
 % 
 %\DescribeMacro{\SIlist}
@@ -902,7 +904,7 @@ This work consists of the file  siunitx.dtx
 %      \DescribeUnit{hour}    \\
 %      \DescribeUnit{litre}   \\
 %        \SpecialUsageIndex{\liter}^^A 
-%       & \cs{liter} & \si{\liter} \\
+%       & \cs{liter} & \unit{\liter} \\
 %      \DescribeNamedUnit{minute (plane angle)}{arcminute} \\ 
 %      \DescribeNamedUnit{minute (time)}{minute} \\
 %      \DescribeNamedUnit{second (plane angle)}{arcsecond} \\ 
@@ -1001,9 +1003,9 @@ This work consists of the file  siunitx.dtx
 % \cs{square} and \cs{cubic} are intended for use before units, with
 % \cs{squared} and \cs{cubed} going after the unit.
 %\begin{LaTeXdemo} 
-%  \si{\square\becquerel} \\
-%  \si{\joule\squared\per\lumen} \\
-%  \si{\cubic\lux\volt\tesla\cubed}
+%  \unit{\square\becquerel} \\
+%  \unit{\joule\squared\per\lumen} \\
+%  \unit{\cubic\lux\volt\tesla\cubed}
 %\end{LaTeXdemo}
 %\DescribeMacro{\tothe}
 %\DescribeMacro{\raiseto}
@@ -1011,18 +1013,18 @@ This work consists of the file  siunitx.dtx
 % and \cs{raiseto} macros. These are the only macros for units which
 % take an argument:
 %\begin{LaTeXdemo} 
-%  \si{\henry\tothe{5}} \\
-%  \si{\raiseto{4.5}\radian}
+%  \unit{\henry\tothe{5}} \\
+%  \unit{\raiseto{4.5}\radian}
 %\end{LaTeXdemo}
 %\DescribeMacro{\per}
 % Reciprocal powers are indicated using the \cs{per} macro. This applies
 % to the next unit only, unless the \opt{sticky-per} option
 % is turned on.
 %\begin{LaTeXdemo} 
-%  \si{\joule\per\mole\per\kelvin} \\
-%  \si{\joule\per\mole\kelvin} \\
-%  \si{\per\henry\tothe{5}} \\
-%  \si{\per\square\becquerel} 
+%  \unit{\joule\per\mole\per\kelvin} \\
+%  \unit{\joule\per\mole\kelvin} \\
+%  \unit{\per\henry\tothe{5}} \\
+%  \unit{\per\square\becquerel} 
 %\end{LaTeXdemo}
 %\DescribeMacro{\of}
 %\changes{v2.0i}{2010/06/29}{Correct behaviour of \cs{of} function
@@ -1030,24 +1032,24 @@ This work consists of the file  siunitx.dtx
 % As for generic powers, generic qualifiers are also available using
 % the \cs{of} function:
 %\begin{LaTeXdemo} 
-%  \si{\kilogram\of{metal}} \\
+%  \unit{\kilogram\of{metal}} \\
 %  \SI[qualifier-mode = brackets]
 %    {0.1}{\milli\mole\of{cat}\per\kilogram\of{prod}}
 %\end{LaTeXdemo}
 %
 % When using the unit macros, the package is able to validate the
 % input given. As part of this, stand-alone unit prefixes can be used
-% with the \cs{si} macro
+% with the \cs{unit} macro
 %\begin{LaTeXdemo} 
-%  \si{\kilo}  \\
-%  \si{\micro} \\
-%  \si[prefixes-as-symbols = false]{\kilo}
+%  \unit{\kilo}  \\
+%  \unit{\micro} \\
+%  \unit[prefixes-as-symbols = false]{\kilo}
 %\end{LaTeXdemo}
 % However, the package only allows a single prefix to be used in this
 % way: multiple prefixes will give an error, as will trying to give 
 % a number without a unit. So the following will raise errors:
 %\begin{LaTeXdemo}[code only] 
-%  \si{\kilo\gram\micro} \\
+%  \unit{\kilo\gram\micro} \\
 %  \SI{10}{\micro}
 %\end{LaTeXdemo}
 % 
@@ -1072,7 +1074,7 @@ This work consists of the file  siunitx.dtx
 % using the \cs{DeclareSIUnitWithOptions} function, where the 
 % \meta{options} argument can be any suitable options, and applies the
 % specific unit macro only. The (first) optional argument to \cs{SI} 
-% and \cs{si} can be used to override the settings for the unit. A 
+% and \cs{unit} can be used to override the settings for the unit. A
 % typical example is the \cs{degree} unit.
 %\begin{LaTeXdemo}
 %  \SI{3.1415}{\degree}
@@ -1122,8 +1124,8 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 % with the functions then used in the document as:
 %\begin{LaTeXdemo}
-%  \si{\kilogram\tothefourth}\\
-%  \si{\quartic\metre}
+%  \unit{\kilogram\tothefourth}\\
+%  \unit{\quartic\metre}
 %\end{LaTeXdemo}
 %
 %\DescribeMacro{\DeclareSIQualifier}
@@ -1243,9 +1245,8 @@ This work consists of the file  siunitx.dtx
 %
 % As a complement to the \texttt{S} column, \pkg{siunitx} also provides
 % a second column type, \texttt{s}.  This is intended for producing 
-% columns of units. The letters chosen are intended to be similar to 
-% \cs{SI} and \cs{si}, respectively. This allows both macro-based and 
-% explicit units to be printed easily (\cref{tab:s:demo}).
+% columns of units.  This allows both macro-based and explicit units to
+% be printed easily (\cref{tab:s:demo}).
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
@@ -1263,9 +1264,9 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-% As the \cs{si} macro can take literal or macro input, the \texttt{s}
+% As the \cs{unit} macro can take literal or macro input, the \texttt{s}
 % column cannot validate the input.  \emph{Everything} in an \texttt{s}
-% column is therefore passed to the \cs{si} macro for processing.  To
+% column is therefore passed to the \cs{unit} macro for processing. To
 % prevent this, you have to use \cs{multicolumn}, as is shown in
 % \cref{tab:s:processing}.  Notice that the braces do not prevent
 % processing and colouring of the cell contents.
@@ -1277,10 +1278,10 @@ This work consists of the file  siunitx.dtx
 %    \sisetup{color = orange}
 %    \begin{tabular}{ss}      
 %      \toprule
-%        {Unit}     & \multicolumn{1}{c}{Unit}\\
+%        {Unit}       & \multicolumn{1}{c}{Unit}\\
 %      \midrule
-%        {\si{m^3}} & \multicolumn{1}{c}{\si{m^3}} \\
-%        \kilogram  & \kilogram \\
+%        {\unit{m^3}} & \multicolumn{1}{c}{\unit{m^3}} \\
+%        \kilogram    & \kilogram \\
 %      \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -2203,7 +2204,7 @@ This work consists of the file  siunitx.dtx
 %
 % The various macro units are created at the start of the document. 
 % \pkg{siunitx} can define these such that they are only available for 
-% use within the \cs{si} and \cs{SI} functions, or can make the unit
+% use within the \cs{unit} and \cs{SI} functions, or can make the unit
 % macros available throughout the document body. There are a number of
 % settings which control this creation process 
 % (\cref{tab:opt:units:def}). As a result, these options all apply
@@ -2235,7 +2236,7 @@ This work consists of the file  siunitx.dtx
 %  options when \opt{free-standing-units} is active}
 %\DescribeOption{overwrite-functions}
 % The \opt{free-standing-units} option controls whether the unit macros 
-% exist outside of the \cs{si} and \cs{SI} arguments. When this option
+% exist outside of the \cs{unit} and \cs{SI} arguments. When this option
 % is \opt{true}, \pkg{siunitx} creates the macros for general use.
 % The standard method to achieve this does not overwrite any existing
 % macros: this behaviour can be altered using the 
@@ -2283,7 +2284,7 @@ This work consists of the file  siunitx.dtx
 % The first configuration file provides a number of convenient 
 % abbreviations for the SI units (\cref{tab:unit:abbr}). The 
 % standard \pkg{siunitx} settings only create these abbreviations within
-% the scope of the \cs{si} and \cs{SI} functions, meaning that no 
+% the scope of the \cs{unit} and \cs{SI} functions, meaning that no 
 % clashes should occur (for example with the standard \cs{pm} symbol). 
 % 
 %\begin{center} 
@@ -2561,8 +2562,8 @@ This work consists of the file  siunitx.dtx
 % space: another common choice is a centred dot. To get the correct
 % spacing it is necessary to use "{}\cdot{}" in the later case.
 %\begin{LaTeXdemo}
-%  \si{\farad\squared\lumen\candela} \\
-%  \si[inter-unit-product={}\cdot{}]{\farad\squared\lumen\candela} 
+%  \unit{\farad\squared\lumen\candela} \\
+%  \unit[inter-unit-product={}\cdot{}]{\farad\squared\lumen\candela} 
 %\end{LaTeXdemo} 
 % 
 %\DescribeOption{per-mode}
@@ -2576,17 +2577,17 @@ This work consists of the file  siunitx.dtx
 % to \opt{fraction} uses the \cs{frac} function to typeset the positive
 % and negative powers of a unit separately. 
 %\begin{LaTeXdemo}
-%  \si{\joule\per\mole\per\kelvin} \\
-%  \si{\metre\per\second\squared} \\
-%  \si[per-mode=fraction]{\joule\per\mole\per\kelvin} \\
-%  \si[per-mode=fraction]{\metre\per\second\squared} 
+%  \unit{\joule\per\mole\per\kelvin} \\
+%  \unit{\metre\per\second\squared} \\
+%  \unit[per-mode=fraction]{\joule\per\mole\per\kelvin} \\
+%  \unit[per-mode=fraction]{\metre\per\second\squared} 
 %\end{LaTeXdemo}
 % The closely-related \opt{reciprocal-positive-first} setting acts in 
 % the same way but places all of the positive powers before any negative
 % ones.
 %\begin{LaTeXdemo}
-%  \si{\ampere\per\mole\second} \\
-%  \si[per-mode = reciprocal-positive-first]
+%  \unit{\ampere\per\mole\second} \\
+%  \unit[per-mode = reciprocal-positive-first]
 %    {\ampere\per\mole\second}
 %\end{LaTeXdemo}
 % It is possible to use a symbol (usually \texttt{/}) to separate the
@@ -2600,16 +2601,16 @@ This work consists of the file  siunitx.dtx
 % \cs{text} will be needed to print textual information.
 %\begin{LaTeXdemo}
 %  \sisetup{per-mode = symbol}%
-%  \si{\joule\per\mole\per\kelvin} \\
-%  \si{\metre\per\second\squared} \\
-%  \si[per-symbol = \text{~div~}]{\joule\per\mole\per\kelvin} \\
-%  \si[bracket-unit-denominator = false]{\joule\per\mole\per\kelvin}
+%  \unit{\joule\per\mole\per\kelvin} \\
+%  \unit{\metre\per\second\squared} \\
+%  \unit[per-symbol = \text{~div~}]{\joule\per\mole\per\kelvin} \\
+%  \unit[bracket-unit-denominator = false]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
 % The often-requested (but mathematically invalid) 
 % \opt{repeated-symbol} option is also available to repeat the symbol 
 % for each \cs{per}.
 %\begin{LaTeXdemo}
-%  \si[per-mode=repeated-symbol]{\joule\per\mole\per\kelvin}
+%  \unit[per-mode=repeated-symbol]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
 % Finally, it is possible for the behaviour of the \cs{per} function
 % to depend on the prevailing math style. Setting \opt{per-mode} to
@@ -2618,29 +2619,29 @@ This work consists of the file  siunitx.dtx
 % \cs{displaystyle} math.
 %\begin{LaTeXdemo}
 %  \sisetup{per-mode = symbol-or-fraction}%
-%  \( \si{\joule\per\mole\per\kelvin} \) 
-%  \[ \si{\joule\per\mole\per\kelvin} \]
-%     \si{\joule\per\mole\per\kelvin} \\
+%  \( \unit{\joule\per\mole\per\kelvin} \) 
+%  \[ \unit{\joule\per\mole\per\kelvin} \]
+%     \unit{\joule\per\mole\per\kelvin} \\
 %  \( 
 %    \displaystyle 
-%    \si{\joule\per\mole\per\kelvin}
+%    \unit{\joule\per\mole\per\kelvin}
 %  \)
 %  \[ 
 %    \textstyle 
-%    \si{\joule\per\mole\per\kelvin}
+%    \unit{\joule\per\mole\per\kelvin}
 %  \]
 %\end{LaTeXdemo}
 % 
 %\DescribeOption{sticky-per}
 % By default, \cs{per} applies only to the next unit
 % given.\footnote{This is the standard method of reading units in
-% English: for example, \si{\joule\per\mole\per\kelvin} is pronounced
+% English: for example, \unit{\joule\per\mole\per\kelvin} is pronounced
 % \enquote{joules per mole per kelvin}.}  By setting the 
 % \opt{sticky-per} flag, this behaviour is changed so that \cs{per} 
 % applies to all subsequent units.
 %\begin{LaTeXdemo}
-%  \si{\pascal\per\gray\henry} \\
-%  \si[sticky-per]{\pascal\per\gray\henry}
+%  \unit{\pascal\per\gray\henry} \\
+%  \unit[sticky-per]{\pascal\per\gray\henry}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{power-font}
@@ -2652,8 +2653,8 @@ This work consists of the file  siunitx.dtx
 % \pkg{euler} package is loaded.
 %\begin{LaTeXdemo}
 %  \sisetup{unit-mode = text}%
-%  \si{\metre\per\second\squared} \\
-%  \si[power-font = unit]{\metre\per\second\squared}
+%  \unit{\metre\per\second\squared} \\
+%  \unit[power-font = unit]{\metre\per\second\squared}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{qualifier-mode}
@@ -2665,14 +2666,14 @@ This work consists of the file  siunitx.dtx
 % possible. With the last settings, powers can lead to ambiguity and are
 % automatically detected and brackets added as appropriate.
 %\begin{LaTeXdemo}
-%  \si{\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
-%  \si[qualifier-mode = brackets]
+%  \unit{\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
+%  \unit[qualifier-mode = brackets]
 %    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
-%  \si[qualifier-mode = subscript]
+%  \unit[qualifier-mode = subscript]
 %    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
-%  \si[qualifier-mode = space]
+%  \unit[qualifier-mode = space]
 %    {\kilogram\polymer\squared\per\mole\catalyst\per\hour}  \\
-%  \si[qualifier-mode = text]
+%  \unit[qualifier-mode = text]
 %    {\deci\bel\isotropic} 
 %\end{LaTeXdemo}
 %
@@ -2683,9 +2684,9 @@ This work consists of the file  siunitx.dtx
 % This correctly deals with the kilogram, which is a base unit even
 % though it involves a prefix.
 %\begin{LaTeXdemo}
-%  \si{\milli\litre\per\mole\deci\ampere} \\
+%  \unit{\milli\litre\per\mole\deci\ampere} \\
 %  \SI{10}{\kilo\gram\squared\deci\second} \\
-%  \si[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
+%  \unit[prefixes-as-symbols=false]{\milli\litre\per\mole\deci\ampere} \\
 %  \SI[prefixes-as-symbols=false]{10}{\kilo\gram\squared\deci\second}
 %\end{LaTeXdemo}
 %
@@ -3667,7 +3668,7 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 % 
-%\subsection{Using units such as \si{\micro\metre\per\second} in 
+%\subsection{Using units such as \unit{\micro\metre\per\second} in 
 %  headings}
 %
 % The \pkg{siunitx} code is designed to work correctly with functions 
@@ -3681,7 +3682,7 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}[code only]
 %  \section{Some text 
 %    \texorpdfstring
-%      {\si{\joule\per\mole\per\kelvin}}
+%      {\unit{\joule\per\mole\per\kelvin}}
 %      {J mol-1 K-1}%
 %    }
 %\end{LaTeXdemo}
@@ -3789,12 +3790,12 @@ This work consists of the file  siunitx.dtx
 %
 % The \file{abbreviations} configuration file provides the unit 
 % \cs{kWh}, which is set up with no spacing between the 
-% \enquote{\si{\kilo\watt}} and the \enquote{\si{\hour}} unit to give 
-% \enquote{\si{\kWh}}. However, this only applies when the unit is given
-% on its own: combinations will follow the normal rules
+% \enquote{\unit{\kilo\watt}} and the \enquote{\unit{\hour}} unit to
+% give \enquote{\unit{\kWh}}. However, this only applies when the unit
+% is given on its own: combinations will follow the normal rules
 %\begin{LaTeXdemo}
-%  \si{\kWh} \\
-%  \si{\kWh\per\metre} 
+%  \unit{\kWh} \\
+%  \unit{\kWh\per\metre} 
 %\end{LaTeXdemo} 
 % This is because the unit \cs{kWh} is defined so that it can still be
 % varied by altering \cs{kilo}, \cs{watt} and \cs{hour}, and so that
@@ -3808,21 +3809,21 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo} 
 % or of course by using literal unit input.
 %\begin{LaTeXdemo}
-%  \si{\KWH\per\metre}\\
-%  \si{kWh.m^{-1}}
+%  \unit{\KWH\per\metre}\\
+%  \unit{kWh.m^{-1}}
 %\end{LaTeXdemo}
 % 
 % Another point to notice is that the \cs{per} macro applies to
 % the next unit, and not an entire unit combination. Thus in
 %\begin{LaTeXdemo}
-%  \si{\candela\per\kWh}
+%  \unit{\candela\per\kWh}
 %\end{LaTeXdemo}
 % \cs{per} applies to the watts but not to the hours. In this case,
 % the units need to be written out in full or the \opt{sticky-per}
 % option should be used.
 %\begin{LaTeXdemo}
-%  \si{\candela\per\kilo\watt\per\hour} \\
-%  \si[sticky-per]{\candela\per\kWh}
+%  \unit{\candela\per\kilo\watt\per\hour} \\
+%  \unit[sticky-per]{\candela\per\kWh}
 %\end{LaTeXdemo}
 %
 %\subsection{Adding items after the last column of a tabular}
@@ -3840,7 +3841,7 @@ This work consists of the file  siunitx.dtx
 %    \caption{Correcting spacing in last \texttt{S} column}
 %    \label{tab:cr}
 %    \hfil
-%    \begin{tabular}{S<{\,\si{\kg}}S<{\,\si{\kg}}}
+%    \begin{tabular}{S<{\,\unit{\kg}}S<{\,\unit{\kg}}}
 %      \toprule
 %      \multicolumn{1}{c}{Long header} &
 %        \multicolumn{1}{c}{Long header} \\
@@ -3851,7 +3852,7 @@ This work consists of the file  siunitx.dtx
 %      \bottomrule
 %    \end{tabular}
 %    \hfil
-%    \begin{tabular}{S<{\,\si{\kg}}S<{\,\si{\kg}}}
+%    \begin{tabular}{S<{\,\unit{\kg}}S<{\,\unit{\kg}}}
 %      \toprule
 %      \multicolumn{1}{c}{Long header} &
 %        \multicolumn{1}{c}{Long header} \\
@@ -3891,9 +3892,9 @@ This work consists of the file  siunitx.dtx
 %      \toprule
 %        & {One} & {Two} \\
 %      \midrule
-%      a / \si{\angstrom}   &  1.234(2) &   5.678(4) \\
-%      \beta / \si{\degree} & 90.34(4)  & 104.45(5)  \\
-%      \mu / \si{\per\mm}   &  0.532    &   0.894    \\
+%      a / \unit{\angstrom}   &  1.234(2) &   5.678(4) \\
+%      \beta / \unit{\degree} & 90.34(4)  & 104.45(5)  \\
+%      \mu / \unit{\per\mm}   &  0.532    &   0.894    \\
 %      \bottomrule
 %    \end{tabular}
 %    \hfil
@@ -4187,6 +4188,10 @@ This work consists of the file  siunitx.dtx
 %\end{itemize}
 % as these items are formally products, and the new option names
 % emphasise this.
+% 
+%\DescribeMacro{\si}
+% The \cs{si} function has been renamed as \cs{unit}, to make the
+% semantic meaning clearer.
 %
 %\section{Correct application of (SI) units}
 %
@@ -4252,7 +4257,7 @@ This work consists of the file  siunitx.dtx
 % a prefix as part of its name and symbol. Only single prefix may
 % be used, and so in the case of the kilogram prefix names are used
 % with the unit name \enquote{gram} and the prefix symbols are used with
-% the unit symbol \si{\gram}.  For example 
+% the unit symbol \unit{\gram}.  For example 
 % \( \SI[prefixes-as-symbols = false]{1}{\milli\gram} =
 % \SI{1}{\milli\gram} \).
 %
@@ -4277,7 +4282,7 @@ This work consists of the file  siunitx.dtx
 % There are also many areas where non-standard units are used so
 % commonly that to do otherwise is difficult or impossible.  For
 % example, most synthetic chemists measure the pressure inside vacuum
-% apparatus in \si{\mmHg}, partly because the most common gauge for
+% apparatus in \unit{\mmHg}, partly because the most common gauge for
 % the task still uses a column of mercury metal.  For these reasons,
 % \pkg{siunitx} does define non-SI units.
 %
@@ -4287,8 +4292,8 @@ This work consists of the file  siunitx.dtx
 % mathematical entity.  This has implications for how both the number
 % and the unit should be printed.  Firstly, the two parts should not
 % be separated: a quantity is a product of the number and the unit. 
-% With the exception of the symbols for plane angles (\si{\degree},
-% \si{\arcminute} and \si{\arcsecond}), the \textsc{bipm}
+% With the exception of the symbols for plane angles (\unit{\degree},
+% \unit{\arcminute} and \unit{\arcsecond}), the \textsc{bipm}
 % specifies either a space or half-height (centred) dot should be 
 % used \cite{BIPM}. 
 %\begin{LaTeXdemo}
@@ -4317,15 +4322,15 @@ This work consists of the file  siunitx.dtx
 % indicated by means of either a half-height (that is, centred) dot
 % or a (thin) space. 
 %\begin{LaTeXdemo}
-%  \( \si{\metre\second} = \text{metre second} \) \\
-%  \( \si{\milli\second} = \text{millisecond}  \) \\
+%  \( \unit{\metre\second} = \text{metre second} \) \\
+%  \( \unit{\milli\second} = \text{millisecond}  \) \\
 %  \sisetup{inter-unit-product = { } \cdot { } }
-%  \( \si{\metre\second} = \text{metre second} \) \\
-%  \( \si{\milli\second} = \text{millisecond}  \)
+%  \( \unit{\metre\second} = \text{metre second} \) \\
+%  \( \unit{\milli\second} = \text{millisecond}  \)
 %\end{LaTeXdemo}
 % There are some circumstances under which it is common practice to omit
-% any spaces.  The classic example is \si{\kWh}, where
-% \enquote{\si[inter-unit-product = \,]{\kWh}} does not add any 
+% any spaces.  The classic example is \unit{\kWh}, where
+% \enquote{\unit[inter-unit-product = \,]{\kWh}} does not add any 
 % useful information. If using such a unit repeatedly, users of 
 % \pkg{siunitx} are advised to create a custom unit to ensure 
 % consistency. It is important to note that while this is common
@@ -4342,9 +4347,9 @@ This work consists of the file  siunitx.dtx
 % it correctly.  In complicated cases, negative exponents are to be
 % preferred over other formats.
 %\begin{LaTeXdemo}
-%  \si{\joule\per\mole\per\kelvin}\\
-%  \si[per-mode = fraction]{\joule\per\mole\per\kelvin}\\
-%  \si[per-mode = symbol]{\joule\per\mole\per\kelvin}
+%  \unit{\joule\per\mole\per\kelvin}\\
+%  \unit[per-mode = fraction]{\joule\per\mole\per\kelvin}\\
+%  \unit[per-mode = symbol]{\joule\per\mole\per\kelvin}
 %\end{LaTeXdemo}
 %
 % Products and errors should show what unit applies to each number
@@ -4395,7 +4400,7 @@ This work consists of the file  siunitx.dtx
 %    }
 %    \begin{tabular}{cS}
 %      \toprule
-%        Entry & {Length/\si{\metre}} \\
+%        Entry & {Length/\unit{\metre}} \\
 %      \midrule
 %        1 & 1.1234 \\
 %        2 & 1.1425 \\
@@ -4410,10 +4415,10 @@ This work consists of the file  siunitx.dtx
 %    \centering
 %    \begin{tikzpicture}
 %      \begin{axis}[
-%        xlabel = \( t/\si{\second} \),
+%        xlabel = \( t/\unit{\second} \),
 %        xmax   = 6,
 %        xmin   = 0,
-%        ylabel = \( d/\si{\metre}  \),
+%        ylabel = \( d/\unit{\metre}  \),
 %        ymin   = 0
 %      ]
 %        \addplot[smooth,mark=*]
@@ -4437,7 +4442,7 @@ This work consists of the file  siunitx.dtx
 % less desirable than adding a fixed exponent to column headers.  An
 % example is shown in \cref{tab:good}.  The use of \cs{multicolumn} is
 % needed here due to the \enquote{\texttt{<}}; without \cs{multicolumn}, 
-% the titles are followed by \enquote{\si{\kilo\gram}}!
+% the titles are followed by \enquote{\unit{\kilo\gram}}!
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
@@ -4451,7 +4456,7 @@ This work consists of the file  siunitx.dtx
 %        table-figures-decimal  = 3,
 %        table-figures-exponent = 1
 %      ]
-%      @{\,\si{\kilogram}}
+%      @{\,\unit{\kilogram}}
 %      S[
 %        table-figures-integer  = 2,
 %        table-figures-decimal  = 2
@@ -5383,7 +5388,6 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_detect_font_shape:}
@@ -9871,7 +9875,7 @@ This work consists of the file  siunitx.dtx
 % Unit macros and related support are created here. To avoid cluttering
 % up the user name-space with a lot of short macro names, the standard
 % method only makes these available inside the unit-processing functions
-% (\cs{SI}, \cs{si} and the \texttt{S} column).
+% (\cs{SI}, \cs{unit} and the \texttt{S} column).
 % 
 %\begin{macro}{\l_siunitx_declare_list_tl}
 % A list of all unit and related functions.
@@ -10182,7 +10186,7 @@ This work consists of the file  siunitx.dtx
 % There are a few unit names which may be defined by other parts of
 % \LaTeX. They need to be unexpandable, as in an \texttt{S} column
 % \TeX\ will look for \cs{omit} \emph{before} starting the internal
-% version of \cs{si} and doing a redefinition. The same is true 
+% version of \cs{unit} and doing a redefinition. The same is true 
 % for the \cs{color} function, which may well be the first thing in 
 % a table cell. The same is true for \cs{array@row@rst}, from REV\TeX,
 % which otherwise gives an error.
@@ -11272,7 +11276,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_unit_format_symbol_aux:}
 %\begin{macro}[aux]{\siunitx_unit_format_symbol_aux_alt:}
 % If there is no symbol, something is wrong! The only exception is
-% when the code is inside the \cs{si} function (or similar) and there
+% when the code is inside the \cs{unit} function (or similar) and there
 % is only a prefix with nothing else present at all.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_symbol: {
@@ -11409,7 +11413,7 @@ This work consists of the file  siunitx.dtx
 % 
 %\begin{macro}{\siunitx_unit_output:nn}
 %\begin{macro}{\siunitx_unit_output:Vn}
-% For typesetting a unit directly: used by \cs{si} and the \texttt{s}
+% For typesetting a unit directly: used by \cs{unit} and the \texttt{s}
 % column. The second argument is any options to set locally.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_output:nn #1#2 {
@@ -12298,7 +12302,7 @@ This work consists of the file  siunitx.dtx
 %
 % The easiest type of printing is the \texttt{s} column. Here, there is
 % no real problem with alignment. All that has to happen is to print the
-% collected input as the argument to the internal part of an \cs{si}
+% collected input as the argument to the internal part of an \cs{unit}
 % function.
 % 
 %\begin{macro}{\l_siunitx_table_unit_align_skip}
@@ -12335,7 +12339,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_print_s:}
 % Actually printing an \texttt{s} column is not very complex. There is
 % some spacing to do at each side, with the main part of the job being
-% to print the material using the internal version of \cs{si}.
+% to print the material using the internal version of \cs{unit}.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_s: { 
   \siunitx_table_align_left:n { \l_siunitx_table_unit_align_skip }
@@ -14020,25 +14024,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\si}
-% The \cs{si} macro needs to pass options through to the internal
-% function as well as setting them here. This is used so that options
-% set for a unit can be overridden on a one-off basis.
-%    \begin{macrocode}
-\NewDocumentCommand \unit { o m } {
-  \group_begin:
-    \IfNoValueTF {#1}
-      { \siunitx_unit_output:nn {#2} { } }
-      {
-        \keys_set:nn { siunitx } {#1}
-        \siunitx_unit_output:nn {#2} {#1}
-      }
-  \group_end:
-}
-\cs_new_eq:NN \si \unit
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\SIlist}
 %\begin{macro}{\SIrange}
 % Lists and range of values are handled in a very similar way.
@@ -14069,23 +14054,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%
-%\begin{macro}{\SI}
-% The main \cs{SI} function follows the same pattern as the previous
-% ones.
-%    \begin{macrocode}
-\NewDocumentCommand \SI { o m o m } {
-  \group_begin:
-    \IfNoValueTF {#1}
-      { \siunitx_combined:nnnn { } {#2} {#3} {#4} }
-      {
-        \keys_set:nn { siunitx } {#1}
-        \siunitx_combined:nnnn {#1} {#2} {#3} {#4}
-      }
-  \group_end:
-}
-%    \end{macrocode}
-%\end{macro}
 % 
 %\begin{macro}{\sisetup}
 % The set up macro simply moves to the correct path and executes 
@@ -14107,6 +14075,28 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nn \l_siunitx_table_collect_tl {#2}
   \siunitx_table_print_S:
 }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{
+%  \unit ,
+%  \si   ,
+%}
+% The \cs{unit} macro needs to pass options through to the internal
+% function as well as setting them here. This is used so that options
+% set for a unit can be overridden on a one-off basis.
+%    \begin{macrocode}
+\NewDocumentCommand \unit { o m } {
+  \group_begin:
+    \IfNoValueTF {#1}
+      { \siunitx_unit_output:nn {#2} { } }
+      {
+        \keys_set:nn { siunitx } {#1}
+        \siunitx_unit_output:nn {#2} {#1}
+      }
+  \group_end:
+}
+\cs_new_eq:NN \si \unit
 %    \end{macrocode}
 %\end{macro}
 %
@@ -14162,6 +14152,7 @@ This work consists of the file  siunitx.dtx
   \cs_set_eq:NN \si       \siunitx_bookmark_si:w
   \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
   \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
+  \cs_set_eq:NN \unit     \siunitx_bookmark_unit:w
   \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
   \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
   \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
@@ -14174,7 +14165,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %\begin{macro}{\siunitx_bookmark_num:w}
 %\begin{macro}{\siunitx_bookmark_numrange:w}
-%\begin{macro}{\siunitx_bookmark_si:w}
+%\begin{macro}{\siunitx_bookmark_unit:w}
 %\begin{macro}{\siunitx_bookmark_SI:w}
 %\begin{macro}{\siunitx_bookmark_SIrange:w}
 % To keep things fast, expandable versions of the document commands
@@ -14184,7 +14175,7 @@ This work consists of the file  siunitx.dtx
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m } 
   { #2 \l_siunitx_range_phrase_tl #3 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_si:w { o m } {#2}
+\DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
   { \IfNoValueF {#3} {#3} #2 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SIrange:w
