@@ -1666,6 +1666,8 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{round-mode}
 %\DescribeOption{round-precision}
+%\changes{v2.1n}{2011/03/31}{Set output to 0 when \opt{round-mode}
+%  is \opt{figures} and \opt{round-precision} is 0}
 % The \pkg{siunitx} package can round numerical input to a fixed
 % number of significant figures or decimal places. This is controlled by
 % the \opt{round-mode} option, which takes the choices \opt{off},
@@ -6953,8 +6955,17 @@ This work consists of the file  siunitx.dtx
 % reconstruction of the number.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_figures:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
-    { \siunitx_number_process_figures_aux:n {#1} }
+  \int_compare:nNnTF { \l_siunitx_process_precision_int } > { 0 }
+    {
+      \prop_if_in:NnT \l_siunitx_number_in_prop {#1} 
+        { \siunitx_number_process_figures_aux:n {#1} }
+    }
+    {
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
+      \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
+    }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_process_figures_aux:n #1 {
   \siunitx_number_process_figures_init:n {#1}
