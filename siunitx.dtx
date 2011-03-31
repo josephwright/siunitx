@@ -299,6 +299,8 @@ This work consists of the file  siunitx.dtx
 %          per,
 %          percent,
 %          protected,
+%          quantlist,
+%          quantrange,
 %          radian,
 %          raiseto,
 %          robustify,
@@ -308,8 +310,6 @@ This work consists of the file  siunitx.dtx
 %          SendSettingsToPgf,
 %          SI,
 %          sievert,
-%          SIlist,
-%          SIrange,
 %          sisetup,
 %          SIUnitSymbolDegree,
 %          square,
@@ -576,8 +576,8 @@ This work consists of the file  siunitx.dtx
 %  \item \cs{SI}\oarg{options}\marg{number}\oarg{pre-unit}\marg{unit}
 %  \item \cs{numlist}\oarg{options}\marg{numbers}
 %  \item \cs{numrange}\oarg{options}\marg{numbers}\marg{number2}
-%  \item \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
-%  \item \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}^^A
+%  \item \cs{quantlist}\oarg{options}\marg{numbers}\marg{unit}
+%  \item \cs{quantrange}\oarg{options}\marg{number1}\marg{number2}^^A
 %    \marg{unit}
 %  \item \cs{sisetup}\marg{options}
 %  \item \cs{tablenum}\oarg{options}\marg{number}
@@ -611,9 +611,9 @@ This work consists of the file  siunitx.dtx
 % Simple lists and ranges of numbers can be handled.
 %\begin{LaTeXdemo}
 %  \numlist{10;20;30}                    \\
-%  \SIlist{0.13;0.67;0.80}{\milli\metre} \\
+%  \quantlist{0.13;0.67;0.80}{\milli\metre} \\
 %  \numrange{10}{20}                     \\
-%  \SIrange{0.13}{0.67}{\milli\metre}
+%  \quantrange{0.13}{0.67}{\milli\metre}
 %\end{LaTeXdemo}
 % 
 % By default, all text is typeset in the current upright, serif math
@@ -783,28 +783,32 @@ This work consists of the file  siunitx.dtx
 % Full details of using \enquote{stand alone} units are found in 
 % \cref{sec:units:creating}.
 % 
-%\DescribeMacro{\SIlist}
+%\DescribeMacro{\quantlist}
+%\changes{v2.2}{2011/03/31}{Renamed \cs{SIlist} to \cs{quantlist}:
+%  old name depreciated but still available}
 %\begin{syntax}
-%  \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit} 
+%  \cs{quantlist}\oarg{options}\marg{numbers}\marg{unit} 
 %\end{syntax}
-% Lists of numbers with units can be handled using the \cs{SIlist}
+% Lists of numbers with units can be handled using the \cs{quantlist}
 % function. The behaviour of this function is similar to \cs{numlist},
 % but with the addition of a unit to each number.  This function should
 % be used in text mode.
 %\begin{LaTeXdemo}
-%  \SIlist{10;30;45}{\metre}
+%  \quant{10;30;45}{\metre}
 %\end{LaTeXdemo}
 % 
-%\DescribeMacro{\SIrange}
+%\DescribeMacro{\quantrange}
+%\changes{v2.2}{2011/03/31}{Renamed \cs{SIrange} to \cs{quantrange}:
+%  old name depreciated but still available}
 %\begin{syntax}
-%  \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit} 
+%  \cs{quantrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit} 
 %\end{syntax}
-% Ranges of numbers with units can be handled using the \cs{SIrange}
+% Ranges of numbers with units can be handled using the \cs{quantrange}
 % function. The behaviour of this function is similar to \cs{numrange},
 % but with the addition of a unit to each number.  This function should
 % be used in text mode.
 %\begin{LaTeXdemo}
-%  \SIrange{10}{30}{\metre}
+%  \quantrange{10}{30}{\metre}
 %\end{LaTeXdemo}
 %
 %\subsection{The unit macros}
@@ -2801,24 +2805,24 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{list-units}
 %\DescribeOption{range-units}
 % The \opt{list-units} and \opt{range-units} options determines how 
-% the \cs{SIlist} and\cs{SIrange} function displays units, respectively.
-% The standard setting for both is \opt{repeat}, where each number will
-% be printed with a unit. Alternatives are \opt{brackets} and 
-% \opt{single}. Any brackets needed on individual numbers within a 
-% product are controlled by the \opt{brackets-numbers} option
-% (\emph{i.e}.~they are treated as pure numbers).
+% the \cs{quantlist} and\cs{quantrange} function displays units,
+% respectively. The standard setting for both is \opt{repeat}, where
+% each number will be printed with a unit. Alternatives are 
+% \opt{brackets} and \opt{single}. Any brackets needed on individual
+% numbers within a product are controlled by the \opt{brackets-numbers}
+% option (\emph{i.e}.~they are treated as pure numbers).
 % These options do not affect the application of brackets for each
 % number within the list or range: they only sets those around the
 % entire group.
 %\begin{LaTeXdemo}
-%  \SIlist{2;4;6;8}{\tesla} \\ 
-%  \SIlist[list-units = brackets]{2;4;6;8}{\tesla} \\
-%  \SIlist[list-units = repeat]{2;4;6;8}{\tesla} \\
-%  \SIlist[list-units = single]{2;4;6;8}{\tesla} \\
-%  \SIrange{2}{4}{\degreeCelsius} \\ 
-%  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
-%  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
-%  \SIrange[range-units = single]{2}{4}{\degreeCelsius}
+%  \quantlist{2;4;6;8}{\tesla} \\ 
+%  \quantlist[list-units = brackets]{2;4;6;8}{\tesla} \\
+%  \quantlist[list-units = repeat]{2;4;6;8}{\tesla} \\
+%  \quantlist[list-units = single]{2;4;6;8}{\tesla} \\
+%  \quantrange{2}{4}{\degreeCelsius} \\ 
+%  \quantrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
+%  \quantrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
+%  \quantrange[range-units = single]{2}{4}{\degreeCelsius}
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -3536,14 +3540,14 @@ This work consists of the file  siunitx.dtx
 % \pkg{babel} package:
 %\begin{LaTeXdemo}
 %  % In English by default
-%  \SIlist{1;2;3}{\metre} \\
-%  \SIrange{1}{10}{\degreeCelsius} \\
+%  \quantlist{1;2;3}{\metre} \\
+%  \quantrange{1}{10}{\degreeCelsius} \\
 %  \selectlanguage{french}%
-%  \SIlist{1;2;3}{\metre} \\
-%  \SIrange{1}{10}{\degreeCelsius} \\
+%  \quantlist{1;2;3}{\metre} \\
+%  \quantrange{1}{10}{\degreeCelsius} \\
 %  \selectlanguage{german}%
-%  \SIlist{1;2;3}{\metre} \\
-%  \SIrange{1}{10}{\degreeCelsius} \\
+%  \quantlist{1;2;3}{\metre} \\
+%  \quantrange{1}{10}{\degreeCelsius} \\
 %\end{LaTeXdemo} 
 % 
 %\section{Hints for using \pkg{siunitx}}   
@@ -14024,14 +14028,18 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\SIlist}
-%\begin{macro}{\SIrange}
+%\begin{macro}{
+%  \quantlist  ,
+%  \quantrange ,
+%  \SIlist     ,
+%  \SIrange    ,
+%}
 % Lists and range of values are handled in a very similar way.
 % Everything is kept relatively simple, and so there is not too much
 % complexity. In theory the two could be combined together, but 
 % the differences between the two make this less desirable.
 %    \begin{macrocode}
-\NewDocumentCommand \SIlist { o > { \SplitList { ; } } m m } {
+\NewDocumentCommand \quantlist { o > { \SplitList { ; } } m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_list_units:nnn {#2} {#3} { }  }
@@ -14041,7 +14049,7 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\NewDocumentCommand \SIrange { o m m m } {
+\NewDocumentCommand \quantrange { o m m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_range_unit:nnnn {#4} { } {#2} {#3} }
@@ -14051,8 +14059,9 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
+\cs_new_eq:NN \SIlist  \quantlist
+\cs_new_eq:NN \SIrange \quantrange
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 % 
 %\begin{macro}{\sisetup}
@@ -14147,12 +14156,13 @@ This work consists of the file  siunitx.dtx
     \siunitx_unit_print_literal_aux:N
   \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command } 
     { none }
-  \cs_set_eq:NN \num      \siunitx_bookmark_num:w
-  \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
-  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
-  \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
-  \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
-  \cs_set_eq:NN \unit     \siunitx_bookmark_unit:w
+  \cs_set_eq:NN \num        \siunitx_bookmark_num:w
+  \cs_set_eq:NN \numrange   \siunitx_bookmark_numrange:w
+  \cs_set_eq:NN \quantrange \siunitx_bookmark_quantrange:w
+  \cs_set_eq:NN \si         \siunitx_bookmark_si:w
+  \cs_set_eq:NN \SI         \siunitx_bookmark_SI:w
+  \cs_set_eq:NN \SIrange    \siunitx_bookmark_quantrange:w
+  \cs_set_eq:NN \unit       \siunitx_bookmark_unit:w
   \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
   \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
   \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
@@ -14163,11 +14173,14 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro} 
-%\begin{macro}{\siunitx_bookmark_num:w}
-%\begin{macro}{\siunitx_bookmark_numrange:w}
-%\begin{macro}{\siunitx_bookmark_unit:w}
-%\begin{macro}{\siunitx_bookmark_SI:w}
-%\begin{macro}{\siunitx_bookmark_SIrange:w}
+%
+%\begin{macro}{
+%  \siunitx_bookmark_num:w        ,
+%  \siunitx_bookmark_numrange:w   ,
+%  \siunitx_bookmark_SI:w         ,
+%  \siunitx_bookmark_quantrange:w ,
+%  \siunitx_bookmark_unit:w       ,
+%}
 % To keep things fast, expandable versions of the document commands
 % are created only once. These are then used if necessary to remove
 % and re-order arguments in an expandable fashion.
@@ -14175,16 +14188,12 @@ This work consists of the file  siunitx.dtx
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m } 
   { #2 \l_siunitx_range_phrase_tl #3 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
   { \IfNoValueF {#3} {#3} #2 ~ #4 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_SIrange:w
+\DeclareExpandableDocumentCommand \siunitx_bookmark_quantrange:w
   { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 % A short check to get things working.
