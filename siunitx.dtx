@@ -14207,13 +14207,15 @@ This work consists of the file  siunitx.dtx
     \siunitx_unit_print_literal_aux:N
   \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command } 
     { none }
-  \cs_set_eq:NN \num        \siunitx_bookmark_num:w
-  \cs_set_eq:NN \numrange   \siunitx_bookmark_numrange:w
+  \cs_set_eq:NN \num      \siunitx_bookmark_num:w
+  \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
+  \cs_set_eq:NN \qty      \siunitx_bookmark_qty:w
+  \cs_set_eq:NN \qtylist  \siunitx_bookmark_qtylist:w
   \cs_set_eq:NN \qtyrange \siunitx_bookmark_qtyrange:w
-  \cs_set_eq:NN \si         \siunitx_bookmark_si:w
-  \cs_set_eq:NN \SI         \siunitx_bookmark_SI:w
-  \cs_set_eq:NN \SIrange    \siunitx_bookmark_qtyrange:w
-  \cs_set_eq:NN \unit       \siunitx_bookmark_unit:w
+  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+  \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
+  \cs_set_eq:NN \SIrange  \siunitx_bookmark_qtyrange:w
+  \cs_set_eq:NN \unit     \siunitx_bookmark_unit:w
   \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
   \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
   \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
@@ -14242,12 +14244,38 @@ This work consists of the file  siunitx.dtx
   { #2 \l_siunitx_range_phrase_tl #3 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_qty:w { o m m } 
   { #2 ~ #3 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_qtylist:w
+  { o m m } { \siunitx_bookmark_qtylist_map:nn {#1} {#2} }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_qtyrange:w
   { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
   { \IfNoValueF {#3} {#3} #2 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_bookmark_qtylist_map:nn}
+%\begin{macro}[aux]{\siunitx_bookmark_qtylist_map_aux:nw}
+% An expandable mapping to replace the list separator in the
+% input by appropriate output version.
+%    \begin{macrocode}
+\cs_new:Npn \siunitx_bookmark_qtylist_map:nn #1#2 {
+  \siunitx_bookmark_qtylist_map_aux:nw {#2} #1 ; \q_recursion_tail ;
+    \q_recursion_tail ; \q_recursion_stop
+}
+\cs_new:Npn \siunitx_bookmark_qtylist_map_aux:nw #1#2 ; #3 ; #4 {
+  #2 ~ #1
+  \quark_if_recursion_tail_stop:n {#3}
+  \quark_if_recursion_tail_stop_do:nn {#4}
+    {
+      \l_siunitx_list_separator_final_tl
+      #3 ~ #1
+    }
+  \l_siunitx_list_separator_tl
+  \siunitx_bookmark_qtylist_map_aux:nw {#1} #3 ; #4
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 % A short check to get things working.
