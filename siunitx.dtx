@@ -5434,25 +5434,26 @@ This work consists of the file  siunitx.dtx
 % by name, based on output type (\texttt{unit} or \texttt{value}) and
 % the family selected by the detector.
 % 
-%\begin{macro}{\l_siunitx_number_math_mode_bool}
-%\begin{macro}{\l_siunitx_unit_math_mode_bool}
+%\begin{macro}{
+%  \l_siunitx_number_math_mode_bool ,
+%  \l_siunitx_unit_math_mode_bool   ,
+%}
 % Most of the variables are created by the keys system: these are not.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_number_math_mode_bool
 \bool_new:N \l_siunitx_unit_math_mode_bool
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\l_siunitx_number_color_tl}
-%\begin{macro}{\siunitx_number_mathrm:n}
-%\begin{macro}{\siunitx_number_mathsf:n}
-%\begin{macro}{\siunitx_number_mathtt:n}
-%\begin{macro}{\siunitx_number_textrm:}
-%\begin{macro}{\siunitx_number_textsf:}
-%\begin{macro}{\siunitx_number_texttt:}
-% The settings are actually created separately for numbers and units:
-% numbers first.
+%\begin{macro}{
+%  \siunitx_number_mathrm:n ,
+%  \siunitx_number_mathsf:n ,
+%  \siunitx_number_mathtt:n ,
+%  \siunitx_number_textrm:  ,
+%  \siunitx_number_textsf:  ,
+%  \siunitx_number_texttt:  ,
+%}
+% Functions for number-mode fonts.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_mathrm:n #1 { }
 \cs_new:Npn \siunitx_number_mathsf:n #1 { }
@@ -5460,6 +5461,13 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_number_textrm: { }
 \cs_new_nopar:Npn \siunitx_number_textsf: { }
 \cs_new_nopar:Npn \siunitx_number_texttt: { }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_number_color_tl}
+% The settings are actually created separately for numbers and units:
+% numbers first.
+%    \begin{macrocode}
 \keys_define:nn { siunitx } {
   number-color  .tl_set:N    = \l_siunitx_number_color_tl,
   number-math-rm .code:n  =
@@ -5482,21 +5490,16 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}  
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%    
-%\begin{macro}{\l_siunitx_unit_color_tl}
-%\begin{macro}{\siunitx_unit_mathrm:n}
-%\begin{macro}{\siunitx_unit_mathsf:n}
-%\begin{macro}{\siunitx_unit_mathtt:n}
-%\begin{macro}{\siunitx_unit_textrm:}
-%\begin{macro}{\siunitx_unit_textsf:}
-%\begin{macro}{\siunitx_unit_texttt:}
-% Units look exactly the same. 
+%
+%\begin{macro}{
+%  \siunitx_unit_mathrm:n ,
+%  \siunitx_unit_mathsf:n ,
+%  \siunitx_unit_mathtt:n ,
+%  \siunitx_unit_textrm:  , 
+%  \siunitx_unit_textsf:  ,
+%  \siunitx_unit_texttt:  ,
+%}
+% The same storage for unit-mode fonts.
 %    \begin{macrocode}
 \cs_new_nopar:Npn \siunitx_unit_mathrm: { }
 \cs_new_nopar:Npn \siunitx_unit_mathsf: { }
@@ -5504,6 +5507,12 @@ This work consists of the file  siunitx.dtx
 \cs_new_nopar:Npn \siunitx_unit_textrm: { }
 \cs_new_nopar:Npn \siunitx_unit_textsf: { }
 \cs_new_nopar:Npn \siunitx_unit_texttt: { }
+%    \end{macrocode}
+%\end{macro}
+%    
+%\begin{macro}{\l_siunitx_unit_color_tl}
+% Units look exactly the same. 
+%    \begin{macrocode}
 \keys_define:nn { siunitx } {
   unit-color  .tl_set:N  = \l_siunitx_unit_color_tl,
   unit-math-rm .code:n =
@@ -5525,12 +5534,6 @@ This work consists of the file  siunitx.dtx
     { \cs_set_nopar:Npn \siunitx_unit_texttt: {#1} }
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}  
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 % The general settings are all meta-keys. A few initial values are set
@@ -5642,8 +5645,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_print:nn}
-%\begin{macro}{\siunitx_print:nV}
+%\begin{macro}{
+%  \siunitx_print:nn ,
+%  \siunitx_print:nV ,
+%}
+%\begin{macro}[aux]{\siunitx_print_aux:}
 % The main printing function does everything inside a group, as 
 % there are category code and definition changes to make. First, set
 % the fonts.  Then move on to printing mode, before moving to actual
@@ -5665,9 +5671,6 @@ This work consists of the file  siunitx.dtx
 }
 \cs_generate_variant:Nn \siunitx_print:nn { nV }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_print_aux:}
 % The various font changes are set up, then the correct printing
 % function is called. Everything is inside \cs{text} as this allows 
 % proper setting of the various mode settings.
@@ -5689,6 +5692,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_print_color:}
@@ -5712,8 +5716,10 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_print_math:}
-%\begin{macro}{\siunitx_print_text:}
+%\begin{macro}{
+%  \siunitx_print_math: ,
+%  \siunitx_print_text: ,
+%}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses "_" and
 % "^" to represent sub- and superscripts, respectively. In this way, 
@@ -5753,11 +5759,12 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\siunitx_print_text_sub:n}
+%\begin{macro}{
+%  \siunitx_print_text_sub:n   ,
+%  \siunitx_print_text_super:n ,
+%}
 %\begin{macro}[aux]{\siunitx_print_text_sub_super:n}
-%\begin{macro}{\siunitx_print_text_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
 % the appearance is the same as math mode. As "_" is a letter, there
 % is the need to do a category-code juggle. The search and replace 
@@ -5801,7 +5808,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
-%\end{macro}
 %
 %\subsection{Pre-processing numbers}
 %
@@ -5826,8 +5832,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_number_arg_tl}
-%\begin{macro}{\l_siunitx_number_next_tl}
+%\begin{macro}{
+%  \l_siunitx_number_arg_tl  ,
+%  \l_siunitx_number_next_tl ,
+%}
 % Storage for the pre-parsed material.  The \texttt{arg} variable 
 % contains the current argument, the \texttt{next} variable contains
 % anything held-over for the next round.
@@ -5835,7 +5843,6 @@ This work consists of the file  siunitx.dtx
 \tl_new:N \l_siunitx_number_arg_tl
 \tl_new:N \l_siunitx_number_next_tl
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\l_siunitx_number_multi_tl}
@@ -5845,18 +5852,21 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_number_denominator_tl}
-%\begin{macro}{\l_siunitx_number_numerator_tl}
+%\begin{macro}{
+%  \l_siunitx_number_denominator_tl ,
+%  \l_siunitx_number_numerator_tl   ,
+%}
 % When searching for quotients, some more storage is needed.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_number_denominator_tl
 \tl_new:N \l_siunitx_number_numerator_tl
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\siunitx_number_preprocess:n}
-%\begin{macro}{\siunitx_number_preprocess:V}
+%\begin{macro}{
+%  \siunitx_number_preprocess:n ,
+%  \siunitx_number_preprocess:V ,
+%}
 % The pre-processor starts with the obvious: the most likely outcome is
 % that all of the argument is passed through unchanged.
 %    \begin{macrocode}
@@ -5869,7 +5879,6 @@ This work consists of the file  siunitx.dtx
 }
 \cs_generate_variant:Nn \siunitx_number_preprocess:n { V }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_preprocess_init:}
@@ -15451,26 +15460,24 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %    
-%\begin{macro}{\newunit}
-%\begin{macro}{\renewunit}
-%\begin{macro}{\provideunit}
+%\begin{macro}{
+%  \newunit     ,
+%  \renewunit   ,
+%  \provideunit ,
+%}
 % The functions for creating units from version one are easy to create.
 %    \begin{macrocode}
-\NewDocumentCommand \newunit { o m m } {
-  \IfNoValueTF {#1}
-    { \siunitx_declare_unit:Nnn #2 {#3} { } }
-    { \siunitx_declare_unit:Nnn #2 {#3} {#1} }
-}
-\cs_new_eq:NN \renewunit   \newunit
-\cs_new_eq:NN \provideunit \newunit
+\cs_new_eq:NN \newunit     \DeclareSIUnit
+\cs_new_eq:NN \renewunit   \DeclareSIUnit
+\cs_new_eq:NN \provideunit \DeclareSIUnit
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}   
 %
-%\begin{macro}{\newpower}
-%\begin{macro}{\renewpower}
-%\begin{macro}{\providepower}
+%\begin{macro}{
+%  \newpower     ,
+%  \renewpower   ,
+%  \providepower ,
+%}
 % Slightly more complex: an optional argument to check. A simple 
 % assumption is made that it will be \texttt{post}: anything else
 % would not make sense anyway.
@@ -15491,13 +15498,13 @@ This work consists of the file  siunitx.dtx
     { \DeclareSIPostPower #2 {#3} }
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro} 
 %
-%\begin{macro}{\newprefix}
-%\begin{macro}{\renewprefix}
-%\begin{macro}{\provideprefix}
+%\begin{macro}{
+%  \newprefix     ,
+%  \renewprefix   ,
+%  \provideprefix ,
+%}
 % Slightly more complex: an optional argument to check. A simple 
 % assumption is made that it will be \texttt{post}: anything else
 % would not make sense anyway.
@@ -15518,13 +15525,13 @@ This work consists of the file  siunitx.dtx
     { \DeclareBinaryPrefix #2 {#3} {#4} }
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}  
 %
-%\begin{macro}{\newqualifier}
-%\begin{macro}{\renewqualifier}
-%\begin{macro}{\providequalifier}
+%\begin{macro}{
+%  \newqualifier     ,
+%  \renewqualifier   ,
+%  \providequalifier ,
+%}
 % The functions for creating qualifiers are easy to create again.
 %    \begin{macrocode}
 \NewDocumentCommand \newqualifier { m m } {
@@ -15533,12 +15540,12 @@ This work consists of the file  siunitx.dtx
 \cs_new_eq:NN \renewqualifier   \newqualifier
 \cs_new_eq:NN \providequalifier \newqualifier
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro} 
 %
-%\begin{macro}{\Square}
-%\begin{macro}{\ssquare}
+%\begin{macro}{
+%  \Square  ,
+%  \ssquare ,
+%}
 % In version 1, \cs{square} is not used with these two alternatives
 % preferred.
 %    \begin{macrocode}
@@ -15546,14 +15553,15 @@ This work consists of the file  siunitx.dtx
 \DeclareSIPrePower \ssquare { 2 }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\BAR}
-%\begin{macro}{\bbar}
-%\begin{macro}{\Day}
-%\begin{macro}{\dday}
-%\begin{macro}{\Gray}
-%\begin{macro}{\ggray}
+%\begin{macro}{
+%  \BAR   ,
+%  \bbar  ,
+%  \Day   ,
+%  \dday  ,
+%  \Gray  ,
+%  \ggray ,
+%}
 % Units which are given awkward names in version one.
 %    \begin{macrocode}
 \DeclareSIUnit \BAR   { \bar }
@@ -15564,13 +15572,12 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \ggray { \gray }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\atomicmass}
+%\begin{macro}{
+%  \atomicmass ,
+%  \arcmin     ,
+%  \arcsec     ,
+%}
 % Slightly different: given more complete names in version two.
 %    \begin{macrocode}
 \DeclareSIUnit \atomicmass { \atomicmassunit }
@@ -15579,13 +15586,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\are}
-%\begin{macro}{\curie}
-%\begin{macro}{\gal}
-%\begin{macro}{\millibar}
-%\begin{macro}{\rad}
-%\begin{macro}{\rem}
-%\begin{macro}{\roentgen}
+%\begin{macro}{
+%  \are      ,
+%  \curie    ,
+%  \gal      ,
+%  \millibar ,
+%  \rad      ,
+%  \rem      ,
+%  \roentgen ,
+%}
 % Units which were defined in version one but are no longer listed
 % by the \textsc{bipm} as acceptable.
 %    \begin{macrocode}
@@ -15598,26 +15607,22 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \roentgen { R }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\micA}
-%\begin{macro}{\micmol}
-%\begin{macro}{\micl}
-%\begin{macro}{\micL}
-%\begin{macro}{\nanog}
-%\begin{macro}{\micg}
-%\begin{macro}{\picm}
-%\begin{macro}{\micm}
-%\begin{macro}{\Sec}
-%\begin{macro}{\mics}
-%\begin{macro}{\cmc}
-%\begin{macro}{\dmc}
-%\begin{macro}{\cms}
+%\begin{macro}{
+%  \micA   ,
+%  \micmol ,
+%  \micl   ,
+%  \micL   ,
+%  \nanog  ,
+%  \micg   ,
+%  \picm   ,
+%  \micm   ,
+%  \Sec    ,
+%  \mics   ,
+%  \cmc    ,
+%  \dmc    ,
+%  \cms    ,
+%}
 % A few abbreviations which have been renamed.
 %    \begin{macrocode}
 \DeclareSIUnit \micA   { \micro \ampere }
@@ -15635,26 +15640,16 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \cms    { \centi \metre \squared }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\centimetrecubed}
-%\begin{macro}{\centimetresquared}
-%\begin{macro}{\cubiccentimetre}
-%\begin{macro}{\cubicdecimetre}
-%\begin{macro}{\squarecentimetre}
-%\begin{macro}{\squaremetre}
-%\begin{macro}{\squarekilometre}
+%\begin{macro}{
+%  \centimetrecubed   ,
+%  \centimetresquared ,
+%  \cubiccentimetre   ,
+%  \cubicdecimetre    ,
+%  \squarecentimetre  ,
+%  \squaremetre       ,
+%  \squarekilometre   ,
+%}
 % Units from version one that did not seem like a good idea to retain.
 %    \begin{macrocode}
 \DeclareSIUnit \centimetrecubed   { \centi \metre \cubed }
@@ -15666,26 +15661,23 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \squarekilometre   { \kilo \metre \squared }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\parsec}
-%\begin{macro}{\lightyear}
+%\begin{macro}{
+%  \parsec    ,
+%  \lightyear ,
+%}
 % A few units for astronomy that version 1 provided.
 %    \begin{macrocode}
 \DeclareSIUnit \parsec    { pc }
 \DeclareSIUnit \lightyear { ly }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
 %    
-%\begin{macro}{\gmol}
-%\begin{macro}{\kgmol}
-%\begin{macro}{\lbmol}
+%\begin{macro}{
+%  \gmol  ,
+%  \kgmol ,
+%  \lbmol ,
+%}
 % Slightly odd chemical engineering units, again provided in version 1.
 %    \begin{macrocode}
 \DeclareSIUnit \gmol  { g  \text { - } mol }
@@ -15693,12 +15685,12 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \lbmol { lb \text { - } mol }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
 %
-%\begin{macro}{\molar}
-%\begin{macro}{\Molar}
-%\begin{macro}{\torr}
+%\begin{macro}{
+%  \molar ,
+%  \Molar ,
+%  \torr  ,
+%}
 % A few common units for chemistry from version 1. \cs{molar} is 
 % simply a handy abbreviation: \cs{Molar} is common but rather 
 % questionable.
@@ -15707,8 +15699,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \Molar { \textsc { m } }
 \DeclareSIUnit \torr  { Torr }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %    
 %\begin{macro}{\gon}
@@ -15725,22 +15715,23 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\micron}
-%\begin{macro}{\mrad}
-%\begin{macro}{\gauss}
-%\begin{macro}{\eVperc}
-%\begin{macro}{\nanobarn}
-%\begin{macro}{\picobarn}
-%\begin{macro}{\femptobarn}
-%\begin{macro}{\attobarn}
-%\begin{macro}{\zeptobarn}
-%\begin{macro}{\yoctobarn}
-%\begin{macro}{\nb}
-%\begin{macro}{\pb}
-%\begin{macro}{\fb}
-%\begin{macro}{\ab}
-%\begin{macro}{\zb}
-%\begin{macro}{\yb}
+%\begin{macro}{
+%  \micron     ,
+%  \mrad       , 
+%  \gauss      ,
+%  \eVperc     ,
+%  \nanobarn   ,
+%  \picobarn   ,
+%  \femptobarn ,
+%  \attobarn   ,
+%  \zeptobarn  ,
+%  \yoctobarn  ,
+%  \nb         ,
+%  \pb         ,
+%  \fb         ,
+%  \ab         ,
+%  \zb         ,
+%}
 % High-energy physics units from version one.
 %    \begin{macrocode}
 \DeclareSIUnit \micron    { \micro \metre }
@@ -15761,24 +15752,9 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \yb        { \yocto \barn }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %  
 %\begin{macro}{\requiresiconfigs}
-%\begin{macro}{\siunitx_requireconfig:n}
+%\begin{macro}[aux]{\siunitx_requireconfig:n}
 % Version one provides this, and it might pop up so should not 
 % cause errors.
 %    \begin{macrocode}
@@ -15814,12 +15790,14 @@ This work consists of the file  siunitx.dtx
 % into related groups, mainly to avoid an overly long list in one
 % place.
 %
-%\begin{macro}{\A}
-%\begin{macro}{\pA}
-%\begin{macro}{\nA}
-%\begin{macro}{\uA}
-%\begin{macro}{\mA}
-%\begin{macro}{\kA}
+%\begin{macro}{
+%  \A  ,
+%  \pA ,
+%  \nA ,
+%  \uA ,
+%  \mA ,
+%  \kA ,
+%}
 % Currents.
 %    \begin{macrocode}
 \DeclareSIUnit \A  {        \ampere }
@@ -15830,17 +15808,14 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \kA { \kilo  \ampere }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\Hz}
-%\begin{macro}{\mHz}
-%\begin{macro}{\kHz}
-%\begin{macro}{\MHz}
-%\begin{macro}{\GHz}
-%\begin{macro}{\THz}
+%\begin{macro}{
+%  \Hz  ,
+%  \mHz ,
+%  \kHz ,
+%  \MHz ,
+%  \GHz ,
+%  \THz ,
+%}
 % Then frequencies.
 %    \begin{macrocode}
 \DeclareSIUnit \Hz  {        \hertz }
@@ -15851,18 +15826,15 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \THz { \tera  \hertz }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\mol}
-%\begin{macro}{\fmol}
-%\begin{macro}{\pmol}
-%\begin{macro}{\nmol}
-%\begin{macro}{\umol}
-%\begin{macro}{\mmol}
-%\begin{macro}{\kmol}
+%\begin{macro}{
+%  \mol  ,
+%  \fmol ,
+%  \pmol ,
+%  \nmol ,
+%  \umol ,
+%  \mmol ,
+%  \kmol ,
+%}
 % Amounts of substance (moles).
 %    \begin{macrocode}
 \DeclareSIUnit \mol  {        \mole }
@@ -15874,15 +15846,11 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \kmol { \kilo  \mole }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\V}
-%\begin{macro}{\mV}
-%\begin{macro}{\kV}
+%\begin{macro}{
+%  \V  ,
+%  \mV ,
+%  \kV ,
+%}
 % Potentials.
 %    \begin{macrocode}
 \DeclareSIUnit \V  {        \volt }
@@ -15890,14 +15858,14 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \kV { \kilo  \volt }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\l}
-%\begin{macro}{\ml}
-%\begin{macro}{\ul}
-%\begin{macro}{\L}
-%\begin{macro}{\mL}
-%\begin{macro}{\uL}
+%\begin{macro}{
+%  \l  ,
+%  \ml ,
+%  \ul ,
+%  \L  ,
+%  \mL ,
+%  \uL ,
+%}
 % Volumes.
 %    \begin{macrocode}
 \DeclareSIUnit \l  {        \litre }
@@ -15908,19 +15876,16 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \uL { \micro \liter }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\fg}
-%\begin{macro}{\pg}
-%\begin{macro}{\ng}
-%\begin{macro}{\ug}
-%\begin{macro}{\mg}
-%\begin{macro}{\g}
-%\begin{macro}{\kg}
-%\begin{macro}{\amu}
+%\begin{macro}{
+%  \fg  ,
+%  \pg  ,
+%  \ng  ,
+%  \ug  ,
+%  \mg  ,
+%  \g   ,
+%  \kg  ,
+%  \amu ,
+%}
 % Masses.
 %    \begin{macrocode}
 \DeclareSIUnit \fg  { \femto \gram }
@@ -15933,27 +15898,22 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \amu { \atomicmassunit }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\W}
-%\begin{macro}{\mW}
-%\begin{macro}{\kW}
-%\begin{macro}{\MW}
-%\begin{macro}{\GW}
-%\begin{macro}{\kJ}
-%\begin{macro}{\J}
-%\begin{macro}{\eV}
-%\begin{macro}{\meV}
-%\begin{macro}{\keV}
-%\begin{macro}{\MeV}
-%\begin{macro}{\GeV}
-%\begin{macro}{\TeV}
-%\begin{macro}{\kWh}
+%\begin{macro}{
+%  \W   ,
+%  \mW  ,
+%  \kW  ,
+%  \MW  ,
+%  \GW  ,
+%  \kJ  , 
+%  \J   ,
+%  \eV  ,
+%  \meV ,
+%  \keV ,
+%  \MeV ,
+%  \GeV ,
+%  \TeV ,
+%  \kWh ,
+%}
 % Energies.
 %    \begin{macrocode}
 \DeclareSIUnit \W   {        \watt }
@@ -15972,27 +15932,16 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit [ inter-unit-product = ] \kWh { \kilo \watt \hour }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\m}
-%\begin{macro}{\pm}
-%\begin{macro}{\nm}
-%\begin{macro}{\um}
-%\begin{macro}{\mm}
-%\begin{macro}{\cm}
-%\begin{macro}{\dm}
-%\begin{macro}{\km}
+%\begin{macro}{
+%  \m  ,
+%  \pm ,
+%  \nm ,
+%  \um ,
+%  \mm ,
+%  \cm ,
+%  \dm ,
+%  \km ,
+%}
 % Lengths.
 %    \begin{macrocode}
 \DeclareSIUnit \m  {        \metre }
@@ -16005,23 +15954,18 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \km { \kilo  \metre }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\begin{macro}{\K}
 % Temperatures.
 %    \begin{macrocode}
 \DeclareSIUnit \K { \kelvin }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}{\N}
-%\begin{macro}{\mN}
-%\begin{macro}{\kN}
-%\begin{macro}{\MN}
+%\begin{macro}{
+%  \N  ,
+%  \mN ,
+%  \kN ,
+%  \MN ,
+%}
 % Forces.
 %    \begin{macrocode}
 \DeclareSIUnit \N  {        \newton } 
@@ -16030,13 +15974,12 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \MN { \mega  \newton }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\Pa}
-%\begin{macro}{\kPa}
-%\begin{macro}{\MPa}
-%\begin{macro}{\GPa}
+%\begin{macro}{
+%  \Pa  ,
+%  \kPa ,
+%  \MPa ,
+%  \GPa ,
+%}
 % Pressures.
 %    \begin{macrocode}
 \DeclareSIUnit \Pa  {        \pascal }
@@ -16045,12 +15988,11 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \GPa { \giga  \pascal }
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\mohm}
-%\begin{macro}{\kohm}
-%\begin{macro}{\Mohm}
+%\begin{macro}{
+%  \mohm ,
+%  \kohm ,
+%  \Mohm ,
+%}
 % Resistances.
 %    \begin{macrocode}
 \DeclareSIUnit \mohm { \milli \ohm }  
@@ -16058,15 +16000,15 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \Mohm { \mega  \ohm }  
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\s}
-%\begin{macro}{\as}
-%\begin{macro}{\fs}
-%\begin{macro}{\ps}
-%\begin{macro}{\ns}
-%\begin{macro}{\us}
-%\begin{macro}{\ms}
+%\begin{macro}{
+%  \s  ,
+%  \as ,
+%  \fs ,
+%  \ps ,
+%  \ns ,
+%  \us ,
+%  \ms ,
+%}
 % Finally, times.
 %    \begin{macrocode}
 \DeclareSIUnit \s  { \second }
@@ -16077,12 +16019,6 @@ This work consists of the file  siunitx.dtx
 \DeclareSIUnit \us { \micro \second }
 \DeclareSIUnit \ms { \milli \second }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 %    \begin{macrocode}
@@ -16100,14 +16036,16 @@ This work consists of the file  siunitx.dtx
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
-%\begin{macro}{\kibi}
-%\begin{macro}{\mebi}
-%\begin{macro}{\gibi}
-%\begin{macro}{\tebi}
-%\begin{macro}{\pebi}
-%\begin{macro}{\exbi}
-%\begin{macro}{\zebi}
-%\begin{macro}{\yobi}
+%\begin{macro}{
+%  \kibi ,
+%  \mebi ,
+%  \gibi ,
+%  \tebi ,
+%  \pebi ,
+%  \exbi ,
+%  \zebi ,
+%  \yobi ,
+%}
 % The binary units as specified by the IEC.
 %    \begin{macrocode}
 \DeclareBinaryPrefix \kibi { Ki } { 10 } 
@@ -16120,21 +16058,15 @@ This work consists of the file  siunitx.dtx
 \DeclareBinaryPrefix \yobi { Yi } { 80 } 
 %    \end{macrocode}
 %\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\bit}
-%\begin{macro}{\byte}
+%\begin{macro}{
+%  \bit  ,
+%  \byte ,
+%}
 % Now the units.
 %    \begin{macrocode}
 \DeclareSIUnit \bit  { bit }
 \DeclareSIUnit \byte { B }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro} 
 %
 %    \begin{macrocode}
