@@ -794,7 +794,7 @@ This work consists of the file  siunitx.dtx
 % but with the addition of a unit to each number.  This function should
 % be used in text mode.
 %\begin{LaTeXdemo}
-%  \quant{10;30;45}{\metre}
+%  \qtylist{10;30;45}{\metre}
 %\end{LaTeXdemo}
 % 
 %\DescribeMacro{\qtyrange}
@@ -11524,6 +11524,15 @@ This work consists of the file  siunitx.dtx
 % Numbers with units have to be formatted in a more complex way than
 % simply sticking the two together.
 % 
+%\begin{macro}{\l_siunitx_preunit_tl}
+% A pre-unit is optional, so can be handled using the setting system.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  preunit .tl_set:N = \l_siunitx_preunit_tl ,
+}
+%    \end{macrocode}
+%\end{macro}
+% 
 %\begin{macro}{\l_siunitx_pre_unit_tl}
 % When there is a pre-unit, it gets stored here.
 %    \begin{macrocode}
@@ -11538,22 +11547,32 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_combined:nnnn}
+%\begin{macro}{
+%  \siunitx_combined:nnn  ,
+%  \siunitx_combined:nnnn ,
+%}
 % Printing numbers and units means first processing the units, then 
 % handing off this information to the combined number and unit 
-% processor.
+% processor. The four-argument function is used by \cs{SI}, whereas
+% the three-argument one is used directly by the newer \cs{qty}
+% approach.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_combined:nnnn #1#2#3#4 {
-  \IfNoValueTF {#3} 
-    { \tl_clear:N \l_siunitx_pre_unit_tl }
+\cs_new_protected:Npn \siunitx_combined:nnn #1#2#3 {
+  \tl_if_empty:NF \l_siunitx_preunit_tl
     {
-      \siunitx_unit_in:nn {#3} {#1} 
+      \siunitx_unit_in:Vn \l_siunitx_preunit_tl {#1} 
       \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
     }
   \cs_set_eq:NN \l_siunitx_brackets_bool 
     \l_siunitx_multi_brackets_bool  
-  \siunitx_combined_unit:nnn {#2} {#4} {#1}
+  \siunitx_combined_unit:nnn {#2} {#3} {#1}
   \siunitx_combined_output:n {#2}
+}
+\cs_new_protected:Npn \siunitx_combined:nnnn #1#2#3#4 {
+  \IfNoValueTF {#3} 
+    { \tl_clear:N \l_siunitx_preunit_tl }
+    { \tl_set:Nn \l_siunitx_preunit_tl {#3} }
+  \siunitx_combined:nnn {#1} {#2} {#4}  
 }
 %    \end{macrocode}
 %\end{macro}
@@ -14028,11 +14047,26 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\qty}
+%    \begin{macrocode}
+\NewDocumentCommand \qty { o m m } {
+  \group_begin:
+    \IfNoValueTF {#1}
+      { \siunitx_combined:nnn { } {#2} {#3} }
+      {
+        \keys_set:nn { siunitx } {#1}
+        \siunitx_combined:nnn {#1} {#2} {#3}
+      }
+  \group_end:
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{
 %  \qtylist  ,
 %  \qtyrange ,
-%  \SIlist     ,
-%  \SIrange    ,
+%  \SIlist   ,
+%  \SIrange  ,
 %}
 % Lists and range of values are handled in a very similar way.
 % Everything is kept relatively simple, and so there is not too much
@@ -14192,11 +14226,12 @@ This work consists of the file  siunitx.dtx
 %\end{macro} 
 %
 %\begin{macro}{
-%  \siunitx_bookmark_num:w        ,
-%  \siunitx_bookmark_numrange:w   ,
-%  \siunitx_bookmark_SI:w         ,
+%  \siunitx_bookmark_num:w      ,
+%  \siunitx_bookmark_numrange:w ,
+%  \siunitx_bookmark_qty:w      ,
 %  \siunitx_bookmark_qtyrange:w ,
-%  \siunitx_bookmark_unit:w       ,
+%  \siunitx_bookmark_SI:w       ,
+%  \siunitx_bookmark_unit:w     ,
 %}
 % To keep things fast, expandable versions of the document commands
 % are created only once. These are then used if necessary to remove
@@ -14205,10 +14240,12 @@ This work consists of the file  siunitx.dtx
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m } 
   { #2 \l_siunitx_range_phrase_tl #3 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
-  { \IfNoValueF {#3} {#3} #2 ~ #4 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_qty:w { o m m } 
+  { #2 ~ #3 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_qtyrange:w
   { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m } 
+  { \IfNoValueF {#3} {#3} #2 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 %    \end{macrocode}
 %\end{macro}
