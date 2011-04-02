@@ -296,8 +296,6 @@ This work consists of the file  siunitx.dtx
 %          per,
 %          percent,
 %          protected,
-%          qtylist,
-%          qtyrange,
 %          radian,
 %          raiseto,
 %          robustify,
@@ -306,6 +304,8 @@ This work consists of the file  siunitx.dtx
 %          selectlanguage,
 %          SendSettingsToPgf,
 %          SI,
+%          SIlist,
+%          SIrange,
 %          sievert,
 %          sisetup,
 %          SIUnitSymbolDegree,
@@ -573,8 +573,8 @@ This work consists of the file  siunitx.dtx
 %  \item \cs{SI}\oarg{options}\marg{number}\oarg{pre-unit}\marg{unit}
 %  \item \cs{numlist}\oarg{options}\marg{numbers}
 %  \item \cs{numrange}\oarg{options}\marg{numbers}\marg{number2}
-%  \item \cs{qtylist}\oarg{options}\marg{numbers}\marg{unit}
-%  \item \cs{qtyrange}\oarg{options}\marg{number1}\marg{number2}^^A
+%  \item \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
+%  \item \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}^^A
 %    \marg{unit}
 %  \item \cs{sisetup}\marg{options}
 %  \item \cs{tablenum}\oarg{options}\marg{number}
@@ -608,9 +608,9 @@ This work consists of the file  siunitx.dtx
 % Simple lists and ranges of numbers can be handled.
 %\begin{LaTeXdemo}
 %  \numlist{10;20;30}                    \\
-%  \qtylist{0.13;0.67;0.80}{\milli\metre} \\
+%  \SIlist{0.13;0.67;0.80}{\milli\metre} \\
 %  \numrange{10}{20}                     \\
-%  \qtyrange{0.13}{0.67}{\milli\metre}
+%  \SIrange{0.13}{0.67}{\milli\metre}
 %\end{LaTeXdemo}
 %
 % By default, all text is typeset in the current upright, serif math
@@ -780,32 +780,28 @@ This work consists of the file  siunitx.dtx
 % Full details of using \enquote{stand alone} units are found in
 % \cref{sec:units:creating}.
 %
-%\DescribeMacro{\qtylist}
-%\changes{v2.2}{2011/03/31}{Renamed \cs{SIlist} to \cs{qtylist}:
-%  old name depreciated but still available}
+%\DescribeMacro{\SIlist}
 %\begin{syntax}
-%  \cs{qtylist}\oarg{options}\marg{numbers}\marg{unit}
+%  \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
 %\end{syntax}
-% Lists of numbers with units can be handled using the \cs{qtylist}
+% Lists of numbers with units can be handled using the \cs{SIlist}
 % function. The behaviour of this function is similar to \cs{numlist},
 % but with the addition of a unit to each number.  This function should
 % be used in text mode.
 %\begin{LaTeXdemo}
-%  \qtylist{10;30;45}{\metre}
+%  \SIlist{10;30;45}{\metre}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\qtyrange}
-%\changes{v2.2}{2011/03/31}{Renamed \cs{SIrange} to \cs{qtyrange}:
-%  old name depreciated but still available}
+%\DescribeMacro{\SIrange}
 %\begin{syntax}
-%  \cs{qtyrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit}
+%  \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit}
 %\end{syntax}
-% Ranges of numbers with units can be handled using the \cs{qtyrange}
+% Ranges of numbers with units can be handled using the \cs{SIrange}
 % function. The behaviour of this function is similar to \cs{numrange},
 % but with the addition of a unit to each number.  This function should
 % be used in text mode.
 %\begin{LaTeXdemo}
-%  \qtyrange{10}{30}{\metre}
+%  \SIrange{10}{30}{\metre}
 %\end{LaTeXdemo}
 %
 %\subsection{The unit macros}
@@ -2801,7 +2797,7 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{list-units}
 %\DescribeOption{range-units}
 % The \opt{list-units} and \opt{range-units} options determines how
-% the \cs{qtylist} and\cs{qtyrange} function displays units,
+% the \cs{SIlist} and\cs{SIrange} function displays units,
 % respectively. The standard setting for both is \opt{repeat}, where
 % each number will be printed with a unit. Alternatives are
 % \opt{brackets} and \opt{single}. Any brackets needed on individual
@@ -2811,14 +2807,14 @@ This work consists of the file  siunitx.dtx
 % number within the list or range: they only sets those around the
 % entire group.
 %\begin{LaTeXdemo}
-%  \qtylist{2;4;6;8}{\tesla} \\
-%  \qtylist[list-units = brackets]{2;4;6;8}{\tesla} \\
-%  \qtylist[list-units = repeat]{2;4;6;8}{\tesla} \\
-%  \qtylist[list-units = single]{2;4;6;8}{\tesla} \\
-%  \qtyrange{2}{4}{\degreeCelsius} \\
-%  \qtyrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
-%  \qtyrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
-%  \qtyrange[range-units = single]{2}{4}{\degreeCelsius}
+%  \SIlist{2;4;6;8}{\tesla} \\
+%  \SIlist[list-units = brackets]{2;4;6;8}{\tesla} \\
+%  \SIlist[list-units = repeat]{2;4;6;8}{\tesla} \\
+%  \SIlist[list-units = single]{2;4;6;8}{\tesla} \\
+%  \SIrange{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
+%  \SIrange[range-units = single]{2}{4}{\degreeCelsius}
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -3600,14 +3596,14 @@ This work consists of the file  siunitx.dtx
 % \pkg{babel} package:
 %\begin{LaTeXdemo}
 %  % In English by default
-%  \qtylist{1;2;3}{\metre} \\
-%  \qtyrange{1}{10}{\degreeCelsius} \\
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
 %  \selectlanguage{french}%
-%  \qtylist{1;2;3}{\metre} \\
-%  \qtyrange{1}{10}{\degreeCelsius} \\
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
 %  \selectlanguage{german}%
-%  \qtylist{1;2;3}{\metre} \\
-%  \qtyrange{1}{10}{\degreeCelsius} \\
+%  \SIlist{1;2;3}{\metre} \\
+%  \SIrange{1}{10}{\degreeCelsius} \\
 %\end{LaTeXdemo}
 %
 %\section{Hints for using \pkg{siunitx}}
@@ -11589,32 +11585,22 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \siunitx_combined:nnn  ,
-%  \siunitx_combined:nnnn ,
-%}
+%\begin{macro}{\siunitx_combined:nnnn}
 % Printing numbers and units means first processing the units, then
 % handing off this information to the combined number and unit
-% processor. The four-argument function is used by \cs{SI}, whereas
-% the three-argument one is used directly by the newer \cs{qty}
-% approach.
+% processor.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_combined:nnn #1#2#3 {
-  \tl_if_empty:NF \l_siunitx_preunit_tl
+\cs_new_protected:Npn \siunitx_combined:nnnn #1#2#3#4 {
+  \IfNoValueTF {#3}
+    { \tl_clear:N \l_siunitx_pre_unit_tl }
     {
-      \siunitx_unit_in:Vn \l_siunitx_preunit_tl {#1}
+      \siunitx_unit_in:nn {#3} {#1}
       \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
     }
   \cs_set_eq:NN \l_siunitx_brackets_bool
     \l_siunitx_multi_brackets_bool
-  \siunitx_combined_unit:nnn {#2} {#3} {#1}
+  \siunitx_combined_unit:nnn {#2} {#4} {#1}
   \siunitx_combined_output:n {#2}
-}
-\cs_new_protected:Npn \siunitx_combined:nnnn #1#2#3#4 {
-  \IfNoValueTF {#3}
-    { \tl_clear:N \l_siunitx_preunit_tl }
-    { \tl_set:Nn \l_siunitx_preunit_tl {#3} }
-  \siunitx_combined:nnn {#1} {#2} {#4}
 }
 %    \end{macrocode}
 %\end{macro}
@@ -14148,24 +14134,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\qty}
-%    \begin{macrocode}
-\NewDocumentCommand \qty { o m m } {
-  \group_begin:
-    \IfNoValueTF {#1}
-      { \siunitx_combined:nnn { } {#2} {#3} }
-      {
-        \keys_set:nn { siunitx } {#1}
-        \siunitx_combined:nnn {#1} {#2} {#3}
-      }
-  \group_end:
-}
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{
-%  \qtylist  ,
-%  \qtyrange ,
 %  \SIlist   ,
 %  \SIrange  ,
 %}
@@ -14174,7 +14143,7 @@ This work consists of the file  siunitx.dtx
 % complexity. In theory the two could be combined together, but
 % the differences between the two make this less desirable.
 %    \begin{macrocode}
-\NewDocumentCommand \qtylist { o > { \SplitList { ; } } m m } {
+\NewDocumentCommand \SIlist { o > { \SplitList { ; } } m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_list_units:nnn {#2} {#3} { }  }
@@ -14184,7 +14153,7 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\NewDocumentCommand \qtyrange { o m m m } {
+\NewDocumentCommand \SIrange { o m m m } {
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_range_unit:nnnn {#4} { } {#2} {#3} }
@@ -14194,8 +14163,6 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\cs_new_eq:NN \SIlist  \qtylist
-\cs_new_eq:NN \SIrange \qtyrange
 %    \end{macrocode}
 %\end{macro}
 %
@@ -14310,12 +14277,9 @@ This work consists of the file  siunitx.dtx
     { none }
   \cs_set_eq:NN \num      \siunitx_bookmark_num:w
   \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
-  \cs_set_eq:NN \qty      \siunitx_bookmark_qty:w
-  \cs_set_eq:NN \qtylist  \siunitx_bookmark_qtylist:w
-  \cs_set_eq:NN \qtyrange \siunitx_bookmark_qtyrange:w
   \cs_set_eq:NN \si       \siunitx_bookmark_si:w
   \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
-  \cs_set_eq:NN \SIrange  \siunitx_bookmark_qtyrange:w
+  \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
   \cs_set_eq:NN \unit     \siunitx_bookmark_unit:w
   \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
   \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
@@ -14331,8 +14295,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \siunitx_bookmark_num:w      ,
 %  \siunitx_bookmark_numrange:w ,
-%  \siunitx_bookmark_qty:w      ,
-%  \siunitx_bookmark_qtyrange:w ,
+%  \siunitx_bookmark_SIlist:w   ,
+%  \siunitx_bookmark_SIrange:w  ,
 %  \siunitx_bookmark_SI:w       ,
 %  \siunitx_bookmark_unit:w     ,
 %}
@@ -14343,28 +14307,26 @@ This work consists of the file  siunitx.dtx
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m }
   { #2 \l_siunitx_range_phrase_tl #3 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_qty:w { o m m }
-  { #2 ~ #3 }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_qtylist:w
-  { o m m } { \siunitx_bookmark_qtylist_map:nn {#1} {#2} }
-\DeclareExpandableDocumentCommand \siunitx_bookmark_qtyrange:w
-  { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_SI:w { o m o m }
   { \IfNoValueF {#3} {#3} #2 ~ #4 }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_SIlist:w
+  { o m m } { \siunitx_bookmark_SIlist_map:nn {#1} {#2} }
+\DeclareExpandableDocumentCommand \siunitx_bookmark_SIrange:w
+  { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_unit:w { o m } {#2}
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_bookmark_qtylist_map:nn}
-%\begin{macro}[aux]{\siunitx_bookmark_qtylist_map_aux:nw}
+%\begin{macro}{\siunitx_bookmark_SIlist_map:nn}
+%\begin{macro}[aux]{\siunitx_bookmark_SIlist_map_aux:nw}
 % An expandable mapping to replace the list separator in the
 % input by appropriate output version.
 %    \begin{macrocode}
-\cs_new:Npn \siunitx_bookmark_qtylist_map:nn #1#2 {
-  \siunitx_bookmark_qtylist_map_aux:nw {#2} #1 ; \q_recursion_tail ;
+\cs_new:Npn \siunitx_bookmark_SIlist_map:nn #1#2 {
+  \siunitx_bookmark_SIlist_map_aux:nw {#2} #1 ; \q_recursion_tail ;
     \q_recursion_tail ; \q_recursion_stop
 }
-\cs_new:Npn \siunitx_bookmark_qtylist_map_aux:nw #1#2 ; #3 ; #4 {
+\cs_new:Npn \siunitx_bookmark_SIlist_map_aux:nw #1#2 ; #3 ; #4 {
   #2 ~ #1
   \quark_if_recursion_tail_stop:n {#3}
   \quark_if_recursion_tail_stop_do:nn {#4}
@@ -14373,7 +14335,7 @@ This work consists of the file  siunitx.dtx
       #3 ~ #1
     }
   \l_siunitx_list_separator_tl
-  \siunitx_bookmark_qtylist_map_aux:nw {#1} #3 ; #4
+  \siunitx_bookmark_SIlist_map_aux:nw {#1} #3 ; #4
 }
 %    \end{macrocode}
 %\end{macro}
