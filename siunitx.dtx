@@ -2841,6 +2841,7 @@ This work consists of the file  siunitx.dtx
 %      table-align-uncertainty   & Switch  & true      \\
 %      table-alignment           & Choice  & \m{none}  \\
 %      table-auto-round          & Switch  & false     \\
+%      table-column-width        & Length  & 0 pt      \\
 %      table-comparator          & Switch  & false     \\
 %      table-figures-decimal     & Integer & 2         \\
 %      table-figures-exponent    & Integer & 0         \\
@@ -3388,6 +3389,40 @@ This work consists of the file  siunitx.dtx
 % to the same value using the \opt{table-alignment} option. This will
 % set all three alignment options to the same value (one of
 % \opt{center}, \opt{right} or \opt{left}).
+% 
+%\DescribeOption{table-column-width}
+%\changes{v2.2}{2011/04/02}{New \opt{table-column-width} option}
+% Usually, the width of the \texttt{S} and \texttt{s} columns is allowed
+% to vary depending on the content. However, there are cases where a
+% strictly fixed width is desirable. For these cases, the
+% \opt{table-column-width} option is available. The standard
+% setting, "0 pt", indicates that no fixing takes place. If a value
+% is set for this option then the tabular material is typeset to
+% the specified width (\cref{tab:width}).
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{Fixed-width columns.}
+%    \label{tab:width}
+%    \begin{tabular}
+%      {
+%        s
+%        s[table-column-width = 2 cm]
+%        S
+%        S[table-column-width = 2 cm]
+%      }
+%      \toprule
+%        {Flexible} &
+%        {Fixed}    &
+%        {Flexible} &
+%        {Fixed}    \\
+%      \midrule
+%        \metre\per\second & \metre\per\second & 1.23 & 1.23 \\
+%        \kilogram\candela & \kilogram\candela & 45.6 & 45.6 \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
 %
 %\subsection{Symbols}
 %
@@ -12251,29 +12286,25 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_siunitx_table_correction_skip}
 %\begin{macro}{\siunitx_table_colortbl_correction:}
 % If the package \pkg{colortbl} is loaded, there is a need to allow
 % that it changes how centring is carried out.
 %    \begin{macrocode}
-\skip_new:N \c_siunitx_table_correction_skip
 \AtBeginDocument {
   \@ifpackageloaded { colortbl }
     {
-      \skip_set:Nn \c_siunitx_table_correction_skip
-        { \c_zero_skip plus -0.5 fill }
+      \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
+        {
+          \skip_horizontal:n { \c_zero_skip plus -0.5 fill }
+          \tex_kern:D \c_zero_skip
+        }
     }
     {
-      \skip_set:Nn \c_siunitx_table_correction_skip
-        { \c_zero_skip }
+      \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
+        { }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction: {
-  \skip_horizontal:n { \c_siunitx_table_correction_skip }
-  \tex_kern:D \c_zero_skip
-}
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_align_left:n}
@@ -12296,6 +12327,51 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+%\begin{macro}{\siunitx_table_column_begin:}
+%\begin{macro}{\siunitx_table_column_end:}
+%    \begin{macrocode}
+\cs_new_eq:NN \siunitx_table_column_begin:n \siunitx_table_align_left:n
+\cs_new_eq:NN \siunitx_table_column_end:n   \siunitx_table_align_right:n
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+% Setting up for a fixed column width is done so that the check is
+% made at the key-setting stage. In that way, there will be some
+% speed gained if the key is set before the table, as the comparison
+% is not made for every cell.
+%    \begin{macrocode}
+\keys_define:nn { siunitx } {
+  table-column-width .code:n =
+    {
+      \dim_compare:nNnTF {#1} = { \c_zero_dim }
+        {
+          \cs_new_eq:NN \siunitx_table_column_begin:n
+            \siunitx_table_align_left:n
+          \cs_new_eq:NN \siunitx_table_column_end:n
+            \siunitx_table_align_right:n
+        }
+        {        
+          \cs_set_protected_nopar:Npn \siunitx_table_column_begin:n ##1
+            {
+              \siunitx_table_colortbl_correction:
+              \tex_hbox:D to \dim_eval:n {#1}
+              \c_group_begin_token
+                \skip_horizontal:n {##1}
+                \tex_kern:D \c_zero_skip
+            }
+          \cs_set_protected_nopar:Npn \siunitx_table_column_end:n ##1
+            {
+                \skip_horizontal:n {##1}
+                \tex_kern:D \c_zero_skip
+              \hbox_set_inline_end:
+              \siunitx_table_colortbl_correction:
+            }
+        }
+    }
+}
+%    \end{macrocode}
 %
 %\subsection{Printing units in \texttt{s} columns}
 %
@@ -12341,9 +12417,9 @@ This work consists of the file  siunitx.dtx
 % to print the material using the internal version of \cs{unit}.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_s: {
-  \siunitx_table_align_left:n { \l_siunitx_table_unit_align_skip }
-  \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }
-  \siunitx_table_align_right:n { \l_siunitx_table_unit_align_skip }
+  \siunitx_table_column_begin:n { \l_siunitx_table_unit_align_skip } 
+    \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }    
+  \siunitx_table_column_end:n { \l_siunitx_table_unit_align_skip }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -12634,16 +12710,17 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_table_print_S: {
   \bool_if:NTF \l_siunitx_table_collect_pre_bool
     {
-      \siunitx_table_align_left:n { \l_siunitx_table_text_align_skip }
-      \tl_use:N \l_siunitx_table_collect_pre_tl
-      \siunitx_table_align_right:n
+      \siunitx_table_column_begin:n
+        { \l_siunitx_table_text_align_skip }
+        \tl_use:N \l_siunitx_table_collect_pre_tl
+      \siunitx_table_column_end:n
         { \l_siunitx_table_text_align_skip }
     }
     {
-      \siunitx_table_align_left:n
+      \siunitx_table_column_begin:n
         { \l_siunitx_table_number_align_skip }
-      \siunitx_table_print_S_aux:
-      \siunitx_table_align_right:n
+        \siunitx_table_print_S_aux:
+      \siunitx_table_column_end:n
         { \l_siunitx_table_number_align_skip }
     }
 }
