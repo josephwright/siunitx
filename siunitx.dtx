@@ -12278,6 +12278,26 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Table printing: general code}
 %
+% Getting the general alignment correct in tables is made more
+% complex than one would like by the \pkg{colortbl} package. In the
+% original \LaTeXe{} definition, cell material is centred by a
+% construction of the (primitive) form
+%\begin{verbatim}
+%  \hfil
+%  #
+%  \hfil
+%\end{verbatim}
+% which only uses \texttt{fil} stretch. That is altered by
+% \pkg{colortbl} to broadly
+%\begin{verbatim}
+%  \hskip 0 pt plus 0.5 fill
+%  \kern 0 pt
+%  #
+%  \hskip 0 pt plus 0.5 fill
+%\end{verbatim}
+% which means there is \texttt{fill} stretch to worry about and
+% the kern as well.
+%
 %\begin{macro}{\c_siunitx_one_fill_skip}
 % A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
@@ -12363,7 +12383,7 @@ This work consists of the file  siunitx.dtx
             }
           \cs_set_protected_nopar:Npn \siunitx_table_column_end:n ##1
             {
-                \skip_horizontal:n {##1}
+                \skip_horizontal:n { \c_siunitx_one_fill_skip - ##1 }
                 \tex_kern:D \c_zero_skip
               \hbox_set_inline_end:
               \siunitx_table_colortbl_correction:
