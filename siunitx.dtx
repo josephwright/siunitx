@@ -1814,6 +1814,7 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
+%      bracket-negative-numbers & Switch  & false             \\
 %      bracket-numbers          & Switch  & true              \\ ^^A (
 %      close-bracket            & Literal & )                 \\
 %      complex-root-position    & Choice  & after-number      \\
@@ -1977,6 +1978,18 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \num{-15673} \\
 %  \num[negative-color = red]{-15673}
+%\end{LaTeXdemo}
+%
+%\DescribeOption{bracket-negative-numbers}
+%\changes{v2.2}{2011/04/02}{New \opt{bracket-negative-numbers} option}
+% A common means to display negative numbers in financial situations
+% is to place them in brackets. This can be carried out automatically
+% using the \opt{bracket-negative-numbers} option.
+%\begin{LaTeXdemo}
+%  \num{-15673} \\
+%  \num[bracket-negative-numbers]{-15673} \\
+%  \SI{-10}{\metre} \\
+%  \SI[bracket-negative-numbers]{-10}{\metre}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{tight-spacing}
@@ -8144,6 +8157,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{
+%  \l_siunitx_negative_bracket_bool    ,
 %  \l_siunitx_brackets_bool            ,
 %  \l_siunitx_bracket_close_tl         ,
 %  \l_siunitx_output_complex_copy_bool ,
@@ -8165,6 +8179,8 @@ This work consists of the file  siunitx.dtx
 % Lots of settings, some used only for numbers, some more widely.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  bracket-negative-numbers  .bool_set:N = 
+    \l_siunitx_negative_bracket_bool ,
   bracket-numbers           .bool_set:N = \l_siunitx_brackets_bool,
   close-bracket             .tl_set:N   = \l_siunitx_bracket_close_tl,
   complex-root-position     .choice:,
@@ -8829,7 +8845,11 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_format_sign:n        ,
 %  \siunitx_number_format_sign_complex: ,
 %}
-%\begin{macro}[aux]{\siunitx_number_format_sign_complex:n}
+%\begin{macro}[aux]{
+%  \siunitx_number_format_sign_aux:n               ,
+%  \siunitx_number_format_sign_negative_brackets:n ,
+%  \siunitx_number_format_sign_complex:n           ,
+%}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 % In the complex number case, there is a need for a correction to get
 % the right formatting in text mode. For speed reasons, this is done in
@@ -8842,32 +8862,54 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
       \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
-          \bool_if:NT \l_siunitx_tight_bool
+          \bool_if:NTF \l_siunitx_negative_bracket_bool
             {
-              \tl_set:Nx \l_siunitx_tmpa_tl
-                { { \exp_not:V \l_siunitx_tmpa_tl } }
+              \str_if_eq:VnTF \l_siunitx_tmpa_tl { - }
+                { \siunitx_number_format_sign_negative_brackets:n {#1} }
+                { \siunitx_number_format_sign_aux:n {#1} }
             }
-          \tl_clear:N \l_siunitx_tmpb_tl
-          \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl
-            \l_siunitx_tmpa_tl
-          \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign }
-            \l_siunitx_tmpb_tl
-          \prop_get:NnN \l_siunitx_number_out_prop {#1}
-            \l_siunitx_tmpa_tl
-          \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-          \prop_put:NnV \l_siunitx_number_out_prop {#1}
-            \l_siunitx_tmpa_tl
-          \prop_get:NnN \l_siunitx_number_out_prop { #1 -result }
-            \l_siunitx_tmpa_tl
-          \quark_if_no_value:NF \l_siunitx_tmpa_tl
-            {
-              \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-              \prop_put:NnV \l_siunitx_number_out_prop { #1 -result }
-                \l_siunitx_tmpa_tl
-            }
-      }
+            { \siunitx_number_format_sign_aux:n {#1} }
+        }
+    }
+}      
+\cs_new_protected_nopar:Npn \siunitx_number_format_sign_aux:n #1 {
+  \bool_if:NT \l_siunitx_tight_bool
+    {
+      \tl_set:Nx \l_siunitx_tmpa_tl
+        { { \exp_not:V \l_siunitx_tmpa_tl } }
+    }
+  \tl_clear:N \l_siunitx_tmpb_tl
+  \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+  \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign }
+    \l_siunitx_tmpb_tl
+  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
+  \prop_get:NnN \l_siunitx_number_out_prop { #1 -result }
+    \l_siunitx_tmpa_tl
+  \quark_if_no_value:NF \l_siunitx_tmpa_tl
+    {
+      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+      \prop_put:NnV \l_siunitx_number_out_prop { #1 -result }
+        \l_siunitx_tmpa_tl
     }
 }
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_format_sign_negative_brackets:n #1
+  {
+    \siunitx_number_format_brackets_aux:n {#1}
+    \prop_get:NnN \l_siunitx_number_out_prop { #1 }
+      \l_siunitx_tmpa_tl
+    \quark_if_no_value:NF \l_siunitx_tmpa_tl
+      {
+        \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
+          \l_siunitx_bracket_open_tl          
+        \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
+          \l_siunitx_bracket_close_tl
+        \prop_put:NnV \l_siunitx_number_out_prop { #1  }
+          \l_siunitx_tmpa_tl
+      }
+  }
 \cs_new_protected_nopar:Npn \siunitx_number_format_sign_complex: {
   \siunitx_number_format_sign_complex:n { complex }
   \siunitx_number_format_sign_complex:n { complex-result }
@@ -13133,7 +13175,8 @@ This work consists of the file  siunitx.dtx
     { mantissa } { }
   \siunitx_table_print_S_get_mantissa:Nn
     \l_siunitx_number_out_prop { }
-  \dim_set:Nn \l_siunitx_table_space_dim { \l_siunitx_table_mantissa_dim }
+  \dim_set:Nn \l_siunitx_table_space_dim
+    { \l_siunitx_table_mantissa_dim }
   \hbox_set:Nn \l_siunitx_table_result_box
     {
       \box_use:N \l_siunitx_table_fill_box
