@@ -546,6 +546,8 @@ This work consists of the file  siunitx.dtx
 %  is set to \opt{places}}
 %\changes{v2.1n}{2011/03/31}{Consistent behaviour for
 %  \opt{round-integer-to-decimal} when \opt{round-precision} is 0}
+%\changes{v2.1o}{2011/04/03}{Fix incorrect font choice when
+%  \pkg{arev} package is loaded}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5511,8 +5513,13 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nx \l_siunitx_tmpa_tl { \familydefault }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl 
     {
-      \@ifpackageloaded { cmbright } { }
-        { \keys_set:nn { siunitx } { math-rm = \mathsf } }
+      \@ifpackageloaded { arev } 
+        { }
+        {
+          \@ifpackageloaded { cmbright }
+            { }
+            { \keys_set:nn { siunitx } { math-rm = \mathsf } }  
+        }
       \keys_set:nn { siunitx } { text-rm  = \sffamily }
     }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_texttt_tl 
