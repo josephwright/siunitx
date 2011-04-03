@@ -1857,6 +1857,7 @@ This work consists of the file  siunitx.dtx
 %      output-close-uncertainty & Literal & )                 \\
 %      output-complex-root      & Math    & \verb=\mathrm{i}= \\
 %      output-decimal-marker    & Math    & .                 \\
+%      output-exponent-marker   & Literal & \meta{none}       \\
 %      output-open-uncertainty  & Literal & (                 \\ ^^A )
 %      separate-uncertainty     & Switch  & false             \\
 %      tight-spacing            & Switch  & false             \\
@@ -1942,6 +1943,16 @@ This work consists of the file  siunitx.dtx
 %  \num[exponent-product = \times]{1e2} \\
 %  \num[exponent-product = \cdot]{1e2} \\
 %  \num[exponent-base = 2]{1e2}
+%\end{LaTeXdemo}
+%\DescribeOption{exponent-exponent-marker}
+%\changes{v2.2}{2011/04/03}{New \opt{exponent-exponent-marker} option}
+% Alternatively, if the \opt{exponent-exponent-marker} option is
+% set then the value stored will be used in place of the normal
+% product and base combination. This will normally be set up to
+% ensure math or text mode.
+%\begin{LaTeXdemo}
+%  \num[output-exponent-marker = \text{e}]{1e2} \\
+%  \num[output-exponent-marker = \ensuremath{\mathrm{E}}]{1e2}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{separate-uncertainty}
@@ -8418,6 +8429,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_bracket_open_tl          ,
 %  \l_siunitx_output_uncert_close_tl   ,
 %  \l_siunitx_output_complex_tl        ,
+%  \l_siunitx_output_exponent_tl       ,
 %  \l_siunitx_output_uncert_open_tl    ,
 %  \l_siunitx_uncert_sep_bool          ,
 %  \l_siunitx_tight_bool               ,
@@ -8467,6 +8479,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_set:Nn \l_siunitx_output_decimal_tl { {#1} }
     },
+  output-exponent-marker    .tl_set:N   = \l_siunitx_output_exponent_tl,
   output-open-uncertainty   .tl_set:N   =
     \l_siunitx_output_uncert_open_tl,
   separate-uncertainty      .bool_set:N = \l_siunitx_uncert_sep_bool,
@@ -8723,17 +8736,20 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_brackets:n { mantissa }
   \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
     \l_siunitx_tmpa_tl
-  \bool_if:NTF \l_siunitx_tight_bool
+  \tl_if_empty:NT \l_siunitx_output_exponent_tl
     {
-      \tl_set:Nx \l_siunitx_tmpb_tl
-        { { \exp_not:V \l_siunitx_exponent_product_tl } }
+      \bool_if:NTF \l_siunitx_tight_bool
+        {
+          \tl_set:Nx \l_siunitx_tmpb_tl
+            { { \exp_not:V \l_siunitx_exponent_product_tl } }
+        }
+        {
+          \tl_set:Nx \l_siunitx_tmpb_tl
+            { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
+        }
+      \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
+        \l_siunitx_tmpb_tl
     }
-    {
-      \tl_set:Nx \l_siunitx_tmpb_tl
-        { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
-    }
-  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_tmpb_tl
   \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
     \l_siunitx_tmpb_tl
   \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
@@ -8752,9 +8768,15 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_format_final_exponent: {
   \prop_get:NnN \l_siunitx_number_out_prop { exponent }
     \l_siunitx_tmpa_tl
-  \tl_set:Nx \l_siunitx_tmpa_tl
-   { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
-  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+  \tl_if_empty:NTF \l_siunitx_output_exponent_tl
+    {  
+      \tl_set:Nx \l_siunitx_tmpa_tl
+       { ^ { \exp_not:V \l_siunitx_tmpa_tl } }
+      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
+    }
+    {
+      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_output_exponent_tl
+    }
   \prop_put:NnV \l_siunitx_number_out_prop { exponent-result }
     \l_siunitx_tmpa_tl
 }
@@ -13551,7 +13573,12 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
   \dim_zero:N \l_siunitx_table_gap_dim
-  \siunitx_table_print_S_reserved_exponent_product:
+  \tl_if_empty:NTF \l_siunitx_output_exponent_tl
+    { \siunitx_table_print_S_reserved_exponent_product: }
+    {
+      \bool_if:NF \l_siunitx_table_align_exp_bool
+        { \tex_hskip:D -\l_siunitx_table_space_dim }
+    }
   \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
     { exponent } { }
   \siunitx_table_print_S_get_exponent:Nn
