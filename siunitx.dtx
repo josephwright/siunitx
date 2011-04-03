@@ -1600,6 +1600,21 @@ This work consists of the file  siunitx.dtx
 % \enquote{\num{1.234(5)}}. The opening and closing symbols used for
 % this type of input are set as \opt{input-open-uncertainty} and
 % \opt{input-close-uncertainty}.
+%\DescribeOption{input-uncertainty-signs}
+%\changes{v2.2}{2011/04/03}{New \opt{input-uncertainty-signs}
+%  option}
+% Alternatively, the uncertainty may be given as a separate part
+% following a sign. Which signs are valid for this operation is
+% determined by the \opt{input-uncertainty-signs} option. As with
+% other signs, the combination \texttt{+-} will automatically be
+% converted to \cs{pm} internally.
+%\begin{LaTeXdemo}
+%  \num{9.99(9)}       \\
+%  \num{9.99 +- 0.09}  \\
+%  \num{9.99 \pm 0.09} \\
+%  \num{123 +- 4.5}    \\
+%  \num{12.3 +- 6}
+%\end{LaTeXdemo}
 %
 %\DescribeOption{input-complex-roots}
 % When using complex numbers in input, the complex root
@@ -5067,12 +5082,14 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \prop_del:cn           ,
 %  \prop_put:cnV          ,
+%  \tl_if_in:NVTF         ,
 %  \tl_replace_all_in:NnV ,
 %}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \prop_del:Nn { c }
 \cs_generate_variant:Nn \prop_put:Nnn { cnV }
+\cs_generate_variant:Nn \tl_if_in:NnTF { NV }
 \cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
 %    \end{macrocode}
 %\end{macro}
@@ -6110,6 +6127,27 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{
+%  \l_siunitx_number_mantissa_length_int
+%  \l_siunitx_number_uncert_tl
+%  \l_siunitx_number_uncert_length_int
+%}
+% Conversion of uncertainty forms requires some storage, mainly for
+% performance reasons.
+%    \begin{macrocode}
+\int_new:N \l_siunitx_number_mantissa_length_int
+\tl_new:N \l_siunitx_number_uncert_tl
+\int_new:N \l_siunitx_number_uncert_length_int
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\l_siunitx_input_uncert_sign_tl}
+% This one is stored by some low-level code, so is declared explicitly.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_input_uncert_sign_tl 
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{
 %  \l_siunitx_input_uncert_close_tl ,
 %  \l_siunitx_input_complex_tl      ,
 %  \l_siunitx_input_comparator_tl   ,
@@ -6139,7 +6177,15 @@ This work consists of the file  siunitx.dtx
   input-protect-tokens    .tl_set:N = \l_siunitx_input_protect_tl      ,
   input-signs             .tl_set:N = \l_siunitx_input_sign_tl         ,
   input-symbols           .tl_set:N = \l_siunitx_input_symbol_tl       ,
-  input-uncertainty-signs .tl_set:N = \l_siunitx_input_uncert_sign_tl  ,
+  input-uncertainty-signs .code:n   = 
+    {
+      \tl_set:Nn \l_siunitx_input_uncert_sign_tl {#1}
+      \tl_map_inline:nn {#1}
+        {
+          \tl_if_in:NnF \l_siunitx_input_sign_tl {##1}
+            { \tl_put_right:Nn \l_siunitx_input_sign_tl {##1} }
+        }
+    } ,
 }
 \keys_set:nn { siunitx } { % (
   input-close-uncertainty = ),
@@ -6152,6 +6198,7 @@ This work consists of the file  siunitx.dtx
   input-protect-tokens    = \approx\ge\geq\gg\le\leg\ll\mp\pi\pm\sim,
   input-signs             = +-\mp\pm,
   input-symbols           = \pi,
+  input-uncertainty-signs = \pm,
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6910,8 +6957,19 @@ This work consists of the file  siunitx.dtx
     {
       \prop_get:NnN \l_siunitx_number_in_prop { complex-sign }
         \l_siunitx_tmpa_tl
-      \siunitx_error:nx { misplaced-sign-token }
-        { \exp_not:V \l_siunitx_tmpa_tl }
+      \tl_if_in:NVTF \l_siunitx_input_uncert_sign_tl \l_siunitx_tmpa_tl
+        {
+          \prop_if_in:NnTF \l_siunitx_number_in_prop { uncertainty }
+            {
+              \siunitx_error:nx { misplaced-sign-token }
+                { \exp_not:n {#1} }
+            }
+            { \siunitx_number_in_complex_to_uncert:n {#1} }
+        }
+        {
+          \siunitx_error:nx { misplaced-sign-token }
+            { \exp_not:n {#1} }
+        }
     }
   \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
     \l_siunitx_tmpa_tl
@@ -6926,6 +6984,161 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%
+%\begin{macro}{\siunitx_number_in_complex_to_uncert:n}
+%\begin{macro}[aux]{
+%  \siunitx_number_in_complex_to_uncert_int: ,
+%  \siunitx_number_in_complex_to_uncert_dec: ,
+%}
+% Internally, uncertainties are stored in \enquote{compact} form.
+% The code here takes a putative complex part and converts it to
+% a compact uncertainty, with checks for the cases where things look
+% wrong. The method needed depends on whether there is an integer
+% part.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert:n #1 {
+  \prop_del:Nn \l_siunitx_number_in_prop { complex }
+  \prop_del:Nn \l_siunitx_number_in_prop { complex-decimal-marker }
+  \prop_del:Nn \l_siunitx_number_in_prop { complex-sign }
+  \prop_put:Nnn \l_siunitx_number_in_prop { uncertainty } { true }
+  \prop_get:NnN \l_siunitx_number_in_prop { complex-integer }
+    \l_siunitx_number_uncert_tl
+  \quark_if_no_value:NTF \l_siunitx_number_uncert_tl
+    { \siunitx_number_in_complex_to_uncert_dec:n {#1} }
+    {
+      \tl_if_single:NTF \l_siunitx_number_uncert_tl
+        {
+          \int_compare:nNnTF 
+            { \l_siunitx_number_uncert_tl } = { \c_zero }
+            { \siunitx_number_in_complex_to_uncert_dec:n {#1} }
+            { \siunitx_number_in_complex_to_uncert_int: }
+        }
+        { \siunitx_number_in_complex_to_uncert_int: }
+    }
+  \prop_del:Nn \l_siunitx_number_in_prop { complex-integer }
+  \prop_del:Nn \l_siunitx_number_in_prop { complex-decimal }
+}
+%    \end{macrocode}
+% When the input has an integer part to the uncertainty, the
+% conversion is easy as all of the decimal part can be copied
+% across.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_int: {
+  \prop_get:NnN \l_siunitx_number_in_prop { complex-decimal }
+    \l_siunitx_tmpa_tl
+  \quark_if_no_value:NT \l_siunitx_tmpa_tl
+    { \tl_clear:N \l_siunitx_tmpa_tl }
+  \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+    \l_siunitx_tmpb_tl
+  \quark_if_no_value:NT \l_siunitx_tmpb_tl
+    { \tl_clear:N \l_siunitx_tmpb_tl }
+  \siunitx_number_in_complex_to_uncert_pad:
+}
+%    \end{macrocode}
+% For a number in which all of the uncertainty is in the decimal part,
+% only the significant digits are needed. This means that a loop is
+% needed to drop non-significant ones.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_dec:n 
+  #1 
+  {
+    \tl_clear:N \l_siunitx_number_uncert_tl
+    \prop_get:NnN \l_siunitx_number_in_prop { complex-decimal }
+      \l_siunitx_tmpa_tl    
+    \quark_if_no_value:NTF \l_siunitx_tmpa_tl
+      {
+        \siunitx_error:nx { misplaced-sign-token }
+          { \exp_not:n {#1} }
+      }
+      {
+        \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+          \l_siunitx_tmpb_tl
+        \quark_if_no_value:NT \l_siunitx_tmpb_tl
+          { \tl_clear:N \l_siunitx_tmpb_tl }
+        \tl_map_function:NN
+          \l_siunitx_tmpa_tl
+          \siunitx_number_in_complex_to_uncert_dec_loop:N
+        \siunitx_number_in_complex_to_uncert_pad:  
+      }
+  }
+\cs_new_protected_nopar:Npn
+  \siunitx_number_in_complex_to_uncert_dec_loop:N #1
+  {
+    \str_if_eq:nnTF {#1} { 0 }
+      {
+        \tl_set:Nf \l_siunitx_tmpa_tl
+          { \tl_tail:V \l_siunitx_tmpa_tl }
+        \tl_if_empty:NF \l_siunitx_tmpb_tl
+          {
+            \tl_set:Nf \l_siunitx_tmpb_tl
+              { \tl_tail:V \l_siunitx_tmpb_tl }
+          }
+      }
+      { \tl_map_break: }
+  }
+%    \end{macrocode}
+% In all cases, there is a need to pad out either the uncertainty or
+% the decimal part so the places agree. To allow the two branches to
+% share code, some of the order here is slightly odd. The code
+% also re-obtains the decimal part from the mantissa, as the stored
+% value may have been trimmed to drop non-significant zeros.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_pad:
+  {
+    \int_set:Nn \l_siunitx_number_uncert_length_int
+      { \tl_elt_count:N \l_siunitx_tmpa_tl }
+    \int_set:Nn \l_siunitx_number_mantissa_length_int
+      { \tl_elt_count:N \l_siunitx_tmpb_tl }
+    \int_compare:nNnTF
+      { \l_siunitx_number_mantissa_length_int }
+        > { \l_siunitx_number_uncert_length_int }
+      {
+        \tl_set:Nx \l_siunitx_tmpa_tl
+          {
+            \exp_not:V \l_siunitx_tmpa_tl
+            \prg_replicate:nn
+              {
+                  \l_siunitx_number_mantissa_length_int
+                - \l_siunitx_number_uncert_length_int
+              }
+              { 0 }
+          }
+      }
+      {
+        \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+          \l_siunitx_tmpb_tl
+        \quark_if_no_value:NT \l_siunitx_tmpb_tl
+          { \tl_clear:N \l_siunitx_tmpb_tl }
+        \tl_set:Nx \l_siunitx_tmpb_tl
+          {
+            \exp_not:V \l_siunitx_tmpb_tl
+            \prg_replicate:nn
+              {
+                  \l_siunitx_number_uncert_length_int
+                - \l_siunitx_number_mantissa_length_int
+              }
+              { 0 }
+          }
+        \tl_if_empty:NF \l_siunitx_tmpb_tl
+          { 
+            \prop_put:NnV \l_siunitx_number_in_prop { mantissa-decimal }
+              \l_siunitx_tmpb_tl
+            \prop_if_in:NnF \l_siunitx_number_in_prop
+              { mantissa-decimal-marker }
+              {
+                \prop_put:Nnn \l_siunitx_number_in_prop
+                  { mantissa-decimal-marker } { . }
+              }
+          }  
+      }
+    \tl_put_right:NV \l_siunitx_number_uncert_tl \l_siunitx_tmpa_tl
+    \prop_put:NnV \l_siunitx_number_in_prop { mantissa-uncertainty }
+      \l_siunitx_number_uncert_tl
+  }
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Post-processing numbers}
