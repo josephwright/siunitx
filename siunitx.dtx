@@ -548,6 +548,8 @@ This work consists of the file  siunitx.dtx
 %  \opt{round-integer-to-decimal} when \opt{round-precision} is 0}
 %\changes{v2.1o}{2011/04/03}{Fix incorrect font choice when
 %  \pkg{arev} package is loaded}
+%\changes{v2.1o}{2011/04/03}{Account for negative exponents
+%  when using \opt{fixed-exponent} system}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -7170,6 +7172,15 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpb_tl
       \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+      \group_begin:
+        \prop_get:NnN \l_siunitx_number_in_prop { exponent-sign }
+          \l_siunitx_tmpa_tl
+        \quark_if_no_value:NF \l_siunitx_tmpa_tl
+          {
+            \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+          }
+      \exp_args:NNNV \group_end:  
+      \tl_set:Nn \l_siunitx_tmpb_tl \l_siunitx_tmpb_tl
       \tl_set:Nx \l_siunitx_tmpa_tl
         { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
       \exp_last_unbraced:NV \siunitx_number_process_fixed_aux_i:nnn 
@@ -7184,8 +7195,17 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_process_fixed_aux_i:nnn #1#2#3 {
   \prop_put:Nnn \l_siunitx_number_in_prop { exponent } 
     { true }
-  \prop_put:NnV \l_siunitx_number_in_prop 
-    { exponent-integer } \l_siunitx_process_fixed_int
+  \int_compare:nNnTF { \l_siunitx_process_fixed_int } > { \c_zero }
+    {
+      \prop_put:NnV \l_siunitx_number_in_prop { exponent-integer }
+        \l_siunitx_process_fixed_int
+      \prop_del:Nn \l_siunitx_number_in_prop { exponent-sign }
+    }
+    {
+      \prop_put:Nnx \l_siunitx_number_in_prop { exponent-integer }
+        { \int_eval:n { - \l_siunitx_process_fixed_int } }
+      \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign } { - }
+    }
   \int_compare:nNnF { #1 + 0 #2 } = { 0 }
     { \siunitx_number_process_fixed_aux_ii:nnn {#1} {#2} {#3} }
 }
