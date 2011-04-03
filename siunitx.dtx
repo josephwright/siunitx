@@ -7207,11 +7207,13 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_process_fixed_bool      ,
+%  \l_siunitx_process_engineering_bool ,
 %  \l_siunitx_process_scientific_bool ,
 %}
 % Settings for the scientific notation system.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_process_fixed_bool
+\bool_new:N \l_siunitx_process_engineering_bool
 \bool_new:N \l_siunitx_process_scientific_bool
 %    \end{macrocode}
 %\end{macro}
@@ -7255,18 +7257,28 @@ This work consists of the file  siunitx.dtx
     / false           .code:n =
     {
       \bool_set_false:N \l_siunitx_process_fixed_bool
+      \bool_set_false:N \l_siunitx_process_engineering_bool
       \bool_set_false:N \l_siunitx_process_scientific_bool
+    },
+  scientific-notation
+    / engineering     .code:n =
+    {
+      \bool_set_false:N  \l_siunitx_process_fixed_bool
+      \bool_set_true:N   \l_siunitx_process_engineering_bool
+      \bool_set_true:N   \l_siunitx_process_scientific_bool
     },
   scientific-notation
     / fixed           .code:n =
     {
       \bool_set_true:N  \l_siunitx_process_fixed_bool
+      \bool_set_false:N \l_siunitx_process_engineering_bool
       \bool_set_false:N \l_siunitx_process_scientific_bool
     },
   scientific-notation
     / true           .code:n =
     {
       \bool_set_false:N \l_siunitx_process_fixed_bool
+      \bool_set_false:N \l_siunitx_process_engineering_bool
       \bool_set_true:N \l_siunitx_process_scientific_bool
     },
 }
