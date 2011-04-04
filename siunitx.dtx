@@ -1795,26 +1795,33 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{scientific-notation}
 %\changes{v2.1}{2010/10/13}{New \opt{scientific-notation} option
 % for to use exponent form for numbers in all cases}
+%\changes{v2.2}{2011/04/04}{Extend \opt{scientific-notation} option
+% to include \opt{engineering} mode}
 %\DescribeOption{fixed-exponent}
 % Numbers can be converted to scientific notation by the package. This
 % is controlled by the \opt{scientific-notation} option, which takes
-% choices \opt{false}, \opt{true} and \opt{fixed}. In the later case,
-% the exponent value used will be set by the \opt{fixed-exponent}
-% option.
+% choices \opt{false}, \opt{true}, \opt{fixed} and
+% \opt{engineering}. The \opt{fixed} setting will use the exponent value
+% by the \opt{fixed-exponent} option. When \opt{engineering} is set,
+% the exponent is always a power of three. 
 %\begin{LaTeXdemo}
 %  \num{0.001}   \\
-%  \num{0.00100} \\
+%  \num{0.0100} \\
 %  \num{1200}    \\
 %  \sisetup{scientific-notation = true}%
 %  \num{0.001}   \\
-%  \num{0.00100} \\
+%  \num{0.0100} \\
+%  \num{1200}    \\
+%  \sisetup{scientific-notation = engineering}%
+%  \num{0.001}   \\
+%  \num{0.0100} \\
 %  \num{1200}    \\
 %  \sisetup{
 %    fixed-exponent      = 2,
 %    scientific-notation = fixed,
 %  }%
 %  \num{0.001}   \\
-%  \num{0.00100} \\
+%  \num{0.0100} \\
 %  \num{1200}
 %\end{LaTeXdemo}
 %
@@ -7206,9 +7213,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{
-%  \l_siunitx_process_fixed_bool      ,
+%  \l_siunitx_process_fixed_bool       ,
 %  \l_siunitx_process_engineering_bool ,
-%  \l_siunitx_process_scientific_bool ,
+%  \l_siunitx_process_scientific_bool  ,
 %}
 % Settings for the scientific notation system.
 %    \begin{macrocode}
@@ -8210,7 +8217,16 @@ This work consists of the file  siunitx.dtx
     \use:c
       {
         siunitx_number_process_scientific_engineering_
-        \int_mod:nn {#3} { 3 }
+	    \int_compare:nNnTF {#3} < { 0 }
+	      {
+	        \prg_case_int:nnn { \int_mod:nn { 0 - (#3) } { 3 } }
+	          {
+	            { 1 } { 2 }
+	            { 2 } { 1 }
+	          }
+	          { 0 }
+	      }
+	      { \int_mod:nn {#3} { 3 } }
         :nnn
       }
       {#1} {#2} {#3}
