@@ -8054,11 +8054,18 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\siunitx_number_process_scientific:}
 %\begin{macro}[aux]{
-%  \siunitx_number_process_scientific_aux_i:nnn  ,
-%  \siunitx_number_process_scientific_aux_ii:nnn ,
-%  \siunitx_number_process_scientific_large:nnn  ,
-%  \siunitx_number_process_scientific_small:wn   ,
-%  \siunitx_number_process_scientific_store:nnn  ,
+%  \siunitx_number_process_scientific_aux_i:nnn           ,
+%  \siunitx_number_process_scientific_aux_ii:nnn          ,
+%  \siunitx_number_process_scientific_large:nnn           ,
+%  \siunitx_number_process_scientific_small:wn            ,
+%  \siunitx_number_process_scientific_store:nnn           ,
+%  \siunitx_number_process_scientific_engineering:nnn     ,
+%  \siunitx_number_process_scientific_engineering_0:nnn   ,
+%  \siunitx_number_process_scientific_engineering_1:nnn   ,
+%  \siunitx_number_process_scientific_engineering_1:nw    ,
+%  \siunitx_number_process_scientific_engineering_2:nnn   ,
+%  \siunitx_number_process_scientific_engineering_2_i:nw  ,
+%  \siunitx_number_process_scientific_engineering_2_ii:nw ,
 %}
 % Converting a number to scientific form is done such that the number
 % of places involved is unchanged. The first step is to skip any
@@ -8081,6 +8088,13 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpb_tl
       \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
+     \group_begin:
+       \prop_get:NnN \l_siunitx_number_in_prop { exponent-sign }
+         \l_siunitx_tmpa_tl
+       \quark_if_no_value:NF \l_siunitx_tmpa_tl
+         { \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl }
+     \exp_args:NNNV \group_end:  
+     \tl_set:Nn \l_siunitx_tmpb_tl \l_siunitx_tmpb_tl
       \tl_set:Nx \l_siunitx_tmpa_tl
         { \l_siunitx_tmpa_tl { \l_siunitx_tmpb_tl } }
       \exp_last_unbraced:NV \siunitx_number_process_scientific_aux_i:nnn
@@ -8152,7 +8166,7 @@ This work consists of the file  siunitx.dtx
           { mantissa-decimal-marker }
       }
       {
-        \prop_put:Nnn \l_siunitx_number_in_propr
+        \prop_put:Nnn \l_siunitx_number_in_prop
           { mantissa-decimal } {#2}
         \prop_if_in:NnF \l_siunitx_number_in_prop
           { mantissa-decimal-marker }
@@ -8161,19 +8175,105 @@ This work consists of the file  siunitx.dtx
               { mantissa-decimal-marker } { . }
           }
       }
-    \int_compare:nNnF {#3} = { 0 }
+    \int_compare:nNnTF {#3} = { 0 }
       {
-        \int_set:Nn \l_siunitx_tmp_int {#3}
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent-sign }
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
+      }
+      {
         \prop_put:Nnn \l_siunitx_number_in_prop { exponent } { true }
-        \prop_put:NnV \l_siunitx_number_in_prop
-          { exponent-integer } \l_siunitx_tmp_int
+        \int_compare:nNnTF {#3} > { 0 }
+          {
+            \int_set:Nn \l_siunitx_tmp_int {#3}            
+            \prop_put:NnV \l_siunitx_number_in_prop
+              { exponent-integer } \l_siunitx_tmp_int
+            \prop_del:Nn \l_siunitx_number_in_prop { exponent-sign }
+          }
+          {
+            \int_set:Nn \l_siunitx_tmp_int { 0 - (#3) }            
+            \prop_put:NnV \l_siunitx_number_in_prop
+              { exponent-integer } \l_siunitx_tmp_int
+            \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign }
+              { - }
+          }
       }
   }
 %    \end{macrocode}
+% For engineering style, the exponent has to be a power of three.
+% The fastest way to do this is by expansion, as the number of tokens
+% is known.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn
   \siunitx_number_process_scientific_engineering:nnn #1#2#3
   {
+    \use:c
+      {
+        siunitx_number_process_scientific_engineering_
+        \int_mod:nn {#3} { 3 }
+        :nnn
+      }
+      {#1} {#2} {#3}
+  }
+\cs_new_eq:cN
+  { siunitx_number_process_scientific_engineering_0:nnn }
+  \siunitx_number_process_scientific_store:nnn
+\cs_new_protected_nopar:cpn
+  { siunitx_number_process_scientific_engineering_1:nnn } #1#2#3
+  {
+    \tl_if_empty:nTF {#2}
+      {
+        \siunitx_number_process_scientific_store:nnn { #1 0 } { } 
+          { #3 - 1 }
+      }
+      {
+        \use:c
+          { siunitx_number_process_scientific_engineering_1:nw }
+          {#1} #2 \q_stop {#3}
+      }
+  }
+\cs_new_protected_nopar:cpn
+  { siunitx_number_process_scientific_engineering_1:nw } 
+  #1#2#3 \q_stop #4
+  {
+    \siunitx_number_process_scientific_store:nnn
+      {#1#2} {#3} { #4 - 1 }
+  }
+\cs_new_protected_nopar:cpn
+  { siunitx_number_process_scientific_engineering_2:nnn } #1#2#3
+  {
+    \tl_if_empty:nTF {#2}
+      {
+        \siunitx_number_process_scientific_store:nnn { #1 00 } { } 
+          { #3 - 2 }
+      }
+      {
+        \use:c
+          { siunitx_number_process_scientific_engineering_2_i:nw }
+          {#1} #2 \q_stop {#3}
+      }
+  }
+\cs_new_protected_nopar:cpn
+  { siunitx_number_process_scientific_engineering_2_i:nw } 
+  #1#2#3 \q_stop #4
+  {
+     \tl_if_empty:nTF {#3}
+       {
+        \siunitx_number_process_scientific_store:nnn { #1#2 0 } { } 
+          { #4 - 2 }
+       }
+       {
+        \use:c
+          { siunitx_number_process_scientific_engineering_2_ii:nw }
+          {#1#2} #3 \q_stop {#4}
+       }
+  }
+\cs_new_protected_nopar:cpn
+  { siunitx_number_process_scientific_engineering_2_ii:nw } 
+  #1#2#3 \q_stop #4
+  {
+    \siunitx_number_process_scientific_store:nnn { #1#2 } {#3} 
+      { #4 - 2 }
   }
 %    \end{macrocode}
 %\end{macro}
