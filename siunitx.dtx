@@ -2891,6 +2891,7 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
+%      table-align-comparator    & Switch  & true      \\
 %      table-align-exponent      & Switch  & true      \\
 %      table-align-text-post     & Switch  & true      \\
 %      table-align-uncertainty   & Switch  & true      \\
@@ -3188,6 +3189,9 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
+%\DescribeOption{table-align-comparator}
+%\changes{v2.2}{2010/04/04}{New \opt{table-align-comparator} and
+% option for more control of table formatting}
 %\DescribeOption{table-align-exponent}
 %\DescribeOption{table-align-uncertainty}
 %\changes{v2.1}{2010/10/12}{New \opt{table-align-exponent} and
@@ -3199,7 +3203,9 @@ This work consists of the file  siunitx.dtx
 % (\cref{tab:align:exp}). Similarly, uncertainty parts which are printed
 % separately from the mantissa can be aligned or closed up. This is
 % set by the \opt{table-align-uncertainty} option
-% (\cref{tab:align:uncert}).
+% (\cref{tab:align:uncert}). Finally, the same approach is available
+% for the comparator with the \opt{table-align-comparator} option
+% (\cref{tab:align:comp}).
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
 %    \centering
@@ -3231,6 +3237,22 @@ This work consists of the file  siunitx.dtx
 %      \midrule
 %        1.2(1)   & 1.2(3)    \\
 %        1.234(5) & 1.234(5) \\
+%      \bottomrule
+%    \end{tabular}
+%  \end{table}
+%\end{LaTeXdemo}
+%\begin{LaTeXdemo}[code and float]
+%  \begin{table}
+%    \centering
+%    \caption{The \opt{table-align-comparator} option}
+%    \label{tab:align:comp}
+%    \sisetup{table-format = >2.2}
+%    \begin{tabular}{SS[table-align-comparator = false]}
+%      \toprule
+%        {Header} & {Header} \\
+%      \midrule
+%        >  1.2  & >  1.2  \\
+%        < 12.34 & < 12.34 \\
 %      \bottomrule
 %    \end{tabular}
 %  \end{table}
@@ -13020,24 +13042,29 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_table_align_exp_bool}
-%\begin{macro}{\l_siunitx_table_align_post_bool}
-%\begin{macro}{\l_siunitx_table_align_uncert_bool}
-%\begin{macro}{\l_siunitx_table_omit_exp_bool}
-%\begin{macro}{\l_siunitx_table_auto_bool}
-%\begin{macro}{\l_siunitx_table_comparator_bool}
-%\begin{macro}{\l_siunitx_table_decimal_int}
-%\begin{macro}{\l_siunitx_table_exponent_int}
-%\begin{macro}{\l_siunitx_table_integer_int}
-%\begin{macro}{\l_siunitx_table_uncert_int}
-%\begin{macro}{\l_siunitx_table_parse_only_bool}
-%\begin{macro}{\l_siunitx_table_pre_tl}
-%\begin{macro}{\l_siunitx_table_post_tl}
-%\begin{macro}{\l_siunitx_table_sign_exponent_bool}
-%\begin{macro}{\l_siunitx_table_sign_manitssa_bool}
+%\begin{macro}{
+%  \l_siunitx_table_align_comparator_bool ,
+%  \l_siunitx_table_align_exp_bool        ,
+%  \l_siunitx_table_align_post_bool       ,
+%  \l_siunitx_table_align_uncert_bool     ,
+%  \l_siunitx_table_omit_exp_bool         ,
+%  \l_siunitx_table_auto_bool             ,
+%  \l_siunitx_table_comparator_bool       ,
+%  \l_siunitx_table_decimal_int           ,
+%  \l_siunitx_table_exponent_int          ,
+%  \l_siunitx_table_integer_int           ,
+%  \l_siunitx_table_uncert_int            ,
+%  \l_siunitx_table_parse_only_bool       ,
+%  \l_siunitx_table_pre_tl                ,
+%  \l_siunitx_table_post_tl               ,
+%  \l_siunitx_table_sign_exponent_bool    ,
+%  \l_siunitx_table_sign_manitssa_bool    ,
+%}
 % As usual, set up the options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
+  table-align-comparator      .bool_set:N
+    = \l_siunitx_table_align_comparator_bool,
   table-align-exponent        .bool_set:N
     = \l_siunitx_table_align_exp_bool,
   table-align-text-post       .bool_set:N
@@ -13113,6 +13140,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_table_sign_mantissa_bool
 }
 \keys_set:nn { siunitx } {
+  table-align-comparator  = true,
   table-align-exponent    = true,
   table-align-text-post   = true,
   table-align-uncertainty = true,
@@ -13122,20 +13150,6 @@ This work consists of the file  siunitx.dtx
   table-figures-integer   = 3
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %\end{macro}
 %
 % A meta-choice for all table alignment is also provided.
@@ -13407,7 +13421,10 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_table_print_S_parse:
   \bool_if:NTF \l_siunitx_table_comparator_bool
-    { \siunitx_table_print_S_reserved_comparator: }
+    {
+      \bool_if:NT \l_siunitx_table_align_comparator_bool
+        { \siunitx_table_print_S_reserved_comparator: }
+    }
     {
       \prop_if_in:NnT \l_siunitx_number_out_prop { comparator }
         {
@@ -13608,10 +13625,19 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected_nopar:Npn
   \siunitx_table_print_S_reserved_mantissa_aux:n #1 {
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { integer } {#1}
-  \siunitx_table_print_S_get_integer:Nn
-    \l_siunitx_number_out_prop {#1}
+  \bool_if:NTF \l_siunitx_table_align_comparator_bool
+    {
+      \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
+        { integer } {#1}
+      \siunitx_table_print_S_get_integer:Nn
+        \l_siunitx_number_out_prop {#1}
+    }
+    {
+      \siunitx_table_print_S_measure_comparator_integer:N
+        \l_siunitx_table_model_prop
+      \siunitx_table_print_S_measure_comparator_integer_get:N
+        \l_siunitx_number_out_prop
+    }
   \box_clear:N \l_siunitx_tmp_box
   \tl_if_empty:NF \l_siunitx_tmpa_tl
     {
@@ -13868,6 +13894,12 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN #1 { mantissa } \l_siunitx_tmpa_tl
   \quark_if_no_value:NT \l_siunitx_tmpa_tl
     { \tl_clear:N \l_siunitx_tmpa_tl }
+  \bool_if:NF \l_siunitx_table_align_comparator_bool
+    {
+      \prop_get:NnN #1 { comparator } \l_siunitx_tmpb_tl
+      \quark_if_no_value:NF \l_siunitx_tmpb_tl
+        { \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -13906,11 +13938,25 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\siunitx_table_print_S_measure_comparator_integer:N}
+%\begin{macro}{\siunitx_table_print_S_measure_comparator_integer_get:N}
 % A special-case macro when the comparator is also needed in
 % measuring up the integer part of the mantissa.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn
   \siunitx_table_print_S_measure_comparator_integer:N #1
+  {
+    \siunitx_table_print_S_measure_comparator_integer_get:N #1
+    \tl_if_empty:NTF \l_siunitx_tmpa_tl
+      { \dim_set:Nn \l_siunitx_table_integer_dim { \c_zero_skip } }
+      {
+        \hbox_set:Nn \l_siunitx_tmp_box
+          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+        \dim_set:Nn \l_siunitx_table_integer_dim
+          { \box_wd:N \l_siunitx_tmp_box }
+      }
+  }
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_measure_comparator_integer_get:N #1
   {
     \prop_get:NnN #1 { comparator } \l_siunitx_tmpa_tl
     \quark_if_no_value:NT \l_siunitx_tmpa_tl
@@ -13922,16 +13968,9 @@ This work consists of the file  siunitx.dtx
     \quark_if_no_value:NT \l_siunitx_tmpb_tl
       { \tl_clear:N \l_siunitx_tmpb_tl }
     \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-    \tl_if_empty:NTF \l_siunitx_tmpa_tl
-      { \dim_set:Nn \l_siunitx_table_integer_dim { \c_zero_skip } }
-      {
-        \hbox_set:Nn \l_siunitx_tmp_box
-          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-        \dim_set:Nn \l_siunitx_table_integer_dim
-          { \box_wd:N \l_siunitx_tmp_box }
-      }
   }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Direct printing in \texttt{S} columns}
