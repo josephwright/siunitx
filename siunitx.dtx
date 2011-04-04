@@ -7263,9 +7263,9 @@ This work consists of the file  siunitx.dtx
   scientific-notation
     / engineering     .code:n =
     {
-      \bool_set_false:N  \l_siunitx_process_fixed_bool
-      \bool_set_true:N   \l_siunitx_process_engineering_bool
-      \bool_set_true:N   \l_siunitx_process_scientific_bool
+      \bool_set_false:N \l_siunitx_process_fixed_bool
+      \bool_set_true:N  \l_siunitx_process_engineering_bool
+      \bool_set_true:N  \l_siunitx_process_scientific_bool
     },
   scientific-notation
     / fixed           .code:n =
@@ -7279,7 +7279,7 @@ This work consists of the file  siunitx.dtx
     {
       \bool_set_false:N \l_siunitx_process_fixed_bool
       \bool_set_false:N \l_siunitx_process_engineering_bool
-      \bool_set_true:N \l_siunitx_process_scientific_bool
+      \bool_set_true:N  \l_siunitx_process_scientific_bool
     },
 }
 \keys_set:nn { siunitx } {
@@ -8058,6 +8058,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_process_scientific_aux_ii:nnn ,
 %  \siunitx_number_process_scientific_large:nnn  ,
 %  \siunitx_number_process_scientific_small:wn   ,
+%  \siunitx_number_process_scientific_store:nnn  ,
 %}
 % Converting a number to scientific form is done such that the number
 % of places involved is unchanged. The first step is to skip any
@@ -8102,33 +8103,10 @@ This work consists of the file  siunitx.dtx
     {
       \int_compare:nNnTF {#1} > { 0 }
         {
-          \prop_put:Nnn \l_siunitx_number_in_prop
-            { mantissa-integer } {#1}
-          \tl_if_empty:nTF {#2}
-            {
-              \prop_del:Nn \l_siunitx_number_in_prop
-                { mantissa-decimal }
-              \prop_del:Nn \l_siunitx_number_in_prop
-                { mantissa-decimal-marker }
-            }
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop
-                { mantissa-decimal } {#2}
-              \prop_if_in:NnF \l_siunitx_number_in_prop
-                { mantissa-decimal-marker }
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop
-                    { mantissa-decimal-marker } { . }
-                }
-            }
-          \int_compare:nNnF {#3} = { 0 }
-            {
-              \int_set:Nn \l_siunitx_tmp_int {#3}
-              \prop_put:Nnn \l_siunitx_number_in_prop { exponent }
-                { true }
-              \prop_put:NnV \l_siunitx_number_in_prop
-                { exponent-integer } \l_siunitx_tmp_int
-            }
+          \bool_if:NTF \l_siunitx_process_engineering_bool
+            { \siunitx_number_process_scientific_engineering:nnn }
+            { \siunitx_number_process_scientific_store:nnn }
+               {#1} {#2} {#3}
         }
         {
           \siunitx_number_process_scientific_small:wn
@@ -8158,9 +8136,45 @@ This work consists of the file  siunitx.dtx
 % For small numbers, the important digit is easy to find.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn
-  \siunitx_number_process_scientific_small:wn #1#2 \q_stop #3 {
-   \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} { #3 - 1 }
-}
+  \siunitx_number_process_scientific_small:wn #1#2 \q_stop #3 
+  { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} { #3 - 1 } }
+%    \end{macrocode}
+% A tidy-up and store routine.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn 
+  \siunitx_number_process_scientific_store:nnn #1#2#3
+  {
+    \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-integer } {#1}
+    \tl_if_empty:nTF {#2}
+      {
+        \prop_del:Nn \l_siunitx_number_in_prop { mantissa-decimal }
+        \prop_del:Nn \l_siunitx_number_in_prop
+          { mantissa-decimal-marker }
+      }
+      {
+        \prop_put:Nnn \l_siunitx_number_in_propr
+          { mantissa-decimal } {#2}
+        \prop_if_in:NnF \l_siunitx_number_in_prop
+          { mantissa-decimal-marker }
+          {
+            \prop_put:Nnn \l_siunitx_number_in_prop
+              { mantissa-decimal-marker } { . }
+          }
+      }
+    \int_compare:nNnF {#3} = { 0 }
+      {
+        \int_set:Nn \l_siunitx_tmp_int {#3}
+        \prop_put:Nnn \l_siunitx_number_in_prop { exponent } { true }
+        \prop_put:NnV \l_siunitx_number_in_prop
+          { exponent-integer } \l_siunitx_tmp_int
+      }
+  }
+%    \end{macrocode}
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn
+  \siunitx_number_process_scientific_engineering:nnn #1#2#3
+  {
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
