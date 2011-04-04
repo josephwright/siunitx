@@ -550,6 +550,10 @@ This work consists of the file  siunitx.dtx
 %  \pkg{arev} package is loaded}
 %\changes{v2.1o}{2011/04/03}{Account for negative exponents
 %  when using \opt{fixed-exponent} system}
+%\changes{v2.1p}{2011/04/04}{Bad table alignment when some rows
+%  contain comparators fixed}
+%\changes{v2.1p}{2011/04/04}{Poor position of comparators in
+%  numbers fixed}
 %  
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -4462,7 +4466,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.  
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/04/03} {2.1o}
+\ProvidesExplPackage {siunitx} {2011/04/04} {2.1p}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 % 
@@ -8716,7 +8720,7 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nx \l_siunitx_tmpa_tl
         { 
           \exp_not:N \ensuremath
-            { { \exp_not:V \l_siunitx_tmpa_tl } }
+            { \exp_not:V \l_siunitx_tmpa_tl }
         }
       \prop_put:NnV \l_siunitx_number_out_prop { comparator }
         \l_siunitx_tmpa_tl
@@ -12651,9 +12655,9 @@ This work consists of the file  siunitx.dtx
     { \box_use:N \l_siunitx_table_pre_box }
   \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
   \siunitx_table_print_S_parse:
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
-    { integer } { mantissa }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
+  \siunitx_table_print_S_measure_comparator_integer:N
+    \l_siunitx_number_out_prop
+  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop
     { marker }  { mantissa }
   \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop 
     { result } { }
@@ -12963,7 +12967,8 @@ This work consists of the file  siunitx.dtx
     { mantissa } { }
   \siunitx_table_print_S_get_mantissa:Nn 
     \l_siunitx_number_out_prop { }
-  \dim_set:Nn \l_siunitx_table_space_dim { \l_siunitx_table_mantissa_dim }
+  \dim_set:Nn \l_siunitx_table_space_dim 
+    { \l_siunitx_table_mantissa_dim }
   \hbox_set:Nn \l_siunitx_table_result_box
     {
       \box_use:N \l_siunitx_table_fill_box
@@ -13214,8 +13219,9 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{\siunitx_table_print_S_get_integer:Nn}
 % Getting the integer part of a number means that the sign also has be
-% considered, even if there is no actual integer. This leas to a 
-% slightly odd approach here.
+% considered, even if there is no actual integer. This leads to a 
+% slightly odd approach here. There is also the comparator to
+% worry about.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn 
   \siunitx_table_print_S_get_integer:Nn #1#2 {
@@ -13272,6 +13278,35 @@ This work consists of the file  siunitx.dtx
   \quark_if_no_value:NT \l_siunitx_tmpa_tl
     { \tl_clear:N \l_siunitx_tmpa_tl }
 }
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_table_print_S_measure_comparator_integer:N}
+% A special-case macro when the comparator is also needed in
+% measuring up the integer part of the mantissa.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_measure_comparator_integer:N #1
+  {
+    \prop_get:NnN #1 { comparator } \l_siunitx_tmpa_tl
+    \quark_if_no_value:NT \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \prop_get:NnN #1 { mantissa-sign } \l_siunitx_tmpb_tl
+    \quark_if_no_value:NF \l_siunitx_tmpb_tl
+      { \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    \prop_get:NnN #1 { mantissa-integer } \l_siunitx_tmpb_tl
+    \quark_if_no_value:NT \l_siunitx_tmpb_tl
+      { \tl_clear:N \l_siunitx_tmpb_tl }
+    \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+    \tl_if_empty:NTF \l_siunitx_tmpa_tl
+      { \dim_set:Nn \l_siunitx_table_integer_dim { \c_zero_skip } }
+      {
+        \hbox_set:Nn \l_siunitx_tmp_box
+          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+        \dim_set:Nn \l_siunitx_table_integer_dim
+          { \box_wd:N \l_siunitx_tmp_box }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -14656,7 +14691,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/04/03} {2.1o} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/04/04} {2.1p} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %    
@@ -15940,7 +15975,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}  
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/04/03} {2.1o}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/04/04} {2.1p}
   {siunitx: Binary units}
 %    \end{macrocode}
 %    
