@@ -1675,6 +1675,7 @@ This work consists of the file  siunitx.dtx
 %      add-integer-zero         & Switch  & true     \\
 %      explicit-sign            & Literal & \m{none} \\
 %      fixed-exponent           & Integer & 0        \\
+%      minimum-integer-digits   & Integer & 0        \\
 %      retain-explicit-plus     & Switch  & false    \\
 %      retain-unity-mantissa    & Switch  & true     \\
 %      retain-zero-exponent     & Switch  & false    \\
@@ -1767,6 +1768,18 @@ This work consists of the file  siunitx.dtx
 %  \num{123.} \\
 %  \num{456}  \\
 %  \num{.789}
+%\end{LaTeXdemo}
+%\DescribeOption{minimum-integer-digits}
+% Related is the \opt{minimum-integer-digits} option. This applies
+% only to the integer part of the mantissa, and ensures that it will
+% contain at least the specified number of digits. This is achieved
+% by padding with zeros if needed.
+%\begin{LaTeXdemo}
+%  \num{123} \\
+%  \num[minimum-integer-digits = 1]{123} \\
+%  \num[minimum-integer-digits = 2]{123} \\
+%  \num[minimum-integer-digits = 3]{123} \\
+%  \num[minimum-integer-digits = 4]{123}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{explicit-sign}
@@ -7256,6 +7269,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_process_integer_zero_bool  ,
 %  \l_siunitx_process_sign_tl            ,
 %  \l_siunitx_process_fixed_int          ,
+%  \l_siunitx_process_integer_min_int    ,
 %  \l_siunitx_process_plus_tl            ,
 %  \l_siunitx_process_unity_mantissa_tl  ,
 %  \l_siunitx_process_zero_exponent_bool ,
@@ -7270,6 +7284,8 @@ This work consists of the file  siunitx.dtx
   add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
   explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
   fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
+  minimum-integer-digits .int_set:N = 
+    \l_siunitx_process_integer_min_int,
   retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
   retain-unity-mantissa .bool_set:N =
     \l_siunitx_process_unity_mantissa_bool,
@@ -7344,6 +7360,7 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
         { \siunitx_number_process_round: }
     }
+  \siunitx_number_process_integer_digits:  
 }
 %    \end{macrocode}
 %\end{macro}
@@ -7741,6 +7758,39 @@ This work consists of the file  siunitx.dtx
   { }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_number_process_integer_digits:}
+% Producing extra digits for the integer part is a simple process
+% once the target is known.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_process_integer_digits: {
+  \int_compare:nNnT
+    { \l_siunitx_process_integer_min_int } > { \c_zero }
+    {
+      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+        \l_siunitx_tmpa_tl
+      \quark_if_no_value:NF \l_siunitx_tmpa_tl
+        {
+          \int_set:Nn \l_siunitx_tmp_int
+            {
+                 \l_siunitx_process_integer_min_int
+              - \tl_elt_count:N \l_siunitx_tmpa_tl
+            }
+          \int_compare:nNnT { \l_siunitx_tmp_int } > { \c_zero }
+            {
+              \tl_set:Nx \l_siunitx_tmpa_tl
+                {
+                  \prg_replicate:nn { \l_siunitx_tmp_int } { 0 }
+                  \exp_not:V \l_siunitx_tmpa_tl
+                }
+              \prop_put:NnV \l_siunitx_number_in_prop
+                { mantissa-integer } \l_siunitx_tmpa_tl
+            }    
+        }
+    }
+}
+%    \end{macrocode}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_number_process_mantissa:}
