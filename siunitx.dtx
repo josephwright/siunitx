@@ -54,6 +54,7 @@ text. To compile the documentation without error, you will
 need the packages:
  - amsmath
  - booktabs
+ - cancel
  - caption
  - cleveref
  - csquotes
@@ -141,8 +142,8 @@ This work consists of the file  siunitx.dtx
 %<*driver>
 \documentclass[german,french,english,UKenglish]{l3doc}
 
-\usepackage{amsmath,babel,booktabs,caption,colortbl,csquotes,datatool}
-\usepackage{helvet,multirow,pgfplots,siunitx,xcolor,xtab}
+\usepackage{amsmath,babel,booktabs,cancel,caption,colortbl,csquotes}
+\usepackage{datatool,helvet,multirow,pgfplots,siunitx,xcolor,xtab}
 \IfFileExists{xfrac.sty}
   {\usepackage{xfrac}}
   {%
@@ -240,6 +241,7 @@ This work consists of the file  siunitx.dtx
 %          bit,
 %          bottomrule,
 %          byte,
+%          cancel
 %          candela,
 %          centi,
 %          color,
@@ -559,6 +561,7 @@ This work consists of the file  siunitx.dtx
 %\begin{itemize}
 % \item \pkg{amsmath}
 % \item \pkg{booktabs}
+% \item \pkg{cancel}
 % \item \pkg{caption}
 % \item \pkg{cleveref}
 % \item \pkg{csquotes}
@@ -5897,6 +5900,8 @@ This work consists of the file  siunitx.dtx
   \group_end:
   \cs_set_protected_nopar:Npn \siunitx_print_math:
     {
+      \cs_set_eq:NN \PrintSubscript   @
+      \cs_set_eq:NN \PrintSuperscript ^
       \ensuremath
         {
           \use:c
@@ -5909,6 +5914,8 @@ This work consists of the file  siunitx.dtx
     }
   \cs_set_protected_nopar:Npn \siunitx_print_text:
     {
+      \cs_set_eq:NN \PrintSubscript   \siunitx_print_text_sub:n
+      \cs_set_eq:NN \PrintSuperscript \siunitx_print_text_super:n
       \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ }
         { \siunitx_print_text_sub:n }
       \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! }
@@ -5968,6 +5975,16 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{
+%  \PrintSubscript   ,
+%  \PrintSuperscript ,
+%}
+% In the unit-construction code, there are places where it cannot
+% be guarenteed that the search-and-replace approach will work.
+% Instead, two user-space functions are needed. These are only
+% defined within the above code: the names are not needed elsewhere.
 %\end{macro}
 %
 %\subsection{Pre-processing numbers}
@@ -10514,11 +10531,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_special:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
-    {
-      \cs_set_protected:Npn \siunitx_tmp:w ##1 {#2}
-      \siunitx_tmp:w {##1}
-    }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
+    { #2 {##1} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_special:n {#2} }
 }
@@ -10606,6 +10620,25 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_parse_qualifier:n {#1}
 }
 %    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\cancel}
+%\begin{macro}[aux]{\siunitx_cancel:n}
+% The \cs{cancel} macro is odd as it is only defined if the appropriate
+% package is loaded.
+%    \begin{macrocode}
+\AtBeginDocument {
+  \cs_if_exist:NT \cancel
+    {
+      \cs_set_eq:NN \siunitx_cancel:n \cancel
+      \tl_put_right:Nn \l_siunitx_declare_list_tl { \cancel }
+      \cs_new_protected:cpn 
+        { siunitx_ \token_to_str:N \cancel _function:w }
+        { \siunitx_unit_parse_special:n { \siunitx_cancel:n }  }
+    }
+}
+%    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Creating body unit macros}
@@ -11356,7 +11389,22 @@ This work consists of the file  siunitx.dtx
             \l_siunitx_unit_product_tl
         }
     }
-  \tl_put_left:cV { l_siunitx_unit #1 _tl } \l_siunitx_unit_current_tl
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    { special- \int_use:N \l_siunitx_unit_int }
+  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+    \l_siunitx_tmpa_tl
+  \quark_if_no_value:NTF \l_siunitx_tmpa_tl  
+  {
+    \tl_put_left:cV { l_siunitx_unit #1 _tl } 
+      \l_siunitx_unit_current_tl
+  }
+  {
+    \tl_put_left:cx { l_siunitx_unit #1 _tl }
+      { 
+        \exp_not:V \l_siunitx_tmpa_tl
+        { \exp_not:V \l_siunitx_unit_current_tl }
+      }
+  }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11622,7 +11670,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_unit_format_power_brackets:
       \tl_put_right:Nx \l_siunitx_unit_current_tl
         {
-          ^
+          \exp_not:N \PrintSuperscript
             {
               \siunitx_unit_format_power_aux:n
                 { \exp_not:V \l_siunitx_tmpa_tl }
@@ -11829,16 +11877,9 @@ This work consists of the file  siunitx.dtx
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
 \char_make_space:N \~
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_set_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript:
-    {
-      \tl_put_right:Nx \l_siunitx_unit_current_tl
-        { @ { \exp_not:V \l_siunitx_tmpa_tl } }
-    }
+\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript: {
+  \tl_put_right:Nx \l_siunitx_unit_current_tl
+    { \exp_not:N \PrintSubscript { \exp_not:V \l_siunitx_tmpa_tl } }
 }
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_text: {
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
@@ -12023,7 +12064,8 @@ This work consists of the file  siunitx.dtx
       \tl_set:Nx \l_siunitx_tmpa_tl
         {
           \int_use:N \l_siunitx_unit_prefix_base_int
-          ^ { \int_use:N \l_siunitx_unit_prefix_int }
+          \exp_not:N \PrintSuperscript
+            { \int_use:N \l_siunitx_unit_prefix_int }
         }
       \siunitx_print:nV { number } \l_siunitx_tmpa_tl
       \siunitx_unit_output_number_sep:
