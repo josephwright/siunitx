@@ -10508,6 +10508,23 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_declare_special:Nn}
+% Special effects functions are declared to store their arguments
+% or to directly apply them.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_declare_special:Nn #1#2 {
+  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
+    {
+      \cs_set_protected:Npn \siunitx_tmp:w ##1 {#2}
+      \siunitx_tmp:w {##1}
+    }
+  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
+    { \siunitx_unit_parse_special:n {#2} }
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_declare_unit:Nnn}
 %\begin{macro}[aux]{\siunitx_unit_first_token:n}
 % Creating units requires various things to be stored.  This is done
@@ -11036,6 +11053,19 @@ This work consists of the file  siunitx.dtx
     { \msg_error:nn { siunitx } { qualifier-before-unit } }
   \tl_set:Nx \l_siunitx_tmpa_tl
     { qualifier- \int_use:N \l_siunitx_unit_int }
+  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+}
+%    \end{macrocode}
+%\end{macro}
+%
+%\begin{macro}{\siunitx_unit_parse_special:n}
+% Special effects are possible by adding code to the unit property
+% list here: this is pretty much arbitrary, so there is no real
+% processing done.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_parse_special:n #1 {
+  \tl_set:Nx \l_siunitx_tmpa_tl
+    { special- \int_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
 }
 %    \end{macrocode}
