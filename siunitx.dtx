@@ -270,6 +270,7 @@ This work consists of the file  siunitx.dtx
 %          gram,
 %          gray,
 %          henry,
+%          highlight,
 %          hour,
 %          Hz,
 %          joule,
@@ -1046,13 +1047,23 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\DescribeMacro{\cancel}
+%\DescribeMacro{\highlight}
 %\changes{v2.2}{2011/04/05}{Support use of \cs{cancel} macro in units}
+%\changes{v2.2}{2011/04/06}{New \cs{highlight} macro for selective
+%  colour in units}
 % If the \pkg{cancel} package is loaded, it is possible to
 % \enquote{cancel out} units using the \cs{cancel} macro. This applies
-% to the next unit, in a similar manner to a prefix.
+% to the next unit, in a similar manner to a prefix. The \cs{highlight}
+% macro is also available to selectively colour units. Both \cs{cancel}
+% and \cs{highlight} are of course outside of the normal semantic
+% meaning of units, but are provided as they may be useful in some
+% cases.
 %\begin{LaTeXdemo}
 %  \si[per-mode = fraction]
-%    {\cancel\kilogram\metre\per\cancel\kilogram\per\second}
+%    {\cancel\kilogram\metre\per\cancel\kilogram\per\second} \\
+%  \si{\highlight{red}\kilogram\metre\per\second} \\
+%  \si[unit-color = purple]
+%    {\highlight{red}\kilogram\metre\per\second}
 %\end{LaTeXdemo}
 %
 % When using the unit macros, the package is able to validate the
@@ -5870,7 +5881,10 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_print_color:}
+%\begin{macro}{
+%  \siunitx_print_color: ,
+%  \siunitx_textcolor:n  ,
+%}
 % The colour system checks if \pkg{color} is loaded, and only does
 % anything if it is.  This will change when \LaTeX3 proper is available:
 % there will be colour out of the box!
@@ -5885,8 +5899,12 @@ This work consists of the file  siunitx.dtx
     }
 }
 \AtBeginDocument {
-  \@ifpackageloaded { color } { }
-    { \cs_set_eq:NN \siunitx_print_color: \scan_stop: }
+  \@ifpackageloaded { color }
+    { \cs_new_eq:NN \siunitx_textcolor:n \textcolor }
+    { 
+      \cs_set_eq:NN \siunitx_print_color: \scan_stop:
+      \cs_new_eq:NN \siunitx_textcolor:n \use:n
+    }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -10480,7 +10498,8 @@ This work consists of the file  siunitx.dtx
 % A list of all unit and related functions.
 %    \begin{macrocode}
 \tl_new:N \l_siunitx_declare_list_tl
-\tl_set:Nn \l_siunitx_declare_list_tl { \of \per \raiseto \tothe }
+\tl_set:Nn \l_siunitx_declare_list_tl
+ { \of \highlight \per \raiseto \tothe }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -10650,6 +10669,18 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\highlight}
+% Another special function: selective colour.
+%    \begin{macrocode}
+\cs_new_protected:cpn
+  { siunitx_ \token_to_str:N \highlight _literal:w } #1
+  { \siunitx_textcolor:n {#1} }
+\cs_new_protected:cpn
+  { siunitx_ \token_to_str:N \highlight _function:w } #1
+  { \siunitx_unit_parse_special:n { \siunitx_textcolor:n {#1} } }
+%    \end{macrocode}
 %\end{macro}
 %
 %\subsection{Creating body unit macros}
@@ -10918,6 +10949,7 @@ This work consists of the file  siunitx.dtx
     \tl_map_function:NN \l_siunitx_declare_list_tl
       \siunitx_unit_if_literal_aux:N
     \cs_set_eq:NN \of \use_none:n
+    \cs_set_eq:NN \highlight \use_none:n
     \cs_set_eq:NN \raiseto \use_none:n
     \cs_set_eq:NN \tothe \use_none:n
     \protected@edef \l_siunitx_tmpa_tl {#1}
