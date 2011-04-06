@@ -11363,14 +11363,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format: {
   \siunitx_unit_format_init:
-  \int_compare:nNnT { \l_siunitx_unit_int } = { 1 }
-    {
-      \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
-        {
-          \prop_if_in:NnT \l_siunitx_unit_prop { per-1 }
-            { \bool_set_true:N \l_siunitx_omit_unit_space_bool }
-        }
-    }
   \int_while_do:nNnn { \l_siunitx_unit_int } > { 0 }
     {
       \siunitx_unit_format_prefix:
@@ -11466,6 +11458,11 @@ This work consists of the file  siunitx.dtx
 % only done if there is no number. Then some construction work.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_fraction: {
+  \int_compare:nNnT { \l_siunitx_unit_numerator_int } = { 0 }
+    {
+      \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
+        { \bool_set_true:N \l_siunitx_omit_unit_space_bool }
+    }
   \int_compare:nNnTF { \l_siunitx_unit_denominator_int } > { 0 }
     {
       \bool_if:NTF \l_siunitx_per_auto_bool
@@ -11938,7 +11935,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_format_sorted: {
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
-  \tl_if_empty:NF \l_siunitx_unit_tl
+  \tl_if_empty:NTF \l_siunitx_unit_tl
     {
       \tl_if_empty:NF \l_siunitx_unit_denominator_tl
         {
@@ -12102,7 +12099,14 @@ This work consists of the file  siunitx.dtx
   \cs_set_eq:NN \siunitx_unit_format_fraction_symbol_aux_ii:
     \siunitx_unit_format_fraction_symbol_aux_alt:
   \siunitx_unit_in:nn {#1} {#2}
-  \int_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 }
+  \int_compare:nNnTF { \l_siunitx_unit_prefix_int } = { 0 }
+    {
+      \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
+        {
+          \int_compare:nNnT { \l_siunitx_unit_numerator_int } = { 0 }
+            { \siunitx_print:nn { unit } { 1 } }
+        }
+    }
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
         {
