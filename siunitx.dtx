@@ -494,6 +494,8 @@ This work consists of the file  siunitx.dtx
 %  contain comparators fixed}
 %\changes{v2.1p}{2011/04/04}{Poor position of comparators in
 %  numbers fixed}
+%\changes{v2.2}{2011/04/15}{Fix issue with \texttt{*} tokens in
+%  tabular preambles}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12577,6 +12579,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %\begin{macro}{\siunitx_table_rewrite_create:N}
+%\begin{macro}[aux]{\siunitx_table_rewrite_create_aux:w}
 % The \texttt{s} and \texttt{S} column types are both created using
 % the \pkg{array} package, but with the internal macros redefined
 % to work with optional argument. First, there is a need to do a
@@ -12586,10 +12589,11 @@ This work consists of the file  siunitx.dtx
 % to the appropriate macro.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_rewrite_create:N #1 {
-  \tl_set:Nn \l_siunitx_tmpa_tl { \NC@do #1 }
-  \tl_put_right:NV \l_siunitx_tmpa_tl \NC@list
   \newcolumntype {#1} { }
-  \toks_set:NV \NC@list \l_siunitx_tmpa_tl
+  \cs_set_protected_nopar:Npn
+    \siunitx_table_rewrite_create_aux:w \NC@do ##1##2 \NC@do #1
+    {  \NC@list { \NC@do ##1 \NC@do #1 ##2 } }
+  \exp_after:wN \siunitx_table_rewrite_create_aux:w \toks_use:N \NC@list
   \exp_args:NNc \renewcommand * { NC@rewrite@ #1 } [1] [ ]
     {
       \toks_put_right:Nn \@temptokena
@@ -12601,9 +12605,11 @@ This work consists of the file  siunitx.dtx
       \NC@find
     }
 }
+\cs_new_protected_nopar:Npn \siunitx_table_rewrite_create_aux:w { }
 \AtBeginDocument { \siunitx_table_rewrite_create:N s }
 \AtBeginDocument { \siunitx_table_rewrite_create:N S }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %
 %\subsection{Collecting tokens in tables}
