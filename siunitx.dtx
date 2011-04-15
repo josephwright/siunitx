@@ -494,8 +494,10 @@ This work consists of the file  siunitx.dtx
 %  contain comparators fixed}
 %\changes{v2.1p}{2011/04/04}{Poor position of comparators in
 %  numbers fixed}
-%\changes{v2.2}{2011/04/15}{Fix issue with \texttt{*} tokens in
+%\changes{v2.2a}{2011/04/15}{Fix issue with \texttt{*} tokens in
 %  tabular preambles}
+%\changes{v2.2a}{2011/04/15}{Expand macros with arguments correctly
+%  in tables}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12725,8 +12727,8 @@ This work consists of the file  siunitx.dtx
         {
           \tl_use:N \l_siunitx_table_collect_pre_tl
           \tl_clear:N \l_siunitx_table_collect_pre_tl
-          \cs_set_nopar:Npx \siunitx_table_collect_next:
-            { \exp_not:N \siunitx_table_collect_get: \exp_not:V #1 }
+          \cs_set_nopar:Npn \siunitx_table_collect_next:
+            { \exp_after:wN \siunitx_table_collect_get: #1 }
         }
         {
           \bool_if:NTF \l_siunitx_table_collect_pre_bool
