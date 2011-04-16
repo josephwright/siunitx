@@ -498,6 +498,8 @@ This work consists of the file  siunitx.dtx
 %  tabular preambles}
 %\changes{v2.2a}{2011/04/15}{Expand macros with arguments correctly
 %  in tables}
+%\changes{v2.2a}{2011/04/16}{Group digits for input containing symbolic
+%  entries}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9123,13 +9125,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_format_group_aux:nn #1#2 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 - #2 }
     {
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { symbolic }
+      \bool_if:cTF { l_siunitx_group_ #2 _bool }
+        { \siunitx_number_format_group_four:nn {#1} {#2} }
         { \siunitx_number_format_copy:n { #1 - #2 } }
-        {
-          \bool_if:cTF { l_siunitx_group_ #2 _bool }
-            { \siunitx_number_format_group_four:nn {#1} {#2} }
-            { \siunitx_number_format_copy:n { #1 - #2 } }
-        }
     }
 }
 %    \end{macrocode}
