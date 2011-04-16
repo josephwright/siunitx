@@ -500,6 +500,8 @@ This work consists of the file  siunitx.dtx
 %  in tables}
 %\changes{v2.2a}{2011/04/16}{Group digits for input containing symbolic
 %  entries}
+%\changes{v2.2a}{2011/04/16}{Insert tokens correctly when last tabular cell
+%  does not end \cs{\\}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12869,6 +12871,17 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+%\begin{macro}{\siunitx_table_collect_end:}
+% The same concept applies to the \cs{end} macro.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_collect_end: {
+  \siunitx_table_print:
+  \cs_set_eq:NN \siunitx_table_print: \prg_do_nothing:
+  \end
+}
+%    \end{macrocode}
+%\end{macro}
+%
 %\begin{macro}{\siunitx_table_collect_not_braced:N}
 %\begin{macro}[aux]{\siunitx_table_collect_not_braced_aux_i:N}
 %\begin{macro}[aux]{\siunitx_table_collect_not_braced_aux_ii:N}
@@ -12891,7 +12904,7 @@ This work consists of the file  siunitx.dtx
         { \cs_set_eq:NN \siunitx_table_collect_next: ##1 }
     }
   \tl_map_function:nN
-    { \cs:w \end \scan_stop: \siunitx_table_print: }
+    { \cs:w \scan_stop: \siunitx_table_print: }
     \siunitx_table_collect_not_braced_aux_ii:N
   \token_if_eq_meaning:NNT \siunitx_table_collect_next:
     \siunitx_table_collect_get:
@@ -12901,7 +12914,14 @@ This work consists of the file  siunitx.dtx
           \cs_set_eq:NN \siunitx_table_collect_next:
             \siunitx_table_collect_newline:
         }
-        { \siunitx_table_collect_token:N #1 }
+        {
+          \token_if_eq_meaning:NNTF #1 \end
+            {
+              \cs_set_eq:NN \siunitx_table_collect_next:
+                \siunitx_table_collect_end:
+            }
+            { \siunitx_table_collect_token:N #1 }
+        }
     }
 }
 \cs_new_protected:Npn \siunitx_table_collect_not_braced_aux_ii:N #1 { }
