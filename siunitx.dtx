@@ -502,6 +502,8 @@ This work consists of the file  siunitx.dtx
 %  entries}
 %\changes{v2.2a}{2011/04/16}{Insert tokens correctly when last tabular cell
 %  does not end \cs{\\}}
+%\changes{v2.2a}{2011/04/16}{Fix bug with literal units and auto-insertion
+%  of \num{1} when \opt{per-mode} is \opt{symbol}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -10921,6 +10923,7 @@ This work consists of the file  siunitx.dtx
         {
           \siunitx_unit_if_literal:nTF {#1}
             {
+              \tl_clear:N \l_siunitx_per_mode_tl
               \bool_if:NTF \l_siunitx_unit_forbid_literal_bool
                 {
                   \msg_error:nnx { siunitx } { literal-unit }
