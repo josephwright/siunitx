@@ -4768,7 +4768,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/04/13} {2.2}
+\ProvidesExplPackage {siunitx} {2011/04/16} {2.2a}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -10592,20 +10592,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_declare_special:Nn}
-% Special effects functions are declared to store their arguments
-% or to directly apply them.
-%    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_declare_special:Nn #1#2 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
-    { #2 {##1} }
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
-    { \siunitx_unit_parse_special:n {#2} }
-}
-%    \end{macrocode}
-%\end{macro}
-%
 %\begin{macro}{\siunitx_declare_unit:Nnn}
 %\begin{macro}[aux]{\siunitx_unit_first_token:n}
 % Creating units requires various things to be stored.  This is done
@@ -10616,7 +10602,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_declare_unit:Nnn #1#2#3 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
+  \cs_set_protected:cpn { siunitx_ \token_to_str:N #1 _function:w }
     {
       \siunitx_unit_if_literal:nTF {#2}
         { \siunitx_unit_parse_unit:Nn #1 {#2} }
@@ -10680,7 +10666,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\of}
 % A flexible qualifier as well.
 %    \begin{macrocode}
-\cs_new_protected:cpn { siunitx_ \token_to_str:N \of _literal:w } #1 {
+\cs_new:cpn { siunitx_ \token_to_str:N \of _literal:w } #1 {
   \text { ~ } ( #1 )
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \of _function:w } #1 {
@@ -10711,7 +10697,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\highlight}
 % Another special function: selective colour.
 %    \begin{macrocode}
-\cs_new_protected:cpn
+\cs_new:cpn
   { siunitx_ \token_to_str:N \highlight _literal:w } #1
   { \siunitx_textcolor:n {#1} }
 \cs_new_protected:cpn
@@ -15623,7 +15609,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/04/13} {2.2} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/04/16} {2.2a} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -16839,7 +16825,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/04/13} {2.2}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/04/16} {2.2a}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
