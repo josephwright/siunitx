@@ -528,6 +528,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.2b}{2011/04/17}{Make \cs{of} work in hyper-linked sections}
 %\changes{v2.2b}{2011/04/17}{Fix bug with \cs{highlight} macro when
 %  no colour support is loaded}
+%\changes{v2.2b}{2011/04/19}{Fix bad formatting of negative exponents when
+%  using the \opt{output-exponent-marker} option}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9084,7 +9086,11 @@ This work consists of the file  siunitx.dtx
       \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_exponent_base_tl
     }
     {
-      \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_output_exponent_tl
+      \tl_set:Nx  \l_siunitx_tmpa_tl
+        {
+          \exp_not:V \l_siunitx_output_exponent_tl
+          { \exp_not:V  \l_siunitx_tmpa_tl }
+        }
     }
   \prop_put:NnV \l_siunitx_number_out_prop { exponent-result }
     \l_siunitx_tmpa_tl
