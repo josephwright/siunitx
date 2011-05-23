@@ -534,6 +534,8 @@ This work consists of the file  siunitx.dtx
 %  using the \opt{output-exponent-marker} option}
 %\changes{v2.2c}{2011/04/20}{Fix bad interaction with \pkg{cellspace} package}
 %\changes{v2.2d}{2011/04/28}{Fix the \opt{strict} option}
+%\changes{v2.2e}{2011/05/23}{Fix incorrect interpretation of complex numbers with
+%  no real part.}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6866,9 +6868,10 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \l_siunitx_number_in_prop
         { complex-decimal-marker }
         { \bool_set_true:N \l_siunitx_number_in_decimal_bool }
-      \prop_if_in:NnT \l_siunitx_number_in_prop
+      \prop_if_in:NnTF \l_siunitx_number_in_prop
         { complex-sign }
         { \bool_set_true:N \l_siunitx_number_in_sign_bool }
+        { \prop_del:Nn \l_siunitx_number_in_prop { mantissa } }
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_in_complex_aux:nn #1#2 {
