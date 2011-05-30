@@ -5309,6 +5309,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{macro}{\siunitx_textsuperscript:n}
+%   This function is set up here so that it can be redefined
+%   elsewhere as expandable. That is used in the bookmark system so
+%   that \pkg{hyperref} does not raise any unnecessary warnings.
+%    \begin{macrocode}
+\cs_new_eq:NN \siunitx_textsuperscript:n \textsuperscript
+%    \end{macrocode}
+% \end{macro}
+%
 %\begin{macro}{\l_siunitx_display_math_bool}
 % To test for display math, a flag is added to the start of every
 % display environment.
@@ -10580,14 +10589,14 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_declare_power_after:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
-    { \textsuperscript {#2} }
+    { \siunitx_textsuperscript {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_after:n {#2} }
 }
 \cs_new_protected:Npn \siunitx_declare_power_before:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
-    { ##1 \textsuperscript {#2} }
+    { ##1 \siunitx_textsuperscript {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_before:n {#2} }
 }
@@ -10678,14 +10687,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _literal:w } #1#2 {
   #2
-  \textsuperscript {#1}
+  \siunitx_textsuperscript {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \raiseto _function:w }
   #1 {
   \siunitx_unit_parse_power_before:n {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
-  \textsuperscript {#1}
+  \siunitx_textsuperscript {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \tothe _function:w }
   #1 {
@@ -14999,73 +15008,75 @@ This work consists of the file  siunitx.dtx
 % \pkg{hyperref}, and ensure that everything works cleanly and with
 % no unnecessary warnings.
 %
-%\begin{macro}{\siunitx_contents_add:N}
-% An updated version of \cs{addtocontents} which will ensure that
-% everything works properly. Using \cs{token_to_str:N} means that
-% there is no problem with the asynchronous nature of \TeX's writing
-% mechanism.
+% \begin{macro}{\siunitx_contents_add:N}
+%   An updated version of \cs{addtocontents} which will ensure that
+%   everything works properly. Using \cs{token_to_str:N} means that
+%   there is no problem with the asynchronous nature of \TeX{}'s writing
+%   mechanism.
 %    \begin{macrocode}
-\AtBeginDocument {
-  \cs_set:Npn \addtocontents #1#2
-    {
-      \protected@write \@auxout
-        {
-          \cs_set_eq:NN \label \use_none:n
-          \cs_set_eq:NN \index \use_none:n
-          \cs_set_eq:NN \glossary\use_none:n
-          \tl_map_function:NN \l_siunitx_declare_list_tl
-            \siunitx_contents_add:N
-        }
-        { \token_to_str:N \@writefile {#1} {#2} }
-    }
-}
-\cs_new_protected_nopar:Npn \siunitx_contents_add:N #1 {
-  \cs_set_nopar:Npn #1 { \token_to_str:N #1 }
-}
+\AtBeginDocument
+  {
+    \cs_set:Npn \addtocontents #1#2
+      {
+        \protected@write \@auxout
+          {
+            \cs_set_eq:NN \label    \use_none:n
+            \cs_set_eq:NN \index    \use_none:n
+            \cs_set_eq:NN \glossary \use_none:n
+            \tl_map_function:NN \l_siunitx_declare_list_tl
+              \siunitx_contents_add:N
+          }
+          { \token_to_str:N \@writefile {#1} {#2} }
+      }
+  }
+\cs_new_protected_nopar:Npn \siunitx_contents_add:N #1
+  { \cs_set_nopar:Npn #1 { \token_to_str:N #1 } }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_contents_bookmarks:}
-% The idea here is two-fold. First, all of the unit macros are set
-% up to simply print their literal interpretation: this is hopefully
-% good enough for most bookmark situations. Secondly, the document
-% commands are made expandable. This allows a bit of re-arrangement
-% of the input, removes any set up options (which are being ignored)
-% and stops \pkg{hyperref} issuing a warning.
+% \begin{macro}{\siunitx_contents_bookmarks:}
+%   The idea here is two-fold. First, all of the unit macros are set
+%   up to simply print their literal interpretation: this is hopefully
+%   good enough for most bookmark situations. Secondly, the document
+%   commands are made expandable. This allows a bit of re-arrangement
+%   of the input, removes any set up options (which are being ignored)
+%   and stops \pkg{hyperref} issuing a warning.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_contents_bookmarks: {
-  \tl_map_function:NN \l_siunitx_declare_list_tl
-    \siunitx_unit_print_literal_aux:N
-  \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command }
-    { none }
-  \cs_set_eq:NN \num      \siunitx_bookmark_num:w
-  \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
-  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
-  \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
-  \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
-  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
-  \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
-  \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
-  \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
-  \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
-  \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
-  \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
-  \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
-}
+\cs_new_protected_nopar:Npn \siunitx_contents_bookmarks:
+  {
+    \tl_map_function:NN \l_siunitx_declare_list_tl
+      \siunitx_unit_print_literal_aux:N
+    \msg_redirect_name:nnn { xparse } { redefine-command } { none }
+    \cs_set_eq:NN \num      \siunitx_bookmark_num:w
+    \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
+    \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+    \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
+    \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
+    \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+    \cs_set_eq:NN \siunitx_textsuperscript:n \use:n
+    \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
+    \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
+    \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
+    \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
+    \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
+    \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
+    \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{
-%  \siunitx_bookmark_num:w      ,
-%  \siunitx_bookmark_numrange:w ,
-%  \siunitx_bookmark_SIlist:w   ,
-%  \siunitx_bookmark_SIrange:w  ,
-%  \siunitx_bookmark_SI:w       ,
-%  \siunitx_bookmark_si:w     
-%}
-% To keep things fast, expandable versions of the document commands
-% are created only once. These are then used if necessary to remove
-% and re-order arguments in an expandable fashion.
+% \begin{macro}
+%   {
+%     \siunitx_bookmark_num:w      ,
+%     \siunitx_bookmark_numrange:w ,
+%     \siunitx_bookmark_SIlist:w   ,
+%     \siunitx_bookmark_SIrange:w  ,
+%     \siunitx_bookmark_SI:w       ,
+%     \siunitx_bookmark_si:w     
+%   }
+%   To keep things fast, expandable versions of the document commands
+%   are created only once. These are then used if necessary to remove
+%   and re-order arguments in an expandable fashion.
 %    \begin{macrocode}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m }
@@ -15078,7 +15089,7 @@ This work consists of the file  siunitx.dtx
   { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_si:w { o m } {#2}
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_bookmark_SIlist_map:nn}
 %\begin{macro}[aux]{\siunitx_bookmark_SIlist_map_aux:nw}
