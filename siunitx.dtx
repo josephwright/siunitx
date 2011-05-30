@@ -5261,7 +5261,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
 \tl_map_inline:nn { \M \A \C \R \O }
-  { \char_make_other:n { `#1 } }
+  { \char_set_catcode_other:n { `#1 } }
 \tl_map_inline:nn { \F \N \T }
   { \char_set_lccode:nn { `#1 } { `#1 } }
 \tl_to_lowercase:n {
@@ -5992,9 +5992,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
   \char_set_lccode:nn { `\! } { `\_ }
-  \char_make_active:N \!
+  \char_set_catcode_active:N \!
 \tl_to_lowercase:n {
   \group_end:
   \cs_set_protected_nopar:Npn \siunitx_print_math:
@@ -6040,7 +6040,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \cs_set_protected:Npn \siunitx_print_text_sub:n #1
@@ -6408,9 +6408,9 @@ This work consists of the file  siunitx.dtx
   \tl_set_rescan:Nnx \l_siunitx_number_arg_tl
     {
       \siunitx_number_in_protect:
-      \char_make_ignore:N \~
-      \char_make_other:N \,
-      \char_make_other:N \.
+      \char_set_catcode_ignore:N \~
+      \char_set_catcode_other:N \,
+      \char_set_catcode_other:N \.
       \cs_set_eq:NN \, \prg_do_nothing:
     }
     {#1}
@@ -11646,7 +11646,7 @@ This work consists of the file  siunitx.dtx
 % then a little work to do sorting out "~" and \texttt{.} characters at
 % the outer level.
 %    \begin{macrocode}
-\char_make_active:N \~
+\char_set_catcode_active:N \~
 \cs_new_protected:Npn \siunitx_unit_format_literal:n #1 {
   \int_zero:N \l_siunitx_unit_prefix_int
   \tl_map_function:NN \l_siunitx_declare_list_tl
@@ -11666,7 +11666,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1 {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }
-\char_make_space:N \~
+\char_set_catcode_space:N \~
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -11962,7 +11962,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
     \l_siunitx_bracket_close_tl
 }
-\char_make_active:N \~
+\char_set_catcode_active:N \~
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_space: {
   \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
@@ -11970,7 +11970,7 @@ This work consists of the file  siunitx.dtx
     { bracket- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
-\char_make_space:N \~
+\char_set_catcode_space:N \~
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript: {
   \tl_put_right:Nx \l_siunitx_unit_current_tl
     { \exp_not:N \PrintSubscript { \exp_not:V \l_siunitx_tmpa_tl } }
@@ -14247,7 +14247,7 @@ This work consists of the file  siunitx.dtx
 % In that sense this is very similar to the normal method, except that
 % it will work with non-numerical input.
 %    \begin{macrocode}
-\char_make_active:N \@
+\char_set_catcode_active:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_centered: {
   \cs_set_eq:NN \siunitx_table_print:
     \siunitx_table_direct_centered_end:
@@ -14275,7 +14275,7 @@ This work consists of the file  siunitx.dtx
           \l_siunitx_output_decimal_tl
     }
 }
-\char_make_letter:N \@
+\char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_centered_end: {
     \c_math_shift_token
   \c_group_end_token
@@ -14314,7 +14314,7 @@ This work consists of the file  siunitx.dtx
 % but needs a bit of measuring. The first box here does need to use
 % \cs{tex_hill:D} as \texttt{fil} glue will not work.
 %    \begin{macrocode}
-\char_make_active:N \@
+\char_set_catcode_active:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_reserved: {
   \cs_set_eq:NN \siunitx_table_print:
     \siunitx_table_direct_reserved_end:
@@ -14365,7 +14365,7 @@ This work consists of the file  siunitx.dtx
           \l_siunitx_output_decimal_tl
     }
 }
-\char_make_letter:N \@
+\char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_reserved_end: {
     \c_math_shift_token
     \tex_hfil:D
@@ -15363,7 +15363,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \DeclareSIUnit \clight { \text { \ensuremath { c @ { 0 } } } }
@@ -15384,7 +15384,7 @@ This work consists of the file  siunitx.dtx
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
   \char_set_lccode:nn { `\E } { `\E }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \DeclareSIUnit \bohr { \text { \ensuremath { a @ { 0 } } } }
