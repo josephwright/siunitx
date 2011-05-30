@@ -179,13 +179,7 @@ This work consists of the file  siunitx.dtx
 \FPmessagesfalse
 \pgfplotsset{compat = newest}
 
-\sisetup{
-  load-configurations =
-    {
-      abbreviations,
-      binary,
-    }
-}
+\sisetup{binary-units}
 \DeclareSIUnit{\KWH}{kWh}
 \DeclareSIPrePower\quartic{4}
 \DeclareSIPostPower\tothefourth{4}
@@ -685,7 +679,7 @@ This work consists of the file  siunitx.dtx
 % The key--value options described later in this document can be used
 % when loading the package, for example
 %\begin{LaTeXdemo}[code only]
-%  \usepackage[load-configurations = version-1]{siunitx}
+%  \usepackage[version-1-compatibility]{siunitx}
 %\end{LaTeXdemo}
 % to use options from version 1 of the package.
 %
@@ -2416,22 +2410,17 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Loading additional units}
 %
-%\DescribeOption{load-configurations}
-% \pkg{siunitx} includes a set of configuration files which are intended
-% to make life easier for the user. The files are loaded using the
-% \opt{load-configurations} option, which accepts a comma-separated of
-% file names.
-%
-% The first configuration file provides a number of convenient
-% abbreviations for the SI units (\cref{tab:unit:abbr}). The
-% standard \pkg{siunitx} settings only create these abbreviations within
-% the scope of the \cs{si} and \cs{SI} functions, meaning that no
-% clashes should occur (for example with the standard \cs{pm} symbol).
+% \DescribeOption{abbreviations}
+% As standard, \pkg{siunitx} loads a set of abbreviated versions of the
+% SI units (\cref{tab:unit:abbr}). The standard \pkg{siunitx} settings only
+% create these abbreviations within the scope of the \cs{si} and \cs{SI}
+% functions, meaning that no clashes should occur (for example with the
+% standard \cs{pm} symbol). Loading of these abbreviations can be prevented
+% by setting the option \opt{abbreviations = false} in the preamble.
 %
 %\begin{center}
 %  \changes{v2.0n}{2010/07/15}{More abbreviated units}
-%  \tablecaption{Abbreviated units \endgraf
-%    (\opt{load-configurations=abbreviations}).}
+%  \tablecaption{Abbreviated units.}
 %  \label{tab:unit:abbr}
 %  \tablefirsthead{^^A
 %    \toprule
@@ -2574,22 +2563,23 @@ This work consists of the file  siunitx.dtx
 %  \end{xtabular}
 %\end{center}
 %
-%\DescribeMacro{\bit}
-%\DescribeMacro{\byte}
+% \DescribeOption{binary-units}
+% \DescribeMacro{\bit}
+% \DescribeMacro{\byte}
 % Binary data is expressed in units of bits and bytes. These are
 % normally given prefixes which use powers of two, rather than the
 % powers of ten used by the SI prefixes. As these binary prefixes are
 % closely related to the SI prefixes, they are defined by \pkg{siunitx}
 % (\cref{tab:unit:binary}). The units \cs{bit} and \cs{byte} are
-% also available.
+% also available. Loading of the binary units and functions can be prevented
+% by setting \opt{binary-units = false} in the preamble.
 %\begin{LaTeXdemo}
 %  \SI{100}{\mebi\byte} \\
 %  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
 %\end{LaTeXdemo}
 %
 %\begin{table}
-%  \caption{Binary prefixes \protect \\
-%  (\opt{load-configurations=binary}).}
+%  \caption{Binary prefixes.}
 %  \label{tab:unit:binary}
 %  \centering
 %  \begin{tabular}{llc>{$}l<{$}}
@@ -2608,9 +2598,10 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
+% \DescribeOption{version-1-compatibility}
 % A configuration file is also included which will use settings
 % and define macros as defined by version 1 of \pkg{siunitx}: this
-% can be accessed with the option \opt{load-configurations = version-1}.
+% can be accessed with the option \opt{version-1-compatibility}.
 % This is intended to allow easy transition to version 2: users
 % should update their source to use the new interfaces and functions.
 %
@@ -4199,7 +4190,7 @@ This work consists of the file  siunitx.dtx
 %
 %\section{Information for those upgrading}
 %
-%\subsection{Upgrading from version  1}
+%\subsection{Upgrading from version 1}
 %\changes{v2.0a}{2010/05/28}{Fix various errors in \file{version-1}
 %  configuration file}
 %\changes{v2.0a}{2010/05/28}{Detect use of version 1 options and
@@ -4220,7 +4211,7 @@ This work consists of the file  siunitx.dtx
 % can be loaded with a configuration file to provide most of the
 % same options and defaults as in version 1:
 %\begin{LaTeXdemo}[code only]
-%  \usepackage[load-configurations = version-1]{siunitx}
+%  \usepackage[version-1-compatibility]{siunitx}
 %\end{LaTeXdemo}
 % Many of the options from version 1 map to similar ones in version 2
 % (\cref{tab:opt:map}). The correspondence often includes a syntax
@@ -4410,7 +4401,7 @@ This work consists of the file  siunitx.dtx
 %\subsection{Upgrading from version 2.0 or 2.1}
 %
 % User feedback on \pkg{siunitx} means that over time some renaming
-% takes place. The following functions and options have been depreciated
+% takes place. The following functions and options have been deprecated
 % in version 2.2. They are therefore available in version 2.2, but
 % should be replaced in new or updated documents with the successor
 % names.
@@ -4439,6 +4430,19 @@ This work consists of the file  siunitx.dtx
 % first optional argument, which removes the need for
 % \cs{DeclareSIUnitWithOptions}. This function is therefore depreciated
 % but retained for compatibility.
+% 
+% \subsection{Upgrading from version 2.2}
+% 
+% \DescribeOption{load-configurations}
+% \changes{v2.3}{2011/03/20}{Load abbreviations and binary units as standard}
+% \changes{v2.3}{2011/03/20}{Replace \opt{load-configurations} option
+%   with separate \opt{abbreviations}, \opt{binary-units} and
+%   \opt{version-1-compatibility} options}
+% The option \opt{load-configurations} has been deprecated in favour of the
+% three options \opt{abbreviations}, \opt{binary-units} and 
+% \opt{version-1-compatibility}. At the same time, loading of the abbreviations
+% and binary units is now the standard behaviour, and so in most cases no
+% explicit configuration file loading will be needed.
 %
 %\section{Correct application of (SI) units}
 %
@@ -5178,7 +5182,7 @@ This work consists of the file  siunitx.dtx
                     \tl_if_blank:nF {#1} { = \exp_not:n {#1} }
                 }
             }
-          \keys_set:nn { siunitx } { load-configurations = version-1 }
+          \keys_set:nn { siunitx } { version-1-compatibility }
           \tl_use:N \l_siunitx_key_tl
         }
         {
@@ -14763,9 +14767,6 @@ This work consists of the file  siunitx.dtx
     but~you~did~not~reserve~any~space~to~print~it: \\
     it~will~be~missing~in~the~output.
   }
-\msg_set:nnnn { siunitx } { unknown-configuration-file }
-  { Unknown~configuration~'#1'. }
-  { The~configuration~file~'siunitx-#1.cfg'~was~not~found. }
 \msg_set:nnnn { siunitx } { unknown-option }
   { Unknown~option~'#1'. }
   {
@@ -14777,7 +14778,7 @@ This work consists of the file  siunitx.dtx
   {
     Use: \\
     \c_space_tl \c_space_tl
-    \token_to_str:N \usepackage[load-configurations = version-1]
+    \token_to_str:N \usepackage[version-1-compatibility]
     \token_to_str:N { siunitx \token_to_str:N } \\
     in~the~preamble~to~load~the~appropriate~code.
   }
@@ -15565,51 +15566,92 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
-%\subsection{Loading additional configurations}
+% \subsection{Loading additional configurations}
+% 
+% \begin{variable}{\c_siunitx_configuration_ext_tl}
+%   Logical mark-up for the file extension.
+%    \begin{macrocode}
+\tl_const:Nn \c_siunitx_configuration_ext_tl { cfg }
+%    \end{macrocode}
+% \end{variable}
 %
-% There is only only option for loading files: keeps things simple.
+% \begin{macro}{\siunitx_load_abbreviations:}
+% \begin{macro}{\siunitx_load_binary:}
+%   Loading abbreviations is on by default, which therefore requires a bit
+%   of juggling. The idea here is that the abbreviations will be loaded unless
+%   specifically turned off. This can occur anywhere in the preamble. The
+%   same approach is taken for the binary options.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    abbreviations .choice:,
+    abbreviations /
+      true        .code:n    = { \siunitx_load_abbreviations: },
+    abbreviations /
+      false       .code:n    =
+      { \cs_set_eq:NN \siunitx_load_abbreviations: \prg_do_nothing: } ,
+    abbreviations .default:n = true ,
+    binary-units  .choice:,
+    binary-units  /
+      true        .code:n    = { \siunitx_load_binary: },
+    binary-units  /
+      false       .code:n    =
+      { \cs_set_eq:NN \siunitx_load_binary: \prg_do_nothing: } ,
+    binary-units  .default:n = true  
+  }
+\cs_new_protected_nopar:Npn \siunitx_load_abbreviations:
+  {
+    \@onefilewithoptions { siunitx-abbreviations } [ ] [ ]
+      \c_siunitx_configuration_ext_tl
+  }
+\cs_new_protected_nopar:Npn \siunitx_load_binary:
+  {
+    \@onefilewithoptions { siunitx-binary } [ ] [ ]
+      \c_siunitx_configuration_ext_tl
+  }
+\AtBeginDocument
+  {
+    \siunitx_load_abbreviations:
+    \siunitx_load_binary:
+  }
+\siunitx_option_deactivate:n { abbreviations , binary }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% The version 1 options are not loaded as standard.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    version-1-compatibility .choice:          ,
+    version-1-compatibility /
+      true                  .code:n    = 
+        {
+          \@onefilewithoptions { siunitx-version-1 } [ ] [ ]
+            \c_siunitx_configuration_ext_tl
+        },
+    version-1-compatibility /
+      false                 .code:n    = { } ,
+    version-1-compatibility .default:n = true  
+  }
+\siunitx_option_deactivate:n { version-1-compatibility }
+%    \end{macrocode}
+%
+% Dealing with the old \opt{load-configurations} option is pretty easy, as
+% only one choice is important.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   load-configurations .code:n =
-    { \siunitx_load_configuration:n {#1} }
-}
-%    \end{macrocode}
-%
-%\begin{macro}{\siunitx_load_configuration:n}
-%\begin{macro}[aux]{\siunitx_load_configuration_aux:n}
-%\begin{macro}{\c_siunitx_configuration_ext_tl}
-% Loading configuration files is made slightly complex by the need
-% to remove spaces in the file names (none of the files contain any at
-% all, so this is easy). Secondly, the \LaTeXe{} \cs{@onefilewithoptions}
-% function is used for file loading, as \LaTeX3 currently needs the
-% \LaTeXe{} category code stack to keep things sane.
-%    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_load_configuration:n #1 {
-  \tl_set_rescan:Nnn \l_siunitx_tmpa_tl
-    { \char_make_ignore:N \ } {#1}
-  \clist_map_function:NN \l_siunitx_tmpa_tl
-    \siunitx_load_configuration_aux:n
-}
-\cs_new_protected:Npn \siunitx_load_configuration_aux:n #1 {
-  \tl_if_empty:nF {#1}
     {
-      \file_if_exist:nTF
-        { siunitx- #1 . \c_siunitx_configuration_ext_tl }
+      \clist_if_in:nnT {#1} { version-1 }
         {
-          \@onefilewithoptions { siunitx- #1 } [ ] [ ]
-          \c_siunitx_configuration_ext_tl
-        }
-        {
-          \msg_error:nnx { siunitx } { unknown-configuration-file } {#1}
+          \@onefilewithoptions { siunitx-version-1 } [ ] [ ]
+            \c_siunitx_configuration_ext_tl
         }
     }
 }
-\tl_new:N \c_siunitx_configuration_ext_tl
-\tl_set:Nn \c_siunitx_configuration_ext_tl { cfg }
+\siunitx_option_deactivate:n { load-configurations }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
 % Load any local configuration file.
 %    \begin{macrocode}
@@ -15638,12 +15680,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \ProvidesExplFile {siunitx-version-1.cfg} {2011/05/25} {2.2f} 
   {siunitx: Version 1 settings}
-%    \end{macrocode}
-%
-% The abbreviations are loaded by default by version one.
-%    \begin{macrocode}
-\keys_set:nn { siunitx }
-  { load-configurations = { abbreviations , binary } }
 %    \end{macrocode}
 %
 % The re-arrangements made to the code in version two, and in particular
@@ -16567,22 +16603,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\requiresiconfigs}
-%\begin{macro}[aux]{\siunitx_requireconfig:n}
-% Version one provides this, and it might pop up so should not
-% cause errors.
+% \begin{macro}{\requiresiconfigs}
+%   Version one provides this, and it might pop up so should not
+%   cause errors.
 %    \begin{macrocode}
-\NewDocumentCommand \requiresiconfigs { m } {
-  \keys_set:nn { siunitx } { load-configurations = version-1 }
-  \clist_map_function:nN {#1} \siunitx_requireconfig:n
-}
-\cs_new_protected_nopar:Npn \siunitx_requireconfig:n #1 {
-  \str_if_eq:nnT {#1} { synchem }
-    { \keys_set:nn { siunitx } { load-configurations = chemistry } }
-}
+\NewDocumentCommand \requiresiconfigs { m }
+  { \keys_set:nn { siunitx } { version-1-compatibility } }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</version-1>
