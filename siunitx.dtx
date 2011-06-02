@@ -528,8 +528,10 @@ This work consists of the file  siunitx.dtx
 %  using the \opt{output-exponent-marker} option}
 %\changes{v2.2c}{2011/04/20}{Fix bad interaction with \pkg{cellspace} package}
 %\changes{v2.2d}{2011/04/28}{Fix the \opt{strict} option}
-%\changes{v2.2e}{2011/05/23}{Fix incorrect interpretation of complex numbers with
-%  no real part.}
+%\changes{v2.2e}{2011/05/23}{Fix incorrect interpretation of complex numbers
+%  with no real part}
+%\changes{v2.2g}{2011/06/02}{Correctly space \ce{degree} and similar units
+%  in lists and ranges when only a single unit is given}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -1271,6 +1273,8 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 %\changes{v2.2}{2011/03/20}{Add new \cs{tablenum} macro to allow
 %  complex table alignments}
+%\changes{v2.2g}{2011/06/02}{Ensure \cs{tablenum} works correctly when
+%  \opt{parse-numbers} is set \opt{false}}
 % Within more complex tables, aligned numbers may be desirable within
 % the argument of \cs{multicolumn} or
 % \cs{multirow}.\footnote{Provided by the \pkg{multirow} package} The
@@ -4793,7 +4797,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/05/25} {2.2f}
+\ProvidesExplPackage {siunitx} {2011/06/02} {2.2g}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -12500,6 +12504,7 @@ This work consists of the file  siunitx.dtx
           \siunitx_print:nn { number }
             { \siunitx_ensuremath:n { \l_siunitx_bracket_close_tl } }
         }
+      \siunitx_unit_parse_options:nn {#2} {#3}  
       \siunitx_unit_output_number_sep:
       \siunitx_unit_output:nn {#2} {#3}
     }
@@ -12604,6 +12609,7 @@ This work consists of the file  siunitx.dtx
           \siunitx_print:nn { number }
             { \siunitx_ensuremath:n { \l_siunitx_bracket_close_tl } }
         }
+      \siunitx_unit_parse_options:nn {#1} {#2} 
       \siunitx_unit_output_number_sep:
       \siunitx_unit_output:nn {#1} {#2}
     }
@@ -14970,14 +14976,20 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\tablenum}
 % A variation on the \cs{num} macro that will retain alignment within
-% \cs{multicolumn} and \cs{multirow} situations.
+% \cs{multicolumn} and \cs{multirow} situations. The slightly odd code
+% for the non-parsed case is needed to reinsert the appropriate tokens
+% after \enquote{collection}.
 %    \begin{macrocode}
 \NewDocumentCommand \tablenum { o m } {
   \IfNoValueF {#1}
     { \keys_set:nn { siunitx } {#1} }
-  \tl_set:Nn \l_siunitx_table_collect_tl {#2}
-  \bool_set_false:N \l_siunitx_table_collect_pre_bool
-  \siunitx_table_print_S:
+  \bool_if:NTF \l_siunitx_number_parse_bool
+    {
+      \tl_set:Nn \l_siunitx_table_collect_tl {#2}
+      \bool_set_false:N \l_siunitx_table_collect_pre_bool
+      \siunitx_table_print_S:
+    }
+    { \siunitx_table_direct: #2 \siunitx_table_print: }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15686,7 +15698,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/05/25} {2.2f} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/06/02} {2.2g} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -16888,7 +16900,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/05/25} {2.2f}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/06/02} {2.2g}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
