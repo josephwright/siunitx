@@ -1277,6 +1277,8 @@ This work consists of the file  siunitx.dtx
 %\end{syntax}
 %\changes{v2.2}{2011/03/20}{Add new \cs{tablenum} macro to allow
 %  complex table alignments}
+%\changes{v2.2f}{2011/06/02}{Ensure \cs{tablenum} works correctly when
+%  \opt{parse-numbers} is set \opt{false}}
 % Within more complex tables, aligned numbers may be desirable within
 % the argument of \cs{multicolumn} or
 % \cs{multirow}.\footnote{Provided by the \pkg{multirow} package} The
@@ -14963,14 +14965,20 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{\tablenum}
 % A variation on the \cs{num} macro that will retain alignment within
-% \cs{multicolumn} and \cs{multirow} situations.
+% \cs{multicolumn} and \cs{multirow} situations. The slightly odd code
+% for the non-parsed case is needed to reinsert the appropriate tokens
+% after \enquote{collection}.
 %    \begin{macrocode}
 \NewDocumentCommand \tablenum { o m } {
   \IfNoValueF {#1}
     { \keys_set:nn { siunitx } {#1} }
-  \tl_set:Nn \l_siunitx_table_collect_tl {#2}
-  \bool_set_false:N \l_siunitx_table_collect_pre_bool
-  \siunitx_table_print_S:
+  \bool_if:NTF \l_siunitx_number_parse_bool
+    {
+      \tl_set:Nn \l_siunitx_table_collect_tl {#2}
+      \bool_set_false:N \l_siunitx_table_collect_pre_bool
+      \siunitx_table_print_S:
+    }
+    { \siunitx_table_direct: #2 \siunitx_table_print: }
 }
 %    \end{macrocode}
 %\end{macro}
