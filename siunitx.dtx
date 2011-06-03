@@ -179,13 +179,7 @@ This work consists of the file  siunitx.dtx
 \FPmessagesfalse
 \pgfplotsset{compat = newest}
 
-\sisetup{
-  load-configurations =
-    {
-      abbreviations,
-      binary,
-    }
-}
+\sisetup{binary-units}
 \DeclareSIUnit{\KWH}{kWh}
 \DeclareSIPrePower\quartic{4}
 \DeclareSIPostPower\tothefourth{4}
@@ -689,7 +683,7 @@ This work consists of the file  siunitx.dtx
 % The key--value options described later in this document can be used
 % when loading the package, for example
 %\begin{LaTeXdemo}[code only]
-%  \usepackage[load-configurations = version-1]{siunitx}
+%  \usepackage[version-1-compatibility]{siunitx}
 %\end{LaTeXdemo}
 % to use options from version 1 of the package.
 %
@@ -2422,22 +2416,17 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Loading additional units}
 %
-%\DescribeOption{load-configurations}
-% \pkg{siunitx} includes a set of configuration files which are intended
-% to make life easier for the user. The files are loaded using the
-% \opt{load-configurations} option, which accepts a comma-separated of
-% file names.
-%
-% The first configuration file provides a number of convenient
-% abbreviations for the SI units (\cref{tab:unit:abbr}). The
-% standard \pkg{siunitx} settings only create these abbreviations within
-% the scope of the \cs{si} and \cs{SI} functions, meaning that no
-% clashes should occur (for example with the standard \cs{pm} symbol).
+% \DescribeOption{abbreviations}
+% As standard, \pkg{siunitx} loads a set of abbreviated versions of the
+% SI units (\cref{tab:unit:abbr}). The standard \pkg{siunitx} settings only
+% create these abbreviations within the scope of the \cs{si} and \cs{SI}
+% functions, meaning that no clashes should occur (for example with the
+% standard \cs{pm} symbol). Loading of these abbreviations can be prevented
+% by setting the option \opt{abbreviations = false} in the preamble.
 %
 %\begin{center}
 %  \changes{v2.0n}{2010/07/15}{More abbreviated units}
-%  \tablecaption{Abbreviated units \endgraf
-%    (\opt{load-configurations=abbreviations}).}
+%  \tablecaption{Abbreviated units.}
 %  \label{tab:unit:abbr}
 %  \tablefirsthead{^^A
 %    \toprule
@@ -2580,22 +2569,23 @@ This work consists of the file  siunitx.dtx
 %  \end{xtabular}
 %\end{center}
 %
-%\DescribeMacro{\bit}
-%\DescribeMacro{\byte}
+% \DescribeOption{binary-units}
+% \DescribeMacro{\bit}
+% \DescribeMacro{\byte}
 % Binary data is expressed in units of bits and bytes. These are
 % normally given prefixes which use powers of two, rather than the
 % powers of ten used by the SI prefixes. As these binary prefixes are
 % closely related to the SI prefixes, they are defined by \pkg{siunitx}
 % (\cref{tab:unit:binary}). The units \cs{bit} and \cs{byte} are
-% also available.
+% also available. Loading of the binary units and functions can be prevented
+% by setting \opt{binary-units = false} in the preamble.
 %\begin{LaTeXdemo}
 %  \SI{100}{\mebi\byte} \\
 %  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
 %\end{LaTeXdemo}
 %
 %\begin{table}
-%  \caption{Binary prefixes \protect \\
-%  (\opt{load-configurations=binary}).}
+%  \caption{Binary prefixes.}
 %  \label{tab:unit:binary}
 %  \centering
 %  \begin{tabular}{llc>{$}l<{$}}
@@ -2614,9 +2604,10 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
+% \DescribeOption{version-1-compatibility}
 % A configuration file is also included which will use settings
 % and define macros as defined by version 1 of \pkg{siunitx}: this
-% can be accessed with the option \opt{load-configurations = version-1}.
+% can be accessed with the option \opt{version-1-compatibility}.
 % This is intended to allow easy transition to version 2: users
 % should update their source to use the new interfaces and functions.
 %
@@ -4205,7 +4196,7 @@ This work consists of the file  siunitx.dtx
 %
 %\section{Information for those upgrading}
 %
-%\subsection{Upgrading from version  1}
+%\subsection{Upgrading from version 1}
 %\changes{v2.0a}{2010/05/28}{Fix various errors in \file{version-1}
 %  configuration file}
 %\changes{v2.0a}{2010/05/28}{Detect use of version 1 options and
@@ -4226,7 +4217,7 @@ This work consists of the file  siunitx.dtx
 % can be loaded with a configuration file to provide most of the
 % same options and defaults as in version 1:
 %\begin{LaTeXdemo}[code only]
-%  \usepackage[load-configurations = version-1]{siunitx}
+%  \usepackage[version-1-compatibility]{siunitx}
 %\end{LaTeXdemo}
 % Many of the options from version 1 map to similar ones in version 2
 % (\cref{tab:opt:map}). The correspondence often includes a syntax
@@ -4416,7 +4407,7 @@ This work consists of the file  siunitx.dtx
 %\subsection{Upgrading from version 2.0 or 2.1}
 %
 % User feedback on \pkg{siunitx} means that over time some renaming
-% takes place. The following functions and options have been depreciated
+% takes place. The following functions and options have been deprecated
 % in version 2.2. They are therefore available in version 2.2, but
 % should be replaced in new or updated documents with the successor
 % names.
@@ -4445,6 +4436,19 @@ This work consists of the file  siunitx.dtx
 % first optional argument, which removes the need for
 % \cs{DeclareSIUnitWithOptions}. This function is therefore depreciated
 % but retained for compatibility.
+% 
+% \subsection{Upgrading from version 2.2}
+% 
+% \DescribeOption{load-configurations}
+% \changes{v2.3}{2011/03/20}{Load abbreviations and binary units as standard}
+% \changes{v2.3}{2011/03/20}{Replace \opt{load-configurations} option
+%   with separate \opt{abbreviations}, \opt{binary-units} and
+%   \opt{version-1-compatibility} options}
+% The option \opt{load-configurations} has been deprecated in favour of the
+% three options \opt{abbreviations}, \opt{binary-units} and 
+% \opt{version-1-compatibility}. At the same time, loading of the abbreviations
+% and binary units is now the standard behaviour, and so in most cases no
+% explicit configuration file loading will be needed.
 %
 %\section{Correct application of (SI) units}
 %
@@ -4805,9 +4809,9 @@ This work consists of the file  siunitx.dtx
 % old then the message system may not be in place at all: there is a
 % back up for that case.
 %    \begin{macrocode}
-\cs_if_exist:NTF \msg_set:nnnn
+\cs_if_exist:NTF \msg_new:nnnn
   {
-    \msg_set:nnnn { siunitx } { support-outdated }
+    \msg_new:nnnn { siunitx } { support-outdated }
       { Support~package~#1~too~old. }
       {
         Please~install~an~up~to~date~version~of~#1. \\
@@ -4824,7 +4828,7 @@ This work consists of the file  siunitx.dtx
   }
 \@ifpackagelater { expl3 } { 2010/11/13 }
   { }
-  {
+  { 
     \msg_error:nnx { siunitx } { support-outdated } { expl3 }
     \tex_endinput:D
   }
@@ -4838,7 +4842,7 @@ This work consists of the file  siunitx.dtx
 % document as well. The message for this may be needed immediately, so
 % it is created here not with the other messages.
 %    \begin{macrocode}
-\msg_set:nnnn { siunitx } { incompatible-package }
+\msg_new:nnnn { siunitx } { incompatible-package }
   { Package~'#1'~incompatible. }
   { The~#1~package~and~siunitx~are~incompatible. }
 \cs_new_protected_nopar:Npn \siunitx_load_check:n #1 {
@@ -4887,7 +4891,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_tmp_box  ,
 %  \l_siunitx_tmp_int  ,
 %  \l_siunitx_tmpa_tl  ,
-%  \l_siunitx_tmpb_tl  ,
+%  \l_siunitx_tmpb_tl  
 %}
 % Scratch variables.
 %    \begin{macrocode}
@@ -4902,7 +4906,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \siunitx_error:nxx ,
 %  \siunitx_error:nx  ,
-%  \siunitx_error:n   ,
+%  \siunitx_error:n   
 %}
 %\begin{macro}{\l_siunitx_error_bool}
 % General-purpose functions for throwing errors.
@@ -4937,7 +4941,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \c_siunitx_minus_tl  ,
-%  \c_siunitx_minus_int ,
+%  \c_siunitx_minus_int 
 %}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
@@ -4959,7 +4963,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \c_siunitx_mu_tl  ,
-%  \c_siunitx_mu_int ,
+%  \c_siunitx_mu_int 
 %}
 % The lack of an upright mu has to be sorted out. The same consideration
 % for \pkg{fontspec} as above.
@@ -4996,7 +5000,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_tl_put_left_math:cV  ,
 %  \siunitx_tl_put_right_math:Nn ,
 %  \siunitx_tl_put_right_math:NV ,
-%  \siunitx_tl_put_right_math:cV ,
+%  \siunitx_tl_put_right_math:cV 
 %}
 % To add stuff in math mode.
 %    \begin{macrocode}
@@ -5184,7 +5188,7 @@ This work consists of the file  siunitx.dtx
                     \tl_if_blank:nF {#1} { = \exp_not:n {#1} }
                 }
             }
-          \keys_set:nn { siunitx } { load-configurations = version-1 }
+          \keys_set:nn { siunitx } { version-1-compatibility }
           \tl_use:N \l_siunitx_key_tl
         }
         {
@@ -5241,7 +5245,7 @@ This work consists of the file  siunitx.dtx
 %  \prop_del:cn           ,
 %  \prop_put:cnV          ,
 %  \tl_if_in:NVTF         ,
-%  \tl_replace_all_in:NnV ,
+%  \tl_replace_all_in:NnV 
 %}
 % Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
@@ -5254,7 +5258,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}[pTF]{
 %  \siunitx_cs_if_tl:N    ,
-%  \siunitx_cs_if_macro:N ,
+%  \siunitx_cs_if_macro:N 
 %}
 %\begin{macro}[aux]{\siunitx_cs_if_tl_aux:w}
 % This is basically a re-hash of stuff from \pkg{expl3}, but to test for
@@ -5263,7 +5267,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
 \tl_map_inline:nn { \M \A \C \R \O }
-  { \char_make_other:n { `#1 } }
+  { \char_set_catcode_other:n { `#1 } }
 \tl_map_inline:nn { \F \N \T }
   { \char_set_lccode:nn { `#1 } { `#1 } }
 \tl_to_lowercase:n {
@@ -5311,6 +5315,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{macro}{\siunitx_textsuperscript:n}
+%   This function is set up here so that it can be redefined
+%   elsewhere as expandable. That is used in the bookmark system so
+%   that \pkg{hyperref} does not raise any unnecessary warnings.
+%    \begin{macrocode}
+\cs_new_eq:NN \siunitx_textsuperscript:n \textsuperscript
+%    \end{macrocode}
+% \end{macro}
+%
 %\begin{macro}{\l_siunitx_display_math_bool}
 % To test for display math, a flag is added to the start of every
 % display environment.
@@ -5332,7 +5345,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_set_math_fam:n}
 %\begin{macro}{
 %  \c_siunitx_mathsf_int ,
-%  \c_siunitx_mathtt_int ,
+%  \c_siunitx_mathtt_int 
 %}
 % The detection routine needs some basic data about the sans serif and
 % monospaced fonts in use.  This is collected up at the start of the
@@ -5367,7 +5380,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_font_set_text_fam:n}
 %\begin{macro}{
 %  \c_siunitx_textsf_tl ,
-%  \c_siunitx_texttt_tl ,
+%  \c_siunitx_texttt_tl 
 %}
 % The text families are done in a somewhat different manner: there are
 % no issues with \cs{AtBeginDocument}, luckily. The need to define
@@ -5400,7 +5413,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_detect_inline_weight_tl  ,
 %  \l_siunitx_detect_shape_bool        ,
 %  \l_siunitx_detect_mode_bool         ,
-%  \l_siunitx_detect_weight_bool       ,
+%  \l_siunitx_detect_weight_bool       
 %}
 % Font detection is all about creating switches, with just a little
 % gloss for \texttt{detect-all} and \texttt{detect-none}.
@@ -5471,7 +5484,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_font_set_bool       ,
-%  \l_siunitx_font_math_mode_bool ,
+%  \l_siunitx_font_math_mode_bool 
 %}
 % The internals of the package need a number of switches to track what
 % is happening.
@@ -5490,7 +5503,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_font_shape:  ,
-%  \siunitx_font_weight: ,
+%  \siunitx_font_weight: 
 %}
 % These could be token lists or functions!
 %    \begin{macrocode}
@@ -5567,7 +5580,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{
 %  \siunitx_detect_font_weight_math: ,
-%  \siunitx_detect_font_weight_text: ,
+%  \siunitx_detect_font_weight_text: 
 %}
 % The tests for font weight depend on whether the module is testing
 % text or math content.
@@ -5628,7 +5641,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{
 %  \siunitx_detect_font_family_math: ,
-%  \siunitx_detect_font_family_text: ,
+%  \siunitx_detect_font_family_text: 
 %}
 % The two detections routines check if the current font is sans serif or
 % monospaced.  The method used depends on whether the current math or
@@ -5689,7 +5702,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_number_math_mode_bool ,
-%  \l_siunitx_unit_math_mode_bool   ,
+%  \l_siunitx_unit_math_mode_bool   
 %}
 % Most of the variables are created by the keys system: these are not.
 %    \begin{macrocode}
@@ -5704,7 +5717,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_mathtt:n ,
 %  \siunitx_number_textrm:  ,
 %  \siunitx_number_textsf:  ,
-%  \siunitx_number_texttt:  ,
+%  \siunitx_number_texttt:  
 %}
 % Functions for number-mode fonts.
 %    \begin{macrocode}
@@ -5750,7 +5763,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_unit_mathtt:n ,
 %  \siunitx_unit_textrm:  ,
 %  \siunitx_unit_textsf:  ,
-%  \siunitx_unit_texttt:  ,
+%  \siunitx_unit_texttt:  
 %}
 % The same storage for unit-mode fonts.
 %    \begin{macrocode}
@@ -5905,7 +5918,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_print:nn ,
-%  \siunitx_print:nV ,
+%  \siunitx_print:nV 
 %}
 %\begin{macro}[aux]{\siunitx_print_aux:}
 % The main printing function does everything inside a group, as
@@ -5955,7 +5968,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_print_color: ,
-%  \siunitx_textcolor:n  ,
+%  \siunitx_textcolor:n  
 %}
 % The colour system checks if \pkg{color} is loaded, and only does
 % anything if it is.  This will change when \LaTeX3 proper is available:
@@ -5983,7 +5996,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_print_math: ,
-%  \siunitx_print_text: ,
+%  \siunitx_print_text: 
 %}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses "_" and
@@ -5994,9 +6007,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
   \char_set_lccode:nn { `\! } { `\_ }
-  \char_make_active:N \!
+  \char_set_catcode_active:N \!
 \tl_to_lowercase:n {
   \group_end:
   \cs_set_protected_nopar:Npn \siunitx_print_math:
@@ -6031,7 +6044,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_print_text_sub:n   ,
-%  \siunitx_print_text_super:n ,
+%  \siunitx_print_text_super:n 
 %}
 %\begin{macro}[aux]{\siunitx_print_text_sub_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
@@ -6042,7 +6055,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \cs_set_protected:Npn \siunitx_print_text_sub:n #1
@@ -6080,7 +6093,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \PrintSubscript   ,
-%  \PrintSuperscript ,
+%  \PrintSuperscript 
 %}
 % In the unit-construction code, there are places where it cannot
 % be guarenteed that the search-and-replace approach will work.
@@ -6113,7 +6126,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_number_arg_tl  ,
-%  \l_siunitx_number_next_tl ,
+%  \l_siunitx_number_next_tl 
 %}
 % Storage for the pre-parsed material.  The \texttt{arg} variable
 % contains the current argument, the \texttt{next} variable contains
@@ -6133,7 +6146,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_number_denominator_tl ,
-%  \l_siunitx_number_numerator_tl   ,
+%  \l_siunitx_number_numerator_tl   
 %}
 % When searching for quotients, some more storage is needed.
 %    \begin{macrocode}
@@ -6144,7 +6157,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_preprocess:n ,
-%  \siunitx_number_preprocess:V ,
+%  \siunitx_number_preprocess:V 
 %}
 % The pre-processor starts with the obvious: the most likely outcome is
 % that all of the argument is passed through unchanged.
@@ -6258,7 +6271,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_number_in_first_bool        ,
 %  \l_siunitx_number_in_sign_bool         ,
 %  \l_siunitx_number_in_uncert_bool       ,
-%  \l_siunitx_number_in_value_bool        ,
+%  \l_siunitx_number_in_value_bool        
 %}
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_number_in_complex_bool
@@ -6293,7 +6306,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_number_part_decimal_marker_tl ,
 %  \l_siunitx_number_part_integer_tl        ,
 %  \l_siunitx_number_part_sign_tl           ,
-%  \l_siunitx_number_part_uncert_tl         ,
+%  \l_siunitx_number_part_uncert_tl         
 %}
 % The names of various parts of a number are set up as stored values.
 % This lets some code be used for different parts of a number, while
@@ -6341,7 +6354,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_input_protect_tl      ,
 %  \l_siunitx_input_sign_tl         ,
 %  \l_siunitx_input_symbol_tl       ,
-%  \l_siunitx_input_uncert_sign_tl  ,
+%  \l_siunitx_input_uncert_sign_tl  
 %}
 % The various tokens to check against when parsing are all set up here.
 % These are valid inside a single number: the pre-processor has already
@@ -6387,7 +6400,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_in_parse:n ,
-%  \siunitx_number_in_parse:V ,
+%  \siunitx_number_in_parse:V 
 %}
 %\begin{macro}[aux]{\siunitx_number_in_parse_aux:n}
 % The parsing routine starts by replacing any formatting in the input
@@ -6410,9 +6423,9 @@ This work consists of the file  siunitx.dtx
   \tl_set_rescan:Nnx \l_siunitx_number_arg_tl
     {
       \siunitx_number_in_protect:
-      \char_make_ignore:N \~
-      \char_make_other:N \,
-      \char_make_other:N \.
+      \char_set_catcode_ignore:N \~
+      \char_set_catcode_other:N \,
+      \char_set_catcode_other:N \.
       \cs_set_eq:NN \, \prg_do_nothing:
     }
     {#1}
@@ -6448,7 +6461,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_in_init:       ,
-%  \siunitx_number_in_init_part:n ,
+%  \siunitx_number_in_init_part:n 
 %}
 % The set up code is divided into to parts. First, code only needed
 % once to start the entire parser. Then a second group, which is
@@ -6518,7 +6531,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_in_parse_error:nn ,
-%  \siunitx_number_in_parse_error:nV ,
+%  \siunitx_number_in_parse_error:nV 
 %}
 % There are lots of rather similar errors in the parser, all of which
 % require a \cs{tl_map_break:}. To keep life simple, this is set up
@@ -6534,7 +6547,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_in_parse_loop:N ,
-%  \siunitx_number_in_parse_more:N ,
+%  \siunitx_number_in_parse_more:N 
 %}
 % The main loop is set up as a place holder, as the definition is
 % varied to keep things fast. There is also a place holder for the
@@ -7027,7 +7040,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_in_uncert_open:N  ,
-%  \siunitx_number_in_uncert_close:N ,
+%  \siunitx_number_in_uncert_close:N 
 %}
 % Opening and closing uncertainty tokens are handled separately. For
 % opening tokens, a check is made that there is something else to the
@@ -7095,7 +7108,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \siunitx_number_in_check:n       ,
 %  \siunitx_number_in_check_short:n ,
-%  \siunitx_number_in_check_full:n  ,
+%  \siunitx_number_in_check_full:n  
 %}
 % The checks needed for a number depend on whether there is a complex
 % part. In all cases, there must be some digits, as well as a sign or
@@ -7172,7 +7185,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_in_complex_to_uncert:n}
 %\begin{macro}[aux]{
 %  \siunitx_number_in_complex_to_uncert_int: ,
-%  \siunitx_number_in_complex_to_uncert_dec: ,
+%  \siunitx_number_in_complex_to_uncert_dec: 
 %}
 % Internally, uncertainties are stored in \enquote{compact} form.
 % The code here takes a putative complex part and converts it to
@@ -7338,7 +7351,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_round_decimal_in_tl  ,
 %  \l_siunitx_round_decimal_out_tl ,
 %  \l_siunitx_round_integer_in_tl  ,
-%  \l_siunitx_round_integer_out_tl ,
+%  \l_siunitx_round_integer_out_tl 
 %}
 % The rounding system needs a number of variables.
 %    \begin{macrocode}
@@ -7356,7 +7369,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_process_decimal_int     ,
 %  \l_siunitx_process_uncertainty_int ,
 %  \l_siunitx_uncertainty_decimal_tl  ,
-%  \l_siunitx_uncertainty_integer_tl  ,
+%  \l_siunitx_uncertainty_integer_tl  
 %}
 % The code to expand uncertainties needs to know numbers of digits, and
 % to store various data.
@@ -7371,7 +7384,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_process_fixed_bool       ,
 %  \l_siunitx_process_engineering_bool ,
-%  \l_siunitx_process_scientific_bool  ,
+%  \l_siunitx_process_scientific_bool  
 %}
 % Settings for the scientific notation system.
 %    \begin{macrocode}
@@ -7393,7 +7406,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_process_zero_exponent_bool ,
 %  \l_siunitx_process_int_to_dec_bool    ,
 %  \l_siunitx_process_round_min_tl       ,
-%  \l_siunitx_process_precision_int      ,
+%  \l_siunitx_process_precision_int      
 %}
 % First, the options are set up.
 %    \begin{macrocode}
@@ -7524,7 +7537,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_figures:n}
 %\begin{macro}[aux]{
 %  \siunitx_number_process_figures_aux:n  ,
-%  \siunitx_number_process_figures_init:n ,
+%  \siunitx_number_process_figures_init:n 
 %}
 % The approach here is to find how many digits there are in each part
 % of the number, working out which are significant. The next stage is
@@ -7716,7 +7729,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_process_fixed_large:nnn   ,
 %  \siunitx_number_process_fixed_large_aux:w ,
 %  \siunitx_number_process_fixed_small:nnn   ,
-%  \siunitx_number_process_fixed_small_aux:w ,
+%  \siunitx_number_process_fixed_small_aux:w 
 %}
 % When working to a fixed exponent value, the idea is to use the stack
 % to do the work. First, there is some set up to do.
@@ -7973,7 +7986,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_process_places_aux_i:n   ,
 %  \siunitx_number_process_places_aux_ii:n  ,
 %  \siunitx_number_process_places_loop:n    ,
-%  \siunitx_number_process_places_integer:n ,
+%  \siunitx_number_process_places_integer:n 
 %}
 % For rounding to a fixed number of places, a check is made to see if
 % the decimal part is exactly zero. If it is, just create the
@@ -8266,7 +8279,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_process_scientific_engineering_1:nw    ,
 %  \siunitx_number_process_scientific_engineering_2:nnn   ,
 %  \siunitx_number_process_scientific_engineering_2_i:nw  ,
-%  \siunitx_number_process_scientific_engineering_2_ii:nw ,
+%  \siunitx_number_process_scientific_engineering_2_ii:nw 
 %}
 % Converting a number to scientific form is done such that the number
 % of places involved is unchanged. The first step is to skip any
@@ -8492,7 +8505,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_sign:}
 %\begin{macro}[aux]{
 %  \siunitx_number_process_sign_add:n  ,
-%  \siunitx_number_process_sign_plus:n ,
+%  \siunitx_number_process_sign_plus:n 
 %}
 %\begin{macro}{\c_siunitx_plus_tl}
 % Sorting out signs consists of two parts: retaining a plus if necessary
@@ -8684,7 +8697,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_zero_fill:}
 %\begin{macro}[aux]{
 %  \siunitx_number_process_zero_fill_aux:n  ,
-%  \siunitx_number_process_zero_fill_aux:nn ,
+%  \siunitx_number_process_zero_fill_aux:nn 
 %}
 % Checks for adding zeros to each component are carried out. The nesting
 % here makes checking the appropriate flag a little more efficient.
@@ -8731,7 +8744,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_group_sep_tl      ,
-%  \l_siunitx_output_decimal_tl ,
+%  \l_siunitx_output_decimal_tl 
 %}
 % A couple of variables are declared here, as they need a little more
 % work than just storage.
@@ -8767,7 +8780,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_output_uncert_open_tl    ,
 %  \l_siunitx_uncert_sep_bool          ,
 %  \l_siunitx_tight_bool               ,
-%  \l_siunitx_uncert_sep_tl            ,
+%  \l_siunitx_uncert_sep_tl            
 %}
 % Lots of settings, some used only for numbers, some more widely.
 %    \begin{macrocode}
@@ -8927,7 +8940,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_complex:}
 %\begin{macro}[aux]{
 %  \siunitx_number_format_complex_aux:n ,
-%  \siunitx_number_format_complex_aux:  ,
+%  \siunitx_number_format_complex_aux:  
 %}
 % The real and complex parts of each number are reassembled, with
 % brackets if needed.
@@ -9000,7 +9013,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_format_copy:n  ,
-%  \siunitx_number_format_copy:nn ,
+%  \siunitx_number_format_copy:nn 
 %}
 % Just copy across.
 %    \begin{macrocode}
@@ -9199,7 +9212,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_group_four:nn}
 %\begin{macro}[aux]{
 %  \siunitx_number_format_group_four_aux:NNNNNNw ,
-%  \siunitx_number_format_group_four_aux:nn      ,
+%  \siunitx_number_format_group_four_aux:nn      
 %}
 % The idea here is that grouping is only needed for items with at
 % least four tokens in them, and perhaps five if the grouping of
@@ -9271,7 +9284,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_format_group_integer_setup:n        ,
 %  \siunitx_number_format_group_integer_setup:V        ,
 %  \siunitx_number_format_group_integer_setup_aux:NNNN ,
-%  \siunitx_number_format_group_integer_aux:NNNN       ,
+%  \siunitx_number_format_group_integer_aux:NNNN       
 %}
 % By keeping everything on the stack, recursion can occur quite
 % efficiently here.
@@ -9354,7 +9367,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_format_join_uncert:  ,
-%  \siunitx_number_format_join_uncert:n ,
+%  \siunitx_number_format_join_uncert:n 
 %}
 %\begin{macro}[aux]{\siunitx_number_format_join_uncert_pm:}
 % For adding separated uncertainties to the main part of a number.
@@ -9445,12 +9458,12 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_format_sign:n        ,
-%  \siunitx_number_format_sign_complex: ,
+%  \siunitx_number_format_sign_complex: 
 %}
 %\begin{macro}[aux]{
 %  \siunitx_number_format_sign_aux:n               ,
 %  \siunitx_number_format_sign_negative_brackets:n ,
-%  \siunitx_number_format_sign_complex:n           ,
+%  \siunitx_number_format_sign_complex:n           
 %}
 % Some simple sign manipulation: for tight signs, a little shuffling.
 % In the complex number case, there is a need for a correction to get
@@ -9555,7 +9568,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_uncertainty:n}
 %\begin{macro}[aux]{
 %  \siunitx_number_format_uncertainty_joined:n ,
-%  \siunitx_number_format_uncertainty_sep:n    ,
+%  \siunitx_number_format_uncertainty_sep:n    
 %}
 % Uncertainty output varies depending on whether there is a need to
 % separate the error form the number in the output.
@@ -9610,7 +9623,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_number_out_tl       ,
-%  \l_siunitx_number_out_saved_tl ,
+%  \l_siunitx_number_out_saved_tl 
 %}
 % The final result, plus a version for loops.
 %    \begin{macrocode}
@@ -9650,7 +9663,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_output_quotient_tl ,
-%  \l_siunix_number_parse_bool   ,
+%  \l_siunix_number_parse_bool   
 %}
 % Some options related to numbers at the output stage.
 %    \begin{macrocode}
@@ -9678,7 +9691,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_output:n ,
-%  \siunitx_number_output:V ,
+%  \siunitx_number_output:V 
 %}
 % The number output system simply sets up for the combined number and
 % unit system.
@@ -9721,7 +9734,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_number_output_parse:n ,
-%  \siunitx_number_output_parse:V ,
+%  \siunitx_number_output_parse:V 
 %}
 %\begin{macro}[aux]{\siunitx_number_output_parse_aux:}
 % The parsing system just has to check if there are multiple parts to
@@ -9772,7 +9785,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{
 %  \siunitx_number_output_parts_aux:    ,
 %  \siunitx_number_output_parts_aux:n   ,
-%  \siunitx_number_output_parts_print:n ,
+%  \siunitx_number_output_parts_print:n 
 %}
 % Printing numbers by parts is necessary when there are units to
 % repeat. That means doing things that have already been done by the
@@ -9990,7 +10003,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}[aux]{
 %  \siunitx_number_output_quotient_aux_i:  ,
-%  \siunitx_number_output_quotient_aux_ii: ,
+%  \siunitx_number_output_quotient_aux_ii: 
 %}
 % The two parts of the number are parsed and formatted.
 %    \begin{macrocode}
@@ -10072,7 +10085,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_angle_degree_space_bool ,
-%  \l_siunitx_angle_minute_space_bool ,
+%  \l_siunitx_angle_minute_space_bool 
 %}
 % The need for spaces between parts of an arc needs to be accommodated:
 % this is achieved by flagging up the need for such spaces using two
@@ -10087,7 +10100,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_angle_marker_box ,
 %  \l_siunitx_angle_unit_box   ,
 %  \l_siunitx_angle_marker_dim ,
-%  \l_siunitx_angle_unit_dim   ,
+%  \l_siunitx_angle_unit_dim   
 %}
 % When creating astronomy-style angles, the decimal marker and angle
 % symbol have to be boxed up and measured.
@@ -10102,7 +10115,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_angle_degree_prop ,
 %  \l_siunitx_angle_minute_prop ,
-%  \l_siunitx_angle_second_prop ,
+%  \l_siunitx_angle_second_prop 
 %}
 % As there are potentially three numbers to parse, three properly lists
 % are made available to hold the results. This allows the code to be
@@ -10120,7 +10133,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_angle_second_zero_bool ,
 %  \l_siunitx_angle_arc_separator_tl ,
 %  \l_siunitx_angle_astronomy_bool   ,
-%  \l_siunitx_angle_unit_product_tl  ,
+%  \l_siunitx_angle_unit_product_tl  
 %}
 % The angle-specific options are created here.
 %    \begin{macrocode}
@@ -10199,7 +10212,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{
 %  \siunitx_angle_direct_aux_i:nnn   ,
 %  \siunitx_angle_direct_aux_ii:nnn  ,
-%  \siunitx_angle_direct_aux_iii:nnn ,
+%  \siunitx_angle_direct_aux_iii:nnn 
 %}
 % When printing an arc directly, there is still the need to fill in
 % any zero values required and to check the spacing is correct. That
@@ -10254,12 +10267,12 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_angle_parse:nnn       ,
 %  \siunitx_angle_check_sign:     ,
 %  \siunitx_angle_zero_fill:      ,
-%  \siunitx_angle_sign_shuffle:nn ,
+%  \siunitx_angle_sign_shuffle:nn 
 %}
 %\begin{macro}[aux]{
 %  \siunitx_angle_parse_aux:nnn        ,
 %  \siunitx_angle_check_sign:n         ,
-%  \siunitx_angle_sign_shuffle_aux:nnn ,
+%  \siunitx_angle_sign_shuffle_aux:nnn 
 %}
 % Parsing an arc requires a number of stages. First, there is the
 % basic conversion of the input numbers into three property lists,
@@ -10437,7 +10450,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_angle_print_astronomy_aux:    ,
 %  \siunitx_angle_print_astronomy_aux:n   ,
 %  \siunitx_angle_print_astronomy_marker: ,
-%  \siunitx_angle_print_astronomy_unit:   ,
+%  \siunitx_angle_print_astronomy_unit:   
 %}
 % The first check for astronomy-style angles is that there is a decimal
 % marker in the current input: if not, the standard method can be used.
@@ -10575,21 +10588,21 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_declare_power_after:Nn  ,
-%  \siunitx_declare_power_before:Nn ,
+%  \siunitx_declare_power_before:Nn 
 %}
 % Creating powers is all about storing values.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_power_after:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
-    { \textsuperscript {#2} }
+    { \siunitx_textsuperscript {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_after:n {#2} }
 }
 \cs_new_protected:Npn \siunitx_declare_power_before:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
-    { ##1 \textsuperscript {#2} }
+    { ##1 \siunitx_textsuperscript {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_before:n {#2} }
 }
@@ -10674,20 +10687,20 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \raiseto ,
-%  \tothe   ,
+%  \tothe   
 %}
 % Generic versions of the pre-set powers.
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _literal:w } #1#2 {
   #2
-  \textsuperscript {#1}
+  \siunitx_textsuperscript {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \raiseto _function:w }
   #1 {
   \siunitx_unit_parse_power_before:n {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
-  \textsuperscript {#1}
+  \siunitx_textsuperscript {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \tothe _function:w }
   #1 {
@@ -10750,7 +10763,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_create_overwrite_bool ,
 %  \l_siunitx_create_prespace_bool  ,
 %  \l_siunitx_create_optional_bool  ,
-%  \l_siunitx_create_xspace_bool    ,
+%  \l_siunitx_create_xspace_bool    
 %}
 % There are a few options which control this behaviour: these are all
 % preamble-only.
@@ -10821,7 +10834,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_unit_create:N          ,
-%  \siunitx_unit_create_with_arg:N ,
+%  \siunitx_unit_create_with_arg:N 
 %}
 % The creation functions expand everything as far as possible so that
 % there is less to do in the document.
@@ -10938,7 +10951,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_unit_forbid_literal_bool ,
-%  \l_siunitx_unit_parse_bool          ,
+%  \l_siunitx_unit_parse_bool          
 %}
 % One option is related to how units are pre-processed.
 %    \begin{macrocode}
@@ -10957,7 +10970,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \siunitx_unit_in:nn ,
 %  \siunitx_unit_in:Vn ,
-%  \siunitx_pm:        ,
+%  \siunitx_pm:        
 %}
 % The master function does a very simple checks then hands off.
 % The definition of \cs{pm} needs to be saved here so that it can
@@ -11030,7 +11043,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_unit_int  ,
-%  \l_siunitx_unit_prop ,
+%  \l_siunitx_unit_prop 
 %}
 % Parsed units are stored in a property list, to keep things compact.
 % An integer is also needed to count up units.
@@ -11049,7 +11062,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_prefix_symbols_bool ,
-%  \l_siunitx_sticky_per_bool     ,
+%  \l_siunitx_sticky_per_bool     
 %}
 % Some options are directly related to how units are handled at this
 % stage, so need be created before the reconstruction part of the code.
@@ -11119,7 +11132,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_unit_parse_power_before:n ,
-%  \siunitx_unit_parse_power_after:n  ,
+%  \siunitx_unit_parse_power_after:n  
 %}
 % Storing powers depends on whether they are given before or after
 % the unit.
@@ -11139,7 +11152,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \siunitx_unit_parse_prefix:n  ,
-%  \siunitx_unit_parse_prefix:nn ,
+%  \siunitx_unit_parse_prefix:nn 
 %}
 % Saving prefixes always increments the counter. For non-symbolic
 % mode, the base needs to be saved along with the power.
@@ -11254,7 +11267,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_unit_current_tl     ,
 %  \l_siunitx_unit_denominator_tl ,
 %  \l_siunitx_unit_numerator_tl   ,
-%  \l_siunitx_unit_saved_tl       ,
+%  \l_siunitx_unit_saved_tl       
 %}
 % Storage space for creating unit output.
 %    \begin{macrocode}
@@ -11269,7 +11282,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \l_siunitx_unit_denominator_int ,
-%  \l_siunitx_unit_numerator_int   ,
+%  \l_siunitx_unit_numerator_int   
 %}
 % For tracking in case brackets are needed.
 %    \begin{macrocode}
@@ -11281,7 +11294,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_unit_prefix_int        ,
 %  \l_siunitx_unit_prefix_base_int   ,
-%  \l_siunitx_unit_prefix_current_tl ,
+%  \l_siunitx_unit_prefix_current_tl 
 %}
 % Used to calculate the overall prefix value.
 %    \begin{macrocode}
@@ -11313,7 +11326,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_per_mode_tl        ,
 %  \l_siunitx_power_number_bool  ,
 %  \l_siunitx_qualifier_mode_tl  ,
-%  \l_siunitx_per_two_parts_bool ,
+%  \l_siunitx_per_two_parts_bool 
 %}
 % For saving settings.
 %    \begin{macrocode}
@@ -11329,7 +11342,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_unit_denominator_bracket_bool ,
 %  \l_siunitx_unit_product_tl               ,
-%  \l_siunitx_per_symbol_tl                 ,
+%  \l_siunitx_per_symbol_tl                 
 %}
 % At this stage, output formatting options are created.
 %    \begin{macrocode}
@@ -11508,7 +11521,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_unit_format_auto:           ,
 %  \siunitx_unit_format_symbol:         ,
 %  \siunitx_unit_format_symbol_aux:     ,
-%  \siunitx_unit_format_symbol_aux_alt: ,
+%  \siunitx_unit_format_symbol_aux_alt: 
 %}
 % When making (\emph{psuedo}-)fractions there is a check to place a
 % \( 1 \) in the numerator is it's blank. For symbol mode, this is
@@ -11648,7 +11661,7 @@ This work consists of the file  siunitx.dtx
 % then a little work to do sorting out "~" and \texttt{.} characters at
 % the outer level.
 %    \begin{macrocode}
-\char_make_active:N \~
+\char_set_catcode_active:N \~
 \cs_new_protected:Npn \siunitx_unit_format_literal:n #1 {
   \int_zero:N \l_siunitx_unit_prefix_int
   \tl_map_function:NN \l_siunitx_declare_list_tl
@@ -11668,7 +11681,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1 {
   \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
 }
-\char_make_space:N \~
+\char_set_catcode_space:N \~
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -11728,7 +11741,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_unit_format_power_aux:nn    ,
 %  \siunitx_unit_format_power_brackets: ,
 %  \siunitx_unit_format_power_per:      ,
-%  \siunitx_unit_format_power_repeat:   ,
+%  \siunitx_unit_format_power_repeat:   
 %}
 % To format powers, there are a few issues: are brackets needed, is
 % the power reciprocal and is fraction-formatting in operation. Repeated
@@ -11844,7 +11857,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{
 %  \siunitx_unit_format_prefix_number:      ,
 %  \siunitx_unit_format_prefix_number_calc: ,
-%  \siunitx_unit_format_prefix_symbol:      ,
+%  \siunitx_unit_format_prefix_symbol:      
 %}
 % If there is a prefix, it is added to the output. When using numerical
 % output, some conversion is needed instead.
@@ -11937,7 +11950,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_unit_format_qualifier_brackets:  ,
 %  \siunitx_unit_format_qualifier_space:     ,
 %  \siunitx_unit_format_qualifier_subscript: ,
-%  \siunitx_unit_format_qualifier_text:      ,
+%  \siunitx_unit_format_qualifier_text:      
 %}
 % Four methods for showing qualifiers, each with its own sub-function.
 % For the \texttt{space} methods, a warning is set in the property list
@@ -11964,7 +11977,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
     \l_siunitx_bracket_close_tl
 }
-\char_make_active:N \~
+\char_set_catcode_active:N \~
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_space: {
   \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
@@ -11972,7 +11985,7 @@ This work consists of the file  siunitx.dtx
     { bracket- \int_use:N \l_siunitx_unit_int }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
-\char_make_space:N \~
+\char_set_catcode_space:N \~
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript: {
   \tl_put_right:Nx \l_siunitx_unit_current_tl
     { \exp_not:N \PrintSubscript { \exp_not:V \l_siunitx_tmpa_tl } }
@@ -12007,7 +12020,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_format_symbol:}
 %\begin{macro}[aux]{
 %  \siunitx_unit_format_symbol_aux:     ,
-%  \siunitx_unit_format_symbol_aux_alt: ,
+%  \siunitx_unit_format_symbol_aux_alt: 
 %}
 % If there is no symbol, something is wrong! The only exception is
 % when the code is inside the \cs{si} function (or similar) and there
@@ -13308,7 +13321,7 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_table_pre_tl                ,
 %  \l_siunitx_table_post_tl               ,
 %  \l_siunitx_table_sign_exponent_bool    ,
-%  \l_siunitx_table_sign_manitssa_bool    ,
+%  \l_siunitx_table_sign_manitssa_bool    
 %}
 % As usual, set up the options.
 %    \begin{macrocode}
@@ -14251,7 +14264,7 @@ This work consists of the file  siunitx.dtx
 % In that sense this is very similar to the normal method, except that
 % it will work with non-numerical input.
 %    \begin{macrocode}
-\char_make_active:N \@
+\char_set_catcode_active:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_centered: {
   \cs_set_eq:NN \siunitx_table_print:
     \siunitx_table_direct_centered_end:
@@ -14279,7 +14292,7 @@ This work consists of the file  siunitx.dtx
           \l_siunitx_output_decimal_tl
     }
 }
-\char_make_letter:N \@
+\char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_centered_end: {
     \c_math_shift_token
   \c_group_end_token
@@ -14318,7 +14331,7 @@ This work consists of the file  siunitx.dtx
 % but needs a bit of measuring. The first box here does need to use
 % \cs{tex_hill:D} as \texttt{fil} glue will not work.
 %    \begin{macrocode}
-\char_make_active:N \@
+\char_set_catcode_active:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_reserved: {
   \cs_set_eq:NN \siunitx_table_print:
     \siunitx_table_direct_reserved_end:
@@ -14369,7 +14382,7 @@ This work consists of the file  siunitx.dtx
           \l_siunitx_output_decimal_tl
     }
 }
-\char_make_letter:N \@
+\char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_direct_reserved_end: {
     \c_math_shift_token
     \tex_hfil:D
@@ -14639,154 +14652,148 @@ This work consists of the file  siunitx.dtx
 % Lots of messages, all of them together in one block to make life
 % easier.
 %    \begin{macrocode}
-\msg_set:nnnn { siunitx } { bad-arc-sign }
+\msg_new:nnnn { siunitx } { bad-arc-sign }
   { Incorrect~use~of~sign~in~degree-minute-second~angle. }
   { Only~the~highest~value~part~of~an~angle~can~have~a~sign. }
-\msg_set:nnnn { siunitx } { duplicate-complex-root-token }
+\msg_new:nnnn { siunitx } { duplicate-complex-root-token }
   { Duplicate~complex~root~token~'#1'~in~input. }
   { Only~one~complex~root~token~can~appear~in~a~single~number. }
-\msg_set:nnnn { siunitx } { duplicate-decimal-token }
+\msg_new:nnnn { siunitx } { duplicate-decimal-token }
   { Duplicate~decimal~marker~token~'#1'~in~input. }
   { Only~one~decimal~marker~token~can~appear~in~a~single~number. }
-\msg_set:nnnn { siunitx } { duplicate-exponent-token }
+\msg_new:nnnn { siunitx } { duplicate-exponent-token }
   { Duplicate~exponent~marker~token~'#1'~in~input. }
   { Only~one~exponent~marker~token~can~appear~in~a~single~number. }
-\msg_set:nnnn { siunitx } { duplicate-quotient-token }
+\msg_new:nnnn { siunitx } { duplicate-quotient-token }
   { Duplicate~quotient~token. }
   { Only~one~quotient~token~can~appear~in~a~single~number. }
-\msg_set:nnnn { siunitx } { duplicate-sticky-per }
+\msg_new:nnnn { siunitx } { duplicate-sticky-per }
   { Duplicate~\token_to_str:N \per. }
   {
     When~the~'sticky-per'~option~is~active,~only~one
-    \token_to_str:N \per \\
-    may~appear~in~a~unit.
+    \token_to_str:N \per may~appear~in~a~unit.
   }
-\msg_set:nnnn { siunitx } { empty-arc }
+\msg_new:nnnn { siunitx } { empty-arc }
   { Empty~degree-minute-second~angle. }
   { The~angle~given~does~not~contain~any~numbers. }
-\msg_set:nnnn { siunitx } { empty-uncertainty }
+\msg_new:nnnn { siunitx } { empty-uncertainty }
   { Empty~uncertainty~given~in~'#1'. }
   { The~number~given~contains~an~empty~uncertainty. }
-\msg_set:nnnn { siunitx } { ending-product-token }
+\msg_new:nnnn { siunitx } { ending-product-token }
   { Misplaced~product~token. }
   { A~number~cannot~end~with~a~product~token. }
-\msg_set:nnnn { siunitx } { ending-quotient-token }
+\msg_new:nnnn { siunitx } { ending-quotient-token }
   { Misplaced~quotient~token. }
   { A~number~cannot~end~with~a~quotient~token. }
-\msg_set:nnnn { siunitx } { invalid-arc-format }
+\msg_new:nnnn { siunitx } { invalid-arc-format }
   { Invalid~degree-minute-second angle~'#1'. }
   {
-    Angles~given~in~degree-minute-second~format~should~contain~two~';'\\
-    symbols~to~divide~up~the~parts~of~the~input.\\
+    Angles~given~in~degree-minute-second~format~should~contain~two~';'
+    symbols~to~divide~up~the~parts~of~the~input.
   }
-\msg_set:nnnn { siunitx } { invalid-number }
+\msg_new:nnnn { siunitx } { invalid-number }
   { Invalid~numerical~input~'#1'. }
   {
-    The~input given~as~a~number~does~not~make~logical~sense.\\
+    The~input given~as~a~number~does~not~make~logical~sense.~
     This~happens,~for example,~if~a~number~only~contains~a~sign.
   }
-\msg_set:nnnn { siunitx } { invalid-token-in-exponent }
+\msg_new:nnnn { siunitx } { invalid-token-in-exponent }
   { Invalid~exponent~in~numerical~input~'#1'. }
   {
-    The~exponent`part~of~a~number~cannot~contain~an~uncertainty~or~
-    complex~part.\\
-    The~input~given~appears~to~contain~one~of~these~in~the~exponent.
+    The~exponent~part~of~a~number~cannot~contain~an~uncertainty~or~
+    complex~part: \\
+    the~input~given~appears~to~contain~one~of~these~in~the~exponent.
   }
-\msg_set:nnnn { siunitx } { invalid-token-in-number }
+\msg_new:nnnn { siunitx } { invalid-token-in-number }
   { Invalid~token~'#1'~in~numerical~input. }
   {
     Numbers~can~only~contain~tokens~defined~using~the~
     'input-...'~options:\\
     the~token~'#1'~is~not~set~up~as~a~valid~part~of~a~number.
   }
-\msg_set:nnnn { siunitx } { invalid-token-in-uncertainty }
+\msg_new:nnnn { siunitx } { invalid-token-in-uncertainty }
   { Invalid~uncertainty~in~numerical~input~'#1'. }
   {
     The~uncertainty~part~of~a~number~may~only~contain~digits~or~
     symbols.
   }
-\msg_set:nnnn { siunitx } { literal-unit }
+\msg_new:nnnn { siunitx } { literal-unit }
   { Literal~units~disabled. }
   {
-    You~gave~the~literal~input~'#1'\\
+    You~gave~the~literal~input~'#1'~
     but~literal~unit~output~is~disabled.
   }
-\msg_set:nnnn { siunitx } { misplaced-sign-token }
+\msg_new:nnnn { siunitx } { misplaced-sign-token }
   { Misplaced~sign~token~'#1'. }
   { Sign~tokens~can~only~come~at~the~beginning~of~a~number. }
-\msg_set:nnnn { siunitx } { misplaced-complex-root-token }
+\msg_new:nnnn { siunitx } { misplaced-complex-root-token }
   { Misplaced~complex~token~in~numerical~input~'#1'. }
   {
-    The~root~token~must~come~either~before~or~after~the~real~digits\\
+    The~root~token~must~come~either~before~or~after~the~real~digits~
     of~the~complex~part.
   }
-\msg_set:nnnn { siunitx } { misplaced-uncertainty-token }
+\msg_new:nnnn { siunitx } { misplaced-uncertainty-token }
   { Misplaced~uncertainty~token~'#1'. }
   {
     The~uncertainty~in~a~number~must~be~given~between~a~set~of~
     delimiters~as~defined~by~the\\
-    \c_space_tl \c_space_tl
-    'input-open-uncertainty'~and~'input-close-uncertainty'\\
+    \ \ 'input-open-uncertainty'~and~'input-close-uncertainty'~
     options.
   }
-\msg_set:nnnn { siunitx } { multi-part-range }
+\msg_new:nnnn { siunitx } { multi-part-range }
   { Numerical~range~with~multiple~parts. }
   {
-    The~input~'#1'~is~a~number~which~has~more~than~one~part.\\
-    Ranges~can~only~contain~one~number~in~each~part.
+    The~input~'#1'~is~a~number~which~has~more~than~one~part: \\
+    ranges~can~only~contain~one~number~in~each~part.
   }
-\msg_set:nnn { siunitx } { option-not-available }
+\msg_new:nnn { siunitx } { option-not-available }
   { Option~'#1'~not~available~in~strict~mode. }
-\msg_set:nnn { siunitx } { option-preamble-only }
+\msg_new:nnn { siunitx } { option-preamble-only }
   { Option~'#1'~only~available~in~the~preamble. }
-\msg_set:nnnn { siunitx } { prefix-base-mismatch }
+\msg_new:nnnn { siunitx } { prefix-base-mismatch }
   { Prefix~bases~do~not~match. }
   {
-    You~have~asked~for~prefixes~to~be~converted~into~a~power,\\
+    You~have~asked~for~prefixes~to~be~converted~into~a~power,~
     but~the~bases~do~not~match.
   }
-\msg_set:nnn { siunitx } { prefix-only }
+\msg_new:nnn { siunitx } { prefix-only }
   { Prefix~with~no~unit. }
-\msg_set:nnnn { siunitx } { qualifier-before-unit }
+\msg_new:nnnn { siunitx } { qualifier-before-unit }
   { Qualifier~before~unit. }
   { Unit~qualifiers~have~to~follow~after~units,~not~before~them. }
-\msg_set:nnnn { siunitx } { restricted-number }
+\msg_new:nnnn { siunitx } { restricted-number }
   { Token~'#1'~forbidden~in~restricted~numerical~input. }
   {
     The~current~input~must~be~a~real~number~and~cannot~contain: \\
-    \c_space_tl -~an~exponent; \\
-    \c_space_tl -~an~uncertainty; \\
-    \c_space_tl -~a~complex~part.
+    \ -~an~exponent; \\
+    \ -~an~uncertainty; \\
+    \ -~a~complex~part.
   }
-\msg_set:nnnn { siunitx } { starting-product-token }
+\msg_new:nnnn { siunitx } { starting-product-token }
   { Misplaced~product~token. }
   { A~number~cannot~begin~with~a~product~token. }
-\msg_set:nnnn { siunitx } { starting-quotient-token }
+\msg_new:nnnn { siunitx } { starting-quotient-token }
   { Misplaced~quotient~token. }
   { A~number~cannot~begin~with~a~quotient~token. }
-\msg_set:nnnn { siunitx } { table-partial-number }
+\msg_new:nnnn { siunitx } { table-partial-number }
   { No~space~reserved~for~#1~\msg_line_context:. }
   {
-    The~number~in~the~current~table~cell~contains~#1~part, \\
+    The~number~in~the~current~table~cell~contains~#1~part,
     but~you~did~not~reserve~any~space~to~print~it: \\
     it~will~be~missing~in~the~output.
   }
-\msg_set:nnnn { siunitx } { unknown-configuration-file }
-  { Unknown~configuration~'#1'. }
-  { The~configuration~file~'siunitx-#1.cfg'~was~not~found. }
-\msg_set:nnnn { siunitx } { unknown-option }
+\msg_new:nnnn { siunitx } { unknown-option }
   { Unknown~option~'#1'. }
   {
-    The~option~file~'#1'~is~not~known~by~siunitx: \\
+    The~option~file~'#1'~is~not~known~by~siunitx:
     perhaps~it~is~spelled~incorrectly.
   }
-\msg_set:nnnn { siunitx } { version-1-option }
+\msg_new:nnnn { siunitx } { version-1-option }
   { Version~1~option~'#1'~detected. }
   {
     Use: \\
-    \c_space_tl \c_space_tl
-    \token_to_str:N \usepackage[load-configurations = version-1]
-    \token_to_str:N { siunitx \token_to_str:N } \\
+    \ \ \token_to_str:N \usepackage [ version-1-compatibility ]
+    \iow_char:N \{ siunitx \token_to_str:N \iow_char:N \} \\
     in~the~preamble~to~load~the~appropriate~code.
   }
 %    \end{macrocode}
@@ -14912,7 +14919,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \SIlist   ,
-%  \SIrange  ,
+%  \SIrange  
 %}
 % Lists and range of values are handled in a very similar way.
 % Everything is kept relatively simple, and so there is not too much
@@ -15015,73 +15022,75 @@ This work consists of the file  siunitx.dtx
 % \pkg{hyperref}, and ensure that everything works cleanly and with
 % no unnecessary warnings.
 %
-%\begin{macro}{\siunitx_contents_add:N}
-% An updated version of \cs{addtocontents} which will ensure that
-% everything works properly. Using \cs{token_to_str:N} means that
-% there is no problem with the asynchronous nature of \TeX's writing
-% mechanism.
+% \begin{macro}{\siunitx_contents_add:N}
+%   An updated version of \cs{addtocontents} which will ensure that
+%   everything works properly. Using \cs{token_to_str:N} means that
+%   there is no problem with the asynchronous nature of \TeX{}'s writing
+%   mechanism.
 %    \begin{macrocode}
-\AtBeginDocument {
-  \cs_set:Npn \addtocontents #1#2
-    {
-      \protected@write \@auxout
-        {
-          \cs_set_eq:NN \label \use_none:n
-          \cs_set_eq:NN \index \use_none:n
-          \cs_set_eq:NN \glossary\use_none:n
-          \tl_map_function:NN \l_siunitx_declare_list_tl
-            \siunitx_contents_add:N
-        }
-        { \token_to_str:N \@writefile {#1} {#2} }
-    }
-}
-\cs_new_protected_nopar:Npn \siunitx_contents_add:N #1 {
-  \cs_set_nopar:Npn #1 { \token_to_str:N #1 }
-}
+\AtBeginDocument
+  {
+    \cs_set:Npn \addtocontents #1#2
+      {
+        \protected@write \@auxout
+          {
+            \cs_set_eq:NN \label    \use_none:n
+            \cs_set_eq:NN \index    \use_none:n
+            \cs_set_eq:NN \glossary \use_none:n
+            \tl_map_function:NN \l_siunitx_declare_list_tl
+              \siunitx_contents_add:N
+          }
+          { \token_to_str:N \@writefile {#1} {#2} }
+      }
+  }
+\cs_new_protected_nopar:Npn \siunitx_contents_add:N #1
+  { \cs_set_nopar:Npn #1 { \token_to_str:N #1 } }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_contents_bookmarks:}
-% The idea here is two-fold. First, all of the unit macros are set
-% up to simply print their literal interpretation: this is hopefully
-% good enough for most bookmark situations. Secondly, the document
-% commands are made expandable. This allows a bit of re-arrangement
-% of the input, removes any set up options (which are being ignored)
-% and stops \pkg{hyperref} issuing a warning.
+% \begin{macro}{\siunitx_contents_bookmarks:}
+%   The idea here is two-fold. First, all of the unit macros are set
+%   up to simply print their literal interpretation: this is hopefully
+%   good enough for most bookmark situations. Secondly, the document
+%   commands are made expandable. This allows a bit of re-arrangement
+%   of the input, removes any set up options (which are being ignored)
+%   and stops \pkg{hyperref} issuing a warning.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_contents_bookmarks: {
-  \tl_map_function:NN \l_siunitx_declare_list_tl
-    \siunitx_unit_print_literal_aux:N
-  \msg_redirect_name:nnn { LaTeX / xparse } { redefine-command }
-    { none }
-  \cs_set_eq:NN \num      \siunitx_bookmark_num:w
-  \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
-  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
-  \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
-  \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
-  \cs_set_eq:NN \si       \siunitx_bookmark_si:w
-  \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
-  \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
-  \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
-  \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
-  \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
-  \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
-  \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
-}
+\cs_new_protected_nopar:Npn \siunitx_contents_bookmarks:
+  {
+    \tl_map_function:NN \l_siunitx_declare_list_tl
+      \siunitx_unit_print_literal_aux:N
+    \msg_redirect_name:nnn { xparse } { redefine-command } { none }
+    \cs_set_eq:NN \num      \siunitx_bookmark_num:w
+    \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
+    \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+    \cs_set_eq:NN \SI       \siunitx_bookmark_SI:w
+    \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
+    \cs_set_eq:NN \si       \siunitx_bookmark_si:w
+    \cs_set_eq:NN \siunitx_textsuperscript:n \use:n
+    \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
+    \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
+    \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
+    \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
+    \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
+    \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
+    \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{
-%  \siunitx_bookmark_num:w      ,
-%  \siunitx_bookmark_numrange:w ,
-%  \siunitx_bookmark_SIlist:w   ,
-%  \siunitx_bookmark_SIrange:w  ,
-%  \siunitx_bookmark_SI:w       ,
-%  \siunitx_bookmark_si:w     ,
-%}
-% To keep things fast, expandable versions of the document commands
-% are created only once. These are then used if necessary to remove
-% and re-order arguments in an expandable fashion.
+% \begin{macro}
+%   {
+%     \siunitx_bookmark_num:w      ,
+%     \siunitx_bookmark_numrange:w ,
+%     \siunitx_bookmark_SIlist:w   ,
+%     \siunitx_bookmark_SIrange:w  ,
+%     \siunitx_bookmark_SI:w       ,
+%     \siunitx_bookmark_si:w     
+%   }
+%   To keep things fast, expandable versions of the document commands
+%   are created only once. These are then used if necessary to remove
+%   and re-order arguments in an expandable fashion.
 %    \begin{macrocode}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_num:w { o m } {#2}
 \DeclareExpandableDocumentCommand \siunitx_bookmark_numrange:w { o m m }
@@ -15094,7 +15103,7 @@ This work consists of the file  siunitx.dtx
   { o m m m } { #2 ~ #4 \l_siunitx_range_phrase_tl #3 ~ #4 }
 \DeclareExpandableDocumentCommand \siunitx_bookmark_si:w { o m } {#2}
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_bookmark_SIlist_map:nn}
 %\begin{macro}[aux]{\siunitx_bookmark_SIlist_map_aux:nw}
@@ -15376,7 +15385,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \DeclareSIUnit \clight { \text { \ensuremath { c @ { 0 } } } }
@@ -15397,7 +15406,7 @@ This work consists of the file  siunitx.dtx
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
   \char_set_lccode:nn { `\E } { `\E }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \DeclareSIUnit \bohr { \text { \ensuremath { a @ { 0 } } } }
@@ -15579,51 +15588,92 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
-%\subsection{Loading additional configurations}
+% \subsection{Loading additional configurations}
+% 
+% \begin{variable}{\c_siunitx_configuration_ext_tl}
+%   Logical mark-up for the file extension.
+%    \begin{macrocode}
+\tl_const:Nn \c_siunitx_configuration_ext_tl { cfg }
+%    \end{macrocode}
+% \end{variable}
 %
-% There is only only option for loading files: keeps things simple.
+% \begin{macro}{\siunitx_load_abbreviations:}
+% \begin{macro}{\siunitx_load_binary:}
+%   Loading abbreviations is on by default, which therefore requires a bit
+%   of juggling. The idea here is that the abbreviations will be loaded unless
+%   specifically turned off. This can occur anywhere in the preamble. The
+%   same approach is taken for the binary options.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    abbreviations .choice:,
+    abbreviations /
+      true        .code:n    = { \siunitx_load_abbreviations: },
+    abbreviations /
+      false       .code:n    =
+      { \cs_set_eq:NN \siunitx_load_abbreviations: \prg_do_nothing: } ,
+    abbreviations .default:n = true ,
+    binary-units  .choice:,
+    binary-units  /
+      true        .code:n    = { \siunitx_load_binary: },
+    binary-units  /
+      false       .code:n    =
+      { \cs_set_eq:NN \siunitx_load_binary: \prg_do_nothing: } ,
+    binary-units  .default:n = true  
+  }
+\cs_new_protected_nopar:Npn \siunitx_load_abbreviations:
+  {
+    \@onefilewithoptions { siunitx-abbreviations } [ ] [ ]
+      \c_siunitx_configuration_ext_tl
+  }
+\cs_new_protected_nopar:Npn \siunitx_load_binary:
+  {
+    \@onefilewithoptions { siunitx-binary } [ ] [ ]
+      \c_siunitx_configuration_ext_tl
+  }
+\AtBeginDocument
+  {
+    \siunitx_load_abbreviations:
+    \siunitx_load_binary:
+  }
+\siunitx_option_deactivate:n { abbreviations , binary }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% The version 1 options are not loaded as standard.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    version-1-compatibility .choice:          ,
+    version-1-compatibility /
+      true                  .code:n    = 
+        {
+          \@onefilewithoptions { siunitx-version-1 } [ ] [ ]
+            \c_siunitx_configuration_ext_tl
+        },
+    version-1-compatibility /
+      false                 .code:n    = { } ,
+    version-1-compatibility .default:n = true  
+  }
+\siunitx_option_deactivate:n { version-1-compatibility }
+%    \end{macrocode}
+%
+% Dealing with the old \opt{load-configurations} option is pretty easy, as
+% only one choice is important.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   load-configurations .code:n =
-    { \siunitx_load_configuration:n {#1} }
-}
-%    \end{macrocode}
-%
-%\begin{macro}{\siunitx_load_configuration:n}
-%\begin{macro}[aux]{\siunitx_load_configuration_aux:n}
-%\begin{macro}{\c_siunitx_configuration_ext_tl}
-% Loading configuration files is made slightly complex by the need
-% to remove spaces in the file names (none of the files contain any at
-% all, so this is easy). Secondly, the \LaTeXe{} \cs{@onefilewithoptions}
-% function is used for file loading, as \LaTeX3 currently needs the
-% \LaTeXe{} category code stack to keep things sane.
-%    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_load_configuration:n #1 {
-  \tl_set_rescan:Nnn \l_siunitx_tmpa_tl
-    { \char_make_ignore:N \ } {#1}
-  \clist_map_function:NN \l_siunitx_tmpa_tl
-    \siunitx_load_configuration_aux:n
-}
-\cs_new_protected:Npn \siunitx_load_configuration_aux:n #1 {
-  \tl_if_empty:nF {#1}
     {
-      \file_if_exist:nTF
-        { siunitx- #1 . \c_siunitx_configuration_ext_tl }
+      \clist_if_in:nnT {#1} { version-1 }
         {
-          \@onefilewithoptions { siunitx- #1 } [ ] [ ]
-          \c_siunitx_configuration_ext_tl
-        }
-        {
-          \msg_error:nnx { siunitx } { unknown-configuration-file } {#1}
+          \@onefilewithoptions { siunitx-version-1 } [ ] [ ]
+            \c_siunitx_configuration_ext_tl
         }
     }
 }
-\tl_new:N \c_siunitx_configuration_ext_tl
-\tl_set:Nn \c_siunitx_configuration_ext_tl { cfg }
+\siunitx_option_deactivate:n { load-configurations }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
 %
 % Load any local configuration file.
 %    \begin{macrocode}
@@ -15652,12 +15702,6 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \ProvidesExplFile {siunitx-version-1.cfg} {2011/06/03} {2.2h} 
   {siunitx: Version 1 settings}
-%    \end{macrocode}
-%
-% The abbreviations are loaded by default by version one.
-%    \begin{macrocode}
-\keys_set:nn { siunitx }
-  { load-configurations = { abbreviations , binary } }
 %    \end{macrocode}
 %
 % The re-arrangements made to the code in version two, and in particular
@@ -16291,7 +16335,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \newunit     ,
 %  \renewunit   ,
-%  \provideunit ,
+%  \provideunit 
 %}
 % The functions for creating units from version one are easy to create.
 %    \begin{macrocode}
@@ -16304,7 +16348,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \newpower     ,
 %  \renewpower   ,
-%  \providepower ,
+%  \providepower 
 %}
 % Slightly more complex: an optional argument to check. A simple
 % assumption is made that it will be \texttt{post}: anything else
@@ -16331,7 +16375,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \newprefix     ,
 %  \renewprefix   ,
-%  \provideprefix ,
+%  \provideprefix 
 %}
 % Slightly more complex: an optional argument to check. A simple
 % assumption is made that it will be \texttt{post}: anything else
@@ -16358,7 +16402,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \newqualifier     ,
 %  \renewqualifier   ,
-%  \providequalifier ,
+%  \providequalifier 
 %}
 % The functions for creating qualifiers are easy to create again.
 %    \begin{macrocode}
@@ -16372,7 +16416,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \Square  ,
-%  \ssquare ,
+%  \ssquare 
 %}
 % In version 1, \cs{square} is not used with these two alternatives
 % preferred.
@@ -16388,7 +16432,7 @@ This work consists of the file  siunitx.dtx
 %  \Day   ,
 %  \dday  ,
 %  \Gray  ,
-%  \ggray ,
+%  \ggray 
 %}
 % Units which are given awkward names in version one.
 %    \begin{macrocode}
@@ -16404,7 +16448,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \atomicmass ,
 %  \arcmin     ,
-%  \arcsec     ,
+%  \arcsec     
 %}
 % Slightly different: given more complete names in version two.
 %    \begin{macrocode}
@@ -16421,7 +16465,7 @@ This work consists of the file  siunitx.dtx
 %  \millibar ,
 %  \rad      ,
 %  \rem      ,
-%  \roentgen ,
+%  \roentgen 
 %}
 % Units which were defined in version one but are no longer listed
 % by the \textsc{bipm} as acceptable.
@@ -16449,7 +16493,7 @@ This work consists of the file  siunitx.dtx
 %  \mics   ,
 %  \cmc    ,
 %  \dmc    ,
-%  \cms    ,
+%  \cms    
 %}
 % A few abbreviations which have been renamed.
 %    \begin{macrocode}
@@ -16476,7 +16520,7 @@ This work consists of the file  siunitx.dtx
 %  \cubicdecimetre    ,
 %  \squarecentimetre  ,
 %  \squaremetre       ,
-%  \squarekilometre   ,
+%  \squarekilometre   
 %}
 % Units from version one that did not seem like a good idea to retain.
 %    \begin{macrocode}
@@ -16492,7 +16536,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \parsec    ,
-%  \lightyear ,
+%  \lightyear 
 %}
 % A few units for astronomy that version 1 provided.
 %    \begin{macrocode}
@@ -16504,7 +16548,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \gmol  ,
 %  \kgmol ,
-%  \lbmol ,
+%  \lbmol 
 %}
 % Slightly odd chemical engineering units, again provided in version 1.
 %    \begin{macrocode}
@@ -16517,7 +16561,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \molar ,
 %  \Molar ,
-%  \torr  ,
+%  \torr  
 %}
 % A few common units for chemistry from version 1. \cs{molar} is
 % simply a handy abbreviation: \cs{Molar} is common but rather
@@ -16558,7 +16602,7 @@ This work consists of the file  siunitx.dtx
 %  \pb         ,
 %  \fb         ,
 %  \ab         ,
-%  \zb         ,
+%  \zb         
 %}
 % High-energy physics units from version one.
 %    \begin{macrocode}
@@ -16581,22 +16625,14 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\requiresiconfigs}
-%\begin{macro}[aux]{\siunitx_requireconfig:n}
-% Version one provides this, and it might pop up so should not
-% cause errors.
+% \begin{macro}{\requiresiconfigs}
+%   Version one provides this, and it might pop up so should not
+%   cause errors.
 %    \begin{macrocode}
-\NewDocumentCommand \requiresiconfigs { m } {
-  \keys_set:nn { siunitx } { load-configurations = version-1 }
-  \clist_map_function:nN {#1} \siunitx_requireconfig:n
-}
-\cs_new_protected_nopar:Npn \siunitx_requireconfig:n #1 {
-  \str_if_eq:nnT {#1} { synchem }
-    { \keys_set:nn { siunitx } { load-configurations = chemistry } }
-}
+\NewDocumentCommand \requiresiconfigs { m }
+  { \keys_set:nn { siunitx } { version-1-compatibility } }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</version-1>
@@ -16624,7 +16660,7 @@ This work consists of the file  siunitx.dtx
 %  \nA ,
 %  \uA ,
 %  \mA ,
-%  \kA ,
+%  \kA 
 %}
 % Currents.
 %    \begin{macrocode}
@@ -16642,7 +16678,7 @@ This work consists of the file  siunitx.dtx
 %  \kHz ,
 %  \MHz ,
 %  \GHz ,
-%  \THz ,
+%  \THz 
 %}
 % Then frequencies.
 %    \begin{macrocode}
@@ -16661,7 +16697,7 @@ This work consists of the file  siunitx.dtx
 %  \nmol ,
 %  \umol ,
 %  \mmol ,
-%  \kmol ,
+%  \kmol 
 %}
 % Amounts of substance (moles).
 %    \begin{macrocode}
@@ -16680,7 +16716,7 @@ This work consists of the file  siunitx.dtx
 %  \nV ,
 %  \uV ,
 %  \mV ,
-%  \kV ,
+%  \kV 
 %}
 % Potentials.
 %    \begin{macrocode}
@@ -16698,7 +16734,7 @@ This work consists of the file  siunitx.dtx
 %  \ul ,
 %  \L  ,
 %  \mL ,
-%  \uL ,
+%  \uL 
 %}
 % Volumes.
 %    \begin{macrocode}
@@ -16718,7 +16754,7 @@ This work consists of the file  siunitx.dtx
 %  \mg  ,
 %  \g   ,
 %  \kg  ,
-%  \amu ,
+%  \amu 
 %}
 % Masses.
 %    \begin{macrocode}
@@ -16746,7 +16782,7 @@ This work consists of the file  siunitx.dtx
 %  \MeV ,
 %  \GeV ,
 %  \TeV ,
-%  \kWh ,
+%  \kWh 
 %}
 % Energies.
 %    \begin{macrocode}
@@ -16774,7 +16810,7 @@ This work consists of the file  siunitx.dtx
 %  \mm ,
 %  \cm ,
 %  \dm ,
-%  \km ,
+%  \km 
 %}
 % Lengths.
 %    \begin{macrocode}
@@ -16798,7 +16834,7 @@ This work consists of the file  siunitx.dtx
 %  \N  ,
 %  \mN ,
 %  \kN ,
-%  \MN ,
+%  \MN 
 %}
 % Forces.
 %    \begin{macrocode}
@@ -16812,7 +16848,7 @@ This work consists of the file  siunitx.dtx
 %  \Pa  ,
 %  \kPa ,
 %  \MPa ,
-%  \GPa ,
+%  \GPa 
 %}
 % Pressures.
 %    \begin{macrocode}
@@ -16825,7 +16861,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \mohm ,
 %  \kohm ,
-%  \Mohm ,
+%  \Mohm 
 %}
 % Resistances.
 %    \begin{macrocode}
@@ -16841,7 +16877,7 @@ This work consists of the file  siunitx.dtx
 %  \ps ,
 %  \ns ,
 %  \us ,
-%  \ms ,
+%  \ms 
 %}
 % Finally, times.
 %    \begin{macrocode}
@@ -16877,7 +16913,7 @@ This work consists of the file  siunitx.dtx
 %  \pebi ,
 %  \exbi ,
 %  \zebi ,
-%  \yobi ,
+%  \yobi 
 %}
 % The binary units as specified by the IEC.
 %    \begin{macrocode}
@@ -16893,7 +16929,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\begin{macro}{
 %  \bit  ,
-%  \byte ,
+%  \byte 
 %}
 % Now the units.
 %    \begin{macrocode}
