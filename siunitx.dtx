@@ -10832,7 +10832,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_unit_create_functions: {
   \bool_if:NT \l_siunitx_create_overwrite_bool
-    { \tl_map_function:NN \l_siunitx_declare_list_tl \cs_gundefine:N }
+    { \tl_map_function:NN \l_siunitx_declare_list_tl \cs_undefine:N }
   \bool_if:NTF \l_siunitx_create_optional_bool
     {
       \tl_map_function:NN \l_siunitx_declare_list_tl
@@ -12862,11 +12862,11 @@ This work consists of the file  siunitx.dtx
     \siunitx_table_collect_get:
   \cs_set_nopar:Npn \peek_execute_branches:
     {
-      \tex_ifcat:D \exp_not:N \l_peek_token \c_group_begin_token
+      \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
         \exp_after:wN \siunitx_table_collect_braced:n
-      \tex_else:D
+      \else:
         \exp_after:wN \siunitx_table_collect_not_braced:N
-      \tex_fi:D
+      \fi:
     }
   \peek_after:NN \peek_ignore_spaces_execute_branches:
 }
