@@ -5344,8 +5344,11 @@ This work consists of the file  siunitx.dtx
 % display environment.
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_display_math_bool
-\toks_put_right:Nn \tex_everydisplay:D
-  { \bool_set_true:N \l_siunitx_display_math_bool }
+\tex_everydisplay:D \exp_after:wN
+  {
+    \tex_the:D \tex_everydisplay:D
+    \bool_set_true:N \l_siunitx_display_math_bool
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -10674,15 +10677,9 @@ This work consists of the file  siunitx.dtx
         {#2}
     }
   \tl_if_empty:nTF {#3}
+    { \cs_undefine:c { l_siunitx_ \token_to_str:N #1 _options_tl } }
     {
-      \cs_if_free:cF { l_siunitx_ \token_to_str:N #1 _options_tl }
-        {
-          \cs_gundefine:c { l_siunitx_ \token_to_str:N #1 _options_tl }
-        }
-    }
-    {
-      \cs_if_free:cT { l_siunitx_ \token_to_str:N #1 _options_tl }
-        { \tl_new:c { l_siunitx_ \token_to_str:N #1 _options_tl } }
+      \tl_clear_new:c { l_siunitx_ \token_to_str:N #1 _options_tl }
       \tl_set:cn { l_siunitx_ \token_to_str:N #1 _options_tl } {#3}
     }
 }
@@ -12653,9 +12650,9 @@ This work consists of the file  siunitx.dtx
         \newcolumntype { C } [1]
           { > { \bcolumn #1 \@nil } #1 < { \ecolumn } }
         \cs_set:Npn \siunitx_tmp:w #1 \NC@do S #2 \q_stop
-          { \toks_set:Nn \NC@list { #1 #2 } }
+          { \NC@list { #1 #2 } }
         \exp_after:wN \siunitx_tmp:w \tex_the:D \NC@list \q_stop
-        \cs_gundefine:N \NC@find@S
+        \cs_undefine:N \NC@find@S
       }
       { }
 }
@@ -12676,11 +12673,12 @@ This work consists of the file  siunitx.dtx
   \cs_set_protected_nopar:Npn
     \siunitx_table_rewrite_create_aux:w \NC@do ##1##2 \NC@do #1
     {  \NC@list { \NC@do ##1 \NC@do #1 ##2 } }
-  \exp_after:wN \siunitx_table_rewrite_create_aux:w \toks_use:N \NC@list
+  \exp_after:wN \siunitx_table_rewrite_create_aux:w \tex_the:D \NC@list
   \exp_args:NNc \renewcommand * { NC@rewrite@ #1 } [1] [ ]
     {
-      \toks_put_right:Nn \@temptokena
+      \@temptokena \exp_after:wN
         {
+          \tex_the:D \@temptokena
           > { \siunitx_table_collect_begin:Nn #1 {##1} }
           c
           < { \siunitx_table_print: }
