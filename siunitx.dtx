@@ -13198,56 +13198,56 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
-%\subsection{Printing units in \texttt{s} columns}
+% \subsection{Printing units in \texttt{s} columns}
 %
 % The easiest type of printing is the \texttt{s} column. Here, there is
 % no real problem with alignment. All that has to happen is to print the
 % collected input as the argument to the internal part of an \cs{si}
 % function.
 %
-%\begin{macro}{\l_siunitx_table_unit_align_skip}
+% \begin{variable}{\l_siunitx_table_unit_align_skip}
 % The spacing used is stored as a skip, which needs to be set up first.
 %    \begin{macrocode}
 \skip_new:N \l_siunitx_table_unit_align_skip
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  table-unit-alignment .choice:,
-  table-unit-alignment / center .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_unit_align_skip
-        { \c_zero_skip plus 0.5 fill }
-    },
-  table-unit-alignment / left   .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_unit_align_skip
-        { \c_zero_skip }
-    },
-  table-unit-alignment / right  .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_unit_align_skip
-        { \c_zero_skip plus 1 fill }
-    },
-}
-\keys_set:nn { siunitx } {
-  table-unit-alignment = center
-}
+\keys_define:nn { siunitx }
+  {
+    table-unit-alignment .choice:,
+    table-unit-alignment / 
+      center             .code:n =
+        {
+          \skip_set:Nn \l_siunitx_table_unit_align_skip
+            { \c_zero_skip plus 0.5 fill }
+        },
+    table-unit-alignment /
+      left               .code:n =
+        { \skip_set:Nn \l_siunitx_table_unit_align_skip { \c_zero_skip } },
+      table-unit-alignment /
+        right            .code:n =
+        {
+          \skip_set:Nn \l_siunitx_table_unit_align_skip
+            { \c_zero_skip plus 1 fill }
+        }
+  }
+\keys_set:nn { siunitx } { table-unit-alignment = center }
 %    \end{macrocode}
 %
-%\begin{macro}{\siunitx_table_print_s:}
-% Actually printing an \texttt{s} column is not very complex. There is
-% some spacing to do at each side, with the main part of the job being
-% to print the material using the internal version of \cs{si}.
+% \begin{macro}{\siunitx_table_print_s:}
+%   Actually printing an \texttt{s} column is not very complex. There is
+%   some spacing to do at each side, with the main part of the job being
+%   to print the material using the internal version of \cs{si}.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_s: {
-  \siunitx_table_column_begin:n { \l_siunitx_table_unit_align_skip } 
-    \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }    
-  \siunitx_table_column_end:n { \l_siunitx_table_unit_align_skip }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_s:
+  {
+    \siunitx_table_column_begin:n { \l_siunitx_table_unit_align_skip } 
+      \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }    
+    \siunitx_table_column_end:n { \l_siunitx_table_unit_align_skip }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\subsection{Formatting and printing in tables}
 %
