@@ -2682,17 +2682,18 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{l}{Option name} &
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
-%    \midrule ^^A (
-%      bracket-unit-denominator & Switch & true       \\
-%      forbid-literal-units     & Switch & false      \\
-%      inter-unit-product       & Math   & \cs{,}     \\
-%      parse-units              & Switch & true       \\
-%      per-mode                 & Choice & reciprocal \\
-%      per-symbol               & Math   & /          \\
-%      power-font               & Choice & number     \\
-%      prefixes-as-symbols      & Switch & true       \\
-%      qualifier-mode           & Choice & subscript  \\
-%      sticky-per               & Switch & false      \\
+%    \midrule
+%      bracket-unit-denominator     & Switch & true       \\
+%      forbid-literal-units         & Switch & false      \\
+%      literal-superscript-as-power & Switch & true       \\
+%      inter-unit-product           & Math   & \cs{,}     \\
+%      parse-units                  & Switch & true       \\
+%      per-mode                     & Choice & reciprocal \\
+%      per-symbol                   & Math   & /          \\
+%      power-font                   & Choice & number     \\
+%      prefixes-as-symbols          & Switch & true       \\
+%      qualifier-mode               & Choice & subscript  \\
+%      sticky-per                   & Switch & false      \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2802,9 +2803,23 @@ This work consists of the file  siunitx.dtx
 % for numbers and units are very different, for example when the
 % \pkg{euler} package is loaded.
 %\begin{LaTeXdemo}
-%  \sisetup{unit-mode = text}%
 %  \si{\metre\per\second\squared} \\
 %  \si[power-font = unit]{\metre\per\second\squared}
+%\end{LaTeXdemo}
+% \DescribeOption{literal-superscript-as-power}
+% \changes{v2.3}{2011/06/08}{New \opt{literal-superscript-as-power} option for
+%   controlling how literal units superscripts behave}
+% When printing units in \enquote{literal} mode, it is possible that simply
+% printing superscripts \enquote{as is} may lead to poor appearance for the
+% numbers. This is most likely if the text font of the document uses
+% old style (lower case) numerals, but the math font uses lining (upper
+% case) numerals. It is therefore possible to treat superscripts within
+% literal units as powers, and thus for the \opt{power-font} option to
+% apply within these literal units. This behaviour is controlled using the
+% \opt{literal-superscript-as-power} switch.
+%\begin{LaTeXdemo}
+%  \si{m.s^{2}} \\
+%  \si[literal-superscript-as-power = false]{m.s^{2}}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{qualifier-mode}
@@ -4464,6 +4479,14 @@ This work consists of the file  siunitx.dtx
 % \DescribeOption{group-four-digits}
 % At the same time, the \opt{group-four-digits} option has been extended
 % to the new option \opt{group-minimum-digits}.
+% 
+% \DescribeOption{literal-superscript-as-power}
+% The new {literal-superscript-as-power} option means that the standard
+% behaviour now uses the current math font for superscripts, even when
+% units are printed literally. This will only be obvious in documents such
+% as this manual, where the text and math mode numerals are (deliberately)
+% different. To restore the previous behaviour, set
+% \opt{literal-superscript-as-power = false}.
 %
 %\section{Correct application of (SI) units}
 %
@@ -11358,6 +11381,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_unit_denominator_bracket_bool ,
 %  \l_siunitx_unit_product_tl               ,
+%  \l_siunitx_literal_power_bool            ,
 %  \l_siunitx_per_symbol_tl                 
 %}
 % At this stage, output formatting options are created.
@@ -11367,6 +11391,8 @@ This work consists of the file  siunitx.dtx
     = \l_siunitx_unit_denominator_bracket_bool,
   inter-unit-product   .tl_set:N = \l_siunitx_unit_product_tl ,
   inter-unit-separator .tl_set:N = \l_siunitx_unit_product_tl ,
+  literal-superscript-as-power
+    .bool_set:N = \l_siunitx_literal_power_bool,
   per-mode             .choice:,
   per-mode / fraction .code:n =
     {
@@ -11430,12 +11456,13 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { text } },
 }
 \keys_set:nn { siunitx } {
-  bracket-unit-denominator = true,
-  inter-unit-product       = \,,
-  per-mode                 = reciprocal,
-  per-symbol               = /,
-  power-font               = number,
-  qualifier-mode           = subscript
+  bracket-unit-denominator     = true,
+  inter-unit-product           = \,,
+  literal-superscript-as-power = true,
+  per-mode                     = reciprocal,
+  per-symbol                   = /,
+  power-font                   = number,
+  qualifier-mode               = subscript
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11670,37 +11697,44 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_unit_format_literal:n}
-%\begin{macro}[aux]{\siunitx_unit_format_literal_aux:N}
-% If the unit given contains anything which is not a unit macro, then
-% any unit macros that are there simply dump literal meanings. There is
-% then a little work to do sorting out "~" and \texttt{.} characters at
-% the outer level.
+% \begin{macro}{\siunitx_unit_format_literal:n}
+% \begin{macro}[aux]{\siunitx_unit_format_literal_aux:N}
+% \begin{macro}[aux]{\siunitx_unit_format_literal_power:n}
+%   If the unit given contains anything which is not a unit macro, then
+%   any unit macros that are there simply dump literal meanings. There is
+%   then a little work to do sorting out |~| and |.| characters at
+%   the outer level.
 %    \begin{macrocode}
 \char_set_catcode_active:N \~
-\cs_new_protected:Npn \siunitx_unit_format_literal:n #1 {
-  \int_zero:N \l_siunitx_unit_prefix_int
-  \tl_map_function:NN \l_siunitx_declare_list_tl
-    \siunitx_unit_print_literal_aux:N
-  \tl_set:Nn \l_siunitx_unit_tl {#1}
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    {
-      \exp_not:N \siunitx_ensuremath:n
-        { \exp_not:V \l_siunitx_unit_product_tl }
-    }
-  \tl_replace_all_in:NnV \l_siunitx_unit_tl { . }
-    \l_siunitx_tmpa_tl
-  \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ }
-    \l_siunitx_tmpa_tl
-  \siunitx_unit_format_literal_extras:
-}
-\cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1 {
-  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w }
-}
+\cs_new_protected:Npn \siunitx_unit_format_literal:n #1
+  {
+    \int_zero:N \l_siunitx_unit_prefix_int
+    \tl_map_function:NN \l_siunitx_declare_list_tl
+      \siunitx_unit_print_literal_aux:N
+    \tl_set:Nn \l_siunitx_unit_tl {#1}
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      {
+        \exp_not:N \siunitx_ensuremath:n
+          { \exp_not:o \l_siunitx_unit_product_tl }
+      }
+    \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
+    \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
+     \bool_if:NT \l_siunitx_literal_power_bool
+       {
+         \tl_replace_all_in:Nnn \l_siunitx_unit_tl { ^ }
+           { \siunitx_unit_format_literal_power:n }
+       }  
+    \siunitx_unit_format_literal_extras:
+  }
 \char_set_catcode_space:N \~
+\cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1
+  { \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w } }
+\cs_new_protected:Npn \siunitx_unit_format_literal_power:n #1
+  { \PrintSuperscript { \siunitx_unit_format_power_aux:n {#1} } } 
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+ %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_literal_extras:}
 %\begin{macro}[aux]{\siunitx_unit_format_literal_extras_aux:nN}
