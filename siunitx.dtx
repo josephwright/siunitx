@@ -13080,121 +13080,122 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\subsection{Table printing: general code}
+% \subsection{Table printing: general code}
 %
 % Getting the general alignment correct in tables is made more
 % complex than one would like by the \pkg{colortbl} package. In the
 % original \LaTeXe{} definition, cell material is centred by a
 % construction of the (primitive) form
-%\begin{verbatim}
-%  \hfil
-%  #
-%  \hfil
-%\end{verbatim}
+% \begin{verbatim}
+%   \hfil
+%   #
+%   \hfil
+% \end{verbatim}
 % which only uses \texttt{fil} stretch. That is altered by
 % \pkg{colortbl} to broadly
-%\begin{verbatim}
-%  \hskip 0 pt plus 0.5 fill
-%  \kern 0 pt
-%  #
-%  \hskip 0 pt plus 0.5 fill
-%\end{verbatim}
+% \begin{verbatim}
+%   \hskip 0 pt plus 0.5 fill
+%   \kern 0 pt
+%   #
+%   \hskip 0 pt plus 0.5 fill
+% \end{verbatim}
 % which means there is \texttt{fill} stretch to worry about and
 % the kern as well.
 %
-%\begin{macro}{\c_siunitx_one_fill_skip}
-% A fixed skip of one \texttt{fill}.
+% \begin{variable}{\c_siunitx_one_fill_skip}
+%   A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
 \skip_new:N \c_siunitx_one_fill_skip
 \skip_set:Nn \c_siunitx_one_fill_skip { \c_zero_skip plus 1 fill }
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\siunitx_table_colortbl_correction:}
-% If the package \pkg{colortbl} is loaded, there is a need to allow
-% that it changes how centring is carried out.
+% \begin{macro}{\siunitx_table_colortbl_correction:}
+%   If the package \pkg{colortbl} is loaded, there is a need to allow
+%   that it changes how centring is carried out.
 %    \begin{macrocode}
-\AtBeginDocument {
-  \@ifpackageloaded { colortbl }
-    {
-      \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
-        {
-          \skip_horizontal:n { \c_zero_skip plus -0.5 fill }
-          \tex_kern:D \c_zero_skip
-        }
-    }
-    {
-      \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
-        { }
-    }
-}
+\AtBeginDocument
+  {
+    \@ifpackageloaded { colortbl }
+      {
+        \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
+          {
+            \skip_horizontal:n { \c_zero_skip plus -0.5 fill }
+            \tex_kern:D \c_zero_skip
+          }
+      }
+      { \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction: { } }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_table_align_left:n}
-%\begin{macro}{\siunitx_table_align_right:n}
-% These are simple shortcuts to keep life clearer in the rest of the
-% code. The idea is that the kern acts as a \enquote{stop} for the
-% horizontal skip. The correction for \pkg{colortbl} is separate as the
-% spacing needs to be explicitly deleted.
+% \begin{macro}{\siunitx_table_align_left:n}
+% \begin{macro}{\siunitx_table_align_right:n}
+%   These are simple shortcuts to keep life clearer in the rest of the
+%   code. The idea is that the kern acts as a \enquote{stop} for the
+%   horizontal skip. The correction for \pkg{colortbl} is separate as the
+%   spacing needs to be explicitly deleted.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_align_left:n #1 {
-  \siunitx_table_colortbl_correction:
-  \skip_horizontal:n {#1}
-  \tex_kern:D \c_zero_skip
-}
-\cs_new_protected_nopar:Npn \siunitx_table_align_right:n #1 {
-  \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
-  \tex_kern:D \c_zero_skip
-  \siunitx_table_colortbl_correction:
-}
+\cs_new_protected_nopar:Npn \siunitx_table_align_left:n #1
+  {
+    \siunitx_table_colortbl_correction:
+    \skip_horizontal:n {#1}
+    \tex_kern:D \c_zero_skip
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_align_right:n #1
+  {
+    \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
+    \tex_kern:D \c_zero_skip
+    \siunitx_table_colortbl_correction:
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_table_column_begin:}
-%\begin{macro}{\siunitx_table_column_end:}
+% \begin{macro}{\siunitx_table_column_begin:}
+% \begin{macro}{\siunitx_table_column_end:}
 %    \begin{macrocode}
 \cs_new_eq:NN \siunitx_table_column_begin:n \siunitx_table_align_left:n
 \cs_new_eq:NN \siunitx_table_column_end:n   \siunitx_table_align_right:n
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
 %
 % Setting up for a fixed column width is done so that the check is
 % made at the key-setting stage. In that way, there will be some
 % speed gained if the key is set before the table, as the comparison
 % is not made for every cell.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  table-column-width .code:n =
-    {
-      \dim_compare:nNnTF {#1} = { \c_zero_dim }
-        {
-          \cs_set_eq:NN \siunitx_table_column_begin:n
-            \siunitx_table_align_left:n
-          \cs_set_eq:NN \siunitx_table_column_end:n
-            \siunitx_table_align_right:n
-        }
-        {        
-          \cs_set_protected_nopar:Npn \siunitx_table_column_begin:n ##1
-            {
-              \siunitx_table_colortbl_correction:
-              \tex_hbox:D to \dim_eval:n {#1}
-              \c_group_begin_token
-                \skip_horizontal:n {##1}
-                \tex_kern:D \c_zero_skip
-            }
-          \cs_set_protected_nopar:Npn \siunitx_table_column_end:n ##1
-            {
-                \skip_horizontal:n { \c_siunitx_one_fill_skip - ##1 }
-                \tex_kern:D \c_zero_skip
-              \hbox_set_inline_end:
-              \siunitx_table_colortbl_correction:
-            }
-        }
-    }
-}
+\keys_define:nn { siunitx }
+  {
+    table-column-width .code:n =
+      {
+        \dim_compare:nNnTF {#1} = { \c_zero_dim }
+          {
+            \cs_set_eq:NN \siunitx_table_column_begin:n
+              \siunitx_table_align_left:n
+            \cs_set_eq:NN \siunitx_table_column_end:n
+              \siunitx_table_align_right:n
+          }
+          {        
+            \cs_set_protected_nopar:Npn \siunitx_table_column_begin:n ##1
+              {
+                \siunitx_table_colortbl_correction:
+                \tex_hbox:D to \dim_eval:n {#1}
+                \c_group_begin_token
+                  \skip_horizontal:n {##1}
+                  \tex_kern:D \c_zero_skip
+              }
+            \cs_set_protected_nopar:Npn \siunitx_table_column_end:n ##1
+              {
+                  \skip_horizontal:n { \c_siunitx_one_fill_skip - ##1 }
+                  \tex_kern:D \c_zero_skip
+                \hbox_set_inline_end:
+                \siunitx_table_colortbl_correction:
+              }
+          }
+      }
+  }
 %    \end{macrocode}
 %
 %\subsection{Printing units in \texttt{s} columns}
