@@ -9422,7 +9422,7 @@ This work consists of the file  siunitx.dtx
 %  \siunitx_number_format_join_uncert:  ,
 %  \siunitx_number_format_join_uncert:n 
 %}
-%\begin{macro}[aux]{\siunitx_number_format_join_uncert_pm:}
+%\begin{macro}[aux]{\siunitx_number_format_join_uncert_pm:N}
 % For adding separated uncertainties to the main part of a number.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert: {
@@ -9440,7 +9440,7 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_format_copy:nn {#1} { #1 -result } }
         {
           \bool_if:NT \l_siunitx_uncert_sep_bool
-            { \siunitx_number_format_join_uncert_pm: }
+            { \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpb_tl }
           \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
           \prop_put:NnV \l_siunitx_number_out_prop { #1 -result }
             \l_siunitx_tmpa_tl
@@ -9449,17 +9449,12 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert_pm: {
-  \bool_if:NTF \l_siunitx_tight_bool
-    {
-      \tl_put_left:Nn \l_siunitx_tmpb_tl
-        { \siunitx_ensuremath:n { { \pm } } }
-    }
-    {
-      \tl_put_left:Nn \l_siunitx_tmpb_tl
-        { \siunitx_ensuremath:n { { } \pm { } } }
-    }
-}
+\cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert_pm:N #1
+  {
+    \bool_if:NTF \l_siunitx_tight_bool
+      { \tl_put_left:Nn #1 { \siunitx_ensuremath:n { { \pm } } } }
+      { \tl_put_left:Nn #1 { \siunitx_ensuremath:n { { } \pm { } } } }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -14040,7 +14035,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn
   \siunitx_table_print_S_reserved_uncert_pm:n #1 {
   \tl_clear:N \l_siunitx_tmpb_tl
-  \siunitx_number_format_join_uncert_pm:
+  \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpb_tl
   \tl_set:Nx \l_siunitx_tmpb_tl
     { { } \exp_not:V \l_siunitx_tmpb_tl { } }
   \hbox_set:Nn \l_siunitx_table_result_box
