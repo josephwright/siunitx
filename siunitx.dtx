@@ -5306,20 +5306,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{
-%  \prop_del:cn           ,
-%  \prop_put:cnV          ,
-%  \tl_if_in:NVTF         ,
-%  \tl_replace_all_in:NnV
-%}
-% Variants needed which are not in \pkg{expl3}.
+% \begin{macro}{\tl_if_in:NVTF, \tl_replace_all:NnV}
+%   Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
-\cs_generate_variant:Nn \prop_del:Nn { c }
-\cs_generate_variant:Nn \prop_put:Nnn { cnV }
 \cs_generate_variant:Nn \tl_if_in:NnTF { NV }
-\cs_generate_variant:Nn \tl_replace_all_in:Nnn { NnV }
+\cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}[pTF]{
 %  \siunitx_cs_if_tl:N    ,
@@ -6098,11 +6091,11 @@ This work consists of the file  siunitx.dtx
     {
       \cs_set_eq:NN \PrintSubscript   \siunitx_print_text_sub:n
       \cs_set_eq:NN \PrintSuperscript \siunitx_print_text_super:n
-      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { @ }
+      \tl_replace_all:Nnn \l_siunitx_print_arg_tl { @ }
         { \siunitx_print_text_sub:n }
-      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ! }
+      \tl_replace_all:Nnn \l_siunitx_print_arg_tl { ! }
         { \siunitx_print_text_sub:n }
-      \tl_replace_all_in:Nnn \l_siunitx_print_arg_tl { ^ }
+      \tl_replace_all:Nnn \l_siunitx_print_arg_tl { ^ }
         { \siunitx_print_text_super:n }
       \l_siunitx_print_arg_tl
     }
@@ -6144,7 +6137,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_print_text_sub_super:n { }
 \cs_new_protected:Npn \siunitx_print_text_super:n #1 {
   \tl_set:Nn \l_siunitx_tmpa_tl {#1}
-  \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - }
+  \tl_replace_all:Nnn \l_siunitx_tmpa_tl { - }
     { \c_siunitx_minus_tl }
   \tl_set:Nx \l_siunitx_tmpa_tl
     {
@@ -6587,12 +6580,12 @@ This work consists of the file  siunitx.dtx
 % A short spin-out to keep the replacement of tokens clear.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_in_sign_replace:N #1 {
-  \tl_replace_all_in:Nnn #1 { -+ } { \mp }
-  \tl_replace_all_in:Nnn #1 { +- } { \pm }
-  \tl_replace_all_in:Nnn #1 { << } { \ll }
-  \tl_replace_all_in:Nnn #1 { <= } { \le }
-  \tl_replace_all_in:Nnn #1 { >> } { \gg }
-  \tl_replace_all_in:Nnn #1 { >= } { \ge }
+  \tl_replace_all:Nnn #1 { -+ } { \mp }
+  \tl_replace_all:Nnn #1 { +- } { \pm }
+  \tl_replace_all:Nnn #1 { << } { \ll }
+  \tl_replace_all:Nnn #1 { <= } { \le }
+  \tl_replace_all:Nnn #1 { >> } { \gg }
+  \tl_replace_all:Nnn #1 { >= } { \ge }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11739,11 +11732,11 @@ This work consists of the file  siunitx.dtx
         \exp_not:N \siunitx_ensuremath:n
           { \exp_not:o \l_siunitx_unit_product_tl }
       }
-    \tl_replace_all_in:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
-    \tl_replace_all_in:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
      \bool_if:NT \l_siunitx_literal_power_bool
        {
-         \tl_replace_all_in:Nnn \l_siunitx_unit_tl { ^ }
+         \tl_replace_all:Nnn \l_siunitx_unit_tl { ^ }
            { \siunitx_unit_format_literal_power:n }
        }
     \siunitx_unit_format_literal_extras:
@@ -11777,7 +11770,7 @@ This work consists of the file  siunitx.dtx
   \char_set_lccode:nn { `\@ } {#1}
   \tl_to_lowercase:n
     {
-      \tl_replace_all_in:NnV \l_siunitx_unit_tl { @ }
+      \tl_replace_all:NnV \l_siunitx_unit_tl { @ }
         \l_siunitx_unit_tl
     }
 }
@@ -11870,7 +11863,7 @@ This work consists of the file  siunitx.dtx
     { \siunitx_print:nn {#1} {#2} }
     {
       \tl_set:Nn \l_siunitx_tmpa_tl {#2}
-      \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - }
+      \tl_replace_all:Nnn \l_siunitx_tmpa_tl { - }
         { \text { \c_siunitx_minus_tl } }
       \siunitx_print:nV {#1} \l_siunitx_tmpa_tl
    }
