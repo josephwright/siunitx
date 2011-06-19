@@ -3009,6 +3009,7 @@ This work consists of the file  siunitx.dtx
 %    \midrule ^^A (
 %      table-align-comparator    & Switch  & true      \\
 %      table-align-exponent      & Switch  & true      \\
+%      table-align-text-pre      & Switch  & true      \\
 %      table-align-text-post     & Switch  & true      \\
 %      table-align-uncertainty   & Switch  & true      \\
 %      table-alignment           & Choice  & \m{none}  \\
@@ -3419,7 +3420,7 @@ This work consists of the file  siunitx.dtx
 %  \begin{table}
 %    \caption{Closing notes up to text.}
 %    \label{tab:S:notes}
-%    \newcommand\NoteMark[1]{%
+%    \newrobustcmd\NoteMark[1]{%
 %      \textsuperscript{\emph{#1}}%
 %    }
 %    \centering
@@ -3427,6 +3428,7 @@ This work consists of the file  siunitx.dtx
 %      table-number-alignment = center,
 %      table-figures-integer  = 2,
 %      table-figures-decimal  = 4,
+%      table-space-text-pre   = \NoteMark{a}
 %    }
 %    \begin{tabular}{
 %      S
@@ -3436,13 +3438,13 @@ This work consists of the file  siunitx.dtx
 %      {Values}             & {Values} \\
 %    \midrule
 %                    2.3456 &               2.3456 \\
-%      \NoteMark{a} 34.234  & \NoteMark{a} 34.234 \\
-%      \NoteMark{b} 56.78   & \NoteMark{b} 56.78  \\
-%      \NoteMark{c} 90.4    & \NoteMark{c} 90.4   \\
+%      \NoteMark{a}  4.234  & \NoteMark{a}  4.234 \\
+%      \NoteMark{b}   .78   & \NoteMark{b}   .78  \\
 %      \NoteMark{d} 88      & \NoteMark{d} 88     \\
 %    \bottomrule
 %    \end{tabular}
 %    \hfil
+%    \sisetup{table-space-text-post = \NoteMark{a}}
 %    \begin{tabular}{
 %      S
 %      S[table-align-text-post = false]
@@ -13421,7 +13423,7 @@ This work consists of the file  siunitx.dtx
             \siunitx_table_print_S_reserved_exponent_aligned:
         },
     table-align-exponent      .default:n  = true,
-    table-align-text-pre      .choice:, % NEW
+    table-align-text-pre      .choice:,
     table-align-text-pre /
       false                   .code:n     =
         {
@@ -13797,13 +13799,13 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_aligned:
   {
-    \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
     \box_use:N \l_siunitx_table_pre_box
+    \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
   }
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_not_aligned:
   {
-    \box_use:N \l_siunitx_table_pre_box
     \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
+    \box_use:N \l_siunitx_table_pre_box
   }
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_post_aligned:
   {
