@@ -14310,7 +14310,9 @@ This work consists of the file  siunitx.dtx
 %     \siunitx_table_print_S_reserved_exponent_not_aligned:
 %   }
 %   Printing the exponent needs to deal with the exponent product. This
-%   is easiest to do by simply re-checking for a mantissa.
+%   is easiest to do by simply re-checking for a mantissa. If there is no
+%   exponent, then any space which needs to be added must be moved from
+%   the mid space to the post space at this stage.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent:
   {
@@ -14359,6 +14361,8 @@ This work consists of the file  siunitx.dtx
             \msg_error:nnx { siunitx } { table-partial-number }
               { an~exponent }
           }
+        \dim_set_eq:NN  \l_siunitx_table_fill_post_dim
+          \l_siunitx_table_fill_mid_dim
       }
   }
 %    \end{macrocode}
