@@ -4935,6 +4935,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \l_siunitx_tmp_bool ,
 %  \l_siunitx_tmp_box  ,
+%  \l_siunitx_tmp_dim  ,
 %  \l_siunitx_tmp_int  ,
 %  \l_siunitx_tmpa_tl  ,
 %  \l_siunitx_tmpb_tl  
@@ -4943,6 +4944,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \bool_new:N \l_siunitx_tmp_bool
 \box_new:N \l_siunitx_tmp_box
+\dim_new:N \l_siunitx_tmp_dim
 \int_new:N \l_siunitx_tmp_int
 \tl_new:N \l_siunitx_tmpa_tl
 \tl_new:N \l_siunitx_tmpb_tl
@@ -12804,7 +12806,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_detect_font:
   \bool_if:NTF \l_siunitx_number_parse_bool
     { \siunitx_table_collect_get: }
-    { \siunitx_table_direct: }
+    { \siunitx_table_print_S_direct: }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -13255,65 +13257,30 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 %
-%\subsection{Formatting and printing in tables}
+% \subsection{Formatting and printing in tables}
 %
 % With the content grabbed, the next stage is to turn it into formatted
 % output then print it. Most of the formatting is done elsewhere, so
 % most of the work here is in printing.
 %
-%\begin{macro}{\l_siunitx_table_center_decimal_bool}
-% A switch for the basic \enquote{decimal marker in the middle}
-% mode.
+% \begin{variable}{\l_siunitx_table_model_prop}
+%   A place to store the model for reserved-space table columns.
 %    \begin{macrocode}
-\bool_new:N \l_siunitx_table_center_decimal_bool
+\prop_new:N \l_siunitx_table_model_prop
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\l_siunitx_table_fill_box}
-% A box which is only ever filled with \texttt{fil} glue, for padding
-% out numbers.
+% \begin{variable}
+%   {
+%     \l_siunitx_table_exponent_dim ,
+%     \l_siunitx_table_integer_dim  ,
+%     \l_siunitx_table_mantissa_dim ,
+%     \l_siunitx_table_marker_dim   ,
+%     \l_siunitx_table_result_dim   ,
+%     \l_siunitx_table_uncert_dim
+%   }
+%  Dimensions to track the various spaces needed.
 %    \begin{macrocode}
-\box_new:N \l_siunitx_table_fill_box
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_table_fill_dim}
-% Calculating the fill needed can be a bit complicated, so is best
-% done using a dedicated dimension.
-%    \begin{macrocode}
-\dim_new:N \l_siunitx_table_fill_dim
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_table_pre_box}
-%\begin{macro}{\l_siunitx_table_post_box}
-% Boxes for the content before and after the numerical part.
-%    \begin{macrocode}
-\box_new:N \l_siunitx_table_pre_box
-\box_new:N \l_siunitx_table_post_box
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_table_result_box}
-% The box which is actually needed for printing.
-%    \begin{macrocode}
-\box_new:N \l_siunitx_table_result_box
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\l_siunitx_table_comparator_dim}
-%\begin{macro}{\l_siunitx_table_decimal_dim}
-%\begin{macro}{\l_siunitx_table_exponent_dim}
-%\begin{macro}{\l_siunitx_table_integer_dim}
-%\begin{macro}{\l_siunitx_table_mantissa_dim}
-%\begin{macro}{\l_siunitx_table_marker_dim}
-%\begin{macro}{\l_siunitx_table_result_dim}
-%\begin{macro}{\l_siunitx_table_uncert_dim}
-% Dimensions for the various model measurements.
-%    \begin{macrocode}
-\dim_new:N \l_siunitx_table_comparator_dim
-\dim_new:N \l_siunitx_table_decimal_dim
 \dim_new:N \l_siunitx_table_exponent_dim
 \dim_new:N \l_siunitx_table_integer_dim
 \dim_new:N \l_siunitx_table_mantissa_dim
@@ -13321,1139 +13288,1330 @@ This work consists of the file  siunitx.dtx
 \dim_new:N \l_siunitx_table_result_dim
 \dim_new:N \l_siunitx_table_uncert_dim
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
+%\end{variable}
 %
-%\begin{macro}{\l_siunitx_table_gap_dim}
-% This is used to work out the potential gap between a number and
-% any following material.
+% \begin{variable}
+%   {\l_siunitx_table_fill_pre_dim, \l_siunitx_table_fill_post_dim}
+%   Calculating the fill needed can be a bit complicated, so is best
+%   done using a dedicated dimension. There is a second one for cases dealing
+%   with fill at the end of a number, where there may be some rearrangement.
 %    \begin{macrocode}
-\dim_new:N \l_siunitx_table_gap_dim
+\dim_new:N \l_siunitx_table_fill_pre_dim
+\dim_new:N \l_siunitx_table_fill_post_dim
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\l_siunitx_table_model_prop}
-% To store the model version of a number, used when reserving space.
+% \begin{variable}{\l_siunitx_table_fill_mid_dim}
+%   For the reserved space approach there is also the need for a third
+%   piece of fill, which may or may not be used.
 %    \begin{macrocode}
-\prop_new:N \l_siunitx_table_model_prop
+\dim_new:N \l_siunitx_table_fill_mid_dim
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\l_siunitx_table_space_dim}
-% This dim is used to keep a track of how much space might need to be
-% deleted if exponents are not being aligned.
+% \begin{variable}{\l_siunitx_table_pre_box, \l_siunitx_table_post_box}
+%   Boxes for the content before and after the numerical part.
 %    \begin{macrocode}
-\dim_new:N \l_siunitx_table_space_dim
+\box_new:N \l_siunitx_table_pre_box
+\box_new:N \l_siunitx_table_post_box
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\l_siunitx_table_text_align_skip}
-%\begin{macro}{\l_siunitx_table_number_align_skip}
-% Skips for aligning text and numbers.
+% \begin{variable}{\l_siunitx_table_mantissa_box}
+%   When printing with space reserved, the mantissa needs to hang around
+%   for a while. This is best done by storing the typeset result in a box.
+%    \begin{macrocode}
+\box_new:N \l_siunitx_table_mantissa_box
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_siunitx_table_result_box}
+%   The box which is actually needed for printing.
+%    \begin{macrocode}
+\box_new:N \l_siunitx_table_result_box
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}
+%   {\l_siunitx_table_number_align_skip, \l_siunitx_table_text_align_skip}
+%   Skips for aligning text and numbers.
 %    \begin{macrocode}
 \skip_new:N \l_siunitx_table_number_align_skip
 \skip_new:N \l_siunitx_table_text_align_skip
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{
-%  \l_siunitx_table_align_comparator_bool ,
-%  \l_siunitx_table_align_exp_bool        ,
-%  \l_siunitx_table_align_post_bool       ,
-%  \l_siunitx_table_align_uncert_bool     ,
-%  \l_siunitx_table_omit_exp_bool         ,
-%  \l_siunitx_table_auto_bool             ,
-%  \l_siunitx_table_comparator_bool       ,
-%  \l_siunitx_table_decimal_int           ,
-%  \l_siunitx_table_exponent_int          ,
-%  \l_siunitx_table_integer_int           ,
-%  \l_siunitx_table_uncert_int            ,
-%  \l_siunitx_table_parse_only_bool       ,
-%  \l_siunitx_table_pre_tl                ,
-%  \l_siunitx_table_post_tl               ,
-%  \l_siunitx_table_sign_exponent_bool    ,
-%  \l_siunitx_table_sign_manitssa_bool    
-%}
-% As usual, set up the options.
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_direct_main:                  ,
+%     \siunitx_table_print_S_main:                         ,
+%     \siunitx_table_print_S_parsed:                       ,
+%     \siunitx_table_print_S_pre:                          ,
+%     \siunitx_table_print_S_post:                         ,
+%     \siunitx_table_print_S_reserved_exponent_aux:        ,
+%     \siunitx_table_print_S_reserved_mantissa_uncert_aux: ,
+%     \siunitx_table_print_S_reserved_round:
+%   }
+% \begin{macro}{\siunitx_table_print_S_reserved_store_fill:n}
+%   Various functions which are set up by the option system, and so are
+%   reserved here first for completeness.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  table-align-comparator      .bool_set:N
-    = \l_siunitx_table_align_comparator_bool,
-  table-align-exponent        .bool_set:N
-    = \l_siunitx_table_align_exp_bool,
-  table-align-text-post       .bool_set:N
-    = \l_siunitx_table_align_post_bool,
-  table-align-uncertainty     .bool_set:N
-    = \l_siunitx_table_align_uncert_bool,
-  table-number-alignment      .choice:,
-  table-number-alignment /
-    center                  .code:n     =
-      {
-        \skip_set:Nn \l_siunitx_table_number_align_skip
-          { \c_zero_skip plus 0.5 fill }
-        \bool_set_false:N \l_siunitx_table_center_decimal_bool
-      },
-  table-number-alignment /
-    center-decimal-marker   .code:n     =
-      {
-        \skip_set:Nn \l_siunitx_table_number_align_skip
-          { \c_zero_skip plus 0.5 fill }
-        \bool_set_true:N \l_siunitx_table_center_decimal_bool
-      },
-  table-number-alignment /
-    left                    .code:n     =
-      {
-        \skip_set:Nn \l_siunitx_table_number_align_skip
-          { \c_zero_skip }
-        \bool_set_false:N \l_siunitx_table_center_decimal_bool
-      },
-  table-number-alignment /
-    right                   .code:n     =
-      {
-        \skip_set:Nn \l_siunitx_table_number_align_skip
-          { \c_zero_skip plus 1 fill }
-        \bool_set_false:N \l_siunitx_table_center_decimal_bool
-      },
-  table-omit-exponent  .bool_set:N = \l_siunitx_table_omit_exp_bool ,
-  table-text-alignment .choice:,
-  table-text-alignment /
-    center                  .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_text_align_skip
-        { \c_zero_skip plus 0.5 fill }
-    },
-  table-text-alignment /
-    left                    .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_text_align_skip
-        { \c_zero_skip }
-    },
-  table-text-alignment /
-    right                   .code:n =
-    {
-      \skip_set:Nn \l_siunitx_table_text_align_skip
-        { \c_zero_skip plus 1 fill }
-    },
-  table-auto-round          .bool_set:N = \l_siunitx_table_auto_bool,
-  table-comparator          .bool_set:N =
-    \l_siunitx_table_comparator_bool,
-  table-figures-decimal     .int_set:N  = \l_siunitx_table_decimal_int,
-  table-figures-exponent    .int_set:N  =
-    \l_siunitx_table_exponent_int,
-  table-figures-integer     .int_set:N  = \l_siunitx_table_integer_int,
-  table-figures-uncertainty .int_set:N  = \l_siunitx_table_uncert_int ,
-  table-parse-only          .bool_set:N =
-    \l_siunitx_table_parse_only_bool,
-  table-space-text-pre      .tl_set:N =
-    \l_siunitx_table_pre_tl,
-  table-space-text-post     .tl_set:N =
-    \l_siunitx_table_post_tl,
-  table-sign-exponent       .bool_set:N =
-    \l_siunitx_table_sign_exponent_bool,
-  table-sign-mantissa       .bool_set:N =
-    \l_siunitx_table_sign_mantissa_bool
-}
-\keys_set:nn { siunitx } {
-  table-align-comparator  = true,
-  table-align-exponent    = true,
-  table-align-text-post   = true,
-  table-align-uncertainty = true,
-  table-number-alignment  = center-decimal-marker,
-  table-text-alignment    = center,
-  table-figures-decimal   = 2,
-  table-figures-integer   = 3
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_main: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_main: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_parsed: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_post: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_aux: { }
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_reserved_mantissa_uncert_aux: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_round: { }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill:n #1 { }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{variable}{\l_siunitx_table_pre_tl, \l_siunitx_table_post_tl}
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    table-align-comparator    .choice:,
+    table-align-comparator /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_store_fill:n
+            \siunitx_table_print_S_reserved_store_fill_pre:n
+        },
+    table-align-comparator /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_store_fill:n
+            \siunitx_table_print_S_reserved_store_fill_mid:n
+        },
+    table-align-comparator    .default:n  = true,
+    table-align-exponent      .choice:,
+    table-align-exponent /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_exponent_aux:
+            \siunitx_table_print_S_reserved_exponent_not_aligned:
+        },
+    table-align-exponent /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_exponent_aux:
+            \siunitx_table_print_S_reserved_exponent_aligned:
+        },
+    table-align-exponent      .default:n  = true,
+    table-align-text-pre      .choice:, % NEW
+    table-align-text-pre /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_pre:
+            \siunitx_table_print_S_pre_not_aligned:
+        },
+    table-align-text-pre /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_pre:
+            \siunitx_table_print_S_pre_aligned:
+        },
+    table-align-text-pre      .default:n  = true ,
+    table-align-text-post     .choice:,
+    table-align-text-post /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_post:
+            \siunitx_table_print_S_post_not_aligned:
+        },
+    table-align-text-post /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_post:
+            \siunitx_table_print_S_post_aligned:
+        },
+    table-align-text-post     .default:n  = true ,
+    table-align-uncertainty   .choice:,
+    table-align-uncertainty /
+      false                   .code:n    =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_mantissa_uncert_aux:
+            \siunitx_table_print_S_reserved_mantissa_uncert_not_aligned:
+        },
+    table-align-uncertainty /
+      true                    .code:n    =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_mantissa_uncert_aux:
+            \siunitx_table_print_S_reserved_mantissa_uncert_aligned:
+        },
+    table-align-uncertainty   .default:n  = true,
+    table-auto-round          .choice:,
+    table-auto-round /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \prg_do_nothing:
+        },
+    table-auto-round /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_reserved_round:
+            \siunitx_table_print_S_reserved_round_auto:
+        },
+    table-auto-round          .default:n  = true,
+    table-number-alignment    .choice:,
+    table-number-alignment /
+      center                  .code:n     =
+        {
+          \skip_set:Nn \l_siunitx_table_number_align_skip
+            { \c_zero_skip plus 0.5 fill }
+          \cs_set_eq:NN \siunitx_table_print_S_direct_main:
+            \siunitx_table_print_S_direct_reserved:
+          \cs_set_eq:NN \siunitx_table_print_S_parsed:
+            \siunitx_table_print_S_reserved:
+        },
+    table-number-alignment /
+      center-decimal-marker   .code:n     =
+        {
+          \skip_set:Nn \l_siunitx_table_number_align_skip
+            { \c_zero_skip plus 0.5 fill }
+          \cs_set_eq:NN \siunitx_table_print_S_direct_main:
+            \siunitx_table_print_S_direct_centered:
+          \cs_set_eq:NN \siunitx_table_print_S_parsed:
+            \siunitx_table_print_S_centered:
+        },
+    table-number-alignment /
+      left                    .code:n     =
+        {
+          \skip_zero:N \l_siunitx_table_number_align_skip
+          \cs_set_eq:NN \siunitx_table_print_S_direct_main:
+            \siunitx_table_print_S_direct_reserved:
+          \cs_set_eq:NN \siunitx_table_print_S_parsed:
+            \siunitx_table_print_S_reserved:
+        },
+    table-number-alignment /
+      right                 .code:n     =
+        {
+          \skip_set:Nn \l_siunitx_table_number_align_skip
+            { \c_zero_skip plus 1 fill }
+          \cs_set_eq:NN \siunitx_table_print_S_direct_main:
+            \siunitx_table_print_S_direct_reserved:
+          \cs_set_eq:NN \siunitx_table_print_S_parsed:
+            \siunitx_table_print_S_reserved:
+        },
+    table-omit-exponent       .choice:,
+    table-omit-exponent /
+      false                   .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_parse_aux:
+            \siunitx_number_process:
+        },
+    table-omit-exponent /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_parse_aux:
+            \siunitx_table_print_S_parse_omit_exp:
+        },
+    table-omit-exponent       .default:n  = true,
+    table-text-alignment      .choice:,
+    table-text-alignment /
+      center                  .code:n     =
+        {
+          \skip_set:Nn \l_siunitx_table_text_align_skip
+            { \c_zero_skip plus 0.5 fill }
+        },
+    table-text-alignment /
+      left                    .code:n     =
+        { \skip_zero:N \l_siunitx_table_text_align_skip  },
+    table-text-alignment /
+      right                   .code:n     =
+        {
+          \skip_set:Nn \l_siunitx_table_text_align_skip
+            { \c_zero_skip plus 1 fill }
+        },
+    table-comparator          .choice:,
+    table-comparator /
+      false                   .code:n     =
+        { \prop_del:Nn \l_siunitx_table_model_prop { comparator } },
+    table-comparator /
+      true                    .code:n     =
+        { \prop_put:Nnn \l_siunitx_table_model_prop { comparator } { \ll } },
+    table-comparator          .default:n  = true,
+    table-figures-decimal     .code:n     =
+      {
+        \int_compare:nNnTF {#1} = \c_zero
+          {
+            \prop_del:Nn \l_siunitx_table_model_prop { mantissa-decimal }
+            \prop_del:Nn \l_siunitx_table_model_prop
+              { mantissa-decimal-marker }
+            \prop_if_in:NnTF \l_siunitx_table_model_prop { mantissa-integer }
+              {
+                \prop_put:Nnn \l_siunitx_table_model_prop { mantissa }
+                   { true }
+              }
+              { \prop_del:Nn \l_siunitx_table_model_prop { mantissa } }
+          }
+          {
+            \prop_put:Nnx \l_siunitx_table_model_prop { mantissa-decimal }
+              { \prg_replicate:nn {#1} { 8 } }
+            \prop_put:Nnn \l_siunitx_table_model_prop { mantissa } { true }
+            \prop_put:NnV \l_siunitx_table_model_prop
+              { mantissa-decimal-marker } \l_siunitx_output_decimal_tl
+          }
+      },
+    table-figures-exponent    .code:n     =
+      {
+        \int_compare:nNnTF {#1} = \c_zero
+          { \prop_del:Nn \l_siunitx_table_model_prop { exponent-integer } }
+          {
+            \prop_put:Nnx \l_siunitx_table_model_prop { exponent-integer }
+              { \prg_replicate:nn {#1} { 8 } }
+            \prop_put:Nnn \l_siunitx_table_model_prop { exponent } { true }
+          }
+      },
+    table-figures-integer     .code:n     =
+      {
+        \int_compare:nNnTF {#1} = \c_zero
+          {
+            \prop_del:Nn \l_siunitx_table_model_prop { mantissa-integer }
+            \prop_if_in:NnTF \l_siunitx_table_model_prop { mantissa-decimal }
+              {
+                \prop_put:Nnn \l_siunitx_table_model_prop { mantissa }
+                   { true }
+              }
+              { \prop_del:Nn \l_siunitx_table_model_prop { mantissa } }
+          }  
+          {
+            \prop_put:Nnx \l_siunitx_table_model_prop { mantissa-integer }
+              { \prg_replicate:nn {#1} { 8 } }
+            \prop_put:Nnn \l_siunitx_table_model_prop { mantissa } { true }
+          }
+      },
+    table-figures-uncertainty .code:n     =
+      {
+        \int_compare:nNnTF {#1} = \c_zero
+          { \prop_del:Nn \l_siunitx_table_model_prop { mantissa-uncertainty } }
+          {
+            \prop_put:Nnx \l_siunitx_table_model_prop { mantissa-uncertainty }
+              { \prg_replicate:nn {#1} { 8 } }
+          }
+      },
+    table-parse-only          .choice: ,
+    table-parse-only /
+      false                   .code:n    =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_main:
+            \siunitx_table_print_S_alignment:
+        },
+    table-parse-only /
+      true                    .code:n     =
+        {
+          \cs_set_eq:NN \siunitx_table_print_S_main:
+            \siunitx_table_print_S_no_alignment:
+        },
+    table-parse-only          .default:n  = true,
+    table-space-text-pre      .tl_set:N   = \l_siunitx_table_pre_tl,
+    table-space-text-post     .tl_set:N   = \l_siunitx_table_post_tl,
+    table-sign-exponent       .code:n     =
+      { \prop_put:Nnn \l_siunitx_table_model_prop { exponent-sign } { - } },
+    table-sign-mantissa       .code:n     =
+      { \prop_put:Nnn \l_siunitx_table_model_prop { mantissa-sign } { - } },
+  }
+%    \end{macrocode}
+% \end{variable}
 %
 % A meta-choice for all table alignment is also provided.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  table-alignment .meta:n =
-    {
-      table-number-alignment = #1,
-      table-text-alignment   = #1,
-      table-unit-alignment   = #1
-    }
-}
-%    \end{macrocode}
-%
-%\begin{macro}{\siunitx_table_format_convert:nn}
-% Another special option. This converts a number format in compacted
-% form into the various internal settings needed. The function is used
-% for the conversion to keep code down.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_format_convert:nn #1#2 {
-  \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-  \quark_if_no_value:NTF \l_siunitx_tmpa_tl
-    { \int_set:cn { l_siunitx_table_ #2 _int } { 0 } }
-    {
-      \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-      \int_set:cn  { l_siunitx_table_ #2 _int } { \l_siunitx_tmpa_tl }
-    }
-}
-\keys_define:nn { siunitx } {
-  table-format .code:n    =
-    {
-      \siunitx_number_in_parse:n {#1}
-      \siunitx_table_format_convert:nn { mantissa-integer } { integer }
-      \siunitx_table_format_convert:nn { mantissa-decimal } { decimal }
-      \siunitx_table_format_convert:nn { mantissa-uncertainty }
-        { uncert }
-      \siunitx_table_format_convert:nn { exponent-integer }
-        { exponent }
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { comparator }
-        { \bool_set_true:N \l_siunitx_table_comparator_bool }
-        { \bool_set_false:N \l_siunitx_table_comparator_bool }
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
-        { \bool_set_true:N \l_siunitx_table_sign_mantissa_bool }
-        { \bool_set_false:N \l_siunitx_table_sign_mantissa_bool }
-      \prop_if_in:NnTF \l_siunitx_number_in_prop { exponent-sign }
-        { \bool_set_true:N \l_siunitx_table_sign_exponent_bool }
-        { \bool_set_false:N \l_siunitx_table_sign_exponent_bool }
-      \keys_set:nn { siunitx } { table-number-alignment = center }
-    },
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S:}
-% The main printing function does a simple test: was there anything
-% found that counts as a number. If there was, most of the detail
-% is handled elsewhere. If there is only test (such as a heading)
-% then it can be printed.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S: {
-  \bool_if:NTF \l_siunitx_table_collect_pre_bool
-    {
-      \siunitx_table_column_begin:n
-        { \l_siunitx_table_text_align_skip }
-        \tl_use:N \l_siunitx_table_collect_pre_tl
-      \siunitx_table_column_end:n
-        { \l_siunitx_table_text_align_skip }
-    }
-    {
-      \siunitx_table_column_begin:n
-        { \l_siunitx_table_number_align_skip }
-        \siunitx_table_print_S_aux:
-      \siunitx_table_column_end:n
-        { \l_siunitx_table_number_align_skip }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_table_print_S_aux:}
-% The auxiliary function now splits the path. If the number is only
-% being parsed, then it is printed with no more fuss. Otherwise, there
-% is a second choice based on the alignment approach.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_aux: {
-  \bool_if:NTF \l_siunitx_table_parse_only_bool
-    {
-      \tl_use:N \l_siunitx_table_collect_pre_tl
-      \siunitx_number_output:V \l_siunitx_table_collect_tl
-      \tl_use:N \l_siunitx_table_collect_post_tl
-    }
-    {
-      \bool_if:NTF \l_siunitx_table_center_decimal_bool
-        { \siunitx_table_print_S_centered: }
-        { \siunitx_table_print_S_reserved: }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}[aux]{\siunitx_table_print_S_parse:}
-% A modified version of the number parser for tables.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_parse: {
-  \bool_set_false:N \l_siunitx_error_bool
-  \siunitx_number_in_parse:V \l_siunitx_table_collect_tl
-  \bool_if:NF \l_siunitx_error_bool
-    {
-      \bool_if:NT \l_siunitx_table_omit_exp_bool
-        { \bool_set_true:N \l_siunitx_process_fixed_bool }
-      \siunitx_number_process:
-      \bool_if:NT \l_siunitx_table_omit_exp_bool
-        {
-          \prop_del:Nn \l_siunitx_number_in_prop { exponent }
-          \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
-        }
-      \siunitx_number_format:
-      \siunitx_number_output_color:
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_centered:}
-% When centring the decimal marker, the logic is relatively simple.
-% First, box up the integer part of the number, the entire number and
-% the decimal marker itself.  There is then a measurement to see
-% which part of the number is bigger: before or after the decimal
-% marker. Based on that, a path is chosen. The two then come back
-% together to print any material after the number: the filling
-% space needed will be equal to the correction required to place notes,
-% \emph{etc}.~flush with the number.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered: {
-  \siunitx_table_print_S_centered_ends:
-  \dim_compare:nNnTF
-    { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
-    { \tl_use:N \l_siunitx_table_collect_pre_tl }
-    { \box_use:N \l_siunitx_table_pre_box }
-  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
-  \siunitx_table_print_S_parse:
-  \siunitx_table_print_S_measure_comparator_integer:N
-    \l_siunitx_number_out_prop
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop
-    { marker }  { mantissa }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_number_out_prop
-    { result } { }
-  \box_set_eq:NN \l_siunitx_table_result_box \l_siunitx_tmp_box
-  \dim_set:Nn \l_siunitx_table_fill_dim
-    { \l_siunitx_table_result_dim - \l_siunitx_table_integer_dim }
-  \prop_if_in:NnT \l_siunitx_number_out_prop
-    { mantissa-decimal-marker }
-    {
-      \dim_set:Nn \l_siunitx_table_fill_dim
-        { \l_siunitx_table_fill_dim - \l_siunitx_table_marker_dim }
-    }
-  \dim_compare:nNnTF
-    { \l_siunitx_table_integer_dim } > { \l_siunitx_table_fill_dim }
-    { \siunitx_table_print_S_centered_integer: }
-    { \siunitx_table_print_S_centered_decimal: }
-  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
-  \bool_if:NTF \l_siunitx_table_align_post_bool
-    { \box_use:N \l_siunitx_table_post_box }
-    {
-      \dim_set:Nn \l_siunitx_table_fill_dim
-        { - \dim_use:N \l_siunitx_table_fill_dim }
-      \skip_horizontal:N \l_siunitx_table_fill_dim
-      \box_use:N \l_siunitx_table_post_box
-      \box_use:N \l_siunitx_table_fill_box
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_table_print_S_centered_ends:}
-% Here, the material before and after the numerical content is boxed up.
-% The shorter one is then re-boxed so that both sides are the same
-% length: this stops the alignment going out.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_ends: {
-  \hbox_set:Nn \l_siunitx_table_pre_box
-    {
+\keys_define:nn { siunitx }
+  {
+    table-alignment .meta:n =
       {
-        \tl_use:N \l_siunitx_table_collect_pre_tl
+        table-number-alignment = #1,
+        table-text-alignment   = #1,
+        table-unit-alignment   = #1
+      }
+  }
+%    \end{macrocode}
+%   
+% Another special option. This converts a number format in compacted
+% form into the various internal settings needed.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    table-format .code:n    =
+      {
+        \siunitx_number_in_parse:n {#1}
+        \prop_set_eq:NN \l_siunitx_table_model_prop \l_siunitx_number_in_prop
+        \tl_clear:N \l_siunitx_tmpa_tl
+        \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-integer }
+          \l_siunitx_tmpb_tl
+          { 
+            \tl_set:Nx \l_siunitx_tmpa_tl 
+              { table-figures-integer = \l_siunitx_tmpb_tl }
+          }
+        \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-decimal }
+          \l_siunitx_tmpb_tl
+          { 
+            \clist_put_right:Nx \l_siunitx_tmpa_tl 
+              { table-figures-decimal = \l_siunitx_tmpb_tl }
+          }
+        \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-uncertainty }
+          \l_siunitx_tmpb_tl
+          { 
+            \clist_put_right:Nx \l_siunitx_tmpa_tl 
+              { table-figures-uncertainty = \l_siunitx_tmpb_tl }
+          }
+        \prop_get:NnNT \l_siunitx_number_in_prop { exponent-integer }
+          \l_siunitx_tmpb_tl
+          { 
+            \clist_put_right:Nx \l_siunitx_tmpa_tl 
+              { table-figures-exponent = \l_siunitx_tmpb_tl }
+          }
+        \clist_put_right:Nn \l_siunitx_tmpa_tl
+          { table-number-alignment = center }  
+        \keys_set:nV { siunitx } \l_siunitx_tmpa_tl
+      }
+  }
+%    \end{macrocode}
+%
+% \begin{macro}{\siunitx_table_print_S:}
+%   The main printing function makes a choice depending on whether there is
+%   any numerical part to print at all. This affects which set of skips to
+%   insert. Font detection for the \texttt{S} column is included here as
+%   this is needed to do this work outside of an \cs{hbox}.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S:
+  {
+    \bool_if:NTF \l_siunitx_table_collect_pre_bool
+      {
+        \siunitx_table_column_begin:n { \l_siunitx_table_text_align_skip }
+          \l_siunitx_table_collect_pre_tl
+        \siunitx_table_column_end:n   { \l_siunitx_table_text_align_skip }
+      }
+      {
+        \siunitx_table_column_begin:n { \l_siunitx_table_number_align_skip }
+          \siunitx_detect_font:
+          \siunitx_table_print_S_main:
+          \siunitx_table_print_S_pre:
+          \box_use:N \l_siunitx_table_result_box
+          \siunitx_table_print_S_post:
+        \siunitx_table_column_end:n   { \l_siunitx_table_number_align_skip }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_no_alignment:}
+%   With no alignment to do, the code can be pretty simple. The collected
+%   number is simply printed between the two non-numerical parts.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_no_alignment:
+  {
+    \l_siunitx_table_collect_pre_tl
+    \siunitx_number_output:V \l_siunitx_table_collect_tl
+    \l_siunitx_table_collect_post_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_alignment:}
+%   This is a pass-through, so that the appropriate alignment mode is
+%   retained without needing to retest on each use.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_alignment:
+  { \siunitx_table_print_S_parsed: }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_parse:}
+% \begin{macro}[aux]{\siunitx_table_print_S_parse_omit_exp:}
+%   A modified version of the number parser for tables.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_parse:
+  {
+    \bool_set_false:N \l_siunitx_error_bool
+    \siunitx_number_in_parse:V \l_siunitx_table_collect_tl
+    \bool_if:NF \l_siunitx_error_bool
+      {
+        \siunitx_table_print_S_parse_aux:
+        \siunitx_number_format:
+        \siunitx_number_output_color:
+      }
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_parse_omit_exp:
+  {
+    \bool_set_true:N \l_siunitx_process_fixed_bool
+    \siunitx_number_process:
+    \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+    \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_measure:NN}
+%   A short routine to measure up whatever has been extracted from the
+%   storage system. Boxing up is avoided for the empty cases, as this saves
+%   a little time(the print routine is relatively slow).
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_measure:NN #1#2
+  {
+    \tl_if_empty:NTF #1
+      { \dim_zero:N #2 }
+      {
+        \group_begin:
+          \hbox_set:Nn \l_siunitx_tmp_box
+            { \siunitx_print:nV { number } #1 }
+        \exp_args:NNNo \group_end:
+        \dim_set:Nn #2 { \tex_the:D \box_wd:N \l_siunitx_tmp_box }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_pre_aligned:      ,
+%     \siunitx_table_print_S_pre_not_aligned:  ,
+%     \siunitx_table_print_S_post_aligned:     ,
+%     \siunitx_table_print_S_post_not_aligned:
+%   }
+%   The non-numerical material is inserted along with the filler needed
+%   to maintain alignment. The order in which the two are inserted depends
+%   on whether those parts are also aligned.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_aligned:
+  {
+    \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
+    \box_use:N \l_siunitx_table_pre_box
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_not_aligned:
+  {
+    \box_use:N \l_siunitx_table_pre_box
+    \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_post_aligned:
+  {
+    \hbox_to_wd:nn { \l_siunitx_table_fill_post_dim } { \tex_hfil:D }
+    \box_use:N \l_siunitx_table_post_box
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_post_not_aligned:
+  {
+    \box_use:N \l_siunitx_table_post_box
+    \hbox_to_wd:nn { \l_siunitx_table_fill_post_dim } { \tex_hfil:D }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Printing the \texttt{S} column with the decimal marker centred}
+%
+% \begin{macro}{\siunitx_table_print_S_centered:}
+%   The main routine for decimal-centred alignment works by boxing up the
+%   entire output, the integer part and the decimal marker. It then works
+%   out which part is bigger and calculates the fill correction accordingly.
+%   Once all of that is done, the various boxes and fill can be inserted.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered:
+  {
+    \siunitx_table_print_S_centered_ends:
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \siunitx_table_print_S_parse:
+    \siunitx_table_print_S_centered_measure:
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \dim_set:Nn \l_siunitx_table_fill_pre_dim
+      {
+          \l_siunitx_table_result_dim
+        - \l_siunitx_table_integer_dim
+        \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-decimal-marker }
+          { - \l_siunitx_table_marker_dim }
+      }
+    \dim_compare:nNnTF \l_siunitx_table_integer_dim >
+      \l_siunitx_table_fill_pre_dim
+      { \siunitx_table_print_S_centered_integer: }
+      { \siunitx_table_print_S_centered_decimal: }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_centered_ends:}
+%   To deal with the material outside of the number, the first step is to
+%   box up both parts. If the pre-numeral part has no width, the tokens are
+%   inserted into the input stream to cover cases where they make a change
+%   to the colour, font or so forth. After that, the narrower of the two
+%   boxes is made the same size as the wider: this maintains the alignment.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_ends:
+  {
+    \hbox_set:Nn \l_siunitx_table_pre_box
+      {
+        {
+          \l_siunitx_table_collect_pre_tl
+          \bool_if:NT \l_siunitx_table_math_bool
+            {
+              \scan_stop:
+              \c_math_shift_token
+            }
+        }
+      }
+    \dim_compare:nNnT
+      { \box_wd:N \l_siunitx_table_pre_box } = \c_zero_skip
+      { \l_siunitx_table_collect_pre_tl }
+    \hbox_set:Nn \l_siunitx_table_post_box
+      {
         \bool_if:NT \l_siunitx_table_math_bool
           {
-            \scan_stop:
             \c_math_shift_token
+            \scan_stop:
+          }
+        \l_siunitx_table_collect_post_tl
+      }
+    \dim_compare:nNnTF
+      { \box_wd:N \l_siunitx_table_pre_box } >
+        { \box_wd:N \l_siunitx_table_post_box }
+      {
+        \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+          { \box_wd:N \l_siunitx_table_pre_box }
+          {
+            \hbox_unpack:N \l_siunitx_table_post_box
+            \tex_hfil:D
           }
       }
-    }
-  \hbox_set:Nn \l_siunitx_table_post_box
-    {
-      \bool_if:NT \l_siunitx_table_math_bool
-        {
-          \c_math_shift_token
-          \scan_stop:
-        }
-      \tl_use:N \l_siunitx_table_collect_post_tl
-    }
-  \dim_compare:nNnTF
-    { \box_wd:N \l_siunitx_table_pre_box  } >
-    { \box_wd:N \l_siunitx_table_post_box }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-        { \box_wd:N \l_siunitx_table_pre_box }
-        {
-          \hbox_unpack:N \l_siunitx_table_post_box
-          \tex_hfil:D
-        }
-    }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
-        { \box_wd:N \l_siunitx_table_post_box }
-        {
-          \tex_hfil:D
-          \hbox_unpack:N \l_siunitx_table_pre_box
-        }
-    }
-}
+      {
+        \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+          { \box_wd:N \l_siunitx_table_post_box }
+          {
+            \tex_hfil:D
+            \hbox_unpack:N \l_siunitx_table_pre_box
+          }
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\begin{macro}[aux]{\siunitx_table_print_S_centered_integer:}
-%\begin{macro}[aux]{\siunitx_table_print_S_centered_decimal:}
-% Actually printing the content is a case of calculating a suitable
-% filler box, then printing it and the content.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_integer: {
-  \dim_set:Nn \l_siunitx_table_fill_dim
-    { \l_siunitx_table_integer_dim - \l_siunitx_table_fill_dim }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-    { \l_siunitx_table_fill_dim } { \tex_hfil:D }
-  \box_use:N \l_siunitx_table_result_box
-  \box_use:N \l_siunitx_table_fill_box
-}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_decimal: {
-  \dim_set:Nn \l_siunitx_table_fill_dim
-    { \l_siunitx_table_fill_dim - \l_siunitx_table_integer_dim }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-    { \l_siunitx_table_fill_dim } { \tex_hfil:D }
-  \box_use:N \l_siunitx_table_fill_box
-  \box_use:N \l_siunitx_table_result_box
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_table_print_S_reserved:}
-% Sorting out a number with reserved space means checking each part
-% in turn. After sorting out the ends, a model number is constructed,
-% and this is then used by the various sub-routines to get the spacing
-% correct.
+% \begin{macro}{\siunitx_table_print_S_centered_measure:}
+% \begin{macro}[aux]
+%   {
+%     \siunitx_table_print_S_centered_measure_int_part: ,
+%     \siunitx_table_print_S_centered_measure_marker:   ,
+%     \siunitx_table_print_S_centered_measure_result:
+%   }
+%   Here, there are three parts of the number to measure: the integer part,
+%   the decimal marker and the entire number. Most of the work consists
+%   of collecting up parts of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved: {
-  \dim_zero:N \l_siunitx_table_gap_dim
-  \dim_zero:N \l_siunitx_table_space_dim
-  \siunitx_table_print_S_reserved_ends:
-  \dim_compare:nNnTF
-    { \box_wd:N \l_siunitx_table_pre_box } = { \c_zero_skip }
-    { \tl_use:N \l_siunitx_table_collect_pre_tl }
-    {
-      \box_use:N \l_siunitx_table_pre_box
-      \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
-    }
-  \siunitx_table_print_S_model_create:
-  \bool_if:NT \l_siunitx_table_auto_bool
-    {
-      \int_set:Nn \l_siunitx_process_precision_int
-        { \l_siunitx_table_decimal_int }
-      \tl_set:Nn \l_siunitx_round_tl { places }
-    }
-  \siunitx_table_print_S_parse:
-  \bool_if:NTF \l_siunitx_table_comparator_bool
-    {
-      \bool_if:NT \l_siunitx_table_align_comparator_bool
-        { \siunitx_table_print_S_reserved_comparator: }
-    }
-    {
-      \prop_if_in:NnT \l_siunitx_number_out_prop { comparator }
-        {
-          \msg_error:nnx { siunitx } { table-partial-number }
-            { a~comparator }
-        }
-    }
-  \int_compare:nNnTF
-    { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } >
-      { 0 }
-    { \siunitx_table_print_S_reserved_mantissa: }
-    {
-      \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
-        {
-          \msg_error:nnx { siunitx } { table-partial-number }
-            { a~mantissa }
-        }
-    }
-  \prop_if_in:NnT \l_siunitx_number_out_prop { complex-result }
-    {
-      \msg_error:nnx { siunitx } { table-partial-number }
-        { a~complex }
-    }
-  \int_compare:nNnTF { \l_siunitx_table_exponent_int } > { 0 }
-    { \siunitx_table_print_S_reserved_exponent: }
-    {
-      \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
-        {
-          \msg_error:nnx { siunitx } { table-partial-number }
-            { an~exponent }
-        }
-    }
-  \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
-  \bool_if:NTF \l_siunitx_table_align_post_bool
-    { \box_use:N \l_siunitx_table_post_box }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-        { \dim_use:N \l_siunitx_table_gap_dim }
-        { \tex_hfil:D }
-      \dim_set:Nn \l_siunitx_table_gap_dim
-        { - \dim_use:N \l_siunitx_table_gap_dim }
-      \skip_horizontal:N \l_siunitx_table_gap_dim
-      \box_use:N \l_siunitx_table_post_box
-      \box_use:N \l_siunitx_table_fill_box
-    }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure:
+  {
+    \siunitx_table_print_S_centered_measure_int_part:
+    \siunitx_table_print_S_centered_measure_marker:
+    \siunitx_table_print_S_centered_measure_result:
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_int_part:
+  {
+    \prop_get:NnNF \l_siunitx_number_out_prop { comparator } \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-sign }
+      \l_siunitx_tmpb_tl
+      { \tl_put_right:No \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-integer }
+      \l_siunitx_tmpb_tl
+      { \tl_put_right:No \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+      \l_siunitx_table_integer_dim
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_marker:
+  {
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      {
+        \exp_not:N \siunitx_ensuremath:n
+          { \exp_not:o \l_siunitx_output_decimal_tl }
+      }
+    \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+      \l_siunitx_table_marker_dim
+  }
 %    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_reserved_ends:}
-% For the reserved case, the two ends are simply boxed up in correctly
-% created spaces.
+%  As the overall result will be needed later, the boxing up here is done
+%  using a named box that will be retained.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_ends: {
-  \hbox_set:Nn \l_siunitx_tmp_box
-    {
-      \l_siunitx_table_pre_tl
-      \bool_if:NT \l_siunitx_table_math_bool
-        {
-          \scan_stop:
-          \c_math_shift_token
-        }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
-    { \box_wd:N \l_siunitx_tmp_box }
-    {
-      \tex_hfil:D
-      { \tl_use:N \l_siunitx_table_collect_pre_tl }
-    }
-  \hbox_set:Nn \l_siunitx_tmp_box { \l_siunitx_table_post_tl }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-    { \box_wd:N \l_siunitx_tmp_box }
-    {
-      \bool_if:NT \l_siunitx_table_math_bool
-        {
-          \c_math_shift_token
-          \scan_stop:
-        }
-      \tl_use:N \l_siunitx_table_collect_post_tl
-      \tex_hfil:D
-    }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_result:
+  {
+    \prop_get:NnN \l_siunitx_number_out_prop { result } \l_siunitx_tmpa_tl
+    \hbox_set:Nn \l_siunitx_table_result_box
+      { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+    \dim_set:Nn \l_siunitx_table_result_dim
+      { \box_wd:N \l_siunitx_table_result_box }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_model_create:}
-%\begin{macro}[aux]{\siunitx_table_print_S_model_aux:nn}
-% A model value is created from the various numbers set up as
-% options. The main formatting routine is used to get everything sorted
-% out, so that there is no code copying here.
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_centered_integer: ,
+%     \siunitx_table_print_S_centered_decimal:
+%   }
+%   The appropriate place to insert the fill is determined by whether the
+%   integer or decimal part of the number is bigger. Two dimensions are
+%   therefore set, for fill before the number and after it. One of these
+%   will always be zero.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_model_create: {
-  \prop_clear:N \l_siunitx_number_in_prop
-  \bool_if:NT \l_siunitx_table_comparator_bool
-    { \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { \ll } }
-  \siunitx_table_print_S_model_aux:nn { integer } { mantissa-integer }
-  \siunitx_table_print_S_model_aux:nn { decimal } { mantissa-decimal }
-  \siunitx_table_print_S_model_aux:nn { uncert }
-    { mantissa-uncertainty }
-  \siunitx_table_print_S_model_aux:nn { exponent } { exponent-integer }
-  \int_compare:nNnF
-    { \l_siunitx_table_integer_int + \l_siunitx_table_decimal_int } =
-      { 0 }
-    {
-      \prop_put:Nnn \l_siunitx_number_in_prop { mantissa }
-        { true }
-    }
-  \int_compare:nNnT { \l_siunitx_table_decimal_int } > { 0 }
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop
-        { mantissa-decimal-marker }
-        \l_siunitx_output_decimal_tl
-    }
-  \bool_if:NT \l_siunitx_table_sign_mantissa_bool
-    { \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-sign } { - } }
-  \int_compare:nNnT { \l_siunitx_table_exponent_int } > { 0 }
-    {
-      \bool_if:NT \l_siunitx_table_sign_exponent_bool
-        {
-          \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign }
-            { - }
-        }
-    }
-  \siunitx_number_process_sign:
-  \siunitx_number_process_zero_fill:
-  \siunitx_number_process_mantissa:
-  \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
-    { \siunitx_number_process_uncertainty: }
-  \siunitx_number_format:
-  \prop_set_eq:NN \l_siunitx_table_model_prop
-    \l_siunitx_number_out_prop
-}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_model_aux:nn #1#2 {
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    {
-      \prg_replicate:nn { \int_use:c { l_siunitx_table_ #1 _int } }
-        { 8 }
-    }
-  \tl_if_empty:NF \l_siunitx_tmpa_tl
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl
-      \prop_put:Nnn  \l_siunitx_number_in_prop {#1} { true }
-    }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_integer:
+  {
+    \dim_set:Nn \l_siunitx_table_fill_post_dim
+      { \l_siunitx_table_integer_dim - \l_siunitx_table_fill_pre_dim }
+    \dim_zero:N \l_siunitx_table_fill_pre_dim
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_decimal:
+  {
+    \dim_sub:Nn \l_siunitx_table_fill_pre_dim
+      { \l_siunitx_table_integer_dim }
+    \dim_zero:N \l_siunitx_table_fill_post_dim
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_reserved_reserved_comparator:}
-% Space for a comparator is pretty easy: it has to be at the start of
-% the output so there is not so much to worry about.
+% \end{macro}
+%
+% \subsection{Printing the \texttt{S} column with space reserved}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved:}
+%   The procedure for inserting a number with space reserved requires a model
+%   for each part of the number.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved:
+  {
+    \siunitx_table_print_S_reserved_init:
+    \siunitx_table_print_S_reserved_ends:
+    \siunitx_table_print_S_reserved_round:
+    \siunitx_table_print_S_parse:
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \siunitx_table_print_S_reserved_comparator:
+    \siunitx_table_print_S_reserved_mantissa:
+    \siunitx_table_print_S_reserved_exponent:
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_init:}
+%   The creation of a model for the cell to follow. Creation of the finalised
+%   model is done here so that all of the other options will apply without
+%   needing complex internal tracking.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_init:
+  {
+    \dim_zero:N \l_siunitx_table_fill_mid_dim
+    \dim_zero:N \l_siunitx_table_fill_post_dim
+    \prop_set_eq:NN \l_siunitx_number_in_prop \l_siunitx_table_model_prop
+    \siunitx_number_process_sign:
+    \siunitx_number_process_zero_fill:
+    \siunitx_number_process_mantissa:
+    \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
+      { \siunitx_number_process_uncertainty: }
+    \siunitx_number_format:
+    \prop_set_eq:NN \l_siunitx_table_model_prop \l_siunitx_number_out_prop 
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_ends:}
+%   The end material here is boxed up into the space already reserved.
+%   That means doing two boxing ups: one for the model, and one for the
+%   real thing. As in the centred case, if the pre-numeral part has no
+%   width then the tokens are inserted \enquote{as is}. To avoid any issues
+%   with people forgetting to reserve space for the pre-numeral part, it is
+%   boxed up first at natural width so that the measurement is accurate.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_ends:
+  {
+    \hbox_set:Nn \l_siunitx_table_pre_box
+      {
+        {
+          \l_siunitx_table_collect_pre_tl
+          \bool_if:NT \l_siunitx_table_math_bool
+            {
+              \scan_stop:
+              \c_math_shift_token
+            }
+        }
+      }
+    \dim_compare:nNnTF
+      { \box_wd:N \l_siunitx_table_pre_box } = \c_zero_skip
+      { \l_siunitx_table_collect_pre_tl }
+      {
+        \hbox_set:Nn \l_siunitx_tmp_box { { \l_siunitx_table_pre_tl } }
+        \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+          { \box_wd:N \l_siunitx_tmp_box }
+          {
+            \tex_hfil:D
+            \hbox_unpack:N \l_siunitx_table_pre_box
+          }
+      }
+    \hbox_set:Nn \l_siunitx_tmp_box { \l_siunitx_table_post_tl }
+    \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+      { \box_wd:N \l_siunitx_tmp_box }
+      {
+        {
+          \bool_if:NT \l_siunitx_table_math_bool
+            {
+              \c_math_shift_token
+              \scan_stop:
+            }
+          \l_siunitx_table_collect_post_tl
+        }
+        \tex_hfil:D
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_round_auto:}
+%   For auto-rounding, the approach is to find how many decimal digits are
+%   allowed for, and if there are none to simply set the rounding value to
+%   zero.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_round_auto:
+  {
+    \prop_get:NnNTF \l_siunitx_table_model_prop { mantissa-decimal }
+      \l_siunitx_tmpa_tl
+      { \int_set:Nn \l_siunitx_process_precision_int { \l_siunitx_tmpa_tl } }
+      { \int_zero:N \l_siunitx_process_precision_int }
+    \tl_set:Nn \l_siunitx_round_tl { places }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_comparator:}
+%   The comparator is quite simple to deal with. Assuming that there is a
+%   comparator in the model, this is measured for the reserved width. The
+%   real comparator can then simply be typeset in a box of the same size.
+%   If there is no comparator in the real case, then the space added to
+%   that for filling: this is needed so that any pre-note can be aligned
+%   freely.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_comparator:
   {
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { comparator } { }
-  \siunitx_table_print_S_get_comparator:Nn
-    \l_siunitx_number_out_prop { }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-    { \l_siunitx_table_comparator_dim }
-    {
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
-      \tex_hfil:D
-    }
-  \box_use:N \l_siunitx_table_result_box
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
-%\begin{macro}[aux]{\siunitx_table_print_S_reserved_mantissa_aux:n}
-% Printing the mantissa is done by measuring the integer part of the
-% model and the real number, and padding out if necessary. Everything
-% else is straight forward. The reason for the two box setting
-% operations here is to allow the amount of empty space left after
-% the decimal marker to be measured: this is needed if exponents are
-% not being aligned.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa: {
-  \siunitx_table_print_S_reserved_mantissa_aux:n { mantissa }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { mantissa } { }
-  \siunitx_table_print_S_get_mantissa:Nn
-    \l_siunitx_number_out_prop { }
-  \dim_set:Nn \l_siunitx_table_space_dim
-    { \l_siunitx_table_mantissa_dim }
-  \hbox_set:Nn \l_siunitx_table_result_box
-    {
-      \box_use:N \l_siunitx_table_fill_box
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
-    }
-  \dim_sub:Nn \l_siunitx_table_space_dim
-    { \box_wd:N \l_siunitx_table_result_box }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-    { \l_siunitx_table_mantissa_dim }
-    {
-      \box_use:N \l_siunitx_table_result_box
-      \tex_hfil:D
-    }
-  \box_use:N \l_siunitx_table_result_box
-  \siunitx_table_print_S_reserved_uncert:n { mantissa }
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_mantissa_aux:n #1 {
-  \bool_if:NTF \l_siunitx_table_align_comparator_bool
-    {
-      \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-        { integer } {#1}
-      \siunitx_table_print_S_get_integer:Nn
-        \l_siunitx_number_out_prop {#1}
-    }
-    {
-      \siunitx_table_print_S_measure_comparator_integer:N
-        \l_siunitx_table_model_prop
-      \siunitx_table_print_S_measure_comparator_integer_get:N
-        \l_siunitx_number_out_prop
-    }
-  \box_clear:N \l_siunitx_tmp_box
-  \tl_if_empty:NF \l_siunitx_tmpa_tl
-    {
-      \hbox_set:Nn \l_siunitx_tmp_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_fill_box
-    { \l_siunitx_table_integer_dim - \box_wd:N \l_siunitx_tmp_box }
-    { \tex_hfil:D }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { decimal } {#1}
-  \box_clear:N \l_siunitx_tmp_box
-  \siunitx_table_print_S_get_decimal:Nn
-    \l_siunitx_number_out_prop {#1}
-  \tl_if_empty:NF \l_siunitx_tmpa_tl
-    {
-      \hbox_set:Nn \l_siunitx_tmp_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-    }
-  \dim_set:Nn \l_siunitx_table_gap_dim
-    {
-      \dim_use:N \l_siunitx_table_decimal_dim -
-      \box_wd:N \l_siunitx_tmp_box
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_reserved_uncert:n}
-%\begin{macro}[aux]{\siunitx_table_print_S_reserved_uncert_aux:n}
-% The uncertainty code is generalised for both real and complex parts.
-% A lot of the logic is similar to the exponent part (the \cs{pm}
-% symbol) or the mantissa (the number measuring). So some of the
-% code is shared.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_uncert:n #1 {
-  \bool_if:NT \l_siunitx_uncert_sep_bool
-    {
-      \int_compare:nNnTF { \l_siunitx_table_uncert_int } > { 0 }
-        { \siunitx_table_print_S_reserved_uncert_aux:n {#1} }
-        {
-          \prop_if_in:NnT \l_siunitx_number_out_prop
-            { #1 -uncertainty }
-            {
-              \msg_error:nn { siunitx } { table-partial-number }
-                { an~uncertainty }
-            }
-        }
-    }
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_uncert_aux:n #1 {
-  \siunitx_table_print_S_reserved_uncert_pm:n {#1}
-  \siunitx_table_print_S_reserved_mantissa_aux:n { #1 -uncertainty }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { uncert } {#1}
-  \siunitx_table_print_S_get_uncert:Nn \l_siunitx_number_out_prop {#1}
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-    { \l_siunitx_table_uncert_dim }
-    {
-      \box_use:N \l_siunitx_table_fill_box
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
-      \tex_hfil:D
-    }
-  \box_use:N \l_siunitx_table_result_box
-  \bool_if:NF \l_siunitx_table_align_uncert_bool
-    {
-      \tex_hskip:D \l_siunitx_table_space_dim
-      \dim_zero:N \l_siunitx_table_space_dim
-    }
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_uncert_pm:n #1 {
-  \tl_clear:N \l_siunitx_tmpb_tl
-  \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpb_tl
-  \tl_set:Nx \l_siunitx_tmpb_tl
-    { { } \exp_not:V \l_siunitx_tmpb_tl { } }
-  \hbox_set:Nn \l_siunitx_table_result_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpb_tl }
-  \prop_if_in:NnF \l_siunitx_number_out_prop { #1 -uncertainty }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-        { \box_wd:N \l_siunitx_table_result_box } { \tex_hfil:D }
-    }
-  \bool_if:NF \l_siunitx_table_align_uncert_bool
-    { \tex_hskip:D -\l_siunitx_table_space_dim }
- \box_use:N \l_siunitx_table_result_box
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_reserved_exponent:}
-%\begin{macro}[aux]{\siunitx_table_print_S_reserved_exponent_product:}
-%\begin{macro}[aux]
-%  {\siunitx_table_print_S_reserved_exponent_product_aux_i:}
-%\begin{macro}[aux]
-%  {\siunitx_table_print_S_reserved_exponent_product_aux_ii:}
-% Most of the code for the exponent is concerned with getting the
-% product sign correct. Other than that, the exponent result is quite
-% easy to handle: just print it with some filling.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent: {
-  \dim_zero:N \l_siunitx_table_gap_dim
-  \tl_if_empty:NTF \l_siunitx_output_exponent_tl
-    { \siunitx_table_print_S_reserved_exponent_product: }
-    {
-      \bool_if:NF \l_siunitx_table_align_exp_bool
-        { \tex_hskip:D -\l_siunitx_table_space_dim }
-    }
-  \siunitx_table_print_S_measure:Nnn \l_siunitx_table_model_prop
-    { exponent } { }
-  \siunitx_table_print_S_get_exponent:Nn
-    \l_siunitx_number_out_prop { }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-    { \l_siunitx_table_exponent_dim }
-    {
-      \siunitx_print:nV { number } \l_siunitx_tmpa_tl
-      \tex_hfil:D
-    }
-  \box_use:N \l_siunitx_table_result_box
-  \bool_if:NF \l_siunitx_table_align_exp_bool
-    { \tex_hskip:D \l_siunitx_table_space_dim }
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_exponent_product: {
-  \tl_clear:N \l_siunitx_tmpa_tl
-  \box_clear:N \l_siunitx_table_result_box
-  \prop_if_in:NnTF \l_siunitx_table_model_prop { mantissa-result }
-    { \siunitx_table_print_S_reserved_exponent_product_aux_i: }
-    {
-      \prop_if_in:NnT \l_siunitx_table_model_prop { complex-result }
-        { \siunitx_table_print_S_reserved_exponent_product_aux_i: }
-    }
-  \bool_if:NF \l_siunitx_table_align_exp_bool
-    { \tex_hskip:D -\l_siunitx_table_space_dim }
-  \box_use:N \l_siunitx_table_result_box
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_exponent_product_aux_i: {
-  \tl_set_eq:NN \l_siunitx_tmpa_tl \l_siunitx_exponent_product_tl
-  \bool_if:NT \l_siunitx_tight_bool
-    {
-      \tl_set:Nx \l_siunitx_tmpa_tl
-        { { \exp_not:V \l_siunitx_tmpa_tl } }
-    }
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    {
-      \exp_not:N \siunitx_ensuremath:n
-        { { } \exp_not:V \l_siunitx_tmpa_tl { } }
-    }
-  \hbox_set:Nn \l_siunitx_table_result_box
-    { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-  \prop_if_in:NnTF \l_siunitx_number_out_prop { exponent-result }
-    {
-      \prop_if_in:NnF \l_siunitx_number_out_prop { mantissa-result }
-        {
-          \prop_if_in:NnF \l_siunitx_number_out_prop { complex-result }
-            {
-              \siunitx_table_print_S_reserved_exponent_product_aux_ii:
-            }
-        }
-    }
-    { \siunitx_table_print_S_reserved_exponent_product_aux_ii: }
-}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_exponent_product_aux_ii: {
-  \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
-    { \box_wd:N \l_siunitx_table_result_box } { \tex_hfil:D }
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_measure:Nnn}
-% The measuring code recovers whatever is needed into
-% \cs{l_siunitx_tmpa_tl} (as this is internal code, that is okay).
-% The content is then boxed up and measured: if there is nothing to do,
-% a bit of time can be saved by not boxing up at all.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_measure:Nnn #1#2#3 {
-  \use:c { siunitx_table_print_S_get_ #2 :Nn } #1 {#3}
-  \tl_if_empty:NTF \l_siunitx_tmpa_tl
-    { \dim_set:cn { l_siunitx_table_ #2 _dim } { \c_zero_skip } }
-    {
-      \hbox_set:Nn \l_siunitx_tmp_box
-        { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-      \dim_set:cn { l_siunitx_table_ #2 _dim }
-        { \box_wd:N \l_siunitx_tmp_box }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_comparator:Nn}
-% Getting the comparator part is quite easy.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_get_comparator:Nn #1#2 {
-  \prop_get:NnN #1 { comparator } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_decimal:Nn}
-% Grabbing the decimal part is a simple operation.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_get_decimal:Nn #1#2 {
-  \prop_get:NnN #1 { #2 -decimal } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_exponent:Nn}
-% Getting the exponent part is quite easy.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_get_exponent:Nn #1#2 {
-  \prop_get:NnN #1 { exponent-result } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_integer:Nn}
-% Getting the integer part of a number means that the sign also has be
-% considered, even if there is no actual integer. This leads to a 
-% slightly odd approach here. There is also the comparator to
-% worry about.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_get_integer:Nn #1#2 {
-  \prop_get:NnN #1 { #2 -sign } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-  \prop_get:NnN #1 { #2 -integer } \l_siunitx_tmpb_tl
-  \quark_if_no_value:NT \l_siunitx_tmpb_tl
-    { \tl_clear:N \l_siunitx_tmpb_tl }
-  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_mantissa:Nn}
-% The mantissa without any uncertainty is needed by the reserved
-% space routine.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_get_mantissa:Nn #1#2 {
-  \prop_get:NnN #1 { mantissa } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-  \bool_if:NF \l_siunitx_table_align_comparator_bool
-    {
-      \prop_get:NnN #1 { comparator } \l_siunitx_tmpb_tl
-      \quark_if_no_value:NF \l_siunitx_tmpb_tl
-        { \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_marker:Nn}
-% The decimal marker is always going to be boxed up using the
-% standard version, not any possible copied value. So the code can be
-% kept quite clear.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_get_marker:Nn #1#2 {
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    {
-      \exp_not:N \siunitx_ensuremath:n
-        { \exp_not:V \l_siunitx_output_decimal_tl }
-    }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_result:Nn}
-% Getting the result values is easy.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_get_result:Nn #1#2 {
-  \prop_get:NnN #1 { result } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%\begin{macro}{\siunitx_table_print_S_get_uncert:Nn}
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_get_uncert:Nn #1#2 {
-  \prop_get:NnN #1 { #2 -uncertainty } \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
-    { \tl_clear:N \l_siunitx_tmpa_tl }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_print_S_measure_comparator_integer:N}
-%\begin{macro}{\siunitx_table_print_S_measure_comparator_integer_get:N}
-% A special-case macro when the comparator is also needed in
-% measuring up the integer part of the mantissa.
-%    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_measure_comparator_integer:N #1
-  {
-    \siunitx_table_print_S_measure_comparator_integer_get:N #1
-    \tl_if_empty:NTF \l_siunitx_tmpa_tl
-      { \dim_set:Nn \l_siunitx_table_integer_dim { \c_zero_skip } }
+    \prop_get:NnNTF \l_siunitx_table_model_prop { comparator }
+      \l_siunitx_tmpa_tl
       {
         \hbox_set:Nn \l_siunitx_tmp_box
           { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-        \dim_set:Nn \l_siunitx_table_integer_dim
-          { \box_wd:N \l_siunitx_tmp_box }
+        \prop_get:NnNTF \l_siunitx_number_out_prop { comparator }
+          \l_siunitx_tmpa_tl
+          {
+            \dim_set:Nn \l_siunitx_table_fill_pre_dim
+              { \box_wd:N \l_siunitx_tmp_box }
+            \cs_set_eq:NN \siunitx_table_print_S_reserved_store_fill:n
+              \siunitx_table_print_S_reserved_store_fill_pre:n
+          }
+          {
+            \hbox_set_to_wd:Nnn \l_siunitx_table_result_box
+              { \box_wd:N \l_siunitx_tmp_box }
+              { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+          }
+      }
+      {
+        \cs_set_eq:NN \siunitx_table_print_S_reserved_store_fill:n
+          \siunitx_table_print_S_reserved_store_fill_pre:n
+        \prop_if_in:NnT \l_siunitx_number_out_prop { comparator }
+          {
+            \msg_error:nnx { siunitx } { table-partial-number }
+              { a~comparator }
+          }
+      } 
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_reserved_store_fill_pre:n ,
+%     \siunitx_table_print_S_reserved_store_fill_mid:n
+%   }
+%   To allow for the various alignment options, fill is stored in a
+%   flexible way.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill_pre:n
+  { \dim_add:Nn \l_siunitx_table_fill_pre_dim }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill_mid:n
+  { \dim_add:Nn \l_siunitx_table_fill_mid_dim }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_mantissa:}
+% \begin{macro}[aux]
+%   {
+%     \siunitx_table_print_S_reserved_mantissa_parts:  ,
+%     \siunitx_table_print_S_reserved_mantissa_integer:
+%   }
+%   The mantissa of a number may contain a sign, an integer part, a
+%   decimal marker, a decimal part and a non-separated uncertainty. That
+%   means that there are two ways to deal with the alignment. Each part
+%   could be done separately, or a correction can be made after setting
+%   the combined mantissa. Here, the later approach is taken. The first
+%   step is to deal with the mantissa as a whole: work out show much space
+%   to reserve, and see if there is anything at all to put in it. The
+%   complexity only starts if there is a mantissa in the current cell.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa:
+  {
+    \prop_get:NnNTF \l_siunitx_table_model_prop { mantissa }
+      \l_siunitx_tmpa_tl
+      {
+        \hbox_set:Nn \l_siunitx_tmp_box
+          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+        \prop_get:NnNTF \l_siunitx_number_out_prop { mantissa }
+          \l_siunitx_tmpa_tl
+          {
+            \dim_set:Nn \l_siunitx_table_mantissa_dim
+              { \box_wd:N \l_siunitx_tmp_box }
+            \hbox_set:Nn \l_siunitx_table_mantissa_box
+              { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+            \siunitx_table_print_S_reserved_mantissa_parts:
+          }
+          {
+            \siunitx_table_print_S_reserved_store_fill:n
+              { \box_wd:N \l_siunitx_tmp_box }
+          }
+      }
+      {
+        \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
+          {
+            \msg_error:nnx { siunitx } { table-partial-number }
+              { a~mantissa }
+          }
+      }
+  }
+%    \end{macrocode}
+%   The aim here is to deal with the mantissa with as few measurements as
+%   possible. The integer part is therefore measured, with the real and model
+%   versions compared. This allows appropriate fill to be calculated to
+%   add the mantissa to the result box, after any comparator and with
+%   the appropriate width. Once that is done, the amount of filler needed
+%   \emph{after} the integer can be calculated: this is the size of the
+%   model mantissa, minus the size of the real mantissa and the amount of
+%   filler needed in the integer part. That is stored in the intermediate
+%   dimension for the present, although it may get moved.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_parts:
+  {
+    \siunitx_table_print_S_reserved_mantissa_integer:
+    \hbox_set:Nn \l_siunitx_table_result_box
+      {
+        \hbox_unpack:N \l_siunitx_table_result_box
+        \hbox_to_wd:nn { \l_siunitx_table_fill_mid_dim } { \tex_hfil:D }
+        \hbox_unpack:N \l_siunitx_table_mantissa_box
+      }
+    \dim_set:Nn \l_siunitx_table_fill_mid_dim
+      {
+          \l_siunitx_table_mantissa_dim
+        - \box_wd:N \l_siunitx_table_mantissa_box
+        - \l_siunitx_table_integer_dim
+      }
+    \siunitx_table_print_S_reserved_mantissa_uncert:
+  }
+%    \end{macrocode}
+%   For the integer part, there is a need to measure both the sign and
+%   the integer itself in the model and in the real number. If there is
+%   no integer part in the real number, then fill is stored to add either
+%   before or after any comparator. If there is an integer part, the
+%   size is measured and the any fill needed is stored for re-insertion.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_integer:
+  {
+    \prop_get:NnNF \l_siunitx_table_model_prop { mantissa-sign }
+      \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \prop_get:NnNT \l_siunitx_table_model_prop { mantissa-integer }
+      \l_siunitx_tmpb_tl
+      { \tl_put_right:No \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+      \l_siunitx_table_integer_dim
+    \prop_get:NnNF \l_siunitx_number_out_prop { mantissa-sign }
+      \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-integer }
+      \l_siunitx_tmpb_tl
+      { \tl_put_right:No \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+    \tl_if_empty:NF \l_siunitx_tmpa_tl
+      {
+        \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+          \l_siunitx_tmp_dim 
+        \dim_sub:Nn \l_siunitx_table_integer_dim { \l_siunitx_tmp_dim }
+      }
+    \siunitx_table_print_S_reserved_store_fill:n
+      { \l_siunitx_table_integer_dim }
+  }
+%    \end{macrocode}
+%   Here, a separated uncertainty is handled. If there is one, then there must
+%   be a \cs{pm} part to add. Once the space calculation is done, a flexible
+%   auxiliary does the spacing and pasting up.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_uncert:
+  {
+    \prop_get:NnNT \l_siunitx_table_model_prop { mantissa-uncertainty }
+      \l_siunitx_tmpa_tl
+      {
+        \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpa_tl
+        \hbox_set:Nn \l_siunitx_tmp_box
+          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+        \prop_get:NnNTF \l_siunitx_number_out_prop { mantissa-uncertainty }
+          \l_siunitx_tmpa_tl
+          {
+            \dim_set:Nn \l_siunitx_table_uncert_dim
+              { \box_wd:N \l_siunitx_tmp_box }
+            \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpa_tl
+            \hbox_set:Nn \l_siunitx_tmp_box
+              { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+            \siunitx_table_print_S_reserved_mantissa_uncert_aux:
+          }
+          {
+            \siunitx_table_print_S_reserved_store_fill:n
+              { \box_wd:N \l_siunitx_tmp_box }
+          }
+      }
+  }
+%    \end{macrocode}
+%   Two auxiliaries, one to place the uncertainty directly next to the rest
+%   of the mantissa, one to maintain alignment. In both cases, any fill ends
+%   up in the middle fill store, but in the alignment case this also removes
+%   any previous fill. The temporary box here contains the uncertainty part.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_reserved_mantissa_uncert_aligned:
+  {
+    \hbox_set:Nn \l_siunitx_table_result_box
+      {
+        \hbox_unpack:N \l_siunitx_table_result_box
+        \hbox_to_wd:nn { \l_siunitx_table_fill_mid_dim } { \tex_hfil:D }
+        \hbox_unpack:N \l_siunitx_tmp_box
+      }
+    \dim_set:Nn \l_siunitx_table_fill_mid_dim
+      { \l_siunitx_table_uncert_dim - \box_wd:N \l_siunitx_tmp_box }
+  }
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_reserved_mantissa_uncert_not_aligned:
+  {
+    \hbox_set:Nn \l_siunitx_table_result_box
+      {
+        \hbox_unpack:N \l_siunitx_table_result_box
+        \hbox_unpack:N \l_siunitx_tmp_box
+      }
+    \dim_add:Nn \l_siunitx_table_fill_mid_dim
+      {
+          \l_siunitx_table_uncert_dim
+        - \box_wd:N \l_siunitx_tmp_box
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_table_print_S_reserved_exponent:}
+% \begin{macro}[aux]
+%   {
+%     \siunitx_table_print_S_reserved_exponent_product:     ,
+%     \siunitx_table_print_S_reserved_exponent_aligned:     ,
+%     \siunitx_table_print_S_reserved_exponent_not_aligned:
+%   }
+%   Printing the exponent needs to deal with the exponent product. This
+%   is easiest to do by simply re-checking for a mantissa.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent:
+  {
+    \prop_get:NnNTF \l_siunitx_table_model_prop { exponent-result }
+      \l_siunitx_tmpa_tl
+      {
+        \prop_if_in:NnT \l_siunitx_table_model_prop { mantissa }
+          { \siunitx_table_print_S_reserved_exponent_product: }
+        \hbox_set:Nn \l_siunitx_tmp_box
+          { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+        \prop_get:NnNTF \l_siunitx_number_out_prop { exponent-result }
+          \l_siunitx_tmpa_tl
+          {
+            \dim_set:Nn \l_siunitx_table_exponent_dim
+              { \box_wd:N \l_siunitx_tmp_box }
+            \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa }
+              { \siunitx_table_print_S_reserved_exponent_product: }
+              {
+                \group_begin:
+                  \tl_clear:N \l_siunitx_tmpa_tl
+                  \siunitx_table_print_S_reserved_exponent_product:
+                  \tl_set:Nx \l_siunitx_tmpa_tl
+                    { { } \exp_not:o \l_siunitx_tmpa_tl { } }
+                  \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+                    \l_siunitx_tmp_dim
+                \exp_args:NNNo \group_end:
+                \dim_set:Nn \l_siunitx_tmp_dim
+                  { \dim_use:N \l_siunitx_tmp_dim }
+                \siunitx_table_print_S_reserved_store_fill:n
+                  { \l_siunitx_tmp_dim }
+                \dim_sub:Nn \l_siunitx_table_exponent_dim
+                  { \l_siunitx_tmp_dim }  
+              }
+            \hbox_set:Nn \l_siunitx_tmp_box
+              { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
+            \siunitx_table_print_S_reserved_exponent_aux:      
+          }
+          {
+            \dim_set:Nn \l_siunitx_table_fill_post_dim
+              { \l_siunitx_table_fill_mid_dim + \box_wd:N \l_siunitx_tmp_box }
+          }
+      }
+      {
+        \prop_if_in:NnT \l_siunitx_number_out_prop { exponent-result }
+          {
+            \msg_error:nnx { siunitx } { table-partial-number }
+              { an~exponent }
+          }
+      }
+  }
+%    \end{macrocode}
+%   A short sub-function to deal with the appearance of the exponent product
+%   for both the real number and the model.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_product:
+  {
+    \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
+    \bool_if:NT \l_siunitx_tight_bool
+      { \tl_set:Nx \l_siunitx_tmpb_tl { { \exp_not:o \l_siunitx_tmpb_tl } } }
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      {
+        \exp_not:N \siunitx_ensuremath:n
+          { { } \exp_not:o \l_siunitx_tmpb_tl  { } }
+        \exp_not:o \l_siunitx_tmpa_tl
+      }
+  }
+%    \end{macrocode}
+%   There are two cases for adding the exponent to the result box, one
+%   with additional space to maintain alignment, and one with no space.
+%   The space needed after the exponent then can be set to either include
+%   or exclude the mid fill space. Doing that here avoids one extra assignment
+%   (to clear the mid fill in the aligned case).
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_aligned:
+  {
+    \hbox_set:Nn \l_siunitx_table_result_box
+      {
+        \hbox_unpack:N \l_siunitx_table_result_box
+        \hbox_to_wd:nn { \l_siunitx_table_fill_mid_dim } { \tex_hfil:D }
+        \hbox_unpack:N \l_siunitx_tmp_box
+      }
+    \dim_set:Nn \l_siunitx_table_fill_post_dim
+      {
+          \l_siunitx_table_exponent_dim
+        - \box_wd:N \l_siunitx_tmp_box
       }
   }
 \cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_measure_comparator_integer_get:N #1
+  \siunitx_table_print_S_reserved_exponent_not_aligned:
   {
-    \prop_get:NnN #1 { comparator } \l_siunitx_tmpa_tl
-    \quark_if_no_value:NT \l_siunitx_tmpa_tl
-      { \tl_clear:N \l_siunitx_tmpa_tl }
-    \prop_get:NnN #1 { mantissa-sign } \l_siunitx_tmpb_tl
-    \quark_if_no_value:NF \l_siunitx_tmpb_tl
-      { \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
-    \prop_get:NnN #1 { mantissa-integer } \l_siunitx_tmpb_tl
-    \quark_if_no_value:NT \l_siunitx_tmpb_tl
-      { \tl_clear:N \l_siunitx_tmpb_tl }
-    \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
+    \hbox_set:Nn \l_siunitx_table_result_box
+      {
+        \hbox_unpack:N \l_siunitx_table_result_box
+        \hbox_unpack:N \l_siunitx_tmp_box
+      }
+    \dim_set:Nn \l_siunitx_table_fill_post_dim
+      {
+          \l_siunitx_table_fill_mid_dim
+        + \l_siunitx_table_exponent_dim
+        - \box_wd:N \l_siunitx_tmp_box
+      }
   }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
 %
-%\subsection{Direct printing in \texttt{S} columns}
+% \subsection{Direct printing in \texttt{S} columns}
 %
 % When number parsing is turned off the usual approach to printing
 % tabular material is not suitable. Instead, the strategy used by
 % \pkg{dcolumn} can be applied, which requires the decimal marker to
 % be made active in math mode.
 %
-%\begin{macro}{\siunitx_table_direct:}
-% The main part of the system simply makes a choice about the
-% methods to use.
+% \begin{macro}{\siunitx_table_print_S_direct:}
+%   The main part of the system simply does the appropriate math work
+%   then calls the main function, which will be assigned by the
+%   key--value system.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_direct: {
-  \m@th
-  \bool_if:NTF \l_siunitx_table_center_decimal_bool
-    { \siunitx_table_direct_centered: }
-    { \siunitx_table_direct_reserved: }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct:
+  {
+    \m@th
+    \siunitx_table_print_S_direct_main:
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
-%\begin{macro}{\siunitx_table_direct_centered:}
-%\begin{macro}[aux]{\siunitx_table_direct_centered_aux:N}
-%\begin{macro}{\siunitx_table_direct_centered_end:}
-% When centring the content about a decimal marker, the trick is
-% to collect everything into two boxes and then compare the sizes.
-% In that sense this is very similar to the normal method, except that
-% it will work with non-numerical input.
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_direct_centered:    ,
+%     \siunitx_table_print_S_direct_centered_end:
+%   }
+% \begin{macro}[aux]{\siunitx_table_print_S_direct_centered_aux:N}
+%   When centring the content about a decimal marker, the trick is
+%   to collect everything into two boxes and then compare the sizes.
+%   In that sense this is very similar to the normal method, except that
+%   it will work with non-numerical input.
 %    \begin{macrocode}
 \char_set_catcode_active:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_direct_centered: {
-  \cs_set_eq:NN \siunitx_table_print:
-    \siunitx_table_direct_centered_end:
-  \hbox_set:Nn \l_siunitx_tmp_box
-    { \siunitx_ensuremath:n { \l_siunitx_output_decimal_tl } }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-    { \box_wd:N \l_siunitx_tmp_box }
-    { \tex_hfil:D }
-  \hbox_set:Nn \l_siunitx_table_pre_box
-    \c_group_begin_token
-      \c_math_shift_token
-      \tl_map_function:NN \l_siunitx_input_decimal_tl
-        \siunitx_table_direct_centered_aux:N
-}
-\cs_new_protected_nopar:Npn \siunitx_table_direct_centered_aux:N #1 {
-  \char_set_lccode:nn { `\@ } { `#1 }
-  \char_set_mathcode:nn { `#1 } { 32768 }
-  \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
-    {
-      \c_math_shift_token
-      \c_group_end_token
-      \hbox_set:Nn \l_siunitx_table_post_box
-        \c_group_begin_token
-          \c_math_shift_token
-          \l_siunitx_output_decimal_tl
-    }
-}
-\char_set_catcode_letter:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_direct_centered_end: {
-    \c_math_shift_token
-  \c_group_end_token
-  \dim_compare:nNnTF
-    { \box_wd:N \l_siunitx_table_pre_box } >
-    { \box_wd:N \l_siunitx_table_post_box }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-        { \box_wd:N \l_siunitx_table_pre_box }
-        {
-          \hbox_unpack:N \l_siunitx_table_post_box
-          \tex_hfil:D
-        }
-    }
-    {
-      \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
-        { \box_wd:N \l_siunitx_table_post_box }
-        {
-          \tex_hfil:D
-          \hbox_unpack:N \l_siunitx_table_pre_box
-        }
-    }
-  \box_use:N \l_siunitx_table_pre_box
-  \box_use:N \l_siunitx_table_post_box
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\siunitx_table_direct_reserved:}
-%\begin{macro}[aux]{\siunitx_table_direct_reserved_aux:N}
-%\begin{macro}{\siunitx_table_direct_reserved_end:}
-% The plan here is to box up the entire number using the information
-% available about the size of the two parts. Relatively easy,
-% but needs a bit of measuring. The first box here does need to use
-% \cs{tex_hill:D} as \texttt{fil} glue will not work.
-%    \begin{macrocode}
-\char_set_catcode_active:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_direct_reserved: {
-  \cs_set_eq:NN \siunitx_table_print:
-    \siunitx_table_direct_reserved_end:
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    { \prg_replicate:nn { \l_siunitx_table_integer_int } { 8 } }
-  \hbox_set:Nn \l_siunitx_tmp_box
-    {
-      \siunitx_ensuremath:n
-        {
-          \bool_if:NT \l_siunitx_table_sign_mantissa_bool { - }
-          \l_siunitx_tmpa_tl
-        }
-    }
-  \dim_set:Nn \l_siunitx_table_integer_dim
-    { \box_wd:N \l_siunitx_tmp_box }
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    { \prg_replicate:nn { \l_siunitx_table_decimal_int } { 8 } }
-  \hbox_set:Nn \l_siunitx_tmp_box
-    {
-      \siunitx_ensuremath:n
-        {
-          \l_siunitx_output_decimal_tl
-          \l_siunitx_tmpa_tl
-        }
-    }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-    { \box_wd:N \l_siunitx_tmp_box }
-    { \tex_hfil:D }
-  \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
-    { \l_siunitx_table_integer_dim }
-    \c_group_begin_token
-      \c_math_shift_token
-      \tl_map_function:NN \l_siunitx_input_decimal_tl
-        \siunitx_table_direct_reserved_aux:N
-      \tex_hfill:D
-}
-\cs_new_protected_nopar:Npn \siunitx_table_direct_reserved_aux:N #1 {
-  \char_set_lccode:nn { `\@ } { `#1 }
-  \char_set_mathcode:nn { `#1 } { 32768 }
-  \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
-    {
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered:
+  {
+    \cs_set_eq:NN \siunitx_table_print:
+      \siunitx_table_print_S_direct_centered_end:
+    \hbox_set:Nn \l_siunitx_tmp_box
+      { \siunitx_ensuremath:n { \l_siunitx_output_decimal_tl } }
+    \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+      { \box_wd:N \l_siunitx_tmp_box }
+      { \tex_hfil:D }
+    \hbox_set:Nn \l_siunitx_table_pre_box
+      \c_group_begin_token
         \c_math_shift_token
-      \c_group_end_token
-      \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
-        { \box_wd:N \l_siunitx_tmp_box }
-        \c_group_begin_token
-          \c_math_shift_token
-          \l_siunitx_output_decimal_tl
-    }
-}
+        \tl_map_function:NN \l_siunitx_input_decimal_tl
+          \siunitx_table_print_S_direct_centered_aux:N
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered_aux:N #1
+  {
+    \char_set_lccode:nn { `\@ } { `#1 }
+    \char_set_mathcode:nn { `#1 } { 32768 }
+    \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
+      {
+        \c_math_shift_token
+        \c_group_end_token
+        \hbox_set:Nn \l_siunitx_table_post_box
+          \c_group_begin_token
+            \c_math_shift_token
+            \l_siunitx_output_decimal_tl
+      }
+  }
 \char_set_catcode_letter:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_direct_reserved_end: {
-    \c_math_shift_token
-    \tex_hfil:D
-  \c_group_end_token
-  \siunitx_table_align_left:n { \l_siunitx_table_number_align_skip }
-  \box_use:N \l_siunitx_table_pre_box
-  \box_use:N \l_siunitx_table_post_box
-  \siunitx_table_align_right:n { \l_siunitx_table_number_align_skip }
-}
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered_end:
+  {
+      \c_math_shift_token
+    \c_group_end_token
+    \dim_compare:nNnTF
+      { \box_wd:N \l_siunitx_table_pre_box } >
+        { \box_wd:N \l_siunitx_table_post_box }
+      {
+        \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+          { \box_wd:N \l_siunitx_table_pre_box }
+          {
+            \hbox_unpack:N \l_siunitx_table_post_box
+            \tex_hfil:D
+          }
+      }
+      {
+        \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+          { \box_wd:N \l_siunitx_table_post_box }
+          {
+            \tex_hfil:D
+            \hbox_unpack:N \l_siunitx_table_pre_box
+          }
+      }
+    \box_use:N \l_siunitx_table_pre_box
+    \box_use:N \l_siunitx_table_post_box
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \siunitx_table_print_S_direct_reserved:    ,
+%     \siunitx_table_print_S_direct_reserved_end:
+%   }
+% \begin{macro}[aux]{\siunitx_table_print_S_direct_reserved_aux:N}
+%   The plan here is to box up the entire number using the information
+%   available about the size of the two parts. Relatively easy,
+%   but needs a bit of measuring. The first box here does need to use
+%   \cs{tex_hill:D} as \texttt{fil} glue will not work.
+%    \begin{macrocode}
+\char_set_catcode_active:N \@
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved:
+  {
+    \cs_set_eq:NN \siunitx_table_print:
+      \siunitx_table_print_S_direct_reserved_end:
+    \prop_get:NnNF \l_siunitx_table_model_prop { mantissa-integer }
+      \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \hbox_set:Nn \l_siunitx_tmp_box
+      {
+        \siunitx_ensuremath:n
+          {
+            \prop_get:NnNT \l_siunitx_table_model_prop { mantissa-sign }
+              \l_siunitx_tmpb_tl
+              { \l_siunitx_tmpb_tl }
+            \l_siunitx_tmpa_tl
+          }
+      }
+    \dim_set:Nn \l_siunitx_table_integer_dim
+      { \box_wd:N \l_siunitx_tmp_box }
+    \prop_get:NnNF \l_siunitx_table_model_prop { mantissa-decimal }
+      \l_siunitx_tmpa_tl
+      { \tl_clear:N \l_siunitx_tmpa_tl }
+    \hbox_set:Nn \l_siunitx_tmp_box
+      {
+        \siunitx_ensuremath:n
+          {
+            \l_siunitx_output_decimal_tl
+            \l_siunitx_tmpa_tl
+          }
+      }
+    \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+      { \box_wd:N \l_siunitx_tmp_box }
+      { \tex_hfil:D }
+    \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+      { \l_siunitx_table_integer_dim }
+      \c_group_begin_token
+        \c_math_shift_token
+        \tl_map_function:NN \l_siunitx_input_decimal_tl
+          \siunitx_table_print_S_direct_reserved_aux:N
+        \tex_hfill:D
+  }
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved_aux:N #1
+  {
+    \char_set_lccode:nn { `\@ } { `#1 }
+    \char_set_mathcode:nn { `#1 } { 32768 }
+    \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
+      {
+          \c_math_shift_token
+        \c_group_end_token
+        \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
+          { \box_wd:N \l_siunitx_tmp_box }
+          \c_group_begin_token
+            \c_math_shift_token
+            \l_siunitx_output_decimal_tl
+      }
+  }
+\char_set_catcode_letter:N \@
+\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved_end:
+  {
+      \c_math_shift_token
+      \tex_hfil:D
+    \c_group_end_token
+    \siunitx_table_align_left:n { \l_siunitx_table_number_align_skip }
+    \box_use:N \l_siunitx_table_pre_box
+    \box_use:N \l_siunitx_table_post_box
+    \siunitx_table_align_right:n { \l_siunitx_table_number_align_skip }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Table settings}
+%
+% To allow for the construction above, the table settings are given here.
+% 
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    table-align-comparator  = true,
+    table-align-exponent    = true,
+    table-align-text-pre    = true,
+    table-align-text-post   = true,
+    table-align-uncertainty = true,
+    table-omit-exponent     = false,
+    table-parse-only        = false,
+    table-number-alignment  = center-decimal-marker,
+    table-text-alignment    = center,
+    table-figures-decimal   = 2,
+    table-figures-integer   = 3
+  }
+%    \end{macrocode}
 %
 %\subsection{Symbols}
 %
@@ -15042,7 +15200,7 @@ This work consists of the file  siunitx.dtx
       \bool_set_false:N \l_siunitx_table_collect_pre_bool
       \siunitx_table_print_S:
     }
-    { \siunitx_table_direct: #2 \siunitx_table_print: }
+    { \siunitx_table_print_S_direct: #2 \siunitx_table_print: }
 }
 %    \end{macrocode}
 %\end{macro}
