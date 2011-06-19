@@ -3407,10 +3407,13 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
+%\DescribeOption{table-align-text-pre}
+% \changes{v2.3}{2011/06/19}{New \opt{table-align-text-pre} option}
 %\DescribeOption{table-align-text-post}
 % Note markers are often given in tables after the numerical content. It
 % may be desirable for these to close up to the numbers. Whether this
-% takes place is controlled by the \opt{table-align-text-post}
+% takes place is controlled by the \opt{table-align-text-pre}
+% and \opt{\ldots-post}
 % option (\cref{tab:S:notes}).
 %\begin{LaTeXdemo}[code and float]
 %  \begin{table}
@@ -3425,6 +3428,21 @@ This work consists of the file  siunitx.dtx
 %      table-figures-integer  = 2,
 %      table-figures-decimal  = 4,
 %    }
+%    \begin{tabular}{
+%      S
+%      S[table-align-text-pre = false]
+%    }
+%    \toprule
+%      {Values}             & {Values} \\
+%    \midrule
+%                    2.3456 &               2.3456 \\
+%      \NoteMark{a} 34.234  & \NoteMark{a} 34.234 \\
+%      \NoteMark{b} 56.78   & \NoteMark{b} 56.78  \\
+%      \NoteMark{c} 90.4    & \NoteMark{c} 90.4   \\
+%      \NoteMark{d} 88      & \NoteMark{d} 88     \\
+%    \bottomrule
+%    \end{tabular}
+%    \hfil
 %    \begin{tabular}{
 %      S
 %      S[table-align-text-post = false]
@@ -13448,9 +13466,7 @@ This work consists of the file  siunitx.dtx
     table-auto-round          .choice:,
     table-auto-round /
       false                   .code:n     =
-        {
-          \cs_set_eq:NN \prg_do_nothing:
-        },
+        { \cs_set_eq:NN \prg_do_nothing: },
     table-auto-round /
       true                    .code:n     =
         {
@@ -14068,7 +14084,10 @@ This work consists of the file  siunitx.dtx
   {
     \prop_get:NnNTF \l_siunitx_table_model_prop { mantissa-decimal }
       \l_siunitx_tmpa_tl
-      { \int_set:Nn \l_siunitx_process_precision_int { \l_siunitx_tmpa_tl } }
+      {
+        \int_set:Nn \l_siunitx_process_precision_int
+          { \tl_length:N \l_siunitx_tmpa_tl }
+      }
       { \int_zero:N \l_siunitx_process_precision_int }
     \tl_set:Nn \l_siunitx_round_tl { places }
   }
