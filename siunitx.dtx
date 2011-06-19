@@ -14030,17 +14030,15 @@ This work consists of the file  siunitx.dtx
             }
         }
       }
-    \dim_compare:nNnTF
+    \dim_compare:nNnT
       { \box_wd:N \l_siunitx_table_pre_box } = \c_zero_skip
       { \l_siunitx_table_collect_pre_tl }
+    \hbox_set:Nn \l_siunitx_tmp_box { { \l_siunitx_table_pre_tl } }
+    \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
+      { \box_wd:N \l_siunitx_tmp_box }
       {
-        \hbox_set:Nn \l_siunitx_tmp_box { { \l_siunitx_table_pre_tl } }
-        \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
-          { \box_wd:N \l_siunitx_tmp_box }
-          {
-            \tex_hfil:D
-            \hbox_unpack:N \l_siunitx_table_pre_box
-          }
+        \tex_hfil:D
+        \hbox_unpack:N \l_siunitx_table_pre_box
       }
     \hbox_set:Nn \l_siunitx_tmp_box { \l_siunitx_table_post_tl }
     \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
@@ -14099,7 +14097,7 @@ This work consists of the file  siunitx.dtx
               { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
           }
           {
-            \dim_set:Nn \l_siunitx_table_fill_pre_dim
+            \dim_add:Nn \l_siunitx_table_fill_pre_dim
               { \box_wd:N \l_siunitx_tmp_box }
             \cs_set_eq:NN \siunitx_table_print_S_reserved_store_fill:n
               \siunitx_table_print_S_reserved_store_fill_pre:n
