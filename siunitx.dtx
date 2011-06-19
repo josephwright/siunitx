@@ -14305,8 +14305,9 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\siunitx_table_print_S_reserved_exponent:}
 % \begin{macro}[aux]
 %   {
-%     \siunitx_table_print_S_reserved_exponent_product:     ,
-%     \siunitx_table_print_S_reserved_exponent_aligned:     ,
+%     \siunitx_table_print_S_reserved_exponent_product:            ,
+%     \siunitx_table_print_S_reserved_exponent_product_correction: ,
+%     \siunitx_table_print_S_reserved_exponent_aligned:            ,
 %     \siunitx_table_print_S_reserved_exponent_not_aligned:
 %   }
 %   Printing the exponent needs to deal with the exponent product. This
@@ -14330,22 +14331,7 @@ This work consists of the file  siunitx.dtx
               { \box_wd:N \l_siunitx_tmp_box }
             \prop_if_in:NnTF \l_siunitx_number_out_prop { mantissa }
               { \siunitx_table_print_S_reserved_exponent_product: }
-              {
-                \group_begin:
-                  \tl_clear:N \l_siunitx_tmpa_tl
-                  \siunitx_table_print_S_reserved_exponent_product:
-                  \tl_set:Nx \l_siunitx_tmpa_tl
-                    { { } \exp_not:o \l_siunitx_tmpa_tl { } }
-                  \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
-                    \l_siunitx_tmp_dim
-                \exp_args:NNNo \group_end:
-                \dim_set:Nn \l_siunitx_tmp_dim
-                  { \dim_use:N \l_siunitx_tmp_dim }
-                \siunitx_table_print_S_reserved_store_fill:n
-                  { \l_siunitx_tmp_dim }
-                \dim_sub:Nn \l_siunitx_table_exponent_dim
-                  { \l_siunitx_tmp_dim }  
-              }
+              { \siunitx_table_print_S_reserved_exponent_product_correction: }
             \hbox_set:Nn \l_siunitx_tmp_box
               { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
             \siunitx_table_print_S_reserved_exponent_aux:      
@@ -14380,6 +14366,24 @@ This work consists of the file  siunitx.dtx
           { { } \exp_not:o \l_siunitx_tmpb_tl  { } }
         \exp_not:o \l_siunitx_tmpa_tl
       }
+  }
+%    \end{macrocode}
+%   If there is no mantissa, then some additional space is needed for the
+%   location where the product symbol would have been.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn
+  \siunitx_table_print_S_reserved_exponent_product_correction:
+  {
+    \group_begin:
+      \tl_clear:N \l_siunitx_tmpa_tl
+      \siunitx_table_print_S_reserved_exponent_product:
+      \tl_set:Nx \l_siunitx_tmpa_tl
+          { { } \exp_not:o \l_siunitx_tmpa_tl { } }
+      \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl \l_siunitx_tmp_dim
+    \exp_args:NNNo \group_end:
+    \dim_set:Nn \l_siunitx_tmp_dim { \dim_use:N \l_siunitx_tmp_dim }
+    \siunitx_table_print_S_reserved_store_fill:n { \l_siunitx_tmp_dim }
+    \dim_sub:Nn \l_siunitx_table_exponent_dim { \l_siunitx_tmp_dim }  
   }
 %    \end{macrocode}
 %   There are two cases for adding the exponent to the result box, one
