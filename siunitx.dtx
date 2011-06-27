@@ -531,6 +531,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.2i}{2011/06/15}{Fix \opt{detect-mode} option inside
 %  table cells}
 %\changes{v2.2j}{2011/06/26}{Fix incorrect line breaking in \cs{SIrange}}
+%\changes{v2.2k}{2011/06/27}{Fix behaviour of subscripts inside alignments
+%  when printing in text mode}
 %\changes{v2.3}{2011/06/19}{New implementation for alignment in \texttt{S}
 %  column}
 %
@@ -4863,7 +4865,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/06/26} {2.2j}
+\ProvidesExplPackage {siunitx} {2011/06/27} {2.2k}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -6113,7 +6115,9 @@ This work consists of the file  siunitx.dtx
 % the appearance is the same as math mode. As "_" is a letter, there
 % is the need to do a category-code juggle. The search and replace
 % code for superscripts deals with the case where a literal number has
-% been given with text mode printing.
+% been given with text mode printing. There is currently an issue with
+% \pkg{expl3}'s \cs{peek_\ldots} functions, which means that the peek
+% code is written out here in full.
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
@@ -6130,9 +6134,15 @@ This work consists of the file  siunitx.dtx
               ^ { \text {##1} }
             }
         }
-      \peek_meaning_remove:NTF \siunitx_print_text_super:n
-        { \siunitx_print_text_sub_super:n }
-        { \ensuremath { @ { \text {#1} } } }
+      \cs_set_eq:NN \l_peek_search_token \siunitx_print_text_super:n
+      \cs_set_nopar:Npn \peek_true:w 
+        { 
+          \tex_afterassignment:D \peek_true_aux:w 
+          \cs_set_eq:NN \peek_tmp:w
+        }  
+      \cs_set_nopar:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
+      \cs_set_nopar:Npn \peek_false:w  { \ensuremath { @ { \text {#1} } } }
+      \peek_after:Nw \peek_execute_branches_meaning:
     }
 }
 \cs_new_protected:Npn \siunitx_print_text_sub_super:n { }
@@ -15927,7 +15937,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/06/26} {2.2j}
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/06/27} {2.2k} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17041,7 +17051,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/06/26} {2.2j}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/06/27} {2.2k}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
