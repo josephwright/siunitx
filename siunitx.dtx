@@ -543,6 +543,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.2i}{2011/06/15}{Fix \opt{detect-mode} option inside
 %  table cells}
 %\changes{v2.2j}{2011/06/26}{Fix incorrect line breaking in \cs{SIrange}}
+%\changes{v2.2k}{2011/06/27}{Fix behaviour of subscripts inside alignments
+%  when printing in text mode}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6041,11 +6043,13 @@ This work consists of the file  siunitx.dtx
 % the appearance is the same as math mode. As "_" is a letter, there
 % is the need to do a category-code juggle. The search and replace
 % code for superscripts deals with the case where a literal number has
-% been given with text mode printing.
+% been given with text mode printing. There is currently an issue with
+% \pkg{expl3}'s \cs{peek_\ldots} functions, which means that the peek
+% code is written out here in full.
 %    \begin{macrocode}
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
-  \char_make_math_subscript:N \@
+  \char_set_catcode_math_subscript:N \@
 \tl_to_lowercase:n {
   \group_end:
   \cs_set_protected:Npn \siunitx_print_text_sub:n #1
@@ -6058,15 +6062,21 @@ This work consists of the file  siunitx.dtx
               ^ { \text {##1} }
             }
         }
-      \peek_meaning_remove:NTF \siunitx_print_text_super:n
-        { \siunitx_print_text_sub_super:n }
-        { \ensuremath { @ { \text {#1} } } }
+      \cs_set_eq:NN \l_peek_search_token \siunitx_print_text_super:n
+      \cs_set_nopar:Npn \peek_true:w 
+        { 
+          \tex_afterassignment:D \peek_true_aux:w 
+          \cs_set_eq:NN \peek_tmp:w
+        }  
+      \cs_set_nopar:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
+      \cs_set_nopar:Npn \peek_false:w  { \ensuremath { @ { \text {#1} } } }
+      \peek_after:Nw \peek_execute_branches_meaning:
     }
 }
 \cs_new_protected:Npn \siunitx_print_text_sub_super:n { }
 \cs_new_protected:Npn \siunitx_print_text_super:n #1 {
   \tl_set:Nn \l_siunitx_tmpa_tl {#1}
-  \tl_replace_all_in:Nnn \l_siunitx_tmpa_tl { - }
+  \tl_replace_all:Nnn \l_siunitx_tmpa_tl { - }
     { \c_siunitx_minus_tl }
   \tl_set:Nx \l_siunitx_tmpa_tl
     {
