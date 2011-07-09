@@ -533,6 +533,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.2j}{2011/06/26}{Fix incorrect line breaking in \cs{SIrange}}
 %\changes{v2.2k}{2011/06/27}{Fix behaviour of subscripts inside alignments
 %  when printing in text mode}
+%\changes{v2.2l}{2011/06/30}{Fix loss of main unit when \opt{per-mode} is set
+%  to \opt{symbol} and a pre-unit is used}
 %\changes{v2.3}{2011/06/19}{New implementation for alignment in \texttt{S}
 %  column}
 %
@@ -12383,8 +12385,11 @@ This work consists of the file  siunitx.dtx
   \IfNoValueTF {#3}
     { \tl_clear:N \l_siunitx_pre_unit_tl }
     {
-      \siunitx_unit_in:nn {#3} {#1}
-      \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
+      \group_begin:
+        \siunitx_unit_in:nn {#3} {#1}
+        \cs_set_eq:NN \l_siunitx_pre_unit_tl \l_siunitx_unit_tl
+      \exp_args:NNNo \group_end:
+      \tl_set:Nn \l_siunitx_pre_unit_tl { \l_siunitx_unit_tl }
     }
   \cs_set_eq:NN \l_siunitx_brackets_bool
     \l_siunitx_multi_brackets_bool
