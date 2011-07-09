@@ -2585,9 +2585,10 @@ This work consists of the file  siunitx.dtx
 % normally given prefixes which use powers of two, rather than the
 % powers of ten used by the SI prefixes. As these binary prefixes are
 % closely related to the SI prefixes, they are defined by \pkg{siunitx}
+% but do have to be loaded using \opt{binary-units = true} (or 
+% simply \opt{binary-units})
 % (\cref{tab:unit:binary}). The units \cs{bit} and \cs{byte} are
-% also available. Loading of the binary units and functions can be prevented
-% by setting \opt{binary-units = false} in the preamble.
+% then also available.
 %\begin{LaTeXdemo}
 %  \SI{100}{\mebi\byte} \\
 %  \SI[prefixes-as-symbols=false]{30}{\kibi\bit}
@@ -4489,14 +4490,14 @@ This work consists of the file  siunitx.dtx
 % \subsection{Upgrading from version 2.2}
 %
 % \DescribeOption{load-configurations}
-% \changes{v2.3}{2011/03/20}{Load abbreviations and binary units as standard}
+% \changes{v2.3}{2011/03/20}{Load abbreviations as standard}
 % \changes{v2.3}{2011/03/20}{Replace \opt{load-configurations} option
 %   with separate \opt{abbreviations}, \opt{binary-units} and
 %   \opt{version-1-compatibility} options}
 % The option \opt{load-configurations} has been deprecated in favour of the
 % three options \opt{abbreviations}, \opt{binary-units} and
 % \opt{version-1-compatibility}. At the same time, loading of the abbreviations
-% and binary units is now the standard behaviour, and so in most cases no
+% is now the standard behaviour, and so in most cases no
 % explicit configuration file loading will be needed.
 %
 % \DescribeOption{group-decimal-digits}
@@ -15838,8 +15839,7 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\siunitx_load_binary:}
 %   Loading abbreviations is on by default, which therefore requires a bit
 %   of juggling. The idea here is that the abbreviations will be loaded unless
-%   specifically turned off. This can occur anywhere in the preamble. The
-%   same approach is taken for the binary options.
+%   specifically turned off. This can occur anywhere in the preamble.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
@@ -15854,8 +15854,7 @@ This work consists of the file  siunitx.dtx
     binary-units  /
       true        .code:n    = { \siunitx_load_binary: },
     binary-units  /
-      false       .code:n    =
-      { \cs_set_eq:NN \siunitx_load_binary: \prg_do_nothing: } ,
+      false       .code:n    = { } ,
     binary-units  .default:n = true
   }
 \cs_new_protected_nopar:Npn \siunitx_load_abbreviations:
