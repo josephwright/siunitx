@@ -538,6 +538,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.3}{2011/06/19}{New implementation for alignment in \texttt{S}
 %  column}
 %\changes{v2.3a}{2011/07/09}{Restore fix in v2.2l missing in v2.3}
+%\changes{v2.3b}{2011/08/08}{Adjust internal load order so that
+%  \op{free-standing-units} works correctly for abbreviations}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -10866,15 +10868,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-% The master control macro which occurs at the start of the document.
-%    \begin{macrocode}
-\AtBeginDocument {
-  \bool_if:NTF \l_siunitx_create_free_bool
-    { \siunitx_unit_create_functions: }
-    { \siunitx_unit_create_empty_functions: }
-}
-%    \end{macrocode}
-%
 %\begin{macro}{\siunitx_unit_create_empty_functions:}
 %\begin{macro}[aux]{\siunitx_unit_create_empty_functions_aux:N}
 % Without this, horrible things happen with \pkg{memoir} and
@@ -15944,6 +15937,15 @@ This work consists of the file  siunitx.dtx
     \@onefilewithoptions { siunitx } [ ] [ ]
       \c_siunitx_configuration_ext_tl
   }
+%    \end{macrocode}
+%
+% The master control macro which occurs at the start of the document.
+%    \begin{macrocode}
+\AtBeginDocument {
+  \bool_if:NTF \l_siunitx_create_free_bool
+    { \siunitx_unit_create_functions: }
+    { \siunitx_unit_create_empty_functions: }
+}
 %    \end{macrocode}
 %
 % Finally apply the settings given at load time.
