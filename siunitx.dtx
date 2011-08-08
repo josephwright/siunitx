@@ -538,6 +538,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.3}{2011/06/19}{New implementation for alignment in \texttt{S}
 %  column}
 %\changes{v2.3a}{2011/07/09}{Restore fix in v2.2l missing in v2.3}
+%\changes{v2.3b}{2011/08/08}{Adjust internal load order so that
+%  \op{free-standing-units} works correctly for abbreviations}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -2436,6 +2438,7 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{center}
 %  \changes{v2.0n}{2010/07/15}{More abbreviated units}
+%  \changes{v2.3b}{2011/07/27}{More abbreviated units}
 %  \tablecaption{Abbreviated units.}
 %  \label{tab:unit:abbr}
 %  \tablefirsthead{^^A
@@ -2560,6 +2563,7 @@ This work consists of the file  siunitx.dtx
 %      \midrule
 %
 %      \DescribeNamedUnit{watt}{W}                \\
+%      \DescribeNamedUnit{microwatt}{uW}          \\
 %      \DescribeNamedUnit{milliwatt}{mW}          \\
 %      \DescribeNamedUnit{kilowatt}{kW}           \\
 %      \DescribeNamedUnit{megawatt}{MW}           \\
@@ -2573,10 +2577,20 @@ This work consists of the file  siunitx.dtx
 %      \DescribeNamedUnit{gigaelectronvolt}{GeV}  \\
 %      \DescribeNamedUnit{teraelectronvolt}{TeV}  \\
 %      \DescribeNamedUnit{kilowatt hour}{kWh}     \\
+%      
+%      \midrule
+%
+%      \DescribeNamedUnit{farad}{F}       \\
+%      \DescribeNamedUnit{femtofarad}{fF} \\
+%      \DescribeNamedUnit{picofarad}{pF}  \\
 %
 %      \midrule
 %
 %      \DescribeNamedUnit{kelvin}{K} \\
+%      
+%      \midrule
+%
+%      \DescribeNamedUnit{decibel}{dB} \\
 %
 %  \end{xtabular}
 %\end{center}
@@ -4869,7 +4883,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/07/09} {2.3a}
+\ProvidesExplPackage {siunitx} {2011/08/08} {2.3b}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -10854,15 +10868,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-% The master control macro which occurs at the start of the document.
-%    \begin{macrocode}
-\AtBeginDocument {
-  \bool_if:NTF \l_siunitx_create_free_bool
-    { \siunitx_unit_create_functions: }
-    { \siunitx_unit_create_empty_functions: }
-}
-%    \end{macrocode}
-%
 %\begin{macro}{\siunitx_unit_create_empty_functions:}
 %\begin{macro}[aux]{\siunitx_unit_create_empty_functions_aux:N}
 % Without this, horrible things happen with \pkg{memoir} and
@@ -15934,6 +15939,15 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
+% The master control macro which occurs at the start of the document.
+%    \begin{macrocode}
+\AtBeginDocument {
+  \bool_if:NTF \l_siunitx_create_free_bool
+    { \siunitx_unit_create_functions: }
+    { \siunitx_unit_create_empty_functions: }
+}
+%    \end{macrocode}
+%
 % Finally apply the settings given at load time.
 %    \begin{macrocode}
 \ProcessKeysOptions { siunitx }
@@ -15950,7 +15964,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/07/09} {2.3a} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/08/08} {2.3b} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -16895,7 +16909,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/07/09} {2.3a}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/08/08} {2.3b}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -16976,10 +16990,11 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}
-%   {\W, \mW, \kW,\MW , \GW, \kJ, \J, \eV, \meV, \keV, \MeV, \GeV, \TeV, \kWh}
+%   {\W, \uW, \mW, \kW,\MW , \GW, \kJ, \J, \eV, \meV, \keV, \MeV, \GeV, \TeV, \kWh}
 %   Energies.
 %    \begin{macrocode}
 \DeclareSIUnit \W   {        \watt }
+\DeclareSIUnit \uW  { \micro \watt }
 \DeclareSIUnit \mW  { \milli \watt }
 \DeclareSIUnit \kW  { \kilo  \watt }
 \DeclareSIUnit \MW  { \mega  \watt }
@@ -17012,6 +17027,18 @@ This work consists of the file  siunitx.dtx
 %   Temperatures.
 %    \begin{macrocode}
 \DeclareSIUnit \K { \kelvin }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\dB}
+%    \begin{macrocode}
+\DeclareSIUnit \dB { \deci \bel }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\F, \fF, \pF}
+%    \begin{macrocode}
+\DeclareSIUnit \F  {        \farad }
+\DeclareSIUnit \fF { \femto \farad }
+\DeclareSIUnit \pF { \pico  \farad }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\N, \mN, \kN, \MN}
@@ -17064,7 +17091,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/07/09} {2.3a}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/08/08} {2.3b}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
