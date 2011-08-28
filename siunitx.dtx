@@ -542,6 +542,8 @@ This work consists of the file  siunitx.dtx
 %  \opt{free-standing-units} works correctly for abbreviations}
 %\changes{v2.3c}{2011/07/12}{Fix display of \( \pm \) in numbers when
 %  \opt{separate-uncertainty} is \opt{true} and literal units are used}
+%\changes{v2.3d}{2011/08/18}{Fix broken superscript display in literal unit
+%  mode}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -4885,7 +4887,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/08/12} {2.3c}
+\ProvidesExplPackage {siunitx} {2011/08/18} {2.3d}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -10651,14 +10653,14 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_declare_power_after:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
-    { \siunitx_textsuperscript {#2} }
+    { \siunitx_textsuperscript:n {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_after:n {#2} }
 }
 \cs_new_protected:Npn \siunitx_declare_power_before:Nn #1#2 {
   \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
-    { ##1 \siunitx_textsuperscript {#2} }
+    { ##1 \siunitx_textsuperscript:n {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_before:n {#2} }
 }
@@ -10743,14 +10745,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new:cpn { siunitx_ \token_to_str:N \raiseto _literal:w } #1#2 {
   #2
-  \siunitx_textsuperscript {#1}
+  \siunitx_textsuperscript:n {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \raiseto _function:w }
   #1 {
   \siunitx_unit_parse_power_before:n {#1}
 }
 \cs_new:cpn { siunitx_ \token_to_str:N \tothe _literal:w } #1 {
-  \siunitx_textsuperscript {#1}
+  \siunitx_textsuperscript:n {#1}
 }
 \cs_new_protected:cpn { siunitx_ \token_to_str:N \tothe _function:w }
   #1 {
@@ -15930,7 +15932,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/08/12} {2.3c} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/08/18} {2.3d} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -16875,7 +16877,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/08/12} {2.3c}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/08/18} {2.3d}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17057,7 +17059,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/08/12} {2.3c}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/08/18} {2.3d}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
