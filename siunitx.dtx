@@ -5418,6 +5418,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{macro}[TF]{\prop_get:NVN}
+%   Missing from \pkg{expl3} at the moment.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \prop_get:NnNT  { NV }
+\cs_generate_variant:Nn \prop_get:NnNF  { NV }
+\cs_generate_variant:Nn \prop_get:NnNTF { NV }
+%    \end{macrocode}
+% \end{macro}
+%
 %\subsection{Font detection}
 %
 % A number of controls and tests are needed to control the font used
@@ -6988,8 +6997,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_in_complex_aux:nn #1#2 {
-  \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
+  \prop_get:NnNT \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
     {
       \prop_del:Nn  \l_siunitx_number_in_prop {#1}
       \prop_put:NnV \l_siunitx_number_in_prop {#2} \l_siunitx_tmpa_tl
@@ -7222,9 +7230,8 @@ This work consists of the file  siunitx.dtx
       \tl_if_eq:NNF \l_siunitx_number_part_tl
         \c_siunitx_number_part_complex_tl
         {
-          \prop_get:NVN \l_siunitx_number_in_prop
+          \prop_get:NVNT \l_siunitx_number_in_prop
             \l_siunitx_number_part_sign_tl  \l_siunitx_tmpa_tl
-          \quark_if_no_value:NF \l_siunitx_tmpa_tl
             {
               \tl_set:Nx \l_siunitx_tmpb_tl
                 { \l_siunitx_number_part_sign_tl -deleted }
@@ -7258,9 +7265,8 @@ This work consists of the file  siunitx.dtx
             { \exp_not:n {#1} }
         }
     }
-  \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+  \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-sign }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa }
         {
@@ -7290,10 +7296,8 @@ This work consists of the file  siunitx.dtx
   \prop_del:Nn \l_siunitx_number_in_prop { complex-decimal-marker }
   \prop_del:Nn \l_siunitx_number_in_prop { complex-sign }
   \prop_put:Nnn \l_siunitx_number_in_prop { uncertainty } { true }
-  \prop_get:NnN \l_siunitx_number_in_prop { complex-integer }
+  \prop_get:NnNTF \l_siunitx_number_in_prop { complex-integer }
     \l_siunitx_number_uncert_tl
-  \quark_if_no_value:NTF \l_siunitx_number_uncert_tl
-    { \siunitx_number_in_complex_to_uncert_dec:n {#1} }
     {
       \tl_if_single:NTF \l_siunitx_number_uncert_tl
         {
@@ -7304,6 +7308,7 @@ This work consists of the file  siunitx.dtx
         }
         { \siunitx_number_in_complex_to_uncert_int: }
     }
+    { \siunitx_number_in_complex_to_uncert_dec:n {#1} }
   \prop_del:Nn \l_siunitx_number_in_prop { complex-integer }
   \prop_del:Nn \l_siunitx_number_in_prop { complex-decimal }
 }
@@ -7313,13 +7318,11 @@ This work consists of the file  siunitx.dtx
 % across.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_int: {
-  \prop_get:NnN \l_siunitx_number_in_prop { complex-decimal }
+  \prop_get:NnNF \l_siunitx_number_in_prop { complex-decimal }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
     { \tl_clear:N \l_siunitx_tmpa_tl }
-  \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+  \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-decimal }
     \l_siunitx_tmpb_tl
-  \quark_if_no_value:NT \l_siunitx_tmpb_tl
     { \tl_clear:N \l_siunitx_tmpb_tl }
   \siunitx_number_in_complex_to_uncert_pad:
 }
@@ -7332,13 +7335,8 @@ This work consists of the file  siunitx.dtx
   #1
   {
     \tl_clear:N \l_siunitx_number_uncert_tl
-    \prop_get:NnN \l_siunitx_number_in_prop { complex-decimal }
+    \prop_get:NnNTF \l_siunitx_number_in_prop { complex-decimal }
       \l_siunitx_tmpa_tl
-    \quark_if_no_value:NTF \l_siunitx_tmpa_tl
-      {
-        \siunitx_error:nx { misplaced-sign-token }
-          { \exp_not:n {#1} }
-      }
       {
         \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
           \l_siunitx_tmpb_tl
@@ -7349,6 +7347,8 @@ This work consists of the file  siunitx.dtx
           \siunitx_number_in_complex_to_uncert_dec_loop:N
         \siunitx_number_in_complex_to_uncert_pad:
       }
+      { \siunitx_error:nx { misplaced-sign-token } { \exp_not:n {#1} } }
+
   }
 \cs_new_protected_nopar:Npn
   \siunitx_number_in_complex_to_uncert_dec_loop:N #1
@@ -7394,9 +7394,8 @@ This work consists of the file  siunitx.dtx
           }
       }
       {
-        \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+        \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-decimal }
           \l_siunitx_tmpb_tl
-        \quark_if_no_value:NT \l_siunitx_tmpb_tl
           { \tl_clear:N \l_siunitx_tmpb_tl }
         \tl_set:Nx \l_siunitx_tmpb_tl
           {
@@ -7614,9 +7613,8 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_process_exponent_aux:n #1 {
-  \prop_get:NnN \l_siunitx_number_in_prop { exponent- #1 }
+  \prop_get:NnNT \l_siunitx_number_in_prop { exponent- #1 }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \int_compare:nNnF { \l_siunitx_tmpa_tl } = { 0 }
         { \bool_set_true:N \l_siunitx_tmp_bool }
@@ -7675,13 +7673,11 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_figures_init:n #1 {
   \int_zero:N \l_siunitx_round_int
   \bool_set_false:N \l_siunitx_round_bool
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -decimal }
     \l_siunitx_round_decimal_in_tl
-  \quark_if_no_value:NT \l_siunitx_round_decimal_in_tl
     { \tl_clear:N \l_siunitx_round_decimal_in_tl }
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
     \l_siunitx_round_integer_in_tl
-  \quark_if_no_value:NT \l_siunitx_round_integer_in_tl
     { \tl_clear:N \l_siunitx_round_integer_in_tl }
   \tl_clear:N \l_siunitx_round_decimal_out_tl
   \tl_clear:N \l_siunitx_round_integer_out_tl
@@ -7829,24 +7825,20 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_fixed: {
   \prop_if_in:NnF \l_siunitx_number_in_prop { complex }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+      \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-integer }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NT \l_siunitx_tmpa_tl
         { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+      \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-decimal }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_clear:N \l_siunitx_tmpb_tl }
       \tl_set:Nx \l_siunitx_tmpa_tl
         { { \l_siunitx_tmpa_tl } { \l_siunitx_tmpb_tl } }
-      \prop_get:NnN \l_siunitx_number_in_prop { exponent-integer }
+      \prop_get:NnNF \l_siunitx_number_in_prop { exponent-integer }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
       \group_begin:
-        \prop_get:NnN \l_siunitx_number_in_prop { exponent-sign }
+        \prop_get:NnNT \l_siunitx_number_in_prop { exponent-sign }
           \l_siunitx_tmpa_tl
-        \quark_if_no_value:NF \l_siunitx_tmpa_tl
           {
             \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
           }
@@ -7991,9 +7983,8 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnT
     { \l_siunitx_process_integer_min_int } > { \c_zero }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+      \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-integer }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \int_set:Nn \l_siunitx_tmp_int
             {
@@ -8026,9 +8017,8 @@ This work consists of the file  siunitx.dtx
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent }
         {
-          \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+          \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-integer }
             \l_siunitx_tmpa_tl
-          \quark_if_no_value:NF \l_siunitx_tmpa_tl
             {
               \tl_if_eq:NNT \c_siunitx_unity_tl \l_siunitx_tmpa_tl
                 {
@@ -8056,9 +8046,8 @@ This work consists of the file  siunitx.dtx
 % happen if the input was zero or if the number is too short.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_pad:n #1 {
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+  \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \int_while_do:nNnn { \l_siunitx_round_int } > { 0 }
         {
@@ -8095,26 +8084,25 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
   \int_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+      \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \int_compare:nNnTF
             { \tl_head:V \l_siunitx_tmpa_tl } > { 4 }
             {
-              \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+              \prop_get:NnNTF \l_siunitx_number_in_prop { #1 -integer }
                 \l_siunitx_tmpa_tl
-              \quark_if_no_value:NTF \l_siunitx_tmpa_tl
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop
-                    { #1 -integer } { 1 }
-                }
                 {
                   \tl_set:Nx \l_siunitx_tmpa_tl
                     { \int_eval:n { \l_siunitx_tmpa_tl + 1 } }
                   \prop_put:NnV \l_siunitx_number_in_prop
                     { #1 -integer } \l_siunitx_tmpa_tl
                 }
+                {
+                  \prop_put:Nnn \l_siunitx_number_in_prop
+                    { #1 -integer } { 1 }
+                }
+
             }
             {
               \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer }
@@ -8131,9 +8119,8 @@ This work consists of the file  siunitx.dtx
         }
     }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+      \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \tl_if_empty:NT \l_siunitx_tmpa_tl
             { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
@@ -8177,9 +8164,8 @@ This work consists of the file  siunitx.dtx
 % To keep the code a little clearer.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_process_places_init:n #1 {
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
+  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
     \l_siunitx_round_integer_in_tl
-  \quark_if_no_value:NT \l_siunitx_round_integer_in_tl
     { \tl_clear:N \l_siunitx_round_integer_in_tl }
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
     \l_siunitx_round_decimal_in_tl
@@ -8380,24 +8366,20 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_process_scientific: {
   \prop_if_in:NnF \l_siunitx_number_in_prop { complex }
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-integer }
+      \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-integer }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NT \l_siunitx_tmpa_tl
         { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-      \prop_get:NnN \l_siunitx_number_in_prop { mantissa-decimal }
+      \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-decimal }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_clear:N \l_siunitx_tmpb_tl }
       \tl_set:Nx \l_siunitx_tmpa_tl
         { { \l_siunitx_tmpa_tl } { \l_siunitx_tmpb_tl } }
-      \prop_get:NnN \l_siunitx_number_in_prop { exponent-integer }
+      \prop_get:NnNF \l_siunitx_number_in_prop { exponent-integer }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_set:Nn \l_siunitx_tmpb_tl { 0 } }
      \group_begin:
-       \prop_get:NnN \l_siunitx_number_in_prop { exponent-sign }
+       \prop_get:NnNT \l_siunitx_number_in_prop { exponent-sign }
          \l_siunitx_tmpa_tl
-       \quark_if_no_value:NF \l_siunitx_tmpa_tl
          { \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl }
      \exp_args:NNNV \group_end:
      \tl_set:Nn \l_siunitx_tmpb_tl \l_siunitx_tmpb_tl
@@ -9004,9 +8986,8 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_brackets_aux:n #1 {
-  \prop_get:NnN \l_siunitx_number_out_prop { #1 -result }
+  \prop_get:NnNF \l_siunitx_number_out_prop { #1 -result }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
     {
       \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
@@ -9037,8 +9018,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_color_aux:n #1 {
-  \prop_get:NnN \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
+  \prop_get:NnNT \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
     {
       \str_if_eq:VnT \l_siunitx_tmpa_tl { - }
         {
@@ -9254,9 +9234,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn
   \siunitx_number_format_final_exponent_only: {
-  \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign }
+  \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-sign }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \bool_if:NT \l_siunitx_tight_bool
         {
@@ -9286,9 +9265,8 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -integer }
     { \siunitx_number_format_copy:nn { #1 -integer } {#1} }
     { \tl_clear:N \l_siunitx_tmpa_tl }
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal-marker }
+  \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal-marker }
     \l_siunitx_tmpb_tl
-  \quark_if_no_value:NF \l_siunitx_tmpb_tl
     {
       \bool_if:NTF \l_siunitx_output_decimal_copy_bool
         { \tl_set:Nx \l_siunitx_tmpb_tl { { \l_siunitx_tmpb_tl } } }
@@ -9304,9 +9282,8 @@ This work consists of the file  siunitx.dtx
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
       \prop_put:NnV \l_siunitx_number_out_prop { #1 -decimal-marker }
         \l_siunitx_tmpb_tl
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -decimal }
+      \prop_get:NnNF \l_siunitx_number_out_prop { #1 -decimal }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         { \tl_clear:N \l_siunitx_tmpb_tl }
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
       \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
@@ -9444,9 +9421,8 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_format_brackets:n { mantissa }
       \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
         \l_siunitx_tmpa_tl
-      \prop_get:NnN \l_siunitx_number_out_prop { complex-result }
+      \prop_get:NnNF \l_siunitx_number_out_prop { complex-result }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NT \l_siunitx_tmpb_tl
         {
           \prop_get:NnN \l_siunitx_number_out_prop { complex }
             \l_siunitx_tmpb_tl
@@ -9473,14 +9449,11 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_join_uncert:n { complex }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert:n #1 {
-  \prop_get:NnN \l_siunitx_number_out_prop {#1}
+  \prop_get:NnNT \l_siunitx_number_out_prop {#1}
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
-      \prop_get:NnN \l_siunitx_number_out_prop { #1 -uncertainty }
+      \prop_get:NnNTF \l_siunitx_number_out_prop { #1 -uncertainty }
         \l_siunitx_tmpb_tl
-      \quark_if_no_value:NTF \l_siunitx_tmpb_tl
-        { \siunitx_number_format_copy:nn {#1} { #1 -result } }
         {
           \bool_if:NT \l_siunitx_uncert_sep_bool
             { \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpb_tl }
@@ -9490,6 +9463,7 @@ This work consists of the file  siunitx.dtx
           \prop_put:Nnn \l_siunitx_number_out_prop { #1 -bracket }
             { true }
         }
+        { \siunitx_number_format_copy:nn {#1} { #1 -result } }
     }
 }
 \cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert_pm:N #1
@@ -9531,9 +9505,8 @@ This work consists of the file  siunitx.dtx
 % to be added to the result, of course.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_number_format_relation: {
-  \prop_get:NnN \l_siunitx_number_in_prop { comparator }
+  \prop_get:NnNT \l_siunitx_number_in_prop { comparator }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
         {
@@ -9564,9 +9537,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_format_sign:n #1 {
   \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign }
+      \prop_get:NnNT \l_siunitx_number_in_prop { #1 -sign }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \bool_if:NTF \l_siunitx_negative_bracket_bool
             {
@@ -9591,9 +9563,8 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
   \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
-  \prop_get:NnN \l_siunitx_number_out_prop { #1 -result }
+  \prop_get:NnNT \l_siunitx_number_out_prop { #1 -result }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
       \prop_put:NnV \l_siunitx_number_out_prop { #1 -result }
@@ -9604,9 +9575,8 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_format_sign_negative_brackets:n #1
   {
     \siunitx_number_format_brackets_aux:n {#1}
-    \prop_get:NnN \l_siunitx_number_out_prop { #1 }
+    \prop_get:NnNT \l_siunitx_number_out_prop { #1 }
       \l_siunitx_tmpa_tl
-    \quark_if_no_value:NF \l_siunitx_tmpa_tl
       {
         \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
           \l_siunitx_bracket_open_tl
@@ -9623,9 +9593,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_number_format_sign_complex:n #1  {
   \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
     {
-      \prop_get:NnN \l_siunitx_number_in_prop { complex-sign }
+      \prop_get:NnNT \l_siunitx_number_in_prop { complex-sign }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \bool_if:NTF \l_siunitx_tight_bool
             {
@@ -9899,9 +9868,8 @@ This work consists of the file  siunitx.dtx
           \siunitx_number_output_parts_aux:n { mantissa }
           \siunitx_number_output_parts_aux:n { complex }
         }
-      \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
+      \prop_get:NnNT \l_siunitx_number_out_prop { exponent-result }
         \l_siunitx_tmpa_tl
-      \quark_if_no_value:NF \l_siunitx_tmpa_tl
         {
           \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
             {
@@ -10399,9 +10367,8 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_in_init:
       \siunitx_number_in_parse_aux:n {#1}
     }
-  \prop_get:NnN \l_siunitx_number_in_prop { mantissa-sign-deleted }
+  \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-sign-deleted }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \prop_put:NnV \l_siunitx_number_in_prop { mantissa-sign }
         \l_siunitx_tmpa_tl
@@ -10564,9 +10531,8 @@ This work consists of the file  siunitx.dtx
     { \siunitx_number_output_single: }
 }
 \cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_aux: {
-  \prop_get:NnN \l_siunitx_number_out_prop { mantissa-integer }
+  \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-integer }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
   \hbox_set:Nn \l_siunitx_angle_marker_box
     {
@@ -10589,9 +10555,8 @@ This work consists of the file  siunitx.dtx
     { \l_siunitx_angle_marker_dim } > { \l_siunitx_angle_unit_dim }
     { \siunitx_angle_print_astronomy_marker: }
     { \siunitx_angle_print_astronomy_unit: }
-  \prop_get:NnN \l_siunitx_number_out_prop { mantissa-decimal }
+  \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-decimal }
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
 }
 \cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_aux:n #1 {
@@ -11580,19 +11545,18 @@ This work consists of the file  siunitx.dtx
     }
   \tl_set:Nx \l_siunitx_tmpa_tl
     { special- \int_use:N \l_siunitx_unit_int }
-  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+  \prop_get:NVNTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NTF \l_siunitx_tmpa_tl
-  {
-    \tl_put_left:cV { l_siunitx_unit #1 _tl }
-      \l_siunitx_unit_current_tl
-  }
   {
     \tl_put_left:cx { l_siunitx_unit #1 _tl }
       {
         \exp_not:V \l_siunitx_tmpa_tl
         { \exp_not:V \l_siunitx_unit_current_tl }
       }
+  }
+  {
+    \tl_put_left:cV { l_siunitx_unit #1 _tl }
+      \l_siunitx_unit_current_tl
   }
 }
 %    \end{macrocode}
@@ -11842,9 +11806,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_power: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { power- \int_use:N \l_siunitx_unit_int }
-  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+  \prop_get:NVNTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NTF \l_siunitx_tmpa_tl
+    { \siunitx_unit_format_power_aux: }
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
         { per- \int_use:N \l_siunitx_unit_int }
@@ -11854,7 +11818,6 @@ This work consists of the file  siunitx.dtx
           \siunitx_unit_format_power_aux:
         }
     }
-    { \siunitx_unit_format_power_aux: }
 }
 %    \end{macrocode}
 % The auxiliary function needs to make sure that the printing routine
@@ -11989,9 +11952,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_prefix_number_calc: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { power- \int_use:N \l_siunitx_unit_int }
-  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+  \prop_get:NVNF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NT \l_siunitx_tmpa_tl
     { \tl_set:Nn \l_siunitx_tmpa_tl { 1 } }
   \tl_set:Nx \l_siunitx_tmpb_tl
     { unit- \int_use:N \l_siunitx_unit_int }
@@ -12050,9 +12012,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { qualifier- \int_use:N \l_siunitx_unit_int }
-  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+  \prop_get:NVNT \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NF \l_siunitx_tmpa_tl
     {
       \use:c
         {
@@ -12120,13 +12081,12 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_unit_format_symbol: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { symbol- \int_use:N \l_siunitx_unit_int }
-  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
+  \prop_get:NVNTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     \l_siunitx_tmpa_tl
-  \quark_if_no_value:NTF \l_siunitx_tmpa_tl
-    { \siunitx_unit_format_symbol_aux: }
     {
       \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
     }
+    { \siunitx_unit_format_symbol_aux: }
 }
 \cs_new_protected_nopar:Npn \siunitx_unit_format_symbol_aux: {
   \msg_error:nn { siunitx } { prefix-only }
