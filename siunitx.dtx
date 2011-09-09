@@ -12878,7 +12878,7 @@ This work consists of the file  siunitx.dtx
 % steps can be taken to insert math shift tokens later.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_table_collect_expand_math:N #1 {
-  \token_if_math_shift:NTF #1
+  \token_if_math_toggle:NTF #1
     {
       \bool_if:NTF \l_siunitx_table_math_bool
         { \bool_set_false:N \l_siunitx_table_math_bool }
@@ -13820,10 +13820,10 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_centered:
   {
     \siunitx_table_print_S_centered_ends:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
     \siunitx_table_print_S_parse:
     \siunitx_table_print_S_centered_measure:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
     \dim_set:Nn \l_siunitx_table_fill_pre_dim
       {
           \l_siunitx_table_result_dim
@@ -13855,7 +13855,7 @@ This work consists of the file  siunitx.dtx
           \bool_if:NT \l_siunitx_table_math_bool
             {
               \scan_stop:
-              \c_math_shift_token
+              \c_math_toggle_token
             }
         }
       }
@@ -13866,7 +13866,7 @@ This work consists of the file  siunitx.dtx
       {
         \bool_if:NT \l_siunitx_table_math_bool
           {
-            \c_math_shift_token
+            \c_math_toggle_token
             \scan_stop:
           }
         \l_siunitx_table_collect_post_tl
@@ -13987,11 +13987,11 @@ This work consists of the file  siunitx.dtx
     \siunitx_table_print_S_reserved_ends:
     \siunitx_table_print_S_reserved_round:
     \siunitx_table_print_S_parse:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
     \siunitx_table_print_S_reserved_comparator:
     \siunitx_table_print_S_reserved_mantissa:
     \siunitx_table_print_S_reserved_exponent:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_shift_token }
+    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -14040,7 +14040,7 @@ This work consists of the file  siunitx.dtx
           \bool_if:NT \l_siunitx_table_math_bool
             {
               \scan_stop:
-              \c_math_shift_token
+              \c_math_toggle_token
             }
         }
       }
@@ -14061,7 +14061,7 @@ This work consists of the file  siunitx.dtx
         {
           \bool_if:NT \l_siunitx_table_math_bool
             {
-              \c_math_shift_token
+              \c_math_toggle_token
               \scan_stop:
             }
           \l_siunitx_table_collect_post_tl
@@ -14480,7 +14480,7 @@ This work consists of the file  siunitx.dtx
       { \tex_hfil:D }
     \hbox_set:Nn \l_siunitx_table_pre_box
       \c_group_begin_token
-        \c_math_shift_token
+        \c_math_toggle_token
         \tl_map_function:NN \l_siunitx_input_decimal_tl
           \siunitx_table_print_S_direct_centered_aux:N
   }
@@ -14490,18 +14490,18 @@ This work consists of the file  siunitx.dtx
     \char_set_mathcode:nn { `#1 } { 32768 }
     \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
       {
-        \c_math_shift_token
+        \c_math_toggle_token
         \c_group_end_token
         \hbox_set:Nn \l_siunitx_table_post_box
           \c_group_begin_token
-            \c_math_shift_token
+            \c_math_toggle_token
             \l_siunitx_output_decimal_tl
       }
   }
 \char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered_end:
   {
-      \c_math_shift_token
+      \c_math_toggle_token
     \c_group_end_token
     \dim_compare:nNnTF
       { \box_wd:N \l_siunitx_table_pre_box } >
@@ -14577,7 +14577,7 @@ This work consists of the file  siunitx.dtx
     \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
       { \l_siunitx_table_integer_dim }
       \c_group_begin_token
-        \c_math_shift_token
+        \c_math_toggle_token
         \tl_map_function:NN \l_siunitx_input_decimal_tl
           \siunitx_table_print_S_direct_reserved_aux:N
         \tex_hfill:D
@@ -14588,19 +14588,19 @@ This work consists of the file  siunitx.dtx
     \char_set_mathcode:nn { `#1 } { 32768 }
     \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
       {
-          \c_math_shift_token
+          \c_math_toggle_token
         \c_group_end_token
         \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
           { \box_wd:N \l_siunitx_tmp_box }
           \c_group_begin_token
-            \c_math_shift_token
+            \c_math_toggle_token
             \l_siunitx_output_decimal_tl
       }
   }
 \char_set_catcode_letter:N \@
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved_end:
   {
-      \c_math_shift_token
+      \c_math_toggle_token
       \tex_hfil:D
     \c_group_end_token
     \siunitx_table_align_left:n { \l_siunitx_table_number_align_skip }
