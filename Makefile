@@ -94,10 +94,10 @@ PDFSETTINGS = \AtBeginDocument{\DisableImplementation}
 	echo "Typesetting $$NAME" ; \
 	pdflatex -draftmode -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
 	if [ $$? = 0 ] ; then  \
-	  makeindex -s gglo.ist  -o $$NAME.gls $$NAME.glo > /dev/null ; \
-	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
+	  makeindex -q -s gglo.ist  -o $$NAME.gls $$NAME.glo > /dev/null ; \
+	  makeindex -q -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
 	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
-	  makeindex -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
+	  makeindex -q -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
 	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
 	else \
 	  echo "  Compilation failed" ; \
