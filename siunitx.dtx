@@ -546,6 +546,8 @@ This work consists of the file  siunitx.dtx
 %  mode}
 %\changes{v2.3e}{2011/09/09}{Internal changes to work with \LaTeX3
 %  updates}
+%\changes{v2.3f}{2011/09/03}{Fix processing of numbers in tables when entire
+%   number is invalid}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -13685,7 +13687,7 @@ This work consists of the file  siunitx.dtx
         \siunitx_table_column_end:n   { \l_siunitx_table_text_align_skip }
       }
       {
-        \siunitx_table_column_begin:n { \l_siunitx_table_number_align_skip }
+        \siunitx_table_column_begin:n { \l_siunitx_table_number_align_skip } 
           \siunitx_detect_font:
           \siunitx_table_print_S_main:
           \siunitx_table_print_S_pre:
@@ -13812,19 +13814,23 @@ This work consists of the file  siunitx.dtx
     \siunitx_table_print_S_centered_ends:
     \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
     \siunitx_table_print_S_parse:
-    \siunitx_table_print_S_centered_measure:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
-    \dim_set:Nn \l_siunitx_table_fill_pre_dim
+    \bool_if:NF \l_siunitx_error_bool
       {
-          \l_siunitx_table_result_dim
-        - \l_siunitx_table_integer_dim
-        \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-decimal-marker }
-          { - \l_siunitx_table_marker_dim }
-      }
-    \dim_compare:nNnTF \l_siunitx_table_integer_dim >
-      \l_siunitx_table_fill_pre_dim
-      { \siunitx_table_print_S_centered_integer: }
-      { \siunitx_table_print_S_centered_decimal: }
+        \siunitx_table_print_S_centered_measure:
+        \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
+        \dim_set:Nn \l_siunitx_table_fill_pre_dim
+          {
+              \l_siunitx_table_result_dim
+            - \l_siunitx_table_integer_dim
+             \prop_if_in:NnT \l_siunitx_number_out_prop
+               { mantissa-decimal-marker }
+               { - \l_siunitx_table_marker_dim }
+          }
+        \dim_compare:nNnTF \l_siunitx_table_integer_dim >
+          \l_siunitx_table_fill_pre_dim
+          { \siunitx_table_print_S_centered_integer: }
+          { \siunitx_table_print_S_centered_decimal: }
+    }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -13977,11 +13983,14 @@ This work consists of the file  siunitx.dtx
     \siunitx_table_print_S_reserved_ends:
     \siunitx_table_print_S_reserved_round:
     \siunitx_table_print_S_parse:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
-    \siunitx_table_print_S_reserved_comparator:
-    \siunitx_table_print_S_reserved_mantissa:
-    \siunitx_table_print_S_reserved_exponent:
-    \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
+    \bool_if:NF \l_siunitx_error_bool
+      {
+        \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
+        \siunitx_table_print_S_reserved_comparator:
+        \siunitx_table_print_S_reserved_mantissa:
+        \siunitx_table_print_S_reserved_exponent:
+        \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
