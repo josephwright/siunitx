@@ -7915,8 +7915,14 @@ This work consists of the file  siunitx.dtx
 % leading zeros to dispose of. There is also a check to avoid adding
 % an additional zero to the decimal part of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_number_process_fixed_large:nnn #1#2#3 {
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large:nnn #1
+  {
+    \int_compare:nNnTF {#1} = \c_zero
+      { \siunitx_number_process_fixed_large_aux:nnn { } }
+      { \siunitx_number_process_fixed_large_aux:nnn {#1} }
+  }
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:nnn #1#2#3
+  {
   \cs_set_protected_nopar:Npn
     \siunitx_number_process_fixed_large_aux:w ##1##2 \q_stop
       {
@@ -7934,7 +7940,7 @@ This work consists of the file  siunitx.dtx
               }
           }
           {
-            \int_compare:nNnTF {#1} = { 0 }
+            \int_compare:nNnTF { 0 #1 } = { 0 }
               {
                 \siunitx_number_process_fixed_aux_ii:nnn {##1} {##2}
                   { #3 - 1 }
