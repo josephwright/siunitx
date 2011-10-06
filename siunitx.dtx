@@ -548,6 +548,8 @@ This work consists of the file  siunitx.dtx
 %  updates}
 %\changes{v2.3f}{2011/09/03}{Fix processing of numbers in tables when entire
 %   number is invalid}
+%\changes{v2.3g}{2011/10/06}{Deal with erroneous leading zero in some
+%  fixed exponent cases}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -1756,19 +1758,19 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      add-decimal-zero         & Switch  & true     \\
-%      add-integer-zero         & Switch  & true     \\
-%      explicit-sign            & Literal & \m{none} \\
-%      fixed-exponent           & Integer & 0        \\
-%      minimum-integer-digits   & Integer & 0        \\
-%      retain-explicit-plus     & Switch  & false    \\
-%      retain-unity-mantissa    & Switch  & true     \\
-%      retain-zero-exponent     & Switch  & false    \\
-%      round-integer-to-decimal & Switch  & false    \\
-%      round-minimum            & Literal & 0        \\
-%      round-mode               & Choice  & off      \\
-%      round-precision          & Integer & 2        \\
-%      scientific-notation      & Switch  & false    \\
+%      add-decimal-zero         & Switch  & true        \\
+%      add-integer-zero         & Switch  & true        \\
+%      explicit-sign            & Literal & \meta{none} \\
+%      fixed-exponent           & Integer & 0           \\
+%      minimum-integer-digits   & Integer & 0           \\
+%      retain-explicit-plus     & Switch  & false       \\
+%      retain-unity-mantissa    & Switch  & true        \\
+%      retain-zero-exponent     & Switch  & false       \\
+%      round-integer-to-decimal & Switch  & false       \\
+%      round-minimum            & Literal & 0           \\
+%      round-mode               & Choice  & off         \\
+%      round-precision          & Integer & 2           \\
+%      scientific-notation      & Switch  & false       \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -3032,30 +3034,30 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      table-align-comparator    & Switch  & true      \\
-%      table-align-exponent      & Switch  & true      \\
-%      table-align-text-pre      & Switch  & true      \\
-%      table-align-text-post     & Switch  & true      \\
-%      table-align-uncertainty   & Switch  & true      \\
-%      table-alignment           & Choice  & \m{none}  \\
-%      table-auto-round          & Switch  & false     \\
-%      table-column-width        & Length  & 0 pt      \\
-%      table-comparator          & Switch  & false     \\
-%      table-figures-decimal     & Integer & 2         \\
-%      table-figures-exponent    & Integer & 0         \\
-%      table-figures-integer     & Integer & 3         \\
-%      table-figures-uncertainty & Integer & 0         \\
-%      table-format              & Special & \m{none}  \\
+%      table-align-comparator    & Switch  & true         \\
+%      table-align-exponent      & Switch  & true         \\
+%      table-align-text-pre      & Switch  & true         \\
+%      table-align-text-post     & Switch  & true         \\
+%      table-align-uncertainty   & Switch  & true         \\
+%      table-alignment           & Choice  & \meta{none}  \\
+%      table-auto-round          & Switch  & false        \\
+%      table-column-width        & Length  & 0 pt         \\
+%      table-comparator          & Switch  & false        \\
+%      table-figures-decimal     & Integer & 2            \\
+%      table-figures-exponent    & Integer & 0            \\
+%      table-figures-integer     & Integer & 3            \\
+%      table-figures-uncertainty & Integer & 0            \\
+%      table-format              & Special & \meta{none}  \\
 %      table-number-alignment    & Choice  &
 %        center-decimal-marker \\
-%      table-parse-only          & Switch  & false     \\
-%      table-omit-exponent       & Switch  & true      \\
-%      table-space-text-pre      & Literal & \m{empty} \\
-%      table-space-text-post     & Literal & \m{empty} \\
-%      table-sign-exponent       & Switch  & false     \\
-%      table-sign-mantissa       & Switch  & false     \\
-%      table-text-alignment      & Choice  & center    \\
-%      table-unit-alignment      & Choice  & center    \\
+%      table-parse-only          & Switch  & false        \\
+%      table-omit-exponent       & Switch  & true         \\
+%      table-space-text-pre      & Literal & \meta{empty} \\
+%      table-space-text-post     & Literal & \meta{empty} \\
+%      table-sign-exponent       & Switch  & false        \\
+%      table-sign-mantissa       & Switch  & false        \\
+%      table-text-alignment      & Choice  & center       \\
+%      table-unit-alignment      & Choice  & center       \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -4897,7 +4899,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2011/09/13} {2.3f}
+\ProvidesExplPackage {siunitx} {2011/10/06} {2.3g}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -5499,11 +5501,17 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{variable}{\l_siunitx_detect_inline_family_tl}
+%   This one is not generated by the keys system.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_detect_inline_family_tl
+%    \end{macrocode}
+% \end{variable}
+%
 %\begin{macro}{
 %  \l_siunitx_detect_display_math_bool ,
 %  \l_siunitx_detect_family_bool       ,
 %  \l_siunitx_detect_inline_family_tl  ,
-%  \l_siunitx_detect_inline_weight_tl  ,
 %  \l_siunitx_detect_shape_bool        ,
 %  \l_siunitx_detect_mode_bool         ,
 %  \l_siunitx_detect_weight_bool
@@ -7909,8 +7917,14 @@ This work consists of the file  siunitx.dtx
 % leading zeros to dispose of. There is also a check to avoid adding
 % an additional zero to the decimal part of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
-  \siunitx_number_process_fixed_large:nnn #1#2#3 {
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large:nnn #1
+  {
+    \int_compare:nNnTF {#1} = \c_zero
+      { \siunitx_number_process_fixed_large_aux:nnn { } }
+      { \siunitx_number_process_fixed_large_aux:nnn {#1} }
+  }
+\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:nnn #1#2#3
+  {
   \cs_set_protected_nopar:Npn
     \siunitx_number_process_fixed_large_aux:w ##1##2 \q_stop
       {
@@ -7928,7 +7942,7 @@ This work consists of the file  siunitx.dtx
               }
           }
           {
-            \int_compare:nNnTF {#1} = { 0 }
+            \int_compare:nNnTF { 0 #1 } = { 0 }
               {
                 \siunitx_number_process_fixed_aux_ii:nnn {##1} {##2}
                   { #3 - 1 }
@@ -15937,7 +15951,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2011/09/13} {2.3f} 
+\ProvidesExplFile {siunitx-version-1.cfg} {2011/10/06} {2.3g} 
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -16882,7 +16896,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/09/13} {2.3f}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2011/10/06} {2.3g}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17064,7 +17078,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2011/09/13} {2.3f}
+\ProvidesExplFile {siunitx-binary.cfg} {2011/10/06} {2.3g}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
