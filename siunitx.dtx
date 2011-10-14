@@ -66,8 +66,6 @@ need the packages:
  - listings
  - pgfplots
  - xcolor
-The xfrac package is also loaded if available, but is not
-required to typeset the documentation.
 %</readme>
 %<*internal>
 \fi
@@ -144,17 +142,7 @@ This work consists of the file  siunitx.dtx
 \documentclass[german,french,english,UKenglish]{l3doc}
 \usepackage[table]{xcolor}
 \usepackage{amsmath,babel,booktabs,cancel,caption,colortbl,csquotes}
-\usepackage{datatool,helvet,multirow,pgfplots,siunitx,xtab}
-\IfFileExists{xfrac.sty}
-  {\usepackage{xfrac}}
-  {%
-    \PackageWarningNoLine{siunitx}
-      {%
-        xfrac unavailable: \string\sfrac\space fraction\MessageBreak
-        will have wrong appearance%
-      }
-  }
-\ProvideDocumentCommand\sfrac{mm}{\frac{#1}{#2}}
+\usepackage{datatool,helvet,multirow,pgfplots,siunitx,xfrac,xtab}
 \usepackage[capitalise]{cleveref}
 \usepackage[final]{listings}
 \usepackage[osf]{mathpazo}
@@ -633,8 +621,6 @@ This work consists of the file  siunitx.dtx
 % \item \pkg{pgfplots}
 % \item \pkg{xcolor}
 %\end{itemize}
-% The \pkg{xfrac} package is also loaded if available, but is not
-% required to typeset the documentation.
 %
 %\section{\pkg{siunitx} for the impatient}
 %
@@ -2222,9 +2208,7 @@ This work consists of the file  siunitx.dtx
 % creates some type of fraction. Most alternatives to the standard
 % \cs{frac} function will involve loading additional packages: the
 % demonstrations here need \pkg{amsmath} and
-% \pkg{xfrac}.\footnote{If \pkg{xfrac} is not available when typesetting
-% this document, the demonstration of \cs{sfrac} will have the wrong
-% appearance.}
+% \pkg{xfrac}.
 %\begin{LaTeXdemo}
 %  \sisetup{quotient-mode = fraction}
 %  \num{1 / 1}
@@ -13355,33 +13339,31 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}
 %   {
 %     \siunitx_table_print_S_direct_main:                  ,
-%     \siunitx_table_print_S_main:                         ,
-%     \siunitx_table_print_S_parsed:                       ,
-%     \siunitx_table_print_S_pre:                          ,
-%     \siunitx_table_print_S_post:                         ,
-%     \siunitx_table_print_S_reserved_exponent_aux:        ,
-%     \siunitx_table_print_S_reserved_mantissa_uncert_aux: ,
-%     \siunitx_table_print_S_reserved_round:
+%     \siunitx_table_print_S_parsed:
 %   }
 % \begin{macro}{\siunitx_table_print_S_reserved_store_fill:n}
 %   Various functions which are set up by the option system, and so are
 %   reserved here first for completeness.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_main: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_main: { }
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_parsed: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_post: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_aux: { }
-\cs_new_protected_nopar:Npn
-  \siunitx_table_print_S_reserved_mantissa_uncert_aux: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_round: { }
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill:n #1 { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
-% \begin{variable}{\l_siunitx_table_pre_tl, \l_siunitx_table_post_tl}
+% \begin{variable}
+%   {
+%     \l_siunitx_table_align_exponent_bool,
+%     \l_siunitx_table_align_text_pre_bool,
+%     \l_siunitx_table_align_text_post_bool,
+%     \l_siunitx_table_align_uncert_bool,
+%     \l_siunitx_table_auto_round_bool,
+%     \l_siunitx_table_omit_exponent_bool,
+%     \l_siunitx_table_parse_only_bool,
+%     \l_siunitx_table_pre_tl,
+%     \l_siunitx_table_post_tl
+%   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
@@ -13399,73 +13381,14 @@ This work consists of the file  siunitx.dtx
             \siunitx_table_print_S_reserved_store_fill_mid:n
         },
     table-align-comparator    .default:n  = true,
-    table-align-exponent      .choice:,
-    table-align-exponent /
-      false                   .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_reserved_exponent_aux:
-            \siunitx_table_print_S_reserved_exponent_not_aligned:
-        },
-    table-align-exponent /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_reserved_exponent_aux:
-            \siunitx_table_print_S_reserved_exponent_aligned:
-        },
-    table-align-exponent      .default:n  = true,
-    table-align-text-pre      .choice:,
-    table-align-text-pre /
-      false                   .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_pre:
-            \siunitx_table_print_S_pre_not_aligned:
-        },
-    table-align-text-pre /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_pre:
-            \siunitx_table_print_S_pre_aligned:
-        },
-    table-align-text-pre      .default:n  = true ,
-    table-align-text-post     .choice:,
-    table-align-text-post /
-      false                   .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_post:
-            \siunitx_table_print_S_post_not_aligned:
-        },
-    table-align-text-post /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_post:
-            \siunitx_table_print_S_post_aligned:
-        },
-    table-align-text-post     .default:n  = true ,
-    table-align-uncertainty   .choice:,
-    table-align-uncertainty /
-      false                   .code:n    =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_reserved_mantissa_uncert_aux:
-            \siunitx_table_print_S_reserved_mantissa_uncert_not_aligned:
-        },
-    table-align-uncertainty /
-      true                    .code:n    =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_reserved_mantissa_uncert_aux:
-            \siunitx_table_print_S_reserved_mantissa_uncert_aligned:
-        },
-    table-align-uncertainty   .default:n  = true,
-    table-auto-round          .choice:,
-    table-auto-round /
-      false                   .code:n     =
-        { \cs_set_eq:NN \prg_do_nothing: },
-    table-auto-round /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_reserved_round:
-            \siunitx_table_print_S_reserved_round_auto:
-        },
-    table-auto-round          .default:n  = true,
+    table-align-exponent      .bool_set:N =
+      \l_siunitx_table_align_exponent_bool,
+    table-align-text-pre      .bool_set:N =
+      \l_siunitx_table_align_text_pre_bool,
+    table-align-text-post     .bool_set:N =
+      \l_siunitx_table_align_text_post_bool,
+    table-align-uncertainty  .bool_set:N  = \l_siunitx_table_align_uncert_bool,
+    table-auto-round          .bool_set:N = \l_siunitx_table_auto_round_bool,
     table-number-alignment    .choice:,
     table-number-alignment /
       center                  .code:n     =
@@ -13506,20 +13429,8 @@ This work consists of the file  siunitx.dtx
           \cs_set_eq:NN \siunitx_table_print_S_parsed:
             \siunitx_table_print_S_reserved:
         },
-    table-omit-exponent       .choice:,
-    table-omit-exponent /
-      false                   .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_parse_aux:
-            \siunitx_number_process:
-        },
-    table-omit-exponent /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_parse_aux:
-            \siunitx_table_print_S_parse_omit_exp:
-        },
-    table-omit-exponent       .default:n  = true,
+    table-omit-exponent       .bool_set:N =
+      \l_siunitx_table_omit_exponent_bool,
     table-text-alignment      .choice:,
     table-text-alignment /
       center                  .code:n     =
@@ -13606,20 +13517,7 @@ This work consists of the file  siunitx.dtx
               { \prg_replicate:nn {#1} { 8 } }
           }
       },
-    table-parse-only          .choice: ,
-    table-parse-only /
-      false                   .code:n    =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_main:
-            \siunitx_table_print_S_alignment:
-        },
-    table-parse-only /
-      true                    .code:n     =
-        {
-          \cs_set_eq:NN \siunitx_table_print_S_main:
-            \siunitx_table_print_S_no_alignment:
-        },
-    table-parse-only          .default:n  = true,
+    table-parse-only          .bool_set:N = \l_siunitx_table_parse_only_bool,
     table-space-text-pre      .tl_set:N   = \l_siunitx_table_pre_tl,
     table-space-text-post     .tl_set:N   = \l_siunitx_table_post_tl,
     table-sign-exponent       .code:n     =
@@ -13701,10 +13599,16 @@ This work consists of the file  siunitx.dtx
       {
         \siunitx_table_column_begin:n { \l_siunitx_table_number_align_skip } 
           \siunitx_detect_font:
-          \siunitx_table_print_S_main:
-          \siunitx_table_print_S_pre:
+          \bool_if:NTF \l_siunitx_table_parse_only_bool
+            { \siunitx_table_print_S_no_alignment: }
+            { \siunitx_table_print_S_alignment: }
+          \bool_if:NTF \l_siunitx_table_align_text_pre_bool
+            { \siunitx_table_print_S_pre_aligned: }
+            { \siunitx_table_print_S_pre_not_aligned: }
           \box_use:N \l_siunitx_table_result_box
-          \siunitx_table_print_S_post:
+          \bool_if:NTF \l_siunitx_table_align_text_post_bool
+            { \siunitx_table_print_S_post_aligned: }
+            { \siunitx_table_print_S_post_not_aligned: }
         \siunitx_table_column_end:n   { \l_siunitx_table_number_align_skip }
       }
   }
@@ -13734,7 +13638,6 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 % \begin{macro}{\siunitx_table_print_S_parse:}
-% \begin{macro}[aux]{\siunitx_table_print_S_parse_omit_exp:}
 %   A modified version of the number parser for tables.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \siunitx_table_print_S_parse:
@@ -13743,20 +13646,19 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_in_parse:V \l_siunitx_table_collect_tl
     \bool_if:NF \l_siunitx_error_bool
       {
-        \siunitx_table_print_S_parse_aux:
+        \bool_if:NTF \l_siunitx_table_omit_exponent_bool
+          {
+            \bool_set_true:N \l_siunitx_process_fixed_bool
+            \siunitx_number_process:
+            \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+            \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
+          }
+          { \siunitx_number_process: }
         \siunitx_number_format:
         \siunitx_number_output_color:
       }
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_parse_omit_exp:
-  {
-    \bool_set_true:N \l_siunitx_process_fixed_bool
-    \siunitx_number_process:
-    \prop_del:Nn \l_siunitx_number_in_prop { exponent }
-    \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
-}
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\siunitx_table_print_S_measure:NN}
@@ -13993,7 +13895,8 @@ This work consists of the file  siunitx.dtx
   {
     \siunitx_table_print_S_reserved_init:
     \siunitx_table_print_S_reserved_ends:
-    \siunitx_table_print_S_reserved_round:
+    \bool_if:NT \l_siunitx_table_auto_round_bool
+      { \siunitx_table_print_S_reserved_round_auto: }
     \siunitx_table_print_S_parse:
     \bool_if:NF \l_siunitx_error_bool
       {
@@ -14281,7 +14184,9 @@ This work consists of the file  siunitx.dtx
             \siunitx_number_format_join_uncert_pm:N \l_siunitx_tmpa_tl
             \hbox_set:Nn \l_siunitx_tmp_box
               { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-            \siunitx_table_print_S_reserved_mantissa_uncert_aux:
+            \bool_if:NTF \l_siunitx_table_align_uncert_bool
+              { \siunitx_table_print_S_reserved_mantissa_uncert_aligned: }
+              { \siunitx_table_print_S_reserved_mantissa_uncert_not_aligned: }
           }
           {
             \siunitx_table_print_S_reserved_store_fill:n
@@ -14357,7 +14262,9 @@ This work consists of the file  siunitx.dtx
               { \siunitx_table_print_S_reserved_exponent_product_correction: }
             \hbox_set:Nn \l_siunitx_tmp_box
               { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
-            \siunitx_table_print_S_reserved_exponent_aux:
+            \bool_if:NTF \l_siunitx_table_align_exponent_bool
+              { \siunitx_table_print_S_reserved_exponent_aligned: }
+              { \siunitx_table_print_S_reserved_exponent_not_aligned: }
           }
           {
             \dim_set:Nn \l_siunitx_table_fill_post_dim
