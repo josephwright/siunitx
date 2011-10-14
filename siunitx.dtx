@@ -550,6 +550,8 @@ This work consists of the file  siunitx.dtx
 %   number is invalid}
 %\changes{v2.3g}{2011/10/06}{Deal with erroneous leading zero in some
 %  fixed exponent cases}
+%\changes{v2.3h}{2011/10/14}{Ensure math mode for exponent products in all
+%  circumstances}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9194,17 +9196,15 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpa_tl
   \tl_if_empty:NT \l_siunitx_output_exponent_tl
     {
-      \bool_if:NTF \l_siunitx_tight_bool
+      \tl_put_right:Nx \l_siunitx_tmpa_tl
         {
-          \tl_set:Nx \l_siunitx_tmpb_tl
-            { { \exp_not:V \l_siunitx_exponent_product_tl } }
+          \exp_not:N \ensuremath
+            {
+              \bool_if:NTF \l_siunitx_tight_bool
+                { {  \exp_not:V \l_siunitx_exponent_product_tl } }
+                { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
+            }
         }
-        {
-          \tl_set:Nx \l_siunitx_tmpb_tl
-            { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
-        }
-      \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-        \l_siunitx_tmpb_tl
     }
   \prop_get:NnN \l_siunitx_number_out_prop { exponent-result }
     \l_siunitx_tmpb_tl
@@ -9887,19 +9887,15 @@ This work consists of the file  siunitx.dtx
         {
           \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
             {
-              \bool_if:NTF \l_siunitx_tight_bool
+              \tl_put_left:Nx \l_siunitx_tmpa_tl
                 {
-                  \tl_set:Nx \l_siunitx_tmpb_tl
-                    { { \exp_not:V \l_siunitx_exponent_product_tl } }
-                }
-                {
-                  \tl_set:Nx \l_siunitx_tmpb_tl
+                  \exp_not:N \ensuremath
                     {
-                      { } \exp_not:V \l_siunitx_exponent_product_tl { }
+                      \bool_if:NTF \l_siunitx_tight_bool
+                        { {  \exp_not:V \l_siunitx_exponent_product_tl } }
+                        { { } \exp_not:V \l_siunitx_exponent_product_tl { } }
                     }
                 }
-              \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-                \l_siunitx_tmpb_tl
               \prop_put:NnV \l_siunitx_number_out_prop { exponent }
                 \l_siunitx_tmpa_tl
             }
