@@ -4932,7 +4932,7 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { incompatible-package }
   { Package~'#1'~incompatible. }
   { The~#1~package~and~siunitx~are~incompatible. }
-\cs_new_protected_nopar:Npn \siunitx_load_check:n #1 {
+\cs_new_protected:Npn \siunitx_load_check:n #1 {
   \group_begin:
     \@ifpackageloaded {#1}
       { \msg_error:nnx { siunitx } { incompatible-package } {#1} }
@@ -5098,7 +5098,7 @@ This work consists of the file  siunitx.dtx
 % To pick up old options, all of the names need to be known.
 %    \begin{macrocode}
 \seq_new:N \c_siunitx_old_options_seq
-\cs_set_protected_nopar:Npn \siunitx_tmp:w #1 {
+\cs_set_protected:Npn \siunitx_tmp:w #1 {
   \seq_put_right:No \c_siunitx_old_options_seq { \tl_to_str:n {#1} }
 }
 \siunitx_tmp:w { addsign }
@@ -5298,10 +5298,10 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_option_deactivate_clist}
 % Some options need to be deactivated at the start of the document.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_option_deactivate:n #1 {
+\cs_new_protected:Npn \siunitx_option_deactivate:n #1 {
   \clist_put_right:Nn \l_siunitx_option_deactivate_clist {#1}
 }
-\cs_new_protected_nopar:Npn \siunitx_option_deactivate_aux:n #1 {
+\cs_new_protected:Npn \siunitx_option_deactivate_aux:n #1 {
   \keys_define:nn { siunitx }
     {
       #1 .code:n =
@@ -5353,7 +5353,7 @@ This work consists of the file  siunitx.dtx
           }
           { \prg_return_false: }
     }
-  \cs_new_nopar:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_stop
+  \cs_new:Npn \siunitx_cs_if_tl_aux:w #1 MACRO #2 \q_stop
     { \tl_if_empty:nTF {#1} }
   \prg_new_conditional:Npnn \siunitx_cs_if_macro:N #1
     { T , F , TF , p }
@@ -5437,7 +5437,7 @@ This work consists of the file  siunitx.dtx
 % using \cs{AtBeginDocument} as it has to come after anything that
 % \pkg{fontspec} does (nasty errors arise otherwise).
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_set_math_fam:n #1 {
+\cs_new_protected:Npn \siunitx_set_math_fam:n #1 {
   \int_new:c { c_siunitx_math #1 _int }
   \group_begin:
     \hbox_set:Nn \l_siunitx_tmp_box
@@ -5470,7 +5470,7 @@ This work consists of the file  siunitx.dtx
 % new macros here arises as \cs{sfdefault} and \cs{ttdefault} are
 % \cs{long}, whereas \cs{f@family} is not.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_set_text_fam:n #1 {
+\cs_new_protected:Npn \siunitx_set_text_fam:n #1 {
   \tl_new:c { c_siunitx_text #1 _tl }
   \tl_set:cx { c_siunitx_text #1 _tl } { \use:c { #1 default } }
 }
@@ -5596,8 +5596,8 @@ This work consists of the file  siunitx.dtx
 %}
 % These could be token lists or functions!
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_font_shape: { }
-\cs_new_nopar:Npn \siunitx_font_weight: { }
+\cs_new:Npn \siunitx_font_shape: { }
+\cs_new:Npn \siunitx_font_weight: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5606,7 +5606,7 @@ This work consists of the file  siunitx.dtx
 % functions.  Nesting font-control should not happen, so the first
 % test is to ensure this is not happening.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font: {
+\cs_new_protected:Npn \siunitx_detect_font: {
   \bool_if:NF \l_siunitx_font_set_bool
     {
       \siunitx_detect_font_init:
@@ -5626,7 +5626,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_detect_font_init:}
 % Set up the basic macros on the assumption nothing happens.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_init: {
+\cs_new_protected:Npn \siunitx_detect_font_init: {
   \bool_set_true:N \l_siunitx_font_set_bool
   \cs_set:Npn \siunitx_font_weight:
     {
@@ -5645,7 +5645,7 @@ This work consists of the file  siunitx.dtx
 % math or text, and also the type of math (if appropriate).  For
 % inline math, there is a choice of what test to apply.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_weight: {
+\cs_new_protected:Npn \siunitx_detect_font_weight: {
   \mode_if_math:TF
     {
       \bool_if:NTF \l_siunitx_display_math_bool
@@ -5674,7 +5674,7 @@ This work consists of the file  siunitx.dtx
 % The tests for font weight depend on whether the module is testing
 % text or math content.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_weight_math: {
+\cs_new_protected:Npn \siunitx_detect_font_weight_math: {
   \str_if_eq:VnT \math@version { bold }
     {
       \cs_set:Npn \siunitx_font_weight:
@@ -5686,7 +5686,7 @@ This work consists of the file  siunitx.dtx
   \str_if_eq:VnT \math@version { light }
     { \cs_set:Npn \siunitx_font_weight: { \lseries } }
 }
-\cs_new_protected_nopar:Npn \siunitx_detect_font_weight_text: {
+\cs_new_protected:Npn \siunitx_detect_font_weight_text: {
   \tl_set:Nx \l_siunitx_tmpa_tl { \tl_head:V \f@series }
   \str_if_eq:VnT \l_siunitx_tmpa_tl { b }
     {
@@ -5706,7 +5706,7 @@ This work consists of the file  siunitx.dtx
 % Family detection usually picks up the surrounding text.  However, for
 % display math there are two options, and so a second test may be made.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_family: {
+\cs_new_protected:Npn \siunitx_detect_font_family: {
   \mode_if_math:TF
     {
       \bool_if:NTF \l_siunitx_display_math_bool
@@ -5738,14 +5738,14 @@ This work consists of the file  siunitx.dtx
 % default (\texttt{rm}), as the text function is always called and may
 % have changed things.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_family_math: {
+\cs_new_protected:Npn \siunitx_detect_font_family_math: {
   \tl_set:Nn \l_siunitx_font_family_tl { rm }
   \int_compare:nNnT { \fam } = { \c_siunitx_mathsf_int }
     { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
   \int_compare:nNnT { \fam } = { \c_siunitx_mathtt_int }
     { \tl_set:Nn \l_siunitx_font_family_tl { tt } }
 }
-\cs_new_protected_nopar:Npn \siunitx_detect_font_family_text: {
+\cs_new_protected:Npn \siunitx_detect_font_family_text: {
   \tl_if_eq:NNT \f@family \c_siunitx_textsf_tl
     { \tl_set:Nn \l_siunitx_font_family_tl { sf } }
   \tl_if_eq:NNT \f@family \c_siunitx_texttt_tl
@@ -5757,11 +5757,11 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_detect_font_shape:}
 % The shape test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_shape: {
+\cs_new_protected:Npn \siunitx_detect_font_shape: {
   \str_if_eq:VnT \f@shape { it }
-    { \cs_set_nopar:Npn \siunitx_font_shape: { \itshape } }
+    { \cs_set:Npn \siunitx_font_shape: { \itshape } }
   \str_if_eq:VnT \f@shape { sl }
-    { \cs_set_nopar:Npn \siunitx_font_shape: { \slshape } }
+    { \cs_set:Npn \siunitx_font_shape: { \slshape } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5770,7 +5770,7 @@ This work consists of the file  siunitx.dtx
 % The mode switch works from the fact that math mode output it the
 % standard.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_detect_font_mode: {
+\cs_new_protected:Npn \siunitx_detect_font_mode: {
   \mode_if_math:F
     {
       \bool_set_false:N \l_siunitx_font_math_mode_bool
@@ -5813,9 +5813,9 @@ This work consists of the file  siunitx.dtx
 \cs_new:Npn \siunitx_number_mathrm:n #1 { }
 \cs_new:Npn \siunitx_number_mathsf:n #1 { }
 \cs_new:Npn \siunitx_number_mathtt:n #1 { }
-\cs_new_nopar:Npn \siunitx_number_textrm: { }
-\cs_new_nopar:Npn \siunitx_number_textsf: { }
-\cs_new_nopar:Npn \siunitx_number_texttt: { }
+\cs_new:Npn \siunitx_number_textrm: { }
+\cs_new:Npn \siunitx_number_textsf: { }
+\cs_new:Npn \siunitx_number_texttt: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5826,22 +5826,22 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   number-color  .tl_set:N    = \l_siunitx_number_color_tl,
   number-math-rm .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_number_mathrm:n ##1 { #1 {##1} } },
   number-math-sf .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_number_mathsf:n ##1 { #1 {##1} } },
   number-math-tt .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_number_mathtt:n ##1 { #1 {##1} } },
   number-mode .choice:,
   number-mode / math .code:n =
     { \bool_set_true:N \l_siunitx_number_math_mode_bool },
   number-mode / text .code:n =
     { \bool_set_false:N \l_siunitx_number_math_mode_bool },
   number-text-rm .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_textrm: {#1} },
+    { \cs_set:Npn \siunitx_number_textrm: {#1} },
   number-text-sf .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_textsf: {#1} },
+    { \cs_set:Npn \siunitx_number_textsf: {#1} },
   number-text-tt .code:n  =
-    { \cs_set_nopar:Npn \siunitx_number_texttt: {#1} }
+    { \cs_set:Npn \siunitx_number_texttt: {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5856,12 +5856,12 @@ This work consists of the file  siunitx.dtx
 %}
 % The same storage for unit-mode fonts.
 %    \begin{macrocode}
-\cs_new_nopar:Npn \siunitx_unit_mathrm: { }
-\cs_new_nopar:Npn \siunitx_unit_mathsf: { }
-\cs_new_nopar:Npn \siunitx_unit_mathtt: { }
-\cs_new_nopar:Npn \siunitx_unit_textrm: { }
-\cs_new_nopar:Npn \siunitx_unit_textsf: { }
-\cs_new_nopar:Npn \siunitx_unit_texttt: { }
+\cs_new:Npn \siunitx_unit_mathrm: { }
+\cs_new:Npn \siunitx_unit_mathsf: { }
+\cs_new:Npn \siunitx_unit_mathtt: { }
+\cs_new:Npn \siunitx_unit_textrm: { }
+\cs_new:Npn \siunitx_unit_textsf: { }
+\cs_new:Npn \siunitx_unit_texttt: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5871,22 +5871,22 @@ This work consists of the file  siunitx.dtx
 \keys_define:nn { siunitx } {
   unit-color  .tl_set:N  = \l_siunitx_unit_color_tl,
   unit-math-rm .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_mathrm:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_unit_mathrm:n ##1 { #1 {##1} } },
   unit-math-sf .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_mathsf:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_unit_mathsf:n ##1 { #1 {##1} } },
   unit-math-tt .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_mathtt:n ##1 { #1 {##1} } },
+    { \cs_set:Npn \siunitx_unit_mathtt:n ##1 { #1 {##1} } },
   unit-mode .choice:,
   unit-mode / math .code:n =
     { \bool_set_true:N \l_siunitx_unit_math_mode_bool },
   unit-mode / text .code:n =
     { \bool_set_false:N \l_siunitx_unit_math_mode_bool },
   unit-text-rm .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_textrm: {#1} },
+    { \cs_set:Npn \siunitx_unit_textrm: {#1} },
   unit-text-sf .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_textsf: {#1} },
+    { \cs_set:Npn \siunitx_unit_textsf: {#1} },
   unit-text-tt .code:n =
-    { \cs_set_nopar:Npn \siunitx_unit_texttt: {#1} }
+    { \cs_set:Npn \siunitx_unit_texttt: {#1} }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -6035,7 +6035,7 @@ This work consists of the file  siunitx.dtx
 % function is called. Everything is inside \cs{text} as this allows
 % proper setting of the various mode settings.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_print_aux: {
+\cs_new_protected:Npn \siunitx_print_aux: {
   \text
     {
       \siunitx_print_color:
@@ -6063,7 +6063,7 @@ This work consists of the file  siunitx.dtx
 % anything if it is.  This will change when \LaTeX3 proper is available:
 % there will be colour out of the box!
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_print_color: {
+\cs_new_protected:Npn \siunitx_print_color: {
   \tl_if_empty:cF { l_siunitx_ \l_siunitx_print_type_tl _color_tl }
     {
       \color
@@ -6101,7 +6101,7 @@ This work consists of the file  siunitx.dtx
   \char_set_catcode_active:N \!
 \tl_to_lowercase:n {
   \group_end:
-  \cs_set_protected_nopar:Npn \siunitx_print_math:
+  \cs_set_protected:Npn \siunitx_print_math:
     {
       \cs_set_eq:NN \PrintSubscript   @
       \cs_set_eq:NN \PrintSuperscript ^
@@ -6115,7 +6115,7 @@ This work consists of the file  siunitx.dtx
               { \l_siunitx_print_arg_tl }
         }
     }
-  \cs_set_protected_nopar:Npn \siunitx_print_text:
+  \cs_set_protected:Npn \siunitx_print_text:
     {
       \cs_set_eq:NN \PrintSubscript   \siunitx_print_text_sub:n
       \cs_set_eq:NN \PrintSuperscript \siunitx_print_text_super:n
@@ -6160,13 +6160,13 @@ This work consists of the file  siunitx.dtx
             }
         }
       \cs_set_eq:NN \l_peek_search_token \siunitx_print_text_super:n
-      \cs_set_nopar:Npn \peek_true:w 
+      \cs_set:Npn \peek_true:w 
         { 
           \tex_afterassignment:D \peek_true_aux:w 
           \cs_set_eq:NN \peek_tmp:w
         }  
-      \cs_set_nopar:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
-      \cs_set_nopar:Npn \peek_false:w  { \ensuremath { @ { \text {#1} } } }
+      \cs_set:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
+      \cs_set:Npn \peek_false:w  { \ensuremath { @ { \text {#1} } } }
       \peek_after:Nw \peek_execute_branches_meaning:
     }
 }
@@ -6273,7 +6273,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_preprocess_init:}
 % A little initialisation as normal.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_preprocess_init: {
+\cs_new_protected:Npn \siunitx_number_preprocess_init: {
   \bool_set_false:N \l_siunitx_error_bool
   \tl_clear:N \l_siunitx_number_multi_tl
 }
@@ -6285,7 +6285,7 @@ This work consists of the file  siunitx.dtx
 % Rather than search through the entire argument, we use the
 % delimited-argument trick.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_preprocess_product: {
+\cs_new_protected:Npn \siunitx_number_preprocess_product: {
   \tl_map_function:NN \l_siunitx_input_product_tl
     \siunitx_number_preprocess_product_aux:N
 }
@@ -6315,7 +6315,7 @@ This work consists of the file  siunitx.dtx
 % For the quotient, only one token can appear in each part. So there
 % is an additional error check.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_preprocess_quotient: {
+\cs_new_protected:Npn \siunitx_number_preprocess_quotient: {
   \tl_map_function:NN \l_siunitx_input_quotient_tl
     \siunitx_number_preprocess_quotient_aux:N
 }
@@ -6565,7 +6565,7 @@ This work consists of the file  siunitx.dtx
 % carried out at the start of each part of a number, and so is called
 % from a few places.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_init: {
+\cs_new_protected:Npn \siunitx_number_in_init: {
   \cs_set_eq:NN \siunitx_number_in_parse_loop:N
     \siunitx_number_in_parse_mantissa:N
   \cs_set_eq:NN \siunitx_number_in_check:n
@@ -6579,7 +6579,7 @@ This work consists of the file  siunitx.dtx
   \bool_set_false:N \l_siunitx_number_in_uncert_bool
   \siunitx_number_in_init_part:n { mantissa }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_in_init_part:n #1 {
+\cs_new_protected:Npn \siunitx_number_in_init_part:n #1 {
   \bool_set_false:N \l_siunitx_number_in_decimal_bool
   \bool_set_true:N \l_siunitx_number_in_first_bool
   \bool_set_false:N \l_siunitx_number_in_sign_bool
@@ -6601,7 +6601,7 @@ This work consists of the file  siunitx.dtx
 % some tokens do not behave safely under \texttt{x} expansion (at the
 % moment). To get round this, they are redefined here.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_protect: {
+\cs_new_protected:Npn \siunitx_number_in_protect: {
   \tl_map_function:NN \l_siunitx_input_protect_tl
     \siunitx_number_in_protect_aux:N
 }
@@ -6615,7 +6615,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_in_sign_replace:N}
 % A short spin-out to keep the replacement of tokens clear.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_sign_replace:N #1 {
+\cs_new_protected:Npn \siunitx_number_in_sign_replace:N #1 {
   \tl_replace_all:Nnn #1 { -+ } { \mp }
   \tl_replace_all:Nnn #1 { +- } { \pm }
   \tl_replace_all:Nnn #1 { << } { \ll }
@@ -6992,7 +6992,7 @@ This work consists of the file  siunitx.dtx
         { \prop_del:Nn \l_siunitx_number_in_prop { mantissa } }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_in_complex_aux:nn #1#2 {
+\cs_new_protected:Npn \siunitx_number_in_complex_aux:nn #1#2 {
   \prop_get:NnNT \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
     {
       \prop_del:Nn  \l_siunitx_number_in_prop {#1}
@@ -7184,7 +7184,7 @@ This work consists of the file  siunitx.dtx
 % A short auxiliary function needed in various places for storing
 % either the integer or decimal part of a number, as appropriate.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_store: {
+\cs_new_protected:Npn \siunitx_number_in_store: {
   \prop_put:NVn \l_siunitx_number_in_prop \l_siunitx_number_part_tl
     { true }
   \bool_if:NTF \l_siunitx_number_in_decimal_bool
@@ -7212,8 +7212,8 @@ This work consists of the file  siunitx.dtx
 % has any sign deleted. For complex numbers, the check is needed in
 % case there was no real part.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_check:n #1 { }
-\cs_new_protected_nopar:Npn \siunitx_number_in_check_short:n #1 {
+\cs_new_protected:Npn \siunitx_number_in_check:n #1 { }
+\cs_new_protected:Npn \siunitx_number_in_check_short:n #1 {
   \prop_if_in:NVF \l_siunitx_number_in_prop
     \l_siunitx_number_part_integer_tl
     {
@@ -7239,7 +7239,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_in_check_full:n #1 {
+\cs_new_protected:Npn \siunitx_number_in_check_full:n #1 {
   \tl_if_eq:NNF \l_siunitx_number_part_tl
     \c_siunitx_number_part_complex_tl
     { \siunitx_number_in_check_short:n {#1} }
@@ -7287,7 +7287,7 @@ This work consists of the file  siunitx.dtx
 % wrong. The method needed depends on whether there is an integer
 % part.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert:n #1 {
+\cs_new_protected:Npn \siunitx_number_in_complex_to_uncert:n #1 {
   \prop_del:Nn \l_siunitx_number_in_prop { complex }
   \prop_del:Nn \l_siunitx_number_in_prop { complex-decimal-marker }
   \prop_del:Nn \l_siunitx_number_in_prop { complex-sign }
@@ -7313,7 +7313,7 @@ This work consists of the file  siunitx.dtx
 % conversion is easy as all of the decimal part can be copied
 % across.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_int: {
+\cs_new_protected:Npn \siunitx_number_in_complex_to_uncert_int: {
   \prop_get:NnNF \l_siunitx_number_in_prop { complex-decimal }
     \l_siunitx_tmpa_tl
     { \tl_clear:N \l_siunitx_tmpa_tl }
@@ -7327,7 +7327,7 @@ This work consists of the file  siunitx.dtx
 % only the significant digits are needed. This means that a loop is
 % needed to drop non-significant ones.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_dec:n
+\cs_new_protected:Npn \siunitx_number_in_complex_to_uncert_dec:n
   #1
   {
     \tl_clear:N \l_siunitx_number_uncert_tl
@@ -7346,7 +7346,7 @@ This work consists of the file  siunitx.dtx
       { \siunitx_error:nx { misplaced-sign-token } { \exp_not:n {#1} } }
 
   }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_in_complex_to_uncert_dec_loop:N #1
   {
     \str_if_eq:nnTF {#1} { 0 }
@@ -7368,7 +7368,7 @@ This work consists of the file  siunitx.dtx
 % also re-obtains the decimal part from the mantissa, as the stored
 % value may have been trimmed to drop non-significant zeros.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_in_complex_to_uncert_pad:
+\cs_new_protected:Npn \siunitx_number_in_complex_to_uncert_pad:
   {
     \int_set:Nn \l_siunitx_number_uncert_length_int
       { \tl_length:N \l_siunitx_tmpa_tl }
@@ -7561,7 +7561,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process:}
 % Post-processing is a series of small tasks.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process: {
+\cs_new_protected:Npn \siunitx_number_process: {
   \siunitx_number_process_sign:
   \siunitx_number_process_zero_fill:
   \siunitx_number_process_mantissa:
@@ -7588,7 +7588,7 @@ This work consists of the file  siunitx.dtx
 % To check for a totally zero exponent, the possibility that one or more
 % of the exponent storage areas is zero needs to be considered.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_exponent: {
+\cs_new_protected:Npn \siunitx_number_process_exponent: {
   \bool_if:NF \l_siunitx_process_zero_exponent_bool
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent }
@@ -7608,7 +7608,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_exponent_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_exponent_aux:n #1 {
   \prop_get:NnNT \l_siunitx_number_in_prop { exponent- #1 }
     \l_siunitx_tmpa_tl
     {
@@ -7629,7 +7629,7 @@ This work consists of the file  siunitx.dtx
 % of the number, working out which are significant. The next stage is
 % reconstruction of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_figures:n #1 {
   \int_compare:nNnTF { \l_siunitx_process_precision_int } > { 0 }
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
@@ -7645,7 +7645,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_figures_aux:n #1 {
   \siunitx_number_process_figures_init:n {#1}
   \siunitx_number_process_figures_count:n { integer }
   \siunitx_number_process_figures_count:n { decimal }
@@ -7666,7 +7666,7 @@ This work consists of the file  siunitx.dtx
       \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures_init:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_figures_init:n #1 {
   \int_zero:N \l_siunitx_round_int
   \bool_set_false:N \l_siunitx_round_bool
   \prop_get:NnNF \l_siunitx_number_in_prop { #1 -decimal }
@@ -7686,7 +7686,7 @@ This work consists of the file  siunitx.dtx
 % The counting code has to check that characters are actually
 % significant.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_figures_count:n #1 {
   \tl_if_empty:cF { l_siunitx_round_ #1 _in_tl }
     {
@@ -7694,7 +7694,7 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_process_figures_count_aux:n {#1} }
     }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_figures_count_aux:n #1 {
   \int_set:Nn \l_siunitx_tmp_int
     { \tl_head:v { l_siunitx_round_ #1 _in_tl } }
@@ -7725,7 +7725,7 @@ This work consists of the file  siunitx.dtx
 % then the integer part as loops. There is then some tidying up if a
 % digit is carried at the end.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures_round: {
+\cs_new_protected:Npn \siunitx_number_process_figures_round: {
   \int_set:Nn \l_siunitx_round_int
     { \l_siunitx_round_int - \l_siunitx_process_precision_int }
   \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
@@ -7744,7 +7744,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_figures_round_loop: {
   \siunitx_number_process_round_decimal:
   \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
@@ -7757,7 +7757,7 @@ This work consists of the file  siunitx.dtx
 % For figures, the integer part is a little complicated as zeros need
 % to be included.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures_integer: {
+\cs_new_protected:Npn \siunitx_number_process_figures_integer: {
   \int_compare:nNnT { \l_siunitx_round_int } > { 0 }
     { \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 0 } }
   \int_compare:nNnF { \l_siunitx_round_int } > { 1 }
@@ -7794,7 +7794,7 @@ This work consists of the file  siunitx.dtx
 % If the number is too short, then the reversal is undone and the
 % padding routine is called.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_figures_pad:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_figures_pad:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -integer }
     \l_siunitx_round_integer_in_tl
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
@@ -7818,7 +7818,7 @@ This work consists of the file  siunitx.dtx
 % When working to a fixed exponent value, the idea is to use the stack
 % to do the work. First, there is some set up to do.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_fixed: {
+\cs_new_protected:Npn \siunitx_number_process_fixed: {
   \prop_if_in:NnF \l_siunitx_number_in_prop { complex }
     {
       \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-integer }
@@ -7850,7 +7850,7 @@ This work consists of the file  siunitx.dtx
 % The main loop checks to see which way to adjust the exponent then
 % does the work.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_fixed_aux_i:nnn #1#2#3 {
   \prop_put:Nnn \l_siunitx_number_in_prop { exponent }
     { true }
@@ -7868,7 +7868,7 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnF { #1 + 0 #2 } = { 0 }
     { \siunitx_number_process_fixed_aux_ii:nnn {#1} {#2} {#3} }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_fixed_aux_ii:nnn #1#2#3 {
   \int_compare:nNnTF {#3} > { \l_siunitx_process_fixed_int }
     { \siunitx_number_process_fixed_large:nnn {#1} {#2} {#3} }
@@ -7905,15 +7905,15 @@ This work consists of the file  siunitx.dtx
 % leading zeros to dispose of. There is also a check to avoid adding
 % an additional zero to the decimal part of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large:nnn #1
+\cs_new_protected:Npn \siunitx_number_process_fixed_large:nnn #1
   {
     \int_compare:nNnTF {#1} = \c_zero
       { \siunitx_number_process_fixed_large_aux:nnn { } }
       { \siunitx_number_process_fixed_large_aux:nnn {#1} }
   }
-\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:nnn #1#2#3
+\cs_new_protected:Npn \siunitx_number_process_fixed_large_aux:nnn #1#2#3
   {
-  \cs_set_protected_nopar:Npn
+  \cs_set_protected:Npn
     \siunitx_number_process_fixed_large_aux:w ##1##2 \q_stop
       {
         \tl_if_empty:nTF {##2}
@@ -7945,11 +7945,11 @@ This work consists of the file  siunitx.dtx
     { \siunitx_number_process_fixed_aux_ii:nnn { #1 0 } { } { #3 - 1 } }
     { \siunitx_number_process_fixed_large_aux:w #2 \q_stop }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_large_aux:w
+\cs_new_protected:Npn \siunitx_number_process_fixed_large_aux:w
   { }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_fixed_small:nnn #1#2#3 {
-  \cs_set_protected_nopar:Npn
+  \cs_set_protected:Npn
     \siunitx_number_process_fixed_small_aux:w ##1##2 \q_stop ##3
       {
         \tl_if_empty:nTF {##2}
@@ -7971,7 +7971,7 @@ This work consists of the file  siunitx.dtx
       }
   \siunitx_number_process_fixed_small_aux:w #1 \q_stop { }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_fixed_small_aux:w
+\cs_new_protected:Npn \siunitx_number_process_fixed_small_aux:w
   { }
 %    \end{macrocode}
 %\end{macro}
@@ -7981,7 +7981,7 @@ This work consists of the file  siunitx.dtx
 % Producing extra digits for the integer part is a simple process
 % once the target is known.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_integer_digits: {
+\cs_new_protected:Npn \siunitx_number_process_integer_digits: {
   \int_compare:nNnT
     { \l_siunitx_process_integer_min_int } > { \c_zero }
     {
@@ -8014,7 +8014,7 @@ This work consists of the file  siunitx.dtx
 % A check for the mantissa consisting only of the token \texttt{1}, when
 % an exponent is also available.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_mantissa: {
+\cs_new_protected:Npn \siunitx_number_process_mantissa: {
   \bool_if:NF \l_siunitx_process_unity_mantissa_bool
     {
       \prop_if_in:NnT \l_siunitx_number_in_prop { exponent }
@@ -8047,7 +8047,7 @@ This work consists of the file  siunitx.dtx
 % For padding a number by adding zero to the end repeatedly. This can
 % happen if the input was zero or if the number is too short.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_pad:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_pad:n #1 {
   \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
     \l_siunitx_tmpa_tl
     {
@@ -8076,14 +8076,14 @@ This work consists of the file  siunitx.dtx
 % appropriate number of zeros in the padding routine.  Otherwise, do the
 % real work.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_places:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_places:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
     {
       \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty }
         { \siunitx_number_process_places_aux_i:n {#1} }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_process_places_aux_i:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_places_aux_i:n #1 {
   \int_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 }
     {
       \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
@@ -8147,7 +8147,7 @@ This work consists of the file  siunitx.dtx
 % difference in length between what is present and what is required.
 % If the number is too short, there is some simple padding to do.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_places_aux_ii:n #1 {
   \int_sub:Nn \l_siunitx_round_int
     { \l_siunitx_process_precision_int }
@@ -8165,7 +8165,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % To keep the code a little clearer.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_places_init:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_places_init:n #1 {
   \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
     \l_siunitx_round_integer_in_tl
     { \tl_clear:N \l_siunitx_round_integer_in_tl }
@@ -8182,7 +8182,7 @@ This work consists of the file  siunitx.dtx
 % If there is an integer, do the same. Only if both are empty does the
 % loop stop.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_places_loop:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_places_loop:n #1 {
   \tl_if_empty:NTF \l_siunitx_round_decimal_in_tl
     {
       \tl_if_empty:NF \l_siunitx_round_integer_in_tl
@@ -8204,7 +8204,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % Rounding for integers is just a case of carrying digits.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_places_integer:n #1 {
   \int_set:Nn \l_siunitx_tmp_int
     { \tl_head:V \l_siunitx_round_integer_in_tl }
@@ -8228,7 +8228,7 @@ This work consists of the file  siunitx.dtx
 % The lead-off for rounding is the same for decimal places and
 % significant figures.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_round: {
+\cs_new_protected:Npn \siunitx_number_process_round: {
   \tl_if_empty:NF \l_siunitx_round_tl
     {
       \bool_if:NT \l_siunitx_process_int_to_dec_bool
@@ -8246,7 +8246,7 @@ This work consists of the file  siunitx.dtx
                 { mantissa-decimal-marker } { . }
             }
         }
-      \cs_set_nopar:Npx \siunitx_tmp:w
+      \cs_set:Npx \siunitx_tmp:w
         {
           \exp_not:N \clist_map_function:nN
             { mantissa , complex }
@@ -8264,14 +8264,14 @@ This work consists of the file  siunitx.dtx
 % so there is a generalised function here. Unfortunately, it is also
 % complicated!
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_round_decimal: {
+\cs_new_protected:Npn \siunitx_number_process_round_decimal: {
   \int_compare:nNnF { \l_siunitx_round_int } > { 1 }
     { \siunitx_number_process_round_decimal_aux: }
   \tl_set:Nx \l_siunitx_round_decimal_in_tl
     { \tl_tail:V \l_siunitx_round_decimal_in_tl }
   \int_decr:N \l_siunitx_round_int
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_round_decimal_aux: {
   \int_set:Nn \l_siunitx_tmp_int
     { \tl_head:V \l_siunitx_round_decimal_in_tl }
@@ -8301,7 +8301,7 @@ This work consists of the file  siunitx.dtx
 % To put data back again: there is a check to see if the number has been
 % rounded to zero and a minimal value has been requested.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_round_tidy:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_round_tidy:n #1 {
   \int_compare:nNnTF
     {
       0 \l_siunitx_round_integer_out_tl +
@@ -8334,7 +8334,7 @@ This work consists of the file  siunitx.dtx
         }
      }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_round_tidy_aux:w #1 . #2 . #3 \q_stop #4 {
   \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
   \prop_put:Nnn \l_siunitx_number_in_prop { #4 -integer } {#1}
@@ -8365,7 +8365,7 @@ This work consists of the file  siunitx.dtx
 % of places involved is unchanged. The first step is to skip any
 % complex-number containing input and to recover the stored data.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_scientific: {
+\cs_new_protected:Npn \siunitx_number_process_scientific: {
   \prop_if_in:NnF \l_siunitx_number_in_prop { complex }
     {
       \prop_get:NnNF \l_siunitx_number_in_prop { mantissa-integer }
@@ -8391,7 +8391,7 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
     }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_aux_i:nnn #1#2#3 {
   \int_compare:nNnF { #1 + 0 #2 } = { 0 }
     { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
@@ -8400,7 +8400,7 @@ This work consists of the file  siunitx.dtx
 % The code here works on a loop, standardising the mantissa into the
 % range \( 1 \le x < 10 \).
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_aux_ii:nnn #1#2#3 {
   \int_compare:nNnTF {#1} > { 9 }
     { \siunitx_number_process_scientific_large:nnn {#1} {#2} {#3} }
@@ -8423,7 +8423,7 @@ This work consists of the file  siunitx.dtx
 % using some mathematics. This does limit the range of the input, but
 % in real cases this should not be an issue.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_large:nnn #1#2#3 {
   \int_set:Nn \l_siunitx_tmp_int { \int_div_truncate:nn {#1} { 10 } }
   \tl_set:Nx \l_siunitx_tmpa_tl { \int_use:N \l_siunitx_tmp_int }
@@ -8439,13 +8439,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % For small numbers, the important digit is easy to find.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_small:wn #1#2 \q_stop #3
   { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} { #3 - 1 } }
 %    \end{macrocode}
 % A tidy-up and store routine.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_store:nnn #1#2#3
   {
     \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-integer } {#1}
@@ -8494,7 +8494,7 @@ This work consists of the file  siunitx.dtx
 % The fastest way to do this is by expansion, as the number of tokens
 % is known.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_scientific_engineering:nnn #1#2#3
   {
     \use:c
@@ -8517,7 +8517,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_eq:cN
   { siunitx_number_process_scientific_engineering_0:nnn }
   \siunitx_number_process_scientific_store:nnn
-\cs_new_protected_nopar:cpn
+\cs_new_protected:cpn
   { siunitx_number_process_scientific_engineering_1:nnn } #1#2#3
   {
     \tl_if_empty:nTF {#2}
@@ -8531,14 +8531,14 @@ This work consists of the file  siunitx.dtx
           {#1} #2 \q_stop {#3}
       }
   }
-\cs_new_protected_nopar:cpn
+\cs_new_protected:cpn
   { siunitx_number_process_scientific_engineering_1:nw }
   #1#2#3 \q_stop #4
   {
     \siunitx_number_process_scientific_store:nnn
       {#1#2} {#3} { #4 - 1 }
   }
-\cs_new_protected_nopar:cpn
+\cs_new_protected:cpn
   { siunitx_number_process_scientific_engineering_2:nnn } #1#2#3
   {
     \tl_if_empty:nTF {#2}
@@ -8552,7 +8552,7 @@ This work consists of the file  siunitx.dtx
           {#1} #2 \q_stop {#3}
       }
   }
-\cs_new_protected_nopar:cpn
+\cs_new_protected:cpn
   { siunitx_number_process_scientific_engineering_2_i:nw }
   #1#2#3 \q_stop #4
   {
@@ -8567,7 +8567,7 @@ This work consists of the file  siunitx.dtx
           {#1#2} #3 \q_stop {#4}
        }
   }
-\cs_new_protected_nopar:cpn
+\cs_new_protected:cpn
   { siunitx_number_process_scientific_engineering_2_ii:nw }
   #1#2#3 \q_stop #4
   {
@@ -8587,7 +8587,7 @@ This work consists of the file  siunitx.dtx
 % Sorting out signs consists of two parts: retaining a plus if necessary
 % and adding an explicit sign.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_sign: {
+\cs_new_protected:Npn \siunitx_number_process_sign: {
   \bool_if:NF \l_siunitx_process_plus_tl
     {
       \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
@@ -8613,7 +8613,7 @@ This work consists of the file  siunitx.dtx
 % Adding a sign to an existing number needs a couple of to make sure
 % there is a number to add to, and to see if there is a sign already.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_sign_add:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_sign_add:n #1 {
   \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -sign }
     {
       \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -had-sign }
@@ -8637,7 +8637,7 @@ This work consists of the file  siunitx.dtx
 % some quick tests and an assignment. Using a pre-defined token list is
 % a speed-related choice: very slightly faster comparison.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_sign_plus:n #1 {
+\cs_new_protected:Npn \siunitx_number_process_sign_plus:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -sign }
     \l_siunitx_tmpa_tl
   \tl_if_eq:NNT \c_siunitx_plus_tl \l_siunitx_tmpa_tl
@@ -8658,11 +8658,11 @@ This work consists of the file  siunitx.dtx
 % There may be a need to expand uncertainties into a decimal and integer
 % part. This is done here so that the core \texttt{in} code is faster.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_uncertainty: {
+\cs_new_protected:Npn \siunitx_number_process_uncertainty: {
   \clist_map_function:nN { mantissa , complex }
     \siunitx_number_process_uncertainty_aux:n
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_uncertainty_aux:n #1 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -uncertainty }
     {
@@ -8680,7 +8680,7 @@ This work consists of the file  siunitx.dtx
 % correctly pad with zeros and also to allow for the possibility that
 % the error crosses the decimal--integer boundary.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_uncertainty_decimal:n #1 {
   \siunitx_number_process_uncertainty_count:nn {#1} { decimal }
   \siunitx_number_process_uncertainty_count:nn {#1} { uncertainty }
@@ -8704,7 +8704,7 @@ This work consists of the file  siunitx.dtx
   \prop_put:NnV \l_siunitx_number_in_prop
     { #1 -uncertainty-decimal-marker } \l_siunitx_tmpa_tl
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_uncertainty_count:nn #1#2 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 }
     \l_siunitx_tmpa_tl
@@ -8717,7 +8717,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_process_uncertainty_pad:}
 % Uncertainty is short: add zeros.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_uncertainty_pad: {
+\cs_new_protected:Npn \siunitx_number_process_uncertainty_pad: {
   \int_while_do:nNnn
     { \l_siunitx_process_uncertainty_int } <
       { \l_siunitx_process_decimal_int }
@@ -8734,7 +8734,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_process_uncertainty_separate_aux:N}
 % Find the integer--decimal boundary and work appropriately.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_uncertainty_separate: {
   \tl_map_function:NN \l_siunitx_tmpa_tl
     \siunitx_number_process_uncertainty_separate_aux:N
@@ -8755,7 +8755,7 @@ This work consists of the file  siunitx.dtx
 % Relatively easy: the uncertainty is in the integer part of the number,
 % and so there is no need to generate zeros.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_uncertainty_integer:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
     \l_siunitx_tmpa_tl
@@ -8773,11 +8773,11 @@ This work consists of the file  siunitx.dtx
 % Checks for adding zeros to each component are carried out. The nesting
 % here makes checking the appropriate flag a little more efficient.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_process_zero_fill: {
+\cs_new_protected:Npn \siunitx_number_process_zero_fill: {
   \siunitx_number_process_zero_fill_aux:n { integer }
   \siunitx_number_process_zero_fill_aux:n { decimal }
 }
-\cs_new_nopar:Npn \siunitx_number_process_zero_fill_aux:n #1 {
+\cs_new:Npn \siunitx_number_process_zero_fill_aux:n #1 {
   \bool_if:cT { l_siunitx_process_ #1 _zero_bool }
     {
       \siunitx_number_process_zero_fill_aux:nn { mantissa } {#1}
@@ -8785,7 +8785,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_number_process_zero_fill_aux:nn { exponent } {#1}
     }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_process_zero_fill_aux:nn #1#2 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 -decimal-marker }
     {
@@ -8955,7 +8955,7 @@ This work consists of the file  siunitx.dtx
 % The master control function for formatting output: the usual set up.
 % The number is put back together in stages.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format: {
+\cs_new_protected:Npn \siunitx_number_format: {
   \prop_if_empty:NF \l_siunitx_number_in_prop
     {
       \prop_clear:N \l_siunitx_number_out_prop
@@ -8977,7 +8977,7 @@ This work consists of the file  siunitx.dtx
 % avoid ambiguity. The function here adds the appropriate tokens
 % around whatever is in the supplied named store.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_brackets:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_brackets:n #1 {
   \bool_if:NT \l_siunitx_brackets_bool
     {
       \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -bracket }
@@ -8987,7 +8987,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_brackets_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_brackets_aux:n #1 {
   \prop_get:NnNF \l_siunitx_number_out_prop { #1 -result }
     \l_siunitx_tmpa_tl
     {
@@ -9012,14 +9012,14 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_format_color_aux:n}
 % If the mantissa is negative, then any colour for output might change.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_color: {
+\cs_new_protected:Npn \siunitx_number_format_color: {
   \tl_if_empty:NF \l_siunitx_negative_color_tl
     {
       \siunitx_number_format_color_aux:n { mantissa-sign }
       \siunitx_number_format_color_aux:n { sign }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_color_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_color_aux:n #1 {
   \prop_get:NnNT \l_siunitx_number_in_prop {#1} \l_siunitx_tmpa_tl
     {
       \str_if_eq:VnT \l_siunitx_tmpa_tl { - }
@@ -9041,7 +9041,7 @@ This work consists of the file  siunitx.dtx
 % The real and complex parts of each number are reassembled, with
 % brackets if needed.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_complex: {
+\cs_new_protected:Npn \siunitx_number_format_complex: {
   \prop_if_in:NnT \l_siunitx_number_in_prop { complex-root }
     {
       \prop_if_in:NnTF \l_siunitx_number_out_prop { complex }
@@ -9068,7 +9068,7 @@ This work consists of the file  siunitx.dtx
         \siunitx_number_format_join_complex:
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_complex_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_complex_aux:n #1 {
   \siunitx_number_format_complex_aux:
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
   \bool_if:NTF \l_siunitx_complex_after_bool
@@ -9082,7 +9082,7 @@ This work consists of the file  siunitx.dtx
     }
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_complex_aux: {
+\cs_new_protected:Npn \siunitx_number_format_complex_aux: {
   \tl_set:Nn \l_siunitx_tmpa_tl
     {
       \use:c
@@ -9113,11 +9113,11 @@ This work consists of the file  siunitx.dtx
 %}
 % Just copy across.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_copy:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_copy:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop  {#1} \l_siunitx_tmpa_tl
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_copy:nn #1#2 {
+\cs_new_protected:Npn \siunitx_number_format_copy:nn #1#2 {
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
   \prop_put:NnV \l_siunitx_number_out_prop {#2} \l_siunitx_tmpa_tl
 }
@@ -9132,7 +9132,7 @@ This work consists of the file  siunitx.dtx
 % part, which needs to be \enquote{copied} to the standard result
 % slot.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_final: {
+\cs_new_protected:Npn \siunitx_number_format_final: {
   \prop_if_in:NnT \l_siunitx_number_out_prop { complex }
     {
       \prop_if_in:NnF \l_siunitx_number_out_prop { mantissa-result }
@@ -9176,7 +9176,7 @@ This work consists of the file  siunitx.dtx
 % \texttt{result-bracket-exponent} indicates that the number needs
 % brackets due to the exponent part, but not in other cases.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_final_combined: {
+\cs_new_protected:Npn \siunitx_number_format_final_combined: {
   \siunitx_number_format_brackets:n { mantissa }
   \prop_get:NnN \l_siunitx_number_out_prop { mantissa-result }
     \l_siunitx_tmpa_tl
@@ -9207,7 +9207,7 @@ This work consists of the file  siunitx.dtx
 % front of the number itself. The number must be superscripted, of
 % course.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_final_exponent: {
+\cs_new_protected:Npn \siunitx_number_format_final_exponent: {
   \prop_get:NnN \l_siunitx_number_out_prop { exponent }
     \l_siunitx_tmpa_tl
   \tl_if_empty:NTF \l_siunitx_output_exponent_tl
@@ -9232,7 +9232,7 @@ This work consists of the file  siunitx.dtx
 % When there is only an exponent, a check must be made for a
 % sign in the mantissa part. If there is one, it is copied across.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_format_final_exponent_only: {
   \prop_get:NnNT \l_siunitx_number_in_prop { mantissa-sign }
     \l_siunitx_tmpa_tl
@@ -9259,7 +9259,7 @@ This work consists of the file  siunitx.dtx
 % Grouping digits only happens if there are no symbols in the input, and
 % of course if grouping has been requested.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_group:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_group:n #1 {
   \siunitx_number_format_group_aux:nn {#1} { integer }
   \siunitx_number_format_group_aux:nn {#1} { decimal }
   \prop_if_in:NnTF \l_siunitx_number_out_prop { #1 -integer }
@@ -9289,7 +9289,7 @@ This work consists of the file  siunitx.dtx
       \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_group_aux:nn #1#2 {
+\cs_new_protected:Npn \siunitx_number_format_group_aux:nn #1#2 {
   \prop_if_in:NnT \l_siunitx_number_in_prop { #1 - #2 }
     {
       \bool_if:cTF { l_siunitx_group_ #2 _bool }
@@ -9304,7 +9304,7 @@ This work consists of the file  siunitx.dtx
 %   The idea here is that grouping is only needed for numbers with sufficient
 %   digits: this is done simply by counting up all of the digits.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_group:nn #1#2
+\cs_new_protected:Npn \siunitx_number_format_group:nn #1#2
   {
     \prop_get:NnN \l_siunitx_number_in_prop { #1 - #2 } \l_siunitx_tmpa_tl
     \int_compare:nNnTF
@@ -9324,7 +9324,7 @@ This work consists of the file  siunitx.dtx
 % simple recursion is needed. This trick is taken more or less directly
 % from \pkg{numprint}.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_group_decimal: {
+\cs_new_protected:Npn \siunitx_number_format_group_decimal: {
   \tl_if_empty:NF \l_siunitx_tmpa_tl
     {
       \exp_after:wN \siunitx_number_format_group_decimal_aux:NNNN
@@ -9362,7 +9362,7 @@ This work consists of the file  siunitx.dtx
 % By keeping everything on the stack, recursion can occur quite
 % efficiently here.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_group_integer: {
+\cs_new_protected:Npn \siunitx_number_format_group_integer: {
   \tl_if_empty:NF \l_siunitx_tmpa_tl
     {
       \siunitx_number_format_group_integer_setup:V \l_siunitx_tmpa_tl
@@ -9414,7 +9414,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_format_join_complex:}
 % For adding the complex part to the main part of a number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_join_complex: {
+\cs_new_protected:Npn \siunitx_number_format_join_complex: {
   \siunitx_number_format_sign_complex:
   \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa }
     {
@@ -9444,11 +9444,11 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_format_join_uncert_pm:N}
 % For adding separated uncertainties to the main part of a number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert: {
+\cs_new_protected:Npn \siunitx_number_format_join_uncert: {
   \siunitx_number_format_join_uncert:n { mantissa }
   \siunitx_number_format_join_uncert:n { complex }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_join_uncert:n #1 {
   \prop_get:NnNT \l_siunitx_number_out_prop {#1}
     \l_siunitx_tmpa_tl
     {
@@ -9466,7 +9466,7 @@ This work consists of the file  siunitx.dtx
         { \siunitx_number_format_copy:nn {#1} { #1 -result } }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_join_uncert_pm:N #1
+\cs_new_protected:Npn \siunitx_number_format_join_uncert_pm:N #1
   {
     \bool_if:NTF \l_siunitx_tight_bool
       { \tl_put_left:Nn #1 { \siunitx_ensuremath:n { { \pm } } } }
@@ -9483,7 +9483,7 @@ This work consists of the file  siunitx.dtx
 % uncertainty is separate, it is stored at this stage pending later
 % re-attachment.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_reassemble: {
+\cs_new_protected:Npn \siunitx_number_format_reassemble: {
   \prop_if_in:NnT \l_siunitx_number_in_prop { mantissa }
     {
       \siunitx_number_format_group:n { mantissa }
@@ -9504,7 +9504,7 @@ This work consists of the file  siunitx.dtx
 % A simple check and copy operation for a relation: this will still need
 % to be added to the result, of course.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_relation: {
+\cs_new_protected:Npn \siunitx_number_format_relation: {
   \prop_get:NnNT \l_siunitx_number_in_prop { comparator }
     \l_siunitx_tmpa_tl
     {
@@ -9534,7 +9534,7 @@ This work consists of the file  siunitx.dtx
 % the right formatting in text mode. For speed reasons, this is done in
 % a separate function.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_sign:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_sign:n #1 {
   \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
     {
       \prop_get:NnNT \l_siunitx_number_in_prop { #1 -sign }
@@ -9550,7 +9550,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_sign_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_sign_aux:n #1 {
   \bool_if:NT \l_siunitx_tight_bool
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
@@ -9571,7 +9571,7 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
     }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_format_sign_negative_brackets:n #1
   {
     \siunitx_number_format_brackets_aux:n {#1}
@@ -9586,11 +9586,11 @@ This work consists of the file  siunitx.dtx
           \l_siunitx_tmpa_tl
       }
   }
-\cs_new_protected_nopar:Npn \siunitx_number_format_sign_complex: {
+\cs_new_protected:Npn \siunitx_number_format_sign_complex: {
   \siunitx_number_format_sign_complex:n { complex }
   \siunitx_number_format_sign_complex:n { complex-result }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_format_sign_complex:n #1  {
+\cs_new_protected:Npn \siunitx_number_format_sign_complex:n #1  {
   \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
     {
       \prop_get:NnNT \l_siunitx_number_in_prop { complex-sign }
@@ -9633,7 +9633,7 @@ This work consists of the file  siunitx.dtx
 % Uncertainty output varies depending on whether there is a need to
 % separate the error form the number in the output.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_format_uncertainty:n #1 {
+\cs_new_protected:Npn \siunitx_number_format_uncertainty:n #1 {
   \prop_if_in:NnTF \l_siunitx_number_in_prop { #1 -uncertainty }
     {
       \bool_if:NTF \l_siunitx_uncert_sep_bool
@@ -9643,7 +9643,7 @@ This work consists of the file  siunitx.dtx
     }
     { \siunitx_number_format_copy:nn {#1} { #1 -result } }
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_format_uncertainty_joined:n #1 {
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
     \l_siunitx_tmpa_tl
@@ -9658,7 +9658,7 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_number_format_uncertainty_sep:n #1 {
   \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -integer }
     {
@@ -9768,7 +9768,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_output_bracket:}
 % Compound numbers may need brackets adding.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_bracket: {
+\cs_new_protected:Npn \siunitx_number_output_bracket: {
   \bool_if:NF \l_siunitx_error_bool
     {
       \bool_if:NT \l_siunitx_number_compound_bool
@@ -9782,7 +9782,7 @@ This work consists of the file  siunitx.dtx
 % If a colour needs to be set, it is recovered here and put into the
 % appropriate place.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_color: {
+\cs_new_protected:Npn \siunitx_number_output_color: {
   \prop_if_in:NnT \l_siunitx_number_out_prop { color }
     {
       \prop_get:NnN \l_siunitx_number_out_prop { color }
@@ -9820,7 +9820,7 @@ This work consists of the file  siunitx.dtx
 % the units to come at the end of the number, and there then have to
 % be brackets in the output if there are any separate parts.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_parse_aux: {
+\cs_new_protected:Npn \siunitx_number_output_parse_aux: {
   \siunitx_number_in_parse:V \l_siunitx_number_arg_tl
   \bool_if:NF \l_siunitx_error_bool
     {
@@ -9851,7 +9851,7 @@ This work consists of the file  siunitx.dtx
 % repeat. That means doing things that have already been done by the
 % number formatter again.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_parts: {
+\cs_new_protected:Npn \siunitx_number_output_parts: {
   \bool_if:nTF
     {
       \tl_if_empty_p:N \l_siunitx_pre_unit_tl &&
@@ -9860,7 +9860,7 @@ This work consists of the file  siunitx.dtx
     { \siunitx_number_output_single: }
     { \siunitx_number_output_parts_aux: }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_output_parts_aux: {
+\cs_new_protected:Npn \siunitx_number_output_parts_aux: {
   \bool_if:NTF \l_siunitx_multi_repeat_bool
     {
       \prop_if_in:NnT \l_siunitx_number_out_prop { mantissa-result }
@@ -9890,7 +9890,7 @@ This work consists of the file  siunitx.dtx
     }
     { \siunitx_number_output_single: }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_output_parts_aux:n #1 {
+\cs_new_protected:Npn \siunitx_number_output_parts_aux:n #1 {
    \prop_if_in:NnT \l_siunitx_number_out_prop {#1}
      { \siunitx_number_output_parts_print:n {#1} }
    \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -uncertainty }
@@ -9907,7 +9907,7 @@ This work consists of the file  siunitx.dtx
        \siunitx_number_output_parts_print:n { #1 -uncertainty }
      }
 }
-\cs_new_protected_nopar:Npn \siunitx_number_output_parts_print:n #1 {
+\cs_new_protected:Npn \siunitx_number_output_parts_print:n #1 {
   \siunitx_unit_output_pre_print:
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
   \siunitx_print:nV { number } \l_siunitx_tmpa_tl
@@ -9923,7 +9923,7 @@ This work consists of the file  siunitx.dtx
 % print everything correctly. The extra group here is necessary
 % otherwise looping will delete the units entirely!
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_product: {
+\cs_new_protected:Npn \siunitx_number_output_product: {
   \bool_if:NTF \l_siunitx_product_brackets_bool
     {
       \bool_if:nTF
@@ -9956,7 +9956,7 @@ This work consists of the file  siunitx.dtx
 % When printing products that have to be bracketed, there is a need to
 % shuffle the units about a bit.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_product_brackets: {
+\cs_new_protected:Npn \siunitx_number_output_product_brackets: {
   \siunitx_unit_output_pre_print:
   \siunitx_print:nn { number }
     { \siunitx_ensuremath:n { \l_siunitx_bracket_open_tl } }
@@ -9976,7 +9976,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{\siunitx_number_output_product_aux:}
 % Printing the products needs a looping function.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_product_aux: {
+\cs_new_protected:Npn \siunitx_number_output_product_aux: {
   \bool_set_true:N \l_siunitx_number_compound_bool
   \siunitx_number_preprocess:V \l_siunitx_number_arg_tl
   \bool_if:NF \l_siunitx_error_bool
@@ -10011,7 +10011,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_number_output_quotient:}
 % For quotients, there are two options.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_quotient: {
+\cs_new_protected:Npn \siunitx_number_output_quotient: {
   \use:c
     { siunitx_number_output_quotient_ \l_siunitx_quotient_mode_tl : }
 }
@@ -10021,7 +10021,7 @@ This work consists of the file  siunitx.dtx
 % For fraction output, there are quite a lot of braces to construct,
 % unfortunately.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_quotient_fraction: {
+\cs_new_protected:Npn \siunitx_number_output_quotient_fraction: {
   \bool_set_false:N \l_siunitx_number_compound_bool
   \siunitx_number_output_quotient_aux_i:
   \tl_set:Nx \l_siunitx_number_out_tl
@@ -10043,7 +10043,7 @@ This work consists of the file  siunitx.dtx
 % If a symbol is used for the division, the build process is less
 % complex.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_quotient_symbol: {
+\cs_new_protected:Npn \siunitx_number_output_quotient_symbol: {
   \bool_set_true:N \l_siunitx_number_compound_bool
   \siunitx_number_output_quotient_aux_i:
   \tl_set_eq:NN \l_siunitx_number_out_tl
@@ -10062,7 +10062,7 @@ This work consists of the file  siunitx.dtx
 %}
 % The two parts of the number are parsed and formatted.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_quotient_aux_i: {
+\cs_new_protected:Npn \siunitx_number_output_quotient_aux_i: {
   \siunitx_number_in_parse:V \l_siunitx_number_numerator_tl
   \siunitx_number_output_quotient_aux_ii:
   \siunitx_number_output_color:
@@ -10089,7 +10089,7 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_out_prop { result }
     \l_siunitx_number_denominator_tl
 }
-\cs_new_protected_nopar:Npn \siunitx_number_output_quotient_aux_ii: {
+\cs_new_protected:Npn \siunitx_number_output_quotient_aux_ii: {
   \siunitx_number_process:
   \siunitx_number_format:
 }
@@ -10105,7 +10105,7 @@ This work consists of the file  siunitx.dtx
 % exponent: if there is, any other parts will already be bracketed and
 % mathematically there is no need for brackets at this point.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_number_output_single: {
+\cs_new_protected:Npn \siunitx_number_output_single: {
   \bool_if:nF
     {
       \tl_if_empty_p:N \l_siunitx_pre_unit_tl &&
@@ -10120,7 +10120,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_number_out_tl
   \siunitx_number_output_single_aux:
 }
-\cs_new_protected_nopar:Npn \siunitx_number_output_single_aux: {
+\cs_new_protected:Npn \siunitx_number_output_single_aux: {
   \siunitx_unit_output_pre_print:
   \quark_if_no_value:NTF \l_siunitx_number_out_tl
     { \tl_clear:N \l_siunitx_number_unit_product_tl }
@@ -10248,7 +10248,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_angle_init:}
 % The usual separation of initial storage resets.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_angle_init: {
+\cs_new_protected:Npn \siunitx_angle_init: {
   \bool_set_false:N \l_siunitx_angle_degree_space_bool
   \bool_set_false:N \l_siunitx_angle_minute_space_bool
   \prop_clear:N \l_siunitx_angle_degree_prop
@@ -10377,7 +10377,7 @@ This work consists of the file  siunitx.dtx
 % Only the highest-order part of an arc can have a sign. This is checked
 % now so that the shuffling code is easier to write.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_angle_check_sign: {
+\cs_new_protected:Npn \siunitx_angle_check_sign: {
   \prop_if_empty:NTF \l_siunitx_angle_degree_prop
     {
       \prop_if_empty:NF \l_siunitx_angle_minute_prop
@@ -10388,7 +10388,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_angle_check_sign_aux:n { second }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_check_sign_aux:n #1 {
+\cs_new_protected:Npn \siunitx_angle_check_sign_aux:n #1 {
   \prop_if_in:cnTF { l_siunitx_angle_ #1 _prop }
     { mantissa-sign }
     { \msg_error:nn { siunitx } { bad-arc-sign } }
@@ -10403,7 +10403,7 @@ This work consists of the file  siunitx.dtx
 % to worry about. There is therefore a shuffle to move them into the
 % correct places.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_angle_zero_fill: {
+\cs_new_protected:Npn \siunitx_angle_zero_fill: {
   \bool_if:nT
     {
       \prop_if_empty_p:N \l_siunitx_angle_second_prop &&
@@ -10441,11 +10441,11 @@ This work consists of the file  siunitx.dtx
       \siunitx_angle_sign_shuffle:nn { minute } { degree }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_sign_shuffle:nn #1#2 {
+\cs_new_protected:Npn \siunitx_angle_sign_shuffle:nn #1#2 {
   \siunitx_angle_sign_shuffle_aux:nnn {#1} {#2} { }
   \siunitx_angle_sign_shuffle_aux:nnn {#1} {#2} { -deleted }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_sign_shuffle_aux:nnn
+\cs_new_protected:Npn \siunitx_angle_sign_shuffle_aux:nnn
   #1#2#3 {
   \prop_get:cnN { l_siunitx_angle_ #1 _prop } { mantissa-sign #3 }
     \l_siunitx_tmpa_tl
@@ -10466,7 +10466,7 @@ This work consists of the file  siunitx.dtx
 % and either does a standard format or calls the special astronomy-style
 % routine. There may also be some spaces to add.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_angle_print: {
+\cs_new_protected:Npn \siunitx_angle_print: {
   \siunitx_angle_print_aux:nn { degree } { \SIUnitSymbolDegree }
   \bool_if:NT \l_siunitx_angle_degree_space_bool
     {
@@ -10481,7 +10481,7 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_angle_print_aux:nn { second } { \SIUnitSymbolArcsecond }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_aux:nn #1#2 {
+\cs_new_protected:Npn \siunitx_angle_print_aux:nn #1#2 {
   \prop_if_empty:cF { l_siunitx_angle_ #1 _prop }
     {
       \prop_set_eq:Nc \l_siunitx_number_in_prop
@@ -10520,13 +10520,13 @@ This work consists of the file  siunitx.dtx
 % added in after superscripts, which otherwise messes up the
 % calculation.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy: {
+\cs_new_protected:Npn \siunitx_angle_print_astronomy: {
   \prop_if_in:NnTF \l_siunitx_number_in_prop
     { mantissa-decimal-marker }
     { \siunitx_angle_print_astronomy_aux: }
     { \siunitx_number_output_single: }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_aux: {
+\cs_new_protected:Npn \siunitx_angle_print_astronomy_aux: {
   \prop_get:NnNT \l_siunitx_number_out_prop { mantissa-integer }
     \l_siunitx_tmpa_tl
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
@@ -10555,7 +10555,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_tmpa_tl
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_aux:n #1 {
+\cs_new_protected:Npn \siunitx_angle_print_astronomy_aux:n #1 {
   \dim_set:cn { l_siunitx_angle_ #1 _dim  }
     { \box_wd:c { l_siunitx_angle_ #1 _box } }
   \hbox_set_to_wd:cnn { l_siunitx_angle_ #1 _box } { \c_zero_skip }
@@ -10565,7 +10565,7 @@ This work consists of the file  siunitx.dtx
       \tex_hss:D
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_marker: {
+\cs_new_protected:Npn \siunitx_angle_print_astronomy_marker: {
   \hbox_set_to_wd:Nnn \l_siunitx_angle_marker_box
     { \l_siunitx_angle_marker_dim }
     {
@@ -10575,7 +10575,7 @@ This work consists of the file  siunitx.dtx
     }
   \box_use:N \l_siunitx_angle_marker_box
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_astronomy_unit: {
+\cs_new_protected:Npn \siunitx_angle_print_astronomy_unit: {
   \hbox_set_to_wd:Nnn \l_siunitx_angle_marker_box
     { \l_siunitx_angle_unit_dim }
     {
@@ -10610,7 +10610,7 @@ This work consists of the file  siunitx.dtx
     }
   \siunitx_angle_print_direct_aux:nn {#3} { \SIUnitSymbolArcsecond }
 }
-\cs_new_protected_nopar:Npn \siunitx_angle_print_direct_aux:nn #1#2 {
+\cs_new_protected:Npn \siunitx_angle_print_direct_aux:nn #1#2 {
   \tl_if_empty:nF {#1}
     {
       \tl_set:Nn \l_siunitx_unit_tl {#2}
@@ -10836,13 +10836,13 @@ This work consists of the file  siunitx.dtx
 % Without this, horrible things happen with \pkg{memoir} and
 % \pkg{hyperref}.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_create_empty_functions: {
+\cs_new_protected:Npn \siunitx_unit_create_empty_functions: {
   \tl_map_function:NN \l_siunitx_declare_list_tl
     \siunitx_unit_create_empty_functions_aux:N
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_unit_create_empty_functions_aux:N #1 {
-  \cs_if_free:NT #1 { \cs_set_protected_nopar:Npn #1 { \ERROR } }
+  \cs_if_free:NT #1 { \cs_set_protected:Npn #1 { \ERROR } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -10851,7 +10851,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_create_functions:}
 % Creation of macros essentially involves picking up a couple of loops.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_create_functions: {
+\cs_new_protected:Npn \siunitx_unit_create_functions: {
   \bool_if:NT \l_siunitx_create_overwrite_bool
     { \tl_map_function:NN \l_siunitx_declare_list_tl \cs_undefine:N }
   \bool_if:NTF \l_siunitx_create_optional_bool
@@ -10963,18 +10963,18 @@ This work consists of the file  siunitx.dtx
 \AtBeginDocument {
   \cs_if_eq:NNT \color \use_none:n
     { \cs_set_protected:Npn \color #1 { } }
-  \cs_set_nopar:Npn \siunitx_tmp:w #1 { }
+  \cs_set:Npn \siunitx_tmp:w #1 { }
   \cs_if_eq:NNT \color \siunitx_tmp:w
     { \cs_set_protected:Npn \color #1 { } }
   \tl_map_function:nN { \bar \color \ng \pm \array@row@rst }
     \siunitx_protect_symbols:N
 }
 \tl_put_right:Nn \document { \siunitx_protect_symbols:N \fg }
-\cs_new_protected_nopar:Npn \siunitx_protect_symbols:N #1 {
+\cs_new_protected:Npn \siunitx_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {
       \siunitx_cs_if_macro:NT #1
-        { \cs_set_protected_nopar:Npx #1 { \exp_not:V #1 } }
+        { \cs_set_protected:Npx #1 { \exp_not:V #1 } }
     }
 }
 %    \end{macrocode}
@@ -11044,7 +11044,7 @@ This work consists of the file  siunitx.dtx
   { \siunitx_unit_format_literal:n {#1} }
 }
 \cs_generate_variant:Nn \siunitx_unit_in:nn { V }
-\cs_new_nopar:Npn \siunitx_pm: { }
+\cs_new:Npn \siunitx_pm: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -11137,7 +11137,7 @@ This work consists of the file  siunitx.dtx
 % little clearer. The definition of \cs{pm} is saved here as it
 % is used by units and numbers.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_parse_init: {
+\cs_new_protected:Npn \siunitx_unit_parse_init: {
   \prop_clear:N \l_siunitx_unit_prop
   \int_zero:N \l_siunitx_unit_int
   \bool_set_false:N \l_siunitx_per_bool
@@ -11217,14 +11217,14 @@ This work consists of the file  siunitx.dtx
 % The \cs{per} function always applies to the next unit seen, so
 % the counter has to be advanced by one.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_parse_per: {
+\cs_new_protected:Npn \siunitx_unit_parse_per: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     {  per- \int_eval:n { \l_siunitx_unit_int + 1 } }
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
   \bool_if:NT \l_siunitx_sticky_per_bool
     { \cs_set_eq:NN \per \siunitx_unit_parse_per_error: }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_parse_per_error: {
+\cs_new_protected:Npn \siunitx_unit_parse_per_error: {
   \msg_error:nn { siunitx } { duplicate-sticky-per }
 }
 %    \end{macrocode}
@@ -11284,7 +11284,7 @@ This work consists of the file  siunitx.dtx
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#2}
   \siunitx_unit_parse_unit_per:
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_parse_unit_per: {
+\cs_new_protected:Npn \siunitx_unit_parse_unit_per: {
   \bool_if:NT \l_siunitx_sticky_per_bool
     {
       \bool_if:NT \l_siunitx_per_bool
@@ -11476,7 +11476,7 @@ This work consists of the file  siunitx.dtx
 % symbol. In that special case, the space between a number and a unit
 % has to be removed.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format: {
+\cs_new_protected:Npn \siunitx_unit_format: {
   \siunitx_unit_format_init:
   \int_while_do:nNnn { \l_siunitx_unit_int } > { 0 }
     {
@@ -11503,7 +11503,7 @@ This work consists of the file  siunitx.dtx
 % The odd code when adding a space is to pick up repeated per symbols,
 % which need to suppress the space.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_add: {
+\cs_new_protected:Npn \siunitx_unit_format_add: {
   \bool_if:NTF \l_siunitx_per_two_parts_bool
     {
       \tl_set:Nx \l_siunitx_tmpb_tl
@@ -11521,7 +11521,7 @@ This work consists of the file  siunitx.dtx
     { \siunitx_unit_format_add_aux:n { } }
   \tl_clear:N \l_siunitx_unit_current_tl
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_add_aux:n #1 {
+\cs_new_protected:Npn \siunitx_unit_format_add_aux:n #1 {
   \tl_if_empty:cF { l_siunitx_unit #1 _tl }
     {
       \str_if_eq:VnTF \l_siunitx_per_mode_tl { repeat }
@@ -11571,7 +11571,7 @@ This work consists of the file  siunitx.dtx
 % \( 1 \) in the numerator is it's blank. For symbol mode, this is
 % only done if there is no number. Then some construction work.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_fraction: {
+\cs_new_protected:Npn \siunitx_unit_format_fraction: {
   \int_compare:nNnT { \l_siunitx_unit_numerator_int } = { 0 }
     {
       \str_if_eq:VnT \l_siunitx_per_mode_tl { symbol }
@@ -11588,7 +11588,7 @@ This work consists of the file  siunitx.dtx
     }
     { \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_fraction: {
+\cs_new_protected:Npn \siunitx_unit_format_fraction_fraction: {
   \tl_if_empty:NT \l_siunitx_unit_numerator_tl
     { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
   \tl_set:Nx \l_siunitx_unit_numerator_tl
@@ -11617,7 +11617,7 @@ This work consists of the file  siunitx.dtx
 % \cs{tex_mathchoice:D}, with appropriate protection, before sending
 % everything through for printing.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_auto: {
+\cs_new_protected:Npn \siunitx_unit_format_fraction_auto: {
     \mode_if_math:TF
       {
         \group_begin:
@@ -11650,7 +11650,7 @@ This work consists of the file  siunitx.dtx
 % For a normal symbol, the two parts of the input are arranged either
 % side of the symbol itself in math mode.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_fraction_symbol: {
+\cs_new_protected:Npn \siunitx_unit_format_fraction_symbol: {
   \siunitx_unit_format_fraction_symbol_aux:
   \int_compare:nNnT { \l_siunitx_unit_denominator_int } > { 1 }
     {
@@ -11667,9 +11667,9 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_per_symbol_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_unit_format_fraction_symbol_aux: { }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_unit_format_fraction_symbol_aux_alt: {
   \tl_if_empty:NT \l_siunitx_unit_numerator_tl
     { \tl_set:Nn \l_siunitx_unit_numerator_tl { 1 } }
@@ -11681,7 +11681,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_format_init:}
 % The normal initialisation stuff.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_init: {
+\cs_new_protected:Npn \siunitx_unit_format_init: {
   \bool_set_false:N \l_siunitx_omit_unit_space_bool
   \tl_clear:N \l_siunitx_unit_tl
   \tl_clear:N \l_siunitx_unit_current_tl
@@ -11743,7 +11743,7 @@ This work consists of the file  siunitx.dtx
 % can appear in units in UTF-8 and related encodings. The idea is to
 % do a search and replace, thus avoiding any active characters.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_literal_extras: {
+\cs_new_protected:Npn \siunitx_unit_format_literal_extras: {
   \siunitx_unit_format_literal_extras_aux:nN { 176 }
     \SIUnitSymbolDegree
   \siunitx_unit_format_literal_extras_aux:nN { 181 }
@@ -11751,7 +11751,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_unit_format_literal_extras_aux:nN { 197 }
     \SIUnitSymbolAngstrom
 }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_unit_format_literal_extras_aux:nN #1#2 {
   \char_set_lccode:nn { `\@ } {#1}
   \tl_to_lowercase:n
@@ -11799,7 +11799,7 @@ This work consists of the file  siunitx.dtx
 % per symbols make life a little more complex, as they have to be
 % handled here as well.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_power: {
+\cs_new_protected:Npn \siunitx_unit_format_power: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { power- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVNTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -11821,7 +11821,7 @@ This work consists of the file  siunitx.dtx
 % different. A search and replace function is needed for superscripts
 % in text mode so that negative signs get printed correctly.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_power_aux: {
+\cs_new_protected:Npn \siunitx_unit_format_power_aux: {
   \str_if_eq:VnTF \l_siunitx_per_mode_tl { repeat }
     { \siunitx_unit_format_power_repeat: }
     { \siunitx_unit_format_power_per: }
@@ -11857,7 +11857,7 @@ This work consists of the file  siunitx.dtx
 % A check is made for a qualifier with a space, which needs brackets
 % if there is also a power.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_power_brackets: {
+\cs_new_protected:Npn \siunitx_unit_format_power_brackets: {
   \tl_set:Nx \l_siunitx_tmpb_tl
     { bracket- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl
@@ -11873,7 +11873,7 @@ This work consists of the file  siunitx.dtx
 % change does not use any numbers, as this makes life easier with
 % non-integer values.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_power_per: {
+\cs_new_protected:Npn \siunitx_unit_format_power_per: {
   \tl_set:Nx \l_siunitx_tmpb_tl
     { per- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl
@@ -11890,7 +11890,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_power_repeat: {
+\cs_new_protected:Npn \siunitx_unit_format_power_repeat: {
   \tl_set:Nx \l_siunitx_tmpb_tl
     { per- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl
@@ -11912,7 +11912,7 @@ This work consists of the file  siunitx.dtx
 % If there is a prefix, it is added to the output. When using numerical
 % output, some conversion is needed instead.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_prefix: {
+\cs_new_protected:Npn \siunitx_unit_format_prefix: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { prefix- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -11924,7 +11924,7 @@ This work consists of the file  siunitx.dtx
         { \siunitx_unit_format_prefix_number: }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_prefix_number: {
+\cs_new_protected:Npn \siunitx_unit_format_prefix_number: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { prefix-base- \int_use:N \l_siunitx_unit_int }
  \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -11945,7 +11945,7 @@ This work consists of the file  siunitx.dtx
 %  is the kilogram and so there is some code to convert the number
 %  back correctly.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_prefix_number_calc: {
+\cs_new_protected:Npn \siunitx_unit_format_prefix_number_calc: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { power- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVNF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -11986,7 +11986,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_prefix_symbol: {
+\cs_new_protected:Npn \siunitx_unit_format_prefix_symbol: {
   \tl_set_eq:NN \l_siunitx_unit_current_tl
     \l_siunitx_unit_prefix_current_tl
 }
@@ -12005,7 +12005,7 @@ This work consists of the file  siunitx.dtx
 % For the \texttt{space} methods, a warning is set in the property list
 % as if there is a power then some brackets will be needed.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier: {
+\cs_new_protected:Npn \siunitx_unit_format_qualifier: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { qualifier- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVNT \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -12018,7 +12018,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_brackets: {
+\cs_new_protected:Npn \siunitx_unit_format_qualifier_brackets: {
   \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
     \l_siunitx_bracket_open_tl
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
@@ -12026,7 +12026,7 @@ This work consists of the file  siunitx.dtx
     \l_siunitx_bracket_close_tl
 }
 \char_set_catcode_active:N \~
-\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_space: {
+\cs_new_protected:Npn \siunitx_unit_format_qualifier_space: {
   \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
   \tl_set:Nx \l_siunitx_tmpa_tl
@@ -12034,11 +12034,11 @@ This work consists of the file  siunitx.dtx
   \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
 }
 \char_set_catcode_space:N \~
-\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_subscript: {
+\cs_new_protected:Npn \siunitx_unit_format_qualifier_subscript: {
   \tl_put_right:Nx \l_siunitx_unit_current_tl
     { \exp_not:N \PrintSubscript { \exp_not:V \l_siunitx_tmpa_tl } }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_text: {
+\cs_new_protected:Npn \siunitx_unit_format_qualifier_text: {
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
 }
 %    \end{macrocode}
@@ -12050,7 +12050,7 @@ This work consists of the file  siunitx.dtx
 % slight issue is making sure that the additional space is included
 % between the two units, if needed.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_sorted: {
+\cs_new_protected:Npn \siunitx_unit_format_sorted: {
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
   \tl_if_empty:NTF \l_siunitx_unit_tl
     {
@@ -12074,7 +12074,7 @@ This work consists of the file  siunitx.dtx
 % when the code is inside the \cs{si} function (or similar) and there
 % is only a prefix with nothing else present at all.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_format_symbol: {
+\cs_new_protected:Npn \siunitx_unit_format_symbol: {
   \tl_set:Nx \l_siunitx_tmpa_tl
     { symbol- \int_use:N \l_siunitx_unit_int }
   \prop_get:NVNTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -12084,10 +12084,10 @@ This work consists of the file  siunitx.dtx
     }
     { \siunitx_unit_format_symbol_aux: }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_symbol_aux: {
+\cs_new_protected:Npn \siunitx_unit_format_symbol_aux: {
   \msg_error:nn { siunitx } { prefix-only }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_format_symbol_aux_alt: {
+\cs_new_protected:Npn \siunitx_unit_format_symbol_aux_alt: {
   \int_compare:nNnTF { \l_siunitx_unit_int } = { 1 }
     {
       \prop_del:Nn \l_siunitx_unit_prop { prefix-1 }
@@ -12247,7 +12247,7 @@ This work consists of the file  siunitx.dtx
 % as in that case omission of the space between a number and unit
 % depends on the current math style.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep: {
+\cs_new_protected:Npn \siunitx_unit_output_number_sep: {
   \bool_if:NTF \l_siunitx_number_unit_breaks_bool
     { \penalty \binoppenalty } { \nobreak }
   \bool_if:NTF \l_siunitx_per_auto_bool
@@ -12267,7 +12267,7 @@ This work consists of the file  siunitx.dtx
     }
     { \siunitx_unit_output_number_sep_aux: }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_output_number_sep_aux: {
+\cs_new_protected:Npn \siunitx_unit_output_number_sep_aux: {
   \bool_if:NF \l_siunitx_omit_unit_space_bool
     { \siunitx_ensuremath:n { \l_siunitx_number_unit_product_tl } }
 }
@@ -12280,14 +12280,14 @@ This work consists of the file  siunitx.dtx
 % The printing functions for units do some simple tests then
 % actually print there output.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_unit_output_pre_print: {
+\cs_new_protected:Npn \siunitx_unit_output_pre_print: {
   \tl_if_empty:NF \l_siunitx_pre_unit_tl
     {
       \nobreak
       \siunitx_print:nV { unit } \l_siunitx_pre_unit_tl
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_unit_output_print: {
+\cs_new_protected:Npn \siunitx_unit_output_print: {
   \int_compare:nNnF { \l_siunitx_unit_prefix_int } = { 0 }
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
@@ -12702,9 +12702,9 @@ This work consists of the file  siunitx.dtx
 % arguments do not work correctly. So they are added \enquote{by hand}
 % to the appropriate macro.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_rewrite_create:N #1 {
+\cs_new_protected:Npn \siunitx_table_rewrite_create:N #1 {
   \newcolumntype {#1} { }
-  \cs_set_protected_nopar:Npn
+  \cs_set_protected:Npn
     \siunitx_table_rewrite_create_aux:w \NC@do ##1##2 \NC@do #1
     {  \NC@list { \NC@do ##1 \NC@do #1 ##2 } }
   \exp_after:wN \siunitx_table_rewrite_create_aux:w \tex_the:D \NC@list
@@ -12720,7 +12720,7 @@ This work consists of the file  siunitx.dtx
       \NC@find
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_table_rewrite_create_aux:w { }
+\cs_new_protected:Npn \siunitx_table_rewrite_create_aux:w { }
 \AtBeginDocument { \siunitx_table_rewrite_create:N s }
 \AtBeginDocument { \siunitx_table_rewrite_create:N S }
 %    \end{macrocode}
@@ -12786,14 +12786,14 @@ This work consists of the file  siunitx.dtx
   \keys_set:nn { siunitx } {#2}
   \use:c { siunitx_table_collect_begin_ #1 : }
 }
-\cs_new_protected_nopar:Npn \siunitx_table_collect_begin_s: {
+\cs_new_protected:Npn \siunitx_table_collect_begin_s: {
   \cs_set_eq:NN \siunitx_table_collect_token:N
     \siunitx_table_collect_token_s:N
   \cs_set_eq:NN \siunitx_table_print: \siunitx_table_print_s:
   \siunitx_table_collect_init_s:
   \siunitx_table_collect_get:
 }
-\cs_new_protected_nopar:Npn \siunitx_table_collect_begin_S: {
+\cs_new_protected:Npn \siunitx_table_collect_begin_S: {
   \cs_set_eq:NN \siunitx_table_collect_token:N
     \siunitx_table_collect_token_S:N
   \cs_set_eq:NN \siunitx_table_print: \siunitx_table_print_S:
@@ -12843,7 +12843,7 @@ This work consists of the file  siunitx.dtx
         {
           \tl_use:N \l_siunitx_table_collect_pre_tl
           \tl_clear:N \l_siunitx_table_collect_pre_tl
-          \cs_set_nopar:Npn \siunitx_table_collect_next:
+          \cs_set:Npn \siunitx_table_collect_next:
             { \exp_after:wN \siunitx_table_collect_get: #1 }
         }
         {
@@ -12894,10 +12894,10 @@ This work consists of the file  siunitx.dtx
 % broken with \pkg{expl3}'s \cs{peek_catcode_ignore_spaces:NTF}, so
 % everything is done by hand.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_get: {
+\cs_new_protected:Npn \siunitx_table_collect_get: {
   \cs_set_eq:NN \siunitx_table_collect_next:
     \siunitx_table_collect_get:
-  \cs_set_nopar:Npn \peek_execute_branches:
+  \cs_set:Npn \peek_execute_branches:
     {
       \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
         \exp_after:wN \siunitx_table_collect_braced:n
@@ -12914,7 +12914,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_collect_init:}
 % The usual spin-out of basics.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_init: {
+\cs_new_protected:Npn \siunitx_table_collect_init: {
   \tl_clear:N \l_siunitx_table_collect_tl
   \tl_clear:N \l_siunitx_table_collect_pre_tl
   \tl_clear:N \l_siunitx_table_collect_post_tl
@@ -12929,7 +12929,7 @@ This work consists of the file  siunitx.dtx
 % initialisation function for numbers is used to set
 % \cs{l_siunitx_number_valid_tl} correctly.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_init_s: {
+\cs_new_protected:Npn \siunitx_table_collect_init_s: {
   \siunitx_table_collect_init:
   \bool_set_false:N \l_siunitx_table_collect_pre_bool
   \cs_set_protected:Npn \siunitx_table_collect_braced:n ##1
@@ -12938,7 +12938,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_table_collect_next:
     }
 }
-\cs_new_protected_nopar:Npn \siunitx_table_collect_init_S: {
+\cs_new_protected:Npn \siunitx_table_collect_init_S: {
   \siunitx_number_in_init:
   \tl_set:Nx \l_siunitx_number_valid_tl
     {
@@ -12972,7 +12972,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_collect_next:}
 % A holder for the next thing to do.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_next: { }
+\cs_new_protected:Npn \siunitx_table_collect_next: { }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -12983,7 +12983,7 @@ This work consists of the file  siunitx.dtx
 % definition of \cs{siunitx_table_print:}, as it will re-appear on its
 % own.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_newline: {
+\cs_new_protected:Npn \siunitx_table_collect_newline: {
   \siunitx_table_print:
   \cs_set_eq:NN \siunitx_table_print: \prg_do_nothing:
   \tabularnewline
@@ -12994,7 +12994,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_table_collect_end:}
 % The same concept applies to the \cs{end} macro.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_collect_end: {
+\cs_new_protected:Npn \siunitx_table_collect_end: {
   \siunitx_table_print:
   \cs_set_eq:NN \siunitx_table_print: \prg_do_nothing:
   \end
@@ -13121,13 +13121,13 @@ This work consists of the file  siunitx.dtx
   {
     \@ifpackageloaded { colortbl }
       {
-        \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction:
+        \cs_new_protected:Npn \siunitx_table_colortbl_correction:
           {
             \skip_horizontal:n { \c_zero_skip plus -0.5 fill }
             \tex_kern:D \c_zero_skip
           }
       }
-      { \cs_new_protected_nopar:Npn \siunitx_table_colortbl_correction: { } }
+      { \cs_new_protected:Npn \siunitx_table_colortbl_correction: { } }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -13139,13 +13139,13 @@ This work consists of the file  siunitx.dtx
 %   horizontal skip. The correction for \pkg{colortbl} is separate as the
 %   spacing needs to be explicitly deleted.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_align_left:n #1
+\cs_new_protected:Npn \siunitx_table_align_left:n #1
   {
     \siunitx_table_colortbl_correction:
     \skip_horizontal:n {#1}
     \tex_kern:D \c_zero_skip
   }
-\cs_new_protected_nopar:Npn \siunitx_table_align_right:n #1
+\cs_new_protected:Npn \siunitx_table_align_right:n #1
   {
     \skip_horizontal:n { \c_siunitx_one_fill_skip - #1 }
     \tex_kern:D \c_zero_skip
@@ -13181,7 +13181,7 @@ This work consists of the file  siunitx.dtx
               \siunitx_table_align_right:n
           }
           {
-            \cs_set_protected_nopar:Npn \siunitx_table_column_begin:n ##1
+            \cs_set_protected:Npn \siunitx_table_column_begin:n ##1
               {
                 \siunitx_table_colortbl_correction:
                 \tex_hbox:D to \dim_eval:n {#1}
@@ -13189,7 +13189,7 @@ This work consists of the file  siunitx.dtx
                   \skip_horizontal:n {##1}
                   \tex_kern:D \c_zero_skip
               }
-            \cs_set_protected_nopar:Npn \siunitx_table_column_end:n ##1
+            \cs_set_protected:Npn \siunitx_table_column_end:n ##1
               {
                   \skip_horizontal:n { \c_siunitx_one_fill_skip - ##1 }
                   \tex_kern:D \c_zero_skip
@@ -13243,7 +13243,7 @@ This work consists of the file  siunitx.dtx
 %   some spacing to do at each side, with the main part of the job being
 %   to print the material using the internal version of \cs{si}.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_s:
+\cs_new_protected:Npn \siunitx_table_print_s:
   {
     \siunitx_table_column_begin:n { \l_siunitx_table_unit_align_skip }
       \siunitx_unit_output:Vn \l_siunitx_table_collect_tl { }
@@ -13345,9 +13345,9 @@ This work consists of the file  siunitx.dtx
 %   Various functions which are set up by the option system, and so are
 %   reserved here first for completeness.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_main: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_parsed: { }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill:n #1 { }
+\cs_new_protected:Npn \siunitx_table_print_S_direct_main: { }
+\cs_new_protected:Npn \siunitx_table_print_S_parsed: { }
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_store_fill:n #1 { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -13588,7 +13588,7 @@ This work consists of the file  siunitx.dtx
 %   insert. Font detection for the \texttt{S} column is included here as
 %   this is needed to do this work outside of an \cs{hbox}.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S:
+\cs_new_protected:Npn \siunitx_table_print_S:
   {
     \bool_if:NTF \l_siunitx_table_collect_pre_bool
       {
@@ -13619,7 +13619,7 @@ This work consists of the file  siunitx.dtx
 %   With no alignment to do, the code can be pretty simple. The collected
 %   number is simply printed between the two non-numerical parts.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_no_alignment:
+\cs_new_protected:Npn \siunitx_table_print_S_no_alignment:
   {
     \l_siunitx_table_collect_pre_tl
     \siunitx_number_output:V \l_siunitx_table_collect_tl
@@ -13632,7 +13632,7 @@ This work consists of the file  siunitx.dtx
 %   This is a pass-through, so that the appropriate alignment mode is
 %   retained without needing to retest on each use.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_alignment:
+\cs_new_protected:Npn \siunitx_table_print_S_alignment:
   { \siunitx_table_print_S_parsed: }
 %    \end{macrocode}
 % \end{macro}
@@ -13640,7 +13640,7 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\siunitx_table_print_S_parse:}
 %   A modified version of the number parser for tables.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_parse:
+\cs_new_protected:Npn \siunitx_table_print_S_parse:
   {
     \bool_set_false:N \l_siunitx_error_bool
     \siunitx_number_in_parse:V \l_siunitx_table_collect_tl
@@ -13666,7 +13666,7 @@ This work consists of the file  siunitx.dtx
 %   storage system. Boxing up is avoided for the empty cases, as this saves
 %   a little time(the print routine is relatively slow).
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_measure:NN #1#2
+\cs_new_protected:Npn \siunitx_table_print_S_measure:NN #1#2
   {
     \tl_if_empty:NTF #1
       { \dim_zero:N #2 }
@@ -13692,22 +13692,22 @@ This work consists of the file  siunitx.dtx
 %   to maintain alignment. The order in which the two are inserted depends
 %   on whether those parts are also aligned.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_aligned:
+\cs_new_protected:Npn \siunitx_table_print_S_pre_aligned:
   {
     \box_use:N \l_siunitx_table_pre_box
     \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_pre_not_aligned:
+\cs_new_protected:Npn \siunitx_table_print_S_pre_not_aligned:
   {
     \hbox_to_wd:nn { \l_siunitx_table_fill_pre_dim } { \tex_hfil:D }
     \box_use:N \l_siunitx_table_pre_box
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_post_aligned:
+\cs_new_protected:Npn \siunitx_table_print_S_post_aligned:
   {
     \hbox_to_wd:nn { \l_siunitx_table_fill_post_dim } { \tex_hfil:D }
     \box_use:N \l_siunitx_table_post_box
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_post_not_aligned:
+\cs_new_protected:Npn \siunitx_table_print_S_post_not_aligned:
   {
     \box_use:N \l_siunitx_table_post_box
     \hbox_to_wd:nn { \l_siunitx_table_fill_post_dim } { \tex_hfil:D }
@@ -13723,7 +13723,7 @@ This work consists of the file  siunitx.dtx
 %   out which part is bigger and calculates the fill correction accordingly.
 %   Once all of that is done, the various boxes and fill can be inserted.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered:
+\cs_new_protected:Npn \siunitx_table_print_S_centered:
   {
     \siunitx_table_print_S_centered_ends:
     \bool_if:NT \l_siunitx_table_math_bool { \c_math_toggle_token }
@@ -13756,7 +13756,7 @@ This work consists of the file  siunitx.dtx
 %   to the colour, font or so forth. After that, the narrower of the two
 %   boxes is made the same size as the wider: this maintains the alignment.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_ends:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_ends:
   {
     \hbox_set:Nn \l_siunitx_table_pre_box
       {
@@ -13815,13 +13815,13 @@ This work consists of the file  siunitx.dtx
 %   the decimal marker and the entire number. Most of the work consists
 %   of collecting up parts of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_measure:
   {
     \siunitx_table_print_S_centered_measure_int_part:
     \siunitx_table_print_S_centered_measure_marker:
     \siunitx_table_print_S_centered_measure_result:
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_int_part:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_measure_int_part:
   {
     \prop_get:NnNF \l_siunitx_number_out_prop { comparator } \l_siunitx_tmpa_tl
       { \tl_clear:N \l_siunitx_tmpa_tl }
@@ -13834,7 +13834,7 @@ This work consists of the file  siunitx.dtx
     \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
       \l_siunitx_table_integer_dim
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_marker:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_measure_marker:
   {
     \tl_set:Nx \l_siunitx_tmpa_tl
       {
@@ -13848,7 +13848,7 @@ This work consists of the file  siunitx.dtx
 %  As the overall result will be needed later, the boxing up here is done
 %  using a named box that will be retained.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_measure_result:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_measure_result:
   {
     \prop_get:NnN \l_siunitx_number_out_prop { result } \l_siunitx_tmpa_tl
     \hbox_set:Nn \l_siunitx_table_result_box
@@ -13870,13 +13870,13 @@ This work consists of the file  siunitx.dtx
 %   therefore set, for fill before the number and after it. One of these
 %   will always be zero.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_integer:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_integer:
   {
     \dim_set:Nn \l_siunitx_table_fill_post_dim
       { \l_siunitx_table_integer_dim - \l_siunitx_table_fill_pre_dim }
     \dim_zero:N \l_siunitx_table_fill_pre_dim
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_centered_decimal:
+\cs_new_protected:Npn \siunitx_table_print_S_centered_decimal:
   {
     \dim_sub:Nn \l_siunitx_table_fill_pre_dim
       { \l_siunitx_table_integer_dim }
@@ -13891,7 +13891,7 @@ This work consists of the file  siunitx.dtx
 %   The procedure for inserting a number with space reserved requires a model
 %   for each part of the number.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved:
   {
     \siunitx_table_print_S_reserved_init:
     \siunitx_table_print_S_reserved_ends:
@@ -13915,7 +13915,7 @@ This work consists of the file  siunitx.dtx
 %   model is done here so that all of the other options will apply without
 %   needing complex internal tracking.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_init:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_init:
   {
     \dim_zero:N \l_siunitx_table_fill_mid_dim
     \dim_zero:N \l_siunitx_table_fill_post_dim
@@ -13945,7 +13945,7 @@ This work consists of the file  siunitx.dtx
 %   with people forgetting to reserve space for the pre-numeral part, it is
 %   boxed up first at natural width so that the measurement is accurate.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_ends:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_ends:
   {
     \hbox_set:Nn \l_siunitx_table_pre_box
       {
@@ -13991,7 +13991,7 @@ This work consists of the file  siunitx.dtx
 %   allowed for, and if there are none to simply set the rounding value to
 %   zero.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_round_auto:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_round_auto:
   {
     \prop_get:NnNTF \l_siunitx_table_model_prop { mantissa-decimal-raw }
       \l_siunitx_tmpa_tl
@@ -14010,7 +14010,7 @@ This work consists of the file  siunitx.dtx
 %   that for filling: this is needed so that any pre-note can be aligned
 %   freely.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_comparator:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_comparator:
   {
     \prop_get:NnNTF \l_siunitx_table_model_prop { comparator }
       \l_siunitx_tmpa_tl
@@ -14052,9 +14052,9 @@ This work consists of the file  siunitx.dtx
 %   To allow for the various alignment options, fill is stored in a
 %   flexible way.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill_pre:n
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_store_fill_pre:n
   { \dim_add:Nn \l_siunitx_table_fill_pre_dim }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_store_fill_mid:n
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_store_fill_mid:n
   { \dim_add:Nn \l_siunitx_table_fill_mid_dim }
 %    \end{macrocode}
 % \end{macro}
@@ -14074,7 +14074,7 @@ This work consists of the file  siunitx.dtx
 %   to reserve, and see if there is anything at all to put in it. The
 %   complexity only starts if there is a mantissa in the current cell.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_mantissa:
   {
     \prop_get:NnNTF \l_siunitx_table_model_prop { mantissa }
       \l_siunitx_tmpa_tl
@@ -14114,7 +14114,7 @@ This work consists of the file  siunitx.dtx
 %   filler needed in the integer part. That is stored in the intermediate
 %   dimension for the present, although it may get moved.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_parts:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_mantissa_parts:
   {
     \siunitx_table_print_S_reserved_mantissa_integer:
     \hbox_set:Nn \l_siunitx_table_result_box
@@ -14138,7 +14138,7 @@ This work consists of the file  siunitx.dtx
 %   before or after any comparator. If there is an integer part, the
 %   size is measured and the any fill needed is stored for re-insertion.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_integer:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_mantissa_integer:
   {
     \prop_get:NnNF \l_siunitx_table_model_prop { mantissa-sign }
       \l_siunitx_tmpa_tl
@@ -14168,7 +14168,7 @@ This work consists of the file  siunitx.dtx
 %   be a \cs{pm} part to add. Once the space calculation is done, a flexible
 %   auxiliary does the spacing and pasting up.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_mantissa_uncert:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_mantissa_uncert:
   {
     \prop_get:NnNT \l_siunitx_table_model_prop { mantissa-uncertainty }
       \l_siunitx_tmpa_tl
@@ -14200,7 +14200,7 @@ This work consists of the file  siunitx.dtx
 %   up in the middle fill store, but in the alignment case this also removes
 %   any previous fill. The temporary box here contains the uncertainty part.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_table_print_S_reserved_mantissa_uncert_aligned:
   {
     \hbox_set:Nn \l_siunitx_table_result_box
@@ -14212,7 +14212,7 @@ This work consists of the file  siunitx.dtx
     \dim_set:Nn \l_siunitx_table_fill_mid_dim
       { \l_siunitx_table_uncert_dim - \box_wd:N \l_siunitx_tmp_box }
   }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_table_print_S_reserved_mantissa_uncert_not_aligned:
   {
     \hbox_set:Nn \l_siunitx_table_result_box
@@ -14243,7 +14243,7 @@ This work consists of the file  siunitx.dtx
 %   exponent, then any space which needs to be added must be moved from
 %   the mid space to the post space at this stage.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_exponent:
   {
     \prop_get:NnNTF \l_siunitx_table_model_prop { exponent-result }
       \l_siunitx_tmpa_tl
@@ -14285,7 +14285,7 @@ This work consists of the file  siunitx.dtx
 %   A short sub-function to deal with the appearance of the exponent product
 %   for both the real number and the model.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_product:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_exponent_product:
   {
     \tl_set_eq:NN \l_siunitx_tmpb_tl \l_siunitx_exponent_product_tl
     \bool_if:NT \l_siunitx_tight_bool
@@ -14301,7 +14301,7 @@ This work consists of the file  siunitx.dtx
 %   If there is no mantissa, then some additional space is needed for the
 %   location where the product symbol would have been.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_table_print_S_reserved_exponent_product_correction:
   {
     \group_begin:
@@ -14322,7 +14322,7 @@ This work consists of the file  siunitx.dtx
 %   or exclude the mid fill space. Doing that here avoids one extra assignment
 %   (to clear the mid fill in the aligned case).
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_reserved_exponent_aligned:
+\cs_new_protected:Npn \siunitx_table_print_S_reserved_exponent_aligned:
   {
     \hbox_set:Nn \l_siunitx_table_result_box
       {
@@ -14336,7 +14336,7 @@ This work consists of the file  siunitx.dtx
         - \box_wd:N \l_siunitx_tmp_box
       }
   }
-\cs_new_protected_nopar:Npn
+\cs_new_protected:Npn
   \siunitx_table_print_S_reserved_exponent_not_aligned:
   {
     \hbox_set:Nn \l_siunitx_table_result_box
@@ -14367,7 +14367,7 @@ This work consists of the file  siunitx.dtx
 %   then calls the main function, which will be assigned by the
 %   key--value system.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct:
+\cs_new_protected:Npn \siunitx_table_print_S_direct:
   {
     \m@th
     \siunitx_table_print_S_direct_main:
@@ -14387,7 +14387,7 @@ This work consists of the file  siunitx.dtx
 %   it will work with non-numerical input.
 %    \begin{macrocode}
 \char_set_catcode_active:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered:
+\cs_new_protected:Npn \siunitx_table_print_S_direct_centered:
   {
     \cs_set_eq:NN \siunitx_table_print:
       \siunitx_table_print_S_direct_centered_end:
@@ -14402,11 +14402,11 @@ This work consists of the file  siunitx.dtx
         \tl_map_function:NN \l_siunitx_input_decimal_tl
           \siunitx_table_print_S_direct_centered_aux:N
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered_aux:N #1
+\cs_new_protected:Npn \siunitx_table_print_S_direct_centered_aux:N #1
   {
     \char_set_lccode:nn { `\@ } { `#1 }
     \char_set_mathcode:nn { `#1 } { 32768 }
-    \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
+    \tl_to_lowercase:n { \cs_set:Npn @ }
       {
         \c_math_toggle_token
         \c_group_end_token
@@ -14417,7 +14417,7 @@ This work consists of the file  siunitx.dtx
       }
   }
 \char_set_catcode_letter:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_centered_end:
+\cs_new_protected:Npn \siunitx_table_print_S_direct_centered_end:
   {
       \c_math_toggle_token
     \c_group_end_token
@@ -14459,7 +14459,7 @@ This work consists of the file  siunitx.dtx
 %   \cs{tex_hill:D} as \texttt{fil} glue will not work.
 %    \begin{macrocode}
 \char_set_catcode_active:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved:
+\cs_new_protected:Npn \siunitx_table_print_S_direct_reserved:
   {
     \cs_set_eq:NN \siunitx_table_print:
       \siunitx_table_print_S_direct_reserved_end:
@@ -14500,11 +14500,11 @@ This work consists of the file  siunitx.dtx
           \siunitx_table_print_S_direct_reserved_aux:N
         \tex_hfill:D
   }
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved_aux:N #1
+\cs_new_protected:Npn \siunitx_table_print_S_direct_reserved_aux:N #1
   {
     \char_set_lccode:nn { `\@ } { `#1 }
     \char_set_mathcode:nn { `#1 } { 32768 }
-    \tl_to_lowercase:n { \cs_set_nopar:Npn @ }
+    \tl_to_lowercase:n { \cs_set:Npn @ }
       {
           \c_math_toggle_token
         \c_group_end_token
@@ -14516,7 +14516,7 @@ This work consists of the file  siunitx.dtx
       }
   }
 \char_set_catcode_letter:N \@
-\cs_new_protected_nopar:Npn \siunitx_table_print_S_direct_reserved_end:
+\cs_new_protected:Npn \siunitx_table_print_S_direct_reserved_end:
   {
       \c_math_toggle_token
       \tex_hfil:D
@@ -14687,7 +14687,7 @@ This work consists of the file  siunitx.dtx
 % For creating the outer symbol macro.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_symbol_new:n #1 {
-  \cs_set_protected_nopar:cpn { SIUnitSymbol #1 }
+  \cs_set_protected:cpn { SIUnitSymbol #1 }
     {
       \mode_if_math:TF
         { \tl_to_lowercase:n { \use:c { l_siunitx_ #1 _math_tl } } }
@@ -14731,7 +14731,7 @@ This work consists of the file  siunitx.dtx
 % be more difficult to follow.
 %    \begin{macrocode}
 \clist_new:N \l_siunitx_pgf_link_clist
-\cs_new_protected_nopar:Npn \siunitx_pgf_link: {
+\cs_new_protected:Npn \siunitx_pgf_link: {
   \clist_clear:N \l_siunitx_pgf_link_clist
   \str_if_eq:VnT \l_siunitx_round_tl { figure }
     {
@@ -14781,7 +14781,7 @@ This work consists of the file  siunitx.dtx
         { showpos = false }
     }
   \group_begin:
-  \cs_set_nopar:Npx \siunitx_tmp:w
+  \cs_set:Npx \siunitx_tmp:w
     {
       \group_end:
       \exp_not:N \pgfqkeys
@@ -15001,7 +15001,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\SendSettingsToPgf}
 % A settings transfer function.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \SendSettingsToPgf { \siunitx_pgf_link: }
+\cs_new_protected:Npn \SendSettingsToPgf { \siunitx_pgf_link: }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -15190,8 +15190,8 @@ This work consists of the file  siunitx.dtx
           { \token_to_str:N \@writefile {#1} {#2} }
       }
   }
-\cs_new_protected_nopar:Npn \siunitx_contents_add:N #1
-  { \cs_set_nopar:Npn #1 { \token_to_str:N #1 } }
+\cs_new_protected:Npn \siunitx_contents_add:N #1
+  { \cs_set:Npn #1 { \token_to_str:N #1 } }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -15203,7 +15203,7 @@ This work consists of the file  siunitx.dtx
 %   of the input, removes any set up options (which are being ignored)
 %   and stops \pkg{hyperref} issuing a warning.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \siunitx_contents_bookmarks:
+\cs_new_protected:Npn \siunitx_contents_bookmarks:
   {
     \tl_map_function:NN \l_siunitx_declare_list_tl
       \siunitx_unit_print_literal_aux:N
@@ -15215,13 +15215,13 @@ This work consists of the file  siunitx.dtx
     \cs_set_eq:NN \SIrange  \siunitx_bookmark_SIrange:w
     \cs_set_eq:NN \si       \siunitx_bookmark_si:w
     \cs_set_eq:NN \siunitx_textsuperscript:n \use:n
-    \cs_set_nopar:Npn \SIUnitSymbolAngstrom  { \AA }
-    \cs_set_nopar:Npn \SIUnitSymbolArcminute { ' }
-    \cs_set_nopar:Npn \SIUnitSymbolArcsecond { '' }
-    \cs_set_nopar:Npn \SIUnitSymbolCelsius   { \textcelsius }
-    \cs_set_nopar:Npn \SIUnitSymbolDegree    { \textdegree }
-    \cs_set_nopar:Npn \SIUnitSymbolMicro     { \textmu }
-    \cs_set_nopar:Npn \SIUnitSymbolOhm       { [ohm] }
+    \cs_set:Npn \SIUnitSymbolAngstrom  { \AA }
+    \cs_set:Npn \SIUnitSymbolArcminute { ' }
+    \cs_set:Npn \SIUnitSymbolArcsecond { '' }
+    \cs_set:Npn \SIUnitSymbolCelsius   { \textcelsius }
+    \cs_set:Npn \SIUnitSymbolDegree    { \textdegree }
+    \cs_set:Npn \SIUnitSymbolMicro     { \textmu }
+    \cs_set:Npn \SIUnitSymbolOhm       { [ohm] }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -15658,10 +15658,10 @@ This work consists of the file  siunitx.dtx
     }
 }
 \siunitx_option_deactivate:n { strict }
-\cs_new_protected_nopar:Npn \siunitx_strict_option:n #1 {
+\cs_new_protected:Npn \siunitx_strict_option:n #1 {
   \clist_map_function:nN {#1} \siunitx_strict_option_aux:n
 }
-\cs_new_protected_nopar:Npn \siunitx_strict_option_aux:n #1 {
+\cs_new_protected:Npn \siunitx_strict_option_aux:n #1 {
   \keys_define:nn { siunitx }
     { #1 .code:n =
       { \msg_warning:nnx { siunitx } { option-not-available } {#1} }
@@ -15768,12 +15768,12 @@ This work consists of the file  siunitx.dtx
       false       .code:n    = { } ,
     binary-units  .default:n = true
   }
-\cs_new_protected_nopar:Npn \siunitx_load_abbreviations:
+\cs_new_protected:Npn \siunitx_load_abbreviations:
   {
     \@onefilewithoptions { siunitx-abbreviations } [ ] [ ]
       \c_siunitx_configuration_ext_tl
   }
-\cs_new_protected_nopar:Npn \siunitx_load_binary:
+\cs_new_protected:Npn \siunitx_load_binary:
   {
     \@onefilewithoptions { siunitx-binary } [ ] [ ]
       \c_siunitx_configuration_ext_tl
