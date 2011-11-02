@@ -2234,20 +2234,25 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
 %      list-final-separator & Literal & \verb*= and =  \\
+%      list-pair-separator  & Literal & \verb*= and =  \\
 %      list-separator       & Literal & \verb*=, =     \\
 %      range-phrase         & Literal & \verb*= to =   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeOption{list-final-separator}
-%\DescribeOption{list-separator}
+% \DescribeOption{list-final-separator}
+% \DescribeOption{list-pair-separator}
+% \changes{v2.4}{2011/11/02}{New \opt{list-pair-separator} option}
+% \DescribeOption{list-separator}
 % Lists of numbers are printed with a separator between each item,
 % which is stored using the \opt{list-separator} option. The
 % separator before the last item of a list may be different, and
-% is therefore set using the \opt{list-final-separator} option. Any
+% is therefore set using the \opt{list-final-separator} option.
+% The separator used for exactly two items is set using the
+% \opt{list-pair-separator} option. Any
 % spaces needed should be included in the option settings: none are
-% added within the code. These two items are printed in text mode.
+% added within the code. These items are printed in text mode.
 %\begin{LaTeXdemo}
 %  \numlist{0.1;0.2;0.3}                              \\
 %  \numlist[list-separator = {; }]{0.1;0.2;0.3}       \\
@@ -2255,7 +2260,9 @@ This work consists of the file  siunitx.dtx
 %  \numlist[
 %    list-separator       = { and },
 %    list-final-separator = { and finally }
-%  ]{0.1;0.2;0.3}
+%  ]{0.1;0.2;0.3} \\
+%  \numlist{0.1;0.2} \\
+%  \numlist[list-pair-separator = {, and }]{0.1;0.2}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{range-phrase}
@@ -12459,78 +12466,103 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\l_siunitx_list_separator_tl}
-%\begin{macro}{\l_siunitx_list_separator_final_tl}
-% Settings for lists.
+% \begin{variable}
+%   {
+%     \l_siunitx_list_separator_pair_tl  ,
+%     \l_siunitx_list_separator_final_tl ,
+%     \l_siunitx_list_separator_tl,
+%   }
+%   Settings for lists.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  list-final-separator .tl_set:N = \l_siunitx_list_separator_final_tl,
-  list-separator       .tl_set:N = \l_siunitx_list_separator_tl,
-  list-units           .choice:,
-  list-units
-    / brackets .code:n   =
-      {
-        \bool_set_true:N  \l_siunitx_list_brackets_bool
-        \bool_set_false:N \l_siunitx_list_repeat_bool
-      },
-  list-units
-    / repeat .code:n   =
-      {
-        \bool_set_false:N \l_siunitx_list_brackets_bool
-        \bool_set_true:N  \l_siunitx_list_repeat_bool
-      },
-  list-units
-    / single .code:n   =
-      {
-        \bool_set_false:N \l_siunitx_list_brackets_bool
-        \bool_set_false:N \l_siunitx_list_repeat_bool
-      },
-}
-\keys_set:nn { siunitx } {
-  list-final-separator = { ~ and ~ },
-  list-separator       = { , ~ },
-  list-units           = repeat,
+\keys_define:nn { siunitx }
+  {
+    list-final-separator .tl_set:N = \l_siunitx_list_separator_final_tl ,
+    list-pair-separator  .tl_set:N = \l_siunitx_list_separator_pair_tl  ,
+    list-separator       .tl_set:N = \l_siunitx_list_separator_tl       ,
+    list-units           .choice:,
+    list-units
+      / brackets .code:n =
+        {
+          \bool_set_true:N  \l_siunitx_list_brackets_bool
+          \bool_set_false:N \l_siunitx_list_repeat_bool
+        },
+    list-units
+      / repeat .code:n   =
+        {
+          \bool_set_false:N \l_siunitx_list_brackets_bool
+          \bool_set_true:N  \l_siunitx_list_repeat_bool
+        },
+    list-units
+      / single .code:n   =
+        {
+          \bool_set_false:N \l_siunitx_list_brackets_bool
+          \bool_set_false:N \l_siunitx_list_repeat_bool
+        }
+  }
+\keys_set:nn { siunitx }
+  {
+    list-final-separator = { ~ and ~ } ,
+    list-pair-separator  = { ~ and ~ } ,
+    list-separator       = { , ~ }     ,
+    list-units           = repeat
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{variable}
 %
-%\begin{macro}{\siunitx_list_numbers:n}
-%\begin{macro}{\siunitx_list_numbers_aux_i:n}
-%\begin{macro}{\siunitx_list_numbers_aux_ii:n}
-% Lists of numbers are handled in a very simple fashion. The input
-% list is traversed, and the items are simply placed on a list for
-% output. This uses the internal function \cs{siunitx_number_output:n}
-% for speed, but does not make any other optimisation. The output list
-% also adds the relevant separators.
+% \begin{macro}{\siunitx_list_numbers:n}
+% \begin{macro}[aux]
+%   {\siunitx_list_numbers_aux_i:n, \siunitx_list_numbers_aux_ii:n}
+% \begin{macro}{\siunitx_list_numbers_aux:nn}
+%   Setting up lists is made slightly complicated by the need to handle the
+%   case of exactly two items and the case of the very last separator
+%   differently from everything else. Beyond that, there is not too much
+%   to any of this code.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_list_numbers:n #1 {
-  \tl_clear:N \l_siunitx_unit_tl
-  \tl_clear:N \l_siunitx_preunit_tl
-  \siunitx_list_numbers_aux_i:n {#1}
-}
-\cs_new_protected:Npn \siunitx_list_numbers_aux_i:n #1 {
-  \tl_clear:N \l_siunitx_list_tl
-  \tl_clear:N \l_siunitx_list_current_tl
-  \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n
-  \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_final_tl
-  \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
-  \tl_use:N \l_siunitx_list_tl
-}
-\cs_new_protected:Npn \siunitx_list_numbers_aux_ii:n #1 {
-  \tl_if_empty:NTF \l_siunitx_list_tl
-    { \tl_set_eq:NN \l_siunitx_list_tl \l_siunitx_list_current_tl }
-    {
-      \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_tl
-      \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
-    }
-  \tl_set:Nn \l_siunitx_list_current_tl
-    { \siunitx_combined_output:n {#1} }
-}
+\cs_new_protected:Npn \siunitx_list_numbers:n #1
+  {
+    \tl_clear:N \l_siunitx_unit_tl
+    \tl_clear:N \l_siunitx_preunit_tl
+    \siunitx_list_numbers_aux_i:n {#1}
+  }
+\cs_new_protected:Npn \siunitx_list_numbers_aux_i:n #1
+  {
+    \bool_set_true:N \l_siunitx_list_first_bool
+    \tl_clear:N \l_siunitx_list_current_tl
+    \int_compare:nNnTF { \tl_length:n {#1} } > \c_two
+      {
+        \tl_map_function:nN {#1} \siunitx_list_numbers_aux_ii:n
+        \l_siunitx_list_tl
+        \l_siunitx_list_separator_final_tl
+        \l_siunitx_list_current_tl
+      }
+      {
+        \int_compare:nNnTF { \tl_length:n {#1} } = \c_two
+          { \siunitx_list_numbers_aux:nn #1 }
+          { \siunitx_combined_output:n {#1} }
+      }  
+    \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_final_tl
+    \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
+  }
+\cs_new_protected:Npn \siunitx_list_numbers_aux_ii:n #1
+  {
+    \tl_if_empty:NTF \l_siunitx_list_tl
+      { \tl_set_eq:NN \l_siunitx_list_tl \l_siunitx_list_current_tl }
+      {
+        \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_separator_tl
+        \tl_put_right:NV \l_siunitx_list_tl \l_siunitx_list_current_tl
+      }
+    \tl_set:Nn \l_siunitx_list_current_tl { \siunitx_combined_output:n {#1} }
+  }
+\cs_new_protected:Npn \siunitx_list_numbers_aux:nn #1#2
+  {
+    \siunitx_combined_output:n {#1}
+    \l_siunitx_list_separator_pair_tl
+    \siunitx_combined_output:n {#2}
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_list_units:nnn}
 % For a list of items with units, the method is to first parse the
