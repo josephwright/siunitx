@@ -9346,8 +9346,7 @@ This work consists of the file  siunitx.dtx
           \tl_put_right:Nn \l_siunitx_tmpb_tl { #1 #2 #3 }
           \tl_if_empty:nF {#4}
             {
-              \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl
-                \l_siunitx_group_sep_tl
+              \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_group_sep_tl
               \siunitx_number_format_group_decimal_aux:NNNN #4
             }
         }
@@ -9406,8 +9405,7 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:Nn \l_siunitx_tmpb_tl {#1#2#3}
   \quark_if_nil:nF {#4}
     {
-      \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl
-        \l_siunitx_group_sep_tl
+      \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_group_sep_tl
       \siunitx_number_format_group_integer_aux:NNNN #4
     }
 }
@@ -14762,10 +14760,7 @@ This work consists of the file  siunitx.dtx
         { { \exp_not:V \l_siunitx_output_decimal_tl } }
     }
   \clist_put_right:Nx \l_siunitx_pgf_link_clist
-    {
-      set~thousands~separator =
-        { \exp_not:V \l_siunitx_group_sep_tl }
-    }
+    { set~thousands~separator = { \exp_not:V \l_siunitx_group_sep_tl } }
   \clist_put_right:Nn \l_siunitx_pgf_link_clist
     { min~exponent~for~1000~sep = \int_use:N \l_siunitx_group_min_int }
   \bool_if:nF
@@ -15975,37 +15970,37 @@ This work consists of the file  siunitx.dtx
   digitsep       .choice: ,
   digitsep /
     cdot         .meta:n    =
-      { group-separator       = { } \cdot { }                         },
+      { group-separator       = \ensuremath { { } \cdot { } }         },
   digitsep /
-    comma        .meta:n    = { group-separator         = { , }       },
+    comma        .meta:n    = { group-separator         = \ensuremath { { , } } },
   digitsep /
-    fullstop     .meta:n    = { group-separator         = .           },
+    fullstop     .meta:n    = { group-separator         = \ensuremath { . } },
   digitsep /
-    med          .meta:n    = { group-separator         = \:          },
+    med          .meta:n    = { group-separator         = \ensuremath { \: } },
   digitsep /
-    medium       .meta:n    = { group-separator         = \:          },
+    medium       .meta:n    = { group-separator         = \ensuremath { \: } },
   digitsep /
     none         .meta:n    = { group-separator         =             },
   digitsep /
-    period       .meta:n    = { group-separator         = .           },
+    period       .meta:n    = { group-separator         = \ensuremath { . } },
   digitsep /
     space        .meta:n    = { group-separator         = \text { ~ } },
   digitsep /
-    stop         .meta:n    = { group-separator         = .           },
+    stop         .meta:n    = { group-separator         = \ensuremath { . } },
   digitsep /
-    thick        .meta:n    = { group-separator         = \;          },
+    thick        .meta:n    = { group-separator         = \ensuremath { \; } },
   digitsep /
-    thin         .meta:n    = { group-separator         = \,          },
+    thin         .meta:n    = { group-separator         = \ensuremath { \, }  },
   digitsep /
     tightcdot    .meta:n    =
-      { group-separator         = \bgroup \cdot \egroup               },
+      { group-separator         = \ensuremath { \bgroup \cdot \egroup } },
   digitsep /
     tighttimes  .meta:n     =
-      { group-separator         = \bgroup \times \egroup              },
+      { group-separator         = \ensuremath { \bgroup \times \egroup } },
   digitsep /
-    times        .meta:n    = { group-separator         = \times      },
+    times        .meta:n    = { group-separator         = \ensuremath { \times } },
   digitsep /
-    unknown      .meta:n    = { group-separator         = #1          },
+    unknown      .meta:n    = { group-separator         = \ensuremath {#1} },
   dp             .meta:n    =
     {
       round-mode      = places,
