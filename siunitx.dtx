@@ -8231,40 +8231,39 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_process_round:}
-% The lead-off for rounding is the same for decimal places and
-% significant figures.
+% \begin{macro}{\siunitx_number_process_round:}
+%   The lead-off for rounding is the same for decimal places and
+%   significant figures.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_round: {
-  \tl_if_empty:NF \l_siunitx_round_tl
-    {
-      \bool_if:NT \l_siunitx_process_int_to_dec_bool
-        {
-          \prop_if_in:NnF \l_siunitx_number_in_prop
-            { mantissa-decimal }
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop
-                { mantissa-decimal } { 0 }
-            }
-          \prop_if_in:NnF \l_siunitx_number_in_prop
-            { mantissa-decimal-marker }
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop
-                { mantissa-decimal-marker } { . }
-            }
-        }
-      \cs_set:Npx \siunitx_tmp:w
-        {
-          \exp_not:N \clist_map_function:nN
-            { mantissa , complex }
-            \exp_not:c
-              { siunitx_number_process_ \l_siunitx_round_tl :n }
-        }
-      \siunitx_tmp:w
-    }
-}
+\cs_new_protected:Npn \siunitx_number_process_round:
+  {
+    \tl_if_empty:NF \l_siunitx_round_tl
+      {
+        \bool_if:NT \l_siunitx_process_int_to_dec_bool
+          {
+            \prop_if_in:NnF \l_siunitx_number_in_prop { mantissa-decimal }
+              {
+                \prop_put:Nnn \l_siunitx_number_in_prop { mantissa-decimal }
+                  { 0 }
+              }
+            \prop_if_in:NnF \l_siunitx_number_in_prop
+              { mantissa-decimal-marker }
+              {
+                \prop_put:Nnn \l_siunitx_number_in_prop
+                  { mantissa-decimal-marker } { . }
+              }
+          }
+        \use:x
+          {
+            \exp_not:N \clist_map_function:nN
+              { mantissa , complex }
+              \exp_not:c
+                { siunitx_number_process_ \l_siunitx_round_tl :n }
+           }
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %\begin{macro}{\siunitx_number_process_round_decimal:}
 %\begin{macro}[aux]{\siunitx_number_process_round_decimal_aux:}
 % The rounding routine for decimals is the same for figures and places,
@@ -10668,21 +10667,29 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_declare_prefix:Nnnn}
-% Prefixes need to store both the symbol and the power they represent.
+% \begin{macro}{\siunitx_declare_prefix:Nnnn}
+% \begin{variable}{\l_siunitx_prefix_2_prop, \l_siunitx_prefix_10_prop}
+%   Prefixes need to store both the symbol and the power they represent.
+%   A reverse system is also set up, to allow powers to be converted to
+%   prefixes.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_declare_prefix:Nnnn #1#2#3#4 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
-  \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
-    {
-      \bool_if:NTF \l_siunitx_prefix_symbols_bool
-        { \siunitx_unit_parse_prefix:n {#2} }
-        { \siunitx_unit_parse_prefix:nn {#3} {#4} }
-    }
-}
+\cs_new_protected:Npn \siunitx_declare_prefix:Nnnn #1#2#3#4
+  {
+    \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+    \prop_put:cnn { l_siunitx_prefix_ #3 _prop } {#4} {#1}
+    \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
+    \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
+      {
+        \bool_if:NTF \l_siunitx_prefix_symbols_bool
+          { \siunitx_unit_parse_prefix:n {#2} }
+          { \siunitx_unit_parse_prefix:nn {#3} {#4} }
+      }
+  }
+\prop_new:c { l_siunitx_prefix_2_prop }
+\prop_new:c { l_siunitx_prefix_10_prop }
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_declare_qualifier:Nn}
 % Qualifiers just need storing.
