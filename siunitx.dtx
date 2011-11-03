@@ -8999,10 +8999,8 @@ This work consists of the file  siunitx.dtx
     {
       \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
     }
-  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_bracket_open_tl
-  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_bracket_close_tl
+  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_bracket_open_tl
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_bracket_close_tl
   \str_if_eq:nnTF {#1} { result }
     { \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl }
     {
@@ -9584,10 +9582,8 @@ This work consists of the file  siunitx.dtx
     \prop_get:NnNT \l_siunitx_number_out_prop { #1 }
       \l_siunitx_tmpa_tl
       {
-        \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-          \l_siunitx_bracket_open_tl
-        \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-          \l_siunitx_bracket_close_tl
+        \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_bracket_open_tl
+        \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_bracket_close_tl
         \prop_put:NnV \l_siunitx_number_out_prop { #1  }
           \l_siunitx_tmpa_tl
       }
@@ -9964,8 +9960,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_output_product_brackets: {
   \siunitx_unit_output_pre_print:
-  \siunitx_print:nn { number }
-    { \siunitx_ensuremath:n { \l_siunitx_bracket_open_tl } }
+  \siunitx_print:nV { number }  \l_siunitx_bracket_open_tl
   \nobreak
   \tl_set_eq:NN \l_siunitx_unit_saved_tl \l_siunitx_unit_tl
   \tl_clear:N \l_siunitx_pre_unit_tl
@@ -9973,8 +9968,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_number_output_product_aux:
   \nobreak
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_saved_tl
-  \siunitx_print:nn { number }
-    { \siunitx_ensuremath:n { \l_siunitx_bracket_close_tl } }
+  \siunitx_print:nV { number } \l_siunitx_bracket_close_tl
   \siunitx_unit_output_print:
 }
 %    \end{macrocode}
@@ -11670,10 +11664,8 @@ This work consists of the file  siunitx.dtx
     {
       \bool_if:NT \l_siunitx_unit_denominator_bracket_bool
         {
-          \siunitx_tl_put_left_math:NV \l_siunitx_unit_denominator_tl
-            \l_siunitx_bracket_open_tl
-          \siunitx_tl_put_right_math:NV \l_siunitx_unit_denominator_tl
-            \l_siunitx_bracket_close_tl
+          \tl_put_left:NV \l_siunitx_unit_denominator_tl \l_siunitx_bracket_open_tl
+          \tl_put_right:NV \l_siunitx_unit_denominator_tl \l_siunitx_bracket_close_tl
         }
     }
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
@@ -11876,10 +11868,8 @@ This work consists of the file  siunitx.dtx
     { bracket- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl
     {
-      \siunitx_tl_put_left_math:NV \l_siunitx_unit_current_tl
-        \l_siunitx_bracket_open_tl
-      \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
-        \l_siunitx_bracket_close_tl
+      \tl_put_left:NV \l_siunitx_unit_current_tl \l_siunitx_bracket_open_tl
+      \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_bracket_close_tl
     }
 }
 %    \end{macrocode}
@@ -12033,11 +12023,9 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_new_protected:Npn \siunitx_unit_format_qualifier_brackets: {
-  \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
-    \l_siunitx_bracket_open_tl
+  \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_bracket_open_tl
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
-  \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
-    \l_siunitx_bracket_close_tl
+  \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_bracket_close_tl
 }
 \char_set_catcode_active:N \~
 \cs_new_protected:Npn \siunitx_unit_format_qualifier_space: {
@@ -12586,16 +12574,10 @@ This work consists of the file  siunitx.dtx
     }
     {
       \bool_if:NT \l_siunitx_list_brackets_bool
-        {
-          \siunitx_print:nn { number }
-            { \siunitx_ensuremath:n { \l_siunitx_bracket_open_tl } }
-        }
+        { \siunitx_print:nV { number } \l_siunitx_bracket_open_tl }
       \siunitx_list_numbers:n {#1}
       \bool_if:NT \l_siunitx_list_brackets_bool
-        {
-          \siunitx_print:nn { number }
-            { \siunitx_ensuremath:n { \l_siunitx_bracket_close_tl } }
-        }
+        { \siunitx_print:nV { number } \l_siunitx_bracket_close_tl }
       \siunitx_unit_output_number_sep:
       \siunitx_unit_output:nn {#2} {#3}
     }
@@ -12691,16 +12673,10 @@ This work consists of the file  siunitx.dtx
     }
     {
       \bool_if:NT \l_siunitx_range_brackets_bool
-        {
-          \siunitx_print:nn { number }
-            { \siunitx_ensuremath:n { \l_siunitx_bracket_open_tl } }
-        }
+        { \siunitx_print:nV { number } \l_siunitx_bracket_open_tl }
       \siunitx_range_numbers:nn {#3} {#4}
       \bool_if:NT \l_siunitx_range_brackets_bool
-        {
-          \siunitx_print:nn { number }
-            { \siunitx_ensuremath:n { \l_siunitx_bracket_close_tl } }
-        }      
+        { \siunitx_print:nV { number } \l_siunitx_bracket_close_tl }
       \siunitx_unit_output_number_sep:
       \siunitx_unit_output:nn {#1} {#2}
     }
@@ -15964,9 +15940,9 @@ This work consists of the file  siunitx.dtx
   astroang       .meta:n    =
     { angle-symbol-over-decimal = #1                                  },
   astroang       .default:n = { true                                  },
-  closeerr       .meta:n    = { close-bracket           = #1          },
-  closefrac      .meta:n    = { close-bracket           = #1          },
-  closerange     .meta:n    = { close-bracket           = #1          },
+  closeerr       .meta:n    = { close-bracket           = \ensuremath {#1} },
+  closefrac      .meta:n    = { close-bracket           = \ensuremath {#1} },
+  closerange     .meta:n    = { close-bracket           = \ensuremath {#1} },
   colour         .code:n    = { color                   = #1          },
   colorall       .code:n    = ,
   colourall      .code:n    = ,
@@ -16152,9 +16128,9 @@ This work consists of the file  siunitx.dtx
   obeyitalic     .default:n = { true                                  },
   obeymode       .meta:n    = { detect-mode             = #1          },
   obeymode       .default:n = { true                                  },
-  openerr        .meta:n    = { open-bracket            = #1          },
-  openfrac       .meta:n    = { open-bracket            = #1          },
-  openrange      .meta:n    = { open-bracket            = #1          },
+  openerr        .meta:n    = { open-bracket            = \ensuremath {#1} },
+  openfrac       .meta:n    = { open-bracket            = \ensuremath {#1} },
+  openrange      .meta:n    = { open-bracket            = \ensuremath {#1} },
   padangle       .choice: ,
   padangle /
     all          .meta:n    =
