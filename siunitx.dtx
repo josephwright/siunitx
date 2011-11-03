@@ -5084,24 +5084,23 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \siunitx_tl_put_left_math:Nn  ,
-%  \siunitx_tl_put_left_math:NV  ,
-%  \siunitx_tl_put_right_math:Nn ,
-%  \siunitx_tl_put_right_math:NV ,
-%}
-% To add stuff in math mode.
+% \begin{macro}
+%   {
+%     \siunitx_tl_put_left_math:Nn  ,
+%     \siunitx_tl_put_left_math:NV  ,
+%     \siunitx_tl_put_right_math:Nn ,
+%     \siunitx_tl_put_right_math:NV ,
+%   }
+%   To add stuff in math mode.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_tl_put_left_math:Nn #1#2 {
-  \tl_put_left:Nn #1 { \siunitx_ensuremath:n {#2} }
-}
+\cs_new_protected:Npn \siunitx_tl_put_left_math:Nn #1#2
+  { \tl_put_left:Nn #1 { \ensuremath {#2} } }
 \cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { NV }
-\cs_new_protected:Npn \siunitx_tl_put_right_math:Nn #1#2 {
-  \tl_put_right:Nn #1 { \siunitx_ensuremath:n {#2} }
-}
+\cs_new_protected:Npn \siunitx_tl_put_right_math:Nn #1#2
+  { \tl_put_right:Nn #1 { \ensuremath {#2} } }
 \cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\c_siunitx_old_options_seq}
 % To pick up old options, all of the names need to be known.
@@ -5377,23 +5376,19 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_ensuremath:n}
-% A copy is made of \cs{ensuremath}: if \pkg{tex4ht} is in use, it
-% is possible to deactivate this to give nicer looking conversion to
-% other formats.
+% If \pkg{tex4ht} is in use, make a few changes to give nicer looking
+% conversion to other formats.
 %    \begin{macrocode}
-\cs_new_eq:NN \siunitx_ensuremath:n \ensuremath
-\AtBeginDocument {
-  \@ifpackageloaded { tex4ht }
-    {
-      \cs_set_eq:NN \siunitx_ensuremath:n \use:n
-      \cs_set_eq:NN \siunitx_print_text_super:n \textsuperscript
-      \keys_set:nn { siunitx } { qualifier-mode = brackets, mode = text }
-    }
-    { }
-}
+\AtBeginDocument
+  {
+    \@ifpackageloaded { tex4ht }
+      {
+        \cs_set_eq:NN \siunitx_print_text_super:n \textsuperscript
+        \keys_set:nn { siunitx } { qualifier-mode = brackets, mode = text }
+      }
+      { }
+  }
 %    \end{macrocode}
-%\end{macro}
 %
 % \begin{macro}{\siunitx_textsuperscript:n}
 %   This function is set up here so that it can be redefined
@@ -9442,8 +9437,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_number_format_join_uncert_pm:N #1
   {
     \bool_if:NTF \l_siunitx_tight_bool
-      { \tl_put_left:Nn #1 { \siunitx_ensuremath:n { { \pm } } } }
-      { \tl_put_left:Nn #1 { \siunitx_ensuremath:n { { } \pm { } } } }
+      { \tl_put_left:Nn #1 { \ensuremath { { \pm } } } }
+      { \tl_put_left:Nn #1 { \ensuremath { { } \pm { } } } }
   }
 %    \end{macrocode}
 %\end{macro}
@@ -9863,14 +9858,8 @@ This work consists of the file  siunitx.dtx
    \prop_if_in:NnT \l_siunitx_number_out_prop { #1 -uncertainty }
      {
         \bool_if:NTF \l_siunitx_tight_bool
-          {
-            \siunitx_print:nn { number }
-              { \siunitx_ensuremath:n { { \pm } } }
-          }
-          {
-            \siunitx_print:nn { number }
-              { \siunitx_ensuremath:n { { } \pm { } } }
-          }
+          { \siunitx_print:nn { number } { \ensuremath { { \pm } } } }
+          { \siunitx_print:nn { number } { \ensuremath { { } \pm { } } } }
        \siunitx_number_output_parts_print:n { #1 -uncertainty }
      }
 }
@@ -9954,17 +9943,11 @@ This work consists of the file  siunitx.dtx
           \bool_if:NTF \l_siunitx_tight_bool
             {
               \siunitx_print:nn { number }
-                {
-                  \siunitx_ensuremath:n
-                    { \l_siunitx_output_product_tl }
-                }
+                { \ensuremath { \l_siunitx_output_product_tl } }
             }
             {
               \siunitx_print:nn  { number }
-                {
-                  \siunitx_ensuremath:n
-                    { { } \l_siunitx_output_product_tl { } }
-                }
+                { \ensuremath { { } \l_siunitx_output_product_tl { } } }
             }
           \siunitx_number_output_parse:V \l_siunitx_number_next_tl
         }
@@ -10577,7 +10560,7 @@ This work consists of the file  siunitx.dtx
   \tl_if_empty:nF {#1}
     {
       \tl_set:Nn \l_siunitx_unit_tl {#2}
-      \siunitx_print:nn { number } { \siunitx_ensuremath:n {#1} }
+      \siunitx_print:nn { number } { \ensuremath {#1} }
       \siunitx_unit_output_print:
     }
 }
@@ -10866,10 +10849,7 @@ This work consists of the file  siunitx.dtx
                 \bool_if:NT \l_siunitx_create_prespace_bool
                   {
                     \exp_not:n
-                      {
-                        \siunitx_ensuremath:n
-                          { \l_siunitx_number_unit_product_tl }
-                      }
+                      { \ensuremath { \l_siunitx_number_unit_product_tl } }
                   }
                 \exp_not:n { \siunitx_unit_output:nn {#1} { } }
               \group_end:
@@ -10904,7 +10884,7 @@ This work consists of the file  siunitx.dtx
                       {
                         \exp_not:n
                           {
-                            \siunitx_ensuremath:n
+                            \ensuremath
                               { \l_siunitx_number_unit_product_tl }
                           }
                       }
@@ -11682,10 +11662,7 @@ This work consists of the file  siunitx.dtx
       \siunitx_unit_print_literal_aux:N
     \tl_set:Nn \l_siunitx_unit_tl {#1}
     \tl_set:Nx \l_siunitx_tmpa_tl
-      {
-        \exp_not:N \siunitx_ensuremath:n
-          { \exp_not:o \l_siunitx_unit_product_tl }
-      }
+      { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_product_tl } }
     \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
     \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
      \bool_if:NT \l_siunitx_literal_power_bool
@@ -12232,7 +12209,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected:Npn \siunitx_unit_output_number_sep_aux: {
   \bool_if:NF \l_siunitx_omit_unit_space_bool
-    { \siunitx_ensuremath:n { \l_siunitx_number_unit_product_tl } }
+    { \ensuremath { \l_siunitx_number_unit_product_tl } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -12343,7 +12320,7 @@ This work consists of the file  siunitx.dtx
     }
     {
       \siunitx_unit_output_pre_print:
-      \siunitx_print:nn { number } { \siunitx_ensuremath:n {#1} }
+      \siunitx_print:nn { number } { \ensuremath {#1} }
       \siunitx_unit_output_print:
     }
 }
@@ -14263,8 +14240,7 @@ This work consists of the file  siunitx.dtx
       { \tl_set:Nx \l_siunitx_tmpb_tl { { \exp_not:o \l_siunitx_tmpb_tl } } }
     \tl_set:Nx \l_siunitx_tmpa_tl
       {
-        \exp_not:N \siunitx_ensuremath:n
-          { { } \exp_not:o \l_siunitx_tmpb_tl  { } }
+        \exp_not:N \ensuremath { { } \exp_not:o \l_siunitx_tmpb_tl  { } }
         \exp_not:o \l_siunitx_tmpa_tl
       }
   }
