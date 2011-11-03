@@ -1947,13 +1947,13 @@ This work consists of the file  siunitx.dtx
 %      exponent-product         & Math    & \cs{times}        \\
 %      group-digits             & Choice  & true              \\
 %      group-minimum-digits     & integer & 5                 \\
-%      group-separator          & Math    & \cs{,}            \\
+%      group-separator          & Literal & \cs{,}            \\
 %      negative-color           & Literal & \meta{none}       \\
 %      open-bracket             & Literal & (
 %        \\ ^^A ) (
 %      output-close-uncertainty & Literal & )                 \\
 %      output-complex-root      & Math    & \verb=\mathrm{i}= \\
-%      output-decimal-marker    & Math    & .                 \\
+%      output-decimal-marker    & Literal & .                 \\
 %      output-exponent-marker   & Literal & \meta{none}       \\
 %      output-open-uncertainty  & Literal & (                 \\ ^^A )
 %      separate-uncertainty     & Switch  & false             \\
@@ -1982,7 +1982,7 @@ This work consists of the file  siunitx.dtx
 %  \num[group-digits = integer]{12345.67890}
 %\end{LaTeXdemo}
 % The separator used between groups of digits is stored by the
-% \opt{group-separator} option.  This takes literal input and is
+% \opt{group-separator} option.  This takes literal input and may be
 % used in math mode: for a text-mode full space use |\text{~}|.
 %\begin{LaTeXdemo}
 %  \num{12345} \\
@@ -9278,11 +9278,6 @@ This work consists of the file  siunitx.dtx
           \tl_set_eq:NN \l_siunitx_tmpb_tl
             \l_siunitx_output_decimal_tl
         }
-      \tl_set:Nx \l_siunitx_tmpb_tl
-        {
-          \exp_not:N \siunitx_ensuremath:n
-            { \exp_not:V \l_siunitx_tmpb_tl }
-        }
       \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl
       \prop_put:NnV \l_siunitx_number_out_prop { #1 -decimal-marker }
         \l_siunitx_tmpb_tl
@@ -10530,8 +10525,7 @@ This work consists of the file  siunitx.dtx
     { \siunitx_print:nV { number } \l_siunitx_tmpa_tl }
   \hbox_set:Nn \l_siunitx_angle_marker_box
     {
-      \siunitx_print:nn { number }
-        { \siunitx_ensuremath:n { { \l_siunitx_output_decimal_tl } } }
+      \siunitx_print:nn { number } { { \l_siunitx_output_decimal_tl } }
     }
   \hbox_set:Nn \l_siunitx_angle_unit_box
     {
@@ -13688,7 +13682,7 @@ This work consists of the file  siunitx.dtx
           \hbox_set:Nn \l_siunitx_tmp_box
             { \siunitx_print:nV { number } #1 }
         \exp_args:NNNo \group_end:
-        \dim_set:Nn #2 { \tex_the:D \box_wd:N \l_siunitx_tmp_box }
+        \dim_set:Nn #2 { \box_wd:N \l_siunitx_tmp_box }
       }
   }
 %    \end{macrocode}
@@ -13849,12 +13843,7 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \siunitx_table_print_S_centered_measure_marker:
   {
-    \tl_set:Nx \l_siunitx_tmpa_tl
-      {
-        \exp_not:N \siunitx_ensuremath:n
-          { \exp_not:o \l_siunitx_output_decimal_tl }
-      }
-    \siunitx_table_print_S_measure:NN \l_siunitx_tmpa_tl
+    \siunitx_table_print_S_measure:NN \l_siunitx_output_decimal_tl
       \l_siunitx_table_marker_dim
   }
 %    \end{macrocode}
@@ -14405,7 +14394,7 @@ This work consists of the file  siunitx.dtx
     \cs_set_eq:NN \siunitx_table_print:
       \siunitx_table_print_S_direct_centered_end:
     \hbox_set:Nn \l_siunitx_tmp_box
-      { \siunitx_ensuremath:n { \l_siunitx_output_decimal_tl } }
+      { \ensuremath { \l_siunitx_output_decimal_tl } }
     \hbox_set_to_wd:Nnn \l_siunitx_table_post_box
       { \box_wd:N \l_siunitx_tmp_box }
       { \tex_hfil:D }
@@ -14481,7 +14470,7 @@ This work consists of the file  siunitx.dtx
       { \tl_clear:N \l_siunitx_tmpa_tl }
     \hbox_set:Nn \l_siunitx_tmp_box
       {
-        \siunitx_ensuremath:n
+        \ensuremath
           {
             \prop_get:NnNT \l_siunitx_table_model_prop { mantissa-sign }
               \l_siunitx_tmpb_tl
@@ -14496,7 +14485,7 @@ This work consists of the file  siunitx.dtx
       { \tl_clear:N \l_siunitx_tmpa_tl }
     \hbox_set:Nn \l_siunitx_tmp_box
       {
-        \siunitx_ensuremath:n
+        \ensuremath
           {
             \l_siunitx_output_decimal_tl
             \l_siunitx_tmpa_tl
@@ -15950,20 +15939,20 @@ This work consists of the file  siunitx.dtx
   decimalsymbol  .choice: ,
   decimalsymbol /
     cdot         .meta:n    =
-      { output-decimal-marker   = { } \cdot { }                       },
+      { output-decimal-marker   = \ensuremath { { } \cdot { } } },
   decimalsymbol /
-    comma        .meta:n    = { output-decimal-marker   = { { , } }   },
+    comma        .meta:n    = { output-decimal-marker   = { \ensuremath { { , } } } },
   decimalsymbol /
-    fullstop     .meta:n    = { output-decimal-marker   = { { . } }   },
+    fullstop     .meta:n    = { output-decimal-marker   = { \ensuremath { { . } } } },
   decimalsymbol /
-    period       .meta:n    = { output-decimal-marker   = { { . } }   },
+    period       .meta:n    = { output-decimal-marker   = { \ensuremath { { . } } } },
   decimalsymbol /
-    stop         .meta:n    = { output-decimal-marker   = { { . } }   },
+    stop         .meta:n    = { output-decimal-marker   = { \ensuremath { { . } } } },
   decimalsymbol /
     tightcdot    .code:n    =
-      { output-decimal-marker   = \bgroup \cdot \egroup               },
+      { output-decimal-marker   = \ensuremath { \bgroup \cdot \egroup } },
   decimalsymbol /
-    unknown      .meta:n    = { output-decimal-marker   = #1          },
+    unknown      .meta:n    = { output-decimal-marker   = \ensuremath {#1} },
   debug          .code:n    = ,
   detectdisplay  .meta:n    = { detect-display-math     = #1          },
   detectdisplay  .default:n = { true                                  },
