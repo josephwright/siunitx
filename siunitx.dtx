@@ -2708,17 +2708,17 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      bracket-unit-denominator     & Switch & true       \\
-%      forbid-literal-units         & Switch & false      \\
-%      literal-superscript-as-power & Switch & true       \\
-%      inter-unit-product           & Math   & \cs{,}     \\
-%      parse-units                  & Switch & true       \\
-%      per-mode                     & Choice & reciprocal \\
-%      per-symbol                   & Math   & /          \\
-%      power-font                   & Choice & number     \\
-%      prefixes-as-symbols          & Switch & true       \\
-%      qualifier-mode               & Choice & subscript  \\
-%      sticky-per                   & Switch & false      \\
+%      bracket-unit-denominator     & Switch  & true       \\
+%      forbid-literal-units         & Switch  & false      \\
+%      literal-superscript-as-power & Switch  & true       \\
+%      inter-unit-product           & Math    & \cs{,}     \\
+%      parse-units                  & Switch  & true       \\
+%      per-mode                     & Choice  & reciprocal \\
+%      per-symbol                   & Literal & /          \\
+%      power-font                   & Choice  & number     \\
+%      prefixes-as-symbols          & Switch  & true       \\
+%      qualifier-mode               & Choice  & subscript  \\
+%      sticky-per                   & Switch  & false      \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2773,8 +2773,6 @@ This work consists of the file  siunitx.dtx
 % unless \opt{bracket-unit-denominator} is set to \opt{false}.
 % Notice that \opt{bracket-unit-denominator} only applies when
 % \opt{per-mode} is set to \opt{symbol} or \opt{symbol-or-fraction}.
-% The output for \opt{per-symbol} is always made in math mode, and so
-% \cs{text} will be needed to print textual information.
 %\begin{LaTeXdemo}
 %  \sisetup{per-mode = symbol}%
 %  \si{\joule\per\mole\per\kelvin} \\
@@ -11661,8 +11659,7 @@ This work consists of the file  siunitx.dtx
         }
     }
   \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
-  \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
-    \l_siunitx_per_symbol_tl
+  \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_per_symbol_tl
   \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
 }
 \cs_new_protected:Npn
@@ -11891,8 +11888,7 @@ This work consists of the file  siunitx.dtx
     { per- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpb_tl
     {
-      \siunitx_tl_put_left_math:NV \l_siunitx_unit_current_tl
-        \l_siunitx_per_symbol_tl
+      \tl_put_left:NV \l_siunitx_unit_current_tl \l_siunitx_per_symbol_tl
     }
 }
 %    \end{macrocode}
@@ -16258,9 +16254,9 @@ This work consists of the file  siunitx.dtx
   sign           .meta:n    = { explicit-sign           = #1          },
   slash          .choice: ,
   slash /
-    slash        .meta:n    = { per-symbol              = /           },
+    slash        .meta:n    = { per-symbol              = \ensuremath { / }  },
   slash /
-    unknown      .meta:n    = { per-symbol              = #1          },
+    unknown      .meta:n    = { per-symbol              = \ensuremath {#1} },
   stickyper      .meta:n    = { sticky-per              = #1          },
   stickyper      .default:n = { true                                  },
   strictarc      .code:n    = ,
