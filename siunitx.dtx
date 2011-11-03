@@ -1958,7 +1958,7 @@ This work consists of the file  siunitx.dtx
 %      output-open-uncertainty  & Literal & (                              \\ ^^A )
 %      separate-uncertainty     & Switch  & false                          \\
 %      tight-spacing            & Switch  & false                          \\
-%      uncertainty-separator    & Math    & \meta{none}                    \\
+%      uncertainty-separator    & Literal & \meta{none}                    \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2291,12 +2291,12 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      add-arc-degree-zero       & Switch & false        \\
-%      add-arc-minute-zero       & Switch & false        \\
-%      add-arc-second-zero       & Switch & false        \\
-%      angle-symbol-over-decimal & Switch & false        \\
-%      arc-separator             & Math   & false        \\
-%      number-angle-product      & Math   & \meta{empty} \\
+%      add-arc-degree-zero       & Switch  & false        \\
+%      add-arc-minute-zero       & Switch  & false        \\
+%      add-arc-second-zero       & Switch  & false        \\
+%      angle-symbol-over-decimal & Switch  & false        \\
+%      arc-separator             & Literal & false        \\
+%      number-angle-product      & Math    & \meta{empty} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -5079,10 +5079,8 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{
 %  \siunitx_tl_put_left_math:Nn  ,
 %  \siunitx_tl_put_left_math:NV  ,
-%  \siunitx_tl_put_left_math:cV  ,
 %  \siunitx_tl_put_right_math:Nn ,
 %  \siunitx_tl_put_right_math:NV ,
-%  \siunitx_tl_put_right_math:cV
 %}
 % To add stuff in math mode.
 %    \begin{macrocode}
@@ -5090,12 +5088,10 @@ This work consists of the file  siunitx.dtx
   \tl_put_left:Nn #1 { \siunitx_ensuremath:n {#2} }
 }
 \cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { NV }
-\cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { cV }
 \cs_new_protected:Npn \siunitx_tl_put_right_math:Nn #1#2 {
   \tl_put_right:Nn #1 { \siunitx_ensuremath:n {#2} }
 }
 \cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV }
-\cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { cV }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -9526,7 +9522,7 @@ This work consists of the file  siunitx.dtx
         { { \exp_not:V \l_siunitx_tmpa_tl } }
     }
   \tl_clear:N \l_siunitx_tmpb_tl
-  \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
+  \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
   \prop_put:NnV \l_siunitx_number_out_prop { #1 -sign }
     \l_siunitx_tmpb_tl
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpa_tl
@@ -9576,8 +9572,7 @@ This work consists of the file  siunitx.dtx
                 }
             }
           \tl_clear:N \l_siunitx_tmpb_tl
-          \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl
-            \l_siunitx_tmpa_tl
+          \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
           \prop_put:NnV \l_siunitx_number_out_prop { complex-sign }
             \l_siunitx_tmpb_tl
           \prop_get:NnN \l_siunitx_number_out_prop {#1}
@@ -9615,12 +9610,9 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_siunitx_number_in_prop { #1 -uncertainty }
     \l_siunitx_tmpa_tl
   \prop_del:Nn \l_siunitx_number_in_prop { #1 -uncertainty }
-  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_output_uncert_open_tl
-  \siunitx_tl_put_left_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_uncert_sep_tl
-  \siunitx_tl_put_right_math:NV \l_siunitx_tmpa_tl
-    \l_siunitx_output_uncert_close_tl
+  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_output_uncert_open_tl
+  \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_uncert_sep_tl
+  \tl_put_right:NV \l_siunitx_tmpa_tl \l_siunitx_output_uncert_close_tl
   \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
   \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl
   \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
@@ -10435,13 +10427,13 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \l_siunitx_angle_degree_space_bool
     {
       \nobreak
-      \siunitx_ensuremath:n { \l_siunitx_angle_arc_separator_tl }
+      \l_siunitx_angle_arc_separator_tl
     }
   \siunitx_angle_print_aux:nn { minute } { \SIUnitSymbolArcminute }
   \bool_if:NT \l_siunitx_angle_minute_space_bool
     {
       \nobreak
-      \siunitx_ensuremath:n { \l_siunitx_angle_arc_separator_tl }
+      \l_siunitx_angle_arc_separator_tl
     }
   \siunitx_angle_print_aux:nn { second } { \SIUnitSymbolArcsecond }
 }
@@ -10563,13 +10555,13 @@ This work consists of the file  siunitx.dtx
   \bool_if:NT \l_siunitx_angle_degree_space_bool
     {
       \nobreak
-      \siunitx_ensuremath:n { \l_siunitx_angle_arc_separator_tl }
+      \l_siunitx_angle_arc_separator_tl
     }
   \siunitx_angle_print_direct_aux:nn {#2} { \SIUnitSymbolArcminute }
   \bool_if:NT \l_siunitx_angle_minute_space_bool
     {
       \nobreak
-      \siunitx_ensuremath:n { \l_siunitx_angle_arc_separator_tl }
+     \l_siunitx_angle_arc_separator_tl
     }
   \siunitx_angle_print_direct_aux:nn {#3} { \SIUnitSymbolArcsecond }
 }
@@ -15859,37 +15851,37 @@ This work consists of the file  siunitx.dtx
   anglesep       .choice: ,
   anglesep /
     cdot         .meta:n    =
-      { arc-separator         = { } \cdot { }                         },
+      { arc-separator         = \ensuremath { { } \cdot { } } },
   anglesep /
-    comma        .meta:n    = { arc-separator           = { {,} }     },
+    comma        .meta:n    = { arc-separator           = \ensuremath { { {,} } } },
   anglesep /
-    fullstop     .meta:n    = { arc-separator           = { { . } }   },
+    fullstop     .meta:n    = { arc-separator           = \ensuremath { { { . } } } },
   anglesep /
-    med          .meta:n    = { arc-separator           = \:          },
+    med          .meta:n    = { arc-separator           = \ensuremath { \: } },
   anglesep /
-    medium       .meta:n    = { arc-separator           = \:          },
+    medium       .meta:n    = { arc-separator           = \ensuremath { \: } },
   anglesep /
     none         .meta:n    = { arc-separator           =             },
   anglesep /
-    period       .meta:n    = { arc-separator           = { { . } }   },
+    period       .meta:n    = { arc-separator           = \ensuremath { { { . } } } },
   anglesep /
     space        .meta:n    = { arc-separator           = \text { ~ } },
   anglesep /
-    stop         .meta:n    = { arc-separator           = { { . } }   },
+    stop         .meta:n    = { arc-separator           = \ensuremath { { { . } } } },
   anglesep /
-    thick        .meta:n    = { arc-separator           = \;          },
+    thick        .meta:n    = { arc-separator           = \ensuremath { \; } },
   anglesep /
-    thin         .meta:n    = { arc-separator           = \,          },
+    thin         .meta:n    = { arc-separator           = \ensuremath { \, }  },
   anglesep /
     tightcdot    .meta:n    =
-      { arc-separator           = \bgroup \cdot \egroup               },
+      { arc-separator           = \ensuremath { \bgroup \cdot \egroup } },
   anglesep /
     tighttimes   .meta:n    =
-      { arc-separator           = \bgroup \times \egroup              },
+      { arc-separator           = \ensuremath { \bgroup \times \egroup } },
   anglesep /
-    times        .meta:n    = { arc-separator           = \times      },
+    times        .meta:n    = { arc-separator           = \ensuremath { \times } },
   anglesep /
-    unknown      .meta:n    = { arc-separator           = #1          },
+    unknown      .meta:n    = { arc-separator           = \ensuremath {#1} },
   astroang       .meta:n    =
     { angle-symbol-over-decimal = #1                                  },
   astroang       .default:n = { true                                  },
@@ -15967,19 +15959,19 @@ This work consists of the file  siunitx.dtx
   emulate        .code:n    = ,
   errspace       .choice: ,
   errspace /
-    med          .meta:n    = { uncertainty-separator   = \:          },
+    med          .meta:n    = { uncertainty-separator   = \ensuremath { \: } },
   errspace /
-    medium       .meta:n    = { uncertainty-separator   = \:          },
+    medium       .meta:n    = { uncertainty-separator   = \ensuremath { \: } },
   errspace /
     none         .meta:n    = { uncertainty-separator   =             },
   errspace /
     space        .meta:n    = { uncertainty-separator   = \text { ~ } },
   errspace /
-    thick        .meta:n    = { uncertainty-separator   = \;          },
+    thick        .meta:n    = { uncertainty-separator   = \ensuremath { \; } },
   errspace /
-    thin         .meta:n    = { uncertainty-separator   = \,          },
+    thin         .meta:n    = { uncertainty-separator   = \ensuremath { \, } },
   errspace /
-    unknown      .meta:n    = { uncertainty-separator   = #1          },
+    unknown      .meta:n    = { uncertainty-separator   = \ensuremath {#1} },
   eVcorra        .code:n    = ,
   eVcorrb        .code:n    = ,
   expbase        .choice: ,
