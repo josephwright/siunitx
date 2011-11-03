@@ -1937,28 +1937,28 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule
-%      bracket-negative-numbers & Switch  & false             \\
-%      bracket-numbers          & Switch  & true              \\ ^^A (
-%      close-bracket            & Literal & )                 \\
-%      complex-root-position    & Choice  & after-number      \\
-%      copy-complex-root        & Choice  & false             \\
-%      copy-decimal-marker      & Choice  & false             \\
-%      exponent-base            & Literal & 10                \\
-%      exponent-product         & Math    & \cs{times}        \\
-%      group-digits             & Choice  & true              \\
-%      group-minimum-digits     & integer & 5                 \\
-%      group-separator          & Literal & \cs{,}            \\
-%      negative-color           & Literal & \meta{none}       \\
+%      bracket-negative-numbers & Switch  & false                          \\
+%      bracket-numbers          & Switch  & true                           \\ ^^A (
+%      close-bracket            & Literal & )                              \\
+%      complex-root-position    & Choice  & after-number                   \\
+%      copy-complex-root        & Choice  & false                          \\
+%      copy-decimal-marker      & Choice  & false                          \\
+%      exponent-base            & Literal & 10                             \\
+%      exponent-product         & Math    & \cs{times}                     \\
+%      group-digits             & Choice  & true                           \\
+%      group-minimum-digits     & integer & 5                              \\
+%      group-separator          & Literal & \cs{,}                         \\
+%      negative-color           & Literal & \meta{none}                    \\
 %      open-bracket             & Literal & (
 %        \\ ^^A ) (
-%      output-close-uncertainty & Literal & )                 \\
-%      output-complex-root      & Math    & \verb=\mathrm{i}= \\
-%      output-decimal-marker    & Literal & .                 \\
-%      output-exponent-marker   & Literal & \meta{none}       \\
-%      output-open-uncertainty  & Literal & (                 \\ ^^A )
-%      separate-uncertainty     & Switch  & false             \\
-%      tight-spacing            & Switch  & false             \\
-%      uncertainty-separator    & Math    & \meta{none}       \\
+%      output-close-uncertainty & Literal & )                              \\
+%      output-complex-root      & Math    & \verb=\ensuremath{\mathrm{i}}= \\
+%      output-decimal-marker    & Literal & .                              \\
+%      output-exponent-marker   & Literal & \meta{none}                    \\
+%      output-open-uncertainty  & Literal & (                              \\ ^^A )
+%      separate-uncertainty     & Switch  & false                          \\
+%      tight-spacing            & Switch  & false                          \\
+%      uncertainty-separator    & Math    & \meta{none}                    \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2013,8 +2013,8 @@ This work consists of the file  siunitx.dtx
 % The decimal marker used in output is set using the
 % \opt{output-decimal-marker} option. This can differ from the input
 % marker, as can the root of $\sqrt{-1}$, which is stored in the
-% \opt{output-complex-root} option. The later is always in math mode,
-% but the standard setting uses \cs{mathrm} to give an upright
+% \opt{output-complex-root} option. The standard setting uses \cs{mathrm}
+% in math mode to give an upright
 % \enquote{i}: this can easily be altered. The complex root or decimal
 % marker from the input can be used in the output by setting the
 % \opt{copy-complex-root} and \opt{copy-decimal-marker} options,
@@ -8936,22 +8936,23 @@ This work consists of the file  siunitx.dtx
   tight-spacing             .bool_set:N = \l_siunitx_tight_bool,
   uncertainty-separator     .tl_set:N   = \l_siunitx_uncert_sep_tl,
 }
-\keys_set:nn { siunitx } {
-  bracket-numbers           = true, % (
-  close-bracket             = ),
-  complex-root-position     = after-number,
-  copy-decimal-marker       = false,
-  exponent-base             = 10,
-  exponent-product          = \times,
-  group-digits              = true,
-  group-minimum-digits      = 5,
-  group-separator           = \,,
-  open-bracket              = (, % ) (
-  output-close-uncertainty  = ),
-  output-complex-root       = \mathrm { i },
-  output-decimal-marker     = .,
-  output-open-uncertainty   = (, % )
-}
+\keys_set:nn { siunitx }
+  {
+    bracket-numbers           = true                          , % (
+    close-bracket             = )                             ,
+    complex-root-position     = after-number                  ,
+    copy-decimal-marker       = false                         ,
+    exponent-base             = 10                            ,
+    exponent-product          = \times                        ,
+    group-digits              = true                          ,
+    group-minimum-digits      = 5                             ,
+    group-separator           = \,                            ,
+    open-bracket              = (                             , % ) (
+    output-close-uncertainty  = )                             ,
+    output-complex-root       = \ensuremath { \mathrm { i } } ,
+    output-decimal-marker     = .                             ,
+    output-open-uncertainty   = ( % )
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -9059,51 +9060,24 @@ This work consists of the file  siunitx.dtx
             }
         }
         {
-          \tl_set:Nx \l_siunitx_tmpa_tl
-            {
-              \exp_not:N \siunitx_ensuremath:n
-                { \exp_not:V \l_siunitx_output_complex_tl }
-            }
           \prop_put:NnV \l_siunitx_number_out_prop { complex }
-            \l_siunitx_tmpa_tl
+            \l_siunitx_output_complex_tl
         }
         \siunitx_number_format_join_complex:
     }
 }
 \cs_new_protected:Npn \siunitx_number_format_complex_aux:n #1 {
-  \siunitx_number_format_complex_aux:
-  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
-  \bool_if:NTF \l_siunitx_complex_after_bool
-    {
-      \siunitx_tl_put_right_math:NV \l_siunitx_tmpb_tl
-        \l_siunitx_tmpa_tl
-    }
-    {
-      \siunitx_tl_put_left_math:NV \l_siunitx_tmpb_tl
-        \l_siunitx_tmpa_tl
-    }
-  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
-}
-\cs_new_protected:Npn \siunitx_number_format_complex_aux: {
-  \tl_set:Nn \l_siunitx_tmpa_tl
-    {
-      \use:c
-        {
-          siunitx_ \l_siunitx_print_type_tl _
-          math \l_siunitx_font_family_tl :n
-        }
-    }
   \bool_if:NTF \l_siunitx_output_complex_copy_bool
     {
       \prop_get:NnN \l_siunitx_number_in_prop { complex-root }
-        \l_siunitx_tmpb_tl
-      \tl_put_right:Nx \l_siunitx_tmpa_tl
-        { { \exp_not:V \l_siunitx_tmpb_tl } }
+        \l_siunitx_tmpa_tl
     }
-    {
-      \tl_put_right:Nx \l_siunitx_tmpa_tl
-        { { \exp_not:V \l_siunitx_output_complex_tl } }
-    }
+    { \tl_set_eq:NN \l_siunitx_tmpa_tl \l_siunitx_output_complex_tl }
+  \prop_get:NnN \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
+  \bool_if:NTF \l_siunitx_complex_after_bool
+    { \tl_put_right:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl }
+    { \tl_put_left:NV \l_siunitx_tmpb_tl \l_siunitx_tmpa_tl }
+  \prop_put:NnV \l_siunitx_number_out_prop {#1} \l_siunitx_tmpb_tl
 }
 %    \end{macrocode}
 %\end{macro}
