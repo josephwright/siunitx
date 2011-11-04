@@ -4905,33 +4905,19 @@ This work consists of the file  siunitx.dtx
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
-% Various problems pop up if the support files are too old. First,
-% a check on \pkg{expl3}. There is also a check on \pkg{xparse}, but
-% that comes a bit later. If the version of \pkg{expl3} is \emph{really}
-% old then the message system may not be in place at all: there is a
-% back up for that case.
+% Make sure that the version of \pkg{l3kernel} in use is sufficiently new.
+% This will also trap any problems with \pkg{l3packages} (as the two are now
+% tied together, version-wise).
 %    \begin{macrocode}
-\cs_if_exist:NTF \msg_new:nnnn
-  {
-    \msg_new:nnnn { siunitx } { support-outdated }
-      { Support~package~#1~too~old. }
-      {
-        Please~install~an~up~to~date~version~of~#1. \\
-        Loading~siunitx~will~abort!
-      }
-  }
-  {
-    \PackageError { siunitx } { Support~package~expl3~too~old. }
-      {
-        Please~install~an~up~to~date~version~of~expl3. \\
-        Loading~siunitx~will~abort!
-      }
-    \tex_endinput:D
-  }
 \@ifpackagelater { expl3 } { 2011/09/05 }
   { }
   {
-    \msg_error:nnx { siunitx } { support-outdated } { expl3 }
+    \PackageError { siunitx } { Support~package~expl3~too~old. }
+      {
+        You~need~to~update~your~installation~of~the~bundles~'l3kernel'~and~
+        'l3packages'.\\
+        Loading~siunitx~will~abort!
+      }
     \tex_endinput:D
   }
 %    \end{macrocode}
