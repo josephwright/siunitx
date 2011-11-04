@@ -4962,6 +4962,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{macro}{\clist_map_function:nc}
+%    \begin{macrocode}
+\cs_generate_variant:Nn \clist_map_function:nN { nc }
+%    \end{macrocode}
+% \end{macro}
+%
 %\begin{macro}{
 %  \l_siunitx_tmp_bool ,
 %  \l_siunitx_tmp_box  ,
@@ -8240,13 +8246,8 @@ This work consists of the file  siunitx.dtx
                   { mantissa-decimal-marker } { . }
               }
           }
-        \use:x
-          {
-            \exp_not:N \clist_map_function:nN
-              { mantissa , complex }
-              \exp_not:c
-                { siunitx_number_process_ \l_siunitx_round_tl :n }
-           }
+        \clist_map_function:nc { mantissa , complex }
+         { siunitx_number_process_ \l_siunitx_round_tl :n }
       }
   }
 %    \end{macrocode}
