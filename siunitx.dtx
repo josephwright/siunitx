@@ -2292,6 +2292,22 @@ This work consists of the file  siunitx.dtx
 %  \numrange[range-phrase = --]{5}{100}
 %\end{LaTeXdemo}
 %
+% \changes{v2.4}{2011/11/04}{Automatically compress exponents for lists and
+%   ranges when fixed exponents are active}
+% For lists and ranges when a single unit is given, \pkg{siunitx} will
+% automatically \enquote{compress} exponents when a fixed exponent is in
+% use.
+%\begin{LaTeXdemo}
+%  \sisetup{
+%    fixed-exponent      = 3        ,
+%    list-units          = brackets ,
+%    range-units         = brackets ,
+%    scientific-notation = fixed
+%  }%
+%  \SIrange{1e3}{7e3}{\metre} \\
+%  \SIlist{1e3;2e3;3e3}{\kg}
+%\end{LaTeXdemo}
+%
 %\subsection{Angles}
 %
 % Angle processing provided by the \cs{ang} function has a set of
@@ -7503,6 +7519,13 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{variable}{\l_siunitx_process_drop_exponent_bool}
+%   Used to drop the exponent when this is necessary.
+%    \begin{macrocode}
+\bool_new:N \l_siunitx_process_drop_exponent_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
 %     \l_siunitx_process_decimal_zero_bool  ,
@@ -7589,30 +7612,36 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{variable}
 %
-%\begin{macro}{\siunitx_number_process:}
-% Post-processing is a series of small tasks.
+% \begin{macro}{\siunitx_number_process:}
+%   Post-processing is a series of small tasks.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process: {
-  \siunitx_number_process_sign:
-  \siunitx_number_process_zero_fill:
-  \siunitx_number_process_mantissa:
-  \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
-    {
-      \siunitx_number_process_exponent:
-      \bool_if:NTF \l_siunitx_process_fixed_bool
-        { \siunitx_number_process_fixed: }
-        {
-          \bool_if:NT \l_siunitx_process_scientific_bool
-            { \siunitx_number_process_scientific: }
-        }
-      \siunitx_number_process_uncertainty:
-      \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
-        { \siunitx_number_process_round: }
-    }
-  \siunitx_number_process_integer_digits:
-}
+\cs_new_protected:Npn \siunitx_number_process:
+  {
+    \siunitx_number_process_sign:
+    \siunitx_number_process_zero_fill:
+    \siunitx_number_process_mantissa:
+    \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
+      {
+        \siunitx_number_process_exponent:
+        \bool_if:NTF \l_siunitx_process_fixed_bool
+          { \siunitx_number_process_fixed: }
+          {
+            \bool_if:NT \l_siunitx_process_scientific_bool
+              { \siunitx_number_process_scientific: }
+          }
+        \siunitx_number_process_uncertainty:
+        \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
+          { \siunitx_number_process_round: }
+      }
+    \siunitx_number_process_integer_digits:
+    \bool_if:NT \l_siunitx_process_drop_exponent_bool
+      {
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent-integer }
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_number_process_exponent:}
 %\begin{macro}[aux]{\siunitx_number_process_exponent_aux:n}
@@ -12577,31 +12606,35 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 % \end{macro}
 %
-%\begin{macro}{\siunitx_list_units:nnn}
-% For a list of items with units, the method is to first parse the
-% unit when repeating (to save time), then to use the number loop above
-% for the actual work. On the other hand, when the unit is only printed
-% once life is easier as the normal unit printer can operate.
+% \begin{macro}{\siunitx_list_units:nnn}
+%   For a list of items with units, the method is to first parse the
+%   unit when repeating (to save time), then to use the number loop above
+%   for the actual work. On the other hand, when the unit is only printed
+%   once life is easier as the normal unit printer can operate.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_list_units:nnn #1#2#3 {
-  \siunitx_unit_parse_options:nn {#2} {#3}
-  \bool_if:NTF \l_siunitx_list_repeat_bool
-    {
-      \siunitx_unit_in:nn {#2} {#3}
-      \siunitx_list_numbers_aux_i:n {#1}
-    }
-    {
-      \bool_if:NT \l_siunitx_list_brackets_bool
-        { \siunitx_print:nV { number } \l_siunitx_bracket_open_tl }
-      \siunitx_list_numbers:n {#1}
-      \bool_if:NT \l_siunitx_list_brackets_bool
-        { \siunitx_print:nV { number } \l_siunitx_bracket_close_tl }
-      \siunitx_unit_output_number_sep:
-      \siunitx_unit_output:nn {#2} {#3}
-    }
-}
+\cs_new_protected:Npn \siunitx_list_units:nnn #1#2#3
+  {
+    \siunitx_unit_parse_options:nn {#2} {#3}
+    \bool_if:NTF \l_siunitx_list_repeat_bool
+      {
+        \siunitx_unit_in:nn {#2} {#3}
+        \siunitx_list_numbers_aux_i:n {#1}
+      }
+      {
+        \bool_if:NT \l_siunitx_process_fixed_bool
+          { \bool_set_true:N \l_siunitx_process_drop_exponent_bool }
+        \bool_if:NT \l_siunitx_list_brackets_bool
+          { \siunitx_print:nV { number } \l_siunitx_bracket_open_tl }
+        \siunitx_list_numbers:n {#1}
+        \bool_if:NT \l_siunitx_list_brackets_bool
+          { \siunitx_print:nV { number } \l_siunitx_bracket_close_tl }
+        \siunitx_range_exponent:
+        \siunitx_unit_output_number_sep:
+        \siunitx_unit_output:nn {#2} {#3}
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\subsection{Ranges}
 %
@@ -12647,38 +12680,42 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_range_numbers:nn}
-%\begin{macro}{\siunitx_range_numbers_aux:n}
-% A range of numbers. This is more restrictive than the \cs{num}
-% function: nothing compound.
+% \begin{macro}{\siunitx_range_numbers:nn}
+% \begin{macro}[aux]{\siunitx_range_numbers_core:nn}
+% \begin{macro}[aux]{\siunitx_range_numbers_aux:n}
+%   A range of numbers. This is more restrictive than the \cs{num}
+%   function: nothing compound.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_range_numbers:nn #1#2 {
-  \siunitx_range_numbers_aux:n {#1}
-  \l_siunitx_range_phrase_tl
-  \siunitx_range_numbers_aux:n {#2}
-}
-\cs_new_protected:Npn \siunitx_range_numbers_aux:n #1 {
-  \bool_if:NTF \l_siunitx_number_parse_bool
-    {
-      \tl_clear:N \l_siunitx_number_out_tl
-      \tl_clear:N \l_siunitx_number_out_saved_tl
-      \bool_set_false:N \l_siunitx_number_compound_bool
-      \siunitx_number_output_parse:n {#1}
-      \bool_if:NT \l_siunitx_number_compound_bool
-        { \msg_error:nnx { siunitx } { multi-part-range } {#1} }
-    }
-    {
-      \siunitx_unit_output_pre_print:
-      \siunitx_print:nn { number } {#1}
-      \siunitx_unit_output_print:
-    }
-}
+\cs_new_protected:Npn \siunitx_range_numbers:nn #1#2
+  {
+    \siunitx_range_numbers_aux:n {#1}
+    \l_siunitx_range_phrase_tl
+    \siunitx_range_numbers_aux:n {#2}
+  }
+\cs_new_protected:Npn \siunitx_range_numbers_aux:n #1
+  {
+    \bool_if:NTF \l_siunitx_number_parse_bool
+      {
+        \tl_clear:N \l_siunitx_number_out_tl
+        \tl_clear:N \l_siunitx_number_out_saved_tl
+        \bool_set_false:N \l_siunitx_number_compound_bool
+        \siunitx_number_output_parse:n {#1}
+        \bool_if:NT \l_siunitx_number_compound_bool
+          { \msg_error:nnx { siunitx } { multi-part-range } {#1} }
+      }
+      {
+        \siunitx_unit_output_pre_print:
+        \siunitx_print:nn { number } {#1}
+        \siunitx_unit_output_print:
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_range_unit:nnnn}
-% Unit printing is also simple: basically a past-up job.
+% Unit printing is also simple: basically a past-up job. The only compl
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_range_unit:nnnn #1#2#3#4 {
   \siunitx_unit_parse_options:nn {#1} {#2}
@@ -12690,17 +12727,44 @@ This work consists of the file  siunitx.dtx
       \siunitx_range_numbers_aux:n {#4}
     }
     {
+      \bool_if:NT \l_siunitx_process_fixed_bool
+        { \bool_set_true:N \l_siunitx_process_drop_exponent_bool }
       \bool_if:NT \l_siunitx_range_brackets_bool
         { \siunitx_print:nV { number } \l_siunitx_bracket_open_tl }
       \siunitx_range_numbers:nn {#3} {#4}
       \bool_if:NT \l_siunitx_range_brackets_bool
         { \siunitx_print:nV { number } \l_siunitx_bracket_close_tl }
+      \siunitx_range_exponent:
       \siunitx_unit_output_number_sep:
       \siunitx_unit_output:nn {#1} {#2}
     }
 }
 %    \end{macrocode}
 %\end{macro}
+%
+% \begin{macro}{\siunitx_range_exponent:}
+%   The idea here is to construct and print an exponent if this is fixed,
+%   and thus removed from the range. This function is also used by the
+%   related list concept.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_range_exponent:
+  {
+    \bool_if:NT \l_siunitx_process_fixed_bool
+      {
+        \tl_set_eq:NN \l_siunitx_tmpa_tl \l_siunitx_exponent_product_tl
+        \bool_if:NT \l_siunitx_tight_bool
+          { \tl_set:Nx \l_siunitx_tmpa_tl { { \exp_not:o \l_siunitx_tmpa_tl } } }
+        \tl_set:Nx \l_siunitx_tmpa_tl
+          {
+            \exp_not:N \ensuremath { { } \exp_not:o \l_siunitx_tmpa_tl  { } }
+            10 \exp_not:N \PrintSuperscript
+              { \int_use:N \l_siunitx_process_fixed_int }
+          }
+        \siunitx_print:nV { number } \l_siunitx_tmpa_tl 
+      }  
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 %\subsection{Setting up tables}
 %
