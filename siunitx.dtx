@@ -1757,6 +1757,7 @@ This work consists of the file  siunitx.dtx
 %      retain-explicit-plus     & Switch  & false       \\
 %      retain-unity-mantissa    & Switch  & true        \\
 %      retain-zero-exponent     & Switch  & false       \\
+%      round-half               & Choice  & up          \\
 %      round-integer-to-decimal & Switch  & false       \\
 %      round-minimum            & Literal & 0           \\
 %      round-mode               & Choice  & off         \\
@@ -1826,6 +1827,20 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{round-minimum = 0.01}%
 %  \num{0.0055} \\
 %  \num{0.0045}
+%\end{LaTeXdemo}
+% \DescribeOption{round-half}
+% \changes{v2.4}{2011/1/04}{New \opt{round-half} option}
+% In cases where the rounded part of a number is exactly half, there are
+% two common methods for \enquote{breaking the tie}. The choice of method
+% is determined by the option \opt{round-half}, which recognises the
+% choices \opt{up} and \opt{even}.
+%\begin{LaTeXdemo}
+%  \sisetup{round-mode = places, round-half = up}%
+%  \num{0.055} \\
+%  \num{0.045} \\
+%  \sisetup{round-half = even}%
+%  \num{0.055} \\
+%  \num{0.045}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{add-decimal-zero}
@@ -7431,26 +7446,33 @@ This work consists of the file  siunitx.dtx
 % for \enquote{formatting}: this is left for the output part of the
 % system.
 %
-%\begin{macro}{
-%  \l_siunitx_round_int            ,
-%  \l_siunitx_round_tl             ,
-%  \l_siunitx_round_bool           ,
-%  \l_siunitx_round_decimal_in_tl  ,
-%  \l_siunitx_round_decimal_out_tl ,
-%  \l_siunitx_round_integer_in_tl  ,
-%  \l_siunitx_round_integer_out_tl
-%}
-% The rounding system needs a number of variables.
+% \begin{variable}
+%   {
+%     \l_siunitx_round_int            ,
+%     \l_siunitx_round_tl             ,
+%     \l_siunitx_round_bool           ,
+%     \l_siunitx_round_decimal_in_tl  ,
+%     \l_siunitx_round_decimal_out_tl ,
+%     \l_siunitx_round_discard_tl     ,
+%     \l_siunitx_round_even_bool      ,
+%     \l_siunitx_round_integer_in_tl  ,
+%     \l_siunitx_round_integer_out_tl ,
+%     \l_siunitx_round_half_up_bool
+%   }
+%   The rounding system needs a number of variables.
 %    \begin{macrocode}
 \int_new:N \l_siunitx_round_int
 \tl_new:N \l_siunitx_round_tl
 \bool_new:N \l_siunitx_round_bool
 \tl_new:N \l_siunitx_round_decimal_in_tl
 \tl_new:N \l_siunitx_round_decimal_out_tl
+\tl_new:N \l_siunitx_round_discard_tl
+\tl_new:N \l_siunitx_round_even_bool
 \tl_new:N \l_siunitx_round_integer_in_tl
 \tl_new:N \l_siunitx_round_integer_out_tl
+\bool_new:N \l_siunitx_round_half_up_bool
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
 %\begin{macro}{
 %  \l_siunitx_process_decimal_int     ,
@@ -7481,82 +7503,91 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \l_siunitx_process_decimal_zero_bool  ,
-%  \l_siunitx_process_integer_zero_bool  ,
-%  \l_siunitx_process_sign_tl            ,
-%  \l_siunitx_process_sign_tl            ,
-%  \l_siunitx_process_fixed_int          ,
-%  \l_siunitx_process_integer_min_int    ,
-%  \l_siunitx_process_plus_tl            ,
-%  \l_siunitx_process_unity_mantissa_tl  ,
-%  \l_siunitx_process_zero_exponent_bool ,
-%  \l_siunitx_process_int_to_dec_bool    ,
-%  \l_siunitx_process_round_min_tl       ,
-%  \l_siunitx_process_precision_int
-%}
+% \begin{variable}
+%   {
+%     \l_siunitx_process_decimal_zero_bool  ,
+%     \l_siunitx_process_integer_zero_bool  ,
+%     \l_siunitx_process_sign_tl            ,
+%     \l_siunitx_process_sign_tl            ,
+%     \l_siunitx_process_fixed_int          ,
+%     \l_siunitx_process_integer_min_int    ,
+%     \l_siunitx_process_plus_tl            ,
+%     \l_siunitx_process_unity_mantissa_tl  ,
+%     \l_siunitx_process_zero_exponent_bool ,
+%     \l_siunitx_process_int_to_dec_bool    ,
+%     \l_siunitx_process_round_min_tl       ,
+%     \l_siunitx_process_precision_int
+%   }
 % First, the options are set up.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
-  add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
-  explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
-  fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
-  minimum-integer-digits .int_set:N =
-    \l_siunitx_process_integer_min_int,
-  retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
-  retain-unity-mantissa .bool_set:N =
-    \l_siunitx_process_unity_mantissa_bool,
-  retain-zero-exponent .bool_set:N =
-    \l_siunitx_process_zero_exponent_bool,
-  round-integer-to-decimal .bool_set:N =
-    \l_siunitx_process_int_to_dec_bool,
-  round-minimum     .tl_set:N  = \l_siunitx_process_round_min_tl,
-  round-mode        .choice: ,
-  round-mode / figures .code:n =
-    { \tl_set:Nn \l_siunitx_round_tl { figures } },
-  round-mode / off     .code:n = { \tl_clear:N \l_siunitx_round_tl },
-  round-mode / places  .code:n =
-    { \tl_set:Nn \l_siunitx_round_tl { places } },
-  round-precision      .int_set:N = \l_siunitx_process_precision_int,
-  scientific-notation .choice: ,
-  scientific-notation
-    / false           .code:n =
-    {
-      \bool_set_false:N \l_siunitx_process_fixed_bool
-      \bool_set_false:N \l_siunitx_process_engineering_bool
-      \bool_set_false:N \l_siunitx_process_scientific_bool
-    },
-  scientific-notation
-    / engineering     .code:n =
-    {
-      \bool_set_false:N \l_siunitx_process_fixed_bool
-      \bool_set_true:N  \l_siunitx_process_engineering_bool
-      \bool_set_true:N  \l_siunitx_process_scientific_bool
-    },
-  scientific-notation
-    / fixed           .code:n =
-    {
-      \bool_set_true:N  \l_siunitx_process_fixed_bool
-      \bool_set_false:N \l_siunitx_process_engineering_bool
-      \bool_set_false:N \l_siunitx_process_scientific_bool
-    },
-  scientific-notation
-    / true           .code:n =
-    {
-      \bool_set_false:N \l_siunitx_process_fixed_bool
-      \bool_set_false:N \l_siunitx_process_engineering_bool
-      \bool_set_true:N  \l_siunitx_process_scientific_bool
-    },
-}
-\keys_set:nn { siunitx } {
-  add-decimal-zero      = true,
-  add-integer-zero      = true,
-  retain-unity-mantissa = true,
-  round-precision       = 2,
-}
+\keys_define:nn { siunitx }
+  {
+    add-decimal-zero  .bool_set:N = \l_siunitx_process_decimal_zero_bool,
+    add-integer-zero  .bool_set:N = \l_siunitx_process_integer_zero_bool,
+    explicit-sign     .tl_set:N   = \l_siunitx_process_sign_tl,
+    fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
+    minimum-integer-digits .int_set:N =
+      \l_siunitx_process_integer_min_int,
+    retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
+    retain-unity-mantissa .bool_set:N =
+      \l_siunitx_process_unity_mantissa_bool,
+    retain-zero-exponent .bool_set:N =
+      \l_siunitx_process_zero_exponent_bool,
+    round-half        .choice:,
+    round-half / even .code:n   =
+      { \bool_set_false:N \l_siunitx_round_half_up_bool },
+    round-half / up   .code:n   =
+      { \bool_set_true:N \l_siunitx_round_half_up_bool },
+    round-integer-to-decimal .bool_set:N =
+      \l_siunitx_process_int_to_dec_bool,
+    round-minimum     .tl_set:N  = \l_siunitx_process_round_min_tl,
+    round-mode        .choice: ,
+    round-mode / figures .code:n =
+      { \tl_set:Nn \l_siunitx_round_tl { figures } },
+    round-mode / off     .code:n = { \tl_clear:N \l_siunitx_round_tl },
+    round-mode / places  .code:n =
+      { \tl_set:Nn \l_siunitx_round_tl { places } },
+    round-precision      .int_set:N = \l_siunitx_process_precision_int,
+    scientific-notation .choice: ,
+    scientific-notation
+      / false           .code:n =
+      {
+        \bool_set_false:N \l_siunitx_process_fixed_bool
+        \bool_set_false:N \l_siunitx_process_engineering_bool
+        \bool_set_false:N \l_siunitx_process_scientific_bool
+      },
+    scientific-notation
+      / engineering     .code:n =
+      {
+        \bool_set_false:N \l_siunitx_process_fixed_bool
+        \bool_set_true:N  \l_siunitx_process_engineering_bool
+        \bool_set_true:N  \l_siunitx_process_scientific_bool
+      },
+    scientific-notation
+      / fixed           .code:n =
+      {
+        \bool_set_true:N  \l_siunitx_process_fixed_bool
+        \bool_set_false:N \l_siunitx_process_engineering_bool
+        \bool_set_false:N \l_siunitx_process_scientific_bool
+      },
+    scientific-notation
+      / true           .code:n =
+      {
+        \bool_set_false:N \l_siunitx_process_fixed_bool
+        \bool_set_false:N \l_siunitx_process_engineering_bool
+        \bool_set_true:N  \l_siunitx_process_scientific_bool
+      }
+  }
+\keys_set:nn { siunitx }
+  {
+    add-decimal-zero      = true,
+    add-integer-zero      = true,
+    retain-unity-mantissa = true,
+    round-half            = up,
+    round-precision       = 2
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
 %\begin{macro}{\siunitx_number_process:}
 % Post-processing is a series of small tasks.
@@ -7620,174 +7651,177 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_process_figures:n}
-%\begin{macro}[aux]{
-%  \siunitx_number_process_figures_aux:n  ,
-%  \siunitx_number_process_figures_init:n
-%}
-% The approach here is to find how many digits there are in each part
-% of the number, working out which are significant. The next stage is
-% reconstruction of the number.
+% \begin{macro}{\siunitx_number_process_figures:n}
+% \begin{macro}[aux]
+%   {
+%     \siunitx_number_process_figures_aux:n  ,
+%     \siunitx_number_process_figures_init:n
+%   }
+%   The approach here is to find how many digits there are in each part
+%   of the number, working out which are significant. The next stage is
+%   reconstruction of the number.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_figures:n #1 {
-  \int_compare:nNnTF { \l_siunitx_process_precision_int } > { 0 }
-    {
-      \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
-        { \siunitx_number_process_figures_aux:n {#1} }
-    }
-    {
-      \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
-      \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
-      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
-      \bool_if:NF \l_siunitx_process_int_to_dec_bool
-        {
-          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
-        }
-    }
-}
-\cs_new_protected:Npn \siunitx_number_process_figures_aux:n #1 {
-  \siunitx_number_process_figures_init:n {#1}
-  \siunitx_number_process_figures_count:n { integer }
-  \siunitx_number_process_figures_count:n { decimal }
-  \bool_if:NTF \l_siunitx_round_bool
-    {
-      \bool_set_false:N \l_siunitx_round_bool
-      \int_compare:nNnTF
-        { \l_siunitx_round_int } >
-          { \l_siunitx_process_precision_int }
-        {
-          \siunitx_number_process_figures_round:
-          \siunitx_number_process_round_tidy:n {#1}
-        }
-        { \siunitx_number_process_figures_pad:n {#1} }
-    }
-    {
-      \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
-      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
-    }
-}
-\cs_new_protected:Npn \siunitx_number_process_figures_init:n #1 {
-  \int_zero:N \l_siunitx_round_int
-  \bool_set_false:N \l_siunitx_round_bool
-  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -decimal }
-    \l_siunitx_round_decimal_in_tl
-    { \tl_clear:N \l_siunitx_round_decimal_in_tl }
-  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
-    \l_siunitx_round_integer_in_tl
-    { \tl_clear:N \l_siunitx_round_integer_in_tl }
-  \tl_clear:N \l_siunitx_round_decimal_out_tl
-  \tl_clear:N \l_siunitx_round_integer_out_tl
-}
+\cs_new_protected:Npn \siunitx_number_process_figures:n #1
+  {
+    \int_compare:nNnTF \l_siunitx_process_precision_int > \c_zero
+      {
+        \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
+          { \siunitx_number_process_figures_aux:n {#1} }
+      }
+      {
+        \prop_del:Nn \l_siunitx_number_in_prop { #1 -sign }
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+        \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+        \bool_if:NF \l_siunitx_process_int_to_dec_bool
+          { \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker } }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_figures_aux:n #1
+  {
+    \siunitx_number_process_figures_init:n {#1}
+    \siunitx_number_process_figures_count:n { integer }
+    \siunitx_number_process_figures_count:n { decimal }
+    \bool_if:NTF \l_siunitx_round_bool
+      {
+        \bool_set_false:N \l_siunitx_round_bool
+        \int_compare:nNnTF
+          \l_siunitx_round_int > \l_siunitx_process_precision_int
+          {
+            \siunitx_number_process_figures_round:
+            \siunitx_number_process_round_tidy:n {#1}
+          }
+          { \siunitx_number_process_figures_pad:n {#1} }
+      }
+      {
+        \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+        \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_figures_init:n #1
+  {
+    \int_zero:N \l_siunitx_round_int
+    \bool_set_false:N \l_siunitx_round_bool
+    \bool_set_false:N \l_siunitx_round_even_bool
+    \prop_get:NnNF \l_siunitx_number_in_prop { #1 -decimal }
+      \l_siunitx_round_decimal_in_tl
+      { \tl_clear:N \l_siunitx_round_decimal_in_tl }
+    \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
+      \l_siunitx_round_integer_in_tl
+      { \tl_clear:N \l_siunitx_round_integer_in_tl }
+    \tl_clear:N \l_siunitx_round_decimal_out_tl
+    \tl_clear:N \l_siunitx_round_integer_out_tl
+    \tl_clear:N \l_siunitx_round_discard_tl
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_process_figures_count:n}
-%\begin{macro}[aux]{\siunitx_number_process_figures_count_aux:n}
-% The counting code has to check that characters are actually
-% significant.
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\siunitx_number_process_figures_count:n}
+% \begin{macro}[aux]{\siunitx_number_process_figures_count_aux:n}
+%   The counting code has to check that characters are actually
+%   significant.
 %    \begin{macrocode}
-\cs_new_protected:Npn
-  \siunitx_number_process_figures_count:n #1 {
-  \tl_if_empty:cF { l_siunitx_round_ #1 _in_tl }
-    {
-      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty }
-        { \siunitx_number_process_figures_count_aux:n {#1} }
-    }
-}
-\cs_new_protected:Npn
-  \siunitx_number_process_figures_count_aux:n #1 {
-  \int_set:Nn \l_siunitx_tmp_int
-    { \tl_head:v { l_siunitx_round_ #1 _in_tl } }
-  \tl_set:cx { l_siunitx_round_ #1 _in_tl }
-    { \tl_tail:v { l_siunitx_round_ #1 _in_tl } }
-  \tl_put_left:cV { l_siunitx_round_ #1 _out_tl } \l_siunitx_tmp_int
-  \bool_if:NF \l_siunitx_round_bool
-    {
-      \int_compare:nNnF { \l_siunitx_tmp_int } = { 0 }
-        { \bool_set_true:N \l_siunitx_round_bool }
-    }
-  \bool_if:NT \l_siunitx_round_bool
-    { \int_incr:N \l_siunitx_round_int }
-  \tl_if_empty:cTF { l_siunitx_round_ #1 _in_tl }
-    {
-      \tl_set_eq:cc { l_siunitx_round_ #1 _in_tl }
-        { l_siunitx_round_ #1 _out_tl }
-      \tl_clear:c { l_siunitx_round_ #1 _out_tl }
-    }
-    { \siunitx_number_process_figures_count_aux:n {#1} }
-}
+\cs_new_protected:Npn \siunitx_number_process_figures_count:n #1
+  {
+    \tl_if_empty:cF { l_siunitx_round_ #1 _in_tl }
+      {
+        \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty }
+          { \siunitx_number_process_figures_count_aux:n {#1} }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_figures_count_aux:n #1
+  {
+    \int_set:Nn \l_siunitx_tmp_int
+      { \tl_head:v { l_siunitx_round_ #1 _in_tl } }
+    \tl_set:cx { l_siunitx_round_ #1 _in_tl }
+      { \tl_tail:v { l_siunitx_round_ #1 _in_tl } }
+    \tl_put_left:cV { l_siunitx_round_ #1 _out_tl } \l_siunitx_tmp_int
+    \bool_if:NF \l_siunitx_round_bool
+      {
+        \int_compare:nNnF { \l_siunitx_tmp_int } = \c_zero
+          { \bool_set_true:N \l_siunitx_round_bool }
+      }
+    \bool_if:NT \l_siunitx_round_bool
+      { \int_incr:N \l_siunitx_round_int }
+    \tl_if_empty:cTF { l_siunitx_round_ #1 _in_tl }
+      {
+        \tl_set_eq:cc { l_siunitx_round_ #1 _in_tl }
+          { l_siunitx_round_ #1 _out_tl }
+        \tl_clear:c { l_siunitx_round_ #1 _out_tl }
+      }
+      { \siunitx_number_process_figures_count_aux:n {#1} }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_process_figures_round:}
-%\begin{macro}[aux]{\siunitx_number_process_figures_round_loop:}
-% The control macro for rounding to figures does the decimal part
-% then the integer part as loops. There is then some tidying up if a
-% digit is carried at the end.
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\siunitx_number_process_figures_round:}
+% \begin{macro}[aux]{\siunitx_number_process_figures_round_loop:}
+%   The control macro for rounding to figures does the decimal part
+%   then the integer part as loops. There is then some tidying up if a
+%   digit is carried at the end.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_figures_round: {
-  \int_set:Nn \l_siunitx_round_int
-    { \l_siunitx_round_int - \l_siunitx_process_precision_int }
-  \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
-    { \siunitx_number_process_figures_round_loop: }
-  \tl_if_empty:NF \l_siunitx_round_integer_in_tl
-    { \siunitx_number_process_figures_integer: }
-  \bool_if:NT \l_siunitx_round_bool
-    {
-      \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 1 }
-      \tl_if_empty:NF \l_siunitx_round_decimal_out_tl
-        {
-          \tl_reverse:N \l_siunitx_round_decimal_out_tl
-          \tl_set:Nx \l_siunitx_round_decimal_out_tl
-            { \tl_tail:n \l_siunitx_round_decimal_out_tl }
-          \tl_reverse:N \l_siunitx_round_decimal_out_tl
-        }
-    }
-}
-\cs_new_protected:Npn
-  \siunitx_number_process_figures_round_loop: {
-  \siunitx_number_process_round_decimal:
-  \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
-    { \siunitx_number_process_figures_round_loop: }
-}
+\cs_new_protected:Npn \siunitx_number_process_figures_round:
+  {
+    \int_set:Nn \l_siunitx_round_int
+      { \l_siunitx_round_int - \l_siunitx_process_precision_int }
+    \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
+      { \siunitx_number_process_figures_round_loop: }
+    \tl_if_empty:NF \l_siunitx_round_integer_in_tl
+      { \siunitx_number_process_figures_integer: }
+    \bool_if:NT \l_siunitx_round_bool
+      {
+        \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 1 }
+        \tl_if_empty:NF \l_siunitx_round_decimal_out_tl
+          {
+            \tl_reverse:N \l_siunitx_round_decimal_out_tl
+            \tl_set:Nx \l_siunitx_round_decimal_out_tl
+              { \tl_tail:n \l_siunitx_round_decimal_out_tl }
+            \tl_reverse:N \l_siunitx_round_decimal_out_tl
+          }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_figures_round_loop:
+  {
+    \siunitx_number_process_round_decimal:
+    \tl_if_empty:NF \l_siunitx_round_decimal_in_tl
+      { \siunitx_number_process_figures_round_loop: }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_process_figures_integer:}
-% For figures, the integer part is a little complicated as zeros need
-% to be included.
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\siunitx_number_process_figures_integer:}
+%   For figures, the integer part is a little complicated as zeros need
+%   to be included.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_figures_integer: {
-  \int_compare:nNnT { \l_siunitx_round_int } > { 0 }
-    { \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 0 } }
-  \int_compare:nNnF { \l_siunitx_round_int } > { 1 }
-    {
-      \int_set:Nn \l_siunitx_tmp_int
-        { \tl_head:V \l_siunitx_round_integer_in_tl }
-      \bool_if:NT \l_siunitx_round_bool
-        { \int_incr:N \l_siunitx_tmp_int }
-      \bool_set_false:N \l_siunitx_round_bool
-      \int_compare:nNnTF { \l_siunitx_round_int } = { 1 }
-        {
-          \int_compare:nNnT { \l_siunitx_tmp_int } > { 4 }
-            { \bool_set_true:N \l_siunitx_round_bool }
-        }
-        {
-          \int_compare:nNnT { \l_siunitx_tmp_int } = { 10 }
-            {
-              \bool_set_true:N \l_siunitx_round_bool
-              \int_zero:N \l_siunitx_tmp_int
-            }
-          \tl_put_left:NV \l_siunitx_round_integer_out_tl
-            \l_siunitx_tmp_int
-        }
-    }
-  \int_decr:N \l_siunitx_round_int
-  \tl_set:Nx \l_siunitx_round_integer_in_tl
-    { \tl_tail:V \l_siunitx_round_integer_in_tl }
-  \tl_if_empty:NF \l_siunitx_round_integer_in_tl
-    { \siunitx_number_process_figures_integer: }
-}
+\cs_new_protected:Npn \siunitx_number_process_figures_integer:
+  {
+    \int_compare:nNnT \l_siunitx_round_int > \c_zero
+      { \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 0 } }
+    \int_compare:nNnF \l_siunitx_round_int > \c_one
+      {
+        \int_set:Nn \l_siunitx_tmp_int
+          { \tl_head:V \l_siunitx_round_integer_in_tl }
+        \siunitx_number_process_round_up:
+        \int_compare:nNnTF \l_siunitx_round_int = \c_one
+          {
+            \int_compare:nNnT \l_siunitx_tmp_int > \c_four
+              { \bool_set_true:N \l_siunitx_round_bool }
+          }
+          {
+            \int_compare:nNnT \l_siunitx_tmp_int = \c_ten
+              {
+                \bool_set_true:N \l_siunitx_round_bool
+                \int_zero:N \l_siunitx_tmp_int
+              }
+            \tl_put_left:NV \l_siunitx_round_integer_out_tl
+              \l_siunitx_tmp_int
+          }
+      }
+    \int_decr:N \l_siunitx_round_int
+    \tl_set:Nx \l_siunitx_round_integer_in_tl
+      { \tl_tail:V \l_siunitx_round_integer_in_tl }
+    \tl_if_empty:NF \l_siunitx_round_integer_in_tl
+      { \siunitx_number_process_figures_integer: }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\siunitx_number_process_figures_pad:n}
@@ -8063,163 +8097,180 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_number_process_places:n}
-%\begin{macro}[aux]{
-%  \siunitx_number_process_places_init:n    ,
-%  \siunitx_number_process_places_aux_i:n   ,
-%  \siunitx_number_process_places_aux_ii:n  ,
-%  \siunitx_number_process_places_loop:n    ,
-%  \siunitx_number_process_places_integer:n
-%}
-% For rounding to a fixed number of places, a check is made to see if
-% the decimal part is exactly zero. If it is, just create the
-% appropriate number of zeros in the padding routine.  Otherwise, do the
-% real work.
+% \begin{macro}{\siunitx_number_process_places:n}
+% \begin{macro}[aux]
+%   {
+%    \siunitx_number_process_places_init:n    ,
+%    \siunitx_number_process_places_aux_i:n   ,
+%    \siunitx_number_process_places_none:     ,
+%    \siunitx_number_process_places_aux_ii:n  ,
+%    \siunitx_number_process_places_loop:n    ,
+%    \siunitx_number_process_places_integer:n
+%  }
+%   For rounding to a fixed number of places, a check is made to see if
+%   the decimal part is exactly zero. If it is, just create the
+%   appropriate number of zeros in the padding routine.  Otherwise, do the
+%   real work.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_places:n #1 {
-  \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
-    {
-      \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty }
-        { \siunitx_number_process_places_aux_i:n {#1} }
-    }
-}
-\cs_new_protected:Npn \siunitx_number_process_places_aux_i:n #1 {
-  \int_compare:nNnTF { \l_siunitx_process_precision_int } = { 0 }
-    {
-      \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
-        \l_siunitx_tmpa_tl
-        {
-          \int_compare:nNnTF
-            { \tl_head:V \l_siunitx_tmpa_tl } > { 4 }
-            {
-              \prop_get:NnNTF \l_siunitx_number_in_prop { #1 -integer }
-                \l_siunitx_tmpa_tl
-                {
-                  \tl_set:Nx \l_siunitx_tmpa_tl
-                    { \int_eval:n { \l_siunitx_tmpa_tl + 1 } }
-                  \prop_put:NnV \l_siunitx_number_in_prop
-                    { #1 -integer } \l_siunitx_tmpa_tl
-                }
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop
-                    { #1 -integer } { 1 }
-                }
-
-            }
-            {
-              \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer }
-                {
-                  \prop_put:Nnn \l_siunitx_number_in_prop
-                    { #1 -integer } { 0 }
-                }
-            }
-        }
-      \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
-      \bool_if:NF \l_siunitx_process_int_to_dec_bool
-        {
-          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
-        }
-    }
-    {
-      \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
-        \l_siunitx_tmpa_tl
-        {
-          \tl_if_empty:NT \l_siunitx_tmpa_tl
-            { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-          \int_compare:nNnTF { \l_siunitx_tmpa_tl } = { 0 }
-            {
-              \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal }
-                { }
-              \int_set:Nn \l_siunitx_round_int
-                { \l_siunitx_process_precision_int }
-              \siunitx_number_process_pad:n {#1}
-            }
-            {
-              \int_set:Nn \l_siunitx_round_int
-                { \tl_length:N \l_siunitx_tmpa_tl }
-              \siunitx_number_process_places_aux_ii:n {#1}
-            }
-        }
-    }
-}
+\cs_new_protected:Npn \siunitx_number_process_places:n #1
+  {
+    \prop_if_in:NnT \l_siunitx_number_in_prop {#1}
+      {
+        \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -uncertainty }
+          { \siunitx_number_process_places_aux_i:n {#1} }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_places_aux_i:n #1
+  {
+    \int_compare:nNnTF \l_siunitx_process_precision_int = \c_zero
+      { \siunitx_number_process_places_none:n {#1} }
+      {
+        \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal }
+          \l_siunitx_tmpa_tl
+          {
+            \tl_if_empty:NT \l_siunitx_tmpa_tl
+              { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
+            \int_compare:nNnTF \l_siunitx_tmpa_tl = \c_zero
+              {
+                \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal } { }
+                \int_set:Nn \l_siunitx_round_int
+                  { \l_siunitx_process_precision_int }
+                \siunitx_number_process_pad:n {#1}
+              }
+              {
+                \int_set:Nn \l_siunitx_round_int
+                  { \tl_length:N \l_siunitx_tmpa_tl }
+                \siunitx_number_process_places_aux_ii:n {#1}
+              }
+          }
+      }
+  }
+%    \end{macrocode}
+%   Rounding to no places at all requires a few checks to see if there is any
+%   work to do. That includes a check for rounding half to even, where if
+%   the decimal part is exactly half then special action is required.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_process_places_none:n #1
+  {
+    \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal } \l_siunitx_tmpa_tl
+      {
+        \int_compare:nNnTF { \tl_head:V \l_siunitx_tmpa_tl } > \c_four
+          {
+            \prop_get:NnNTF \l_siunitx_number_in_prop { #1 -integer }
+              \l_siunitx_tmpb_tl
+              {
+                \tl_set:Nx \l_siunitx_tmpb_tl
+                  { \int_eval:n { \l_siunitx_tmpb_tl + 1 } }
+                \bool_if:NF \l_siunitx_round_half_up_bool
+                  {
+                    \int_compare:nNnT 
+                      { 0 \tl_tail:V \l_siunitx_tmpa_tl } = \c_zero
+                      {
+                        \int_if_odd:nT \l_siunitx_tmpb_tl
+                          {
+                            \tl_set:Nx \l_siunitx_tmpb_tl
+                              { \int_eval:n { \l_siunitx_tmpb_tl - 1 } }
+                          }
+                      }
+                  }   
+              }
+              { \tl_set:Nn \l_siunitx_tmpb_tl { 1 } }
+            \prop_put:NnV \l_siunitx_number_in_prop
+              { #1 -integer } \l_siunitx_tmpb_tl
+          }
+          {
+            \prop_if_in:NnF \l_siunitx_number_in_prop { #1 -integer }
+              {
+                \prop_put:Nnn \l_siunitx_number_in_prop
+                  { #1 -integer } { 0 }
+              }
+          }
+      }
+    \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+    \bool_if:NF \l_siunitx_process_int_to_dec_bool
+      { \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker } }
+  }
 %    \end{macrocode}
 % For rounding to a fixed number of places, the package finds the
 % difference in length between what is present and what is required.
 % If the number is too short, there is some simple padding to do.
 %    \begin{macrocode}
-\cs_new_protected:Npn
-  \siunitx_number_process_places_aux_ii:n #1 {
-  \int_sub:Nn \l_siunitx_round_int
-    { \l_siunitx_process_precision_int }
-  \int_compare:nNnTF { \l_siunitx_round_int } < { 0 }
-    {
-      \int_set:Nn \l_siunitx_round_int { - \l_siunitx_round_int }
-      \siunitx_number_process_pad:n {#1}
-    }
-    {
-      \siunitx_number_process_places_init:n {#1}
-      \siunitx_number_process_places_loop:n {#1}
-      \siunitx_number_process_round_tidy:n {#1}
-    }
-}
+\cs_new_protected:Npn \siunitx_number_process_places_aux_ii:n #1
+  {
+    \int_sub:Nn \l_siunitx_round_int
+      { \l_siunitx_process_precision_int }
+    \int_compare:nNnTF \l_siunitx_round_int < \c_zero
+      {
+        \int_set:Nn \l_siunitx_round_int { - \l_siunitx_round_int }
+        \siunitx_number_process_pad:n {#1}
+      }
+      {
+        \siunitx_number_process_places_init:n {#1}
+        \siunitx_number_process_places_loop:n {#1}
+        \siunitx_number_process_round_tidy:n {#1}
+      }
+  }
 %    \end{macrocode}
-% To keep the code a little clearer.
+%   To keep the code a little clearer.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_places_init:n #1 {
-  \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
-    \l_siunitx_round_integer_in_tl
-    { \tl_clear:N \l_siunitx_round_integer_in_tl }
-  \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
-    \l_siunitx_round_decimal_in_tl
-  \tl_reverse:N \l_siunitx_round_integer_in_tl
-  \tl_reverse:N \l_siunitx_round_decimal_in_tl
-  \tl_clear:N \l_siunitx_round_integer_out_tl
-  \tl_clear:N \l_siunitx_round_decimal_out_tl
-  \bool_set_false:N \l_siunitx_round_bool
-}
+\cs_new_protected:Npn \siunitx_number_process_places_init:n #1
+  {
+    \prop_get:NnNF \l_siunitx_number_in_prop { #1 -integer }
+      \l_siunitx_round_integer_in_tl
+      { \tl_clear:N \l_siunitx_round_integer_in_tl }
+    \prop_get:NnN \l_siunitx_number_in_prop { #1 -decimal }
+      \l_siunitx_round_decimal_in_tl
+    \tl_reverse:N \l_siunitx_round_integer_in_tl
+    \tl_reverse:N \l_siunitx_round_decimal_in_tl
+    \tl_clear:N \l_siunitx_round_integer_out_tl
+    \tl_clear:N \l_siunitx_round_decimal_out_tl
+    \tl_clear:N \l_siunitx_round_discard_tl
+    \bool_set_false:N \l_siunitx_round_bool
+    \bool_set_false:N \l_siunitx_round_even_bool
+  }
 %    \end{macrocode}
 % If there is a decimal, do the decimal processing then come back here.
 % If there is an integer, do the same. Only if both are empty does the
 % loop stop.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_places_loop:n #1 {
-  \tl_if_empty:NTF \l_siunitx_round_decimal_in_tl
-    {
-      \tl_if_empty:NF \l_siunitx_round_integer_in_tl
-        {
-          \siunitx_number_process_places_integer:n {#1}
-          \siunitx_number_process_places_loop:n {#1}
-        }
-      \bool_if:NT \l_siunitx_round_bool
-        {
-          \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 1 }
-          \bool_set_false:N \l_siunitx_round_bool
-        }
-    }
-    {
-      \siunitx_number_process_round_decimal:
-      \siunitx_number_process_places_loop:n {#1}
-    }
-}
+\cs_new_protected:Npn \siunitx_number_process_places_loop:n #1
+  {
+    \tl_if_empty:NTF \l_siunitx_round_decimal_in_tl
+      {
+        \tl_if_empty:NF \l_siunitx_round_integer_in_tl
+          {
+            \siunitx_number_process_places_integer:n {#1}
+            \siunitx_number_process_places_loop:n {#1}
+          }
+        \bool_if:NT \l_siunitx_round_bool
+          {
+            \tl_put_left:Nn \l_siunitx_round_integer_out_tl { 1 }
+            \bool_set_false:N \l_siunitx_round_bool
+          }
+      }
+      {
+        \siunitx_number_process_round_decimal:
+        \siunitx_number_process_places_loop:n {#1}
+      }
+  }
 %    \end{macrocode}
 % Rounding for integers is just a case of carrying digits.
 %    \begin{macrocode}
-\cs_new_protected:Npn
-  \siunitx_number_process_places_integer:n #1 {
-  \int_set:Nn \l_siunitx_tmp_int
-    { \tl_head:V \l_siunitx_round_integer_in_tl }
-  \tl_set:Nx \l_siunitx_round_integer_in_tl
-    { \tl_tail:V \l_siunitx_round_integer_in_tl }
-  \bool_if:NT \l_siunitx_round_bool
-    { \int_incr:N \l_siunitx_tmp_int }
-  \bool_set_false:N \l_siunitx_round_bool
-  \int_compare:nNnT { \l_siunitx_tmp_int } = { 10 }
-    {
-      \int_zero:N \l_siunitx_tmp_int
-      \bool_set_true:N \l_siunitx_round_bool
-    }
-  \tl_put_left:NV \l_siunitx_round_integer_out_tl \l_siunitx_tmp_int
-}
+\cs_new_protected:Npn \siunitx_number_process_places_integer:n #1
+  {
+    \int_set:Nn \l_siunitx_tmp_int
+      { \tl_head:V \l_siunitx_round_integer_in_tl }
+    \tl_set:Nx \l_siunitx_round_integer_in_tl
+      { \tl_tail:V \l_siunitx_round_integer_in_tl }
+    \siunitx_number_process_round_up:
+    \bool_set_false:N \l_siunitx_round_bool
+    \int_compare:nNnT \l_siunitx_tmp_int = \c_ten
+      {
+        \int_zero:N \l_siunitx_tmp_int
+        \bool_set_true:N \l_siunitx_round_bool
+      }
+    \tl_put_left:NV \l_siunitx_round_integer_out_tl \l_siunitx_tmp_int
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -8252,93 +8303,133 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 % \end{macro}
-%\begin{macro}{\siunitx_number_process_round_decimal:}
-%\begin{macro}[aux]{\siunitx_number_process_round_decimal_aux:}
-% The rounding routine for decimals is the same for figures and places,
-% so there is a generalised function here. Unfortunately, it is also
-% complicated!
+% \begin{macro}{\siunitx_number_process_round_decimal:}
+% \begin{macro}[aux]{\siunitx_number_process_round_decimal_aux:}
+%   The rounding routine for decimals is the same for figures and places,
+%   so there is a generalised function here. Unfortunately, it is also
+%   complicated!
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_round_decimal: {
-  \int_compare:nNnF { \l_siunitx_round_int } > { 1 }
-    { \siunitx_number_process_round_decimal_aux: }
-  \tl_set:Nx \l_siunitx_round_decimal_in_tl
-    { \tl_tail:V \l_siunitx_round_decimal_in_tl }
-  \int_decr:N \l_siunitx_round_int
-}
-\cs_new_protected:Npn
-  \siunitx_number_process_round_decimal_aux: {
-  \int_set:Nn \l_siunitx_tmp_int
-    { \tl_head:V \l_siunitx_round_decimal_in_tl }
-  \bool_if:NT \l_siunitx_round_bool
-    { \int_incr:N \l_siunitx_tmp_int }
-  \bool_set_false:N \l_siunitx_round_bool
-  \int_compare:nNnTF { \l_siunitx_round_int } = { 1 }
-    {
-      \int_compare:nNnT { \l_siunitx_tmp_int } > { 4 }
-        { \bool_set_true:N \l_siunitx_round_bool }
-    }
-    {
-      \int_compare:nNnT { \l_siunitx_tmp_int } = { 10 }
-        {
-          \bool_set_true:N \l_siunitx_round_bool
-          \int_zero:N \l_siunitx_tmp_int
-        }
-      \tl_put_left:NV \l_siunitx_round_decimal_out_tl
-        \l_siunitx_tmp_int
-    }
-}
+\cs_new_protected:Npn \siunitx_number_process_round_decimal:
+  {
+    \int_compare:nNnF \l_siunitx_round_int > \c_one
+      { \siunitx_number_process_round_decimal_aux: }
+    \tl_put_right:Nx \l_siunitx_round_discard_tl
+      { \tl_head:V \l_siunitx_round_decimal_in_tl }
+    \tl_set:Nx \l_siunitx_round_decimal_in_tl
+      { \tl_tail:V \l_siunitx_round_decimal_in_tl }
+    \int_decr:N \l_siunitx_round_int
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%\begin{macro}{\siunitx_number_process_round_tidy:n}
-%\begin{macro}[aux]{\siunitx_number_process_round_tidy_aux:w}
-% To put data back again: there is a check to see if the number has been
-% rounded to zero and a minimal value has been requested.
+%  The logic here has to deal with the (simpler) rounding up method and the
+%  case where there is a need to check for rounding to an even number. The
+%  later is only required when the discarded part is exactly equal to 
+%  half of the least-significant digit. So there is a somewhat complex check
+%  for that, along with a somewhat simpler check when carrying out the
+%  rounding.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_number_process_round_tidy:n #1 {
-  \int_compare:nNnTF
-    {
-      0 \l_siunitx_round_integer_out_tl +
-      0 \l_siunitx_round_decimal_out_tl
-    }
-      = { 0 }
-    {
-      \fp_compare:nNnTF { \l_siunitx_process_round_min_tl } = { 0 }
-        {
-          \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
-          \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
-            \l_siunitx_round_decimal_out_tl
-        }
-        {
-          \exp_after:wN \siunitx_number_process_round_tidy_aux:w
-            \l_siunitx_process_round_min_tl . . \q_stop {#1}
-        }
-    }
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
-        \l_siunitx_round_integer_out_tl
-      \tl_if_empty:NTF \l_siunitx_round_decimal_out_tl
-        {
-          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
-          \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
-        }
-        {
-          \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
-            \l_siunitx_round_decimal_out_tl
-        }
-     }
-}
-\cs_new_protected:Npn
-  \siunitx_number_process_round_tidy_aux:w #1 . #2 . #3 \q_stop #4 {
-  \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
-  \prop_put:Nnn \l_siunitx_number_in_prop { #4 -integer } {#1}
-  \tl_if_empty:nTF {#2}
-    { \prop_del:Nn \l_siunitx_number_in_prop { #4 -decimal } }
-    { \prop_put:Nnn \l_siunitx_number_in_prop { #4 -decimal } {#2} }
-}
+\cs_new_protected:Npn \siunitx_number_process_round_decimal_aux:
+  {
+    \int_set:Nn \l_siunitx_tmp_int
+      { \tl_head:V \l_siunitx_round_decimal_in_tl }
+    \siunitx_number_process_round_up:
+    \int_compare:nNnTF \l_siunitx_round_int = \c_one
+      {
+        \int_compare:nNnT \l_siunitx_tmp_int > \c_four
+          {
+            \bool_set_true:N \l_siunitx_round_bool
+            \bool_if:NF \l_siunitx_round_half_up_bool
+              {
+                \int_compare:nNnT
+                  { \l_siunitx_round_discard_tl \int_use:N \l_siunitx_tmp_int }
+                    = \c_five
+                  { \bool_set_true:N \l_siunitx_round_even_bool }
+              }
+          }
+      }
+      {
+        \int_compare:nNnT \l_siunitx_tmp_int = \c_ten
+          {
+            \bool_set_true:N \l_siunitx_round_bool
+            \int_zero:N \l_siunitx_tmp_int
+          }
+        \tl_put_left:NV \l_siunitx_round_decimal_out_tl
+          \l_siunitx_tmp_int
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\siunitx_number_process_round_up:}
+%   This is needed a few times, to round up the current digit unless
+%   it is even and \enquote{half to even} is active.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_process_round_up:
+  {
+    \bool_if:NT \l_siunitx_round_bool
+      {
+        \bool_if:NTF \l_siunitx_round_even_bool
+          {
+            \bool_set_false:N \l_siunitx_round_even_bool
+            \int_if_even:nF \l_siunitx_tmp_int
+              { \int_incr:N \l_siunitx_tmp_int }
+          }
+          { \int_incr:N \l_siunitx_tmp_int }
+      }
+    \bool_set_false:N \l_siunitx_round_bool
+  }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\siunitx_number_process_round_tidy:n}
+% \begin{macro}[aux]{\siunitx_number_process_round_tidy_aux:w}
+%   To put data back again: there is a check to see if the number has been
+% r  ounded to zero and a minimal value has been requested.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_process_round_tidy:n #1
+  {
+    \int_compare:nNnTF
+      {
+        0 \l_siunitx_round_integer_out_tl +
+        0 \l_siunitx_round_decimal_out_tl
+      }
+        = \c_zero
+      {
+        \fp_compare:nNnTF { \l_siunitx_process_round_min_tl } = { 0 }
+          {
+            \prop_put:Nnn \l_siunitx_number_in_prop { #1 -integer } { 0 }
+            \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
+              \l_siunitx_round_decimal_out_tl
+          }
+          {
+            \exp_after:wN \siunitx_number_process_round_tidy_aux:w
+              \l_siunitx_process_round_min_tl . . \q_stop {#1}
+          }
+      }
+      {
+        \prop_put:NnV \l_siunitx_number_in_prop { #1 -integer }
+          \l_siunitx_round_integer_out_tl
+        \tl_if_empty:NTF \l_siunitx_round_decimal_out_tl
+          {
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
+          }
+          {
+            \prop_put:NnV \l_siunitx_number_in_prop { #1 -decimal }
+              \l_siunitx_round_decimal_out_tl
+          }
+       }
+  }
+\cs_new_protected:Npn \siunitx_number_process_round_tidy_aux:w
+  #1 . #2 . #3 \q_stop #4
+  {
+    \prop_put:Nnn \l_siunitx_number_in_prop { comparator } { < }
+    \prop_put:Nnn \l_siunitx_number_in_prop { #4 -integer } {#1}
+    \tl_if_empty:nTF {#2}
+      { \prop_del:Nn \l_siunitx_number_in_prop { #4 -decimal } }
+      { \prop_put:Nnn \l_siunitx_number_in_prop { #4 -decimal } {#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_number_process_scientific:}
 %\begin{macro}[aux]{
