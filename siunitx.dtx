@@ -2938,6 +2938,7 @@ This work consists of the file  siunitx.dtx
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
 %      allow-number-unit-breaks & Switch & false    \\
+%      exponent-to-prefix       & Switch & false    \\
 %      list-units               & Choice & repeat   \\
 %      multi-part-units         & Choice & brackets \\
 %      number-unit-product      & Math   & \cs{,}   \\
@@ -3040,6 +3041,24 @@ This work consists of the file  siunitx.dtx
 %  \SIrange[range-units = brackets]{2}{4}{\degreeCelsius} \\
 %  \SIrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
 %  \SIrange[range-units = single]{2}{4}{\degreeCelsius}
+%\end{LaTeXdemo}
+%
+% \DescribeOption{exponent-to-prefix}
+% \changes{v2.4}{2011/11/06}{New \opt{exponent-to-prefix} option}
+% When the \opt{exponent-to-prefix} option is set \opt{true}, the package
+% will attempt to convert any exponents in quantities into unit prefixes,
+% and will attach these to the first unit given. This process is only
+% possible if the exponent is one for which a prefix is available, and
+% retains the number of significant figures in the input.
+%\begin{LaTeXdemo}
+%  \SI{1700}{\g}  \\
+%  \SI{1.7e3}{\g} \\
+%  \sisetup{exponent-to-prefix}%
+%  \SI{1700}{\g}  \\
+%  \SI{1.7e3}{\g} \\
+%  \sisetup{fixed-exponent = 3, scientific-notation = fixed }
+%  \SI{1700}{\g}  \\
+%  \SI{1.7e3}{\g}
 %\end{LaTeXdemo}
 %
 %\subsection{Tabular material}
@@ -7630,6 +7649,11 @@ This work consists of the file  siunitx.dtx
               { \siunitx_number_process_scientific: }
           }
         \siunitx_number_process_uncertainty:
+        \bool_if:NT \l_siunitx_exp_to_prefix_bool
+          {
+            \tl_if_empty:NF \l_siunitx_unit_tl
+              { \siunitx_number_exp_to_prefix: }
+          }
         \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
           { \siunitx_number_process_round: }
       }
@@ -8910,6 +8934,49 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+% \begin{macro}{\siunitx_number_exp_to_prefix:}
+%   This function is a bit awkward, as it essentially cuts across the
+%   unit processor. The idea here is first to recover the numerical exponent,
+%   and sign if there is one.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_exp_to_prefix:
+  {
+    \prop_set_eq:NN \l_siunitx_unit_prop \l_siunitx_unit_saved_prop
+    \prop_get:NnNT \l_siunitx_number_in_prop { exponent-integer }
+      \l_siunitx_tmpa_tl
+      {
+        \prop_get:NnNT \l_siunitx_number_in_prop { exponent-sign }
+          \l_siunitx_tmpb_tl
+          { \tl_put_left:NV \l_siunitx_tmpa_tl \l_siunitx_tmpb_tl }
+        \prop_get:NnNT \l_siunitx_unit_prop { prefix-1 } \l_siunitx_tmpb_tl
+          {
+            \prop_del:Nn \l_siunitx_unit_prop { prefix-1 }
+            \prop_del:Nn \l_siunitx_unit_prop { prefix-symbol-1 }
+            \prop_get:NVN \l_siunitx_prefix_forward_prop \l_siunitx_tmpb_tl
+              \l_siunitx_tmpb_tl
+            \tl_set:Nx \l_siunitx_tmpa_tl
+              { \int_eval:n { \l_siunitx_tmpa_tl + \l_siunitx_tmpb_tl } }
+          }
+        \prop_get:NVNTF \l_siunitx_prefix_reverse_prop \l_siunitx_tmpa_tl
+          \l_siunitx_tmpb_tl
+          { 
+            \prop_del:Nn \l_siunitx_number_in_prop { exponent }
+            \use:c
+              {
+                siunitx_ \exp_after:wN \token_to_str:N \l_siunitx_tmpb_tl
+                _function:w
+              }
+            \siunitx_unit_format:  
+          }
+          {
+            \msg_error:nnx { siunitx } { non-convertible-exponent }
+              { \l_siunitx_tmpa_tl }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 %\subsection{Formatting numbers for output}
 %
@@ -10719,7 +10786,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\siunitx_declare_prefix:Nnnn}
-% \begin{variable}{\l_siunitx_prefix_2_prop, \l_siunitx_prefix_10_prop}
+% \begin{variable}
+%   {\l_siunitx_prefix_forward_prop, \l_siunitx_prefix_reverse_prop}
 %   Prefixes need to store both the symbol and the power they represent.
 %   A reverse system is also set up, to allow powers to be converted to
 %   prefixes.
@@ -10727,17 +10795,18 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_declare_prefix:Nnnn #1#2#3#4
   {
     \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
-    \prop_put:cnn { l_siunitx_prefix_ #3 _prop } {#4} {#1}
+    \prop_put:Nnn \l_siunitx_prefix_forward_prop {#1} {#4}
+    \prop_put:Nnn \l_siunitx_prefix_reverse_prop {#4} {#1}
     \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
     \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
       {
         \bool_if:NTF \l_siunitx_prefix_symbols_bool
-          { \siunitx_unit_parse_prefix:n {#2} }
+          { \siunitx_unit_parse_prefix:Nn #1 {#2} }
           { \siunitx_unit_parse_prefix:nn {#3} {#4} }
       }
   }
-\prop_new:c { l_siunitx_prefix_2_prop }
-\prop_new:c { l_siunitx_prefix_10_prop }
+\prop_new:N \l_siunitx_prefix_forward_prop
+\prop_new:N \l_siunitx_prefix_reverse_prop
 %    \end{macrocode}
 % \end{variable}
 % \end{macro}
@@ -11099,6 +11168,7 @@ This work consists of the file  siunitx.dtx
               \cs_set_eq:NN \siunitx_pm: \pm
               \siunitx_unit_parse:nn {#1} {#2}
               \siunitx_unit_format:
+              \prop_set_eq:NN \l_siunitx_unit_saved_prop \l_siunitx_unit_prop
               \cs_set_eq:NN \pm \siunitx_pm:
             }
       }
@@ -11144,17 +11214,20 @@ This work consists of the file  siunitx.dtx
 % input to collect up the units, before re-combining everything into
 % a single block at the end of the process.
 %
-%\begin{macro}{
-%  \l_siunitx_unit_int  ,
-%  \l_siunitx_unit_prop
-%}
-% Parsed units are stored in a property list, to keep things compact.
-% An integer is also needed to count up units.
+% \begin{variable}
+%   {
+%     \l_siunitx_unit_int        ,
+%     \l_siunitx_unit_prop       ,
+%     \l_siunitx_unit_saved_prop
+%   }
+%   Parsed units are stored in a property list, to keep things compact.
+%   An integer is also needed to count up units.
 %    \begin{macrocode}
 \int_new:N \l_siunitx_unit_int
 \prop_new:N \l_siunitx_unit_prop
+\prop_new:N \l_siunitx_unit_saved_prop
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
 %\begin{macro}{\l_siunitx_per_bool}
 % To allow \cs{per} to be \enquote{sticky}.
@@ -11163,22 +11236,24 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \l_siunitx_prefix_symbols_bool ,
-%  \l_siunitx_sticky_per_bool
-%}
-% Some options are directly related to how units are handled at this
-% stage, so need be created before the reconstruction part of the code.
+% \begin{variable}
+%   {
+%     \l_siunitx_exp_to_prefix_bool  ,
+%     \l_siunitx_prefix_symbols_bool ,
+%     \l_siunitx_sticky_per_bool
+%   }
+%   Some options are directly related to how units are handled at this
+%   stage, so need be created before the reconstruction part of the code.
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  prefixes-as-symbols .bool_set:N    = \l_siunitx_prefix_symbols_bool,
-  sticky-per          .bool_set:N    = \l_siunitx_sticky_per_bool,
-}
-\keys_set:nn { siunitx } {
-  prefixes-as-symbols = true
-}
+\keys_define:nn { siunitx }
+  {
+    exponent-to-prefix  .bool_set:N  = \l_siunitx_exp_to_prefix_bool  ,
+    prefixes-as-symbols .bool_set:N  = \l_siunitx_prefix_symbols_bool ,
+    sticky-per          .bool_set:N  = \l_siunitx_sticky_per_bool
+  }
+\keys_set:nn { siunitx } { prefixes-as-symbols = true }
 %    \end{macrocode}
-%\end{macro}
+% \end{variable}
 %
 %\begin{macro}{\siunitx_unit_parse:nn}
 % The unit to be parsed is received here along with any options given.
@@ -11254,24 +11329,29 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{
-%  \siunitx_unit_parse_prefix:n  ,
+%  \siunitx_unit_parse_prefix:Nn  ,
 %  \siunitx_unit_parse_prefix:nn
 %}
 % Saving prefixes always increments the counter. For non-symbolic
 % mode, the base needs to be saved along with the power.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_parse_prefix:n #1 {
-  \int_incr:N \l_siunitx_unit_int
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    { prefix- \int_use:N \l_siunitx_unit_int }
-  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
-}
-\cs_new_protected:Npn \siunitx_unit_parse_prefix:nn #1#2 {
-  \siunitx_unit_parse_prefix:n {#2}
-  \tl_set:Nx \l_siunitx_tmpa_tl
-    { prefix-base- \int_use:N \l_siunitx_unit_int }
-  \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
-}
+\cs_new_protected:Npn \siunitx_unit_parse_prefix:Nn #1#2
+  {
+    \int_incr:N \l_siunitx_unit_int
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      { prefix- \int_use:N \l_siunitx_unit_int }
+    \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      { prefix-symbol- \int_use:N \l_siunitx_unit_int }
+    \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#2}
+  }
+\cs_new_protected:Npn \siunitx_unit_parse_prefix:nn #1#2
+  {
+    \siunitx_unit_parse_prefix:Nn \ERROR {#2}
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      { prefix-base- \int_use:N \l_siunitx_unit_int }
+    \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl {#1}
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -11329,7 +11409,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_parse_unit:Nn #1#2 {
   \tl_set:Nx \l_siunitx_tmpa_tl
-    { prefix- \int_use:N \l_siunitx_unit_int }
+    { prefix-symbol- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVTF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     {
       \tl_set:Nx \l_siunitx_tmpa_tl
@@ -11965,7 +12045,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_format_prefix: {
   \tl_set:Nx \l_siunitx_tmpa_tl
-    { prefix- \int_use:N \l_siunitx_unit_int }
+    { prefix-symbol- \int_use:N \l_siunitx_unit_int }
   \prop_if_in:NVT \l_siunitx_unit_prop \l_siunitx_tmpa_tl
     {
       \prop_get:NVN \l_siunitx_unit_prop \l_siunitx_tmpa_tl
@@ -12140,6 +12220,7 @@ This work consists of the file  siunitx.dtx
   \int_compare:nNnTF { \l_siunitx_unit_int } = { 1 }
     {
       \prop_del:Nn \l_siunitx_unit_prop { prefix-1 }
+      \prop_del:Nn \l_siunitx_unit_prop { prefix-symbol-1 }
       \prop_del:Nn \l_siunitx_unit_prop { prefix-base-1 }
       \prop_if_empty:NF \l_siunitx_unit_prop
         { \msg_error:nn { siunitx } { prefix-only } }
@@ -14981,6 +15062,8 @@ This work consists of the file  siunitx.dtx
     The~input~'#1'~is~a~number~which~has~more~than~one~part: \\
     ranges~can~only~contain~one~number~in~each~part.
   }
+\msg_new:nnn { siunitx } { non-convertible-exponent }
+  { Exponent~'#1'~cannot~be~converted~into~a~symbolic~prefix. }
 \msg_new:nnn { siunitx } { option-not-available }
   { Option~'#1'~not~available~in~strict~mode. }
 \msg_new:nnn { siunitx } { option-preamble-only }
