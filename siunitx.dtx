@@ -543,6 +543,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.3h}{2011/10/14}{Improvements to output when using \pkg{tex4ht}}
 %\changes{v2.4}{2011/11/03}{Reduce number of math mode options, improving
 %  consistency of output}
+%\changes{v2.4a}{2011/11/28}{Extend search-and-replace code for UTF-8
+%  characters}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -11915,14 +11917,19 @@ This work consists of the file  siunitx.dtx
 % can appear in units in UTF-8 and related encodings. The idea is to
 % do a search and replace, thus avoiding any active characters.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_format_literal_extras: {
-  \siunitx_unit_format_literal_extras_aux:nN { 176 }
-    \SIUnitSymbolDegree
-  \siunitx_unit_format_literal_extras_aux:nN { 181 }
-    \SIUnitSymbolMicro
-  \siunitx_unit_format_literal_extras_aux:nN { 197 }
-    \SIUnitSymbolAngstrom
-}
+\cs_new_protected:Npn \siunitx_unit_format_literal_extras:
+  {
+    \siunitx_unit_format_literal_extras_aux:nN { 176 }
+      \SIUnitSymbolDegree
+    \siunitx_unit_format_literal_extras_aux:nN { 181 }
+      \SIUnitSymbolMicro
+    \siunitx_unit_format_literal_extras_aux:nN { 197 }
+      \SIUnitSymbolAngstrom
+    \siunitx_unit_format_literal_extras_aux:nN { 8451 }
+      \SIUnitSymbolCelsius
+    \siunitx_unit_format_literal_extras_aux:nN { 8486 }
+      \SIUnitSymbolOhm
+  }
 \cs_new_protected:Npn
   \siunitx_unit_format_literal_extras_aux:nN #1#2 {
   \char_set_lccode:nn { `\@ } {#1}
