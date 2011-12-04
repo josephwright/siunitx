@@ -3819,6 +3819,11 @@ This work consists of the file  siunitx.dtx
 % Notice that these names capitalise the unit name (to make reading
 % the macro name easier!).\footnote{The function
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
+% 
+% \changes{v2.4a}{2011/12/04}{Use UTF-8 symbols with \XeTeX{} and \LuaTeX{}
+%   if \pkg{fontspec} is loaded}
+% When using \XeTeX{} or \LuaTeX{}, if \pkg{fontspec} is loaded these options 
+% are redefined to use UTF-8 characters directly.
 %
 %\subsection{Other options}
 %
@@ -14979,6 +14984,68 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
+%
+% \begin{variable}
+%   {
+%     \c_siunitx_degree_int,
+%     \c_siunitx_micro_int,
+%     \c_siunitx_angstrom_int,
+%     \c_siunitx_celsius_int,
+%     \c_siunitx_ohm_int
+%   }
+%   For UTF-8 engines, it may be possible to use better symbols than those set
+%   up as standard.
+%    \begin{macrocode}
+\pdftex_if_engine:F
+  {
+    \AtBeginDocument
+      {
+        \@ifpackageloaded { fontspec }
+          {
+            \int_const:Nn \c_siunitx_degree_int   { 176 }
+            \int_const:Nn \c_siunitx_micro_int    { 181 }
+            \int_const:Nn \c_siunitx_angstrom_int { 197 }
+            \int_const:Nn \c_siunitx_celsius_int  { 8451 }
+            \int_const:Nn \c_siunitx_ohm_int      { 8486 }
+            \siunitx_option_unchanged:Nnn \l_siunitx_angstrom_math_tl
+              { \text { \AA } }
+              { \tex_char:D \c_siunitx_angstrom_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_celsius_math_tl
+              { { } ^ { \circ } \kern - \scriptspace \text { C } } 
+              { \tex_char:D \c_siunitx_celsius_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_degree_math_tl
+              { { } ^ { \circ } }
+              { \tex_char:D \c_siunitx_degree_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_micro_math_tl
+              { \text { \c_siunitx_mu_tl } }
+              { \tex_char:D \c_siunitx_micro_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_ohm_math_tl
+              { \text { \ensuremath { \c_siunitx_omega_tl } } }
+              { \tex_char:D \c_siunitx_ohm_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_angstrom_text_tl
+              { \AA }
+              { \tex_char:D \c_siunitx_angstrom_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_celsius_text_tl
+              {
+                \ensuremath
+                  { { } ^ { \circ } \kern - \scriptspace \text { C } } 
+              }
+              { \tex_char:D \c_siunitx_celsius_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_degree_text_tl
+              { \ensuremath { { } ^ { \circ } } }
+              { \tex_char:D \c_siunitx_degree_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_micro_text_tl
+              { \c_siunitx_mu_tl }
+              { \tex_char:D \c_siunitx_micro_int }
+            \siunitx_option_unchanged:Nnn \l_siunitx_ohm_text_tl
+              { \ensuremath { \c_siunitx_omega_tl } }
+              { \tex_char:D \c_siunitx_ohm_int }
+          }
+          { }
+      }
+  }
+%    \end{macrocode}
+% \end{variable}
 %
 %\subsection{Working with other packages}
 %
