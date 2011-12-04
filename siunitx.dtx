@@ -545,6 +545,8 @@ This work consists of the file  siunitx.dtx
 %  consistency of output}
 %\changes{v2.4a}{2011/11/28}{Extend search-and-replace code for UTF-8
 %  characters}
+%\changes{v2.4a}{2011/12/04}{Use a more cautious approach to changing
+%  settings at the start of the document}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5408,6 +5410,19 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
+% \begin{macro}{\siunitx_option_unchanged:Nnn}
+%   Needed to allow for altering of options at the start of the document
+%   only if they are unchanged. This needs to use the low-level implementation
+%   detail, hence the use of variable name directly.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_option_unchanged:Nnn #1#2#3
+  {
+    \str_if_eq:VnT #1 {#2}
+      { \tl_set:Nn #1 {#3} }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\tl_if_in:NVTF, \tl_replace_all:NnV}
 %   Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
@@ -5466,7 +5481,9 @@ This work consists of the file  siunitx.dtx
     \@ifpackageloaded { tex4ht }
       {
         \cs_set_eq:NN \siunitx_print_text_super:n \textsuperscript
-        \keys_set:nn { siunitx } { qualifier-mode = brackets, mode = text }
+        \siunitx_option_unchanged:Nnn \l_siunitx_qualifier_mode_tl
+          { subscript } { brackets }
+        \keys_set:nn { siunitx } { mode = text }
       }
       { }
   }
@@ -6053,17 +6070,32 @@ This work consists of the file  siunitx.dtx
         {
           \@ifpackageloaded { cmbright }
             { }
-            { \keys_set:nn { siunitx } { math-rm = \mathsf } }
+            {
+              \cs_set:Npn \siunitx_tmp:w ##1 { \mathrm {#1} }
+              \cs_if_eq:NNT \siunitx_number_mathrm:n \siunitx_tmp:w
+                { \keys_set:nn { siunitx } { number-math-rm = \mathsf } }
+              \cs_if_eq:NNT \siunitx_unit_mathrm:n \siunitx_tmp:w
+                { \keys_set:nn { siunitx } { unit-math-rm = \mathsf } }
+            }
         }
-      \keys_set:nn { siunitx } { text-rm  = \sffamily }
+      \cs_set:Npn \siunitx_tmp:w { \rmfamily }
+      \cs_if_eq:NNT \siunitx_number_textrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { number-text-rm = \sffamily } }
+      \cs_if_eq:NNT \siunitx_unit_textrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { unit-text-rm = \sffamily } }
     }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_texttt_tl
     {
-      \keys_set:nn { siunitx }
-        {
-          math-rm = \mathtt,
-          text-rm  = \ttfamily
-        }
+      \cs_set:Npn \siunitx_tmp:w ##1 { \mathrm {#1} }
+      \cs_if_eq:NNT \siunitx_number_mathrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { number-math-rm = \mathtt } }
+      \cs_if_eq:NNT \siunitx_unit_mathrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { unit-math-rm = \mathtt } }
+      \cs_set:Npn \siunitx_tmp:w { \rmfamily }
+      \cs_if_eq:NNT \siunitx_number_textrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { number-text-rm = \ttfamily } }
+      \cs_if_eq:NNT \siunitx_unit_textrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { unit-text-rm = \ttfamily } }
     }
 }
 %    \end{macrocode}
@@ -14775,50 +14807,61 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\l_siunitx_redefine_symbols_bool}
 % Only one setting applies here!
 %    \begin{macrocode}
-\keys_define:nn { siunitx } {
-  redefine-symbols .bool_set:N = \l_siunitx_redefine_symbols_bool,
-}
-\keys_set:nn { siunitx } {
-  redefine-symbols = true
-}
+\keys_define:nn { siunitx }
+  { redefine-symbols .bool_set:N = \l_siunitx_redefine_symbols_bool }
+\keys_set:nn { siunitx } { redefine-symbols = true }
 %    \end{macrocode}
 %\end{macro}
 %
 % The redefinition of symbols has to do a number of checks to ensure
 % that there are no clashes.
 %    \begin{macrocode}
-\AtBeginDocument {
-  \bool_if:NT \l_siunitx_redefine_symbols_bool
-    {
-      \@ifpackageloaded { textcomp }
-        {
-          \keys_set:nn { siunitx }
-            {
-              math-degree = \text { \textdegree },
-              text-degree  = \textdegree,
-            }
-          \@ifpackageloaded { mathptmx } { }
-            {
-              \keys_set:nn { siunitx } { text-micro = \textmu }
-              \@ifpackageloaded { fourier } { }
-                { \keys_set:nn { siunitx } { text-ohm = \textohm } }
-            }
-          \str_if_eq:VnT \encodingdefault { OT1 }
-            {
-              \keys_set:nn { siunitx }
-                {
-                  math-angstrom = \text { \capitalring { A } },
-                  text-angstrom = \capitalring { A }
-                }
-            }
-        } { }
-      \@ifpackageloaded { upgreek }
-        {
-          \keys_set:nn { siunitx }
-            { math-ohm = \Upomega }
-        } { }
-    }
-}
+\AtBeginDocument
+  {
+    \bool_if:NT \l_siunitx_redefine_symbols_bool
+      {
+        \@ifpackageloaded { textcomp }
+          {
+            \siunitx_option_unchanged:Nnn \l_siunitx_degree_math_tl
+              { { } ^ { \circ } }
+              { \text { \textdegree } }
+            \siunitx_option_unchanged:Nnn \l_siunitx_degree_text_tl
+              { \ensuremath { { } ^ { \circ } } }
+              { \textdegree }
+            \@ifpackageloaded { mathptmx }
+              { }
+              {
+                \siunitx_option_unchanged:Nnn \l_siunitx_micro_text_tl
+                  { \c_siunitx_mu_tl }
+                  { \textmu }
+                \@ifpackageloaded { fourier }
+                  { }
+                  {
+                    \siunitx_option_unchanged:Nnn \l_siunitx_ohm_text_tl
+                      { \ensuremath { \c_siunitx_omega_tl } }
+                      { \textohm }
+                  }
+              }
+            \str_if_eq:VnT \encodingdefault { OT1 }
+              {
+                \siunitx_option_unchanged:Nnn \l_siunitx_angstrom_math_tl
+                  { \text { \AA } }
+                  { \text { \capitalring { A } } }
+                \siunitx_option_unchanged:Nnn \l_siunitx_angstrom_text_tl
+                  { \AA }
+                  { \capitalring { A } }
+              }
+          }
+          { }
+        \@ifpackageloaded { upgreek }
+          {
+            \siunitx_option_unchanged:Nnn \l_siunitx_ohm_math_tl
+              { \text { \ensuremath { \c_siunitx_omega_tl } } }
+              { \Upomega }
+          }
+          { }
+      }
+  }
 %    \end{macrocode}
 %
 %\begin{macro}{\l_siunitx_angstrom_math_tl}
