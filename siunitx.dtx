@@ -552,6 +552,8 @@ This work consists of the file  siunitx.dtx
 %  where the command clashes with a unit name}
 %\changes{v2.4e}{2011/12/11}{Fix issue with \pkg{inputenc} package and
 %  some of the recent special symbol changes}
+%\changes{v2.4f}{2011/12/21}{Allow easier use of headings when not parsing
+%  numbers in tables}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -3603,10 +3605,10 @@ This work consists of the file  siunitx.dtx
 %      S[table-number-alignment = left]
 %      }
 %    \toprule
-%        \multicolumn{1}{c}{Some values}
-%      & \multicolumn{1}{c}{Some values}
-%      & \multicolumn{1}{c}{Some values}
-%      & \multicolumn{1}{c}{Some values} \\
+%        {Some values}
+%      & {Some values}
+%      & {Some values}
+%      & {Some values} \\
 %    \midrule
 %       2.35  &    2.35  &    2.35  &   2.35   \\
 %      34.234 &   34.234 &   34.234 &  34.234  \\
@@ -13063,7 +13065,7 @@ This work consists of the file  siunitx.dtx
   \siunitx_detect_font:
   \bool_if:NTF \l_siunitx_number_parse_bool
     { \siunitx_table_collect_get: }
-    { \siunitx_table_print_S_direct: }
+    { \siunitx_table_print_S_direct:N }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -14618,17 +14620,36 @@ This work consists of the file  siunitx.dtx
 % \pkg{dcolumn} can be applied, which requires the decimal marker to
 % be made active in math mode.
 %
-% \begin{macro}{\siunitx_table_print_S_direct:}
-%   The main part of the system simply does the appropriate math work
-%   then calls the main function, which will be assigned by the
-%   key--value system.
+% \begin{macro}{\siunitx_table_print_S_direct:N}
+% \begin{macro}{\siunitx_table_print_S_direct_text:n}
+%   The lead-off here first moves the \cs{ignorespaces} in the input to
+%   avoid picking it up. There is then a test to see if the very first item
+%   in the cell is a |{|. If it is, then we use the same approach as for
+%   parsed columns and set the material as text. Otherwise, switch to math
+%   mode and hand off to the main routine.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_table_print_S_direct:
+\cs_new_protected:Npn \siunitx_table_print_S_direct:N #1
   {
-    \m@th
-    \siunitx_table_print_S_direct_main:
+    #1
+    \cs_set:Npn \peek_execute_branches:
+      {
+        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
+          \exp_after:wN \siunitx_table_print_S_direct_text:n
+        \else:
+          \m@th
+          \exp_after:wN \siunitx_table_print_S_direct_main:
+        \fi:
+      }
+    \peek_after:Nw \peek_ignore_spaces_execute_branches:
+  }
+\cs_new_protected:Npn \siunitx_table_print_S_direct_text:n #1
+  {
+    \siunitx_table_column_begin:n { \l_siunitx_table_text_align_skip }
+      #1
+    \siunitx_table_column_end:n   { \l_siunitx_table_text_align_skip }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}
