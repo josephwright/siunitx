@@ -10838,12 +10838,15 @@ This work consists of the file  siunitx.dtx
 % method only makes these available inside the unit-processing functions
 % (\cs{SI}, \cs{si} and the \texttt{S} column).
 %
-%\begin{macro}{\l_siunitx_declare_list_tl}
+%\begin{macro}{\l_siunitx_declare_list_seq}
 % A list of all unit and related functions.
 %    \begin{macrocode}
-\tl_new:N \l_siunitx_declare_list_tl
-\tl_set:Nn \l_siunitx_declare_list_tl
- { \of \highlight \per \raiseto \tothe }
+\seq_new:N \l_siunitx_declare_list_seq
+\seq_put_right:Nn \l_siunitx_declare_list_seq { \of }
+\seq_put_right:Nn \l_siunitx_declare_list_seq { \highlight }
+\seq_put_right:Nn \l_siunitx_declare_list_seq { \per }
+\seq_put_right:Nn \l_siunitx_declare_list_seq { \raiseto }
+\seq_put_right:Nn \l_siunitx_declare_list_seq { \tothe }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -10854,14 +10857,14 @@ This work consists of the file  siunitx.dtx
 % Creating powers is all about storing values.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_power_after:Nn #1#2 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \seq_put_right:Nn \l_siunitx_declare_list_seq {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
     { \siunitx_textsuperscript:n {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
     { \siunitx_unit_parse_power_after:n {#2} }
 }
 \cs_new_protected:Npn \siunitx_declare_power_before:Nn #1#2 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \seq_put_right:Nn \l_siunitx_declare_list_seq {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } ##1
     { ##1 \siunitx_textsuperscript:n {#2} }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
@@ -10879,7 +10882,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_prefix:Nnnn #1#2#3#4
   {
-    \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+    \seq_put_right:Nn \l_siunitx_declare_list_seq {#1}
     \prop_put:Nnn \l_siunitx_prefix_forward_prop {#1} {#4}
     \prop_put:Nnn \l_siunitx_prefix_reverse_prop {#4} {#1}
     \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
@@ -10900,7 +10903,7 @@ This work consists of the file  siunitx.dtx
 % Qualifiers just need storing.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_qualifier:Nn #1#2 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \seq_put_right:Nn \l_siunitx_declare_list_seq {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w }
     { \text { ~ } ( #2 ) }
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _function:w }
@@ -10917,7 +10920,7 @@ This work consists of the file  siunitx.dtx
 % problem with the creation order for units.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_unit:Nnn #1#2#3 {
-  \tl_put_right:Nn \l_siunitx_declare_list_tl {#1}
+  \seq_put_right:Nn \l_siunitx_declare_list_seq {#1}
   \cs_set:cpn { siunitx_ \token_to_str:N #1 _literal:w } {#2}
   \cs_set_protected:cpn { siunitx_ \token_to_str:N #1 _function:w }
     {
@@ -10995,7 +10998,7 @@ This work consists of the file  siunitx.dtx
   \cs_if_exist:NT \cancel
     {
       \cs_set_eq:NN \siunitx_cancel:n \cancel
-      \tl_put_right:Nn \l_siunitx_declare_list_tl { \cancel }
+      \seq_put_right:Nn \l_siunitx_declare_list_seq { \cancel }
       \cs_new_protected:cpn
         { siunitx_ \token_to_str:N \cancel _function:w }
         { \siunitx_unit_parse_special:n { \siunitx_cancel:n }  }
@@ -11056,7 +11059,7 @@ This work consists of the file  siunitx.dtx
 % \pkg{hyperref}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_create_empty_functions: {
-  \tl_map_function:NN \l_siunitx_declare_list_tl
+  \seq_map_function:NN \l_siunitx_declare_list_seq
     \siunitx_unit_create_empty_functions_aux:N
 }
 \cs_new_protected:Npn
@@ -11072,14 +11075,14 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_create_functions: {
   \bool_if:NT \l_siunitx_create_overwrite_bool
-    { \tl_map_function:NN \l_siunitx_declare_list_tl \cs_undefine:N }
+    { \seq_map_function:NN \l_siunitx_declare_list_seq \cs_undefine:N }
   \bool_if:NTF \l_siunitx_create_optional_bool
     {
-      \tl_map_function:NN \l_siunitx_declare_list_tl
+      \seq_map_function:NN \l_siunitx_declare_list_seq
         \siunitx_unit_create_with_arg:N
     }
     {
-      \tl_map_function:NN \l_siunitx_declare_list_tl
+      \seq_map_function:NN \l_siunitx_declare_list_seq
         \siunitx_unit_create:N
     }
   \bool_if:NT \l_siunitx_create_xspace_bool
@@ -11380,7 +11383,7 @@ This work consists of the file  siunitx.dtx
   \prop_clear:N \l_siunitx_unit_prop
   \int_zero:N \l_siunitx_unit_int
   \bool_set_false:N \l_siunitx_per_bool
-  \tl_map_function:NN \l_siunitx_declare_list_tl
+  \seq_map_function:NN \l_siunitx_declare_list_seq
     \siunitx_unit_parse_init_aux:N
 }
 \cs_new_protected:Npn \siunitx_unit_parse_init_aux:N #1 {
@@ -11933,7 +11936,7 @@ This work consists of the file  siunitx.dtx
   \int_zero:N \l_siunitx_unit_prefix_int
   \int_zero:N \l_siunitx_unit_denominator_int
   \int_zero:N \l_siunitx_unit_numerator_int
-  \tl_map_function:NN \l_siunitx_declare_list_tl
+  \seq_map_function:NN \l_siunitx_declare_list_seq
     \siunitx_unit_print_literal_aux:N
 }
 %    \end{macrocode}
@@ -11951,7 +11954,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_unit_format_literal:n #1
   {
     \int_zero:N \l_siunitx_unit_prefix_int
-    \tl_map_function:NN \l_siunitx_declare_list_tl
+    \seq_map_function:NN \l_siunitx_declare_list_seq
       \siunitx_unit_print_literal_aux:N
     \tl_set:Nn \l_siunitx_unit_tl {#1}
     \tl_set:Nx \l_siunitx_tmpa_tl
@@ -15550,7 +15553,7 @@ This work consists of the file  siunitx.dtx
             \cs_set_eq:NN \label    \use_none:n
             \cs_set_eq:NN \index    \use_none:n
             \cs_set_eq:NN \glossary \use_none:n
-            \tl_map_function:NN \l_siunitx_declare_list_tl
+            \seq_map_function:NN \l_siunitx_declare_list_seq
               \siunitx_contents_add:N
           }
           { \token_to_str:N \@writefile {#1} {#2} }
@@ -15577,7 +15580,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_contents_bookmarks:
   {
-    \tl_map_function:NN \l_siunitx_declare_list_tl
+    \seq_map_function:NN \l_siunitx_declare_list_seq
       \siunitx_unit_print_literal_aux:N
     \msg_redirect_name:nnn { xparse } { redefine-command } { none }
     \cs_set_eq:NN \num      \siunitx_bookmark_num:w
