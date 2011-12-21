@@ -11373,24 +11373,20 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_unit_parse_init:}
-%\begin{macro}[aux]{\siunitx_unit_parse_init_aux:N}
-% As always, the initialisation is a separate routine to make life a
-% little clearer. The definition of \cs{pm} is saved here as it
-% is used by units and numbers.
+% \begin{macro}{\siunitx_unit_parse_init:}
+%   As always, the initialisation is a separate routine to make life a
+%   little clearer. The definition of \cs{pm} is saved here as it
+%   is used by units and numbers.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_parse_init: {
-  \prop_clear:N \l_siunitx_unit_prop
-  \int_zero:N \l_siunitx_unit_int
-  \bool_set_false:N \l_siunitx_per_bool
-  \seq_map_function:NN \l_siunitx_declare_list_seq
-    \siunitx_unit_parse_init_aux:N
-}
-\cs_new_protected:Npn \siunitx_unit_parse_init_aux:N #1 {
-  \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _function:w }
-}
+\cs_new_protected:Npn \siunitx_unit_parse_init:
+  {
+    \prop_clear:N \l_siunitx_unit_prop
+    \int_zero:N \l_siunitx_unit_int
+    \bool_set_false:N \l_siunitx_per_bool
+    \seq_map_inline:Nn \l_siunitx_declare_list_seq
+      { \cs_set_eq:Nc ##1 { siunitx_ \token_to_str:N ##1 _function:w } }
+  }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\siunitx_unit_parse_options:n}
@@ -11936,8 +11932,8 @@ This work consists of the file  siunitx.dtx
   \int_zero:N \l_siunitx_unit_prefix_int
   \int_zero:N \l_siunitx_unit_denominator_int
   \int_zero:N \l_siunitx_unit_numerator_int
-  \seq_map_function:NN \l_siunitx_declare_list_seq
-    \siunitx_unit_print_literal_aux:N
+  \seq_map_inline:Nn \l_siunitx_declare_list_seq
+    { \siunitx_unit_print_literal_aux:N ##1 }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -11954,8 +11950,8 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_unit_format_literal:n #1
   {
     \int_zero:N \l_siunitx_unit_prefix_int
-    \seq_map_function:NN \l_siunitx_declare_list_seq
-      \siunitx_unit_print_literal_aux:N
+    \seq_map_inline:Nn \l_siunitx_declare_list_seq
+      { \siunitx_unit_print_literal_aux:N ##1 }
     \tl_set:Nn \l_siunitx_unit_tl {#1}
     \tl_set:Nx \l_siunitx_tmpa_tl
       { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_product_tl } }
@@ -15553,8 +15549,8 @@ This work consists of the file  siunitx.dtx
             \cs_set_eq:NN \label    \use_none:n
             \cs_set_eq:NN \index    \use_none:n
             \cs_set_eq:NN \glossary \use_none:n
-            \seq_map_function:NN \l_siunitx_declare_list_seq
-              \siunitx_contents_add:N
+            \seq_map_inline:Nn \l_siunitx_declare_list_seq
+              { \siunitx_contents_add:N ##1 }
           }
           { \token_to_str:N \@writefile {#1} {#2} }
       }
@@ -15580,8 +15576,8 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_contents_bookmarks:
   {
-    \seq_map_function:NN \l_siunitx_declare_list_seq
-      \siunitx_unit_print_literal_aux:N
+    \seq_map_inline:Nn \l_siunitx_declare_list_seq
+      { \siunitx_unit_print_literal_aux:N ##1 }
     \msg_redirect_name:nnn { xparse } { redefine-command } { none }
     \cs_set_eq:NN \num      \siunitx_bookmark_num:w
     \cs_set_eq:NN \numrange \siunitx_bookmark_numrange:w
