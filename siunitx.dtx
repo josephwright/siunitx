@@ -554,6 +554,8 @@ This work consists of the file  siunitx.dtx
 %  some of the recent special symbol changes}
 %\changes{v2.4f}{2011/12/21}{Allow easier use of headings when not parsing
 %  numbers in tables}
+%\changes{v2.4f}{2011/12/23}{Fix bug with detection of bold font in table
+%  cells}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -13878,7 +13880,6 @@ This work consists of the file  siunitx.dtx
       }
       {
         \siunitx_table_column_begin:n { \l_siunitx_table_number_align_skip }
-          \siunitx_detect_font:
           \bool_if:NTF \l_siunitx_table_parse_only_bool
             { \siunitx_table_print_S_no_alignment: }
             { \siunitx_table_print_S_alignment: }
@@ -14051,7 +14052,10 @@ This work consists of the file  siunitx.dtx
       }
     \dim_compare:nNnT
       { \box_wd:N \l_siunitx_table_pre_box } = \c_zero_skip
-      { \l_siunitx_table_collect_pre_tl }
+      {
+        \l_siunitx_table_collect_pre_tl
+        \bool_set_false:N \l_siunitx_font_set_bool
+      }
     \hbox_set:Nn \l_siunitx_table_post_box
       {
         \bool_if:NT \l_siunitx_table_math_bool
@@ -14235,7 +14239,10 @@ This work consists of the file  siunitx.dtx
       }
     \dim_compare:nNnT
       { \box_wd:N \l_siunitx_table_pre_box } = \c_zero_skip
-      { \l_siunitx_table_collect_pre_tl }
+      {
+        \l_siunitx_table_collect_pre_tl
+        \bool_set_false:N \l_siunitx_font_set_bool
+      }
     \hbox_set:Nn \l_siunitx_tmp_box { { \l_siunitx_table_pre_tl } }
     \hbox_set_to_wd:Nnn \l_siunitx_table_pre_box
       { \box_wd:N \l_siunitx_tmp_box }
