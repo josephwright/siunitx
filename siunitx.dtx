@@ -558,6 +558,8 @@ This work consists of the file  siunitx.dtx
 %  cells}
 %\changes{v2.4g}{2012/01/06}{Update internals to match changes in \pkg{expl3}
 %  which caused issues with some tokens in numerical arguments}
+%\changes{v2.4h}{2012/01/15}{Bug fix for implementation of
+%  \opt{reciprocal-positive-first}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12275,25 +12277,26 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_unit_format_sorted:}
-% For when the powers are sorted with the positive ones first. The only
-% slight issue is making sure that the additional space is included
-% between the two units, if needed.
+% \begin{macro}{\siunitx_unit_format_sorted:}
+%   For when the powers are sorted with the positive ones first. The only
+%   slight issue is making sure that the additional space is included
+%   between the two units, if needed.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_format_sorted: {
-  \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
-  \tl_if_empty:NTF \l_siunitx_unit_tl
-    {
-      \tl_if_empty:NF \l_siunitx_unit_denominator_tl
-        {
-          \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
-            \l_siunitx_unit_product_tl
-        }
-    }
+\cs_new_protected:Npn \siunitx_unit_format_sorted:
+  {
+    \tl_set_eq:NN \l_siunitx_unit_tl \l_siunitx_unit_numerator_tl
+    \tl_if_empty:NT \l_siunitx_unit_tl
+      {
+        \tl_if_empty:NF \l_siunitx_unit_denominator_tl
+          {
+            \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
+              \l_siunitx_unit_product_tl
+          }
+      }
     \tl_put_right:NV \l_siunitx_unit_tl \l_siunitx_unit_denominator_tl
-}
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\siunitx_unit_format_symbol:}
 %\begin{macro}[aux]{
