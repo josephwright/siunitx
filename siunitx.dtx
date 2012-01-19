@@ -8241,6 +8241,7 @@ This work consists of the file  siunitx.dtx
 %   {
 %    \siunitx_number_process_places_init:n    ,
 %    \siunitx_number_process_places_aux_i:n   ,
+%    \siunitx_number_process_places_aux_i:TF  ,
 %    \siunitx_number_process_places_none:     ,
 %    \siunitx_number_process_places_aux_ii:n  ,
 %    \siunitx_number_process_places_loop:n    ,
@@ -8269,7 +8270,7 @@ This work consists of the file  siunitx.dtx
           {
             \tl_if_empty:NT \l_siunitx_tmpa_tl
               { \tl_set:Nn \l_siunitx_tmpa_tl { 0 } }
-            \int_compare:nNnTF \l_siunitx_tmpa_tl = \c_zero
+            \siunitx_number_process_places_aux_i:TF
               {
                 \prop_put:Nnn \l_siunitx_number_in_prop { #1 -decimal } { }
                 \int_set:Nn \l_siunitx_round_int
@@ -8283,6 +8284,23 @@ This work consists of the file  siunitx.dtx
               }
           }
       }
+  }
+%    \end{macrocode}
+%   The number of digits in the decimal part could be more that \TeX{} can
+%   handle, so a slow loop is used to see if we need to round.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_process_places_aux_i:TF
+  {
+    \bool_set_true:N \l_siunitx_tmp_bool
+    \tl_map_inline:Nn \l_siunitx_tmpa_tl
+      {
+        \int_compare:nNnF {##1} = \c_zero
+          {
+            \bool_set_false:N \l_siunitx_tmp_bool
+            \tl_map_break:
+          }
+      }
+    \bool_if:NTF \l_siunitx_tmp_bool
   }
 %    \end{macrocode}
 %   Rounding to no places at all requires a few checks to see if there is any
