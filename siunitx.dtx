@@ -562,6 +562,8 @@ This work consists of the file  siunitx.dtx
 %  \opt{reciprocal-positive-first}}
 %\changes{v2.4i}{2012/01/19}{Bug fix for rounding with large numbers of
 %  decimal places}
+%\changes{v2.4j}{2012/01/26}{Leave vertical mode before any document-level
+%  commands}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15420,6 +15422,7 @@ This work consists of the file  siunitx.dtx
 % correct then print it.
 %    \begin{macrocode}
 \NewDocumentCommand \num { o m } {
+  \leavevmode
   \group_begin:
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
@@ -15433,6 +15436,7 @@ This work consists of the file  siunitx.dtx
 % Lists of numbers are trivially easy to work with.
 %    \begin{macrocode}
 \NewDocumentCommand \numlist { o > { \SplitList { ; } } m } {
+  \leavevmode
   \group_begin:
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
@@ -15447,6 +15451,7 @@ This work consists of the file  siunitx.dtx
 % anything complicated.
 %    \begin{macrocode}
 \NewDocumentCommand \numrange { o m m } {
+  \leavevmode
   \group_begin:
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
@@ -15466,6 +15471,7 @@ This work consists of the file  siunitx.dtx
 % the differences between the two make this less desirable.
 %    \begin{macrocode}
 \NewDocumentCommand \SIlist { o > { \SplitList { ; } } m m } {
+  \leavevmode
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_list_units:nnn {#2} {#3} { }  }
@@ -15476,6 +15482,7 @@ This work consists of the file  siunitx.dtx
   \group_end:
 }
 \NewDocumentCommand \SIrange { o m m m } {
+  \leavevmode
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_range_unit:nnnn {#4} { } {#2} {#3} }
@@ -15493,6 +15500,7 @@ This work consists of the file  siunitx.dtx
 % ones.
 %    \begin{macrocode}
 \NewDocumentCommand \SI { o m o m } {
+  \leavevmode
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_combined:nnnn { } {#2} {#3} {#4} }
@@ -15522,6 +15530,7 @@ This work consists of the file  siunitx.dtx
 % after \enquote{collection}.
 %    \begin{macrocode}
 \NewDocumentCommand \tablenum { o m } {
+  \leavevmode
   \IfNoValueF {#1}
     { \keys_set:nn { siunitx } {#1} }
   \bool_if:NTF \l_siunitx_number_parse_bool
@@ -15541,6 +15550,7 @@ This work consists of the file  siunitx.dtx
 % set for a unit can be overridden on a one-off basis.
 %    \begin{macrocode}
 \NewDocumentCommand \si { o m } {
+  \leavevmode
   \group_begin:
     \IfNoValueTF {#1}
       { \siunitx_unit_output:nn {#2} { } }
