@@ -564,6 +564,8 @@ This work consists of the file  siunitx.dtx
 %  decimal places}
 %\changes{v2.4j}{2012/01/26}{Leave vertical mode before any document-level
 %  commands}
+%\changes{v2.4k}{2012/03/22}{Internal changes to allow for \pkg{breqn}
+%  package tricks}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6239,6 +6241,20 @@ This work consists of the file  siunitx.dtx
 % \pkg{underscore} package may make "_" active, or more likely
 % it will be a superscript character. Both are tested for here.
 %    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_print_math:
+  {
+    \cs_set_eq:NN \PrintSubscript   \sb
+    \cs_set_eq:NN \PrintSuperscript \sp
+    \ensuremath
+      {
+        \use:c
+          {
+            siunitx_ \l_siunitx_print_type_tl _
+            math \l_siunitx_font_family_tl :n
+          }
+            { \l_siunitx_print_arg_tl }
+      }
+  }
 \group_begin:
   \char_set_lccode:nn { `\@ } { `\_ }
   \char_set_catcode_math_subscript:N \@
@@ -6246,21 +6262,7 @@ This work consists of the file  siunitx.dtx
   \char_set_catcode_active:N \!
 \tl_to_lowercase:n {
   \group_end:
-  \cs_set_protected:Npn \siunitx_print_math:
-    {
-      \cs_set_eq:NN \PrintSubscript   @
-      \cs_set_eq:NN \PrintSuperscript ^
-      \ensuremath
-        {
-          \use:c
-            {
-              siunitx_ \l_siunitx_print_type_tl _
-              math \l_siunitx_font_family_tl :n
-            }
-              { \l_siunitx_print_arg_tl }
-        }
-    }
-  \cs_set_protected:Npn \siunitx_print_text:
+  \cs_new_protected:Npn \siunitx_print_text:
     {
       \tl_replace_all:Nnn \l_siunitx_print_arg_tl { - }
         { \c_siunitx_minus_tl }
@@ -6284,39 +6286,32 @@ This work consists of the file  siunitx.dtx
 %}
 %\begin{macro}[aux]{\siunitx_print_text_sub_super:n}
 % The appropriate macros for sub- and superscript in text mode ensure
-% the appearance is the same as math mode. As "_" is a letter, there
-% is the need to do a category-code juggle. The search and replace
+% the appearance is the same as math mode. . The search and replace
 % code for superscripts deals with the case where a literal number has
 % been given with text mode printing. There is currently an issue with
 % \pkg{expl3}'s \cs{peek_\ldots} functions, which means that the peek
 % code is written out here in full.
 %    \begin{macrocode}
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\_ }
-  \char_set_catcode_math_subscript:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_set_protected:Npn \siunitx_print_text_sub:n #1
-    {
-      \cs_set:Npn \siunitx_print_text_sub_super:n ##1
-        {
-          \ensuremath
-            {
-              @ { \text {#1} }
-              ^ { \text {##1} }
+\cs_new_protected:Npn \siunitx_print_text_sub:n #1
+  {
+    \cs_set:Npn \siunitx_print_text_sub_super:n ##1
+      {
+      \ensuremath
+          {
+            \sb { \text {#1} }
+            \sp { \text {##1} }
             }
-        }
-      \cs_set_eq:NN \l_peek_search_token \siunitx_print_text_super:n
-      \cs_set:Npn \peek_true:w
-        {
-          \tex_afterassignment:D \peek_true_aux:w
-          \cs_set_eq:NN \peek_tmp:w
-        }
-      \cs_set:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
-      \cs_set:Npn \peek_false:w  { \ensuremath { @ { \text {#1} } } }
-      \peek_after:Nw \peek_execute_branches_meaning:
-    }
-}
+      }
+    \cs_set_eq:NN \l_peek_search_token \siunitx_print_text_super:n
+    \cs_set:Npn \peek_true:w
+      {
+        \tex_afterassignment:D \peek_true_aux:w
+        \cs_set_eq:NN \peek_tmp:w
+      }
+    \cs_set:Npn \peek_true_aux:w { \siunitx_print_text_sub_super:n }
+    \cs_set:Npn \peek_false:w  { \ensuremath { \sb { \text {#1} } } }
+    \peek_after:Nw \peek_execute_branches_meaning:
+  }
 \cs_new_protected:Npn \siunitx_print_text_sub_super:n { }
 \cs_new_protected:Npn \siunitx_print_text_super:n #1 {
   \tl_set:Nn \l_siunitx_tmpa_tl {#1}
@@ -6325,9 +6320,7 @@ This work consists of the file  siunitx.dtx
   \tl_set:Nx \l_siunitx_tmpa_tl
     {
       \exp_not:N \ensuremath
-        {
-          ^ { \exp_not:N \text { \exp_not:V \l_siunitx_tmpa_tl } }
-        }
+        { \sp { \exp_not:N \text { \exp_not:V \l_siunitx_tmpa_tl } } }
     }
   \l_siunitx_tmpa_tl
 }
