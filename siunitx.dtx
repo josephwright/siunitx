@@ -566,6 +566,8 @@ This work consists of the file  siunitx.dtx
 %  commands}
 %\changes{v2.4k}{2012/03/22}{Internal changes to allow for \pkg{breqn}
 %  package tricks}
+%\changes{v2.4l}{2012/03/23}{Fix a load-order issue with \pkg{soulpos}
+%  package}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -11076,38 +11078,68 @@ This work consists of the file  siunitx.dtx
 % Without this, horrible things happen with \pkg{memoir} and
 % \pkg{hyperref}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_create_empty_functions: {
-  \seq_map_function:NN \l_siunitx_declare_list_seq
-    \siunitx_unit_create_empty_functions_aux:N
-}
-\cs_new_protected:Npn
-  \siunitx_unit_create_empty_functions_aux:N #1 {
-  \cs_if_free:NT #1 { \cs_set_protected:Npn #1 { \ERROR } }
-}
+\cs_new_protected_nopar:Npn \siunitx_unit_create_empty_functions:
+  {
+    \siunitx_unit_create_functions_aux_i:
+    \seq_map_function:NN \l_siunitx_declare_list_seq
+      \siunitx_unit_create_empty_functions_aux:N
+    \siunitx_unit_create_functions_aux_ii:
+  }
+\cs_new_protected:Npn \siunitx_unit_create_empty_functions_aux:N #1
+  {
+    \cs_if_free:NT #1
+      { \cs_set_protected:Npn #1 { \ERROR } }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\siunitx_unit_create_functions:}
-% Creation of macros essentially involves picking up a couple of loops.
+% \begin{macro}{\siunitx_unit_create_functions:}
+% \begin{macro}[aux]
+%   {
+%     \siunitx_unit_create_functions_aux_i:,
+%     \siunitx_unit_create_functions_aux_ii:
+%   }
+%   Creation of macros essentially involves picking up a couple of loops.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_create_functions: {
-  \bool_if:NT \l_siunitx_create_overwrite_bool
-    { \seq_map_function:NN \l_siunitx_declare_list_seq \cs_undefine:N }
-  \bool_if:NTF \l_siunitx_create_optional_bool
-    {
-      \seq_map_function:NN \l_siunitx_declare_list_seq
-        \siunitx_unit_create_with_arg:N
-    }
-    {
-      \seq_map_function:NN \l_siunitx_declare_list_seq
-        \siunitx_unit_create:N
-    }
-  \bool_if:NT \l_siunitx_create_xspace_bool
-    { \RequirePackage { xspace } }
-}
+\cs_new_protected_nopar:Npn \siunitx_unit_create_functions:
+  {
+    \siunitx_unit_create_functions_aux_i:
+    \bool_if:NT \l_siunitx_create_overwrite_bool
+      { \seq_map_function:NN \l_siunitx_declare_list_seq \cs_undefine:N }
+    \bool_if:NTF \l_siunitx_create_optional_bool
+      {
+        \seq_map_function:NN \l_siunitx_declare_list_seq
+          \siunitx_unit_create_with_arg:N
+      }
+      {
+        \seq_map_function:NN \l_siunitx_declare_list_seq
+          \siunitx_unit_create:N
+      }
+    \siunitx_unit_create_functions_aux_ii:
+    \bool_if:NT \l_siunitx_create_xspace_bool
+      { \RequirePackage { xspace } }
+  }
+\cs_new_protected_nopar:Npn \siunitx_unit_create_functions_aux_i:
+  {
+    \@ifpackageloaded { soulpos }
+      {
+        \@ifpackageloaded { soul }
+          { }
+          {
+            \cs_set_protected_nopar:Npn \siunitx_unit_create_functions_aux_ii:
+              {
+                \cs_undefine:N \hl
+                \cs_undefine:N \ul
+              }
+          }
+      }
+      { }
+  }
+\cs_new_protected_nopar:Npn \siunitx_unit_create_functions_aux_ii: { }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
+%  \end{macro}
 %
 %\begin{macro}{
 %  \siunitx_unit_create:N          ,
