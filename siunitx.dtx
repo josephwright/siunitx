@@ -570,6 +570,8 @@ This work consists of the file  siunitx.dtx
 %  package}
 %\changes{v2.4m}{2012/04/03}{Correct bug in \cs{SIlist} when only a single
 %  number is given}
+%\changes{v2.4n}{2012/04/04}{Allow conversion of numbers with more than
+%  nine digits to scientific notation}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5032,7 +5034,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2012/04/04} {2.4m}
+\ProvidesExplPackage {siunitx} {2012/04/04} {2.4n}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -8644,11 +8646,20 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
     }
 }
-\cs_new_protected:Npn
-  \siunitx_number_process_scientific_aux_i:nnn #1#2#3 {
-  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
-    { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
-}
+\cs_new_protected:Npn \siunitx_number_process_scientific_aux_i:nnn #1#2#3
+  {
+    \bool_set_true:N \l_siunitx_tmp_bool
+    \tl_map_inline:nn {#1#2}
+      {
+        \str_if_eq:nnF {##1} { 0 }
+          {
+            \bool_set_false:N \l_siunitx_tmp_bool
+            \tl_map_break:
+          }
+                }
+    \bool_if:NF \l_siunitx_tmp_bool
+      { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
+  }
 %    \end{macrocode}
 % The code here works on a loop, standardising the mantissa into the
 % range \( 1 \le x < 10 \).
@@ -16299,7 +16310,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2012/04/04} {2.4m}
+\ProvidesExplFile {siunitx-version-1.cfg} {2012/04/04} {2.4n}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17244,7 +17255,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/04/04} {2.4m}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/04/04} {2.4n}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17426,7 +17437,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2012/04/04} {2.4m}
+\ProvidesExplFile {siunitx-binary.cfg} {2012/04/04} {2.4n}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
