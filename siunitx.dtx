@@ -8636,11 +8636,20 @@ This work consists of the file  siunitx.dtx
         \l_siunitx_tmpa_tl
     }
 }
-\cs_new_protected:Npn
-  \siunitx_number_process_scientific_aux_i:nnn #1#2#3 {
-  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
-    { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
-}
+\cs_new_protected:Npn \siunitx_number_process_scientific_aux_i:nnn #1#2#3
+  {
+    \bool_set_true:N \l_siunitx_tmp_bool
+    \tl_map_inline:nn {#1#2}
+      {
+        \str_if_eq:nnF {##1} { 0 }
+          {
+            \bool_set_false:N \l_siunitx_tmp_bool
+            \tl_map_break:
+          }
+                }
+    \bool_if:NF \l_siunitx_tmp_bool
+      { \siunitx_number_process_scientific_aux_ii:nnn {#1} {#2} {#3} }
+  }
 %    \end{macrocode}
 % The code here works on a loop, standardising the mantissa into the
 % range \( 1 \le x < 10 \).
