@@ -1785,6 +1785,7 @@ This work consists of the file  siunitx.dtx
 %      explicit-sign            & Literal & \meta{none} \\
 %      fixed-exponent           & Integer & 0           \\
 %      minimum-integer-digits   & Integer & 0           \\
+%      omit-uncertainty         & Switch  & false       \\
 %      retain-explicit-plus     & Switch  & false       \\
 %      retain-unity-mantissa    & Switch  & true        \\
 %      retain-zero-exponent     & Switch  & false       \\
@@ -1965,6 +1966,15 @@ This work consists of the file  siunitx.dtx
 %  \num{0.001}   \\
 %  \num{0.0100} \\
 %  \num{1200}
+%\end{LaTeXdemo}
+%
+% \DescribeOption{omit-uncertainty}
+% \changes{v2.5}{2012/04/07}{New \opt{omit-uncertainty} option}
+% The printing of an uncertainty can be suppressed entirely using the
+% \opt{omit-uncertainty} option.
+%\begin{LaTeXdemo}
+%  \num{0.01(2)} \\
+%  \num[omit-uncertainty]{0.01(2)}
 %\end{LaTeXdemo}
 %
 %\subsection{Printing numbers}
@@ -7649,10 +7659,10 @@ This work consists of the file  siunitx.dtx
 %     \l_siunitx_process_decimal_zero_bool  ,
 %     \l_siunitx_process_integer_zero_bool  ,
 %     \l_siunitx_process_sign_tl            ,
-%     \l_siunitx_process_sign_tl            ,
 %     \l_siunitx_process_fixed_int          ,
 %     \l_siunitx_process_integer_min_int    ,
-%     \l_siunitx_process_plus_tl            ,
+%     \l_siunitx_process_plus_bool          ,
+%     \l_siunitx_omit_uncert_bool           ,
 %     \l_siunitx_process_unity_mantissa_tl  ,
 %     \l_siunitx_process_zero_exponent_bool ,
 %     \l_siunitx_process_int_to_dec_bool    ,
@@ -7669,7 +7679,8 @@ This work consists of the file  siunitx.dtx
     fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
     minimum-integer-digits .int_set:N =
       \l_siunitx_process_integer_min_int,
-    retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
+    retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_bool,
+    omit-uncertainty      .bool_set:N = \l_siunitx_omit_uncert_bool,
     retain-unity-mantissa .bool_set:N =
       \l_siunitx_process_unity_mantissa_bool,
     retain-zero-exponent .bool_set:N =
@@ -7754,7 +7765,15 @@ This work consists of the file  siunitx.dtx
             \tl_if_empty:NF \l_siunitx_unit_tl
               { \siunitx_number_exp_to_prefix: }
           }
-        \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
+        \prop_if_in:NnTF \l_siunitx_number_in_prop { uncertainty }
+          {
+            \bool_if:NTF \l_siunitx_omit_uncert_bool
+              {
+                \prop_del:Nn \l_siunitx_number_in_prop { uncertainty }
+                \prop_del:Nn \l_siunitx_number_in_prop { mantissa-uncertainty }
+              }
+              { \siunitx_number_process_round: }
+          }
           { \siunitx_number_process_round: }
       }
     \siunitx_number_process_integer_digits:
@@ -8844,7 +8863,7 @@ This work consists of the file  siunitx.dtx
 % and adding an explicit sign.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_process_sign: {
-  \bool_if:NF \l_siunitx_process_plus_tl
+  \bool_if:NF \l_siunitx_process_plus_bool
     {
       \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
         { \siunitx_number_process_sign_plus:n { mantissa } }
