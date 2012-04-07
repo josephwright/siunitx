@@ -5210,17 +5210,12 @@ This work consists of the file  siunitx.dtx
 %   {
 %     \siunitx_tl_put_left_math:Nn  ,
 %     \siunitx_tl_put_left_math:NV  ,
-%     \siunitx_tl_put_right_math:Nn ,
-%     \siunitx_tl_put_right_math:NV ,
 %   }
 %   To add stuff in math mode.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_tl_put_left_math:Nn #1#2
   { \tl_put_left:Nn #1 { \ensuremath {#2} } }
 \cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { NV }
-\cs_new_protected:Npn \siunitx_tl_put_right_math:Nn #1#2
-  { \tl_put_right:Nn #1 { \ensuremath {#2} } }
-\cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -11181,10 +11176,7 @@ This work consists of the file  siunitx.dtx
                         { l_siunitx_ \token_to_str:N #1 _options_tl }
                   }
                 \bool_if:NT \l_siunitx_create_prespace_bool
-                  {
-                    \exp_not:n
-                      { \ensuremath { \l_siunitx_number_unit_product_tl } }
-                  }
+                  { \exp_not:V \l_siunitx_number_unit_product_tl }
                 \exp_not:n { \siunitx_unit_output:nn {#1} { } }
               \group_end:
               \bool_if:NT \l_siunitx_create_xspace_bool
@@ -11215,13 +11207,7 @@ This work consists of the file  siunitx.dtx
                 \exp_not:N \IfNoValueTF {####1}
                   {
                     \bool_if:NT \l_siunitx_create_prespace_bool
-                      {
-                        \exp_not:n
-                          {
-                            \ensuremath
-                              { \l_siunitx_number_unit_product_tl }
-                          }
-                      }
+                      { \exp_not:V \l_siunitx_number_unit_product_tl }
                     \exp_not:n { \siunitx_unit_output:nn {#1} { } }
                   }
                   { \SI {####1} { \exp_not:N #1 } }
@@ -11839,12 +11825,12 @@ This work consists of the file  siunitx.dtx
             { per- \int_eval:n { \l_siunitx_unit_int + 1 } }
           \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
             {
-              \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
+              \tl_put_right:NV \l_siunitx_unit_current_tl
                 \l_siunitx_unit_product_tl
             }
         }
         {
-          \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
+          \tl_put_right:NV \l_siunitx_unit_current_tl
             \l_siunitx_unit_product_tl
         }
     }
@@ -12019,10 +12005,8 @@ This work consists of the file  siunitx.dtx
     \seq_map_inline:Nn \l_siunitx_declare_list_seq
       { \siunitx_unit_print_literal_aux:N ##1 }
     \tl_set:Nn \l_siunitx_unit_tl {#1}
-    \tl_set:Nx \l_siunitx_tmpa_tl
-      { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_product_tl } }
-    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
-    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_unit_product_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_unit_product_tl
      \bool_if:NT \l_siunitx_literal_power_bool
        {
          \tl_replace_all:Nnn \l_siunitx_unit_tl { ^ }
@@ -12354,7 +12338,7 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty:NF \l_siunitx_unit_denominator_tl
           {
-            \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
+            \tl_put_right:NV \l_siunitx_unit_tl
               \l_siunitx_unit_product_tl
           }
       }
@@ -12553,14 +12537,11 @@ This work consists of the file  siunitx.dtx
     {
       \mode_if_math:TF
         {
-          \ensuremath
-            {
-              \tex_mathchoice:D
-                { \l_siunitx_number_unit_product_tl }
-                { \siunitx_unit_output_number_sep_aux: }
-                { \siunitx_unit_output_number_sep_aux: }
-                { \siunitx_unit_output_number_sep_aux: }
-            }
+          \tex_mathchoice:D
+            { \l_siunitx_number_unit_product_tl }
+            { \siunitx_unit_output_number_sep_aux: }
+            { \siunitx_unit_output_number_sep_aux: }
+            { \siunitx_unit_output_number_sep_aux: }
         }
         { \siunitx_unit_output_number_sep_aux: }
     }
@@ -12568,7 +12549,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected:Npn \siunitx_unit_output_number_sep_aux: {
   \bool_if:NF \l_siunitx_omit_unit_space_bool
-    { \ensuremath { \l_siunitx_number_unit_product_tl } }
+    { \l_siunitx_number_unit_product_tl }
 }
 %    \end{macrocode}
 %\end{macro}
