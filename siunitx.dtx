@@ -572,6 +572,8 @@ This work consists of the file  siunitx.dtx
 %  number is given}
 %\changes{v2.4n}{2012/04/04}{Allow conversion of numbers with more than
 %  nine digits to scientific notation}
+%\changes{v2.5}{2012/04/07}{Minor change to table code to give fewer underfull
+%  boxes when comparators are used}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -1419,12 +1421,12 @@ This work consists of the file  siunitx.dtx
 %  \item[\texttt{Literal}] A key which uses the value(s) given directly,
 %    either to check input (for example the \texttt{input-digits} key)
 %    or in output.
+%  \item[\texttt{Macro}] Requires a macro, which may need a single
+%    argument.
 %  \item[\texttt{Math}] Similar to a \texttt{literal} option, but the
 %    input is always used in math mode, irrespective of other
 %    \pkg{siunitx} settings. Thus to text-mode only input must be
 %    placed inside the argument of a \cs{text} macro.
-%  \item[\texttt{Macro}] Requires a macro, which may need a single
-%    argument.
 %  \item[\texttt{Meta}] These are options which actually apply
 %    a number of other options. As such, they do not take any
 %    value at all.
@@ -1787,6 +1789,7 @@ This work consists of the file  siunitx.dtx
 %      explicit-sign            & Literal & \meta{none} \\
 %      fixed-exponent           & Integer & 0           \\
 %      minimum-integer-digits   & Integer & 0           \\
+%      omit-uncertainty         & Switch  & false       \\
 %      retain-explicit-plus     & Switch  & false       \\
 %      retain-unity-mantissa    & Switch  & true        \\
 %      retain-zero-exponent     & Switch  & false       \\
@@ -1796,6 +1799,7 @@ This work consists of the file  siunitx.dtx
 %      round-mode               & Choice  & off         \\
 %      round-precision          & Integer & 2           \\
 %      scientific-notation      & Switch  & false       \\
+%      zero-decimal-to-integer  & Switch  & false       \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1808,9 +1812,9 @@ This work consists of the file  siunitx.dtx
 % number of significant figures or decimal places. This is controlled by
 % the \opt{round-mode} option, which takes the choices \opt{off},
 % \opt{figures} and \opt{places}. When rounding is turned on, the
-% number of digits used (either decimal places or significant figures)
-% is set using the \opt{round-precision} option. No rounding will take
-% place if the number contains an uncertainty component.
+% number of digits used (either decimal places or significant figures in
+% the mantissa) is set using the \opt{round-precision} option. No rounding will
+% take place if the number contains an uncertainty component.
 %\begin{LaTeXdemo}
 %  \num{1.23456} \\
 %  \num{14.23} \\
@@ -1831,7 +1835,7 @@ This work consists of the file  siunitx.dtx
 %  \num{0.12345(9)}
 %\end{LaTeXdemo}
 %\DescribeOption{round-integer-to-decimal}
-%\changes{v2.1}{2010/10/25}{New \opt{round-integer-to-decimal} option
+%\changes{v2.1}{2010/10/25}{New \opt{zero-integer-to-decimal} option
 % to convert integers to decimals on rounding}
 % The standard settings for \pkg{siunitx} do not add a decimal part
 % if none was given in the input. The \opt{round-integer-to-decimal}
@@ -1843,6 +1847,17 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{round-integer-to-decimal}
 %  \num[round-mode = figures]{1} \\
 %  \num[round-mode = places]{1}
+%\end{LaTeXdemo}
+% \DescribeOption{zero-decimal-to-integer}
+% \changes{v2.5}{2011/04/07}{New \opt{zero-decimal-to-integer} option}
+% It may be desirable to convert decimals to integers if the decimal part is
+% zero. This is set up using the \opt{zero-decimal-to-integer} option.
+%\begin{LaTeXdemo}
+%  \num{2.0} \\
+%  \num{2.1} \\
+%  \sisetup{zero-decimal-to-integer}
+%  \num{2.0} \\
+%  \num{2.1}
 %\end{LaTeXdemo}
 %\DescribeOption{round-minimum}
 %\changes{v2.1}{2010/10/27}{New \opt{round-minimum} option
@@ -1968,6 +1983,24 @@ This work consists of the file  siunitx.dtx
 %  \num{0.0100} \\
 %  \num{1200}
 %\end{LaTeXdemo}
+% \changes{v2.5}{2012/04/08}{Slight alteration of code order so that
+%   \opt{fixed-exponent} can be used to remove an exponent part from
+%   numerical input}
+% When used with a \opt{fixed-exponent} of zero, this may be used to remove
+% scientific notation from the input
+%\begin{LaTeXdemo}
+%  \num{1.23e4} \\
+%  \num[scientific-notation = fixed, fixed-exponent = 0]{1.23e4}
+%\end{LaTeXdemo}
+%
+% \DescribeOption{omit-uncertainty}
+% \changes{v2.5}{2012/04/07}{New \opt{omit-uncertainty} option}
+% The printing of an uncertainty can be suppressed entirely using the
+% \opt{omit-uncertainty} option.
+%\begin{LaTeXdemo}
+%  \num{0.01(2)} \\
+%  \num[omit-uncertainty]{0.01(2)}
+%\end{LaTeXdemo}
 %
 %\subsection{Printing numbers}
 %
@@ -1994,7 +2027,7 @@ This work consists of the file  siunitx.dtx
 %      copy-complex-root        & Choice  & false                          \\
 %      copy-decimal-marker      & Choice  & false                          \\
 %      exponent-base            & Literal & 10                             \\
-%      exponent-product         & Math    & \cs{times}                     \\
+%      exponent-product         & Math    & \verb=\times=                  \\
 %      group-digits             & Choice  & true                           \\
 %      group-minimum-digits     & integer & 5                              \\
 %      group-separator          & Literal & \cs{,}                         \\
@@ -2211,12 +2244,12 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      fraction-function  & Macro   & \cs{frac}  \\
-%      input-product      & Literal & x          \\
-%      input-quotient     & Literal & /          \\
-%      output-product     & Math    & \cs{times} \\
-%      output-quotient    & Literal & /          \\
-%      quotient-mode      & Choice  & symbol     \\
+%      fraction-function  & Macro   & \cs{frac}     \\
+%      input-product      & Literal & x             \\
+%      input-quotient     & Literal & /             \\
+%      output-product     & Math    & \verb=\times= \\
+%      output-quotient    & Literal & /             \\
+%      quotient-mode      & Choice  & symbol        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2362,7 +2395,7 @@ This work consists of the file  siunitx.dtx
 %      add-arc-second-zero       & Switch  & false        \\
 %      angle-symbol-over-decimal & Switch  & false        \\
 %      arc-separator             & Literal & false        \\
-%      number-angle-product      & Math    & \meta{empty} \\
+%      number-angle-product      & Literal & \meta{empty} \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2777,7 +2810,7 @@ This work consists of the file  siunitx.dtx
 %      bracket-unit-denominator     & Switch  & true       \\
 %      forbid-literal-units         & Switch  & false      \\
 %      literal-superscript-as-power & Switch  & true       \\
-%      inter-unit-product           & Math    & \cs{,}     \\
+%      inter-unit-product           & Literal & \cs{,}     \\
 %      parse-units                  & Switch  & true       \\
 %      per-mode                     & Choice  & reciprocal \\
 %      per-symbol                   & Literal & /          \\
@@ -2799,10 +2832,11 @@ This work consists of the file  siunitx.dtx
 % The separator between each unit is stored using the
 % \opt{inter-unit-product} option. The standard setting is a thin
 % space: another common choice is a centred dot. To get the correct
-% spacing it is necessary to use "{}\cdot{}" in the latter case.
+% spacing it is necessary to use |\ensuremath{{}\cdot{}}| in the latter case.
 %\begin{LaTeXdemo}
 %  \si{\farad\squared\lumen\candela} \\
-%  \si[inter-unit-product={}\cdot{}]{\farad\squared\lumen\candela}
+%  \si[inter-unit-product = \ensuremath{{}\cdot{}}]
+%    {\farad\squared\lumen\candela}
 %\end{LaTeXdemo}
 %
 %\DescribeOption{per-mode}
@@ -2970,13 +3004,13 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      allow-number-unit-breaks & Switch & false    \\
-%      exponent-to-prefix       & Switch & false    \\
-%      list-units               & Choice & repeat   \\
-%      multi-part-units         & Choice & brackets \\
-%      number-unit-product      & Math   & \cs{,}   \\
-%      product-units            & Choice & repeat   \\
-%      range-units              & Choice & repeat   \\
+%      allow-number-unit-breaks & Switch  & false    \\
+%      exponent-to-prefix       & Switch  & false    \\
+%      list-units               & Choice  & repeat   \\
+%      multi-part-units         & Choice  & brackets \\
+%      number-unit-product      & Literal & \cs{,}   \\
+%      product-units            & Choice  & repeat   \\
+%      range-units              & Choice  & repeat   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2998,9 +3032,7 @@ This work consists of the file  siunitx.dtx
 %
 %\DescribeOption{number-unit-product}
 % The product symbol between the number and unit is set using the
-% \opt{number-unit-product} option. This is always printed in math
-% mode, and so anything which must be printed as text should be placed
-% inside a \cs{text} macro.
+% \opt{number-unit-product} option.
 %\begin{LaTeXdemo}
 %  \SI{2.67}{\farad} \\
 %  \SI[number-unit-product = \text{~}]{2.67}{\farad} \\
@@ -4676,6 +4708,15 @@ This work consists of the file  siunitx.dtx
 % math or text mode, the \enquote{intrinsic} math mode options could lead to
 % inconsistent output. The only options which now force math mode are those
 % for products, which will almost always require the use of math mode.
+% 
+% \subsection{Upgrading from version 2.4}
+%
+% The process of removing options which assume math mode, begun with
+% version~2.4, has been taken further, and only \opt{output-product}
+% and \opt{exponent-product} now do not require \cs{ensuremath} for material
+% which must be in math mode. The standard settings have been altered to take
+% account of this, but user-set options for products may need to be updated
+% accordingly.
 %
 %\section{Correct application of (SI) units}
 %
@@ -4808,7 +4849,7 @@ This work consists of the file  siunitx.dtx
 %\begin{LaTeXdemo}
 %  \( \si{\metre\second} = \text{metre second} \) \\
 %  \( \si{\milli\second} = \text{millisecond}  \) \\
-%  \sisetup{inter-unit-product = { } \cdot { } }
+%  \sisetup{inter-unit-product = \ensuremath { { } \cdot { } } }
 %  \( \si{\metre\second} = \text{metre second} \) \\
 %  \( \si{\milli\second} = \text{millisecond}  \)
 %\end{LaTeXdemo}
@@ -5207,17 +5248,12 @@ This work consists of the file  siunitx.dtx
 %   {
 %     \siunitx_tl_put_left_math:Nn  ,
 %     \siunitx_tl_put_left_math:NV  ,
-%     \siunitx_tl_put_right_math:Nn ,
-%     \siunitx_tl_put_right_math:NV ,
 %   }
 %   To add stuff in math mode.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_tl_put_left_math:Nn #1#2
   { \tl_put_left:Nn #1 { \ensuremath {#2} } }
 \cs_generate_variant:Nn \siunitx_tl_put_left_math:Nn { NV }
-\cs_new_protected:Npn \siunitx_tl_put_right_math:Nn #1#2
-  { \tl_put_right:Nn #1 { \ensuremath {#2} } }
-\cs_generate_variant:Nn \siunitx_tl_put_right_math:Nn { NV }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -7649,15 +7685,16 @@ This work consists of the file  siunitx.dtx
 %     \l_siunitx_process_decimal_zero_bool  ,
 %     \l_siunitx_process_integer_zero_bool  ,
 %     \l_siunitx_process_sign_tl            ,
-%     \l_siunitx_process_sign_tl            ,
 %     \l_siunitx_process_fixed_int          ,
 %     \l_siunitx_process_integer_min_int    ,
-%     \l_siunitx_process_plus_tl            ,
+%     \l_siunitx_process_plus_bool          ,
+%     \l_siunitx_omit_uncert_bool           ,
 %     \l_siunitx_process_unity_mantissa_tl  ,
 %     \l_siunitx_process_zero_exponent_bool ,
 %     \l_siunitx_process_int_to_dec_bool    ,
 %     \l_siunitx_process_round_min_tl       ,
-%     \l_siunitx_process_precision_int
+%     \l_siunitx_process_precision_int      ,
+%     \l_siunitx_zero_decimal_to_integer_bool
 %   }
 % First, the options are set up.
 %    \begin{macrocode}
@@ -7669,7 +7706,8 @@ This work consists of the file  siunitx.dtx
     fixed-exponent    .int_set:N  = \l_siunitx_process_fixed_int,
     minimum-integer-digits .int_set:N =
       \l_siunitx_process_integer_min_int,
-    retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_tl,
+    retain-explicit-plus  .bool_set:N = \l_siunitx_process_plus_bool,
+    omit-uncertainty      .bool_set:N = \l_siunitx_omit_uncert_bool,
     retain-unity-mantissa .bool_set:N =
       \l_siunitx_process_unity_mantissa_bool,
     retain-zero-exponent .bool_set:N =
@@ -7717,7 +7755,9 @@ This work consists of the file  siunitx.dtx
         \bool_set_false:N \l_siunitx_process_fixed_bool
         \bool_set_false:N \l_siunitx_process_engineering_bool
         \bool_set_true:N  \l_siunitx_process_scientific_bool
-      }
+      },
+    zero-decimal-to-integer .bool_set:N =
+      \l_siunitx_zero_decimal_to_integer_bool
   }
 \keys_set:nn { siunitx }
   {
@@ -7741,22 +7781,31 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_process_mantissa:
     \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
       {
-        \siunitx_number_process_exponent:
         \bool_if:NTF \l_siunitx_process_fixed_bool
           { \siunitx_number_process_fixed: }
           {
             \bool_if:NT \l_siunitx_process_scientific_bool
               { \siunitx_number_process_scientific: }
           }
+        \siunitx_number_process_exponent:
         \siunitx_number_process_uncertainty:
         \bool_if:NT \l_siunitx_exp_to_prefix_bool
           {
             \tl_if_empty:NF \l_siunitx_unit_tl
               { \siunitx_number_exp_to_prefix: }
           }
-        \prop_if_in:NnF \l_siunitx_number_in_prop { uncertainty }
+        \prop_if_in:NnTF \l_siunitx_number_in_prop { uncertainty }
+          {
+            \bool_if:NTF \l_siunitx_omit_uncert_bool
+              {
+                \prop_del:Nn \l_siunitx_number_in_prop { uncertainty }
+                \prop_del:Nn \l_siunitx_number_in_prop { mantissa-uncertainty }
+              }
+              { \siunitx_number_process_round: }
+          }
           { \siunitx_number_process_round: }
       }
+    \siunitx_number_process_zero_to_integer:
     \siunitx_number_process_integer_digits:
     \bool_if:NT \l_siunitx_process_drop_exponent_bool
       {
@@ -8844,7 +8893,7 @@ This work consists of the file  siunitx.dtx
 % and adding an explicit sign.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_process_sign: {
-  \bool_if:NF \l_siunitx_process_plus_tl
+  \bool_if:NF \l_siunitx_process_plus_bool
     {
       \prop_if_in:NnTF \l_siunitx_number_in_prop { mantissa-sign }
         { \siunitx_number_process_sign_plus:n { mantissa } }
@@ -9052,6 +9101,42 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+% \begin{macro}{\siunitx_number_process_zero_to_integer:}
+% \begin{macro}[aux]{\siunitx_number_process_zero_to_integer_aux:n}
+%   Look for a decimal part which is simply zero, and if found delete it.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_process_zero_to_integer:
+  {
+    \bool_if:NT \l_siunitx_zero_decimal_to_integer_bool
+      {
+        \siunitx_number_process_zero_to_integer_aux:n { mantissa }
+        \siunitx_number_process_zero_to_integer_aux:n { complex }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_zero_to_integer_aux:n #1
+  {
+    \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal } \l_siunitx_tmpa_tl
+      {
+        \bool_set_true:N \l_siunitx_tmp_bool
+        \tl_map_inline:Nn \l_siunitx_tmpa_tl
+          {
+            \str_if_eq:nnF {##1} { 0 }
+              {
+                \bool_set_false:N \l_siunitx_tmp_bool
+                \tl_map_break:
+              }
+          }
+        \bool_if:NT \l_siunitx_tmp_bool
+          {
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\siunitx_number_exp_to_prefix:}
 %   This function is a bit awkward, as it essentially cuts across the
@@ -9998,10 +10083,10 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_quotient_mode_tl { symbol } },
 }
 \keys_set:nn { siunitx } {
-  fraction-function = \frac,
-  output-product    = \times,
-  output-quotient   = /,
-  parse-numbers     = true,
+  fraction-function = \frac  ,
+  output-product    = \times ,
+  output-quotient   = /      ,
+  parse-numbers     = true   ,
   quotient-mode     = symbol
 }
 %    \end{macrocode}
@@ -11178,10 +11263,7 @@ This work consists of the file  siunitx.dtx
                         { l_siunitx_ \token_to_str:N #1 _options_tl }
                   }
                 \bool_if:NT \l_siunitx_create_prespace_bool
-                  {
-                    \exp_not:n
-                      { \ensuremath { \l_siunitx_number_unit_product_tl } }
-                  }
+                  { \exp_not:V \l_siunitx_number_unit_product_tl }
                 \exp_not:n { \siunitx_unit_output:nn {#1} { } }
               \group_end:
               \bool_if:NT \l_siunitx_create_xspace_bool
@@ -11212,13 +11294,7 @@ This work consists of the file  siunitx.dtx
                 \exp_not:N \IfNoValueTF {####1}
                   {
                     \bool_if:NT \l_siunitx_create_prespace_bool
-                      {
-                        \exp_not:n
-                          {
-                            \ensuremath
-                              { \l_siunitx_number_unit_product_tl }
-                          }
-                      }
+                      { \exp_not:V \l_siunitx_number_unit_product_tl }
                     \exp_not:n { \siunitx_unit_output:nn {#1} { } }
                   }
                   { \SI {####1} { \exp_not:N #1 } }
@@ -11836,12 +11912,12 @@ This work consists of the file  siunitx.dtx
             { per- \int_eval:n { \l_siunitx_unit_int + 1 } }
           \prop_if_in:NVF \l_siunitx_unit_prop \l_siunitx_tmpa_tl
             {
-              \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
+              \tl_put_right:NV \l_siunitx_unit_current_tl
                 \l_siunitx_unit_product_tl
             }
         }
         {
-          \siunitx_tl_put_right_math:NV \l_siunitx_unit_current_tl
+          \tl_put_right:NV \l_siunitx_unit_current_tl
             \l_siunitx_unit_product_tl
         }
     }
@@ -12016,10 +12092,8 @@ This work consists of the file  siunitx.dtx
     \seq_map_inline:Nn \l_siunitx_declare_list_seq
       { \siunitx_unit_print_literal_aux:N ##1 }
     \tl_set:Nn \l_siunitx_unit_tl {#1}
-    \tl_set:Nx \l_siunitx_tmpa_tl
-      { \exp_not:N \ensuremath { \exp_not:V \l_siunitx_unit_product_tl } }
-    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_tmpa_tl
-    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_tmpa_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_unit_product_tl
+    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_unit_product_tl
      \bool_if:NT \l_siunitx_literal_power_bool
        {
          \tl_replace_all:Nnn \l_siunitx_unit_tl { ^ }
@@ -12351,7 +12425,7 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty:NF \l_siunitx_unit_denominator_tl
           {
-            \siunitx_tl_put_right_math:NV \l_siunitx_unit_tl
+            \tl_put_right:NV \l_siunitx_unit_tl
               \l_siunitx_unit_product_tl
           }
       }
@@ -12550,14 +12624,11 @@ This work consists of the file  siunitx.dtx
     {
       \mode_if_math:TF
         {
-          \ensuremath
-            {
-              \tex_mathchoice:D
-                { \l_siunitx_number_unit_product_tl }
-                { \siunitx_unit_output_number_sep_aux: }
-                { \siunitx_unit_output_number_sep_aux: }
-                { \siunitx_unit_output_number_sep_aux: }
-            }
+          \tex_mathchoice:D
+            { \l_siunitx_number_unit_product_tl }
+            { \siunitx_unit_output_number_sep_aux: }
+            { \siunitx_unit_output_number_sep_aux: }
+            { \siunitx_unit_output_number_sep_aux: }
         }
         { \siunitx_unit_output_number_sep_aux: }
     }
@@ -12565,7 +12636,7 @@ This work consists of the file  siunitx.dtx
 }
 \cs_new_protected:Npn \siunitx_unit_output_number_sep_aux: {
   \bool_if:NF \l_siunitx_omit_unit_space_bool
-    { \ensuremath { \l_siunitx_number_unit_product_tl } }
+    { \l_siunitx_number_unit_product_tl }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -13795,7 +13866,7 @@ This work consists of the file  siunitx.dtx
         { \prop_del:Nn \l_siunitx_table_model_prop { comparator } },
     table-comparator /
       true                    .code:n     =
-        { \prop_put:Nnn \l_siunitx_table_model_prop { comparator } { \ll } },
+        { \prop_put:Nnn \l_siunitx_table_model_prop { comparator } { > } },
     table-comparator          .default:n  = true,
     table-figures-decimal     .code:n     =
       {
@@ -16127,23 +16198,23 @@ This work consists of the file  siunitx.dtx
   locale /
     DE   .meta:n =
       {
-        exponent-product      = \cdot  ,
-        inter-unit-product    = { \, } ,
-        output-decimal-marker = { , }  ,
+        exponent-product      = \ensuremath { \cdot } ,
+        inter-unit-product    = \,                    ,
+        output-decimal-marker = { , }
       },
   locale /
     FR   .meta:n =
       {
-        exponent-product      = \times ,
-        inter-unit-product    = { \, } ,
-        output-decimal-marker = { , }  ,
+        exponent-product      = \ensuremath { \times } ,
+        inter-unit-product    = \,                     ,
+        output-decimal-marker = { , }
       },
   locale /
     UK   .meta:n =
       {
-        exponent-product      = \times ,
-        inter-unit-product    = \,     ,
-        output-decimal-marker = .      ,
+        exponent-product      = \ensuremath { \times } ,
+        inter-unit-product    = \,                     ,
+        output-decimal-marker = .
       },
   locale /
     US   .meta:n = { locale = UK },
@@ -16152,9 +16223,9 @@ This work consists of the file  siunitx.dtx
   locale /
     ZA   .meta:n =
       {
-        exponent-product      = \times ,
-        inter-unit-product    = \cdot  ,
-        output-decimal-marker = { , }  ,
+        exponent-product      = \ensuremath { \times } ,
+        inter-unit-product    = \ensuremath { \cdot }  ,
+        output-decimal-marker = { , }
       },
 }
 %    \end{macrocode}
@@ -16470,17 +16541,17 @@ This work consists of the file  siunitx.dtx
   expproduct     .choice: ,
   expproduct /
     cdot         .meta:n    =
-      { exponent-product        = { } \cdot { }                       },
+      { exponent-product        = \ensuremath { { } \cdot { } }        },
   expproduct /
     tightcdot    .meta:n    =
-      { exponent-product        = \bgroup \cdot \egroup                },
+      { exponent-product        = \ensuremath { \bgroup \cdot \egroup } },
   expproduct /
     tighttimes   .meta:n    =
-      { exponent-product        = \bgroup \times \egroup             },
+      { exponent-product        = \ensuremath { \bgroup \times \egroup } },
   expproduct /
-    times        .meta:n    = { exponent-product        = \times     },
+    times        .meta:n    = { exponent-product        = \ensuremath { \times } },
   expproduct /
-    unknown      .meta:n    = { exponent-product        = #1         },
+    unknown      .meta:n    = { exponent-product        = \ensuremath {#1} },
   fixdp .choice:,
   fixdp /
     false        .meta:n    = { round-mode              = none        },
@@ -16813,15 +16884,15 @@ This work consists of the file  siunitx.dtx
   unitsep        .choice: ,
   unitsep /
     cdot         .meta:n    =
-      { inter-unit-product      = { } \cdot { }                       },
+      { inter-unit-product      = \ensuremath { { } \cdot { } }        },
   unitsep /
     comma        .meta:n    = { inter-unit-product      = { {,} }     },
   unitsep /
     fullstop     .meta:n    = { inter-unit-product      = { { . } }   },
   unitsep /
-    med          .meta:n    = { inter-unit-product      = \:          },
+    med          .meta:n    = { inter-unit-product      = \ensuremath { \: } },
   unitsep /
-    medium       .meta:n    = { inter-unit-product      = \:          },
+    medium       .meta:n    = { inter-unit-product      = \ensuremath { \: } },
   unitsep /
     none         .meta:n    = { inter-unit-product      =             },
   unitsep /
@@ -16831,34 +16902,34 @@ This work consists of the file  siunitx.dtx
   unitsep /
     stop         .meta:n    = { inter-unit-product      = { { . } }   },
   unitsep /
-    thick        .meta:n    = { inter-unit-product      = \;          },
+    thick        .meta:n    = { inter-unit-product      = \ensuremath { \; } },
   unitsep /
     thin         .meta:n    = { inter-unit-product      = \,          },
   unitsep /
     tightcdot    .meta:n    =
-      { inter-unit-product      = \bgroup \cdot \egroup               },
+      { inter-unit-product      = \ensuremath { \bgroup \cdot \egroup } },
   unitsep /
     tighttimes   .meta:n    =
-      { inter-unit-product      = \bgroup \times \egroup              },
+      { inter-unit-product      = \ensuremath { \bgroup \times \egroup } },
   unitsep /
-    times        .meta:n   = { inter-unit-product       = \times      },
+    times        .meta:n   = { inter-unit-product       = \ensuremath { \times } },
   unitsep /
-    unknown      .meta:n   = { inter-unit-product       = #1          },
+    unknown      .meta:n   = { inter-unit-product       = \ensuremath {#1} },
   unitspace      .choice: ,
   unitspace /
-    med          .meta:n   = { inter-unit-product       = \:          },
+    med          .meta:n   = { inter-unit-product       = \ensuremath { \: } },
   unitspace /
-    medium       .meta:n   = { inter-unit-product       = \:          },
+    medium       .meta:n   = { inter-unit-product       = \ensuremath { \: } },
   unitspace /
     none         .meta:n   = { inter-unit-product       =             },
   unitspace /
     space        .meta:n   = { inter-unit-product       = \text { ~ } },
   unitspace /
-    thick        .meta:n   = { inter-unit-product       = \;          },
+    thick        .meta:n   = { inter-unit-product       = \ensuremath { \; } },
   unitspace /
     thin         .meta:n   = { inter-unit-product       = \,          },
   unitspace /
-    unknown      .meta:n   = { inter-unit-product       = #1          },
+    unknown      .meta:n   = { inter-unit-product       = \ensuremath {#1} },
   valuecolor     .meta:n   = { number-color             = #1          },
   valuecolour    .meta:n   = { number-color             = #1          },
   valuemathrm    .meta:x   =
@@ -16877,15 +16948,15 @@ This work consists of the file  siunitx.dtx
   valuesep        .choice: ,
   valuesep /
     cdot         .meta:n    =
-      { number-unit-product     = { } \cdot { }                       },
+      { number-unit-product     = \ensuremath { { } \cdot { } }  },
   valuesep /
     comma        .meta:n    = { number-unit-product     = { {,} }     },
   valuesep /
     fullstop     .meta:n    = { number-unit-product     = { { . } }   },
   valuesep /
-    med          .meta:n    = { number-unit-product     = \:          },
+    med          .meta:n    = { number-unit-product     = \ensuremath { \: } },
   valuesep /
-    medium       .meta:n    = { number-unit-product     = \:          },
+    medium       .meta:n    = { number-unit-product     = \ensuremath { \: } },
   valuesep /
     none         .meta:n    = { number-unit-product     =             },
   valuesep /
@@ -16895,19 +16966,19 @@ This work consists of the file  siunitx.dtx
   valuesep /
     stop         .meta:n    = { number-unit-product     = { { . } }   },
   valuesep /
-    thick        .meta:n    = { number-unit-product     = \;          },
+    thick        .meta:n    = { number-unit-product     = \ensuremath { \; } },
   valuesep /
     thin         .meta:n    = { number-unit-product     = \,          },
   valuesep /
     tightcdot    .meta:n    =
-      { number-unit-product      = \bgroup \cdot \egroup              },
+      { number-unit-product      = \ensuremath { \bgroup \cdot \egroup } },
   valuesep /
     tighttimes   .meta:n    =
-      { number-unit-product      = \bgroup \times \egroup             },
+      { number-unit-product      = \ensuremath { \bgroup \times \egroup } },
   valuesep /
-    times        .meta:n    = { number-unit-product      = \times     },
+    times        .meta:n    = { number-unit-product      = \ensuremath { \times } },
   valuesep /
-    unknown      .meta:n    = { number-unit-product      = #1         },
+    unknown      .meta:n    = { number-unit-product      = \ensuremath {#1} },
   xspace         .meta:n    = { use-xspace               = #1         },
   xspace         .default:n = { true                                  },
 }
