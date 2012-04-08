@@ -1423,6 +1423,10 @@ This work consists of the file  siunitx.dtx
 %    or in output.
 %  \item[\texttt{Macro}] Requires a macro, which may need a single
 %    argument.
+%  \item[\texttt{Math}] Similar to a \texttt{literal} option, but the
+%    input is always used in math mode, irrespective of other
+%    \pkg{siunitx} settings. Thus to text-mode only input must be
+%    placed inside the argument of a \cs{text} macro.
 %  \item[\texttt{Meta}] These are options which actually apply
 %    a number of other options. As such, they do not take any
 %    value at all.
@@ -2023,7 +2027,7 @@ This work consists of the file  siunitx.dtx
 %      copy-complex-root        & Choice  & false                          \\
 %      copy-decimal-marker      & Choice  & false                          \\
 %      exponent-base            & Literal & 10                             \\
-%      exponent-product         & Literal & \verb=\ensuremath{\times}=     \\
+%      exponent-product         & Math    & \verb=\times=                  \\
 %      group-digits             & Choice  & true                           \\
 %      group-minimum-digits     & integer & 5                              \\
 %      group-separator          & Literal & \cs{,}                         \\
@@ -2125,8 +2129,8 @@ This work consists of the file  siunitx.dtx
 % parts of the output.  Notice that the base is in the current mode, but
 % the product sign is always in math mode.
 %\begin{LaTeXdemo}
-%  \num[exponent-product = \ensuremath{\times}]{1e2} \\
-%  \num[exponent-product = \ensuremath{\cdot}]{1e2} \\
+%  \num[exponent-product = \times]{1e2} \\
+%  \num[exponent-product = \cdot]{1e2} \\
 %  \num[exponent-base = 2]{1e2}
 %\end{LaTeXdemo}
 %\DescribeOption{output-exponent-marker}
@@ -2240,12 +2244,12 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      fraction-function  & Macro   & \cs{frac}                  \\
-%      input-product      & Literal & x                          \\
-%      input-quotient     & Literal & /                          \\
-%      output-product     & Literal & \verb=\ensuremath{\times}= \\
-%      output-quotient    & Literal & /                          \\
-%      quotient-mode      & Choice  & symbol                     \\
+%      fraction-function  & Macro   & \cs{frac}     \\
+%      input-product      & Literal & x             \\
+%      input-quotient     & Literal & /             \\
+%      output-product     & Math    & \verb=\times= \\
+%      output-quotient    & Literal & /             \\
+%      quotient-mode      & Choice  & symbol        \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -2266,7 +2270,7 @@ This work consists of the file  siunitx.dtx
 % The symbols used for printing products and quotients are stored using
 % the options \opt{output-product} and \opt{output-quotient}.
 %\begin{LaTeXdemo}
-%  \num[output-product = \ensuremath{\cdot}]{4.87 x 5.321 x 6.90545} \\
+%  \num[output-product = \cdot]{4.87 x 5.321 x 6.90545} \\
 %  \num[output-quotient = \text{ div }]{1 / 2}
 %\end{LaTeXdemo}
 %
@@ -4708,10 +4712,11 @@ This work consists of the file  siunitx.dtx
 % \subsection{Upgrading from version 2.4}
 %
 % The process of removing options which assume math mode, begun with
-% version~2.4, has been completed and all options now require
-% \cs{ensuremath} for material which must be in math mode. The standard
-% settings have been altered to take account of this, but user-set options
-% for products may need to be updated accordingly.
+% version~2.4, has been taken further, and only \opt{output-product}
+% and \opt{exponent-product} now do not require \cs{ensuremath} for material
+% which must be in math mode. The standard settings have been altered to take
+% account of this, but user-set options for products may need to be updated
+% accordingly.
 %
 %\section{Correct application of (SI) units}
 %
@@ -9318,7 +9323,7 @@ This work consists of the file  siunitx.dtx
     complex-root-position     = after-number                  ,
     copy-decimal-marker       = false                         ,
     exponent-base             = 10                            ,
-    exponent-product          = \ensuremath { \times }        ,
+    exponent-product          = \times                        ,
     group-digits              = true                          ,
     group-minimum-digits      = 5                             ,
     group-separator           = \,                            ,
@@ -10078,10 +10083,10 @@ This work consists of the file  siunitx.dtx
     { \tl_set:Nn \l_siunitx_quotient_mode_tl { symbol } },
 }
 \keys_set:nn { siunitx } {
-  fraction-function = \frac                  ,
-  output-product    = \ensuremath { \times } ,
-  output-quotient   = /                      ,
-  parse-numbers     = true                   ,
+  fraction-function = \frac  ,
+  output-product    = \times ,
+  output-quotient   = /      ,
+  parse-numbers     = true   ,
   quotient-mode     = symbol
 }
 %    \end{macrocode}
