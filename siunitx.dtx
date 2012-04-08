@@ -1795,6 +1795,7 @@ This work consists of the file  siunitx.dtx
 %      round-mode               & Choice  & off         \\
 %      round-precision          & Integer & 2           \\
 %      scientific-notation      & Switch  & false       \\
+%      zero-decimal-to-integer  & Switch  & false       \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -1830,7 +1831,7 @@ This work consists of the file  siunitx.dtx
 %  \num{0.12345(9)}
 %\end{LaTeXdemo}
 %\DescribeOption{round-integer-to-decimal}
-%\changes{v2.1}{2010/10/25}{New \opt{round-integer-to-decimal} option
+%\changes{v2.1}{2010/10/25}{New \opt{zero-integer-to-decimal} option
 % to convert integers to decimals on rounding}
 % The standard settings for \pkg{siunitx} do not add a decimal part
 % if none was given in the input. The \opt{round-integer-to-decimal}
@@ -1842,6 +1843,17 @@ This work consists of the file  siunitx.dtx
 %  \sisetup{round-integer-to-decimal}
 %  \num[round-mode = figures]{1} \\
 %  \num[round-mode = places]{1}
+%\end{LaTeXdemo}
+% \DescribeOption{zero-decimal-to-integer}
+% \changes{v2.5}{2011/04/07}{New \opt{zero-decimal-to-integer} option}
+% It may be desirable to convert decimals to integers if the decimal part is
+% zero. This is set up using the \opt{zero-decimal-to-integer} option.
+%\begin{LaTeXdemo}
+%  \num{2.0} \\
+%  \num{2.1} \\
+%  \sisetup{zero-decimal-to-integer}
+%  \num{2.0} \\
+%  \num{2.1}
 %\end{LaTeXdemo}
 %\DescribeOption{round-minimum}
 %\changes{v2.1}{2010/10/27}{New \opt{round-minimum} option
@@ -7667,7 +7679,8 @@ This work consists of the file  siunitx.dtx
 %     \l_siunitx_process_zero_exponent_bool ,
 %     \l_siunitx_process_int_to_dec_bool    ,
 %     \l_siunitx_process_round_min_tl       ,
-%     \l_siunitx_process_precision_int
+%     \l_siunitx_process_precision_int      ,
+%     \l_siunitx_zero_decimal_to_integer_bool
 %   }
 % First, the options are set up.
 %    \begin{macrocode}
@@ -7728,7 +7741,9 @@ This work consists of the file  siunitx.dtx
         \bool_set_false:N \l_siunitx_process_fixed_bool
         \bool_set_false:N \l_siunitx_process_engineering_bool
         \bool_set_true:N  \l_siunitx_process_scientific_bool
-      }
+      },
+    zero-decimal-to-integer .bool_set:N =
+      \l_siunitx_zero_decimal_to_integer_bool
   }
 \keys_set:nn { siunitx }
   {
@@ -7776,6 +7791,7 @@ This work consists of the file  siunitx.dtx
           }
           { \siunitx_number_process_round: }
       }
+    \siunitx_number_process_zero_to_integer:
     \siunitx_number_process_integer_digits:
     \bool_if:NT \l_siunitx_process_drop_exponent_bool
       {
@@ -9071,6 +9087,42 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+%
+% \begin{macro}{\siunitx_number_process_zero_to_integer:}
+% \begin{macro}[aux]{\siunitx_number_process_zero_to_integer_aux:n}
+%   Look for a decimal part which is simply zero, and if found delete it.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \siunitx_number_process_zero_to_integer:
+  {
+    \bool_if:NT \l_siunitx_zero_decimal_to_integer_bool
+      {
+        \siunitx_number_process_zero_to_integer_aux:n { mantissa }
+        \siunitx_number_process_zero_to_integer_aux:n { complex }
+      }
+  }
+\cs_new_protected:Npn \siunitx_number_process_zero_to_integer_aux:n #1
+  {
+    \prop_get:NnNT \l_siunitx_number_in_prop { #1 -decimal } \l_siunitx_tmpa_tl
+      {
+        \bool_set_true:N \l_siunitx_tmp_bool
+        \tl_map_inline:Nn \l_siunitx_tmpa_tl
+          {
+            \str_if_eq:nnF {##1} { 0 }
+              {
+                \bool_set_false:N \l_siunitx_tmp_bool
+                \tl_map_break:
+              }
+          }
+        \bool_if:NT \l_siunitx_tmp_bool
+          {
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal }
+            \prop_del:Nn \l_siunitx_number_in_prop { #1 -decimal-marker }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\siunitx_number_exp_to_prefix:}
 %   This function is a bit awkward, as it essentially cuts across the
