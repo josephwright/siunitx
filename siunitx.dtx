@@ -1979,6 +1979,15 @@ This work consists of the file  siunitx.dtx
 %  \num{0.0100} \\
 %  \num{1200}
 %\end{LaTeXdemo}
+% \changes{v2.5}{2012/04/08}{Slight alteration of code order so that
+%   \opt{fixed-exponent = 0} can be used to remove an exponent part from
+%   numerical input}
+% When used with a \opt{fixed-exponent} of zero, this may be used to remove
+% scientific notation from the input
+%\begin{LaTeXdemo}
+%  \num{1.23e4} \\
+%  \num[scientific-notation = fixed, fixed-exponent = 0]{1.23e4}
+%\end{LaTeXdemo}
 %
 % \DescribeOption{omit-uncertainty}
 % \changes{v2.5}{2012/04/07}{New \opt{omit-uncertainty} option}
@@ -7767,13 +7776,13 @@ This work consists of the file  siunitx.dtx
     \siunitx_number_process_mantissa:
     \prop_if_in:NnF \l_siunitx_number_in_prop { symbolic }
       {
-        \siunitx_number_process_exponent:
         \bool_if:NTF \l_siunitx_process_fixed_bool
           { \siunitx_number_process_fixed: }
           {
             \bool_if:NT \l_siunitx_process_scientific_bool
               { \siunitx_number_process_scientific: }
           }
+        \siunitx_number_process_exponent:
         \siunitx_number_process_uncertainty:
         \bool_if:NT \l_siunitx_exp_to_prefix_bool
           {
