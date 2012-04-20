@@ -580,6 +580,8 @@ This work consists of the file  siunitx.dtx
 %  for \enquote{dynamic} nature of spacing (bug introduced in v2.5)}
 %\changes{v2.5b}{2012/04/20}{Deal correctly with \texttt{\^} and \texttt{\_}
 %  in literal units when \pkg{breqn} package is loaded}
+%\changes{v2.5b}{2012/04/20}{Detect \pkg{eulervm} package and alter
+%  math mode font setting accordingly}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6140,6 +6142,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \AtBeginDocument {
   \tl_set:Nx \l_siunitx_tmpa_tl { \familydefault }
+  \@ifpackageloaded { eulervm }
+    {
+      \cs_set:Npn \siunitx_tmp:w #1 { \mathrm {#1} }
+      \cs_if_eq:NNT \siunitx_number_mathrm:n \siunitx_tmp:w
+         { \keys_set:nn { siunitx } { number-math-rm = \mathnormal } }
+      \cs_if_eq:NNT \siunitx_unit_mathrm:n \siunitx_tmp:w
+        { \keys_set:nn { siunitx } { unit-math-rm = \mathnormal } }
+    }
+    { }
   \tl_if_eq:NNT \l_siunitx_tmpa_tl \c_siunitx_textsf_tl
     {
       \@ifpackageloaded { arev }
