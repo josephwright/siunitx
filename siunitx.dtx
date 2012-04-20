@@ -578,6 +578,8 @@ This work consists of the file  siunitx.dtx
 %  options}
 %\changes{v2.5a}{2012/04/19}{When creating free-standing unit, allow
 %  for \enquote{dynamic} nature of spacing (bug introduced in v2.5)}
+%\changes{v2.5b}{2012/04/20}{Deal correctly with \texttt{\^} and \texttt{\_}
+%  in literal units when \pkg{breqn} package is loaded}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6306,6 +6308,8 @@ This work consists of the file  siunitx.dtx
   \char_set_catcode_math_subscript:N \@
   \char_set_lccode:nn { `\! } { `\_ }
   \char_set_catcode_active:N \!
+  \char_set_lccode:nn { `\= } { `\_ }
+  \char_set_lccode:nn { `\+ } { `\^ }
 \tl_to_lowercase:n {
   \group_end:
   \cs_new_protected:Npn \siunitx_print_text:
@@ -6318,7 +6322,11 @@ This work consists of the file  siunitx.dtx
         { \siunitx_print_text_sub:n }
       \tl_replace_all:Nnn \l_siunitx_print_arg_tl { ! }
         { \siunitx_print_text_sub:n }
+      \tl_replace_all:Nnn \l_siunitx_print_arg_tl { = }
+        { \siunitx_print_text_sub:n }
       \tl_replace_all:Nnn \l_siunitx_print_arg_tl { ^ }
+        { \siunitx_print_text_super:n }
+      \tl_replace_all:Nnn \l_siunitx_print_arg_tl { + }
         { \siunitx_print_text_super:n }
       \l_siunitx_print_arg_tl
     }
@@ -12089,23 +12097,30 @@ This work consists of the file  siunitx.dtx
 %   then a little work to do sorting out |~| and |.| characters at
 %   the outer level.
 %    \begin{macrocode}
-\char_set_catcode_active:N \~
-\cs_new_protected:Npn \siunitx_unit_format_literal:n #1
+\group_begin:
+  \char_set_lccode:nn { `\+ } { `\^ }
+  \char_set_catcode_active:N \~
+\tl_to_lowercase:n
   {
-    \int_zero:N \l_siunitx_unit_prefix_int
-    \seq_map_inline:Nn \l_siunitx_declare_list_seq
-      { \siunitx_unit_print_literal_aux:N ##1 }
-    \tl_set:Nn \l_siunitx_unit_tl {#1}
-    \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_unit_product_tl
-    \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_unit_product_tl
-     \bool_if:NT \l_siunitx_literal_power_bool
-       {
-         \tl_replace_all:Nnn \l_siunitx_unit_tl { ^ }
-           { \siunitx_unit_format_literal_power:n }
-       }
-    \siunitx_unit_format_literal_extras:
+    \group_end:
+    \cs_new_protected:Npn \siunitx_unit_format_literal:n #1
+      {
+        \int_zero:N \l_siunitx_unit_prefix_int
+        \seq_map_inline:Nn \l_siunitx_declare_list_seq
+          { \siunitx_unit_print_literal_aux:N ##1 }
+        \tl_set:Nn \l_siunitx_unit_tl {#1}
+        \tl_replace_all:NnV \l_siunitx_unit_tl { . } \l_siunitx_unit_product_tl
+        \tl_replace_all:NnV \l_siunitx_unit_tl { ~ } \l_siunitx_unit_product_tl
+        \bool_if:NT \l_siunitx_literal_power_bool
+          {
+            \tl_replace_all:Nnn \l_siunitx_unit_tl { ^ }
+              { \siunitx_unit_format_literal_power:n }
+            \tl_replace_all:Nnn \l_siunitx_unit_tl { + }
+              { \siunitx_unit_format_literal_power:n }
+          }
+        \siunitx_unit_format_literal_extras:
+      }
   }
-\char_set_catcode_space:N \~
 \cs_new_protected:Npn \siunitx_unit_print_literal_aux:N #1
   { \cs_set_eq:Nc #1 { siunitx_ \token_to_str:N #1 _literal:w } }
 \cs_new_protected:Npn \siunitx_unit_format_literal_power:n #1
