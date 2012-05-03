@@ -8060,6 +8060,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}[aux]{
 %  \siunitx_number_process_fixed_aux_i:nnn   ,
 %  \siunitx_number_process_fixed_aux_ii:nnn  ,
+%  \siunitx_number_process_fixed_aux_iii:nnn ,
 %  \siunitx_number_process_fixed_large:nnn   ,
 %  \siunitx_number_process_fixed_large_aux:w ,
 %  \siunitx_number_process_fixed_small:nnn   ,
@@ -8100,26 +8101,38 @@ This work consists of the file  siunitx.dtx
 % The main loop checks to see which way to adjust the exponent then
 % does the work.
 %    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_process_fixed_aux_i:nnn #1#2#3
+  {
+    \prop_put:Nnn \l_siunitx_number_in_prop { exponent } { true }
+    \int_compare:nNnTF { \l_siunitx_process_fixed_int } > { \c_zero }
+      {
+        \prop_put:NnV \l_siunitx_number_in_prop { exponent-integer }
+          \l_siunitx_process_fixed_int
+        \prop_del:Nn \l_siunitx_number_in_prop { exponent-sign }
+      }
+      {
+        \prop_put:Nnx \l_siunitx_number_in_prop { exponent-integer }
+          { \int_eval:n { - \l_siunitx_process_fixed_int } }
+        \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign } { - }
+      }
+    \siunitx_number_process_fixed_aux_ii:nnn {#1} {#2} {#3}
+  }
+\cs_new_protected:Npn \siunitx_number_process_fixed_aux_ii:nnn #1#2#3
+  {
+    \bool_set_true:N \l_siunitx_tmp_bool
+    \tl_map_inline:nn {#1#2}
+      {
+        \str_if_eq:nnF {##1} { 0 }
+          {
+            \bool_set_false:N \l_siunitx_tmp_bool
+            \tl_map_break:
+          }
+                }
+    \bool_if:NF \l_siunitx_tmp_bool
+      { \siunitx_number_process_fixed_aux_iii:nnn {#1} {#2} {#3} }
+  }
 \cs_new_protected:Npn
-  \siunitx_number_process_fixed_aux_i:nnn #1#2#3 {
-  \prop_put:Nnn \l_siunitx_number_in_prop { exponent }
-    { true }
-  \int_compare:nNnTF { \l_siunitx_process_fixed_int } > { \c_zero }
-    {
-      \prop_put:NnV \l_siunitx_number_in_prop { exponent-integer }
-        \l_siunitx_process_fixed_int
-      \prop_del:Nn \l_siunitx_number_in_prop { exponent-sign }
-    }
-    {
-      \prop_put:Nnx \l_siunitx_number_in_prop { exponent-integer }
-        { \int_eval:n { - \l_siunitx_process_fixed_int } }
-      \prop_put:Nnn \l_siunitx_number_in_prop { exponent-sign } { - }
-    }
-  \int_compare:nNnF { #1 + 0 #2 } = { 0 }
-    { \siunitx_number_process_fixed_aux_ii:nnn {#1} {#2} {#3} }
-}
-\cs_new_protected:Npn
-  \siunitx_number_process_fixed_aux_ii:nnn #1#2#3 {
+  \siunitx_number_process_fixed_aux_iii:nnn #1#2#3 {
   \int_compare:nNnTF {#3} > { \l_siunitx_process_fixed_int }
     { \siunitx_number_process_fixed_large:nnn {#1} {#2} {#3} }
     {
