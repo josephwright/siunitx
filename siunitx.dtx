@@ -585,6 +585,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5c}{2012/04/03}{Allow conversion of numbers with more than
 %  nine digits when using fixed exponents}
 %\changes{v2.5c}{2012/05/03}{Detect entirely empty cells in \texttt{s} columns}
+%\changes{v2.5d}{2012/06/11}{Extend range of settings automatically altered
+%  to use UTF-8 values is appropriate}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15213,14 +15215,19 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{variable}
 %   {
-%     \c_siunitx_degree_int,
-%     \c_siunitx_micro_int,
-%     \c_siunitx_angstrom_int,
-%     \c_siunitx_celsius_int,
-%     \c_siunitx_ohm_int
+%     \c_siunitx_degree_int   ,
+%     \c_siunitx_micro_int    ,
+%     \c_siunitx_angstrom_int ,
+%     \c_siunitx_ohm_int      ,
+%     \c_siunitx_arcminute_int,
+%     \c_siunitx_arcsecond_int
 %   }
 %   For UTF-8 engines, it may be possible to use better symbols than those set
-%   up as standard.
+%   up as standard. Unicode normalises both the ohm and {\aa}ngstr{\"{o}}m
+%   symbols to the appropriate letters, so these are used directly. On the
+%   other hand, micro is distinct from mu, so the proper symbol is selected.
+%   The single degree Celsius symbol is a compatibility character, and so
+%   the two separate glyphs \enquote{degree} and \enquote{C} are used.
 %    \begin{macrocode}
 \pdftex_if_engine:F
   {
@@ -15228,17 +15235,19 @@ This work consists of the file  siunitx.dtx
       {
         \@ifpackageloaded { fontspec }
           {
-            \int_const:Nn \c_siunitx_degree_int   { 176 }
-            \int_const:Nn \c_siunitx_micro_int    { 181 }
-            \int_const:Nn \c_siunitx_angstrom_int { 197 }
-            \int_const:Nn \c_siunitx_celsius_int  { 8451 }
-            \int_const:Nn \c_siunitx_ohm_int      { 8486 }
+            \int_const:Nn \c_siunitx_degree_int    { 176 }
+            \int_const:Nn \c_siunitx_micro_int     { 181 }
+            \int_const:Nn \c_siunitx_angstrom_int  { 197 }
+            \int_const:Nn \c_siunitx_ohm_int       { 937 }
             \siunitx_option_unchanged:Nnn \l_siunitx_angstrom_math_tl
               { \text { \AA } }
               { \tex_char:D \c_siunitx_angstrom_int }
             \siunitx_option_unchanged:Nnn \l_siunitx_celsius_math_tl
               { { } ^ { \circ } \kern - \scriptspace \text { C } }
-              { \tex_char:D \c_siunitx_celsius_int }
+              {
+                \tex_char:D \c_siunitx_degree_int
+                C
+              }
             \siunitx_option_unchanged:Nnn \l_siunitx_degree_math_tl
               { { } ^ { \circ } }
               { \tex_char:D \c_siunitx_degree_int }
@@ -15256,7 +15265,10 @@ This work consists of the file  siunitx.dtx
                 \ensuremath
                   { { } ^ { \circ } \kern - \scriptspace \text { C } }
               }
-              { \tex_char:D \c_siunitx_celsius_int }
+              {
+                \tex_char:D \c_siunitx_degree_int
+                C
+              }
             \siunitx_option_unchanged:Nnn \l_siunitx_degree_text_tl
               { \ensuremath { { } ^ { \circ } } }
               { \tex_char:D \c_siunitx_degree_int }
@@ -15266,6 +15278,28 @@ This work consists of the file  siunitx.dtx
             \siunitx_option_unchanged:Nnn \l_siunitx_ohm_text_tl
               { \ensuremath { \c_siunitx_omega_tl } }
               { \tex_char:D \c_siunitx_ohm_int }
+          }
+          { }
+%    \end{macrocode}
+%   Slightly more specialised: these only work in math mode with
+%   \pkg{unicode-math}.
+%    \begin{macrocode}
+        \@ifpackageloaded { unicode-math }
+          {
+            \int_const:Nn \c_siunitx_arcminute_int { 8242 }
+            \int_const:Nn \c_siunitx_arcsecond_int { 8243 }
+            \siunitx_option_unchanged:Nnn \l_siunitx_arcminute_math_tl
+              { { } ^ { \prime } }
+              { \ensuremath { \tex_char:D \c_siunitx_arcminute_int } }
+            \siunitx_option_unchanged:Nnn \l_siunitx_arcsecond_math_tl
+              { { } ^ { \prime \prime } }
+              { \ensuremath { \tex_char:D \c_siunitx_arcsecond_int } }
+            \siunitx_option_unchanged:Nnn \l_siunitx_arcminute_text_tl
+              { \ensuremath { { } ^ { \prime } } }
+              { \ensuremath { \tex_char:D \c_siunitx_arcminute_int } }
+            \siunitx_option_unchanged:Nnn \l_siunitx_arcsecond_text_tl
+              { \ensuremath { { } ^ { \prime \prime } } }
+              { \ensuremath { \tex_char:D \c_siunitx_arcsecond_int } }
           }
           { }
       }
