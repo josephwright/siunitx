@@ -2959,11 +2959,15 @@ This work consists of the file  siunitx.dtx
 %\DescribeOption{qualifier-mode}
 %\changes{v2.1c}{2010/11/13}{New \opt{text} choice for
 %  \opt{qualifier-mode} option}
+% \changes{v2.6}{2012/06/11}{New \opt{phrase} choice for \opt{qualifier-mode}
+%   option}
+% \DescribeOption{qualifier-phrase}  
+% \changes{v2.6}{2012/06/11}{New \opt{qualifier-phrase} option}
 % Unit qualifiers can be printed in three different formats, set by the
 % \opt{qualifier-mode} option. The standard setting is \opt{subscript},
-% while the options \opt{brackets}, \opt{space} and \opt{text} are also
-% possible. With the last settings, powers can lead to ambiguity and are
-% automatically detected and brackets added as appropriate.
+% while the options \opt{brackets}, \opt{phrase}, \opt{space} and \opt{text}
+% are also possible. With the last settings, powers can lead to ambiguity and
+% are automatically detected and brackets added as appropriate.
 %\begin{LaTeXdemo}
 %  \si{\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
 %  \si[qualifier-mode = brackets]
@@ -2974,6 +2978,14 @@ This work consists of the file  siunitx.dtx
 %    {\kilogram\polymer\squared\per\mole\catalyst\per\hour}  \\
 %  \si[qualifier-mode = text]
 %    {\deci\bel\isotropic}
+%\end{LaTeXdemo}
+% The \opt{phrase} setting for \opt{qualifier-mode} uses the text stored using
+% \opt{qualifier-phrase} to separate the qualifier.
+%\begin{LaTeXdemo}
+%  \si[qualifier-mode = phrase]
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\
+%  \si[qualifier-mode = phrase, qualifier-phrase = { by }]
+%    {\kilogram\polymer\squared\per\mole\catalyst\per\hour} \\ 
 %\end{LaTeXdemo}
 %
 %\DescribeOption{prefixes-as-symbols}
@@ -3838,7 +3850,7 @@ This work consists of the file  siunitx.dtx
 % the definitions are variations using \cs{text} or \cs{ensuremath} to
 % produce the correct output, as the symbols available in the document
 % may vary considerably. In the case of the micro symbol
-% (\SIUnitSymbolMicro), \pkg{sunitx} provides a suitable low-level
+% (\SIUnitSymbolMicro), \pkg{siunitx} provides a suitable low-level
 % definition for the symbol. Depending on the fonts available, this
 % may need to be replaced by an alternative by the user. The
 % ohm symbol (\SIUnitSymbolOhm) is usually set to \cs{Omega}, but
@@ -11805,7 +11817,8 @@ This work consists of the file  siunitx.dtx
 %  \l_siunitx_unit_denominator_bracket_bool ,
 %  \l_siunitx_unit_product_tl               ,
 %  \l_siunitx_literal_power_bool            ,
-%  \l_siunitx_per_symbol_tl
+%  \l_siunitx_per_symbol_tl                 ,
+%  \l_siunitx_qualifier_phrase_tl
 %}
 % At this stage, output formatting options are created.
 %    \begin{macrocode}
@@ -11871,12 +11884,15 @@ This work consists of the file  siunitx.dtx
   qualifier-mode       .choice:,
   qualifier-mode / brackets .code:n =
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { brackets } },
+  qualifier-mode / phrase   .code:n =
+    { \tl_set:Nn \l_siunitx_qualifier_mode_tl { phrase } },
   qualifier-mode / space .code:n =
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { space } },
   qualifier-mode / subscript .code:n =
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { subscript } },
   qualifier-mode / text      .code:n =
     { \tl_set:Nn \l_siunitx_qualifier_mode_tl { text } },
+  qualifier-phrase     .tl_set:N = \l_siunitx_qualifier_phrase_tl
 }
 \keys_set:nn { siunitx } {
   bracket-unit-denominator     = true,
@@ -11885,7 +11901,8 @@ This work consists of the file  siunitx.dtx
   per-mode                     = reciprocal,
   per-symbol                   = /,
   power-font                   = number,
-  qualifier-mode               = subscript
+  qualifier-mode               = subscript,
+  qualifier-phrase             = { ~ of ~ }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -12413,6 +12430,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\siunitx_unit_format_qualifier:}
 %\begin{macro}[aux]{
 %  \siunitx_unit_format_qualifier_brackets:  ,
+%  \siunitx_unit_format_qualifier_phrase:    ,
 %  \siunitx_unit_format_qualifier_space:     ,
 %  \siunitx_unit_format_qualifier_subscript: ,
 %  \siunitx_unit_format_qualifier_text:
@@ -12439,6 +12457,14 @@ This work consists of the file  siunitx.dtx
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
   \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_bracket_close_tl
 }
+\cs_new_protected_nopar:Npn \siunitx_unit_format_qualifier_phrase:
+  {
+    \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_qualifier_phrase_tl
+    \tl_put_right:NV \l_siunitx_unit_current_tl \l_siunitx_tmpa_tl
+    \tl_set:Nx \l_siunitx_tmpa_tl
+      { bracket- \int_use:N \l_siunitx_unit_int }
+    \prop_put:NVn \l_siunitx_unit_prop \l_siunitx_tmpa_tl { true }
+  }
 \char_set_catcode_active:N \~
 \cs_new_protected:Npn \siunitx_unit_format_qualifier_space: {
   \tl_put_right:Nn \l_siunitx_unit_current_tl { \text { ~ } }
