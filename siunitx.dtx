@@ -587,6 +587,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5c}{2012/05/03}{Detect entirely empty cells in \texttt{s} columns}
 %\changes{v2.5d}{2012/06/11}{Extend range of settings automatically altered
 %  to use UTF-8 values is appropriate}
+%\changes{v2.5e}{2012/06/13}{Fix an internal error in unit expansion,
+%  introduced in v2.4f}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -11460,49 +11462,32 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-% \begin{macro}{\siunitx_unit_if_literal:nTF}
-% \begin{macro}[aux]
-%   {
-%     \siunitx_unit_if_literal_aux:n,
-%     \siunitx_unit_if_literal_aux_std:n,
-%     \siunitx_unit_if_literal_aux_skip:n
-%   }
-%   A test to see if there is anything in the input which is not know to
-%   the package. As the full list of names is rather long and there is no
-%   need to worry about nesting here, the best approach is to look for all
-%   of the implemetation functions. The only issue with that is dealing with
-%   the non-standard names, which are sorted out using a set up to gobble
-%   their argument.
+%\begin{macro}{\siunitx_unit_if_literal:nTF}
+%\begin{macro}[aux]{\siunitx_unit_if_literal_aux:N}
+% A test is needed to see if the input only contains unit macros. This
+% is done by altering setting all of the unit macros to expand to
+% nothing at all. Thus there will only be anything left if there is
+% a literal in the unit.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_if_literal:nTF #1
-  {
-    \bool_set_false:N \l_siunitx_tmp_bool
-    \tl_map_function:nN {#1} \siunitx_unit_if_literal_aux:n
-    \bool_if:NTF \l_siunitx_tmp_bool
-  }
-\cs_new_protected:Npn \siunitx_unit_if_literal_aux_std:n #1
- {
-   \cs_if_exist:cF { siunitx_ \tl_to_str:o { \token_to_str:N #1 } _function:w }
-     {
-       \bool_set_true:N \l_siunitx_tmp_bool
-       \tl_map_break:
-     }
-   \tl_if_in:nnT { \of \highlight \raiseto \tothe } {#1}
-     {
-       \cs_set_eq:NN \siunitx_unit_if_literal_aux:n
-         \siunitx_unit_if_literal_aux_skip:n
-     }
- }
-\cs_new_protected:Npn \siunitx_unit_if_literal_aux_skip:n #1
-  {
-    \cs_set_eq:NN \siunitx_unit_if_literal_aux:n
-      \siunitx_unit_if_literal_aux_std:n
-  }
-\cs_new_eq:NN \siunitx_unit_if_literal_aux:n \siunitx_unit_if_literal_aux_std:n
-\cs_generate_variant:Nn \tl_to_str:n { o }
+\cs_new_protected:Npn \siunitx_unit_if_literal:nTF #1#2#3 {
+  \group_begin:
+    \seq_map_function:NN \l_siunitx_declare_list_seq
+      \siunitx_unit_if_literal_aux:N
+    \cs_set_eq:NN \of \use_none:n
+    \cs_set_eq:NN \highlight \use_none:n
+    \cs_set_eq:NN \raiseto \use_none:n
+    \cs_set_eq:NN \tothe \use_none:n
+    \protected@edef \l_siunitx_tmpa_tl {#1}
+  \exp_args:NNNV \group_end:
+  \tl_set:Nn \l_siunitx_tmpa_tl \l_siunitx_tmpa_tl
+  \tl_if_empty:NTF \l_siunitx_tmpa_tl {#3} {#2}
+}
+\cs_new_protected:Npn \siunitx_unit_if_literal_aux:N #1 {
+  \cs_set_eq:NN #1 \prg_do_nothing:
+}
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+%\end{macro}
+%\end{macro}
 %
 %\subsection{Parsing macro units}
 %
