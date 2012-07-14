@@ -6380,7 +6380,7 @@ This work consists of the file  siunitx.dtx
   {
     \cs_set:Npn \siunitx_print_text_sub_super:n ##1
       {
-      \ensuremath
+        \ensuremath
           {
             \sb { \text {#1} }
             \sp { \text {##1} }
@@ -6394,7 +6394,7 @@ This work consists of the file  siunitx.dtx
       }
     \cs_set:Npn \__peek_true_aux:w { \siunitx_print_text_sub_super:n }
     \cs_set:Npn \__peek_false:w  { \ensuremath { \sb { \text {#1} } } }
-    \peek_after:Nw \peek_execute_branches_meaning:
+    \peek_after:Nw \__peek_execute_branches_meaning:
   }
 \cs_new_protected:Npn \siunitx_print_text_sub_super:n { }
 \cs_new_protected:Npn \siunitx_print_text_super:n #1 {
@@ -13369,7 +13369,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_table_collect_get: {
   \cs_set_eq:NN \siunitx_table_collect_next:
     \siunitx_table_collect_get:
-  \cs_set:Npn \peek_execute_branches:
+  \cs_set:Npn \__peek_execute_branches:
     {
       \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
         \exp_after:wN \siunitx_table_collect_braced:n
@@ -13377,7 +13377,7 @@ This work consists of the file  siunitx.dtx
         \exp_after:wN \siunitx_table_collect_not_braced:N
       \fi:
     }
-  \peek_after:Nw \peek_ignore_spaces_execute_branches:
+  \peek_after:Nw \__peek_ignore_spaces_execute_branches:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -14845,7 +14845,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \siunitx_table_print_S_direct:N #1
   {
     #1
-    \cs_set:Npn \peek_execute_branches:
+    \cs_set:Npn \__peek_execute_branches:
       {
         \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
           \exp_after:wN \siunitx_table_print_S_direct_text:n
@@ -14854,7 +14854,7 @@ This work consists of the file  siunitx.dtx
           \exp_after:wN \siunitx_table_print_S_direct_main:
         \fi:
       }
-    \peek_after:Nw \peek_ignore_spaces_execute_branches:
+    \peek_after:Nw \__peek_ignore_spaces_execute_branches:
   }
 \cs_new_protected:Npn \siunitx_table_print_S_direct_text:n #1
   {
