@@ -2715,6 +2715,7 @@ This work consists of the file  siunitx.dtx
 %\end{center}
 %
 % \DescribeOption{binary-units}
+% \changes{v2.5g}{2012/07/22}{Fix \opt{binary-units} option}
 % \DescribeMacro{\bit}
 % \DescribeMacro{\byte}
 % Binary data is expressed in units of bits and bytes. These are
@@ -16373,21 +16374,22 @@ This work consists of the file  siunitx.dtx
       true        .code:n    = { \@@_load_abbreviations: },
     abbreviations /
       false       .code:n    =
-      { \cs_set_eq:NN \@@_load_abbreviations: \prg_do_nothing: } ,
+        { \cs_set_eq:NN \@@_load_abbreviations: \prg_do_nothing: } ,
     abbreviations .default:n = true ,
     binary-units  .choice:,
     binary-units  /
       true        .code:n    = { \@@_load_binary: },
     binary-units  /
-      false       .code:n    = { } ,
+      false       .code:n    =
+        { \cs_set_eq:NN \@@_load_binary: \prg_do_nothing: } ,
     binary-units  .default:n = true
   }
-\cs_new_protected:Npn \@@_load_abbreviations:
+\cs_new_protected_nopar:Npn \@@_load_abbreviations:
   {
     \@onefilewithoptions { siunitx-abbreviations } [ ] [ ]
       \c_@@_configuration_ext_tl
   }
-\cs_new_protected:Npn \@@_load_binary:
+\cs_new_protected_nopar:Npn \@@_load_binary:
   {
     \@onefilewithoptions { siunitx-binary } [ ] [ ]
       \c_@@_configuration_ext_tl
