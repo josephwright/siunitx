@@ -590,6 +590,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5e}{2012/06/13}{Fix an internal error in unit expansion,
 %  introduced in v2.4f}
 %\changes{v2.5f}{2012/07/16}{Track changes in \pkg{expl3}}
+%\changes{v2.5g}{2012/08/28}{Alter literal unit test to allow spaces in
+%  units to be ignored}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5164,6 +5166,13 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\clist_map_function:nc}
 %    \begin{macrocode}
 \cs_generate_variant:Nn \clist_map_function:nN { nc }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\tl_if_blank:VTF}
+%   Needed for the literal test.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \tl_if_blank:nTF { V } 
 %    \end{macrocode}
 % \end{macro}
 %
@@ -11486,7 +11495,7 @@ This work consists of the file  siunitx.dtx
     \protected@edef \l_@@_tmpa_tl {#1}
   \exp_args:NNNV \group_end:
   \tl_set:Nn \l_@@_tmpa_tl \l_@@_tmpa_tl
-  \tl_if_empty:NTF \l_@@_tmpa_tl {#3} {#2}
+  \tl_if_blank:VTF \l_@@_tmpa_tl {#3} {#2}
 }
 \cs_new_protected:Npn \@@_unit_if_literal_aux:N #1 {
   \cs_set_eq:NN #1 \prg_do_nothing:
