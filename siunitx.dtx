@@ -595,6 +595,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5i}{2012/09/11}{Fix alignment of values without uncertainties in
 %  columns where space is reserved for uncertainties}
 %\changes{v2.5j}{2012/09/18}{Fix rounding when uncertainties are present}
+%\changes{v2.5k}{2012/09/20}{Store fraction function as a macro rather than
+%  using \cs{let}: fixes a warning with \pkg{amsmath}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -10144,7 +10146,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   fraction-function  .code:n     =
-     { \cs_set_eq:NN \@@_fraction:nn #1 },
+     { \cs_set_protected:Npn \@@_fraction:nn {#1} },
   output-product     .tl_set:N   = \l_@@_output_product_tl,
   output-quotient    .tl_set:N   = \l_@@_output_quotient_tl,
   parse-numbers      .bool_set:N = \l_@@_number_parse_bool,
