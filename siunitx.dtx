@@ -602,6 +602,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5m}{2012/11/27}{Fix bug with UTF8 engines and literal units}
 %\changes{v2.5m}{2012/11/27}{Handle \cs{highlight} correctly in bookmarks}
 %\changes{v2.5m}{2012/11/27}{Load \opt{binary-units} only if requested}
+%\changes{v2.5m}{2012/11/27}{Allow for right-to-left mode with \pkg{bidi}
+%  package}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5611,6 +5613,24 @@ This work consists of the file  siunitx.dtx
       { }
   }
 %    \end{macrocode}
+%    
+% \begin{macro}{\@@_ensure_ltr:n}
+%   When the \pkg{bidi} package is loaded with \XeTeX{} we need to make sure
+%   that \cs{text} is doing the correct thing. The \pkg{bidi} package seems to
+%   lead to a slightly broken \cs{text}, so this is something of a hack.
+%    \begin{macrocode}
+\cs_new_eq:NN \@@_ensure_ltr:n \use:n
+\AtBeginDocument
+  {
+     \@ifpackageloaded { bidi }
+       {
+         \xetex_if_engine:T
+           { \cs_set_protected:Npn \@@_ensure_ltr:n #1 { \LRE {#1} } }
+       }
+       { }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\@@_textsuperscript:n}
 %   This function is set up here so that it can be redefined
@@ -6287,22 +6307,26 @@ This work consists of the file  siunitx.dtx
 % function is called. Everything is inside \cs{text} as this allows
 % proper setting of the various mode settings.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_aux: {
-  \text
-    {
-      \@@_print_color:
-      \@@_font_shape:
-      \@@_font_weight:
-      \use:c
-        {
-          @@_ \l_@@_print_type_tl _
-          text \l_@@_font_family_tl :
-        }
-      \bool_if:NTF \l_@@_font_math_mode_bool
-        { \@@_print_math: }
-        { \@@_print_text: }
-    }
-}
+\cs_new_protected:Npn \@@_print_aux:
+  {
+    \text
+      {
+        \@@_ensure_ltr:n
+          {
+            \@@_print_color:
+            \@@_font_shape:
+            \@@_font_weight:
+            \use:c
+              {
+                @@_ \l_@@_print_type_tl _
+                text \l_@@_font_family_tl :
+              }
+            \bool_if:NTF \l_@@_font_math_mode_bool
+              { \@@_print_math: }
+              { \@@_print_text: }
+          }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
