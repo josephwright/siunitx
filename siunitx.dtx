@@ -599,6 +599,7 @@ This work consists of the file  siunitx.dtx
 %  using \cs{let}: fixes a warning with \pkg{amsmath}}
 %\changes{v2.5k}{2012/11/13}{Skip spaces correctly after start of document}
 %\changes{v2.5l}{2012/11/21}{Track changes in \pkg{expl3}}
+%\changes{v2.5m}{2012/11/27}{Fix bug with UTF8 engines and literal units}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12203,10 +12204,7 @@ This work consists of the file  siunitx.dtx
   \@@_unit_format_literal_extras_aux:nN #1#2 {
   \char_set_lccode:nn { `\@ } {#1}
   \tl_to_lowercase:n
-    {
-      \tl_replace_all:NnV \l_@@_unit_tl { @ }
-        \l_@@_unit_tl
-    }
+    { \tl_replace_all:NnV \l_@@_unit_tl { @ } #2 }
 }
 \pdftex_if_engine:T
   {
