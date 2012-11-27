@@ -601,6 +601,7 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5l}{2012/11/21}{Track changes in \pkg{expl3}}
 %\changes{v2.5m}{2012/11/27}{Fix bug with UTF8 engines and literal units}
 %\changes{v2.5m}{2012/11/27}{Handle \cs{highlight} correctly in bookmarks}
+%\changes{v2.5m}{2012/11/27}{Load \opt{binary-units} only if requested}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -16397,7 +16398,7 @@ This work consists of the file  siunitx.dtx
     abbreviations .default:n = true ,
     binary-units  .choice:,
     binary-units  /
-      true        .code:n    = { \@@_load_binary: },
+      true        .code:n    = { \AtBeginDocument { \@@_load_binary: } },
     binary-units  /
       false       .code:n    =
         { \cs_set_eq:NN \@@_load_binary: \prg_do_nothing: } ,
@@ -16413,11 +16414,7 @@ This work consists of the file  siunitx.dtx
     \@onefilewithoptions { siunitx-binary } [ ] [ ]
       \c_@@_configuration_ext_tl
   }
-\AtBeginDocument
-  {
-    \@@_load_abbreviations:
-    \@@_load_binary:
-  }
+\AtBeginDocument { \@@_load_abbreviations: }
 \@@_option_deactivate:n { abbreviations , binary }
 %    \end{macrocode}
 % \end{macro}
