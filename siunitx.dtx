@@ -135,7 +135,7 @@ This work consists of the file  siunitx.dtx
 \fi
 %</internal>
 %<*driver|package>
-\RequirePackage{expl3}
+\RequirePackage{expl3,xparse}
 %</driver|package>
 %<*driver>
 \documentclass[german,french,english,UKenglish]{l3doc}
@@ -589,9 +589,21 @@ This work consists of the file  siunitx.dtx
 %  to use UTF-8 values is appropriate}
 %\changes{v2.5e}{2012/06/13}{Fix an internal error in unit expansion,
 %  introduced in v2.4f}
+%\changes{v2.5f}{2012/07/16}{Track changes in \pkg{expl3}}
+%\changes{v2.5h}{2012/08/28}{Alter literal unit test to allow spaces in
+%  units to be ignored}
 %\changes{v2.5i}{2012/09/11}{Fix alignment of values without uncertainties in
 %  columns where space is reserved for uncertainties}
 %\changes{v2.5j}{2012/09/18}{Fix rounding when uncertainties are present}
+%\changes{v2.5k}{2012/09/20}{Store fraction function as a macro rather than
+%  using \cs{let}: fixes a warning with \pkg{amsmath}}
+%\changes{v2.5k}{2012/11/13}{Skip spaces correctly after start of document}
+%\changes{v2.5l}{2012/11/21}{Track changes in \pkg{expl3}}
+%\changes{v2.5m}{2012/11/27}{Fix bug with UTF8 engines and literal units}
+%\changes{v2.5m}{2012/11/27}{Handle \cs{highlight} correctly in bookmarks}
+%\changes{v2.5m}{2012/11/27}{Load \opt{binary-units} only if requested}
+%\changes{v2.5m}{2012/11/27}{Allow for right-to-left mode with \pkg{bidi}
+%  package}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -2654,8 +2666,8 @@ This work consists of the file  siunitx.dtx
 %
 %      \midrule
 %
-%      \DescribeNamedUnit{newton}{N}       \\
 %      \DescribeNamedUnit{millinewton}{mN} \\
+%      \DescribeNamedUnit{newton}{N}       \\
 %      \DescribeNamedUnit{kilonewton}{kN}  \\
 %      \DescribeNamedUnit{meganewton}{MN}  \\
 %
@@ -2717,6 +2729,7 @@ This work consists of the file  siunitx.dtx
 %\end{center}
 %
 % \DescribeOption{binary-units}
+% \changes{v2.5g}{2012/07/22}{Fix \opt{binary-units} option}
 % \DescribeMacro{\bit}
 % \DescribeMacro{\byte}
 % Binary data is expressed in units of bits and bytes. These are
@@ -3752,9 +3765,9 @@ This work consists of the file  siunitx.dtx
 %        s[table-unit-alignment = left]
 %      }
 %      \toprule
-%        {Left-aligned}  &
+%        {Right-aligned}  &
 %        {Centred text}  &
-%        {Right-aligned} \\
+%        {Left-aligned} \\
 %      \midrule
 %        \metre\per\second & \metre\per\second & \metre\per\second \\
 %        \kilogram         & \kilogram         & \kilogram         \\
@@ -5101,7 +5114,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2012/06/13} {2.5e}
+\ProvidesExplPackage {siunitx} {2012/11/27} {2.5m}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -5109,13 +5122,13 @@ This work consists of the file  siunitx.dtx
 % This will also trap any problems with \pkg{l3packages} (as the two are now
 % tied together, version-wise).
 %    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2011/09/05 }
+\@ifpackagelater { expl3 } { 2012/11/21 }
   { }
   {
-    \PackageError { siunitx } { Support~package~expl3~too~old. }
+    \PackageError { siunitx } { Support~package~expl3~too~old }
       {
         You~need~to~update~your~installation~of~the~bundles~'l3kernel'~and~
-        'l3packages'.\\
+        'l3packages'.\MessageBreak
         Loading~siunitx~will~abort!
       }
     \tex_endinput:D
@@ -5165,6 +5178,13 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\clist_map_function:nc}
 %    \begin{macrocode}
 \cs_generate_variant:Nn \clist_map_function:nN { nc }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\tl_if_blank:VTF}
+%   Needed for the literal test.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \tl_if_blank:nTF { V } 
 %    \end{macrocode}
 % \end{macro}
 %
@@ -5593,6 +5613,24 @@ This work consists of the file  siunitx.dtx
       { }
   }
 %    \end{macrocode}
+%    
+% \begin{macro}{\@@_ensure_ltr:n}
+%   When the \pkg{bidi} package is loaded with \XeTeX{} we need to make sure
+%   that \cs{text} is doing the correct thing. The \pkg{bidi} package seems to
+%   lead to a slightly broken \cs{text}, so this is something of a hack.
+%    \begin{macrocode}
+\cs_new_eq:NN \@@_ensure_ltr:n \use:n
+\AtBeginDocument
+  {
+     \@ifpackageloaded { bidi }
+       {
+         \xetex_if_engine:T
+           { \cs_set_protected:Npn \@@_ensure_ltr:n #1 { \LRE {#1} } }
+       }
+       { }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\@@_textsuperscript:n}
 %   This function is set up here so that it can be redefined
@@ -5660,10 +5698,12 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\tl_put_right:Nn \document {
-  \@@_set_math_fam:n { sf }
-  \@@_set_math_fam:n { tt }
-}
+\tl_put_right:Nn \document 
+  {
+    \@@_set_math_fam:n { sf }
+    \@@_set_math_fam:n { tt }
+    \ignorespaces
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -5895,7 +5935,7 @@ This work consists of the file  siunitx.dtx
     { \cs_set:Npn \@@_font_weight: { \lseries } }
 }
 \cs_new_protected:Npn \@@_detect_font_weight_text: {
-  \tl_set:Nx \l_@@_tmpa_tl { \tl_head:V \f@series }
+  \tl_set:Nx \l_@@_tmpa_tl { \tl_head:N \f@series }
   \str_if_eq:VnT \l_@@_tmpa_tl { b }
     {
       \cs_set:Npn \@@_font_weight:
@@ -6267,22 +6307,26 @@ This work consists of the file  siunitx.dtx
 % function is called. Everything is inside \cs{text} as this allows
 % proper setting of the various mode settings.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_aux: {
-  \text
-    {
-      \@@_print_color:
-      \@@_font_shape:
-      \@@_font_weight:
-      \use:c
-        {
-          @@_ \l_@@_print_type_tl _
-          text \l_@@_font_family_tl :
-        }
-      \bool_if:NTF \l_@@_font_math_mode_bool
-        { \@@_print_math: }
-        { \@@_print_text: }
-    }
-}
+\cs_new_protected:Npn \@@_print_aux:
+  {
+    \text
+      {
+        \@@_ensure_ltr:n
+          {
+            \@@_print_color:
+            \@@_font_shape:
+            \@@_font_weight:
+            \use:c
+              {
+                @@_ \l_@@_print_type_tl _
+                text \l_@@_font_family_tl :
+              }
+            \bool_if:NTF \l_@@_font_math_mode_bool
+              { \@@_print_math: }
+              { \@@_print_text: }
+          }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -7585,12 +7629,12 @@ This work consists of the file  siunitx.dtx
   {
     \str_if_eq:nnTF {#1} { 0 }
       {
-        \tl_set:Nf \l_@@_tmpa_tl
-          { \tl_tail:V \l_@@_tmpa_tl }
+        \tl_set:Nx \l_@@_tmpa_tl
+          { \tl_tail:N \l_@@_tmpa_tl }
         \tl_if_empty:NF \l_@@_tmpb_tl
           {
-            \tl_set:Nf \l_@@_tmpb_tl
-              { \tl_tail:V \l_@@_tmpb_tl }
+            \tl_set:Nx \l_@@_tmpb_tl
+              { \tl_tail:N \l_@@_tmpb_tl }
           }
       }
       { \tl_map_break: }
@@ -8040,7 +8084,7 @@ This work consists of the file  siunitx.dtx
     \int_compare:nNnF \l_@@_round_int > \c_one
       {
         \int_set:Nn \l_@@_tmp_int
-          { \tl_head:V \l_@@_round_integer_in_tl }
+          { \tl_head:N \l_@@_round_integer_in_tl }
         \@@_number_process_round_up:
         \int_compare:nNnTF \l_@@_round_int = \c_one
           {
@@ -8059,7 +8103,7 @@ This work consists of the file  siunitx.dtx
       }
     \int_decr:N \l_@@_round_int
     \tl_set:Nx \l_@@_round_integer_in_tl
-      { \tl_tail:V \l_@@_round_integer_in_tl }
+      { \tl_tail:N \l_@@_round_integer_in_tl }
     \tl_if_empty:NF \l_@@_round_integer_in_tl
       { \@@_number_process_figures_integer: }
   }
@@ -8426,7 +8470,7 @@ This work consists of the file  siunitx.dtx
   {
     \prop_get:NnNT \l_@@_number_in_prop { #1 -decimal } \l_@@_tmpa_tl
       {
-        \int_compare:nNnTF { \tl_head:V \l_@@_tmpa_tl } > \c_four
+        \int_compare:nNnTF { \tl_head:N \l_@@_tmpa_tl } > \c_four
           {
             \prop_get:NnNTF \l_@@_number_in_prop { #1 -integer }
               \l_@@_tmpb_tl
@@ -8436,7 +8480,7 @@ This work consists of the file  siunitx.dtx
                 \bool_if:NF \l_@@_round_half_up_bool
                   {
                     \int_compare:nNnT
-                      { 0 \tl_tail:V \l_@@_tmpa_tl } = \c_zero
+                      { 0 \tl_tail:N \l_@@_tmpa_tl } = \c_zero
                       {
                         \int_if_odd:nT \l_@@_tmpb_tl
                           {
@@ -8531,9 +8575,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_number_process_places_integer:n #1
   {
     \int_set:Nn \l_@@_tmp_int
-      { \tl_head:V \l_@@_round_integer_in_tl }
+      { \tl_head:N \l_@@_round_integer_in_tl }
     \tl_set:Nx \l_@@_round_integer_in_tl
-      { \tl_tail:V \l_@@_round_integer_in_tl }
+      { \tl_tail:N \l_@@_round_integer_in_tl }
     \@@_number_process_round_up:
     \bool_set_false:N \l_@@_round_bool
     \int_compare:nNnT \l_@@_tmp_int = \c_ten
@@ -8586,9 +8630,9 @@ This work consists of the file  siunitx.dtx
     \int_compare:nNnF \l_@@_round_int > \c_one
       { \@@_number_process_round_decimal_aux: }
     \tl_put_right:Nx \l_@@_round_discard_tl
-      { \tl_head:V \l_@@_round_decimal_in_tl }
+      { \tl_head:N \l_@@_round_decimal_in_tl }
     \tl_set:Nx \l_@@_round_decimal_in_tl
-      { \tl_tail:V \l_@@_round_decimal_in_tl }
+      { \tl_tail:N \l_@@_round_decimal_in_tl }
     \int_decr:N \l_@@_round_int
   }
 %    \end{macrocode}
@@ -8602,7 +8646,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_number_process_round_decimal_aux:
   {
     \int_set:Nn \l_@@_tmp_int
-      { \tl_head:V \l_@@_round_decimal_in_tl }
+      { \tl_head:N \l_@@_round_decimal_in_tl }
     \@@_number_process_round_up:
     \int_compare:nNnTF \l_@@_round_int = \c_one
       {
@@ -10133,7 +10177,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
   fraction-function  .code:n     =
-     { \cs_set_eq:NN \@@_fraction:nn #1 },
+     { \cs_set_protected:Npn \@@_fraction:nn {#1} },
   output-product     .tl_set:N   = \l_@@_output_product_tl,
   output-quotient    .tl_set:N   = \l_@@_output_quotient_tl,
   parse-numbers      .bool_set:N = \l_@@_number_parse_bool,
@@ -11486,7 +11530,7 @@ This work consists of the file  siunitx.dtx
     \protected@edef \l_@@_tmpa_tl {#1}
   \exp_args:NNNV \group_end:
   \tl_set:Nn \l_@@_tmpa_tl \l_@@_tmpa_tl
-  \tl_if_empty:NTF \l_@@_tmpa_tl {#3} {#2}
+  \tl_if_blank:VTF \l_@@_tmpa_tl {#3} {#2}
 }
 \cs_new_protected:Npn \@@_unit_if_literal_aux:N #1 {
   \cs_set_eq:NN #1 \prg_do_nothing:
@@ -12186,10 +12230,7 @@ This work consists of the file  siunitx.dtx
   \@@_unit_format_literal_extras_aux:nN #1#2 {
   \char_set_lccode:nn { `\@ } {#1}
   \tl_to_lowercase:n
-    {
-      \tl_replace_all:NnV \l_@@_unit_tl { @ }
-        \l_@@_unit_tl
-    }
+    { \tl_replace_all:NnV \l_@@_unit_tl { @ } #2 }
 }
 \pdftex_if_engine:T
   {
@@ -13587,7 +13628,7 @@ This work consists of the file  siunitx.dtx
 %   A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
 \skip_new:N \c_@@_one_fill_skip
-\skip_set:Nn \c_@@_one_fill_skip { \c_zero_skip plus 1 fill }
+\skip_set:Nn \c_@@_one_fill_skip { \c_zero_dim plus 1 fill }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -13601,7 +13642,7 @@ This work consists of the file  siunitx.dtx
       {
         \cs_new_protected:Npn \@@_table_colortbl_correction:
           {
-            \skip_horizontal:n { \c_zero_skip plus -0.5 fill }
+            \skip_horizontal:n { \c_zero_dim plus -0.5 fill }
             \tex_kern:D \c_zero_skip
           }
       }
@@ -13701,7 +13742,7 @@ This work consists of the file  siunitx.dtx
       center             .code:n =
         {
           \skip_set:Nn \l_@@_table_unit_align_skip
-            { \c_zero_skip plus 0.5 fill }
+            { \c_zero_dim plus 0.5 fill }
         },
     table-unit-alignment /
       left               .code:n =
@@ -13710,7 +13751,7 @@ This work consists of the file  siunitx.dtx
         right            .code:n =
           {
             \skip_set:Nn \l_@@_table_unit_align_skip
-              { \c_zero_skip plus 1 fill }
+              { \c_zero_dim plus 1 fill }
           }
   }
 \keys_set:nn { siunitx } { table-unit-alignment = center }
@@ -13873,7 +13914,7 @@ This work consists of the file  siunitx.dtx
       center                  .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_skip plus 0.5 fill }
+            { \c_zero_dim plus 0.5 fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_reserved:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -13883,7 +13924,7 @@ This work consists of the file  siunitx.dtx
       center-decimal-marker   .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_skip plus 0.5 fill }
+            { \c_zero_dim plus 0.5 fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_centered:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -13902,7 +13943,7 @@ This work consists of the file  siunitx.dtx
       right                 .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_skip plus 1 fill }
+            { \c_zero_dim plus 1 fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_reserved:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -13915,7 +13956,7 @@ This work consists of the file  siunitx.dtx
       center                  .code:n     =
         {
           \skip_set:Nn \l_@@_table_text_align_skip
-            { \c_zero_skip plus 0.5 fill }
+            { \c_zero_dim plus 0.5 fill }
         },
     table-text-alignment /
       left                    .code:n     =
@@ -13924,7 +13965,7 @@ This work consists of the file  siunitx.dtx
       right                   .code:n     =
         {
           \skip_set:Nn \l_@@_table_text_align_skip
-            { \c_zero_skip plus 1 fill }
+            { \c_zero_dim plus 1 fill }
         },
     table-comparator          .choice:,
     table-comparator /
@@ -14248,7 +14289,7 @@ This work consists of the file  siunitx.dtx
         }
       }
     \dim_compare:nNnT
-      { \box_wd:N \l_@@_table_pre_box } = \c_zero_skip
+      { \box_wd:N \l_@@_table_pre_box } = \c_zero_dim
       {
         \l_@@_table_collect_pre_tl
         \bool_set_false:N \l_@@_font_set_bool
@@ -14435,7 +14476,7 @@ This work consists of the file  siunitx.dtx
         }
       }
     \dim_compare:nNnT
-      { \box_wd:N \l_@@_table_pre_box } = \c_zero_skip
+      { \box_wd:N \l_@@_table_pre_box } = \c_zero_dim
       {
         \l_@@_table_collect_pre_tl
         \bool_set_false:N \l_@@_font_set_bool
@@ -15831,6 +15872,7 @@ This work consists of the file  siunitx.dtx
     \cs_set_eq:NN \SI       \@@_bookmark_SI:w
     \cs_set_eq:NN \SIrange  \@@_bookmark_SIrange:w
     \cs_set_eq:NN \si       \@@_bookmark_si:w
+    \cs_set_eq:NN \highlight \use_ii:nn
     \cs_set_eq:NN \@@_textsuperscript:n \use:n
     \cs_set:Npn \SIUnitSymbolAngstrom  { \AA }
     \cs_set:Npn \SIUnitSymbolArcminute { ' }
@@ -16376,30 +16418,27 @@ This work consists of the file  siunitx.dtx
       true        .code:n    = { \@@_load_abbreviations: },
     abbreviations /
       false       .code:n    =
-      { \cs_set_eq:NN \@@_load_abbreviations: \prg_do_nothing: } ,
+        { \cs_set_eq:NN \@@_load_abbreviations: \prg_do_nothing: } ,
     abbreviations .default:n = true ,
     binary-units  .choice:,
     binary-units  /
-      true        .code:n    = { \@@_load_binary: },
+      true        .code:n    = { \AtBeginDocument { \@@_load_binary: } },
     binary-units  /
-      false       .code:n    = { } ,
+      false       .code:n    =
+        { \cs_set_eq:NN \@@_load_binary: \prg_do_nothing: } ,
     binary-units  .default:n = true
   }
-\cs_new_protected:Npn \@@_load_abbreviations:
+\cs_new_protected_nopar:Npn \@@_load_abbreviations:
   {
     \@onefilewithoptions { siunitx-abbreviations } [ ] [ ]
       \c_@@_configuration_ext_tl
   }
-\cs_new_protected:Npn \@@_load_binary:
+\cs_new_protected_nopar:Npn \@@_load_binary:
   {
     \@onefilewithoptions { siunitx-binary } [ ] [ ]
       \c_@@_configuration_ext_tl
   }
-\AtBeginDocument
-  {
-    \@@_load_abbreviations:
-    \@@_load_binary:
-  }
+\AtBeginDocument { \@@_load_abbreviations: }
 \@@_option_deactivate:n { abbreviations , binary }
 %    \end{macrocode}
 % \end{macro}
@@ -16473,7 +16512,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2012/06/13} {2.5e}
+\ProvidesExplFile {siunitx-version-1.cfg} {2012/11/27} {2.5m}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17418,7 +17457,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/06/13} {2.5e}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/11/27} {2.5m}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17600,7 +17639,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2012/06/13} {2.5e}
+\ProvidesExplFile {siunitx-binary.cfg} {2012/11/27} {2.5m}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
