@@ -6420,6 +6420,8 @@ This work consists of the file  siunitx.dtx
 %  \@@_print_text_super:n
 %}
 %\begin{macro}[aux]{\@@_print_text_sub_super:n}
+% \begin{macro}[aux]{\@@_print_text_sub_peek:}
+% \begin{macro}[aux]{\@@_peek_true:, \@@_peek_false:}
 % The appropriate macros for sub- and superscript in text mode ensure
 % the appearance is the same as math mode. The search and replace
 % code for superscripts deals with the case where a literal number has
@@ -6435,18 +6437,27 @@ This work consists of the file  siunitx.dtx
           {
             \sb { \text {#1} }
             \sp { \text {##1} }
-            }
+          }
       }
-    \cs_set_eq:NN \l__peek_search_token \@@_print_text_super:n
-    \cs_set:Npn \__peek_true:w
+    \cs_set_protected_nopar:Npn \@@_peek_true:
       {
-        \tex_afterassignment:D \__peek_true_aux:w
-        \cs_set_eq:NN \__peek_tmp:w
+        \tex_afterassignment:D \@@_print_text_sub_super:n
+        \cs_set_eq:NN \@@_tmp:w
       }
-    \cs_set:Npn \__peek_true_aux:w { \@@_print_text_sub_super:n }
-    \cs_set:Npn \__peek_false:w  { \ensuremath { \sb { \text {#1} } } }
-    \peek_after:Nw \__peek_execute_branches_meaning:
+    \cs_set_protected_nopar:Npn \@@_peek_false:
+      { \ensuremath { \sb { \text {#1} } } }
+    \peek_after:Nw \@@_print_text_sub_peek:
   }
+\cs_new_protected:Npn \@@_print_text_sub_peek:
+  {
+    \if_meaning:w \l_peek_token \@@_print_text_super:n
+      \exp_after:wN \@@_peek_true:
+    \else:
+      \exp_after:wN \@@_peek_false:
+    \fi:
+  }
+\cs_new_protected_nopar:Npn \@@_peek_true: { }
+\cs_new_protected_nopar:Npn \@@_peek_false: { }
 \cs_new_protected:Npn \@@_print_text_sub_super:n { }
 \cs_new_protected:Npn \@@_print_text_super:n #1 {
   \tl_set:Nn \l_@@_tmpa_tl {#1}
@@ -6462,6 +6473,8 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{
 %  \PrintSubscript   ,
