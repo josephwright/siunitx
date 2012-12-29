@@ -604,6 +604,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5m}{2012/11/27}{Load \opt{binary-units} only if requested}
 %\changes{v2.5m}{2012/11/27}{Allow for right-to-left mode with \pkg{bidi}
 %  package}
+%\changes{v2.5n}{2012/12/29}{Fix transmission of grouping information by
+%  \cs{SendSettingsToPgf}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5114,7 +5116,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2012/11/27} {2.5m}
+\ProvidesExplPackage {siunitx} {2012/12/29} {2.5n}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -15406,8 +15408,10 @@ This work consists of the file  siunitx.dtx
     }
   \clist_put_right:Nx \l_@@_pgf_link_clist
     { set~thousands~separator = { \exp_not:V \l_@@_group_sep_tl } }
-  \clist_put_right:Nn \l_@@_pgf_link_clist
-    { min~exponent~for~1000~sep = \int_use:N \l_@@_group_min_int }
+  \clist_put_right:Nx \l_@@_pgf_link_clist
+    {
+       min~exponent~for~1000~sep = \int_eval:n { \l_@@_group_min_int - \c_one } 
+    }
   \bool_if:nF
     {
       \l_@@_group_decimal_bool ||
@@ -15435,15 +15439,12 @@ This work consists of the file  siunitx.dtx
       \clist_put_right:Nn \l_@@_pgf_link_clist
         { showpos = false }
     }
-  \group_begin:
-  \cs_set:Npx \@@_tmp:w
+  \use:x
     {
-      \group_end:
       \exp_not:N \pgfqkeys
         { /pgf/number~format }
         { \exp_not:V \l_@@_pgf_link_clist }
     }
-  \@@_tmp:w
 }
 %    \end{macrocode}
 %\end{macro}
@@ -16525,7 +16526,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2012/11/27} {2.5m}
+\ProvidesExplFile {siunitx-version-1.cfg} {2012/12/29} {2.5n}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17470,7 +17471,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/11/27} {2.5m}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/12/29} {2.5n}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17652,7 +17653,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2012/11/27} {2.5m}
+\ProvidesExplFile {siunitx-binary.cfg} {2012/12/29} {2.5n}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
