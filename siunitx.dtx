@@ -607,6 +607,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.5n}{2012/12/29}{Fix transmission of grouping information by
 %  \cs{SendSettingsToPgf}}
 %\changes{v2.5o}{2013/01/09}{Update internals to track \pkg{expl3} changes}
+%\changes{v2.5p}{2013/02/01}{Fix printing of \cs{pm} and \cs{mp} when used
+%  as signs in text mode}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6400,6 +6402,10 @@ This work consists of the file  siunitx.dtx
     {
       \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
         { \c_@@_minus_tl }
+      \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
+        { \ensuremath { \pm } }
+      \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
+        { \ensuremath { \mp } }
       \cs_set_eq:NN \PrintSubscript   \@@_print_text_sub:n
       \cs_set_eq:NN \PrintSuperscript \@@_print_text_super:n
       \tl_replace_all:Nnn \l_@@_print_arg_tl { @ }
