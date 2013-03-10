@@ -611,6 +611,8 @@ This work consists of the file  siunitx.dtx
 %  as signs in text mode}
 %\changes{v2.5q}{2013/03/10}{Replace active \texttt{-} in numbers with
 %  standard hyphen}
+%\changes{v2.5q}{2013/03/10}{Reorder internals to allow for binary units
+%  in tables}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -16519,18 +16521,19 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
-% The master control macro which occurs at the start of the document.
+% Finally apply the settings given at load time.
+%    \begin{macrocode}
+\ProcessKeysOptions { siunitx }
+%    \end{macrocode}
+%    
+% Creating document commands has to happen here so it is after any load-time
+% changes to the units available.
 %    \begin{macrocode}
 \AtBeginDocument {
   \bool_if:NTF \l_@@_create_free_bool
     { \@@_unit_create_functions: }
     { \@@_unit_create_empty_functions: }
 }
-%    \end{macrocode}
-%
-% Finally apply the settings given at load time.
-%    \begin{macrocode}
-\ProcessKeysOptions { siunitx }
 %    \end{macrocode}
 %
 %    \begin{macrocode}
