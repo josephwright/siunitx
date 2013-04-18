@@ -88,7 +88,7 @@ See http://www.latex-project.org/lppl.txt
 
 \endpreamble
 \postamble
-Copyright (C) 2008-2012 by
+Copyright (C) 2008-2013 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
@@ -606,6 +606,13 @@ This work consists of the file  siunitx.dtx
 %  package}
 %\changes{v2.5n}{2012/12/29}{Fix transmission of grouping information by
 %  \cs{SendSettingsToPgf}}
+%\changes{v2.5o}{2013/01/09}{Update internals to track \pkg{expl3} changes}
+%\changes{v2.5p}{2013/02/01}{Fix printing of \cs{pm} and \cs{mp} when used
+%  as signs in text mode}
+%\changes{v2.5q}{2013/03/10}{Replace active \texttt{-} in numbers with
+%  standard hyphen}
+%\changes{v2.5q}{2013/03/10}{Reorder internals to allow for binary units
+%  in tables}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5116,7 +5123,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2012/12/29} {2.5n}
+\ProvidesExplPackage {siunitx} {2013/03/11} {2.5q}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -6399,6 +6406,10 @@ This work consists of the file  siunitx.dtx
     {
       \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
         { \c_@@_minus_tl }
+      \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
+        { \ensuremath { \pm } }
+      \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
+        { \ensuremath { \mp } }
       \cs_set_eq:NN \PrintSubscript   \@@_print_text_sub:n
       \cs_set_eq:NN \PrintSuperscript \@@_print_text_super:n
       \tl_replace_all:Nnn \l_@@_print_arg_tl { @ }
@@ -6909,14 +6920,23 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\@@_number_in_sign_replace:N}
 % A short spin-out to keep the replacement of tokens clear.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_number_in_sign_replace:N #1 {
-  \tl_replace_all:Nnn #1 { -+ } { \mp }
-  \tl_replace_all:Nnn #1 { +- } { \pm }
-  \tl_replace_all:Nnn #1 { << } { \ll }
-  \tl_replace_all:Nnn #1 { <= } { \le }
-  \tl_replace_all:Nnn #1 { >> } { \gg }
-  \tl_replace_all:Nnn #1 { >= } { \ge }
-}
+\group_begin:
+\char_set_catcode_active:N \*
+\char_set_lccode:nn { `\* } { `\- }
+\tl_to_lowercase:n
+  {
+    \group_end:
+    \cs_new_protected:Npn \@@_number_in_sign_replace:N #1
+      {
+        \tl_replace_all:Nnn #1 { * }  { - }
+        \tl_replace_all:Nnn #1 { -+ } { \mp }
+        \tl_replace_all:Nnn #1 { +- } { \pm }
+        \tl_replace_all:Nnn #1 { << } { \ll }
+        \tl_replace_all:Nnn #1 { <= } { \le }
+        \tl_replace_all:Nnn #1 { >> } { \gg }
+        \tl_replace_all:Nnn #1 { >= } { \ge }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -7261,7 +7281,7 @@ This work consists of the file  siunitx.dtx
                 { complex-integer }
               \@@_number_in_complex_aux:nn
                 { mantissa-decimal-marker } { complex-decimal-marker }
-              \prop_del:Nn \l_@@_number_in_prop { mantissa }
+              \prop_remove:Nn \l_@@_number_in_prop { mantissa }
               \prop_put:Nnn \l_@@_number_in_prop { complex }
                 { true }
             }
@@ -7283,13 +7303,13 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnTF \l_@@_number_in_prop
         { complex-sign }
         { \bool_set_true:N \l_@@_number_in_sign_bool }
-        { \prop_del:Nn \l_@@_number_in_prop { mantissa } }
+        { \prop_remove:Nn \l_@@_number_in_prop { mantissa } }
     }
 }
 \cs_new_protected:Npn \@@_number_in_complex_aux:nn #1#2 {
   \prop_get:NnNT \l_@@_number_in_prop {#1} \l_@@_tmpa_tl
     {
-      \prop_del:Nn  \l_@@_number_in_prop {#1}
+      \prop_remove:Nn  \l_@@_number_in_prop {#1}
       \prop_put:NnV \l_@@_number_in_prop {#2} \l_@@_tmpa_tl
    }
 }
@@ -7528,7 +7548,7 @@ This work consists of the file  siunitx.dtx
               \prop_put:NVV \l_@@_number_in_prop
                 \l_@@_tmpb_tl \l_@@_tmpa_tl
             }
-          \prop_del:NV \l_@@_number_in_prop
+          \prop_remove:NV \l_@@_number_in_prop
             \l_@@_number_part_sign_tl
         }
     }
@@ -7560,7 +7580,7 @@ This work consists of the file  siunitx.dtx
     {
       \prop_if_in:NnF \l_@@_number_in_prop { mantissa }
         {
-          \prop_del:Nn \l_@@_number_in_prop { mantissa-sign }
+          \prop_remove:Nn \l_@@_number_in_prop { mantissa-sign }
           \prop_put:NnV \l_@@_number_in_prop { complex-sign }
             \l_@@_tmpa_tl
         }
@@ -7582,9 +7602,9 @@ This work consists of the file  siunitx.dtx
 % part.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_in_complex_to_uncert:n #1 {
-  \prop_del:Nn \l_@@_number_in_prop { complex }
-  \prop_del:Nn \l_@@_number_in_prop { complex-decimal-marker }
-  \prop_del:Nn \l_@@_number_in_prop { complex-sign }
+  \prop_remove:Nn \l_@@_number_in_prop { complex }
+  \prop_remove:Nn \l_@@_number_in_prop { complex-decimal-marker }
+  \prop_remove:Nn \l_@@_number_in_prop { complex-sign }
   \prop_put:Nnn \l_@@_number_in_prop { uncertainty } { true }
   \prop_get:NnNTF \l_@@_number_in_prop { complex-integer }
     \l_@@_number_uncert_tl
@@ -7599,8 +7619,8 @@ This work consists of the file  siunitx.dtx
         { \@@_number_in_complex_to_uncert_int: }
     }
     { \@@_number_in_complex_to_uncert_dec:n {#1} }
-  \prop_del:Nn \l_@@_number_in_prop { complex-integer }
-  \prop_del:Nn \l_@@_number_in_prop { complex-decimal }
+  \prop_remove:Nn \l_@@_number_in_prop { complex-integer }
+  \prop_remove:Nn \l_@@_number_in_prop { complex-decimal }
 }
 %    \end{macrocode}
 % When the input has an integer part to the uncertainty, the
@@ -7664,9 +7684,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_number_in_complex_to_uncert_pad:
   {
     \int_set:Nn \l_@@_number_uncert_length_int
-      { \tl_length:N \l_@@_tmpa_tl }
+      { \tl_count:N \l_@@_tmpa_tl }
     \int_set:Nn \l_@@_number_mantissa_length_int
-      { \tl_length:N \l_@@_tmpb_tl }
+      { \tl_count:N \l_@@_tmpb_tl }
     \int_compare:nNnTF
       { \l_@@_number_mantissa_length_int }
         > { \l_@@_number_uncert_length_int }
@@ -7906,8 +7926,8 @@ This work consists of the file  siunitx.dtx
           {
             \bool_if:NT \l_@@_omit_uncert_bool
               {
-                \prop_del:Nn \l_@@_number_in_prop { uncertainty }
-                \prop_del:Nn \l_@@_number_in_prop { mantissa-uncertainty }
+                \prop_remove:Nn \l_@@_number_in_prop { uncertainty }
+                \prop_remove:Nn \l_@@_number_in_prop { mantissa-uncertainty }
               }
           }
           { \@@_number_process_round: }
@@ -7916,8 +7936,8 @@ This work consists of the file  siunitx.dtx
     \@@_number_process_integer_digits:
     \bool_if:NT \l_@@_process_drop_exponent_bool
       {
-        \prop_del:Nn \l_@@_number_in_prop { exponent }
-        \prop_del:Nn \l_@@_number_in_prop { exponent-integer }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent-integer }
       }
   }
 %    \end{macrocode}
@@ -7939,10 +7959,10 @@ This work consists of the file  siunitx.dtx
             { \@@_number_process_exponent_aux:n { decimal } }
           \bool_if:NF \l_@@_tmp_bool
             {
-              \prop_del:Nn \l_@@_number_in_prop { exponent }
-              \prop_del:Nn \l_@@_number_in_prop
+              \prop_remove:Nn \l_@@_number_in_prop { exponent }
+              \prop_remove:Nn \l_@@_number_in_prop
                 { exponent-integer }
-              \prop_del:Nn \l_@@_number_in_prop
+              \prop_remove:Nn \l_@@_number_in_prop
                 { exponent-decimal }
              }
         }
@@ -7978,11 +7998,11 @@ This work consists of the file  siunitx.dtx
           { \@@_number_process_figures_aux:n {#1} }
       }
       {
-        \prop_del:Nn \l_@@_number_in_prop { #1 -sign }
+        \prop_remove:Nn \l_@@_number_in_prop { #1 -sign }
         \prop_put:Nnn \l_@@_number_in_prop { #1 -integer } { 0 }
-        \prop_del:Nn \l_@@_number_in_prop { #1 -decimal }
+        \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal }
         \bool_if:NF \l_@@_process_int_to_dec_bool
-          { \prop_del:Nn \l_@@_number_in_prop { #1 -decimal-marker } }
+          { \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal-marker } }
       }
   }
 \cs_new_protected:Npn \@@_number_process_figures_aux:n #1
@@ -8003,7 +8023,7 @@ This work consists of the file  siunitx.dtx
       }
       {
         \prop_put:Nnn \l_@@_number_in_prop { #1 -integer } { 0 }
-        \prop_del:Nn \l_@@_number_in_prop { #1 -decimal }
+        \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal }
       }
   }
 \cs_new_protected:Npn \@@_number_process_figures_init:n #1
@@ -8192,7 +8212,7 @@ This work consists of the file  siunitx.dtx
       {
         \prop_put:NnV \l_@@_number_in_prop { exponent-integer }
           \l_@@_process_fixed_int
-        \prop_del:Nn \l_@@_number_in_prop { exponent-sign }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent-sign }
       }
       {
         \prop_put:Nnx \l_@@_number_in_prop { exponent-integer }
@@ -8227,9 +8247,9 @@ This work consists of the file  siunitx.dtx
             { mantissa-integer } {#1}
           \tl_if_empty:nTF {#2}
             {
-              \prop_del:Nn \l_@@_number_in_prop
+              \prop_remove:Nn \l_@@_number_in_prop
                 { mantissa-decimal }
-              \prop_del:Nn \l_@@_number_in_prop
+              \prop_remove:Nn \l_@@_number_in_prop
                 { mantissa-decimal-marker }
             }
             {
@@ -8338,7 +8358,7 @@ This work consists of the file  siunitx.dtx
           \int_set:Nn \l_@@_tmp_int
             {
                  \l_@@_process_integer_min_int
-              - \tl_length:N \l_@@_tmpa_tl
+              - \tl_count:N \l_@@_tmpa_tl
             }
           \int_compare:nNnT { \l_@@_tmp_int } > { \c_zero }
             {
@@ -8374,9 +8394,9 @@ This work consists of the file  siunitx.dtx
                   \prop_if_in:NnF \l_@@_number_in_prop
                     { mantissa-decimal-marker }
                     {
-                      \prop_del:Nn \l_@@_number_in_prop
+                      \prop_remove:Nn \l_@@_number_in_prop
                         { mantissa }
-                      \prop_del:Nn \l_@@_number_in_prop
+                      \prop_remove:Nn \l_@@_number_in_prop
                         { mantissa-integer }
                     }
                 }
@@ -8453,7 +8473,7 @@ This work consists of the file  siunitx.dtx
               }
               {
                 \int_set:Nn \l_@@_round_int
-                  { \tl_length:N \l_@@_tmpa_tl }
+                  { \tl_count:N \l_@@_tmpa_tl }
                 \@@_number_process_places_aux_ii:n {#1}
               }
           }
@@ -8517,9 +8537,9 @@ This work consists of the file  siunitx.dtx
               }
           }
       }
-    \prop_del:Nn \l_@@_number_in_prop { #1 -decimal }
+    \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal }
     \bool_if:NF \l_@@_process_int_to_dec_bool
-      { \prop_del:Nn \l_@@_number_in_prop { #1 -decimal-marker } }
+      { \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal-marker } }
   }
 %    \end{macrocode}
 % For rounding to a fixed number of places, the package finds the
@@ -8740,8 +8760,8 @@ This work consists of the file  siunitx.dtx
           \l_@@_round_integer_out_tl
         \tl_if_empty:NTF \l_@@_round_decimal_out_tl
           {
-            \prop_del:Nn \l_@@_number_in_prop { #1 -decimal }
-            \prop_del:Nn \l_@@_number_in_prop { #1 -decimal-marker }
+            \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal }
+            \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal-marker }
           }
           {
             \prop_put:NnV \l_@@_number_in_prop { #1 -decimal }
@@ -8755,7 +8775,7 @@ This work consists of the file  siunitx.dtx
     \prop_put:Nnn \l_@@_number_in_prop { comparator } { < }
     \prop_put:Nnn \l_@@_number_in_prop { #4 -integer } {#1}
     \tl_if_empty:nTF {#2}
-      { \prop_del:Nn \l_@@_number_in_prop { #4 -decimal } }
+      { \prop_remove:Nn \l_@@_number_in_prop { #4 -decimal } }
       { \prop_put:Nnn \l_@@_number_in_prop { #4 -decimal } {#2} }
   }
 %    \end{macrocode}
@@ -8876,8 +8896,8 @@ This work consists of the file  siunitx.dtx
     \prop_put:Nnn \l_@@_number_in_prop { mantissa-integer } {#1}
     \tl_if_empty:nTF {#2}
       {
-        \prop_del:Nn \l_@@_number_in_prop { mantissa-decimal }
-        \prop_del:Nn \l_@@_number_in_prop
+        \prop_remove:Nn \l_@@_number_in_prop { mantissa-decimal }
+        \prop_remove:Nn \l_@@_number_in_prop
           { mantissa-decimal-marker }
       }
       {
@@ -8892,9 +8912,9 @@ This work consists of the file  siunitx.dtx
       }
     \int_compare:nNnTF {#3} = { 0 }
       {
-        \prop_del:Nn \l_@@_number_in_prop { exponent }
-        \prop_del:Nn \l_@@_number_in_prop { exponent-sign }
-        \prop_del:Nn \l_@@_number_in_prop { exponent-integer }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent-sign }
+        \prop_remove:Nn \l_@@_number_in_prop { exponent-integer }
       }
       {
         \prop_put:Nnn \l_@@_number_in_prop { exponent } { true }
@@ -8903,7 +8923,7 @@ This work consists of the file  siunitx.dtx
             \int_set:Nn \l_@@_tmp_int {#3}
             \prop_put:NnV \l_@@_number_in_prop
               { exponent-integer } \l_@@_tmp_int
-            \prop_del:Nn \l_@@_number_in_prop { exponent-sign }
+            \prop_remove:Nn \l_@@_number_in_prop { exponent-sign }
           }
           {
             \int_set:Nn \l_@@_tmp_int { 0 - (#3) }
@@ -9067,7 +9087,7 @@ This work consists of the file  siunitx.dtx
     \l_@@_tmpa_tl
   \tl_if_eq:NNT \c_@@_plus_tl \l_@@_tmpa_tl
     {
-      \prop_del:Nn \l_@@_number_in_prop { #1 -sign }
+      \prop_remove:Nn \l_@@_number_in_prop { #1 -sign }
       \prop_put:Nnn \l_@@_number_in_prop { #1 -had-sign } { true }
     }
 }
@@ -9134,7 +9154,7 @@ This work consists of the file  siunitx.dtx
   \prop_get:NnN \l_@@_number_in_prop { #1 - #2 }
     \l_@@_tmpa_tl
   \int_set:cn { l_@@_process_ #2 _int }
-    { \tl_length:N \l_@@_tmpa_tl }
+    { \tl_count:N \l_@@_tmpa_tl }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -9249,8 +9269,8 @@ This work consists of the file  siunitx.dtx
           }
         \bool_if:NT \l_@@_tmp_bool
           {
-            \prop_del:Nn \l_@@_number_in_prop { #1 -decimal }
-            \prop_del:Nn \l_@@_number_in_prop { #1 -decimal-marker }
+            \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal }
+            \prop_remove:Nn \l_@@_number_in_prop { #1 -decimal-marker }
           }
       }
   }
@@ -9274,8 +9294,8 @@ This work consists of the file  siunitx.dtx
           { \tl_put_left:NV \l_@@_tmpa_tl \l_@@_tmpb_tl }
         \prop_get:NnNT \l_@@_unit_prop { prefix-1 } \l_@@_tmpb_tl
           {
-            \prop_del:Nn \l_@@_unit_prop { prefix-1 }
-            \prop_del:Nn \l_@@_unit_prop { prefix-symbol-1 }
+            \prop_remove:Nn \l_@@_unit_prop { prefix-1 }
+            \prop_remove:Nn \l_@@_unit_prop { prefix-symbol-1 }
             \prop_get:NVN \l_@@_prefix_forward_prop \l_@@_tmpb_tl
               \l_@@_tmpb_tl
             \tl_set:Nx \l_@@_tmpa_tl
@@ -9284,7 +9304,7 @@ This work consists of the file  siunitx.dtx
         \prop_get:NVNTF \l_@@_prefix_reverse_prop \l_@@_tmpa_tl
           \l_@@_tmpb_tl
           {
-            \prop_del:Nn \l_@@_number_in_prop { exponent }
+            \prop_remove:Nn \l_@@_number_in_prop { exponent }
             \use:c
               {
                 @@_ \exp_after:wN \token_to_str:N \l_@@_tmpb_tl
@@ -9488,7 +9508,7 @@ This work consists of the file  siunitx.dtx
       \prop_if_in:NnT \l_@@_number_out_prop { #1 -bracket }
         {
           \@@_number_format_brackets_aux:n {#1}
-          \prop_del:Nn \l_@@_number_out_prop { #1 -bracket }
+          \prop_remove:Nn \l_@@_number_out_prop { #1 -bracket }
         }
     }
 }
@@ -9629,7 +9649,7 @@ This work consists of the file  siunitx.dtx
     {
       \prop_put:Nnn \l_@@_number_out_prop { result-bracket }
         { true }
-      \prop_del:Nn \l_@@_number_out_prop { mantissa-bracket }
+      \prop_remove:Nn \l_@@_number_out_prop { mantissa-bracket }
     }
   \prop_if_in:NnT \l_@@_number_out_prop { comparator }
     {
@@ -9779,7 +9799,7 @@ This work consists of the file  siunitx.dtx
   {
     \prop_get:NnN \l_@@_number_in_prop { #1 - #2 } \l_@@_tmpa_tl
     \int_compare:nNnTF
-      { \tl_length:N \l_@@_tmpa_tl } < \l_@@_group_min_int
+      { \tl_count:N \l_@@_tmpa_tl } < \l_@@_group_min_int
       { \@@_number_format_copy:n { #1 - #2 } }
       {
         \tl_clear:N \l_@@_tmpb_tl
@@ -10113,7 +10133,7 @@ This work consists of the file  siunitx.dtx
   \@@_number_format_uncertainty_joined:n #1 {
   \prop_get:NnN \l_@@_number_in_prop { #1 -uncertainty }
     \l_@@_tmpa_tl
-  \prop_del:Nn \l_@@_number_in_prop { #1 -uncertainty }
+  \prop_remove:Nn \l_@@_number_in_prop { #1 -uncertainty }
   \tl_put_left:NV \l_@@_tmpa_tl \l_@@_output_uncert_open_tl
   \tl_put_left:NV \l_@@_tmpa_tl \l_@@_uncert_sep_tl
   \tl_put_right:NV \l_@@_tmpa_tl \l_@@_output_uncert_close_tl
@@ -10897,7 +10917,7 @@ This work consists of the file  siunitx.dtx
   #1#2#3 {
   \prop_get:cnN { l_@@_angle_ #1 _prop } { mantissa-sign #3 }
     \l_@@_tmpa_tl
-  \prop_del:cn { l_@@_angle_ #1 _prop } { mantissa-sign #3 }
+  \prop_remove:cn { l_@@_angle_ #1 _prop } { mantissa-sign #3 }
   \quark_if_no_value:NF \l_@@_tmpa_tl
     {
       \prop_put:cnV { l_@@_angle_ #2 _prop } { mantissa-sign #3 }
@@ -12580,9 +12600,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_unit_format_symbol_aux_alt: {
   \int_compare:nNnTF { \l_@@_unit_int } = { 1 }
     {
-      \prop_del:Nn \l_@@_unit_prop { prefix-1 }
-      \prop_del:Nn \l_@@_unit_prop { prefix-symbol-1 }
-      \prop_del:Nn \l_@@_unit_prop { prefix-base-1 }
+      \prop_remove:Nn \l_@@_unit_prop { prefix-1 }
+      \prop_remove:Nn \l_@@_unit_prop { prefix-symbol-1 }
+      \prop_remove:Nn \l_@@_unit_prop { prefix-base-1 }
       \prop_if_empty:NF \l_@@_unit_prop
         { \msg_error:nn { siunitx } { prefix-only } }
     }
@@ -13009,7 +13029,7 @@ This work consists of the file  siunitx.dtx
   {
     \bool_set_true:N \l_@@_list_first_bool
     \tl_clear:N \l_@@_list_current_tl
-    \int_compare:nNnTF { \tl_length:n {#1} } > \c_two
+    \int_compare:nNnTF { \tl_count:n {#1} } > \c_two
       {
         \tl_map_function:nN {#1} \@@_list_numbers_aux_ii:n
         \l_@@_list_tl
@@ -13017,7 +13037,7 @@ This work consists of the file  siunitx.dtx
         \l_@@_list_current_tl
       }
       {
-        \int_compare:nNnTF { \tl_length:n {#1} } = \c_two
+        \int_compare:nNnTF { \tl_count:n {#1} } = \c_two
           { \@@_list_numbers_aux:nn #1 }
           { \@@_combined_output:n #1 }
       }
@@ -13221,6 +13241,9 @@ This work consists of the file  siunitx.dtx
           { \NC@list { #1 #2 } }
         \exp_after:wN \@@_tmp:w \tex_the:D \NC@list \q_stop
         \cs_undefine:N \NC@find@S
+        \msg_new:nnn { siunitx } { moved-cellspace-column }
+          { Column~type~for~cellspace~package~moved~to~'#1'. }
+        \msg_warning:nnn { siunitx } { moved-cellspace-column } { C }  
       }
       { }
 }
@@ -13985,7 +14008,7 @@ This work consists of the file  siunitx.dtx
     table-comparator          .choice:,
     table-comparator /
       false                   .code:n     =
-        { \prop_del:Nn \l_@@_table_model_prop { comparator } },
+        { \prop_remove:Nn \l_@@_table_model_prop { comparator } },
     table-comparator /
       true                    .code:n     =
         { \prop_put:Nnn \l_@@_table_model_prop { comparator } { > } },
@@ -13994,16 +14017,16 @@ This work consists of the file  siunitx.dtx
       {
         \int_compare:nNnTF {#1} = \c_zero
           {
-            \prop_del:Nn \l_@@_table_model_prop { mantissa-decimal }
-            \prop_del:Nn \l_@@_table_model_prop { mantissa-decimal-raw }
-            \prop_del:Nn \l_@@_table_model_prop
+            \prop_remove:Nn \l_@@_table_model_prop { mantissa-decimal }
+            \prop_remove:Nn \l_@@_table_model_prop { mantissa-decimal-raw }
+            \prop_remove:Nn \l_@@_table_model_prop
               { mantissa-decimal-marker }
             \prop_if_in:NnTF \l_@@_table_model_prop { mantissa-integer }
               {
                 \prop_put:Nnn \l_@@_table_model_prop { mantissa }
                    { true }
               }
-              { \prop_del:Nn \l_@@_table_model_prop { mantissa } }
+              { \prop_remove:Nn \l_@@_table_model_prop { mantissa } }
           }
           {
             \prop_put:Nnx \l_@@_table_model_prop { mantissa-decimal }
@@ -14018,7 +14041,7 @@ This work consists of the file  siunitx.dtx
     table-figures-exponent    .code:n     =
       {
         \int_compare:nNnTF {#1} = \c_zero
-          { \prop_del:Nn \l_@@_table_model_prop { exponent-integer } }
+          { \prop_remove:Nn \l_@@_table_model_prop { exponent-integer } }
           {
             \prop_put:Nnx \l_@@_table_model_prop { exponent-integer }
               { \prg_replicate:nn {#1} { 8 } }
@@ -14029,13 +14052,13 @@ This work consists of the file  siunitx.dtx
       {
         \int_compare:nNnTF {#1} = \c_zero
           {
-            \prop_del:Nn \l_@@_table_model_prop { mantissa-integer }
+            \prop_remove:Nn \l_@@_table_model_prop { mantissa-integer }
             \prop_if_in:NnTF \l_@@_table_model_prop { mantissa-decimal }
               {
                 \prop_put:Nnn \l_@@_table_model_prop { mantissa }
                    { true }
               }
-              { \prop_del:Nn \l_@@_table_model_prop { mantissa } }
+              { \prop_remove:Nn \l_@@_table_model_prop { mantissa } }
           }
           {
             \prop_put:Nnx \l_@@_table_model_prop { mantissa-integer }
@@ -14046,7 +14069,7 @@ This work consists of the file  siunitx.dtx
     table-figures-uncertainty .code:n     =
       {
         \int_compare:nNnTF {#1} = \c_zero
-          { \prop_del:Nn \l_@@_table_model_prop { mantissa-uncertainty } }
+          { \prop_remove:Nn \l_@@_table_model_prop { mantissa-uncertainty } }
           {
             \prop_put:Nnx \l_@@_table_model_prop { mantissa-uncertainty }
               { \prg_replicate:nn {#1} { 8 } }
@@ -14184,8 +14207,8 @@ This work consists of the file  siunitx.dtx
           {
             \bool_set_true:N \l_@@_process_fixed_bool
             \@@_number_process:
-            \prop_del:Nn \l_@@_number_in_prop { exponent }
-            \prop_del:Nn \l_@@_number_in_prop { exponent-integer }
+            \prop_remove:Nn \l_@@_number_in_prop { exponent }
+            \prop_remove:Nn \l_@@_number_in_prop { exponent-integer }
           }
           { \@@_number_process: }
         \@@_number_format:
@@ -16501,18 +16524,19 @@ This work consists of the file  siunitx.dtx
   }
 %    \end{macrocode}
 %
-% The master control macro which occurs at the start of the document.
+% Finally apply the settings given at load time.
+%    \begin{macrocode}
+\ProcessKeysOptions { siunitx }
+%    \end{macrocode}
+%    
+% Creating document commands has to happen here so it is after any load-time
+% changes to the units available.
 %    \begin{macrocode}
 \AtBeginDocument {
   \bool_if:NTF \l_@@_create_free_bool
     { \@@_unit_create_functions: }
     { \@@_unit_create_empty_functions: }
 }
-%    \end{macrocode}
-%
-% Finally apply the settings given at load time.
-%    \begin{macrocode}
-\ProcessKeysOptions { siunitx }
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -16526,7 +16550,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2012/12/29} {2.5n}
+\ProvidesExplFile {siunitx-version-1.cfg} {2013/03/11} {2.5q}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17471,7 +17495,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2012/12/29} {2.5n}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2013/03/11} {2.5q}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17653,7 +17677,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2012/12/29} {2.5n}
+\ProvidesExplFile {siunitx-binary.cfg} {2013/03/11} {2.5q}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
