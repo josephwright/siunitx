@@ -1,4 +1,4 @@
-siunitx --- A comprehensive (SI) units package
+siunitx - A comprehensive (SI) units package
 ==============================================
 
 Physical quantities have both numbers and units, and each
