@@ -608,6 +608,7 @@ This work consists of the file  siunitx.dtx
 %  in tables}
 %\changes{v2.5r}{2013/07/11}{Update internals to track \pkg{expl3} changes}
 %\changes{v2.5s}{2013/07/31}{Update internals to track \pkg{expl3} changes}
+% \changes{v2.5t}{2013/11/19}{Allow for loading of \pkg{mdwtab}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -13272,6 +13273,18 @@ This work consists of the file  siunitx.dtx
       \NC@find
     }
 }
+\AtBeginDocument
+  {
+    \cs_set_protected:Npn \__siunitx_table_rewrite_create:N #1
+      {
+        \newcolumntype {#1} [1] []
+          {
+            > { \__siunitx_table_collect_begin:Nn #1 {##1} }
+            c
+            < { \__siunitx_table_print: }
+          }
+      }
+  }
 \cs_new_protected:Npn \@@_table_rewrite_create_aux:w { }
 \AtBeginDocument { \@@_table_rewrite_create:N s }
 \AtBeginDocument { \@@_table_rewrite_create:N S }
@@ -13561,14 +13574,18 @@ This work consists of the file  siunitx.dtx
 % so that the table actually works. The newline function needs its own
 % function, which is picked up by hand.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_collect_not_braced:N #1 {
-  \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
-    {
-      \token_if_eq_meaning:NNF #1 \tex_unskip:D
-        { \@@_table_collect_not_braced_aux_i:N #1 }
-    }
-  \@@_table_collect_next:
-}
+\cs_new_protected:Npn \@@_table_collect_not_braced:N #1
+  {
+    \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
+      {
+        \token_if_eq_meaning:NNF #1 \tex_unskip:D
+          {
+            \token_if_eq_meaning:NNF #1 \tab@setcr
+              { \__siunitx_table_collect_not_braced_aux_i:N #1 }
+          }
+      }
+    \@@_table_collect_next:
+  }
 \cs_new_protected:Npn \@@_table_collect_not_braced_aux_i:N #1 {
   \cs_set:Npn \@@_table_collect_not_braced_aux_ii:N ##1
     {
