@@ -13275,15 +13275,19 @@ This work consists of the file  siunitx.dtx
 }
 \AtBeginDocument
   {
-    \cs_set_protected:Npn \__siunitx_table_rewrite_create:N #1
+    \@ifpackageloaded { mdwtab }
       {
-        \newcolumntype {#1} [1] []
+        \cs_set_protected:Npn \@@_table_rewrite_create:N #1
           {
-            > { \__siunitx_table_collect_begin:Nn #1 {##1} }
-            c
-            < { \__siunitx_table_print: }
-          }
+            \newcolumntype {#1} [1] []
+              {
+                > { \__siunitx_table_collect_begin:Nn #1 {##1} }
+                c
+                < { \__siunitx_table_print: }
+              }
+           }
       }
+      { }
   }
 \cs_new_protected:Npn \@@_table_rewrite_create_aux:w { }
 \AtBeginDocument { \@@_table_rewrite_create:N s }
@@ -13579,12 +13583,28 @@ This work consists of the file  siunitx.dtx
     \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
       {
         \token_if_eq_meaning:NNF #1 \tex_unskip:D
-          {
-            \token_if_eq_meaning:NNF #1 \tab@setcr
-              { \__siunitx_table_collect_not_braced_aux_i:N #1 }
-          }
+          { \@@_table_collect_not_braced_aux_i:N #1 }
       }
     \@@_table_collect_next:
+  }
+\AtBeginDocument
+  {
+    \@ifpackageloaded { mdwtab }
+      {
+        \cs_set_protected:Npn \@@_table_collect_not_braced:N #1
+          {
+            \token_if_eq_meaning:NNF #1 \tex_ignorespaces:D
+              {
+                \token_if_eq_meaning:NNF #1 \tex_unskip:D
+                  {
+                    \token_if_eq_meaning:NNF #1 \tab@setcr
+                      { \@@_table_collect_not_braced_aux_i:N #1 }
+                  }
+              }
+            \@@_table_collect_next:
+          }
+      }
+      { }
   }
 \cs_new_protected:Npn \@@_table_collect_not_braced_aux_i:N #1 {
   \cs_set:Npn \@@_table_collect_not_braced_aux_ii:N ##1
