@@ -91,20 +91,24 @@ PDFSETTINGS = \AtBeginDocument{\DisableImplementation}
 
 %.pdf: %.dtx
 	NAME=`basename $< .dtx` ; \
-	echo "Typesetting $$NAME" ; \
+	echo -n "Typesetting $$NAME" ; \
 	pdflatex -draftmode -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
 	if [ $$? = 0 ] ; then  \
+	  echo -n "." ; \
 	  makeindex -q -s gglo.ist  -o $$NAME.gls $$NAME.glo > /dev/null ; \
 	  makeindex -q -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
 	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
+	  echo -n "." ; \
 	  makeindex -q -s gind.ist -o $$NAME.ind $$NAME.idx > /dev/null ; \
 	  pdflatex -interaction=nonstopmode "$(PDFSETTINGS) \input $<" > /dev/null ; \
+	  echo -n "." ; \
 	else \
-	  echo "  Compilation failed" ; \
+	  echo -n " -- failed!" ; \
 	fi ; \
 	for I in $(AUXFILES) ; do \
 	  rm -f $$NAME.$$I ; \
-	done
+	done ; \
+	echo "" ;
 			
 ################################################################
 # User make options                                            #
