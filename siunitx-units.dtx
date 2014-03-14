@@ -57,6 +57,72 @@
 % \maketitle
 % 
 % \begin{documentation}
+% 
+% \section{Defining symbolic units}
+% 
+% \begin{function}{\units_set_prefix:Nnn}
+%   \begin{syntax}
+%     \cs{units_set_prefix:Nnn} \meta{prefix} \Arg{symbol} \Arg{power}
+%   \end{syntax}
+%   Defines a symbolic \meta{prefix} (which should be a control sequence
+%   such as |\kilo|) to be converted by the parser to the \meta{symbol}.
+%   The latter should consist of literal content (\emph{e.g.}~|k|).
+%   In literal mode the \meta{symbol} will be typeset directly. The prefix
+%   should represent an integer \meta{power} of $10$, and this information
+%   may be used to convert from one or more \meta{prefix} symbols to an
+%   overall power applying to a unit. See also \cs{units_set_prefix:Nn}.
+% \end{function}
+% 
+% \begin{function}{\units_set_prefix:Nn}
+%   \begin{syntax}
+%     \cs{units_set_prefix:Nn}  \meta{prefix} \Arg{symbol}
+%   \end{syntax}
+%   Defines a symbolic \meta{prefix} (which should be a control sequence
+%   such as |\kilo|) to be converted by the parser to the \meta{symbol}.
+%   The latter should consist of literal content (\emph{e.g.}~|k|).
+%   In literal mode the \meta{symbol} will be typeset directly. In contrast
+%   to \cs{units_set_prefix:Nnn}, there is no assumption about the mathematical
+%   nature of the \meta{prefix}, \emph{i.e.}~the prefix may represent a
+%   power of any base. As a result, no conversion of the \meta{prefix} to a
+%   numerical power will be possible.
+% \end{function}
+% 
+% \begin{function}{\units_set_power:NnN}
+%   \begin{syntax}
+%     \cs{units_set_unit:Nn} \meta{power} \Arg{value} \meta{precedes}
+%   \end{syntax}
+%   Defines a symbolic \meta{power} (which should be a control sequence
+%   such as |\squsred|) to be converted by the parser to the \meta{value}.
+%   The latter should be an integer or floating point number in the format
+%   defined for \pkg{l3fp}. Powers may precede a unit or be given after it:
+%   which case applies to the \meta{power} is determined by the boolean
+%   \meta{precedes}. In literal mode, the \meta{value} will be applied as
+%   a superscript to either the next token in the input (\meta{precedes} 
+%   true) or appended to the previously-typeset material (\meta{precedes}
+%   false).
+% \end{function}
+% 
+% \begin{function}{\units_set_qualifier:Nn}
+%   \begin{syntax}
+%     \cs{units_set_qualifier:Nn} \meta{qualifier} \Arg{meaning}
+%   \end{syntax}
+%   Defines a symbolic \meta{qualifier} (which should be a control sequence
+%   such as |\catalyst|) to be converted by the parser to the \meta{meaning}.
+%   The latter should consist of literal content (\emph{e.g.}~|cat|). In
+%   literal mode the \meta{meaning} will be typeset following a space after
+%   the unit to which it applies.
+% \end{function}
+% 
+% \begin{function}{\units_set_unit:Nn}
+%   \begin{syntax}
+%     \cs{units_set_unit:Nn} \meta{unit} \Arg{meaning}
+%   \end{syntax}
+%   Defines a symbolic \meta{unit} (which should be a control sequence
+%   such as |\kilogram|) to be converted by the parser to the \meta{meaning}.
+%   The latter may consist of literal content (\emph{e.g.}~|kg|), other
+%   symbolic unit commands (\emph{e.g.}~|\kilo\gram|) or a mixture of the two.
+%   In literal mode the \meta{meaning} will be typeset directly.
+% \end{function}
 %
 % \end{documentation}
 %
@@ -85,6 +151,16 @@
 %   Scratch space.
 %    \begin{macrocode}
 \tl_new:N  \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_parsing_bool}
+%   A boolean is used to indicate when the symbolic unit functions should
+%   produce symbolic or literal output. This is used when the symbolic names
+%   are used along with literal input, and ensures that there is a sensible
+%   fall-back for these cases.
+%    \begin{macrocode}
+\bool_new:N \l_@@_parsing_bool
 %    \end{macrocode}
 % \end{variable}
 %
@@ -133,6 +209,137 @@
 % names (for example \cs{pm}). Setting up the mechanisms to allow this requires
 % a few additional steps on top of simply saving the data given by the user
 % in creating the unit.
+% 
+% \begin{variable}[int]{\l_@@_symbolic_seq}
+%   A list of all of the symbolic units, \emph{etc.}, set up. This is needed
+%   to allow the symbolic names to be defined within the scope of the unit
+%   parser but not elsewhere using simple mappings.
+%    \begin{macrocode}
+\seq_new:N \l_@@_symbolic_seq
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{macro}[int]{\@@_set_symbolic:Nnn}
+% \begin{macro}[int]{\@@_set_symbolic:Npnn}
+% \begin{macro}[aux]{\@@_set_symbolic:NNpnn}
+%   The majority of the work for saving each symbolic definition is the same
+%   irrespective of the item being defined (unit, prefix, power, qualifier).
+%   This is therefore all carried out in a single internal function which
+%   does the common tasks. The three arguments here are the symbolic macro
+%   name, the literal output and the code to insert when doing full unit
+%   parsing. To allow for the \enquote{special cases} (where arguments are
+%   required) the entire mechanism is set up in a two-part fashion allowing
+%   for flexibility at the slight cost of additional functions.
+%   
+%   Importantly, notice that the unit macros are declared as expandable. This
+%   is required so that literals can be correctly converted into a token list
+%   of material which does not depend on local redefinitions for the unit
+%   macros. That is required so that the unit formatting system can be grouped.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_set_symbolic:Nnn #1
+  { \@@_set_symbolic:NNnnn \cs_set_nopar:cpn #1 { } }
+\cs_new_protected:Npn \@@_set_symbolic:Npnn #1#2#
+  { \@@_set_symbolic:NNnnn \cs_set:cpn #1 {#2} }
+\cs_new_protected:Npn \@@_set_symbolic:NNnnn #1#2#3#4#5
+  {
+    \seq_put_right:Nn \l_@@_symbolic_seq {#2}
+    #1 { units ~ > ~ \token_to_str:N #2 } #3
+      {
+        \bool_if:NF \l_@@_test_bool
+          {
+            \bool_if:NTF \l_@@_parsing_bool
+              {#5}
+              {#4}
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int]{\units_set_power:NnN}
+%   For powers, there is the slight complication that the symbolic name may
+%   appear either before or after the unit it applies to, and these two
+%   different cases need slightly different code for the literal case. A
+%   boolean is used to determine which case is in operation, and in parsing
+%   mode this data is passed directly to the underlying function.
+%    \begin{macrocode}
+\cs_new_protected:Npn \units_set_power:NnN #1#2#3
+  {
+    \bool_if:NTF #3
+      {
+        \@@_set_symbolic:Nnn #1
+          { \@@_literal_power:nN {#1} }
+      }
+      {
+        \@@_set_symbolic:Nnn #1
+          { ^ {#2} }
+      }
+        { \@@_parse_power:nnN {#1} {#2} #3 }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\units_set_prefix:Nn}
+% \begin{macro}[int]{\units_set_prefix:Nnn}
+% \begin{variable}[int]
+%   {\l_@@_prefixes_forward_prop, \l_@@_prefixes_reverse_prop}
+%   For prefixes there are a couple of options. In all cases, the basic
+%   requirement is to set up to parse the prefix using the appropriate
+%   internal function. For prefixes which are powers of $10$, there is also
+%   the need to be able to do conversion to/from the numerical equivalent.
+%   That is handled using two properly lists which can be used to supply
+%   the conversion data later.
+%    \begin{macrocode}
+\cs_new_protected:Npn \units_set_prefix:Nn #1#2
+  {
+    \@@_set_symbolic:Nnn #1
+      {#2}
+      { \@@_parse_prefix:Nn #1 {#2} }
+  }
+\cs_new_protected:Npn \units_set_prefix:Nnn #1#2#3
+  {
+    \units_set_prefix:Nn #1 {#2}
+    \prop_put:Nnn \l_@@_prefixes_forward_prop {#2} {#3}
+    \prop_put:Nnn \l_@@_prefixes_reverse_prop {#3} {#2}
+  }
+\prop_new:N \l_@@_prefixes_forward_prop
+\prop_new:N \l_@@_prefixes_reverse_prop
+%    \end{macrocode}
+% \end{variable}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\units_set_qualifier:Nn}
+%   Qualifiers are relatively easy to handle: nothing to do other than save
+%   the input appropriately.
+%    \begin{macrocode}
+\cs_new_protected:Npn \units_set_qualifier:Nn #1#2
+  {
+    \@@_set_symbolic:Nnn #1
+      { \  ( #2 ) }
+      { \@@_parse_qualifier:nn {#1} {#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\units_set_unit:Nn}
+%   For the unit parsing, allowing for variations in definition order requires
+%   that a test is made for the output of each unit at point of use.
+%    \begin{macrocode}
+\cs_new_protected:Npn \units_set_unit:Nn #1#2
+  {
+    \@@_set_symbolic:Nnn #1
+      {#2}
+      {
+        \@@_if_symbolic:nTF {#2}
+          {#2}
+          { \@@_parse_unit:Nn #1 {#2} }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 % 
 % \subsection{Non-standard symbolic units}
 %
