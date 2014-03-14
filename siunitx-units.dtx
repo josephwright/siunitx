@@ -75,6 +75,55 @@
 %<@@=siunitx_units>
 %    \end{macrocode}
 %    
+% \subsection{Initial set up}
+%
+% The mechanisms defined here need a few variables to exist and to be
+% correctly set: these don't belong to one subsection and so are created
+% in a small general block.
+% 
+% \subsection{Defining symbolic unit}
+%
+% Unit macros and related support are created here. These exist only within
+% the scope of the unit processor code, thus not polluting document-level
+% namespace and allowing overlap with other areas in the case of useful short
+% names (for example \cs{pm}). Setting up the mechanisms to allow this requires
+% a few additional steps on top of simply saving the data given by the user
+% in creating the unit.
+% 
+% \subsection{Non-standard symbolic units}
+%
+% A few of the symbolic units require non-standard definitions: these are
+% created here. They all use parts of the more general code but have particular
+% requirements which can only be addressed by hand. Some of these could in
+% principle be used in place of the dedicated definitions above, but at point
+% of use that would then require additional expansions for each unit parsed:
+% as the macro names would still be needed, this does not offer any real
+% benefits.
+% 
+% \subsection{Main formatting routine}
+%
+% Unit input can take two forms, \enquote{literal} units (material to be
+% typeset directly) or \enquote{symbolic} units (macro-based). Before any
+% parsing or typesetting is carried out, a small amount of pre-parsing has to
+% be carried out to decide which of these cases applies.
+% 
+% \subsection{Formatting literal units}
+% 
+% While in literal mode no parsing occurs, there is a need to provide a few
+% auxiliary functions to handle one or two special cases.
+% 
+% \subsection{Parsing symbolic units}
+%
+% Parsing units takes place by storing information about each unit in a
+% \texttt{prop}. As well as the unit itself, there are various other optional
+% data points, for example a prefix or a power. Some of these can come before
+% the unit, others only after. The parser therefore tracks the number of units
+% read and uses the current position to allocate data to individual units.
+% 
+% \subsection{Formatting parsed units}
+% 
+% \subsection{Messages}
+%    
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
