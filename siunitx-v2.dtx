@@ -11543,33 +11543,6 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\@@_unit_if_literal:nTF}
-%\begin{macro}[aux]{\@@_unit_if_literal_aux:N}
-% A test is needed to see if the input only contains unit macros. This
-% is done by altering setting all of the unit macros to expand to
-% nothing at all. Thus there will only be anything left if there is
-% a literal in the unit.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_unit_if_literal:nTF #1#2#3 {
-  \group_begin:
-    \seq_map_function:NN \l_@@_declare_list_seq
-      \@@_unit_if_literal_aux:N
-    \cs_set_eq:NN \of \use_none:n
-    \cs_set_eq:NN \highlight \use_none:n
-    \cs_set_eq:NN \raiseto \use_none:n
-    \cs_set_eq:NN \tothe \use_none:n
-    \protected@edef \l_@@_tmpa_tl {#1}
-  \exp_args:NNNV \group_end:
-  \tl_set:Nn \l_@@_tmpa_tl \l_@@_tmpa_tl
-  \tl_if_blank:VTF \l_@@_tmpa_tl {#3} {#2}
-}
-\cs_new_protected:Npn \@@_unit_if_literal_aux:N #1 {
-  \cs_set_eq:NN #1 \prg_do_nothing:
-}
-%    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
 %\subsection{Parsing macro units}
 %
 % For macro-based units, the macros are converted into literal text,
