@@ -48,7 +48,7 @@
   rem when the user calls "make clean"
 
   set AUXFILES=aux bbl blg cmds dvi glo gls hd idx ilg ind ist log los out tmp toc
-  set CLEAN=bib bst cfg cls eps gz ins pdf sty tex txt zip
+  set CLEAN=bib bst cfg cls eps gz pdf sty tex txt zip
 
   rem Sets the order for searching for source files for pdfs
 

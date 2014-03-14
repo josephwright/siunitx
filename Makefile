@@ -73,7 +73,6 @@ AUXFILES = \
 CLEAN = \
 	cfg \
 	gz  \
-	ins \
 	pdf \
 	sty \
 	txt \
