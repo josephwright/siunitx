@@ -107,12 +107,16 @@
 %   and to do nothing, with the few special cases handled manually. If
 %   an \texttt{x}-type definition then yields nothing at all then the
 %   assumption is that the input is symbolic.
+%   
+%   Note that as we are dealing with arbitrary \LaTeXe{} input, there is the
+%   need to use \cs{protected@edef} here: in a \enquote{pure} \LaTeX3 version
+%   that would replaced by \cs{tl_set:Nx}.
 %    \begin{macrocode}
 \prg_new_protected_conditional:Npnn \@@_if_symbolic:n #1 { TF }
   {
     \group_begin:
       \bool_set_true:N \l_@@_test_bool
-      \tl_set:Nx \l_@@_tmp_tl {#1}
+      \protected@edef \l_@@_tmp_tl {#1}
     \exp_args:NNV \group_end:
     \tl_if_blank:nTF \l_@@_tmp_tl
       { \prg_return_true: }
