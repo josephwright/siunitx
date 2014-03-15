@@ -204,6 +204,16 @@
 %   Inserted between unit combinations in parsed mode, and used to replace
 %   |.| and |~| in literal mode.
 % \end{function}
+% 
+% \begin{function}{sticky-per}
+%   \begin{syntax}
+%     \texttt{sticky-per} = \texttt{true}\verb"|"\texttt{false}
+%   \end{syntax}
+%   Used to determine whether \cs{per} should be applied one a unit-by-unit
+%   basis (when \texttt{false}) or should apply to all following units
+%   (when \texttt{true}). The latter mode is somewhat akin conceptually to the
+%   \TeX{} \cs{over} primitive.
+% \end{function}
 %
 % \end{documentation}
 %
@@ -233,11 +243,14 @@
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
 % 
+% \begin{variable}[int]{\l_@@_tmp_int}
 % \begin{variable}[int]{\l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\int_new:N \l_@@_tmp_int
 \tl_new:N  \l_@@_tmp_tl
 %    \end{macrocode}
+% \end{variable}
 % \end{variable}
 % 
 % \begin{variable}[int]{\l_@@_parsing_bool}
@@ -576,6 +589,234 @@
 % data points, for example a prefix or a power. Some of these can come before
 % the unit, others only after. The parser therefore tracks the number of units
 % read and uses the current position to allocate data to individual units.
+%
+% The result of parsing is a property list (\cs{l_@@_parsed_prop}) which
+% contains one or more entries for each unit:
+% \begin{itemize}
+%   \item \texttt{prefix-$n$} The symbol for the prefix which applies to this
+%     unit, \emph{e.g.} for \cs{kilo} with (almost certainly) would be
+%     |k|.
+%   \item \texttt{unit-$n$} The symbol for the unit itself, \emph{e.g.}~for
+%     \cs{metre} with (almost certainly) would be |m|.
+%   \item \texttt{power-$n$} The power which a unit is raised to. During
+%     initial parsing this will (almost certainly) be positive, but is combined
+%     with \texttt{per-$n$} to give a \enquote{fully qualified} power before
+%     any formatting takes place 
+%   \item \texttt{per-$n$} Indicates that \texttt{per} applies to the current
+%     unit: stored during initial parsing then combined with \texttt{power-$n$}
+%     (and removed from the list) before further work.
+%   \item \texttt{qualifier-$n$} Any qualifier which applies to the current
+%     unit.
+%   \item \texttt{special-$n$} Any \enquote{special effect} to apply to the
+%     current unit.
+% \end{itemize}
+% 
+% \begin{variable}[int]{\l_@@_sticky_per_bool}
+%   There is one option when \emph{parsing} the input (as opposed to
+%   \emph{formatting} for output): how to deal with \cs{per}.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / units }
+  {
+    sticky-per .bool_set:N = \l_@@_sticky_per_bool
+  }
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_parsed_prop}
+% \begin{variable}[int]{\l_@@_per_bool}
+% \begin{variable}[int]{\l_@@_position_int}
+%   Parsing units requires a small number of variables are available: a
+%   \texttt{prop} for the parsed units themselves, a \texttt{bool} to
+%   indicate if \cs{per} is active and an \texttt{int} to track how many units
+%   have be parsed.
+%    \begin{macrocode}
+\prop_new:N \l_@@_parsed_prop
+\bool_new:N \l_@@_per_bool
+\int_new:N \l_@@_position_int
+%    \end{macrocode}
+% \end{variable}
+% \end{variable}
+% \end{variable}
+% 
+% \begin{macro}[int]{\@@_parse:n}
+%   The main parsing function is quite simple. After initialising the variables,
+%   each symbolic unit is set up. The input is then simply inserted into the
+%   input stream: the symbolic units themselves then do the real work of
+%   placing data into the parsing system. There is then a bit of tidying up to
+%   ensure that later stages can rely on the nature of the data here.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse:n #1
+  {
+    \prop_clear:N \l_@@_parsed_prop
+    \bool_set_true:N \l_@@_parsing_bool
+    \bool_set_false:N \l_@@_per_bool
+    \bool_set_false:N \l_@@_test_bool
+    \int_zero:N \l_@@_position_int
+    #1
+    \int_step_inline:nnnn \c_one \c_one \l_@@_position_int
+      { \@@_parse_finalise:n {##1} }
+    \@@_parse_finalise:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_add:nnnn}
+%   In all cases, storing a data item requires setting a temporary \texttt{tl}
+%   which will be used as the key, then using this to store the value. The
+%   \texttt{tl} is  set using \texttt{x}-type expansion as this will expand the
+%   unit index and any additional calculations made for this.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_add:nnnn #1#2#3#4
+  {
+    \tl_set:Nx \l_@@_tmp_tl { #1 - #2 }
+    \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
+      { \msg_error:nnnn { siunitx } { duplicate-part } {#1} {#3} }
+      { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl {#4} }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_prefix:Nn}
+% \begin{macro}[int]{\@@_parse_power:nnN}
+% \begin{macro}[int]{\@@_parse_qualifier:nn}
+% \begin{macro}[int]{\@@_parse_special:nn}
+%   Storage of the various optional items follows broadly the same pattern
+%   in each case. The data to be stored is passed along with an appropriate
+%   key name to the underlying storage system. The details for each type of
+%   item should be relatively clear. For example, prefixes have to come before
+%   their \enquote{parent} unit and so there is some adjustment to do to add
+%   them to the correct unit.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_prefix:Nn #1#2
+  {
+    \int_set:Nn \l_@@_tmp_int { \l_@@_position_int + \c_one }
+    \@@_parse_add:nnnn { prefix } { \int_use:N \l_@@_tmp_int }
+      {#1} {#2}
+  }
+\cs_new_protected:Npn \@@_parse_power:nnN #1#2#3
+  {
+    \@@_parse_add:nnnn { power }
+      { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + \c_one } } }
+      {#1} {#2}
+  }
+\cs_new_protected:Npn \@@_parse_qualifier:nn #1#2
+  {
+    \tl_set:Nx \l_@@_tmp_tl
+      { unit- \int_use:N \l_@@_position_int }
+    \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
+      {
+        \@@_parse_add:nnnn { qualifier }
+          { \int_use:N \l_@@_position_int } {#1} {#2}
+      }
+      { \msg_error:nnn { siunitx } { qualifier-before-unit } {#1} }
+  }
+%    \end{macrocode}
+%  Special (exceptional) items should always come before the relevant units.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_special:nn #1#2
+  {
+    \@@_parse_add:nnnn { special }
+      { \int_eval:n { \l_@@_position_int + \c_one } }
+      {#1} {#2}
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_unit:Nn}
+%   Parsing units is slightly more involved than the other cases: this is the
+%   one place where the tracking value is incremented.  If the switch
+%   \cs{l_@@_per_bool} is set true then the current unit is also
+%   reciprocal: this can only happen if \cs{l_@@_sticky_per_bool} is also
+%   true, so only one test is required.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_unit:Nn #1#2
+  {
+    \int_incr:N \l_@@_position_int
+    \@@_parse_add:nnnn { unit } { \int_use:N \l_@@_position_int }
+      {#1} {#2}
+    \bool_if:NT \l_@@_per_bool
+      {
+        \@@_parse_add:nnnn { per } { \int_use:N \l_@@_position_int }
+          { \per } { true }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_per:}
+%   Storing the \cs{per} command requires adding a data item separate from
+%   the power which applies: this makes later formatting much more
+%   straight-forward. This data could in principle be combined with the
+%   \texttt{power}, but depending on the output format required that may make
+%   life  more complex. Thus this information is stored separately for later
+%   retrieval. If \cs{per} is set to be \enquote{sticky} then after parsing
+%   the first occurrence, any further uses are in error.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_per:
+  {
+    \bool_if:NTF \l_@@_sticky_per_bool
+      {
+        \bool_set_true:N \l_@@_per_bool
+        \cs_set_protected_nopar:Npn \per
+          { \msg_error:nn { siunitx } { duplicate-sticky-per } }
+      }
+      {
+        \@@_parse_add:nnnn
+          { per } { \int_eval:n { \l_@@_position_int + \c_one } }
+          { \per } { true }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_parse_finalise:n}
+%   If \cs{per} applies to the current unit, the power needs to be multiplied
+%   by $-1$. That is done using an \texttt{fp} operation so that non-integer
+%   powers are supported. The flag for \cs{per} is also removed as this means
+%   we don't have to check that the original power was positive. To be on
+%   the safe side, there is a check for a trivial power at this stage.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_finalise:n #1
+  {
+    \tl_set:Nx \l_@@_tmp_tl { per- #1 }
+    \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
+      {
+        \prop_del:NV \l_@@_parsed_prop \l_@@_tmp_tl
+        \tl_set:Nx \l_@@_tmp_tl { power- #1 }
+        \prop_get:NVNTF \l_@@_parsed_prop \l_@@_tmp_tl
+          \l_@@_part_tl
+          {
+            \tl_set:Nx \l_@@_part_tl
+              { \fp_eval:n { \l_@@_part_tl * -1 } }
+            \fp_compare:nNnTF \l_@@_part_tl = \c_one_fp
+              { \prop_del:NV \l_@@_parsed_prop \l_@@_tmp_tl }
+              {
+                \prop_put:NVV \l_@@_parsed_prop
+                  \l_@@_tmp_tl \l_@@_part_tl
+              }
+          }
+          { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl { -1 } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_parse_finalise:}
+%   The final task is to check that there is not a \enquote{dangling} prefix:
+%   these are added to the \enquote{next} unit so are easy to test for.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_finalise:
+  {
+    \tl_set:Nx \l_@@_tmp_tl
+      { prefix- \int_eval:n { \l_@@_position_int + \c_one } }
+    \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
+      { \msg_error:nn { siunitx } { prefix-only } }
+  }
+%    \end{macrocode}
+% \end{macro}
 % 
 % \subsection{Formatting parsed units}
 % 
