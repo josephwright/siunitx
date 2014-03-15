@@ -478,6 +478,17 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 % 
+% \begin{variable}[int]{\l_@@_product_tl}
+%   Options which apply to the main formatting routine, and so are not tided
+%   to either symbolic or literal input.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / units }
+  {
+    inter-unit-product .tl_set:N = \l_@@_product_tl
+  }
+%    \end{macrocode}
+\end{variable}
+% 
 % \begin{variable}[int]{\l_@@_formatted_tl}
 %   A token list for the final formatted result: may or may not be generated
 %   by the parser, depending on the nature of the input.
@@ -490,6 +501,55 @@
 % 
 % While in literal mode no parsing occurs, there is a need to provide a few
 % auxiliary functions to handle one or two special cases.
+%
+% \begin{macro}[int]{\@@_literal_power:nN}
+%   For printing literal units which are given before the unit they apply to,
+%   there is a slight rearrangement.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_literal_power:nN #1#2 { #2 ^ {#1} }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_literal_special:nN}
+%   When dealing with the special cases, there is an argument to absorb. This
+%   should be braced to be passed up to the user level, which is dealt with
+%   here.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_literal_special:nN #1#2 { #1 {#2} }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_literal:n}
+%   To format literal units, there are two tasks to do. The input is
+%   \texttt{x}-type expanded to force any symbolic units to be converted into
+%   their literal representation: this requires setting the appropriate
+%   switch. In the resulting token list, all |.| and |~| tokens are then
+%   replaced by the current unit product token list. To enable this to happen
+%   correctly with a normal (active) |~|, a small amount of
+%   \enquote{protection} is needed first.
+%   
+%   As with other code dealing with user input, \cs{protected@edef} is used
+%   here rather than \cs{tl_set:Nx} as \LaTeXe{} robust commands may be
+%   present.
+%    \begin{macrocode}
+\group_begin:
+  \char_set_catcode_active:n { `\~ }
+  \cs_new_protected:Npn \@@_format_literal:n #1
+    {
+      \group_begin:
+        \bool_set_false:N \l_@@_parsing_bool
+        \cs_set_protected:Npn ~ { }
+        \protected@edef \l_@@_formatted_tl {#1}
+        \tl_replace_all:NnV \l_@@_formatted_tl { . }
+          \l_@@_product_tl
+        \tl_replace_all:NnV \l_@@_formatted_tl { ~ }
+          \l_@@_product_tl
+      \exp_args:NNNV \group_end:
+      \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
+    }
+\group_end:
+%    \end{macrocode}
+% \end{macro}
 % 
 % \subsection{Parsing symbolic units}
 %
