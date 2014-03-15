@@ -258,14 +258,14 @@
 % \end{macro}
 % \end{macro}
 % 
-% \begin{macro}[int]{\units_set_power:NnN}
+% \begin{macro}{\siunitx_units_set_power:NnN}
 %   For powers, there is the slight complication that the symbolic name may
 %   appear either before or after the unit it applies to, and these two
 %   different cases need slightly different code for the literal case. A
 %   boolean is used to determine which case is in operation, and in parsing
 %   mode this data is passed directly to the underlying function.
 %    \begin{macrocode}
-\cs_new_protected:Npn \units_set_power:NnN #1#2#3
+\cs_new_protected:Npn \siunitx_units_set_power:NnN #1#2#3
   {
     \bool_if:NTF #3
       {
@@ -281,8 +281,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\units_set_prefix:Nn}
-% \begin{macro}[int]{\units_set_prefix:Nnn}
+% \begin{macro}{\siunitx_units_set_prefix:Nn}
+% \begin{macro}{\siunitx_units_set_prefix:Nnn}
 % \begin{variable}[int]
 %   {\l_@@_prefixes_forward_prop, \l_@@_prefixes_reverse_prop}
 %   For prefixes there are a couple of options. In all cases, the basic
@@ -292,13 +292,13 @@
 %   That is handled using two properly lists which can be used to supply
 %   the conversion data later.
 %    \begin{macrocode}
-\cs_new_protected:Npn \units_set_prefix:Nn #1#2
+\cs_new_protected:Npn \siunitx_units_set_prefix:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       {#2}
       { \@@_parse_prefix:Nn #1 {#2} }
   }
-\cs_new_protected:Npn \units_set_prefix:Nnn #1#2#3
+\cs_new_protected:Npn \siunitx_units_set_prefix:Nnn #1#2#3
   {
     \units_set_prefix:Nn #1 {#2}
     \prop_put:Nnn \l_@@_prefixes_forward_prop {#2} {#3}
@@ -311,11 +311,11 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\units_set_qualifier:Nn}
+% \begin{macro}{\siunitx_units_set_qualifier:Nn}
 %   Qualifiers are relatively easy to handle: nothing to do other than save
 %   the input appropriately.
 %    \begin{macrocode}
-\cs_new_protected:Npn \units_set_qualifier:Nn #1#2
+\cs_new_protected:Npn \siunitx_units_set_qualifier:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       { \  ( #2 ) }
@@ -324,11 +324,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\units_set_unit:Nn}
+% \begin{macro}{\siunitx_units_set_unit:Nn}
 %   For the unit parsing, allowing for variations in definition order requires
 %   that a test is made for the output of each unit at point of use.
 %    \begin{macrocode}
-\cs_new_protected:Npn \units_set_unit:Nn #1#2
+\cs_new_protected:Npn \siunitx_units_set_unit:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       {#2}
