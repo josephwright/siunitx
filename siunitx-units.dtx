@@ -567,7 +567,15 @@
 %   switch. In the resulting token list, all |.| and |~| tokens are then
 %   replaced by the current unit product token list. To enable this to happen
 %   correctly with a normal (active) |~|, a small amount of
-%   \enquote{protection} is needed first.
+%   \enquote{protection} is needed first. The same is true fro \cs{sb} and
+%   \cs{sp} as they may be made expandable by the \pkg{mathstyle} package.
+%   
+%   The series of \cs{tl_replace_all:Nnn} are needed as if the output ends up
+%   inside for example \cs{textrm} then math mode sub/superscripts cannot be
+%   used. Replacing them all here is done using two category codes: the normal
+%   \LaTeXe{} ones and as \enquote{other} characters. The reason for the latter
+%   is that most packages that carry out \enquote{special effects} with these
+%   chars use mathcode rather than catcode to alter behaviour.
 %   
 %   As with other code dealing with user input, \cs{protected@edef} is used
 %   here rather than \cs{tl_set:Nx} as \LaTeXe{} robust commands may be
@@ -575,20 +583,31 @@
 %    \begin{macrocode}
 \group_begin:
   \char_set_catcode_active:n { `\~ }
-  \cs_new_protected:Npn \@@_format_literal:n #1
+  \char_set_catcode_subscript:n { `\= }
+  \char_set_lccode:nn { `\+ } { `\^ }
+  \char_set_lccode:nn { `\= } { `\_ }
+  \tl_to_lowercase:n
     {
-      \group_begin:
-        \bool_set_false:N \l_@@_parsing_bool
-        \cs_set_protected:Npn ~ { }
-        \protected@edef \l_@@_formatted_tl {#1}
-        \tl_replace_all:NnV \l_@@_formatted_tl { . }
-          \l_@@_product_tl
-        \tl_replace_all:NnV \l_@@_formatted_tl { ~ }
-          \l_@@_product_tl
-      \exp_args:NNNV \group_end:
-      \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
-    }
-\group_end:
+      \group_end:
+      \cs_new_protected:Npn \@@_format_literal:n #1
+        {
+          \group_begin:
+            \bool_set_false:N \l_@@_parsing_bool
+            \cs_set_protected_nopar:Npn ~ { }
+            \cs_set_protected_nopar:Npn \sb { }
+            \cs_set_protected_nopar:Npn \sp { }
+            \protected@edef \l_@@_formatted_tl {#1}
+            \tl_replace_all:NnV \l_@@_formatted_tl { . }
+              \l_@@_product_tl
+            \tl_replace_all:NnV \l_@@_formatted_tl { ~ }
+              \l_@@_product_tl
+            \tl_replace_all:Nnn \l_@@_formatted_tl { ^ } { \sp }
+            \tl_replace_all:Nnn \l_@@_formatted_tl { + } { \sp }
+            \tl_replace_all:Nnn \l_@@_formatted_tl { _ } { \sb }
+            \tl_replace_all:Nnn \l_@@_formatted_tl { = } { \sb }
+          \exp_args:NNNV \group_end:
+          \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
+        }
 %    \end{macrocode}
 % \end{macro}
 % 
