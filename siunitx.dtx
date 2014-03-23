@@ -105,6 +105,40 @@
   }
 %    \end{macrocode}
 %    
+% \begin{macro}{\@@_load_check:}
+%   There are a number of packages that are incompatible with \pkg{siunitx}
+%   as they cover the same concepts and in some cases define the same command
+%   names. These are all tested at the point of loading to try to trap
+%   issues, and a couple are also tested later as it's possible for them to
+%   load without an obvious error if \pkg{siunitx} was loaded first.
+%   
+%   The testing here is done in a group so that the tests do not add
+%   anything to the hash table.
+%    \begin{macrocode}
+\msg_new:nnnn { siunitx } { incompatible-package }
+  { Package~'#1'~incompatible. }
+  { The~#1~package~and~siunitx~are~incompatible. }
+\cs_new_protected:Npn \@@_load_check:n #1
+  {
+    \group_begin:
+      \@ifpackageloaded {#1}
+        {
+          \group_end:
+          \msg_error:nnx { siunitx } { incompatible-package } {#1}
+        }
+        { \group_end: }
+  }
+\clist_map_function:nN
+  { SIunits , sistyle , unitsdef , fancyunits }
+  \@@_load_check:n
+\AtBeginDocument
+  {
+    \clist_map_function:nN { SIunits , sistyle }
+      \@@_load_check:n
+  }
+%    \end{macrocode}
+%\end{macro}
+%    
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}

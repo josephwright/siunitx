@@ -5123,51 +5123,6 @@ This work consists of the file  siunitx.dtx
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
-% Make sure that the version of \pkg{l3kernel} in use is sufficiently new.
-% This will also trap any problems with \pkg{l3packages} (as the two are now
-% tied together, version-wise).
-%    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2012/11/21 }
-  { }
-  {
-    \PackageError { siunitx } { Support~package~expl3~too~old }
-      {
-        You~need~to~update~your~installation~of~the~bundles~'l3kernel'~and~
-        'l3packages'.\MessageBreak
-        Loading~siunitx~will~abort!
-      }
-    \tex_endinput:D
-  }
-%    \end{macrocode}
-%
-%\begin{macro}{\@@_load_check:}
-% There are also a number of packages that are incompatible with
-% \pkg{siunitx}. These are all checked for next.  Some of the
-% incompatible packages will not raise an error if loaded after
-% \pkg{siunitx}.  So a test is made at the beginning of the
-% document as well. The message for this may be needed immediately, so
-% it is created here not with the other messages.
-%    \begin{macrocode}
-\msg_new:nnnn { siunitx } { incompatible-package }
-  { Package~'#1'~incompatible. }
-  { The~#1~package~and~siunitx~are~incompatible. }
-\cs_new_protected:Npn \@@_load_check:n #1 {
-  \group_begin:
-    \@ifpackageloaded {#1}
-      { \msg_error:nnx { siunitx } { incompatible-package } {#1} }
-      { }
-  \group_end:
-}
-\clist_map_function:nN
-  { SIunits , sistyle , siunits , SIstyle , unitsdef , fancyunits }
-  \@@_load_check:n
-\AtBeginDocument {
-  \clist_map_function:nN { SIunits , sistyle , siunits , SIstyle }
-    \@@_load_check:n
-}
-%    \end{macrocode}
-%\end{macro}
-%
 % Now load the support packages.
 %    \begin{macrocode}
 \RequirePackage{ amstext , array , l3keys2e }
