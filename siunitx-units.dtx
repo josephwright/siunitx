@@ -67,6 +67,22 @@
 % symbolic units can then be controlled by a number of key--value options
 % made available by the module.
 % 
+% \section{Formatting units}
+% 
+% \begin{function}{\siunitx_units_format:nN}
+%   \begin{syntax}
+%     \cs{siunitx_units_format:nN} \Arg{units} \meta{tl~var}
+%   \end{syntax}
+%   Parses the \meta{units}, which may either be symbolic or literal as
+%   described elsewhere, and 
+% \end{function}
+% 
+% \begin{function}{\siunitx_units_format:nNN}
+%   \begin{syntax}
+%     \cs{siunitx_units_format:nNN} \Arg{units} \meta{tl~var} \meta{fp~var}
+%   \end{syntax}
+% \end{function}
+%
 % \section{Defining symbolic units}
 % 
 % \begin{function}{\siunitx_units_set_prefix:Nnn}
@@ -206,6 +222,31 @@
 % 
 % The options defined by this submodule are available within the \pkg{l3keys}
 % |siunitx/units| tree. 
+%
+% \begin{function}{bracket-denominator}
+%   \begin{syntax}
+%     |bracket-denominator| = \meta{symbol}
+%   \end{syntax}
+%   Switch to determine whether brackets are added to the denominator part of
+%   a unit when printed in fractional form. The standard setting is |false|.
+% \end{function}
+% 
+% \begin{function}{close-bracket}
+%   \begin{syntax}
+%     |close-bracket| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Bracket symbol used to close a matched pair around units when once is
+%   required to maintain mathematical logic. The standard setting is ^^A (
+%   |)|.
+% \end{function}
+% 
+% \begin{function}{open-bracket}
+%   \begin{syntax}
+%     |open-bracket| = \meta{symbol}
+%   \end{syntax}
+%   Bracket symbol used to open a matched pair around units when once is
+%   required to maintain mathematical logic. The standard setting is |(|. ^^A )
+% \end{function}
 % 
 % \begin{function}{inter-unit-product}
 %   \begin{syntax}
@@ -213,6 +254,57 @@
 %   \end{syntax}
 %   Inserted between unit combinations in parsed mode, and used to replace
 %   |.| and |~| in literal mode. The standard setting is |\,|.
+% \end{function}
+% 
+% \begin{function}{per-mode}
+%   \begin{syntax}
+%     |per-mode| = \meta{choice}
+%   \end{syntax}
+%   Selects how the negative powers (\cs{per}) are formatted: a choice from
+%   the options |fraction|, |power|, |power-positive-first|, |repeated-symbol|,
+%   |symbol| and |symbol-or-fraction|. The option |fraction| generates
+%   fractional output when appropriate using the command specified by
+%   the |fraction-function| option. The setting |power| uses reciprocal powers
+%   leaving the units in the order of input, while |power-positive-first| uses
+%   the same display format but sorts units such that the positive powers
+%   come before negative ones. The |symbol| setting uses a symbol (specified
+%   by |per-symbol|) between positive and negative powers, while
+%   |repeated-symbol| uses the same symbol but places it before \emph{every}
+%   unit with a negative power (this is mathematically \enquote{wrong} but
+%   often seen in real work). Finally, |symbol-or-fraction| acts like
+%   |symbol| for inline output and like |fraction| when the output is used
+%   in a display math environment. The standard setting is |power|.
+% \end{function}
+% 
+% \begin{function}{per-symbol}
+%   \begin{syntax}
+%     |per-symbol| = \meta{symbol}
+%   \end{syntax}
+%   Specifies the symbol to be used to denote negative powers when the option
+%   |per-mode| is set to |repeated-symbol|, |symbol| or |symbol-or-fraction|.
+%   The standard setting is |/|.
+% \end{function}
+% 
+% \begin{function}{qualifier-mode}
+%   \begin{syntax}
+%     |qualifier-mode| = \meta{choice}
+%   \end{syntax}
+%   Selects how qualifiers are formatted: a choice from the options |brackets|,
+%   |phrase|, |space|, |subscript| and |text|. The option |brackets| wraps the
+%   qualifier in parenthesis, |phrase| inserts a textual linker (see
+%   |qualifier-phrase|), |space| introduces a space between the two items,
+%   |subscript| formats the qualifier as a subscript and |text| inserts the
+%   qualifier with no additional formatting. The standard setting is
+%   |subscript|.
+% \end{function}
+% 
+% \begin{function}{qualifier-phrase}
+%   \begin{syntax}
+%     |qualifier-phrase| = \meta{text}
+%   \end{syntax}
+%   Specifies the \meta{text} inserted between a unit and associated qualifier
+%   when |qualifier-mode| is set to |phrase|. The standard setting is
+%   \verb*|\ of\ |.
 % \end{function}
 % 
 % \begin{function}{sticky-per}
@@ -253,13 +345,16 @@
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
 % 
+% \begin{variable}[int]{\l_@@_tmp_fp}
 % \begin{variable}[int]{\l_@@_tmp_int}
 % \begin{variable}[int]{\l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\fp_new:N \l_@@_tmp_fp
 \int_new:N \l_@@_tmp_int
 \tl_new:N  \l_@@_tmp_tl
 %    \end{macrocode}
+% \end{variable}
 % \end{variable}
 % \end{variable}
 % 
@@ -849,6 +944,658 @@
 % \end{macro}
 % 
 % \subsection{Formatting parsed units}
+%
+% \begin{variable}[int]^^A
+%   {
+%     \l_@@_denominator_bracket_bool ,
+%     \l_@@_bracket_close_tl         ,
+%     \l_@@_bracket_open_tl          ,
+%     \l_@@_per_symbol_tl            ,
+%     \l_@@_qualifier_mode_tl        ,
+%     \l_@@_qualifier_phrase_tl
+%   }
+%   Set up the options which apply to formatting.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / units }
+  {
+    bracket-denominator .bool_set:N      = \l_@@_denominator_bracket_bool ,
+    close-bracket       .tl_set:N        = \l_@@_bracket_close_tl         ,
+    open-bracket        .tl_set:N        = \l_@@_bracket_open_tl          ,
+    per-mode            .choice:                                          ,
+    per-mode / fraction             .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_per_symbol_bool
+        \bool_set_true:N  \l_@@_powers_positive_bool
+        \bool_set_true:N  \l_@@_two_part_bool
+      } ,
+    per-mode / power                .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_per_symbol_bool
+        \bool_set_false:N \l_@@_powers_positive_bool
+        \bool_set_false:N \l_@@_two_part_bool
+      } ,
+    per-mode / power-positive-first .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_per_symbol_bool
+        \bool_set_false:N \l_@@_powers_positive_bool
+        \bool_set_true:N  \l_@@_two_part_bool
+      } ,
+    per-mode / repeated-symbol      .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_true:N  \l_@@_per_symbol_bool
+        \bool_set_true:N  \l_@@_powers_positive_bool
+        \bool_set_false:N \l_@@_two_part_bool
+      } , 
+    per-mode / symbol               .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_true:N  \l_@@_per_symbol_bool
+        \bool_set_true:N  \l_@@_powers_positive_bool
+        \bool_set_true:N  \l_@@_two_part_bool
+      } ,  
+    per-mode / symbol-or-fraction   .code:n =
+      {
+        \bool_set_true:N \l_@@_autofrac_bool
+        \bool_set_true:N \l_@@_per_symbol_bool
+        \bool_set_true:N \l_@@_powers_positive_bool
+        \bool_set_true:N \l_@@_two_part_bool
+      } , 
+    per-symbol          .tl_set:N        = \l_@@_per_symbol_tl             ,
+    qualifier-mode      .choice:                                           ,
+    qualifier-mode / brackets .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { brackets } }  ,
+    qualifier-mode / phrase   .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { phrase } }    ,
+    qualifier-mode / space .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { space } }     ,
+    qualifier-mode / subscript .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { subscript } } ,
+    qualifier-mode / text      .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { text } }      ,
+    qualifier-phrase .tl_set:N = \l_@@_qualifier_phrase_tl
+  }
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_bracket_bool}
+%   A flag to indicate that the unit currently under construction will require
+%   brackets if a power is added.
+%    \begin{macrocode}
+\bool_new:N \l_@@_bracket_bool
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]^^A
+%   {
+%     \l_@@_autofrac_bool        ,
+%     \l_@@_powers_positive_bool ,
+%     \l_@@_per_symbol_bool      ,
+%     \l_@@_two_part_bool
+%   }
+%   Dealing with the various ways that reciprocal (\cs{per}) can be handled
+%   requires a few different switches. 
+%    \begin{macrocode}
+\bool_new:N \l_@@_autofrac_bool
+\bool_new:N \l_@@_per_symbol_bool
+\bool_new:N \l_@@_powers_positive_bool
+\bool_new:N \l_@@_two_part_bool
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_numerator_bool}
+%   Indicates that the current unit should go into the numerator when splitting
+%   into two parts (fractions or other \enquote{sorted} styles).
+%    \begin{macrocode}
+\bool_new:N \l_@@_numerator_bool
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}{\tl_new:N \l_@@_qualifier_mode_tl}
+%   For storing the text of options which are best handled by picking
+%   function names.
+%    \begin{macrocode}
+\tl_new:N \l_@@_qualifier_mode_tl
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_prefix_power_bool}
+%   Used to determine if prefixes are converted into powers. Note that
+%   while this may be set as an option \enquote{higher up}, at this point it
+%   is handled as an internal switch (see the two formatting interfaces for
+%   reasons).
+%    \begin{macrocode}
+\bool_new:N \l_@@_prefix_power_bool
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_prefix_fp}
+%   When converting prefixes to powers, the calculations are done as an
+%   \texttt{fp}. 
+%    \begin{macrocode}
+\fp_new:N \l_@@_prefix_fp
+%    \end{macrocode}
+% \end{variable} 
+% 
+% \begin{variable}[int]{\l_@@_current_tl, \l_@@_part_tl}
+%   Building up the (partial) formatted unit requires some token list storage.
+%   Each part of the unit combination that is recovered also has to be
+%   placed in a token list: this is a dedicated one to leave the scratch
+%   variables available.
+%    \begin{macrocode}
+\tl_new:N \l_@@_current_tl
+\tl_new:N \l_@@_part_tl
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_denominator_tl}
+%   For fraction-like units, space is needed for the denominator as well as
+%   the numerator (which is handled using \cs{l_@@_formatted_tl}).
+%    \begin{macrocode}
+\tl_new:N \l_@@_denominator_tl
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{variable}[int]{\l_@@_total_int}
+%   The formatting routine needs to know both the total number of units and
+%   the current unit. Thus an \texttt{int} is required in addition to
+%   \cs{l_@@_position_int}.
+%    \begin{macrocode}
+\int_new:N \l_@@_total_int
+%    \end{macrocode}
+% \end{variable}
+% 
+% \begin{macro}{\siunitx_units_format:nN}
+% \begin{macro}{\siunitx_units_format:nNN}
+% \begin{macro}[aux]{\@@_format:nNN}
+% \begin{macro}[aux]{\@@_format_aux:}
+%   Formatting parsed units can take place either with the prefixes printed or
+%   separated out into a power of ten. This variation is handled using two
+%   separate functions: as this submodule does not really deal with numbers,
+%   formatting the numeral part here would be tricky and it is better therefore
+%   to have a mechanism to return a simple numerical power. At the same time,
+%   most uses will no want this more complex return format and so a version of
+%   the code which does not do this is also provided.
+% 
+%   The main unit formatting routine groups all of the parsing/formatting, so
+%   that the only value altered will be the return token list. As definitions
+%   for the various unit macros are not globally created, the first step is to
+%   map over the list of names and active the unit definitions: these do
+%   different things depending on the switches set. There is then a decision to
+%   be made: is the unit input one that can be parsed (\enquote{symbolic}), or
+%   is is one containing one or more literals. In the latter case, there is a
+%   still the need to convert the input into an expanded token list as some
+%   parts of the input could still be using unit macros.
+%   
+%   Notice that for \cs{siunitx_units_format:nN} a second return value from the
+%   auxiliary has to be allowed for, but is simply discarded.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_units_format:nN #1#2
+  {
+    \bool_set_false:N \l_@@_prefix_power_bool
+    \@@_format:nNN {#1} #2 \l_@@_tmp_fp
+  } 
+\cs_new_protected:Npn \siunitx_units_format:nNN #1#2#3
+  {
+    \bool_set_true:N \l_@@_prefix_power_bool
+    \@@_format:nNN {#1} #2 #3
+  }
+\cs_new_protected:Npn \@@_format:nNN #1#2#3
+  {  
+    \group_begin:
+      \seq_map_inline:Nn \l_@@_symbolic_seq
+        { \cs_set_eq:Nc ##1 { units ~ > ~ \token_to_str:N ##1 } }  
+      \@@_if_symbolic:nTF {#1}
+        {
+          \@@_parse:n {#1}
+          \@@_format_parsed:
+        }
+        {
+          \fp_zero:N \l_@@_prefix_fp
+          \@@_format_literal:n {#1} 
+        }
+      \cs_set_protected_nopar:Npx \@@_format_aux:
+        {
+          \tl_set:Nn \exp_not:N #2
+            { \exp_not:V \l_@@_formatted_tl }
+          \fp_set:Nn \exp_not:N #3
+            { \fp_use:N \l_@@_prefix_fp }
+        }
+    \exp_after:wN \group_end:
+    \@@_format_aux:
+  }
+\cs_new_protected_nopar:Npn \@@_format_aux: { }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_format_parsed:}
+% \begin{macro}[aux]{\@@_format_parsed_aux:n}
+%   The main formatting routine is essentially a loop over each position,
+%   reading the various parts of the unit to build up complete unit
+%   combination.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_parsed:
+  {
+    \int_set_eq:NN \l_@@_total_int \l_@@_position_int
+    \tl_clear:N \l_@@_denominator_tl
+    \tl_clear:N \l_@@_formatted_tl
+    \fp_zero:N \l_@@_prefix_fp
+    \int_zero:N \l_@@_position_int
+    \int_do_while:nNnn \l_@@_position_int < \l_@@_total_int
+      {
+        \bool_set_false:N \l_@@_bracket_bool
+        \tl_clear:N \l_@@_current_tl
+        \bool_set_true:N \l_@@_numerator_bool
+        \int_incr:N \l_@@_position_int
+        \clist_map_inline:nn { prefix , unit , qualifier , power , special }
+          { \@@_format_parsed_aux:n {##1} }
+        \@@_format_output:
+      }
+    \@@_format_finalise:
+  }
+\cs_new_protected:Npn \@@_format_parsed_aux:n #1
+  {
+    \tl_set:Nx \l_@@_tmp_tl { #1 - \int_use:N \l_@@_position_int }
+    \prop_get:NVNT \l_@@_parsed_prop
+      \l_@@_tmp_tl \l_@@_part_tl
+      { \use:c { @@_format_ #1 : } }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int, EXP]{\@@_format_bracket:N}
+%   A quick utility function which wraps up a token list variable in brackets
+%   if they are required.
+%    \begin{macrocode}
+\cs_new:Npn \@@_format_bracket:N #1
+  {
+    \bool_if:NTF \l_@@_bracket_bool
+      {
+        \exp_not:V \l_@@_left_bracket_tl
+        \exp_not:V #1 
+        \exp_not:V \l_@@_right_bracket_tl
+      }
+      { \exp_not:V #1 }
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_power:}
+% \begin{macro}[aux, EXP]{\@@_format_power_aux:wTF}
+% \begin{macro}[aux]^^A
+%   {
+%     \@@_format_power_positive: ,
+%     \@@_format_power_negative:  
+%   }
+% \begin{macro}[aux, EXP]{\@@_format_power_negative_aux:w}
+% \begin{macro}[aux]{\@@_format_power_superscript:}
+%   Formatting powers requires a test for negative numbers and depending on
+%   output format requests some adjustment to the stored value. This could be
+%   done using an \texttt{fp} function, but that would be slow compared to
+%   a dedicated if lower-level approach based on delimited arguments.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_power:
+  {
+    \exp_after:wN \@@_format_power_aux:wTF \l_@@_part_tl - \q_stop
+      { \@@_format_power_negative: }
+      { \@@_format_power_positive: }
+  }
+\cs_new:Npn \@@_format_power_aux:wTF #1 - #2 \q_stop
+  { \tl_if_empty:nTF {#1} }
+%    \end{macrocode}
+%   In the case of positive powers, there is little to do: add the power
+%   as a subscript (must be required as the parser ensures it's $\neq 1$).
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_power_positive:
+  { \@@_format_power_superscript: }
+%    \end{macrocode}
+%   Dealing with negative powers starts by flipping the switch used to track
+%   where in the final output the current part should get added to. For the
+%   case where the output is fraction-like, strip off the |~| then ensure that
+%   the result is not the trivial power~$1$. Assuming all is well, addition
+%   to the current unit combination goes ahead.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_power_negative:
+  {
+    \bool_set_false:N \l_@@_numerator_bool
+    \bool_if:NTF \l_@@_powers_positive_bool
+      { 
+        \tl_set:Nx \l_@@_part_tl
+          {
+            \exp_after:wN \@@_format_power_negative_aux:w
+              \l_@@_part_tl \q_stop 
+          }
+        \str_if_eq_x:nnF { \exp_not:V \l_@@_part_tl } { 1 }
+          { \@@_format_power_superscript: }
+      }
+      { \@@_format_power_superscript: }
+  }
+\cs_new:Npn \@@_format_power_negative_aux:w - #1 \q_stop
+  { \exp_not:n {#1} }
+%    \end{macrocode}
+%   Adding the power as a superscript has the slight complication that there
+%   is the possibility of needing some brackets. The superscript itself uses
+%   \cs{sp} as that avoids any category code issues and also allows redirection
+%   at a higher level more readily.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_power_superscript:
+  {
+    \tl_set:Nx \l_@@_current_tl
+      {
+        \@@_format_bracket:N \l_@@_current_tl
+        \exp_not:N \sp { \exp_not:V \l_@@_part_tl }
+      }
+    \bool_set_false:N \l_@@_bracket_bool
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_prefix:}
+% \begin{macro}[aux]{\@@_format_prefix_power:, \@@_format_prefix_symbol:}
+%   Formatting for prefixes depends on whether they are to be expressed as
+%   symbols or collected up to be returned as a power of $10$. The latter
+%   case requires a bit of processing, which includes checking that the
+%   conversion is possible and allowing for any power that applies to the
+%   current unit.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_prefix:
+  {
+    \bool_if:NTF \l_@@_prefix_power_bool
+      { \@@_format_prefix_power: }
+      { \@@_format_prefix_symbol: }
+  }
+\cs_new_protected_nopar:Npn \@@_format_prefix_power:
+  {
+    \prop_get:NVNTF \l_@@_prefixes_forward_prop
+      \l_@@_part_tl \l_@@_part_tl
+      {
+        \tl_set:Nx \l_@@_tmp_tl
+          { power- \int_use:N \l_@@_position_int }
+        \prop_get:NVNF \l_@@_parsed_prop
+          \l_@@_tmp_tl \l_@@_tmp_tl
+          { \tl_set:Nn \l_@@_tmp_tl { 1 } }
+        \fp_add:Nn \l_@@_prefix_fp
+          { \l_@@_tmp_tl * \l_@@_part_tl }
+      }
+      { \@@_format_prefix_symbol: }
+  }
+\cs_new_protected_nopar:Npn \@@_format_prefix_symbol:
+  { \tl_set_eq:NN \l_@@_current_tl \l_@@_part_tl }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_qualifier:}
+% \begin{macro}[aux]^^A
+%   {
+%     \@@_format_qualifier_brackets:  ,
+%     \@@_format_qualifier_phrase:    ,
+%     \@@_format_qualifier_space: ,
+%     \@@_format_qualifier_subscript: ,
+%     \@@_format_qualifier_text:
+%   }
+%  There are various ways that a qualifier can be added to the output. The
+%  idea here is to modify the \enquote{base} text appropriately and then add
+%  to the current unit. In the case that a linking phrase is in use, the
+%  addition of spaces means that the unit may end up ambiguous, and brackets
+%  are therefore required \emph{if} there is a power. Notice that when the
+%  qualifier is just treated as \enquote{text}, the auxiliary is actually
+%  a no-op. 
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_qualifier:
+  {
+    \use:c { @@_format_qualifier_ \l_@@_qualifier_mode_tl : }
+    \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl
+  }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_brackets:
+  {
+    \tl_set:Nx \l_@@_part_tl 
+      {
+        \exp_not:V \l_@@_left_bracket_tl
+        \exp_not:V \l_@@_part_tl
+        \exp_not:V \l_@@_right_bracket_tl
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_phrase:
+  {
+    \tl_set:Nx \l_@@_part_tl 
+      {
+        \exp_not:V \l_@@_qualifier_phrase_tl
+        \exp_not:V \l_@@_part_tl
+      }
+    \bool_set_true:N \l_@@_bracket_bool
+  }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_space:
+  {
+    \tl_put_left:Nn \l_@@_part_tl { \  }
+    \bool_set_true:N \l_@@_bracket_bool
+  }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
+  {
+    \tl_set:Nx \l_@@_part_tl 
+      { \exp_not:N \sb { \exp_not:V \l_@@_part_tl } }
+  }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_text: { }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_special:}
+%   Any special odds and ends are handled by simply making the current
+%   combination into an argument for the recovered code.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_special:
+  {
+    \tl_set:Nx \l_@@_current_tl
+      {
+        \exp_not:V \l_@@_part_tl
+          { \exp_not:V \l_@@_current_tl }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_unit:}
+%   A very simple task: add the unit to the output currently being
+%   constructed.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_unit:
+  { \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_output:}
+% \begin{macro}[aux]^^A
+%   {\@@_format_output_aux:, \@@_format_output_denominator:}
+% \begin{macro}[aux]^^A
+%   {
+%     \@@_format_output_aux:nn ,
+%     \@@_format_output_aux:nV ,
+%     \@@_format_output_aux:nv
+%   }
+%   The first step here is to make a choice based on whether the current
+%   part should be stored as part of the numerator or denominator of a
+%   fraction. In all cases, if the switch \cs{l_@@_numerator_bool} is
+%   true then life is simple: add the current part to the numerator with
+%   a standard separator
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_output:
+  {
+    \bool_set_false:N \l_@@_bracket_bool
+    \use:c
+      {
+        @@_format_output_
+        \bool_if:NTF \l_@@_numerator_bool
+          { aux: }
+          { denominator: }
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_format_output_aux:
+  {
+    \@@_format_output_aux:nV { formatted }
+      \l_@@_product_tl
+  }
+%    \end{macrocode}
+%   There are a few things to worry about at this stage if the current part
+%   is in the denominator.  Powers have already been dealt with and some
+%   formatting outcomes only need a branch at the final point of building
+%   the entire unit. That means that there are three possible outcomes here:
+%   if collecting two separate parts, add to the denominator with a product
+%   separator, or if only building one token list there may be a need to use
+%   a symbol separator.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_output_denominator:
+  {
+    \bool_if:NTF \l_@@_two_part_bool
+      {
+        \bool_if:nT
+          {
+             ! ( \tl_if_empty_p:N \l_@@_denominator_tl )
+             &&
+             \l_@@_denominator_bracket_bool
+          }
+          { \bool_set_true:N \l_@@_bracket_bool }
+        \@@_format_output_aux:nV { denominator }
+          \l_@@_product_tl
+      }
+      {
+        \@@_format_output_aux:nv { formatted }
+          {
+            l_@@_
+            \bool_if:NTF \l_@@_per_symbol_bool
+              { per_symbol }
+              { product }
+            _tl
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_format_output_aux:nn #1#2
+  {
+    \tl_set:cx { l_@@_ #1 _tl }
+      {
+         \exp_not:v { l_@@_ #1 _tl }
+         \tl_if_empty:cF { l_@@_ #1 _tl }
+           { \exp_not:n {#2} }
+         \exp_not:V \l_@@_part_tl 
+      }
+  }
+\cs_generate_variant:Nn \@@_format_output_aux:nn { nV , nv }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}[int]{\@@_format_finalise:}
+% \begin{macro}[aux]^^A
+%   {
+%     \@@_format_finalise_autofrac:   ,
+%     \@@_format_finalise_fractional: ,
+%     \@@_format_finalise_power:
+%   }
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_finalise:
+  {
+    \tl_if_empty:NF \l_@@_denominator_tl
+      {
+        \bool_if:NTF \l_@@_powers_positive_bool
+          { \@@_format_finalise_power: }
+          { \@@_format_finalise_fractional: }
+      }
+  }
+%    \end{macrocode}
+%   For fraction-like output, there are three possible choices and two
+%   actual styles. To deal with the \enquote{auto-format} case, the two
+%   styles (fraction and symbol) are handled in auxiliaries: this allows both
+%   to be used at the same time! Beyond that, the key here is to use a 
+%   single \cs{tl_set:Nx} to keep down the number of assignments.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_finalise_fractional:
+  {
+    \bool_if:NTF \l_@@_autofrac_bool
+      { \@@_format_finalise_autofrac: }
+      {
+        \bool_if:NTF \l_@@_per_symbol_bool
+          { \@@_format_finalise_symbol: }
+          { \@@_format_finalise_fraction: }
+      }
+  }
+%    \end{macrocode}
+%   For the \enquote{auto-selected} fraction method, the two other auxiliary
+%   functions are used to do both forms of formatting. So that everything
+%   required is available, this needs one group so that the second auxiliary
+%   receives the correct input. After that it is just a case of applying
+%   \cs{mathchoice} to the formatted output.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_finalise_autofrac:
+  {
+    \group_begin:
+      \@@_format_finalise_fraction:
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn \l_@@_tmp_tl \l_@@_formatted_tl
+    \@@_format_finalise_symbol:
+    \tl_set:Nx \l_@@_formatted_tl
+      {
+        \mathchoice
+          { \exp_not:V \l_@@_tmp_tl }
+          { \exp_not:V \l_@@_formatted_tl }
+          { \exp_not:V \l_@@_formatted_tl }
+          { \exp_not:V \l_@@_formatted_tl }
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_format_finalise_fraction:
+  {
+    \tl_set:Nx \l_@@_formatted_tl
+      {
+        \exp_not:V \l_@@_fraction_function_tl
+          {
+            \tl_if_empty:NTF \l_@@_formatted_tl
+              { 1 }
+              { \@@_format_bracket:N \l_@@_formatted_tl }
+          }
+          { \exp_not:V \l_@@_denominator_tl }
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_format_finalise_symbol:
+  {
+    \tl_set:Nx \l_@@_formatted_tl
+      {
+        \@@_format_bracket:N \l_@@_formatted_tl
+        \exp_not:V \l_@@_per_symbol_tl
+        \exp_not:V \l_@@_denominator_tl 
+      }
+  }
+%    \end{macrocode}
+%   In the case of sorted powers, there is a test to make sure there was
+%   at least one positive power, and if so a simple join of the two parts
+%   with the appropriate product.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_format_finalise_power:
+  {
+    \tl_if_empty:NTF \l_@@_formatted_tl
+      { \tl_set_eq:NN \l_@@_formatted_tl \l_@@_denominator_tl }
+      {
+        \tl_set:Nx \l_@@_formatted_tl
+          {
+            \exp_not:V \l_@@_formatted_tl
+            \exp_not:V \l_@@_product_tl
+            \exp_not:V \l_@@_denominator_tl
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % 
 % \subsection{Messages}
 %
@@ -884,8 +1631,15 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx / units }
   {
-    inter-unit-product = \,    ,
-    sticky-per         = false 
+    bracket-denominator = true          , % (
+    close-bracket       = )             ,
+    open-bracket        = (             , % )
+    inter-unit-product  = \,            ,
+    per-mode            = power         ,
+    per-symbol          = /             ,
+    qualifier-mode      = subscript     ,
+    qualifier-phrase    = \ \mbox{of}\  ,
+    sticky-per          = false 
   }
 %    \end{macrocode}
 %    
