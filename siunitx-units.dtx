@@ -94,6 +94,13 @@
 %     \cs{siunitx_units_format:nNN} \Arg{units} \meta{tl~var} \meta{fp~var}
 %   \end{syntax}
 % \end{function}
+% 
+% \begin{variable}{\l_siunitx_units_font_tl}
+%   Stores the command applied to text during output of units: the content
+%   should be command usable in math mode for font selection. This variable is
+%   equivalent to the |font-command| key, but is available directly as this
+%   allows rapid setting by higher-level systems which detect font usage. 
+% \end{variable}
 %
 % \section{Defining symbolic units}
 %
@@ -251,6 +258,15 @@
 %   required to maintain mathematical logic. The standard setting is ^^A (
 %   |)|.
 % \end{function}
+% 
+% \begin{function}{font-command}
+%   \begin{syntax}
+%     |font-command| = \meta{command}
+%   \end{syntax}
+%   Command applied to text during output of units: should be command usable
+%   in math mode for font selection. The standard setting is |\mathrm|. See
+%   also \cs{l_siunitx_units_font_tl}.
+% \end{function}
 %
 % \begin{function}{fraction-command}
 %   \begin{syntax}
@@ -284,7 +300,7 @@
 %   the options |fraction|, |power|, |power-positive-first|, |repeated-symbol|,
 %   |symbol| and |symbol-or-fraction|. The option |fraction| generates
 %   fractional output when appropriate using the command specified by
-%   the |fraction-function| option. The setting |power| uses reciprocal powers
+%   the |fraction-command| option. The setting |power| uses reciprocal powers
 %   leaving the units in the order of input, while |power-positive-first| uses
 %   the same display format but sorts units such that the positive powers
 %   come before negative ones. The |symbol| setting uses a symbol (specified
@@ -634,15 +650,18 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 %
+% \begin{variable}{\l_siunitx_units_font_tl}
 % \begin{variable}[int]{\l_@@_product_tl}
 %   Options which apply to the main formatting routine, and so are not tided
 %   to either symbolic or literal input.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / units }
   {
+    font-command       .tl_set:N = \l_siunitx_units_font_tl ,
     inter-unit-product .tl_set:N = \l_@@_product_tl
   }
 %    \end{macrocode}
+% \end{variable}
 % \end{variable}
 %
 % \begin{variable}[int]{\l_@@_formatted_tl}
@@ -708,10 +727,6 @@
         {
           \group_begin:
             \bool_set_false:N \l_@@_parsing_bool
-            \cs_set_protected_nopar:Npn ~ { }
-            \cs_set_protected_nopar:Npn \sb { }
-            \cs_set_protected_nopar:Npn \sp { }
-            \protected@edef \l_@@_formatted_tl {#1}
             \tl_replace_all:NnV \l_@@_formatted_tl { . }
               \l_@@_product_tl
             \tl_replace_all:NnV \l_@@_formatted_tl { ~ }
@@ -720,6 +735,10 @@
             \tl_replace_all:Nnn \l_@@_formatted_tl { + } { \sp }
             \tl_replace_all:Nnn \l_@@_formatted_tl { _ } { \sb }
             \tl_replace_all:Nnn \l_@@_formatted_tl { = } { \sb }
+            \cs_set_protected_nopar:Npn \sb { }
+            \cs_set_protected_nopar:Npn \sp { }
+            \protected@edef \l_@@_formatted_tl {#1}
+              { \exp_not:V \l_siunitx_units_font_tl {#1} }
           \exp_args:NNNV \group_end:
           \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
         }
@@ -1509,7 +1528,8 @@
          \exp_not:v { l_@@_ #1 _tl }
          \tl_if_empty:cF { l_@@_ #1 _tl }
            { \exp_not:n {#2} }
-         \exp_not:V \l_@@_current_tl
+         \exp_not:V \l_siunitx_units_font_tl
+           { \exp_not:V \l_@@_current_tl }
       }
   }
 \cs_generate_variant:Nn \@@_format_output_aux:nn { nV , nv }
@@ -1656,6 +1676,7 @@
     bracket-denominator = true          , % (
     close-bracket       = )             ,
     fraction-function   = \frac         ,
+    font-command        = \mathrm       ,
     open-bracket        = (             , % )
     inter-unit-product  = \,            ,
     per-mode            = power         ,
