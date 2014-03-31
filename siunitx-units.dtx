@@ -549,18 +549,16 @@
 %   from others (symbolic) or is defined in terms of some literals. To do this,
 %   the approach used is to set all of the symbolic unit commands expandable
 %   and to do nothing, with the few special cases handled manually. If
-%   an \texttt{x}-type definition then yields nothing at all then the
-%   assumption is that the input is symbolic.
-%
-%   Note that as we are dealing with arbitrary \LaTeXe{} input, there is the
-%   need to use \cs{protected@edef} here: in a \enquote{pure} \LaTeX3 version
-%   that would replaced by \cs{tl_set:Nx}.
+%   an \texttt{f}-type definition then yields nothing at all then the
+%   assumption is that the input is symbolic. (We use \texttt{f}-type
+%   expansion since it will turn the symbolic unit names into nothing at
+%   all but doesn't require them to be expandable.)
 %    \begin{macrocode}
 \prg_new_protected_conditional:Npnn \@@_if_symbolic:n #1 { TF }
   {
     \group_begin:
       \bool_set_true:N \l_@@_test_bool
-      \protected@edef \l_@@_tmp_tl {#1}
+      \tl_set:Nf \l_@@_tmp_tl {#1}
     \exp_args:NNV \group_end:
     \tl_if_blank:nTF \l_@@_tmp_tl
       { \prg_return_true: }
@@ -605,9 +603,9 @@
 %   macros. That is required so that the unit formatting system can be grouped.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_set_symbolic:Nnn #1
-  { \@@_set_symbolic:NNnnn \cs_set_nopar:cpn #1 { } }
+  { \@@_set_symbolic:NNnnn \cs_set_protected_nopar:cpn #1 { } }
 \cs_new_protected:Npn \@@_set_symbolic:Npnn #1#2#
-  { \@@_set_symbolic:NNnnn \cs_set:cpn #1 {#2} }
+  { \@@_set_symbolic:NNnnn \cs_set_protected:cpn #1 {#2} }
 \cs_new_protected:Npn \@@_set_symbolic:NNnnn #1#2#3#4#5
   {
     \seq_put_right:Nn \l_@@_symbolic_seq {#2}
