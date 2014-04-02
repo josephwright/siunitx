@@ -821,6 +821,7 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_format_literal:n}
+% \begin{macro}[aux]{\@@_format_literal_aux:w}
 %   To format literal units, there are two tasks to do. The input is
 %   \texttt{x}-type expanded to force any symbolic units to be converted into
 %   their literal representation: this requires setting the appropriate
@@ -853,23 +854,40 @@
         {
           \group_begin:
             \bool_set_false:N \l_@@_parsing_bool
-            \tl_replace_all:NnV \l_@@_formatted_tl { . }
-              \l_@@_product_tl
-            \tl_replace_all:NnV \l_@@_formatted_tl { ~ }
-              \l_@@_product_tl
-            \tl_replace_all:Nnn \l_@@_formatted_tl { ^ } { \sp }
-            \tl_replace_all:Nnn \l_@@_formatted_tl { + } { \sp }
-            \tl_replace_all:Nnn \l_@@_formatted_tl { _ } { \sb }
-            \tl_replace_all:Nnn \l_@@_formatted_tl { = } { \sb }
+            \tl_set:Nn \l_@@_tmp_tl {#1}
+            \tl_replace_all:Nnn \l_@@_tmp_tl { ~ } { . }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { ^ } { \sp }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { + } { \sp }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { _ } { \sb }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { = } { \sb }
             \cs_set_protected_nopar:Npn \sb { }
             \cs_set_protected_nopar:Npn \sp { }
-            \protected@edef \l_@@_formatted_tl
-              { \exp_not:V \l_siunitx_unit_font_tl {#1} }
+            \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
+            \tl_clear:N \l_@@_formatted_tl
+            \exp_after:wN \@@_format_literal_aux:w \l_@@_tmp_tl .
+              \q_recursion_tail . \q_recursion_stop
           \exp_args:NNNV \group_end:
           \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
         }
     }
 %    \end{macrocode}
+%   To introduce the font changing commands while still allowing for line
+%   breaks in literal units, a loop is needed to replace on |.| at a time. 
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_literal_aux:w #1 .
+  {
+    \quark_if_recursion_tail_stop:n {#1}
+    \tl_set:Nx \l_@@_formatted_tl
+      {
+        \exp_not:V \l_@@_formatted_tl
+        \tl_if_empty:NF \l_@@_formatted_tl
+          { \exp_not:V \l_@@_product_tl }
+        \exp_not:V \l_siunitx_unit_font_tl { \exp_not:n {#1} }
+      }
+    \@@_format_literal_aux:w
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Parsing symbolic units}
