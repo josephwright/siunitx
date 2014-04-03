@@ -419,6 +419,14 @@
 %   Inserted between unit combinations in parsed mode, and used to replace
 %   |.| and |~| in literal mode. The standard setting is |\,|.
 % \end{function}
+% 
+% \begin{function}{parse}
+%   \begin{syntax}
+%     |parse| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Determines whether parsing of unit symbols is attempted or literal
+%   mode is used directly. The standard setting is |true|.
+% \end{function}
 %
 % \begin{function}{per-mode}
 %   \begin{syntax}
@@ -439,7 +447,7 @@
 %   |symbol| for inline output and like |fraction| when the output is used
 %   in a display math environment. The standard setting is |power|.
 % \end{function}
-%
+% 
 % \begin{function}{per-symbol}
 %   \begin{syntax}
 %     |per-symbol| = \meta{symbol}
@@ -1134,6 +1142,7 @@
 %     \l_@@_fraction_function_tl     ,
 %     \l_@@_bracket_close_tl         ,
 %     \l_@@_bracket_open_tl          ,
+%     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
 %     \l_@@_qualifier_mode_tl        ,
 %     \l_@@_qualifier_phrase_tl
@@ -1146,6 +1155,7 @@
     fraction-command    .tl_set:N        = \l_@@_fraction_function_tl     ,
     close-bracket       .tl_set:N        = \l_@@_bracket_close_tl         ,
     open-bracket        .tl_set:N        = \l_@@_bracket_open_tl          ,
+    parse               .bool_set:N      = \l_@@_parse_bool               ,
     per-mode            .choice:                                          ,
     per-mode / fraction             .code:n =
       {
@@ -1333,15 +1343,17 @@
     \group_begin:
       \seq_map_inline:Nn \l_@@_symbolic_seq
         { \cs_set_eq:Nc ##1 { units ~ > ~ \token_to_str:N ##1 } }
-      \@@_if_symbolic:nTF {#1}
+      \fp_zero:N \l_@@_prefix_fp
+      \bool_if:nTF \l_@@_parse_bool
         {
-          \@@_parse:n {#1}
-          \@@_format_parsed:
-        }
-        {
-          \fp_zero:N \l_@@_prefix_fp
-          \@@_format_literal:n {#1}
-        }
+          \@@_if_symbolic:nTF {#1}
+            {
+              \@@_parse:n {#1}
+              \@@_format_parsed:
+            }
+            { \@@_format_literal:n {#1} }
+        }    
+        { \@@_format_literal:n {#1} }
       \cs_set_protected_nopar:Npx \@@_format_aux:
         {
           \tl_set:Nn \exp_not:N #2
@@ -2134,6 +2146,7 @@
     fraction-command    = \frac         ,
     open-bracket        = (             , % )
     inter-unit-product  = \,            ,
+    parse               = true          ,
     per-mode            = power         ,
     per-symbol          = /             ,
     qualifier-mode      = subscript     ,
