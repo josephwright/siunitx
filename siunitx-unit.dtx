@@ -789,7 +789,7 @@
 %   Options which apply to the main formatting routine, and so are not tided
 %   to either symbolic or literal input.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / units }
+\keys_define:nn { siunitx / unit }
   {
     font-command       .tl_set:N = \l_siunitx_unit_font_tl ,
     inter-unit-product .tl_set:N = \l_@@_product_tl
@@ -931,7 +931,7 @@
 %   There is one option when \emph{parsing} the input (as opposed to
 %   \emph{formatting} for output): how to deal with \cs{per}.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / units }
+\keys_define:nn { siunitx / unit }
   {
     sticky-per .bool_set:N = \l_@@_sticky_per_bool
   }
@@ -986,7 +986,7 @@
   {
     \tl_set:Nx \l_@@_tmp_tl { #1 - #2 }
     \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
-      { \msg_error:nnnn { siunitx / units } { duplicate-part } {#1} {#3} }
+      { \msg_error:nnnn { siunitx / unit } { duplicate-part } {#1} {#3} }
       { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl {#4} }
   }
 %    \end{macrocode}
@@ -1024,7 +1024,7 @@
         \@@_parse_add:nnnn { qualifier }
           { \int_use:N \l_@@_position_int } {#1} {#2}
       }
-      { \msg_error:nnn { siunitx / units } { qualifier-before-unit } {#1} }
+      { \msg_error:nnn { siunitx / unit } { qualifier-before-unit } {#1} }
   }
 %    \end{macrocode}
 %  Special (exceptional) items should always come before the relevant units.
@@ -1077,7 +1077,7 @@
       {
         \bool_set_true:N \l_@@_per_bool
         \cs_set_protected_nopar:Npn \per
-          { \msg_error:nn { siunitx / units } { duplicate-sticky-per } }
+          { \msg_error:nn { siunitx / unit } { duplicate-sticky-per } }
       }
       {
         \@@_parse_add:nnnn
@@ -1129,7 +1129,7 @@
     \tl_set:Nx \l_@@_tmp_tl
       { prefix- \int_eval:n { \l_@@_position_int + \c_one } }
     \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
-      { \msg_error:nn { siunitx / units } { prefix-only } }
+      { \msg_error:nn { siunitx / unit } { prefix-only } }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1149,7 +1149,7 @@
 %   }
 %   Set up the options which apply to formatting.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / units }
+\keys_define:nn { siunitx / unit }
   {
     bracket-denominator .bool_set:N      = \l_@@_denominator_bracket_bool ,
     fraction-command    .tl_set:N        = \l_@@_fraction_function_tl     ,
@@ -2109,21 +2109,21 @@
 % \subsection{Messages}
 %
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx / units } { duplicate-part }
+\msg_new:nnnn { siunitx / unit } { duplicate-part }
   { Duplicate~#1~part~'#2'. }
   {
     Each~unit~may~have~only~one~#1:\\
     the~additional~value~'#2'~will~be~ignored.
   }
-\msg_new:nnnn { siunitx / units } { duplicate-sticky-per }
+\msg_new:nnnn { siunitx / unit } { duplicate-sticky-per }
   { Duplicate~\token_to_str:N \per. }
   {
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
-\msg_new:nnn { siunitx / units } { prefix-only }
+\msg_new:nnn { siunitx / unit } { prefix-only }
   { Prefix~with~no~unit. }
-\msg_new:nnnn { siunitx / units } { qualifier-before-unit }
+\msg_new:nnnn { siunitx / unit } { qualifier-before-unit }
   { Qualifier~before~unit:~'#1'. }
   {
     Unit~qualifiers~have~to~follow~after~units:~
@@ -2138,7 +2138,7 @@
 % (\emph{e.g.}~boolean variables are always |false| to begin with),
 % but for clarity everything is set here.
 %    \begin{macrocode}
-\keys_set:nn { siunitx / units }
+\keys_set:nn { siunitx / unit }
   {
     bracket-denominator = true          , % (
     close-bracket       = )             ,
