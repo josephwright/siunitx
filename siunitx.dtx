@@ -611,6 +611,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6}{2013/11/19}{Allow for loading of \pkg{mdwtab}}
 % \changes{v2.6}{2013/11/19}{Produce proper minus sign when \pkg{tex4ht}
 %   is in use}
+% \changes{v2.6}{2013/11/19}{Fix spacing when printing comparators}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9667,7 +9668,7 @@ This work consists of the file  siunitx.dtx
   \prop_if_in:NnT \l_@@_number_out_prop { mantissa-bracket }
     {
       \prop_put:Nnn \l_@@_number_out_prop { result-bracket }
-        { true }
+        { true }mwiht \snum
       \prop_remove:Nn \l_@@_number_out_prop { mantissa-bracket }
     }
   \prop_if_in:NnT \l_@@_number_out_prop { comparator }
@@ -9677,7 +9678,12 @@ This work consists of the file  siunitx.dtx
         \l_@@_tmpa_tl
       \prop_get:NnN \l_@@_number_out_prop { result }
         \l_@@_tmpb_tl
-      \tl_put_right:No \l_@@_tmpa_tl { \l_@@_tmpb_tl }
+      \tl_set:Nx \l_@@_tmpa_tl
+        {
+          \exp_not:N \mathord
+          \exp_not:V \l_@@_tmpa_tl
+          \exp_not:V \l_@@_tmpb_tl
+        }
       \prop_put:NnV \l_@@_number_out_prop { result }
         \l_@@_tmpa_tl
     }
