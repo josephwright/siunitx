@@ -1233,7 +1233,7 @@ This work consists of the file  siunitx.dtx
 % The spacing can still be altered at point of use:
 %\begin{LaTeXdemo}
 %  \SI{67890}{\degree} \\
-%  \SI[number-unit-product = \;]{67890}{\degree}
+%  \SI[number-unit-product = \,]{67890}{\degree}
 %\end{LaTeXdemo}
 % The meaning of a pre-defined unit can be altered by using
 % \cs{DeclareSIUnit} after loading \pkg{siunitx}. This will overwrite
@@ -3052,13 +3052,13 @@ This work consists of the file  siunitx.dtx
 %      Type &
 %      \multicolumn{1}{l}{Default} \\
 %    \midrule ^^A (
-%      allow-number-unit-breaks & Switch  & false    \\
-%      exponent-to-prefix       & Switch  & false    \\
-%      list-units               & Choice  & repeat   \\
-%      multi-part-units         & Choice  & brackets \\
-%      number-unit-product      & Literal & \cs{,}   \\
-%      product-units            & Choice  & repeat   \\
-%      range-units              & Choice  & repeat   \\
+%      allow-number-unit-breaks & Switch  & false     \\
+%      exponent-to-prefix       & Switch  & false     \\
+%      list-units               & Choice  & repeat    \\
+%      multi-part-units         & Choice  & brackets  \\
+%      number-unit-product      & Literal & \verb*" " \\
+%      product-units            & Choice  & repeat    \\
+%      range-units              & Choice  & repeat    \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -3079,11 +3079,13 @@ This work consists of the file  siunitx.dtx
 %\end{LaTeXdemo}
 %
 %\DescribeOption{number-unit-product}
+% \changes{v2.6}{2014/09/03}{Change standard setting for
+%   \opt{number-unit-product} to a full space}
 % The product symbol between the number and unit is set using the
 % \opt{number-unit-product} option.
 %\begin{LaTeXdemo}
 %  \SI{2.67}{\farad} \\
-%  \SI[number-unit-product = \text{~}]{2.67}{\farad} \\
+%  \SI[number-unit-product = \,]{2.67}{\farad} \\
 %  \SI[number-unit-product = ]{2.67}{\farad}
 %\end{LaTeXdemo}
 %
@@ -4765,6 +4767,12 @@ This work consists of the file  siunitx.dtx
 % which must be in math mode. The standard settings have been altered to take
 % account of this, but user-set options for products may need to be updated
 % accordingly.
+%
+% \subsection{Upgrading from version 2.5}
+%
+% The standard setting for \opt{number-unit-product} is now a full width
+% space: this has been revised to bring it into line with the recommendations
+% of the \textsc{bipm}.
 %
 %\section{Correct application of (SI) units}
 %
@@ -12704,7 +12712,7 @@ This work consists of the file  siunitx.dtx
 }
 \keys_set:nn { siunitx } {
   multi-part-units    = brackets,
-  number-unit-product = \,,
+  number-unit-product = \  ,
   product-units       = repeat,
 }
 %    \end{macrocode}
