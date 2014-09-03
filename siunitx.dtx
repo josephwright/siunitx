@@ -6423,6 +6423,7 @@ This work consists of the file  siunitx.dtx
         { \ensuremath { \pm } }
       \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
         { \ensuremath { \mp } }
+      \tl_remove_all:Nn \l_@@_print_arg_tl { \mathord }
       \cs_set_eq:NN \PrintSubscript   \@@_print_text_sub:n
       \cs_set_eq:NN \PrintSuperscript \@@_print_text_super:n
       \tl_replace_all:Nnn \l_@@_print_arg_tl { @ }
@@ -10094,7 +10095,7 @@ This work consists of the file  siunitx.dtx
           \bool_if:NTF \l_@@_tight_bool
             {
               \tl_set:Nx \l_@@_tmpa_tl
-                { { \exp_not:V \l_@@_tmpa_tl } }
+                { \exp_not:N \mathord \exp_not:V \l_@@_tmpa_tl } 
             }
             {
               \prop_if_in:NnT \l_@@_number_out_prop { mantissa }
@@ -13218,7 +13219,10 @@ This work consists of the file  siunitx.dtx
       {
         \tl_set_eq:NN \l_@@_tmpa_tl \l_@@_exponent_product_tl
         \bool_if:NT \l_@@_tight_bool
-          { \tl_set:Nx \l_@@_tmpa_tl { { \exp_not:o \l_@@_tmpa_tl } } }
+          { 
+            \tl_set:Nx \l_@@_tmpa_tl
+              { \exp_not:N \mathord \exp_not:o \l_@@_tmpa_tl }
+          }
         \tl_set:Nx \l_@@_tmpa_tl
           {
             \exp_not:N \ensuremath { { } \exp_not:o \l_@@_tmpa_tl  { } }
@@ -14893,7 +14897,10 @@ This work consists of the file  siunitx.dtx
   {
     \tl_set_eq:NN \l_@@_tmpb_tl \l_@@_exponent_product_tl
     \bool_if:NT \l_@@_tight_bool
-      { \tl_set:Nx \l_@@_tmpb_tl { { \exp_not:o \l_@@_tmpb_tl } } }
+      {
+        \tl_set:Nx \l_@@_tmpb_tl
+          { \exp_not:N \mathord \exp_not:o \l_@@_tmpb_tl }
+      }
     \tl_set:Nx \l_@@_tmpa_tl
       {
         \exp_not:N \ensuremath { { } \exp_not:o \l_@@_tmpb_tl  { } }
