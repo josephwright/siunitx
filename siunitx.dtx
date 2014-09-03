@@ -763,14 +763,17 @@ This work consists of the file  siunitx.dtx
 %\subsection{Numbers}
 %
 %\DescribeMacro{\num}
+% \begin{changes}{v2.6}{2014/09/03}{Ignore hard spaces (\texttt{\~}) in
+%   argument of \cs{num})
 %\begin{syntax}
 %  \cs{num}\oarg{options}\marg{number}
 %\end{syntax}
 % Numbers are automatically formatted by the \cs{num} macro.  This
 % takes one optional argument, \meta{options}, and one mandatory one,
 % \meta{number}.  The contents of \meta{number} are automatically
-% formatted.  The formatter removes \enquote{hard} spaces
-% (\cs{,} and "~"), automatically identifies exponents (by default
+% formatted.  The formatter removes both \enquote{soft} (\verb*" ") and
+% \enquote{hard} spaces (\cs{,} and "~"), automatically identifies
+% exponents (by default
 % marked using \texttt{e}, \texttt{E}, \texttt{d} or \texttt{D}) and
 % adds the appropriate spacing of large numbers.  With the standard
 % settings a leading zero is added before a decimal marker, if needed:
@@ -6821,46 +6824,51 @@ This work consists of the file  siunitx.dtx
     }
 }
 \cs_generate_variant:Nn \@@_number_in_parse:n { V }
-\cs_new_protected:Npn \@@_number_in_parse_aux:n #1
-  {
-    \group_begin:
-      \@@_number_in_protect:
-      \cs_set_eq:NN \, \prg_do_nothing:
-      \tl_set_rescan:Nnx \l_@@_number_arg_tl
-        {
-          \char_set_catcode_ignore:N \~
-          \char_set_catcode_other:N \,
-          \char_set_catcode_other:N \.  
-        }
-        {#1}
-    \exp_args:NNNV \group_end:
-    \tl_set:Nn \l_@@_number_arg_tl \l_@@_number_arg_tl
-    \@@_number_in_sign_replace:N \l_@@_number_arg_tl
-    \@@_number_in_parse_relation:N \l_@@_number_arg_tl
-    \tl_map_function:NN \l_@@_number_arg_tl
-      \@@_number_in_parse_loop:N
-    \tl_if_empty:NF \l_@@_number_parsed_tl
-      {
-        \bool_if:NTF \l_@@_number_in_uncert_bool
-          { \@@_error:nx { invalid-number } {#1} }
+\group_begin:
+  \char_set_catcode_active:N \~
+  \char_set_catcode_space:N \  %
+  \cs_new_protected:Npn \@@_number_in_parse_aux:n #1
+    {
+      \group_begin:
+        \@@_number_in_protect:
+        \cs_set_eq:NN \, \prg_do_nothing:
+        \cs_set_eq:NN ~ \prg_do_nothing:
+        \tl_set_rescan:Nnx \l_@@_number_arg_tl
           {
-            \prop_put:NVn \l_@@_number_in_prop
-              \l_@@_number_part_tl { true }
-            \bool_if:NTF \l_@@_number_in_decimal_bool
-              {
-                \prop_put:NVV \l_@@_number_in_prop
-                  \l_@@_number_part_decimal_tl
-                  \l_@@_number_parsed_tl
-              }
-              {
-                \prop_put:NVV \l_@@_number_in_prop
-                  \l_@@_number_part_integer_tl
-                  \l_@@_number_parsed_tl
-              }
-         }
-      }
-    \@@_number_in_check:n {#1}
-  }
+            \char_set_catcode_ignore:N \  %
+            \char_set_catcode_other:N \,
+            \char_set_catcode_other:N \.  
+          }
+          {#1}
+      \exp_args:NNNV \group_end:
+      \tl_set:Nn \l_@@_number_arg_tl \l_@@_number_arg_tl
+      \@@_number_in_sign_replace:N \l_@@_number_arg_tl
+      \@@_number_in_parse_relation:N \l_@@_number_arg_tl
+      \tl_map_function:NN \l_@@_number_arg_tl
+        \@@_number_in_parse_loop:N
+      \tl_if_empty:NF \l_@@_number_parsed_tl
+        {
+          \bool_if:NTF \l_@@_number_in_uncert_bool
+            { \@@_error:nx { invalid-number } {#1} }
+            {
+              \prop_put:NVn \l_@@_number_in_prop
+                \l_@@_number_part_tl { true }
+              \bool_if:NTF \l_@@_number_in_decimal_bool
+                {
+                  \prop_put:NVV \l_@@_number_in_prop
+                    \l_@@_number_part_decimal_tl
+                    \l_@@_number_parsed_tl
+                }
+                {
+                  \prop_put:NVV \l_@@_number_in_prop
+                    \l_@@_number_part_integer_tl
+                    \l_@@_number_parsed_tl
+                }
+           }
+        }
+      \@@_number_in_check:n {#1}
+    }
+\group_end:
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
