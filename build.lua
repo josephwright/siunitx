@@ -6,9 +6,6 @@
 bundle = ""
 module = "siunitx"
 
--- .dtx is self-contained
-unpackfiles = {"*.dtx"}
-
 -- Install config files
 installfiles = {"*.cfg", "*.sty"}
 
