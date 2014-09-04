@@ -614,6 +614,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6}{2014/09/03}{Fix spacing when printing comparators}
 % \changes{v2.6}{2014/09/04}{Fix printing of uncertainties when the
 %   input is an integer and the uncertainty is given as a separate part}
+% \changes{v2.6}{2014/09/04}{Preserve standard meaning of \cs{fg} in
+%   bookmarks when \pkg{babel} is loaded with the \opt{french} option}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15968,6 +15970,8 @@ This work consists of the file  siunitx.dtx
   {
     \seq_map_inline:Nn \l_@@_declare_list_seq
       { \@@_unit_print_literal_aux:N ##1 }
+    \cs_if_exist:NT \FB@fg
+      { \cs_set_eq:NN \fg \FB@fg }
     \msg_redirect_name:nnn { xparse } { redefine-command } { none }
     \cs_set_eq:NN \num      \@@_bookmark_num:w
     \cs_set_eq:NN \numrange \@@_bookmark_numrange:w
