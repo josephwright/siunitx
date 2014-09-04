@@ -1,0 +1,225 @@
+\input{regression-test}
+
+\RequirePackage{siunitx}
+
+\START
+\AUTHOR{Joseph Wright}
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protectedd:Npn \test:n #1
+  {
+    \siunitx_unit_format:nN {#1} \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
+\TEST { Base~units }
+  {
+    \clist_map_inline:nn
+      {
+        \kilogram ,
+        \metre    ,
+        \meter    ,
+        \mole     ,
+        \kelvin   ,
+        \candela  ,
+        \second   ,
+        \ampere
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Gram }
+  {
+    \clist_map_inline:nn
+      {
+        \gram
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Prefixes~(using~metre~as~unit) }
+  {
+    \clist_map_inline:nn
+      {
+        \yocto ,
+        \zepto ,
+        \atto  ,
+        \femto ,
+        \pico  ,
+        \nano  ,
+        \micro ,
+        \milli ,
+        \centi ,
+        \deci  ,
+        \deca  ,
+        \deka  ,
+        \hecto ,
+        \kilo  ,
+        \mega  ,
+        \giga  ,
+        \tera  ,
+        \peta  ,
+        \exa   ,
+        \zetta ,
+        \yotta
+      }
+      {
+        \test:n { #1 \metre }
+      }
+  }
+
+\TEST { Defined~units }
+  {
+    \clist_map_inline:nn
+      {
+        \becquerel     ,
+        \degreeCelsius ,
+        \coulomb       ,
+        \farad         ,
+        \gray          ,
+        \hertz         ,
+        \henry         ,
+        \joule         ,
+        \katal         ,
+        \lumen         ,
+        \lux           ,
+        \newton        ,
+        \ohm           ,
+        \pascal        ,
+        \radian        ,
+        \siemens       ,
+        \sievert       ,
+        \steradian     ,
+        \tesla         ,
+        \volt          ,
+        \watt          ,
+        \weber
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Accepted~units }
+  {
+    \clist_map_inline:nn
+      {
+        \day       ,
+        \hectare   ,
+        \hour      ,
+        \litre     ,
+        \liter     ,
+        \minute    ,
+        \tonne
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Units~of~plane~angles }
+  {
+    \clist_map_inline:nn
+      {
+        \arcminute ,
+        \arcsecond ,
+        \degree
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Units~based~on~physical~measurements }
+  {
+    \clist_map_inline:nn
+      {
+        \astronomicalunit ,
+        \atomicmassunit   ,
+        \dalton           ,
+        \electronvolt     ,
+        \nuaction         ,
+        \numass           ,
+        \nuspeed          ,
+        \nutime           ,
+        \auaction         ,
+        \aucharge         ,
+        \auenergy         ,
+        \aulength         ,
+        \aumass           ,
+        \autime           ,
+        \bohr             ,
+        \hartree
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Accepted~units }
+  {
+    \clist_map_inline:nn
+      {
+        \angstrom          ,
+        \bar               ,
+        \barn              ,
+        \bel               ,
+        \decibel           ,
+        \knot              ,
+        \millimetremercury ,
+        \nauticalmile      ,
+        \neper
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { CGS~units }
+  {
+    \clist_map_inline:nn
+      {
+        \dyne    ,
+        \erg     ,
+        \gal     ,
+        \gauss   ,
+        \maxwell ,
+        \oersted ,
+        \phot    ,
+        \poise   ,
+        \stilb   ,
+        \stokes
+      }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Pre-defined~powers~of~units }
+  {
+    \clist_map_inline:nn
+      {
+        \square  ,
+        \cubic
+      }
+      {
+        \test:n { #1 \metre }
+      }
+    \clist_map_inline:nn
+      {
+        \squared  ,
+        \cubed
+      }
+      {
+        \test:n { \metre #1 }
+      }
+  }
+
+\END
