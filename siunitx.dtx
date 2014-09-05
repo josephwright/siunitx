@@ -5148,7 +5148,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2013/07/31} {2.5s}
+\ProvidesExplPackage {siunitx} {2014/05/09} {2.6}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -6396,7 +6396,8 @@ This work consists of the file  siunitx.dtx
 %
 %\begin{macro}{
 %  \@@_print_math: ,
-%  \@@_print_text:
+%  \@@_print_text:,
+%  \@@_print_text_aux:
 %}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses "_" and
@@ -6432,8 +6433,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
         { \c_@@_minus_tl }
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
-        { \ensuremath { \pm } }
+      \@@_print_text_aux:  
       \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
         { \ensuremath { \mp } }
       \tl_remove_all:Nn \l_@@_print_arg_tl { \mathord }
@@ -6452,6 +6452,22 @@ This work consists of the file  siunitx.dtx
       \l_@@_print_arg_tl
     }
 }
+\cs_new_protected:Npn \@@_print_text_aux:
+  {
+    \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
+      { \ensuremath { \pm } }
+  }
+\AtBeginDocument
+  {
+    \@ifpackageloaded { textcomp }
+      {
+        \cs_set_protected:Npn \@@_print_text_aux:
+          {
+            \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
+              { \textpm }
+          }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -16625,7 +16641,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2013/07/31} {2.5s}
+\ProvidesExplFile {siunitx-version-1.cfg} {2014/05/09} {2.6}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17567,7 +17583,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2013/07/31} {2.5s}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2014/05/09} {2.6}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17749,7 +17765,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2013/07/31} {2.5s}
+\ProvidesExplFile {siunitx-binary.cfg} {2014/05/09} {2.6}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
