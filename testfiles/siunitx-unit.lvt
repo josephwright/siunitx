@@ -15,6 +15,44 @@
   }
 \TIMO
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Creating~units }
+  {
+    \siunitx_unit_set:Nn \molar { M }
+    \test:n { \molar }
+    \siunitx_unit_set:Nn \molar { \textsc { M } }
+    \test:n { \molar }
+  }
+
+\TEST { Creating~prefixes }
+  {
+    \siunitx_unit_prefix_set:Nn \myprefix { Y }
+    \test:n { \myprefix \metre }
+    \test:n { \per \myprefix \metre }
+    \siunitx_unit_prefix_set:Nnn \myprefix { X } { 11 }
+    \test:n { \myprefix \metre }
+    \test:n { \per \myprefix \metre }
+  }
+
+\TEST { Creating~powers }
+  {
+    \siunitx_unit_power_set:NnN \quartic { 4 } \c_true_bool
+    \test:n { \quartic \metre }
+    \test:n { \per \quartic \metre }
+    \siunitx_unit_power_set:NnN \quartic { 4 } \c_false_bool
+    \test:n { \metre \quartic }
+    \test:n { \per \metre \quartic }
+  }
+
+\TEST { Creating~qualifiers }
+  {
+    \siunitx_unit_qualifier_set:Nn \polymer { polymer }
+    \test:n { \mole \of { catalyst } \per \gram \polymer }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \TEST { Base~units }
   {
     \clist_map_inline:nn
