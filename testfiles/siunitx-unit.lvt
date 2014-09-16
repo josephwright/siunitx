@@ -17,6 +17,49 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\OMIT
+  \char_set_catcode_active:N \~
+  \cs_set_eq:NN ~ \c_space_tl
+\TIMO
+
+\TEST { Basic~unit~formatting }
+  {
+    \siunitx_unit_format:nN { \joule \per \mole \per \kelvin } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format:nN { J . mol ^ { -1 } . K  ^ { -1 } } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format:nN { J ~  mol ^ { -1 } ~ K  ^ { -1 } } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format:nN { \joule . mol ^ { -1 } . K  ^ { -1 } } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+  
+\OMIT 
+  \char_set_catcode_space:N \~
+\TIMO
+
+\TEST { Unit~formatting~with~prefix~conversion }
+  {
+    \siunitx_unit_format:nNN { \joule \per \mole \per \kelvin }
+      \l_tmpa_tl \l_tmpa_fp
+    \tl_show:N \l_tmpa_tl
+    \fp_show:N \l_tmpa_fp
+    \siunitx_unit_format:nNN { \kilo \metre }
+      \l_tmpa_tl \l_tmpa_fp
+    \tl_show:N \l_tmpa_tl
+    \fp_show:N \l_tmpa_fp
+    \siunitx_unit_format:nNN { \kilo \metre \per \kilo \gram }
+      \l_tmpa_tl \l_tmpa_fp
+    \tl_show:N \l_tmpa_tl
+    \fp_show:N \l_tmpa_fp
+    \siunitx_unit_format:nNN { \kilo \metre \per \second \per \micro \ampere }
+      \l_tmpa_tl \l_tmpa_fp
+    \tl_show:N \l_tmpa_tl
+    \fp_show:N \l_tmpa_fp
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \TEST { Creating~units }
   {
     \siunitx_unit_set:Nn \molar { M }
