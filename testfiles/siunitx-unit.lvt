@@ -394,4 +394,22 @@
     \test:n { \kilo \gram \metre \per \second \squared }
   }
 
+\TEST { Option~setting~"per-mode" }
+  {
+    \clist_map_inline:nn
+      {
+        fraction             ,
+        power                ,
+        power-positive-first ,
+        repeated-symbol      ,
+        symbol               ,
+        symbol-or-fraction
+      }
+      {
+        \keys_set:nn { siunitx / unit } { per-mode = #1 }
+        \test:n { \joule \per \mole \per \kelvin }
+        \test:n { \per \metre \second \per \mole \ampere }
+      }
+  }
+
 \END
