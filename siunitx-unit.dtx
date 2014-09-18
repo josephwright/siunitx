@@ -95,13 +95,6 @@
 %     \cs{siunitx_unit_format:nNN} \Arg{units} \meta{tl~var} \meta{fp~var}
 %   \end{syntax}
 % \end{function}
-% 
-% \begin{variable}{\l_siunitx_unit_font_tl}
-%   Stores the command applied to text during output of units: the content
-%   should be command usable in math mode for font selection. This variable is
-%   equivalent to the |font-command| key, but is available directly as this
-%   allows rapid setting by higher-level systems which detect font usage. 
-% \end{variable}
 %
 % \section{Defining symbolic units}
 %
@@ -474,8 +467,9 @@
 %     |font-command| = \meta{command}
 %   \end{syntax}
 %   Command applied to text during output of units: should be command usable
-%   in math mode for font selection. The standard setting is |\mathrm|. See
-%   also \cs{l_siunitx_unit_font_tl}.
+%   in math mode for font selection. Notice that in a typical unit this does
+%   not (necessarily) apply to all output, for example powers or brackets.
+%   The standard setting is |\mathrm|.
 % \end{function}
 %
 % \begin{function}{fraction-command}
@@ -867,14 +861,14 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 %
-% \begin{variable}{\l_siunitx_unit_font_tl}
+% \begin{variable}{\l_@@_font_tl}
 % \begin{variable}[int]{\l_@@_product_tl}
-%   Options which apply to the main formatting routine, and so are not tided
+%   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / unit }
   {
-    font-command       .tl_set:N = \l_siunitx_unit_font_tl ,
+    font-command       .tl_set:N = \l_@@_font_tl    ,
     inter-unit-product .tl_set:N = \l_@@_product_tl
   }
 %    \end{macrocode}
@@ -973,7 +967,7 @@
         \exp_not:V \l_@@_formatted_tl
         \tl_if_empty:NF \l_@@_formatted_tl
           { \exp_not:V \l_@@_product_tl }
-        \exp_not:V \l_siunitx_unit_font_tl { \exp_not:n {#1} }
+        \exp_not:V \l_@@_font_tl { \exp_not:n {#1} }
       }
     \@@_format_literal_aux:w
   }
@@ -1769,7 +1763,7 @@
          \exp_not:v { l_@@_ #1 _tl }
          \tl_if_empty:cF { l_@@_ #1 _tl }
            { \exp_not:n {#2} }
-         \exp_not:V \l_siunitx_unit_font_tl
+         \exp_not:V \l_@@_font_tl
            { \exp_not:V \l_@@_current_tl }
       }
   }
