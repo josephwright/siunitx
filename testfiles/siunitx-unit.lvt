@@ -452,4 +452,27 @@
     \test:n { \kilo \gram \metre \per \second \kelvin }
   }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Duplicate~parts }
+  {
+    \clist_map_inline:nn
+      {
+        \kilo \micro \metre              ,
+        \cubic \square \metre            ,
+        \cubic \metre \cubed             ,
+        \per \per \metre                 ,
+        \metre \of { oil } \of { water }
+      }
+      {
+        \test:n { #1 }
+      }
+  }
+
+\TEST { Duplicate~'sticky'~per }
+  {
+    \keys_set:nn { siunitx / unit } { sticky-per }
+    \test:n { \joule \per \mole \per \kelvin }
+  }
+
 \END

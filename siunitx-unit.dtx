@@ -1037,7 +1037,10 @@
   {
     \tl_set:Nx \l_@@_tmp_tl { #1 - #2 }
     \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
-      { \msg_error:nnnn { siunitx / unit } { duplicate-part } {#1} {#3} }
+      {
+        \msg_error:nnxx { siunitx / unit } { duplicate-part }
+          { \exp_not:n {#1} } { \token_to_str:N #3 }
+      }
       { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl {#4} }
   }
 %    \end{macrocode}
@@ -2216,10 +2219,10 @@
 %
 %    \begin{macrocode}
 \msg_new:nnnn { siunitx / unit } { duplicate-part }
-  { Duplicate~#1~part~'#2'. }
+  { Duplicate~#1~part:~#2. }
   {
     Each~unit~may~have~only~one~#1:\\
-    the~additional~value~'#2'~will~be~ignored.
+    the~additional~#1~part~"#2"~will~be~ignored.
   }
 \msg_new:nnnn { siunitx / unit } { duplicate-sticky-per }
   { Duplicate~\token_to_str:N \per. }
