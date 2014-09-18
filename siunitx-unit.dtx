@@ -68,10 +68,7 @@
 % made available by the module.
 %
 % A small number of \LaTeXe{} math mode commands are assumed to be available
-% as part of the formatted output. In particular, \cs{sb} and \cs{sp} are used
-% to represent sub/superscripts in the formatted output: this avoids the need
-% to take account of category codes for |_| and |^| and allows application of
-% further \enquote{effects} at a higher level. The \cs{mathchoice} command
+% as part of the formatted output. The \cs{mathchoice} command
 % (normally the \TeX{} primitive) is needed when using
 % |per-mode = symbol-or-fraction|. The commands \cs{frac}, \cs{mathrm},
 % \cs{mbox}, \verb*|\ | and \cs{,} are used by the standard module settings,
@@ -902,15 +899,7 @@
 %   switch. In the resulting token list, all |.| and |~| tokens are then
 %   replaced by the current unit product token list. To enable this to happen
 %   correctly with a normal (active) |~|, a small amount of
-%   \enquote{protection} is needed first. The same is true for \cs{sb} and
-%   \cs{sp} as they may be made expandable by the \pkg{mathstyle} package.
-%
-%   The series of \cs{tl_replace_all:Nnn} are needed as if the output ends up
-%   inside for example \cs{textrm} then math mode sub/superscripts cannot be
-%   used. Replacing them all here is done using two category codes: the normal
-%   \LaTeXe{} ones and as \enquote{other} characters. The reason for the latter
-%   is that most packages that carry out \enquote{special effects} with these
-%   chars use mathcode rather than catcode to alter behaviour.
+%   \enquote{protection} is needed first.
 %
 %   As with other code dealing with user input, \cs{protected@edef} is used
 %   here rather than \cs{tl_set:Nx} as \LaTeXe{} robust commands may be
@@ -930,12 +919,8 @@
             \bool_set_false:N \l_@@_parsing_bool
             \tl_set:Nn \l_@@_tmp_tl {#1}
             \tl_replace_all:Nnn \l_@@_tmp_tl { ~ } { . }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { ^ } { \sp }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { + } { \sp }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { _ } { \sb }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { = } { \sb }
-            \cs_set_protected_nopar:Npn \sb { }
-            \cs_set_protected_nopar:Npn \sp { }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { + } { ^ }
+            \tl_replace_all:Nnn \l_@@_tmp_tl { _ } { = }
             \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
             \tl_clear:N \l_@@_formatted_tl
             \exp_after:wN \@@_format_literal_aux:w \l_@@_tmp_tl .
@@ -1558,7 +1543,7 @@
     \tl_set:Nx \l_@@_current_tl
       {
         \@@_format_bracket:N \l_@@_current_tl
-        \exp_not:N \sp { \exp_not:V \l_@@_part_tl }
+        ^ { \exp_not:V \l_@@_part_tl }
       }
     \bool_set_false:N \l_@@_bracket_bool
   }
@@ -1645,15 +1630,25 @@
         \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
       }
   }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
-  {
-    \@@_format_font:
-    \tl_set:Nx \l_@@_part_tl
-      {
-        \exp_not:N \sb
-          { \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl } }
-      }
-  }
+\group_begin:
+  \char_set_catcode_subscript:n { `\= }
+  \char_set_lccode:nn { `\= } { `\_ }
+  \tl_to_lowercase:n
+    {
+      \group_end:
+      \cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
+        {
+          \@@_format_font:
+          \tl_set:Nx \l_@@_part_tl
+            {
+              =
+                {
+                  \exp_not:V \l_@@_font_tl
+                    { \exp_not:V \l_@@_part_tl }
+                }
+            }
+        }
+    }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2013,7 +2008,7 @@
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \becquerel { Bq }
 \siunitx_unit_set:Nn \degreeCelsius
-  { \ensuremath { \sp { \circ } } \kern -\scriptspace C }
+  { \ensuremath { ^ { \circ } } \kern -\scriptspace C }
 \siunitx_unit_set:Nn \coulomb   { C }
 \siunitx_unit_set:Nn \farad     { F }
 \siunitx_unit_set:Nn \gray      { Gy }
@@ -2085,9 +2080,9 @@
 %  }
 %   Arc units: again, non-SI, but accepted for general use.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \arcminute { \ensuremath { \sp { \prime } } }
-\siunitx_unit_set:Nn \arcsecond { \ensuremath { \sp { \prime \prime } } }
-\siunitx_unit_set:Nn \degree    { \ensuremath { \sp { \circ } } }
+\siunitx_unit_set:Nn \arcminute { \ensuremath { ^ { \prime } } }
+\siunitx_unit_set:Nn \arcsecond { \ensuremath { ^ { \prime \prime } } }
+\siunitx_unit_set:Nn \degree    { \ensuremath { ^ { \circ } } }
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -2105,9 +2100,16 @@
 %   Natural units based on physical constants.
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \nuaction { \ensuremath { \mathit { \hbar } } }
-\siunitx_unit_set:Nn \numass
-  { \ensuremath { \mathit { m } \sb { \mathrm { e } } } }
-\siunitx_unit_set:Nn \nuspeed  { \ensuremath { \mathit { c } \sb{ 0 } } }
+\group_begin:
+  \char_set_catcode_subscript:n { `\= }
+  \char_set_lccode:nn { `\= } { `\_ }
+  \tl_to_lowercase:n
+    {
+      \group_end:
+      \siunitx_unit_set:Nn \numass
+        { \ensuremath { \mathit { m } = { \mathrm { e } } } }
+      \siunitx_unit_set:Nn \nuspeed  { \ensuremath { \mathit { c } = { 0 } } }
+    }
 \siunitx_unit_set:Nn \nutime
   { \numass \per \numass \per \nuspeed \squared }
 %    \end{macrocode}
