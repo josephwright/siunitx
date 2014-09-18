@@ -1798,13 +1798,16 @@
   }
 %    \end{macrocode}
 %   For fraction-like output, there are three possible choices and two
-%   actual styles. To deal with the \enquote{auto-format} case, the two
+%   actual styles. In all cases, if the numerator is empty then it is set
+%   here to |1|.  To deal with the \enquote{auto-format} case, the two
 %   styles (fraction and symbol) are handled in auxiliaries: this allows both
 %   to be used at the same time! Beyond that, the key here is to use a
 %   single \cs{tl_set:Nx} to keep down the number of assignments.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_format_finalise_fractional:
   {
+    \tl_if_empty:NT \l_@@_formatted_tl
+      { \tl_set:Nn \l_@@_formatted_tl { 1 } }
     \bool_if:NTF \l_@@_autofrac_bool
       { \@@_format_finalise_autofrac: }
       {
@@ -1837,19 +1840,14 @@
       }
   }
 %    \end{macrocode}
-%   When using a fraction function the two parts are now assembled. If the
-%   numerator is empty, a |1| is added instead so the fraction makes sense.
+%   When using a fraction function the two parts are now assembled.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_format_finalise_fraction:
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
         \exp_not:V \l_@@_fraction_function_tl
-          {
-            \tl_if_empty:NTF \l_@@_formatted_tl
-              { 1 }
-              { \exp_not:V \l_@@_formatted_tl }
-          }
+          { \exp_not:V \l_@@_formatted_tl }
           { \exp_not:V \l_@@_denominator_tl }
       }
   }
