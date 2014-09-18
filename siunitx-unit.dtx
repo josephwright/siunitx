@@ -1725,7 +1725,11 @@
 %   the entire unit. That means that there are three possible outcomes here:
 %   if collecting two separate parts, add to the denominator with a product
 %   separator, or if only building one token list there may be a need to use
-%   a symbol separator.
+%   a symbol separator. When the |repeated-symbol| option is in use there may
+%   be a need to add a leading |1| to the output in the case where the
+%   first unit is in the denominator: that can be picked up by looking for
+%   empty output in combination with the flag for using a symbol in the output
+%   but not a two-part strategy.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_format_output_denominator:
   {
@@ -1742,6 +1746,12 @@
           \l_@@_product_tl
       }
       {
+        \bool_if:nT
+          {
+               \l_@@_per_symbol_bool 
+            && \tl_if_empty_p:N \l_@@_formatted_tl
+          }
+          { \tl_set:Nn \l_@@_formatted_tl { 1 } }
         \@@_format_output_aux:nv { formatted }
           {
             l_@@_
