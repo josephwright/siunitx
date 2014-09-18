@@ -1286,6 +1286,12 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_font_bool}
+%   A flag to control when font wrapping is applied to the output.
+\bool_new:N \l_@@_font_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}[int]^^A
 %   {
 %     \l_@@_autofrac_bool        ,
@@ -1450,6 +1456,7 @@
       {
         \bool_set_false:N \l_@@_bracket_bool
         \tl_clear:N \l_@@_current_tl
+        \bool_set_false:N \l_@@_font_bool
         \bool_set_true:N \l_@@_numerator_bool
         \int_incr:N \l_@@_position_int
         \clist_map_inline:nn { prefix , unit , qualifier , power , special }
@@ -1502,6 +1509,7 @@
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_format_power:
   {
+    \@@_format_font:
     \exp_after:wN \@@_format_power_aux:wTF \l_@@_part_tl - \q_stop
       { \@@_format_power_negative: }
       { \@@_format_power_positive: }
@@ -1618,6 +1626,7 @@
   }
 \cs_new_protected_nopar:Npn \@@_format_qualifier_bracket:
   {
+    \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_bracket_open_tl
@@ -1628,6 +1637,7 @@
 \cs_new_protected_nopar:Npn \@@_format_qualifier_combine: { }
 \cs_new_protected_nopar:Npn \@@_format_qualifier_space:
   {
+    \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:N \  
@@ -1636,6 +1646,7 @@
   }
 \cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
   {
+    \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:N \sb
@@ -1687,6 +1698,7 @@
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_format_output:
   {
+    \@@_format_font:
     \bool_set_false:N \l_@@_bracket_bool
     \use:c
       {
@@ -1752,14 +1764,32 @@
          \exp_not:v { l_@@_ #1 _tl }
          \tl_if_empty:cF { l_@@_ #1 _tl }
            { \exp_not:n {#2} }
-         \exp_not:V \l_@@_font_tl
-           { \exp_not:V \l_@@_current_tl }
+         \exp_not:V \l_@@_current_tl
       }
   }
 \cs_generate_variant:Nn \@@_format_output_aux:nn { nV , nv }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_format_font:}
+%   A short auxiliary which checks if the font has been applied to the
+%   main part of the output: if not, add it and set the flag.
+%    \begin{marocode}
+\cs_new_protected_nopar:Npn \@@_format_font:
+  {
+    \bool_if:NF \l_@@_font_bool
+      {
+        \tl_set:Nx \l_@@_current_tl
+          {
+            \exp_not:V \l_@@_font_tl
+              { \exp_not:V \l_@@_current_tl }
+          }
+        \bool_set_true:N \l_@@_font_bool
+      }
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_format_finalise:}
