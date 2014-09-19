@@ -1110,9 +1110,22 @@
   }
 \cs_new_protected:Npn \@@_parse_power:nnN #1#2#3
   {
-    \@@_parse_add:nnnn { power }
-      { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + \c_one } } }
-      {#1} {#2}
+    \tl_set:Nx \l_@@_tmp_tl
+      { unit- \int_use:N \l_@@_position_int }
+    \bool_if:nTF
+      {
+          #3
+       || \prop_if_in_p:NV \l_@@_parsed_prop \l_@@_tmp_tl
+      }
+      {
+        \@@_parse_add:nnnn { power }
+          { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + \c_one } } }
+          {#1} {#2}
+      }
+      {
+        \msg_error:nnxx { siunitx / unit }
+          { part-before-unit } { power } { \token_to_str:N #1 }
+      }
   }
 \cs_new_protected:Npn \@@_parse_qualifier:nn #1#2
   {
@@ -1123,7 +1136,10 @@
         \@@_parse_add:nnnn { qualifier }
           { \int_use:N \l_@@_position_int } {#1} {#2}
       }
-      { \msg_error:nnn { siunitx / unit } { qualifier-before-unit } {#1} }
+      {
+        \msg_error:nnnn { siunitx / unit }
+          { part-before-unit } { qualifier } { \token_to_str:N #1 } 
+      }
   }
 %    \end{macrocode}
 %  Special (exceptional) items should always come before the relevant units.
@@ -2294,12 +2310,11 @@
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
-\msg_new:nnnn { siunitx / unit } { qualifier-before-unit }
-  { Qualifier~before~unit:~'#1'. }
+\msg_new:nnnn { siunitx / unit } { part-before-unit }
+  { Found~#1~part~before~first~unit:~#2. }
   {
-    Unit~qualifiers~have~to~follow~after~units:~
-    they~cannot~appear~before~them.\\ \\
-    The~qualifier~'#1'~will~be~ignored.
+    The~#1~part~'#2'~must~follow~after~a~unit:~
+    it~cannot~appear~before~any~units~and~will~therefore~be~ignored.
   }
 %    \end{macrocode}
 %
