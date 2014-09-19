@@ -83,14 +83,48 @@
 %   \begin{syntax}
 %     \cs{siunitx_unit_format:nN} \Arg{units} \meta{tl~var}
 %   \end{syntax}
-%   Parses the \meta{units}, which may either be symbolic or literal as
-%   described elsewhere, and
+%   This function converts the input \meta{units} into a processed
+%   \meta[tl~var} which can then be inserted in math mode to typeset the
+%   material. Where the \meta{units} are given in symbolic form, described
+%   elsewhere, this formatting process takes place in two stages: the
+%   \meta{units} are parsed into a structured form before the generation
+%   of the appropriate output form based on the active settings. When the
+%   \meta{units} are given as literals, processing is minimal: the
+%   characters |.| and |~| are converted to unit products (boundaries).
+%   In both cases, the result is a series of tokens intended to be typeset
+%   in math mode with appropriate choice of font for typesetting of the
+%   textual parts.
+%   
+%   For example,
+%   \begin{verbatim}
+%     \siunitx_unit_format:nN { \kilo \metre \per \second } \l_tmpa_tl
+%   \end{verbatim}
+%   will, with standard settings, result in \cs{l_tmpa_tl} being set to
+%   \begin{verbatim}
+%     \mathrm{km}\,\mathrm{s}^{-1}
+%   \end{verbatim}
 % \end{function}
 %
 % \begin{function}{\siunitx_unit_format:nNN}
 %   \begin{syntax}
 %     \cs{siunitx_unit_format:nNN} \Arg{units} \meta{tl~var} \meta{fp~var}
 %   \end{syntax}
+%   This function formats the \meta{units} in the same way as described for
+%   \cs{siunitx_unit_format:nN}. When the input is given in symbolic form,
+%   any decimal unit prefixes will be extracted and the overall power of
+%   ten that these represent will be stored in the \meta{fp~var}.
+%   
+%   For example,
+%   \begin{verbatim}
+%     \siunitx_unit_format:nNN { \kilo \metre \per \second }
+%       \l_tmpa_tl \l_tmpa_fp
+%   \end{verbatim}
+%   will, with standard settings, result in \cs{l_tmpa_tl} being set to
+%   \begin{verbatim}
+%     \mathrm{m}\,\mathrm{s}^{-1}
+%   \end{verbatim}
+%   with \cs{l_tmpa_fp} taking value $3$. Note that the latter is a floating
+%   point variable: it is possible for non-integer values to be obtained here.
 % \end{function}
 %
 % \section{Defining symbolic units}
