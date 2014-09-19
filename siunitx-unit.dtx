@@ -2179,12 +2179,19 @@
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \auaction { \ensuremath { \mathit { \hbar } } }
 \siunitx_unit_set:Nn \aucharge { \ensuremath { \mathit { e } } }
-\siunitx_unit_set:Nn \auenergy
-  { \ensuremath { \mathit { E } \sb { \mathrm { h } } } }
-\siunitx_unit_set:Nn \aulength
-  { \ensuremath { \mathit { a } \sb { 0 } } }
-\siunitx_unit_set:Nn \aumass
-  { \ensuremath { \mathit { m } \sb { \mathrm { e } } } }
+\group_begin:
+  \char_set_catcode_subscript:n { `\= }
+  \char_set_lccode:nn { `\= } { `\_ }
+  \tl_to_lowercase:n
+    {
+      \group_end:
+      \siunitx_unit_set:Nn \auenergy
+        { \ensuremath { \mathit { E } = { \mathrm { h } } } }
+      \siunitx_unit_set:Nn \aulength
+        { \ensuremath { \mathit { a } = { 0 } } }
+      \siunitx_unit_set:Nn \aumass
+        { \ensuremath { \mathit { m } = { \mathrm { e } } } }
+  }
 \siunitx_unit_set:Nn \autime   { \auaction \per \auenergy }
 \siunitx_unit_set:Nn \bohr     { \aulength }
 \siunitx_unit_set:Nn \hartree  { \auenergy }
