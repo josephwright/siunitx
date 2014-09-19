@@ -1220,15 +1220,19 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_finalise:}
-%   The final task is to check that there is not a \enquote{dangling} prefix:
-%   these are added to the \enquote{next} unit so are easy to test for.
+%   The final task is to check that there is not a \enquote{dangling} power
+%   or prefix: these are added to the \enquote{next} unit so are easy to
+%   test for.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_finalise:
   {
-    \tl_set:Nx \l_@@_tmp_tl
-      { prefix- \int_eval:n { \l_@@_position_int + \c_one } }
-    \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
-      { \msg_error:nn { siunitx / unit } { prefix-only } }
+    \clist_map_inline:nn { per , power , prefix }
+      {
+        \tl_set:Nx \l_@@_tmp_tl
+          { ##1 - \int_eval:n { \l_@@_position_int + \c_one } }
+        \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
+          { \msg_error:nnn { siunitx / unit } { dangling-part } { ##1 } }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2272,6 +2276,12 @@
 % \subsection{Messages}
 %
 %    \begin{macrocode}
+\msg_new:nnn { siunitx / unit } { dangling-part }
+  { Found~#1~part~with~no~unit. }
+  {
+    Each~#1~part~must~be~associated~with~a~unit:~a~#1~part~was~found~
+    but~no~following~unit~was~given.
+  }
 \msg_new:nnnn { siunitx / unit } { duplicate-part }
   { Duplicate~#1~part:~#2. }
   {
@@ -2284,8 +2294,6 @@
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
-\msg_new:nnn { siunitx / unit } { prefix-only }
-  { Prefix~with~no~unit. }
 \msg_new:nnnn { siunitx / unit } { qualifier-before-unit }
   { Qualifier~before~unit:~'#1'. }
   {
