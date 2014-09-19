@@ -569,11 +569,22 @@
 %     |qualifier-mode| = \meta{choice}
 %   \end{syntax}
 %   Selects how qualifiers are formatted: a choice from the options |brackets|,
-%   |combine|, |space| and |subscript|. The option |bracket| wraps
+%   |combine|, |phrase| and |subscript|. The option |bracket| wraps
 %   the qualifier in parenthesis, |combine| joins the qualifier with the unit
-%   directly, |space| inserts a full width space between the unit ans qualifier
-%   and |subscript| formats the qualifier as a subscript. The standard setting
-%   is |subscript|.
+%   directly, |phrase| inserts the content stored by the option
+%   |qualifier-phrase| between the unit and qualifier, and |subscript| formats
+%   the qualifier as a subscript. The standard setting is |subscript|.
+% \end{function}
+%
+% \begin{function}{qualifier-phrase}
+%   \begin{syntax}
+%     |qualifier-phrase| = \meta{choice}
+%   \end{syntax}
+%   Defines the text to be inserted between a unit and qualifier when
+%   |qualifier-mode| is set to |phrase|. This material is inserted without
+%   any font control and so if text mode is required it should be
+%   included in the setting, for example \verb*|\ \mbox{of}\ |. The
+%   standard setting is a full width space (\verb*|\ |).
 % \end{function}
 %
 % \begin{function}{sticky-per}
@@ -1232,7 +1243,8 @@
 %     \l_@@_bracket_open_tl          ,
 %     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
-%     \l_@@_qualifier_mode_tl
+%     \l_@@_qualifier_mode_tl        ,
+%     \l_@@_qualifier_phrase_tl
 %   }
 %   Set up the options which apply to formatting.
 %    \begin{macrocode}
@@ -1292,10 +1304,11 @@
       { \tl_set:Nn \l_@@_qualifier_mode_tl { bracket  } }  ,
     qualifier-mode / combine  .code:n =
       { \tl_set:Nn \l_@@_qualifier_mode_tl { combine } }   ,
-    qualifier-mode / space    .code:n =
-      { \tl_set:Nn \l_@@_qualifier_mode_tl { space } }     ,
+    qualifier-mode / phrase    .code:n =
+      { \tl_set:Nn \l_@@_qualifier_mode_tl { phrase } }    ,
     qualifier-mode / subscript .code:n =
       { \tl_set:Nn \l_@@_qualifier_mode_tl { subscript } } ,
+    qualifier-phrase    .tl_set:N        = \l_@@_qualifier_phrase_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -1631,7 +1644,7 @@
 %   {
 %     \@@_format_qualifier_bracket :  ,
 %     \@@_format_qualifier_combine:   ,
-%     \@@_format_qualifier_space:     ,
+%     \@@_format_qualifier_phrase:    ,
 %     \@@_format_qualifier_subscript:
 %   }
 %  There are various ways that a qualifier can be added to the output. The
@@ -1658,12 +1671,12 @@
       }
   }
 \cs_new_protected_nopar:Npn \@@_format_qualifier_combine: { }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_space:
+\cs_new_protected_nopar:Npn \@@_format_qualifier_phrase:
   {
     \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
       {
-        \exp_not:N \  
+        \exp_not:V \l_@@_qualifier_phrase_tl
         \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
       }
   }
@@ -2293,6 +2306,7 @@
     per-mode            = power         ,
     per-symbol          = /             ,
     qualifier-mode      = subscript     ,
+    qualifier-phrase    = \             ,
     sticky-per          = false
   }
 %    \end{macrocode}
