@@ -75,6 +75,27 @@
 %<@@=siunitx_number>
 %    \end{macrocode}
 %
+% \subsection{Main formatting routine}
+%
+% \begin{variable}[int]{\l_@@_formatted_tl}
+%   A token list for the final formatted result: may or may not be generated
+%   by the parser, depending on settings which are active.
+%    \begin{macrocode}
+\tl_new:N \l_@@_formatted_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_number_format:nN}
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_format:nN #1#2
+  {
+    \group_begin:
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn #1 \l_@@_formatted_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsection{Parsing numbers}
 %
 % Some parts of the number formatting process, for example normalising
@@ -99,6 +120,8 @@
 % 
 % Parsed numbers are stored as a single token list representing what is
 % understood as a single number.
+%
+% \subsection{Formatting parsed numbers}
 %
 %    \begin{macrocode}
 %</package>
