@@ -917,6 +917,74 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{macro}{\siunitx_unit_format:nN}
+% \begin{macro}{\siunitx_unit_format:nNN}
+% \begin{macro}[aux]{\@@_format:nNN}
+% \begin{macro}[aux]{\@@_format_aux:}
+%   Formatting parsed units can take place either with the prefixes printed or
+%   separated out into a power of ten. This variation is handled using two
+%   separate functions: as this submodule does not really deal with numbers,
+%   formatting the numeral part here would be tricky and it is better therefore
+%   to have a mechanism to return a simple numerical power. At the same time,
+%   most uses will no want this more complex return format and so a version of
+%   the code which does not do this is also provided.
+%
+%   The main unit formatting routine groups all of the parsing/formatting, so
+%   that the only value altered will be the return token list. As definitions
+%   for the various unit macros are not globally created, the first step is to
+%   map over the list of names and active the unit definitions: these do
+%   different things depending on the switches set. There is then a decision to
+%   be made: is the unit input one that can be parsed (\enquote{symbolic}), or
+%   is is one containing one or more literals. In the latter case, there is a
+%   still the need to convert the input into an expanded token list as some
+%   parts of the input could still be using unit macros.
+%
+%   Notice that for \cs{siunitx_unit_format:nN} a second return value from the
+%   auxiliary has to be allowed for, but is simply discarded.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_format:nN #1#2
+  {
+    \bool_set_false:N \l_@@_prefix_power_bool
+    \@@_format:nNN {#1} #2 \l_@@_tmp_fp
+  }
+\cs_new_protected:Npn \siunitx_unit_format:nNN #1#2#3
+  {
+    \bool_set_true:N \l_@@_prefix_power_bool
+    \@@_format:nNN {#1} #2 #3
+  }
+\cs_new_protected:Npn \@@_format:nNN #1#2#3
+  {
+    \group_begin:
+      \seq_map_inline:Nn \l_@@_symbolic_seq
+        { \cs_set_eq:Nc ##1 { units ~ > ~ \token_to_str:N ##1 } }
+      \fp_zero:N \l_@@_prefix_fp
+      \bool_if:nTF \l_@@_parse_bool
+        {
+          \@@_if_symbolic:nTF {#1}
+            {
+              \@@_parse:n {#1}
+              \@@_format_parsed:
+            }
+            { \@@_format_literal:n {#1} }
+        }    
+        { \@@_format_literal:n {#1} }
+      \cs_set_protected_nopar:Npx \@@_format_aux:
+        {
+          \tl_set:Nn \exp_not:N #2
+            { \exp_not:V \l_@@_formatted_tl }
+          \fp_set:Nn \exp_not:N #3
+            { \fp_use:N \l_@@_prefix_fp }
+        }
+    \exp_after:wN \group_end:
+    \@@_format_aux:
+  }
+\cs_new_protected_nopar:Npn \@@_format_aux: { }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Formatting literal units}
 %
 % While in literal mode no parsing occurs, there is a need to provide a few
@@ -1429,74 +1497,6 @@
 \int_new:N \l_@@_total_int
 %    \end{macrocode}
 % \end{variable}
-%
-% \begin{macro}{\siunitx_unit_format:nN}
-% \begin{macro}{\siunitx_unit_format:nNN}
-% \begin{macro}[aux]{\@@_format:nNN}
-% \begin{macro}[aux]{\@@_format_aux:}
-%   Formatting parsed units can take place either with the prefixes printed or
-%   separated out into a power of ten. This variation is handled using two
-%   separate functions: as this submodule does not really deal with numbers,
-%   formatting the numeral part here would be tricky and it is better therefore
-%   to have a mechanism to return a simple numerical power. At the same time,
-%   most uses will no want this more complex return format and so a version of
-%   the code which does not do this is also provided.
-%
-%   The main unit formatting routine groups all of the parsing/formatting, so
-%   that the only value altered will be the return token list. As definitions
-%   for the various unit macros are not globally created, the first step is to
-%   map over the list of names and active the unit definitions: these do
-%   different things depending on the switches set. There is then a decision to
-%   be made: is the unit input one that can be parsed (\enquote{symbolic}), or
-%   is is one containing one or more literals. In the latter case, there is a
-%   still the need to convert the input into an expanded token list as some
-%   parts of the input could still be using unit macros.
-%
-%   Notice that for \cs{siunitx_unit_format:nN} a second return value from the
-%   auxiliary has to be allowed for, but is simply discarded.
-%    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_format:nN #1#2
-  {
-    \bool_set_false:N \l_@@_prefix_power_bool
-    \@@_format:nNN {#1} #2 \l_@@_tmp_fp
-  }
-\cs_new_protected:Npn \siunitx_unit_format:nNN #1#2#3
-  {
-    \bool_set_true:N \l_@@_prefix_power_bool
-    \@@_format:nNN {#1} #2 #3
-  }
-\cs_new_protected:Npn \@@_format:nNN #1#2#3
-  {
-    \group_begin:
-      \seq_map_inline:Nn \l_@@_symbolic_seq
-        { \cs_set_eq:Nc ##1 { units ~ > ~ \token_to_str:N ##1 } }
-      \fp_zero:N \l_@@_prefix_fp
-      \bool_if:nTF \l_@@_parse_bool
-        {
-          \@@_if_symbolic:nTF {#1}
-            {
-              \@@_parse:n {#1}
-              \@@_format_parsed:
-            }
-            { \@@_format_literal:n {#1} }
-        }    
-        { \@@_format_literal:n {#1} }
-      \cs_set_protected_nopar:Npx \@@_format_aux:
-        {
-          \tl_set:Nn \exp_not:N #2
-            { \exp_not:V \l_@@_formatted_tl }
-          \fp_set:Nn \exp_not:N #3
-            { \fp_use:N \l_@@_prefix_fp }
-        }
-    \exp_after:wN \group_end:
-    \@@_format_aux:
-  }
-\cs_new_protected_nopar:Npn \@@_format_aux: { }
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
 %
 % \begin{macro}[int]{\@@_format_parsed:}
 % \begin{macro}[aux]{\@@_format_parsed_aux:n}
