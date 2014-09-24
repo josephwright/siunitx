@@ -95,6 +95,7 @@
 \cs_new_protected:Npn \@@_format:nN #1#2
   {
     \group_begin:
+      \@@_parse:n {#1}
     \exp_args:NNNV \group_end:
     \tl_set:Nn #1 \l_@@_formatted_tl
   }
@@ -103,6 +104,26 @@
 % \end{macro}
 %
 % \subsection{Parsing numbers}
+%
+% \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
+%   Used to hold the real and imaginary parts of a number in the standardised
+%   format.
+%    \begin{macrocode}
+\tl_new:N \l_@@_imaginary_tl
+\tl_new:N \l_@@_real_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}[aux]{\@@_parse:n}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse:n
+  {
+    \tl_clear:N \l_@@_imaginary_tl
+    \tl_clear:N \l_@@_real_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Processing numbers}
 %
