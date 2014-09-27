@@ -615,6 +615,8 @@ This work consists of the file  siunitx.dtx
 %   bookmarks when \pkg{babel} is loaded with the \opt{french} option}
 % \changes{v2.6a}{2014/09/15}{Better glyph selection when \pkg{fontspec}
 %   is detected}
+% \changes{v2.6b}{2014/09/27}{Extend range of font shapes which can be
+%   detected}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6033,12 +6035,13 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\@@_detect_font_shape:}
 % The shape test uses \cs{f@shape} as a handy indicator.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_detect_font_shape: {
-  \str_if_eq:VnT \f@shape { it }
-    { \cs_set:Npn \@@_font_shape: { \itshape } }
-  \str_if_eq:VnT \f@shape { sl }
-    { \cs_set:Npn \@@_font_shape: { \slshape } }
-}
+\cs_new_protected:Npn \@@_detect_font_shape:
+  {
+    \cs_if_exist:nT { \f@shape shape }
+      {
+        \cs_set:Npx \@@_font_shape: { \exp_not:c { \f@shape shape } }
+      }
+  }
 %    \end{macrocode}
 %\end{macro}
 %
