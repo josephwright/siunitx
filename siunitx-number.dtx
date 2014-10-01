@@ -220,15 +220,15 @@
     \tl_clear:N \l_@@_imaginary_tl
     \tl_clear:N \l_@@_real_tl
     \protected@edef \l_@@_arg_tl {#1}
-    \@@_parse_replace:N #1
+    \@@_parse_replace:
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_replace:N}
-% \begin{macro}[aux]{\@@_parse_replace_aux:NNN}
-% \begin{macro}[aux]{\@@_parse_replace_aux:NnN}
-% \begin{macro}[aux]{\@@_parse_replace_sign:N}
+% \begin{macro}[int]{\@@_parse_replace:}
+% \begin{macro}[aux]{\@@_parse_replace_aux:NN}
+% \begin{macro}[aux]{\@@_parse_replace_aux:nN}
+% \begin{macro}[aux]{\@@_parse_replace_sign:}
 % \begin{variable}{\c_@@_parse_normalise_tl, \c_@@_parse_sign_replacement_tl}
 %   There are three parts to the replacement code. First, any active
 %   hyphens signs are normalised: these can come up with some packages and
@@ -236,26 +236,26 @@
 %   about the multiple possible tokens in the input for each data part.
 %   Finally, multi-token signs are converted to the single token equivalents.
 %    \end{macrocode}
-\cs_new_protected:Npn \@@_parse_replace:N #1
+\cs_new_protected_nopar:Npn \@@_parse_replace:
   {
-    \@@_parse_replace_minus:N #1
-    \exp_last_unbraced:NNV \@@_parse_replace_aux:NNN #1
+    \@@_parse_replace_minus:
+    \exp_last_unbraced:NNV \@@_parse_replace_aux:NN
       \c_@@_parse_normalise_tl
       ? \q_recursion_tail
         \q_recursion_stop
-    \exp_last_unbraced:NNV \@@_parse_replace_aux:NnN #1
+    \exp_last_unbraced:NNV \@@_parse_replace_aux:nN
       \c_@@_parse_sign_replacement_tl
       { ? } \q_recursion_tail
         \q_recursion_stop
   }
-\cs_set_protected:Npn \@@_parse_replace_aux:NNN #1#2#3
+\cs_set_protected:Npn \@@_parse_replace_aux:NN #1#2
   {
-    \quark_if_recursion_tail_stop:N #3
-    \tl_map_inline:Nn #2
+    \quark_if_recursion_tail_stop:N #2
+    \tl_map_inline:Nn #1
       {
-        \tl_replace_all:Nnn #1 {##1} {#3}
+        \tl_replace_all:Nnn \l_@@_arg_tl {##1} {#2}
       }
-    \@@_parse_replace_aux:NNN #1
+    \@@_parse_replace_aux:NN
   }
 \tl_const:Npn \c_@@_parse_normalise_tl
   {
@@ -265,11 +265,11 @@
     \l_@@_input_exponent_tl     e
     \l_@@_input_complex_tl      i
   }
-\cs_set_protected:Npn \@@_parse_replace_aux:NnN #1#2#3
+\cs_set_protected:Npn \@@_parse_replace_aux:nN #1#2
   {
-    \quark_if_recursion_tail_stop:N #3
-    \tl_replace_all:Nnn #1 {#2} {#3}
-    \@@_parse_replace_aux:NnN #1
+    \quark_if_recursion_tail_stop:N #2
+    \tl_replace_all:Nnn \l_@@_arg_tl {#1} {#2}
+    \@@_parse_replace_aux:nN
   }
 \tl_const:Npn \c_@@_parse_sign_replacement_tl
   {
@@ -286,9 +286,9 @@
 \tl_to_lowercase:n
   {
     \group_end:
-    \cs_new_protected:Npn \@@_parse_replace_minus:N #1
+    \cs_new_protected_nopar:Npn \@@_parse_replace_minus:
       {
-        \tl_replace_all:Nnn #1 { * }  { - }
+        \tl_replace_all:Nnn \l_@@_arg_tl { * }  { - }
       }
   }
 %    \end{macrocode}
