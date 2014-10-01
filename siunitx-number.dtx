@@ -105,6 +105,50 @@
 %
 % \subsection{Parsing numbers}
 %
+% Before numbers can be manipulated or formatted they need to be parsed into
+% an internal form. In particular, if multiple code paths are to be avoided,
+% it is necessary to do such parsing even for relatively simple cases such
+% as converting |1e10| to |1 \times 10^{10}|.
+% 
+% Storing the result of such parsing can be done in a number of ways. In the
+% first version of \pkg{siunitx} a series of separate data stores were used.
+% This is potentially quite fast (as recovery of items relies only on \TeX{}'s
+% hash table) but makes managing the various data entries somewhat tedious and
+% error-prone. For version two of the package, a single data structure
+% (property list) was used for each part of the parsed number. Whilst this is
+% easy to manage and extend, it is somewhat slower as at a \TeX{} level there
+% are repeated pack--unpack steps. In particular, the fact that there are a
+% limited number of items to track for a \enquote{number} means that a more
+% efficient approach is desirable (contrast parsing units, which is open-ended
+% and therefore fits well with using a property list).
+% 
+% In this version a hybrid approach is taken to storing the parsed data,
+% splitting the number into \enquote{fixed} and \enquote{flexible} parts.
+% The \enquote{fixed} part is stored in a form similar to that used by many
+% computer systems to represent real numbers.
+% \begin{quote}
+%   \meta{sign}\meta{integer}.\meta{decimal}(\meta{uncertainty})^^A
+%     e\meta{sign}\meta{exponent}
+% \end{quote}
+% where
+% \begin{itemize}
+%   \item The \meta{sign} is exactly one token in both cases
+%   \item The \meta{integer} should be one or more digits
+%   \item The \meta{decimal} may be zero or more digits where no digits
+%     at all represents a stored integer
+%   \item The \meta{uncertainty} should be one or more digits with |0|
+%     representing the fact that no uncertainty was given
+%    \item The \meta{exponent} should be one or more digits
+% \end{itemize}
+% The \enquote{flexible} part is made up of a series of keys stored in a
+% property list, with the current possible keys being
+% \begin{itemize}
+% \end{itemize}
+% 
+% To allow for complex numbers, two parallel data structures are used, one for
+% the real part and one for the imaginary part. If the part is entirely absent
+% then the data structures are left empty.
+%
 % \begin{variable}[int]^^A
 %   {
 %      \l_@@_input_uncert_close_tl ,
@@ -154,13 +198,17 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_imaginary_prop, \l_@@_real_prop}
 % \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
 %   Used to hold the real and imaginary parts of a number in the standardised
 %   format.
 %    \begin{macrocode}
+\prop_new:N \l_@@_imaginary_prop
+\prop_new:N \l_@@_real_prop
 \tl_new:N \l_@@_imaginary_tl
 \tl_new:N \l_@@_real_tl
 %    \end{macrocode}
+% \end{variable}
 % \end{variable}
 %
 % \begin{macro}[int]{\@@_parse:n}
