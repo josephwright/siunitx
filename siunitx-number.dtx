@@ -143,6 +143,7 @@
 % The \enquote{flexible} part is made up of a series of keys stored in a
 % property list, with the current possible keys being
 % \begin{itemize}
+%   \item \texttt{comparator} Any comparator found (a single token)
 % \end{itemize}
 % 
 % To allow for complex numbers, two parallel data structures are used, one for
@@ -212,17 +213,42 @@
 % \end{variable}
 %
 % \begin{macro}[int]{\@@_parse:n}
+%   After some initial set up, the parser expands the input and then replaces
+%   as far as possible tricky tokens with ones that can be handled using
+%   delimited arguments. The parser begins with the assumption that the input
+%   is a real number.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse:n #1
   {
-    \prop_clear:N \l_@@_imaginary_prop
     \prop_clear:N \l_@@_real_prop
-    \tl_clear:N \l_@@_imaginary_tl
     \tl_clear:N \l_@@_real_tl
     \protected@edef \l_@@_arg_tl {#1}
     \@@_parse_replace:
+    \@@_parse_comparator:
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_comparator:}
+% \begin{macro}[aux]{\@@_parse_comparator_aux:}
+%   A comparator has to be the very first token in the input. A such, the
+%   test for this can be very fast: grab the first token, do a check and
+%   if appropriate store the result.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_comparator:
+  {
+    \exp_after:wN \@@_parse_comparator_aux:Nw \l_@@_arg_tl \q_stop
+  }
+\cs_new_protected:Npn \@@_parse_comparator_aux:Nw #1#2 \q_stop
+  {
+    \tl_if_in:NnT \l_@@_input_comparator_tl {#1}
+      {
+        \prop_put:Nnn \l_@@_real_prop { comparator } {#1}
+        \tl_set:Nn \l_@@_arg_tl {#2}
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_replace:}
