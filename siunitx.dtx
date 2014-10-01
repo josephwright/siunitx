@@ -617,6 +617,8 @@ This work consists of the file  siunitx.dtx
 %   is detected}
 % \changes{v2.6b}{2014/09/27}{Extend range of font shapes which can be
 %   detected}
+% \changes{v2.6c}{2014/10/01}{Fix use of \cs{micro} when \pkg{fontspec}
+%   is loaded but \pkg{unicode-math} is not}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15420,7 +15422,9 @@ This work consists of the file  siunitx.dtx
         \@ifpackageloaded { fontspec }
           {
             \int_const:Nn \c_@@_degree_int    { 176 }
-            \int_const:Nn \c_@@_micro_int     { "003BC }
+            \@ifpackageloaded { unicode-math }
+              { \int_const:Nn \c_@@_micro_int { "003BC } }
+              { \int_const:Nn \c_@@_micro_int { "000B5 } }
             \int_const:Nn \c_@@_angstrom_int  { "0212B }
             \int_const:Nn \c_@@_ohm_int       { "003A9 }
             \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
