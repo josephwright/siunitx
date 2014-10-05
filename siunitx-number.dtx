@@ -227,15 +227,13 @@
     \protected@edef \l_@@_arg_tl {#1}
     \@@_parse_replace:
     \tl_if_blank:nF {#1}
-      {
-        \@@_parse_comparator:
-      }
+      { \@@_parse_comparator: }
   }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_comparator:}
-% \begin{macro}[aux]{\@@_parse_comparator_aux:}
+% \begin{macro}[aux]{\@@_parse_comparator_aux:Nw}
 %   A comparator has to be the very first token in the input. A such, the
 %   test for this can be very fast: grab the first token, do a check and
 %   if appropriate store the result.
@@ -251,6 +249,13 @@
         \prop_put:Nnn \l_@@_real_prop { comparator } {#1}
         \tl_set:Nn \l_@@_arg_tl {#2}
       }
+    \tl_if_blank:NF \l_@@_arg_tl
+      { \@@_parse_exponent: }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}[int]{\@@_parse_digit_check:nT}
 %   A test that the argument given is made up only of tokens from the current
 %   list of digits. If it is, the break statement will never be inserted and
@@ -270,8 +275,53 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \begin{macro}[int]{\@@_parse_exponent:}
+% \begin{macro}[aux]{\@@_parse_exponent_aux:w}
+% \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
+%   An exponent part of a number has to come at the end and can only occur
+%   once. Thus it is relatively easy to parse. First, there is a check that
+%   an exponent part is allowed, and if so a split is made (the previous
+%   part of the chain checks that there is some content in \cs{l_@@_arg_tl}
+%   before calling this function). After splitting, if there is no exponent
+%   then simply save a default. Otherwise, check for a sign and then store
+%   either this or an assumed |+| and the digits after a check that nothing
+%   else is present after the~|e|.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_exponent:
+  {
+    \tl_if_blank:NTF \l_@@_input_exponent_tl
+      { \tl_set:Nn \l_@@_real_tl { e+0 } }
+      {
+        \exp_after:wN \@@_parse_exponent_aux:Nw \l_@@_arg_tl
+           e \q_nil e \q_stop
+      }
+  }
+\cs_new_protected:Npn \@@_parse_exponent_aux:w #1 e #2 e #3 \q_stop
+  {
+    \quark_if_nil:nTF {#2}
+      { \tl_set:Nn \l_@@_real_tl { e+0 } }
+      {
+        \tl_set:Nn \l_@@_arg_tl {#1}
+        \tl_if_blank:nF {#2}
+          { \@@_parse_exponent_aux:Nw #2 \q_stop }
+      }
+    \tl_if_empty:NF \l_@@_real_tl
+      { }
+  }
+\cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
+  {
+    \tl_if_in:VNTF \l_@@_input_sign_tl #1
+      {
+        \@@_parse_digit_check:nT {#2}
+        \tl_set:Nn \l_@@_real_tl { e #1#2 }
+      }
+      {
+        \@@_parse_digit_check:nT {#1#2}
+        \tl_set:Nn \l_@@_real_tl { e + #1#2 }
+      }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
