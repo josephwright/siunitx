@@ -249,6 +249,25 @@
         \prop_put:Nnn \l_@@_real_prop { comparator } {#1}
         \tl_set:Nn \l_@@_arg_tl {#2}
       }
+% \begin{macro}[int]{\@@_parse_digit_check:nT}
+%   A test that the argument given is made up only of tokens from the current
+%   list of digits. If it is, the break statement will never be inserted and
+%   the \cs{use:n} will remove the braces from the |T| argument. However, if
+%   there is an issue the break will occur and \cs{use_none:nn} will remove
+%   both \cs{use:n} and the |T| argument.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_digit_check:nT #1
+  {
+    \tl_map_inline:nn {#1}
+      {
+        \tl_if_in:VF \l_@@_input_digit_tl
+          { \tl_map_break:nn { \use_none:nn } }
+      }
+    \use:n
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
   }
 %    \end{macrocode}
 % \end{macro}
