@@ -339,7 +339,9 @@
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_replace:
   {
-    \tl_remove_all:NV \l_@@_arg_tl \l_@@_input_ignore_tl
+    \tl_remove_all:Nn \l_@@_arg_tl { ~ }
+    \tl_map_inline:Nn \l_@@_input_ignore_tl
+      { \tl_remove_all:Nn \l_@@_arg_tl {##1} }
     \@@_parse_replace_minus:
     \exp_last_unbraced:NNV \@@_parse_replace_aux:NN
       \c_@@_parse_normalise_tl
@@ -410,6 +412,7 @@
 % (\emph{e.g.}~boolean variables are always |false| to begin with),
 % but for clarity everything is set here.
 %    \begin{macrocode}
+\char_set_catcode_active:n { `\~ }
 \keys_set:nn { siunitx / number }
   { % (
     input-close-uncertainty = )                                      ,
@@ -418,10 +421,12 @@
     input-decimal-markers   = { ., }                                 ,
     input-digits            = 0123456789                             ,
     input-exponent-markers  = dDeE                                   ,
+    input-ignore            = \,~                                    ,
     input-open-uncertainty  = (                                      , % )
     input-signs             = +-\mp\pm                               ,
     input-uncertainty-signs = \pm
   }
+\char_set_catcode_space:n { `\~ }
 %    \end{macrocode}
 %
 %    \begin{macrocode}
