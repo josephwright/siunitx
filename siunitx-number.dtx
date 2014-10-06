@@ -250,7 +250,7 @@
         \tl_set:Nn \l_@@_arg_tl {#2}
       }
     \tl_if_blank:NF \l_@@_arg_tl
-      { \@@_parse_exponent: }
+      { \@@_parse_sign: }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -290,34 +290,35 @@
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
     \tl_if_blank:NTF \l_@@_input_exponent_tl
-      { \tl_set:Nn \l_@@_real_tl { e+0 } }
+      { \tl_put_right:Nn \l_@@_real_tl { e+0 } }
       {
-        \exp_after:wN \@@_parse_exponent_aux:Nw \l_@@_arg_tl
+        \exp_after:wN \@@_parse_exponent_aux:w \l_@@_arg_tl
            e \q_nil e \q_stop
       }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:w #1 e #2 e #3 \q_stop
   {
     \quark_if_nil:nTF {#2}
-      { \tl_set:Nn \l_@@_real_tl { e+0 } }
+      { \tl_put_right:Nn \l_@@_real_tl { e+0 } }
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
-        \tl_if_blank:nF {#2}
+        \tl_if_blank:nTF {#2}
+          { \tl_clear:N \l_@@_real_tl }
           { \@@_parse_exponent_aux:Nw #2 \q_stop }
       }
     \tl_if_empty:NF \l_@@_real_tl
-      { }
+      {  }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
   {
     \tl_if_in:VNTF \l_@@_input_sign_tl #1
       {
         \@@_parse_digit_check:nT {#2}
-        \tl_set:Nn \l_@@_real_tl { e #1#2 }
+        \tl_put_right:Nn \l_@@_real_tl { e #1#2 }
       }
       {
         \@@_parse_digit_check:nT {#1#2}
-        \tl_set:Nn \l_@@_real_tl { e + #1#2 }
+        \tl_put_right:Nn \l_@@_real_tl { e + #1#2 }
       }
   }
 %    \end{macrocode}
@@ -399,6 +400,32 @@
 % \end{variable}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_sign:}
+% \begin{macro}[aux]{\@@_parse_sign_aux:Nw}
+%  The first token of a number after a comparator could be a sign. A quick
+%  check is made and if found stored; if there is no sign then the internal
+%  format requires that |+| is used. For the number to be valid it has to be
+%  more than just a sign, so the next part of the chain is only called if that
+%  is the case.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_sign:
+  { \exp_after:wN \@@_parse_sign_aux:Nw \l_@@_arg_tl \q_stop }
+\cs_new_protected:Npn \@@_parse_sign_aux:Nw #1#2 \q_stop
+  {
+    \tl_if_in:nNTF {#1} \l_@@_sign_tl
+      {
+        \tl_set:Nn \l_@@_arg_tl {#2}
+        \tl_set:Nn \l_@@_real_tl {#1}
+      }
+      { \tl_set:Nn \l_@@_real_tl { + } }
+    \tl_if_empty:NTF \l_@@_arg_tl
+      { \tl_clear:N \l_@@_real_tl }
+      { \@@_parse_exponent: }
+  }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
