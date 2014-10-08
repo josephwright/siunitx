@@ -199,6 +199,15 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_exponent_tl}
+%   The exponent part of a parsed number. It is easiest to find this
+%   relatively early in the parsing process, but as it needs to go at
+%   the end of the internal format is held separately until required.
+%    \begin{macrocode}
+\tl_new:N \l_@@_exponent_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}[int]{\l_@@_imaginary_prop, \l_@@_real_prop}
 % \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
 %   Used to hold the real and imaginary parts of a number in the standardised
@@ -290,7 +299,7 @@
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
     \tl_if_blank:NTF \l_@@_input_exponent_tl
-      { \tl_put_right:Nn \l_@@_real_tl { e+0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
       {
         \exp_after:wN \@@_parse_exponent_aux:w \l_@@_arg_tl
            e \q_nil e \q_stop
@@ -299,7 +308,7 @@
 \cs_new_protected:Npn \@@_parse_exponent_aux:w #1 e #2 e #3 \q_stop
   {
     \quark_if_nil:nTF {#2}
-      { \tl_put_right:Nn \l_@@_real_tl { e+0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
         \tl_if_blank:nTF {#2}
@@ -314,11 +323,11 @@
     \tl_if_in:VNTF \l_@@_input_sign_tl #1
       {
         \@@_parse_digit_check:nT {#2}
-        \tl_put_right:Nn \l_@@_real_tl { e #1#2 }
+        \tl_set:Nn \l_@@_exponent_tl { e #1#2 }
       }
       {
         \@@_parse_digit_check:nT {#1#2}
-        \tl_put_right:Nn \l_@@_real_tl { e + #1#2 }
+        \tl_set:Nn \l_@@_exponent_tl { e + #1#2 }
       }
   }
 %    \end{macrocode}
