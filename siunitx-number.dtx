@@ -271,33 +271,15 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
-%
-% \begin{macro}[int]{\@@_parse_digit_check:nT}
-%   A test that the argument given is made up only of tokens from the current
-%   list of digits. If it is, the break statement will never be inserted and
-%   the \cs{use:n} will remove the braces from the |T| argument. However, if
-%   there is an issue the break will occur and \cs{use_none:nn} will remove
-%   both \cs{use:n} and the |T| argument.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_digit_check:nT #1
-  {
-    \tl_map_inline:nn {#1}
-      {
-        \tl_if_in:VF \l_@@_input_digit_tl
-          { \tl_map_break:nn { \use_none:nn } }
-      }
-    \use:n
-  }
-%    \end{macrocode}
-% \end{macro}
 % 
 % \begin{macro}[int]{\@@_parse_exponent:}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:w}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:nn}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:Nn}
-% \begin{macro}[aux, EXP]{\@@_parse_exponent_zero_test:N}
-% \begin{macro}[aux, EXP]{\@@_parse_exponent_tidy:N}
+% \begin{macro}[aux]
+%   {\@@_parse_exponent_zero_test:N, \@@_parse_exponent_check:N}
+% \begin{macro}[aux]{\@@_parse_exponent_cleanup:N}
 %   An exponent part of a number has to come at the end and can only occur
 %   once. Thus it is relatively easy to parse. First, there is a check that
 %   an exponent part is allowed, and if so a split is made (the previous
@@ -360,25 +342,30 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
   {
-    \@@_parse_digit_check:nT {#2}
-      {
-        \tl_set:Nn \l_@@_exponent_tl
-          {
-            e #1
-            \@@_parse_exponent_zero_test:N #2
-              \q_recursion_tail \q_recursion_stop
-          }
-      }
+    \tl_set:Nn \l_@@_exponent_tl { e #1 }
+    \@@_parse_exponent_zero_test:N #2
+      \q_recursion_tail \q_recursion_stop
   }
-\cs_new:Npn \@@_parse_exponent_zero_test:N #1
+\cs_new_protected:Npn \@@_parse_exponent_zero_test:N #1
   {
-    \quark_if_recursion_tail_stop_do:Nn #1 { 0 }
+    \quark_if_recursion_tail_stop_do:Nn #1
+      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
     \str_if_eq:nnTF {#1} { 0 }
       { \@@_parse_exponent_zero_test:N }
-      { \@@_parse_exponent_tidy:wNN }
+      { \@@_parse_exponent_check:N #1 }
   }
-\cs_new:Npn \@@_parse_exponent_tidy:wNN
-  #1 \q_recursion_tail \q_recursion_stop {#1}
+\cs_new_protected:Npn \@@_parse_exponent_check:N #1
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \tl_if_in:nNTF {#1} \l_@@_digit_tl
+      {
+        \tl_put_right:Nn \l_@@_exponent_tl {#1}
+        \@@_parse_exponent_check:N
+      }
+      { \@@_parse_exponent_cleanup:wN }
+  }
+\cs_new_protected:Npn \@@_parse_exponent_cleanup:wN #1 \q_recursion_stop
+  { \tl_clear:N \l_@@_exponent_tl }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
