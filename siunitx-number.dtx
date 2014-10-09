@@ -336,46 +336,21 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_replace:}
-% \begin{macro}[aux]{\@@_parse_replace_aux:NN}
 % \begin{macro}[aux]{\@@_parse_replace_aux:nN}
 % \begin{macro}[aux]{\@@_parse_replace_sign:}
-% \begin{variable}{\c_@@_parse_normalise_tl, \c_@@_parse_sign_replacement_tl}
-%   There are three parts to the replacement code. First, any active
+% \begin{variable}{\c_@@_parse_sign_replacement_tl}
+%   There are two parts to the replacement code. First, any active
 %   hyphens signs are normalised: these can come up with some packages and
-%   cause issues. There is then a normalisation step to avoid having to worry
-%   about the multiple possible tokens in the input for each data part.
-%   Finally, multi-token signs are converted to the single token equivalents.
+%   cause issues. Multi-token signs then are converted to the single token
+%   equivalents so that everything else can work on a one token basis.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_replace:
   {
-    \tl_map_inline:Nn \l_@@_input_ignore_tl
-      { \tl_remove_all:Nn \l_@@_arg_tl {##1} }
     \@@_parse_replace_minus:
-    \exp_last_unbraced:NNV \@@_parse_replace_aux:NN
-      \c_@@_parse_normalise_tl
-      ? \q_recursion_tail
-        \q_recursion_stop
     \exp_last_unbraced:NNV \@@_parse_replace_aux:nN
       \c_@@_parse_sign_replacement_tl
       { ? } \q_recursion_tail
         \q_recursion_stop
-  }
-\cs_set_protected:Npn \@@_parse_replace_aux:NN #1#2
-  {
-    \quark_if_recursion_tail_stop:N #2
-    \tl_map_inline:Nn #1
-      {
-        \tl_replace_all:Nnn \l_@@_arg_tl {##1} {#2}
-      }
-    \@@_parse_replace_aux:NN
-  }
-\tl_const:Nn \c_@@_parse_normalise_tl
-  {
-    \l_@@_input_decimal_tl      .
-    \l_@@_input_uncert_open_tl  (
-    \l_@@_input_uncert_close_tl )
-    \l_@@_input_exponent_tl     e
-    \l_@@_input_complex_tl      i
   }
 \cs_set_protected:Npn \@@_parse_replace_aux:nN #1#2
   {
