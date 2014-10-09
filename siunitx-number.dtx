@@ -293,8 +293,11 @@
 % 
 % \begin{macro}[int]{\@@_parse_exponent:}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:w}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:nnn}
+% \begin{macro}[aux]{\@@_parse_exponent_aux:nn}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
+% \begin{macro}[aux]{\@@_parse_exponent_aux:Nn}
+% \begin{macro}[aux, EXP]{\@@_parse_exponent_zero_test:N}
+% \begin{macro}[aux, EXP]{\@@_parse_exponent_tidy:N}
 %   An exponent part of a number has to come at the end and can only occur
 %   once. Thus it is relatively easy to parse. First, there is a check that
 %   an exponent part is allowed, and if so a split is made (the previous
@@ -305,7 +308,9 @@
 %   else is present after the~|e|. The only slight complication to all of
 %   this is allowing an arbitrary token in the input to represent the exponent:
 %   this is done by setting any exponent tokens to the first of the allowed
-%   list, then using that in a delimited argument set up.
+%   list, then using that in a delimited argument set up. Once an exponent
+%   part is found, there is a loop to check that each of the tokens is a digit
+%   then a tidy up step to remove any leading zeros.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
@@ -322,7 +327,7 @@
               ####2 \exp_not:V \l_@@_tmp_tl
               ####3 \exp_not:N \q_stop
           }
-            { \@@_parse_exponent_aux:nnn {##1} {##2} {##3} }
+            { \@@_parse_exponent_aux:nn {##1} {##2} }
         \use:x
           {
             \@@_parse_exponent_aux:w \exp_not:V \l_@@_arg_tl
@@ -332,7 +337,7 @@
       }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:w  { }
-\cs_new_protected:Npn \@@_parse_exponent_aux:nnn #1#2#3
+\cs_new_protected:Npn \@@_parse_exponent_aux:nn #1#2
   {
     \quark_if_nil:nTF {#2}
       { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
@@ -348,16 +353,35 @@
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
   {
     \tl_if_in:VNTF \l_@@_input_sign_tl #1
+      { \@@_parse_exponent_aux:Nn #1 {#2} }
+      { \@@_parse_exponent_aux:Nn + {#1#2} }
+    \tl_if_empty:NT \l_@@_exponent_tl
+      { \tl_clear:N \l_@@_real_tl }
+  }
+\cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
+  {
+    \@@_parse_digit_check:nT {#2}
       {
-        \@@_parse_digit_check:nT {#2}
-        \tl_set:Nn \l_@@_exponent_tl { e #1#2 }
-      }
-      {
-        \@@_parse_digit_check:nT {#1#2}
-        \tl_set:Nn \l_@@_exponent_tl { e + #1#2 }
+        \tl_set:Nn \l_@@_exponent_tl
+          {
+            e #1
+            \@@_parse_exponent_zero_test:N #2
+              \q_recursion_tail \q_recursion_stop
+          }
       }
   }
+\cs_new:Npn \@@_parse_exponent_zero_test:N #1
+  {
+    \quark_if_recursion_tail_stop_do:Nn #1 { 0 }
+    \str_if_eq:nnTF {#1} { 0 }
+      { \@@_parse_exponent_zero_test:N }
+      { \@@_parse_exponent_tidy:wNN }
+  }
+\cs_new:Npn \@@_parse_exponent_tidy:wNN
+  #1 \q_recursion_tail \q_recursion_stop {#1}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
