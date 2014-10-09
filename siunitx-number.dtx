@@ -75,6 +75,13 @@
 %<@@=siunitx_number>
 %    \end{macrocode}
 %
+% \begin{variable}[int]{\l_@@_tmp_tl}
+%   Scratch space
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \subsection{Main formatting routine}
 %
 % \begin{variable}[int]{\l_@@_formatted_tl}
@@ -286,6 +293,7 @@
 % 
 % \begin{macro}[int]{\@@_parse_exponent:}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:w}
+% \begin{macro}[aux]{\@@_parse_exponent_aux:nnn}
 % \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
 %   An exponent part of a number has to come at the end and can only occur
 %   once. Thus it is relatively easy to parse. First, there is a check that
@@ -294,18 +302,37 @@
 %   before calling this function). After splitting, if there is no exponent
 %   then simply save a default. Otherwise, check for a sign and then store
 %   either this or an assumed |+| and the digits after a check that nothing
-%   else is present after the~|e|.
+%   else is present after the~|e|. The only slight complication to all of
+%   this is allowing an arbitrary token in the input to represent the exponent:
+%   this is done by setting any exponent tokens to the first of the allowed
+%   list, then using that in a delimited argument set up.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
     \tl_if_blank:NTF \l_@@_input_exponent_tl
       { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
       {
-        \exp_after:wN \@@_parse_exponent_aux:w \l_@@_arg_tl
-           e \q_nil e \q_stop
+        \tl_set:Nx \l_@@_tmp_tl { \tl_head:V \l_@@_input_exponent_tl }
+        \tl_map_inline:Vn \l_@@_input_exponent_tl
+          { \tl_replace_all:NnV \l_@@_arg_tl {##1} \l_@@_tmp_tl }
+        \use:x
+          {
+            \cs_set_protected:Npn \exp_not:N \@@_parse_exponent_aux:w
+              ####1 \exp_not:V \l_@@_tmp_tl
+              ####2 \exp_not:V \l_@@_tmp_tl
+              ####3 \exp_not:N \q_stop
+          }
+            { \@@_parse_exponent_aux:nnn {##1} {##2} {##3} }
+        \use:x
+          {
+            \@@_parse_exponent_aux:w \exp_not:V \l_@@_arg_tl
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_nil
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_stop
+          }
       }
   }
-\cs_new_protected:Npn \@@_parse_exponent_aux:w #1 e #2 e #3 \q_stop
+\cs_new_protected:Npn \@@_parse_exponent_aux:w  { }
+\cs_new_protected:Npn \@@_parse_exponent_aux:nnn #1#2#3
   {
     \quark_if_nil:nTF {#2}
       { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
@@ -331,6 +358,7 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
