@@ -131,27 +131,6 @@
 % 
 % In this version a hybrid approach is taken to storing the parsed data,
 % splitting the number into \enquote{fixed} and \enquote{flexible} parts.
-% The \enquote{fixed} part is stored in a form similar to that used by many
-% computer systems to represent real numbers.
-% \begin{quote}
-%   \meta{sign}\meta{integer}.\meta{decimal}(\meta{uncertainty})^^A
-%     e\meta{sign}\meta{exponent}
-% \end{quote}
-% where
-% \begin{itemize}
-%   \item The \meta{sign} is exactly one token in both cases
-%   \item The \meta{integer} should be one or more digits
-%   \item The \meta{decimal} may be zero or more digits where no digits
-%     at all represents a stored integer
-%   \item The \meta{uncertainty} should be one or more digits with |0|
-%     representing the fact that no uncertainty was given
-%    \item The \meta{exponent} should be one or more digits
-% \end{itemize}
-% The \enquote{flexible} part is made up of a series of keys stored in a
-% property list, with the current possible keys being
-% \begin{itemize}
-%   \item \texttt{comparator} Any comparator found (a single token)
-% \end{itemize}
 % 
 % To allow for complex numbers, two parallel data structures are used, one for
 % the real part and one for the imaginary part. If the part is entirely absent
@@ -297,7 +276,7 @@
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
     \tl_if_blank:NTF \l_@@_input_exponent_tl
-      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
       {
         \tl_set:Nx \l_@@_tmp_tl { \tl_head:V \l_@@_input_exponent_tl }
         \tl_map_inline:Vn \l_@@_input_exponent_tl
@@ -322,7 +301,7 @@
 \cs_new_protected:Npn \@@_parse_exponent_aux:nn #1#2
   {
     \quark_if_nil:nTF {#2}
-      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
         \tl_if_blank:nTF {#2}
@@ -342,14 +321,14 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
   {
-    \tl_set:Nn \l_@@_exponent_tl { e #1 }
+    \tl_set:Nn \l_@@_exponent_tl { #1 }
     \@@_parse_exponent_zero_test:N #2
       \q_recursion_tail \q_recursion_stop
   }
 \cs_new_protected:Npn \@@_parse_exponent_zero_test:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1
-      { \tl_set:Nn \l_@@_exponent_tl { e+0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
     \str_if_eq:nnTF {#1} { 0 }
       { \@@_parse_exponent_zero_test:N }
       { \@@_parse_exponent_check:N #1 }
