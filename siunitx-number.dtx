@@ -254,7 +254,8 @@
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_comparator:
   {
-    \exp_after:wN \@@_parse_comparator_aux:Nw \l_@@_arg_tl \q_stop
+    \exp_after:wN \@@_parse_comparator_aux:Nw
+      \l_@@_arg_tl \q_stop
   }
 \cs_new_protected:Npn \@@_parse_comparator_aux:Nw #1#2 \q_stop
   {
@@ -297,12 +298,17 @@
     \tl_if_blank:NTF \l_@@_input_exponent_tl
       { \tl_set:Nn \l_@@_exponent_tl { +0 } }
       {
-        \tl_set:Nx \l_@@_tmp_tl { \tl_head:V \l_@@_input_exponent_tl }
+        \tl_set:Nx \l_@@_tmp_tl
+          { \tl_head:V \l_@@_input_exponent_tl }
         \tl_map_inline:Vn \l_@@_input_exponent_tl
-          { \tl_replace_all:NnV \l_@@_arg_tl {##1} \l_@@_tmp_tl }
+          {
+            \tl_replace_all:NnV \l_@@_arg_tl
+              {##1} \l_@@_tmp_tl
+          }
         \use:x
           {
-            \cs_set_protected:Npn \exp_not:N \@@_parse_exponent_aux:w
+            \cs_set_protected:Npn
+              \exp_not:N \@@_parse_exponent_aux:w
               ####1 \exp_not:V \l_@@_tmp_tl
               ####2 \exp_not:V \l_@@_tmp_tl
               ####3 \exp_not:N \q_stop
@@ -310,7 +316,8 @@
             { \@@_parse_exponent_aux:nn {##1} {##2} }
         \use:x
           {
-            \@@_parse_exponent_aux:w \exp_not:V \l_@@_arg_tl
+            \@@_parse_exponent_aux:w
+              \exp_not:V \l_@@_arg_tl
               \exp_not:V \l_@@_tmp_tl \exp_not:N \q_nil
               \exp_not:V \l_@@_tmp_tl \exp_not:N \q_stop
           }
@@ -362,7 +369,8 @@
       }
       { \@@_parse_exponent_cleanup:wN }
   }
-\cs_new_protected:Npn \@@_parse_exponent_cleanup:wN #1 \q_recursion_stop
+\cs_new_protected:Npn \@@_parse_exponent_cleanup:wN
+  #1 \q_recursion_stop
   { \tl_clear:N \l_@@_exponent_tl }
 %    \end{macrocode}
 % \end{macro}
@@ -543,7 +551,10 @@
                     \bool_if:NTF #4
                       {
                         \tl_if_in:nNTF {#5} \l_@@_input_sign_tl
-                          { \@@_parse_loop_main_sign:NNN #1#2 #5 }
+                          {
+                            \@@_parse_loop_main_sign:NNN
+                              #1#2 #5
+                          }
                           { \@@_parse_loop_break:wN }
                       }
                       { \@@_parse_loop_break:wN }
@@ -636,7 +647,8 @@
   {
     \@@_parse_loop_main_store:NNN #1#2 \c_true_bool
     \tl_set:Nn \l_@@_flex_tl {#3}
-    \@@_parse_loop_first:NNN \l_@@_flex_tl \c_false_bool
+    \@@_parse_loop_first:NNN
+      \l_@@_flex_tl \c_false_bool
   }
 %    \end{macrocode}
 %   A common auxiliary for the various non-digit token functions: tidy up the
@@ -717,7 +729,8 @@
             \tl_if_in:nNTF {#3} \l_@@_input_sign_tl
               {
                 \tl_set:Nn \l_@@_flex_tl {#3}
-                \@@_parse_loop_first:NNN \l_@@_flex_tl \c_false_bool
+                \@@_parse_loop_first:NNN
+                  \l_@@_flex_tl \c_false_bool
               }
               { \@@_parse_loop_break:wN }
           }
@@ -759,7 +772,8 @@
 %   Nothing is allowed after a complex root token: check and if there is
 %   kill the parsing.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_complex_cleanup:wN #1 \q_recursion_stop
+\cs_new_protected:Npn \@@_parse_loop_complex_cleanup:wN
+  #1 \q_recursion_stop
   {
     \tl_if_blank:nF {#1}
       { \@@_parse_loop_break:wN \q_recursion_stop }
@@ -769,7 +783,8 @@
 %   number and clear the storage areas as a signal for the next part of the
 %   code.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_break:wN #1 \q_recursion_stop
+\cs_new_protected:Npn \@@_parse_loop_break:wN
+  #1 \q_recursion_stop
   {
     \tl_clear:N \l_@@_complex_tl
     \tl_clear:N \l_@@_real_tl
@@ -800,7 +815,10 @@
 %  is the case.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_sign:
-  { \exp_after:wN \@@_parse_sign_aux:Nw \l_@@_arg_tl \q_stop }
+  {
+    \exp_after:wN \@@_parse_sign_aux:Nw
+      \l_@@_arg_tl \q_stop
+  }
 \cs_new_protected:Npn \@@_parse_sign_aux:Nw #1#2 \q_stop
   {
     \tl_if_in:nNTF {#1} \l_@@_sign_tl
