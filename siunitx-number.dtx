@@ -194,6 +194,16 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_flex_tl}
+%   When parsing for a separate uncertainty or complex number, the nature
+%   of the grabbed part cannot be determined until the end of the number.
+%   To avoid abusing the storage areas, this dedicated one is used for
+%   \enquote{flexible} cases.
+%    \begin{macrocode}
+\tl_new:N \l_@@_flex_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}[int]{\l_@@_imaginary_prop, \l_@@_real_prop}
 % \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
 %   Used to hold the real and imaginary parts of a number in the standardised
@@ -205,6 +215,15 @@
 \tl_new:N \l_@@_real_tl
 %    \end{macrocode}
 % \end{variable}
+% \end{variable}
+%
+% \begin{variable}[int]{\l_@@_partial_tl}
+%   To avoid needing to worry about the fact that the final data stores are
+%   somewhat tricky to add to token-by-token, a simple store is used to build
+%   up the parsed part of a number before transferring in one go.
+%    \begin{macrocode}
+\tl_new:N \l_@@_partial_tl
+%    \end{macrocode}
 % \end{variable}
 %
 % \begin{macro}[int]{\@@_parse:n}
@@ -309,7 +328,7 @@
           { \@@_parse_exponent_aux:Nw #2 \q_stop }
       }
     \tl_if_empty:NF \l_@@_real_tl
-      {  }
+      { \@@_parse_loop: }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
   {
@@ -398,6 +417,375 @@
   }
 %    \end{macrocode}
 % \end{variable}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_loop:}
+% \begin{macro}[aux]{\@@_parse_loop_first:N}
+% \begin{macro}[aux]{\@@_parse_loop_main:NNNNN}
+% \begin{macro}[aux]{\@@_parse_loop_main_end:NN}
+% \begin{macro}[aux]{\@@_parse_loop_main_digit:NNNNN}
+% \begin{macro}[aux]{\@@_parse_loop_main_decimal:NN}
+% \begin{macro}[aux]{\@@_parse_loop_main_uncert:NNN}
+% \begin{macro}[aux]{\@@_parse_loop_main_complex:NN}
+% \begin{macro}[aux]{\@@_parse_loop_main_sign:NNN}
+% \begin{macro}[aux]{\@@_parse_loop_main_store:NNN}
+% \begin{macro}[aux]{\@@_parse_loop_uncert:NNNNN}
+% \begin{macro}[aux]{\@@_parse_loop_after_uncert:NNN}
+% \begin{macro}[aux]{\@@_parse_loop_root_swap:NNwNN}
+% \begin{macro}[aux]{\@@_parse_loop_complex_cleanup:wN}
+% \begin{macro}[aux]{\@@_parse_loop_break:wN}
+%   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
+%   mantissa, which may contain an uncertainty or complex part. Parsing this
+%   and allowing for all of the different formats possible is best done using
+%   a token-by-token approach. However, as at each stage only a subset of
+%   tokens are valid, the approach take is to use a set of semi-dedicated
+%   functions to parse different components along with switches to allow a
+%   sensible amount of code sharing.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_loop:
+  {
+    \tl_clear:N \l_@@_partial_tl
+    \exp_after:wN \@@_parse_loop_first:NNN
+      \exp_after:wN \l_@@_real_tl \exp_after:wN \c_true_bool
+        \l_@@_arg_tl
+        \q_recursion_tail \q_recursion_stop
+  }
+%    \end{macrocode}
+%   The very first token of the input is handled with a dedicated function.
+%   Valid cases here are
+%   \begin{itemize}
+%     \item Entirely blank if the original input was for example |+e10|:
+%       simply clean up if in the integer part of issue an error if in
+%       a second part (complex number, \emph{etc.}).
+%     \item An integer part digit: pass through to the main collection
+%       routine.
+%     \item A decimal marker: store an empty integer part and move to
+%       the main collection routine for a decimal part.
+%     \item A complex root token: shuffle to the end of the input.
+%   \end{itemize}
+%   Anything else is invalid and sends the code to the abort function.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_first:NNN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      {
+        \bool_if:NTF #2
+          { \tl_put_right:Nn #1 { { } { } { } } }
+          { \@@_parse_loop_break:wN }
+      }
+    \tl_if_in:nNTF {#3} \l_@@_input_digit_tl
+      {
+        \@@_parse_loop_main:NNNNN
+          #1 \c_true_bool \c_false_bool #2 #3
+      }
+      {
+        \tl_if_in:nNTF {#3} \l_@@_input_decimal_tl
+          {
+            \tl_put_right:Nn #1 { { } }
+            \@@_parse_loop_main:NNNNN
+              #1 \c_false_bool \c_true_bool #2
+          }
+          {
+            \tl_if_in:nNTF {#3} \l_@@_input_complex_tl
+              { \@@_parse_loop_root_swap:NNwNN #1 #3 }
+              { \@@_parse_loop_break:wN }
+          }
+      }
+  }
+%    \end{macrocode}
+%   A single function is used to cover the \enquote{main} part of numbers:
+%   finding real, complex or separated uncertainty parts and covering both
+%   the integer and decimal components. This works because these elements
+%   share a lot of concepts: a small number of switches can be used to
+%   differentiate between them. To keep the code at least somewhat readable,
+%   this main function deals with the validity testing but hands off other
+%   tasks to dedicated auxiliaries for each case.
+%   
+%   The possibilities are
+%   \begin{itemize}
+%     \item The number terminates, meaning that some digits were collected
+%       and everything is simply tidied up (as far as the loop is concerned).
+%     \item A digit is found: this is the common case and leads to a storage
+%       auxiliary (which handles non-significant zeros).
+%     \item A decimal marker is found: only valid in the integer part and
+%       there leading to a store-and-switch situation.
+%     \item An open-uncertainty token: switch to the dedicated collector
+%       for uncertainties.
+%     \item A complex root token: store the current number as an imaginary
+%       part and terminate the loop.
+%     \item A sign token (if allowed): stop collecting this number and
+%       restart collection for the second part.
+%   \end{itemize}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main:NNNNN #1#2#3#4#5
+  {
+    \quark_if_recursion_tail_stop_do:Nn #5
+      { \@@_parse_loop_main_end:NN #1#2 }
+    \tl_if_in:nNTF {#5} \l_@@_input_digit_tl
+      { \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5 }
+      {
+        \tl_if_in:nNTF {#5} \l_@@_input_decimal_tl
+          {
+            \bool_if:NTF #2
+              { \@@_parse_loop_main_decimal:NN #1 #4 }
+              { \@@_parse_loop_break:wN }
+          }
+          {
+            \tl_if_in:nNTF {#5} \l_@@_input_uncert_open_tl
+              { \@@_parse_loop_main_uncert:NNN #1#2 #4 }
+              {
+                \tl_if_in:nNTF {#5} \l_@@_input_complex_tl
+                  { \@@_parse_loop_main_complex:NN #1#2 }
+                  {
+                    \bool_if:NTF #4
+                      {
+                        \tl_if_in:nNTF {#5} \l_@@_input_sign_tl
+                          { \@@_parse_loop_main_sign:NNN #1#2 #5 }
+                          { \@@_parse_loop_break:wN }
+                      }
+                      { \@@_parse_loop_break:wN }
+                  }
+              }
+          }
+      }
+  }
+%    \end{macrocode}
+%   If the main loop finds the end marker then there is a tidy up phase.
+%   The current partial number is stored either as the integer or decimal,
+%   depending on the setting for the indicator switch. For the integer
+%   part, if no number has been collected then one or more non-significant
+%   zeros have been dropped. Exactly once zero is therefore needed to make
+%   sure the parsed result is correct.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_end:NN #1#2
+  {
+    \bool_if:nT 
+      { #2 && \tl_if_empty_p:N \l_@@_partial_tl }
+      { \tl_set:Nn \l_@@_partial_tl { 0 } }
+    \tl_put_right:Nx #1
+      {
+        { \exp_not:V \l_@@_partial_tl }
+        \bool_if:NT #2 { { } }
+        { }
+      }
+  }
+%    \end{macrocode}
+%   The most common case for the main loop collector is to find a digit.
+%   Here, in the integer part it is possible that zeros are non-significant:
+%   that is handled using a combination of a switch and a string test. Other
+%   than that, the situation here is simple: store the input and loop.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5
+  {
+    \bool_if:nTF
+      {
+        #2 &&
+        ! ( \str_if_eq_p:nn {#5} { 0 } )
+      }
+      {
+        \tl_put_right:Nn \l_@@_partial_tl {#5}
+        \@@_parse_loop_main:NNNNN #1 #2 \c_true_bool #4
+      }
+      { \@@_parse_loop_main:NNNNN #1 #2 \c_false_bool #4 }
+  }
+%    \end{macrocode}
+%   When a decimal marker was found, move the integer part to the
+%   store and then go back to the loop with the flags set correctly.
+%   There is the case of non-significant zeros to cover before that, of course.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_decimal:NN
+  {
+    \@@_parse_loop_main_store:NNN #1 \c_false_bool \c_false_bool
+    \@@_parse_loop_main:NNNNN #1 \c_false_bool \c_true_bool #2
+  }
+%    \end{macrocode}
+%   Starting an uncertainty part means storing the number to date as in other
+%   cases, with the possibility of a blank decimal part allowed for. The
+%   uncertainty itself is collected by a dedicated function as it is extremely
+%   restricted.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_uncert:NNN #1#2#3
+  {
+    \@@_parse_loop_main_store:NNN #1#2 \c_false_bool
+    \@@_parse_loop_uncert:NNNNN
+      #1 \c_true_bool \c_false_bool #3
+  }
+%    \end{macrocode}
+%   A complex root token has to be at the end of the input (leading ones
+%   are dealt with specially). Thus after moving the data to the correct
+%   place there is a hand-off to a cleanup function. The case where only the
+%   complex root token was given is covered by
+%   \cs{@@_parse_loop_root_swap:NNwNN}.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_complex:NN #1#2
+  {
+    \@@_parse_loop_main_store:NNN #1#2 \c_true_bool
+    \tl_set_eq:NN \l_@@_imaginary_tl #1
+    \tl_clear:N #1
+    \@@_parse_loop_complex_cleanup:wN
+  }
+%    \end{macrocode}
+%   If a sign is found, terminate the current number, store the sign as the
+%   first token of the second part and go back to do the dedicated first-token
+%   function.
+%    \begin{macrocode} 
+\cs_new_protected:Npn \@@_parse_loop_main_sign:NNN #1#2#3
+  {
+    \@@_parse_loop_main_store:NNN #1#2 \c_true_bool
+    \tl_set:Nn \l_@@_flex_tl {#3}
+    \@@_parse_loop_first:NNN \l_@@_flex_tl \c_false_bool
+  }
+%    \end{macrocode}
+%   A common auxiliary for the various non-digit token functions: tidy up the
+%   integer and decimal parts of a number. Here, the two flags are used to
+%   indicate if empty decimal and uncertainty parts should be included in
+%   the storage cycle.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_store:NNN #1#2#3
+  {
+    \tl_if_empty:NT \l_@@_partial_tl
+      { \tl_set:Nn \l_@@_partial_tl { 0 } }
+    \tl_put_right:Nx #1
+      {
+        { \exp_not:V \l_@@_partial_tl }
+        \bool_if:NT #2 { { } }
+        \bool_if:NT #3 { { } }
+      }
+    \tl_clear:N \l_@@_partial_tl
+  }
+%    \end{macrocode}
+%   Inside the brackets for an uncertainty the range of valid choices is
+%   very limited. Either the token is a digit, in which case there is a
+%   test to look for non-significant zeros, or it is a closing bracket. The
+%   latter is not valid for the very first token, which is handled using a
+%   switch (it's a simple enough difference).
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_uncert:NNNNN #1#2#3#4#5
+  {
+    \quark_if_recursion_tail_stop_do:Nn
+      { \@@_parse_loop_break:wN }
+    \tl_if_in:nNTF {#5} \l_@@_input_digit_tl
+      {
+        \bool_if:nTF
+          {
+            #3 &&
+            ! ( \str_if_eq_p:nn {#5} { 0 } )
+          }
+          {
+            \tl_put_right:Nn \l_@@_partial_tl {#5}
+            \@@_parse_loop_uncert:NNNNN
+              #1 \c_false_bool \c_true_bool #4
+          }
+          {
+            \@@_parse_loop_uncert:NNNNN
+              #1 \c_false_bool \c_false_bool #4
+          }
+      }
+      {
+        \tl_if_in:nNTF {#5} \l_@@_input_uncert_close_tl
+          {
+            \bool_if:NTF #2
+              { \@@_parse_loop_break:wN }
+              {
+                \@@_parse_loop_main_store:NNN #1
+                  \c_false_bool \c_false_bool
+                \@@_parse_loop_after_uncert:NNN #1 #3
+              }
+          }
+          { \@@_parse_loop_break:wN }
+      }
+  }
+%    \end{macrocode}
+%   After a bracketed uncertainty there are only a very small number of
+%   valid choices. The number can end, there can be a complex root token
+%   or there can be a sign. The latter is only allowed if the part being
+%   parsed at the moment was the first part of the number. The case where
+%   there is no root symbol but there should have been is cleared up after
+%   the loop code, so at this stage there is no check.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_after_uncert:NNN #1#2#3
+  {
+    \quark_if_recursion_tail_stop:N #3
+    \tl_if_in:nNTF {#3} \l_@@_input_complex_tl
+      { \@@_parse_loop_main_complex:NN #1 }
+      {
+        \bool_if:NTF #2
+          {
+            \tl_if_in:nNTF {#3} \l_@@_input_sign_tl
+              {
+                \tl_set:Nn \l_@@_flex_tl {#3}
+                \@@_parse_loop_first:NNN \l_@@_flex_tl \c_false_bool
+              }
+              { \@@_parse_loop_break:wN }
+          }
+          { \@@_parse_loop_break:wN }
+      }
+  }
+%    \end{macrocode}
+%   When the complex root symbol comes at the start of the number rather than
+%   at the end, the easiest approach is to shuffle it to the \enquote{normal}
+%   position. As the exponent has already been removed, this must be the last
+%   token of the input and any duplication will be picked up. The case where
+%   just a complex root token has to be covered: in that situation, there is
+%   an implicit |1| to store after which the loop stops.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_root_swap:NNwNN #1#2#3
+  \q_recursion_tail \q_recursion_stop
+  {
+    \tl_if_blank:nTF {#3}
+      {
+        \tl_set:Nx \l_@@_imaginary_tl
+          {
+            \exp_not:V #1
+            { 1 } { } { }
+          }
+        \tl_clear:N #1
+      }
+      {
+        \use:x
+          {
+            \tl_clear:N \exp_not:N #1
+            \tl_set:Nn \exp_not:N \l_@@_flex_tl { \exp_not:V #1 }
+          }
+        \@@_parse_loop_first:NNN 
+          \l_@@_flex_tl \c_false_bool 
+          #3 #2 \q_recursion_tail \q_recursion_stop
+      }
+  }
+%    \end{macrocode}
+%   Nothing is allowed after a complex root token: check and if there is
+%   kill the parsing.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_complex_cleanup:wN #1 \q_recursion_stop
+  {
+    \tl_if_blank:nF {#1}
+      { \@@_parse_loop_break:wN \q_recursion_stop }
+  }
+%    \end{macrocode}
+%   Something is not right: remove all of the remaining tokens from the
+%   number and clear the storage areas as a signal for the next part of the
+%   code.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_break:wN #1 \q_recursion_stop
+  {
+    \tl_clear:N \l_@@_complex_tl
+    \tl_clear:N \l_@@_real_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
