@@ -75,6 +75,13 @@
 %<@@=siunitx_number>
 %    \end{macrocode}
 %
+% \subsection{Initial set-up}
+%
+%   Variants not provided by \pkg{expl3}.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \tl_if_blank:fT { f }
+%    \end{macrocode}
+%
 % \begin{variable}[int]{\l_@@_tmp_tl}
 %   Scratch space
 %    \begin{macrocode}
@@ -217,6 +224,13 @@
 % \end{variable}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_input_tl}
+%   The numerical input exactly as given by the user.
+%    \begin{macrocode}
+\tl_new:N \l_@@_input_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}[int]{\l_@@_partial_tl}
 %   To avoid needing to worry about the fact that the final data stores are
 %   somewhat tricky to add to token-by-token, a simple store is used to build
@@ -239,11 +253,51 @@
     \prop_clear:N \l_@@_real_prop
     \tl_clear:N \l_@@_real_tl
     \protected@edef \l_@@_arg_tl {#1}
+    \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
     \@@_parse_replace:
     \tl_if_blank:nF {#1}
       { \@@_parse_comparator: }
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_check:}
+% \begin{macro}[aux]{\@@_parse_comparator_aux:Nw}
+%   After the loop there is one case that might need tidying up. If a
+%   separated uncertainty was found it will be currently in \cs{l_@@_flex_tl}
+%   and needs moving. A series of tests pick up that case, then the check is
+%   made that some content was found for at least one of the real or imaginary
+%   parts of the number.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_check:
+  {
+    \tl_if_empty:NF \l_@@_flex_tl
+      {
+        \tl_if_blank:fTF
+          { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
+          {
+            \tl_set:Nx \l_@@_tmp_tl
+              { \exp_after:wN \use_i:nnnn \l_@@_flex_tl }
+            \tl_if_in:VNTF \l_@@_tmp_tl
+              \l_@@_input_uncert_sign_tl
+              { \@@_parse_: }
+              { \tl_clear:N \l_@@_real_tl }
+          }
+          { \tl_clear:N \l_@@_real_tl }
+      }
+    \bool_if:nTF
+      {
+        \tl_if_empty_p:N \l_@@_real_tl  &&
+        \tl_if_empty_p:N \l_@@_imaginary_tl
+      }
+      {
+        \msg_error:nnx { siunitx / number } { invalid-number }
+          { \exp_not:V \l_@@_input_tl }
+      }
+      { \@@_parse_finalise: }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_comparator:}
@@ -453,13 +507,14 @@
 %   functions to parse different components along with switches to allow a
 %   sensible amount of code sharing.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_parse_loop:
+\cs_new_protected_nopar:Npn \@@_parse_loop: {#1}
   {
     \tl_clear:N \l_@@_partial_tl
     \exp_after:wN \@@_parse_loop_first:NNN
       \exp_after:wN \l_@@_real_tl \exp_after:wN \c_true_bool
         \l_@@_arg_tl
         \q_recursion_tail \q_recursion_stop
+    \@@_parse_check:
   }
 %    \end{macrocode}
 %   The very first token of the input is handled with a dedicated function.
@@ -838,6 +893,17 @@
 % \subsection{Processing numbers}
 %
 % \subsection{Formatting parsed numbers}
+%
+% \subsection{Messages}
+%
+%    \begin{macrocode}
+\msg_new:nnnn { siunitx / number } { invalid-input }
+  { Invalid~number~'#1'. }
+  {
+    The~input~'#1'~could~not~be~parsed~as~a~number~following~the~
+    format~defined~in~module~documentation.
+  }
+%    \end{macrocode}
 %
 % \subsection{Standard settings for module options}
 %
