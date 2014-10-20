@@ -337,9 +337,16 @@
 \cs_new_protected:Npn
   \@@_parse_combine_uncert_auxi:NnnnNnnn #1#2#3#4#5#6#7#8
   {
-    \@@_parse_combine:uncert_auxii:fnnnn
-      { \int_eval:n { \tl_count:n {#3} - \tl_count:n {#7} } }
-      {#2} {#3} {#6} {#7}
+    \int_compare:nNnTF { \tl_count:n {#6} } > { \tl_count:n {#2} }
+      {
+        \msg_error:nnx { siunitx / number } { uncertainty-invalid }
+          { \exp_not:V \l_@@_input_tl }
+      }
+      {
+        \@@_parse_combine:uncert_auxii:fnnnn
+          { \int_eval:n { \tl_count:n {#3} - \tl_count:n {#7} } }
+          {#2} {#3} {#6} {#7}
+      }
   }
 \cs_new_protected:Npn
   \@@_parse_combine_uncert_auxii:nnnnn #1
@@ -991,6 +998,12 @@
   {
     The~input~'#1'~could~not~be~parsed~as~a~number~following~the~
     format~defined~in~module~documentation.
+  }
+\msg_new:nnnn { siunitx / number } { uncertainty-invalid }
+  { Uncertainty~part~in~'#1'~invalid. }
+  {
+    The~uncertainty~(second~part)~in~the~input~'#1'~has~more~figures~than~the~
+    main~number~in~the~integer~part.~This~cannot~be~handled~by~siunitx.
   }
 %    \end{macrocode}
 %
