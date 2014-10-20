@@ -300,11 +300,93 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_combine_uncert:}
+% \begin{macro}[aux]{\@@_parse_combine_uncert_auxi:NnnnNnnn}
+% \begin{macro}[aux]
+%   {^^A
+%     \@@_parse_combine_uncert_auxii:nnnnn,
+%     \@@_parse_combine_uncert_auxii:fnnnn
+%   }
+% \begin{macro}[aux]
+%   {^^A
+%     \@@_parse_combine_uncert_auxiii:nnnnnn,
+%     \@@_parse_combine_uncert_auxiii:fnnnnn
+%   }
+% \begin{macro}[aux]{\@@_parse_combine_uncert_auxiv:nnnn}
+%   Conversion of a second numerical part to an uncertainty needs a bit of
+%   work. The first step is to extract the useful information from the two
+%   stores: the sign, integer and decimal parts from the real number and the
+%   integer and decimal parts from the second number. That is done using the
+%   input stack to avoid lots of assignments.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_combine_uncert:
   {
+    \exp_last_unbraced:NNNV \exp_last_unbraced:NV
+    \@@_parse_combine_uncert_auxi:NnnnNnnn
+      \l_@@_real_tl \l_@@_flex_tl
   }
 %    \end{macrocode}
+%  Here, |#4|, |#5| and |#8| are all junk arguments simply there to mop up
+%  tokens, while |#1| will be recovered later from \cs{l_@@__real_tl} so does
+%  not need to be passed about. The difference in places between the two
+%  decimal parts is now found: this is done just once to avoid having to
+%  part token lists twice. The value is then used to generate a number of
+%  filler |0| tokens, and these are added to the appropriate part of the
+%  number. Finally, everything is recombined: the integer part only needs
+%  a test to avoid an empty main number.
+%    \begin{macrocode}
+\cs_new_protected:Npn
+  \@@_parse_combine_uncert_auxi:NnnnNnnn #1#2#3#4#5#6#7#8
+  {
+    \@@_parse_combine:uncert_auxii:fnnnn
+      { \int_eval:n { \tl_count:n {#3} - \tl_count:n {#7} } }
+      {#2} {#3} {#6} {#7}
+  }
+\cs_new_protected:Npn
+  \@@_parse_combine_uncert_auxii:nnnnn #1
+  {
+    \@@_parse_combine_uncert_auxiii:fnnnnn
+      { \prg_replicate:nn {#1} { 0 } }
+      {#1}
+  }
+\cs_generate_variant:Nn \@@_parse_combine_uncert_auxii:nnnnn { f }
+\cs_new_protected:Npn
+  \@@_parse_combine_uncert_auxiii:nnnnnn #1#2#3#4#5#6
+  {
+    \int_compare:nNnTF {#2} > \c_zero
+      {
+        \@@_parse_combine_uncert_auxiv:nnnn
+          {#3} {#4} {#5} { #6 #1 }
+      }
+      {
+        \@@_parse_combine_uncert_auxiv:nnnn
+          {#3} { #4 #1 } {#5} {#6}
+      }
+  }
+\cs_generate_variant:Nn \@@_parse_combine_uncert_auxiii:nnnnnn { f }
+\cs_new_protected:Npn
+  \@@_parse_combine_uncert_auxiv:nnnn #1#2#3#4
+  {
+    \tl_set:Nx \l_@@_real_tl
+      {
+        \tl_head:V \l_@@_real_tl
+          { \exp_not:n  {#1} }
+          {
+            \bool_if:nTF
+              {
+                   \tl_if_blank_p:n {#2}
+                && ! (\tl_if_blank_p:n {#3} )
+              }
+              { 0 }
+              { \exp_not:n {#2} }  
+          }
+          { \exp_not:n {#3#4} }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_comparator:}
