@@ -192,6 +192,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_comparator_tl}
+%   A comparator, if found, is held here.
+%    \begin{macrocode}
+\tl_new:N \l_@@_comparator_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}[int]{\l_@@_exponent_tl}
 %   The exponent part of a parsed number. It is easiest to find this
 %   relatively early in the parsing process, but as it needs to go at
@@ -211,17 +218,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_imaginary_prop, \l_@@_real_prop}
 % \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
 %   Used to hold the real and imaginary parts of a number in the standardised
 %   format.
 %    \begin{macrocode}
-\prop_new:N \l_@@_imaginary_prop
-\prop_new:N \l_@@_real_prop
 \tl_new:N \l_@@_imaginary_tl
 \tl_new:N \l_@@_real_tl
 %    \end{macrocode}
-% \end{variable}
 % \end{variable}
 %
 % \begin{variable}[int]{\l_@@_input_tl}
@@ -250,7 +253,6 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse:n #1
   {
-    \prop_clear:N \l_@@_real_prop
     \tl_clear:N \l_@@_real_tl
     \protected@edef \l_@@_arg_tl {#1}
     \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
@@ -409,11 +411,12 @@
   }
 \cs_new_protected:Npn \@@_parse_comparator_aux:Nw #1#2 \q_stop
   {
-    \tl_if_in:NnT \l_@@_input_comparator_tl {#1}
+    \tl_if_in:NnTF \l_@@_input_comparator_tl {#1}
       {
-        \prop_put:Nnn \l_@@_real_prop { comparator } {#1}
+        \tl_set:Nn \l_@@_comparator_tl {#1}
         \tl_set:Nn \l_@@_arg_tl {#2}
       }
+      { \tl_clear:N \l_@@_comparator_tl }
     \tl_if_blank:NF \l_@@_arg_tl
       { \@@_parse_sign: }
   }
@@ -577,6 +580,37 @@
 % \end{variable}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_parse_finalise:}
+% \begin{macro}[aux]{\@@_parse_finalise_aux:Nw}
+%   Combine all of the bits of a number together: both the real and
+%   imaginary parts contain all of the data.
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_parse_finalise:
+  {
+    \tl_map_inline:nn
+      { \l_@@_real_tl \l_@@_imaginary_tl }
+      {
+        \tl_if_empty:NF ##1
+          {
+            \tl_set:Nx ##1
+              {
+                { \exp_not:V \l_@@_comparator_tl }
+                \exp_not:V ##1
+                \exp_after:wN \@@_parse_finalise_aux:Nw
+                  \l_@@_exponent_tl \q_stop
+              }
+          }
+      }
+  }
+\cs_new:Npn \@@_parse_finalise_aux:Nw #1#2 \q_stop
+  {
+    \exp_not:N #1
+    { \exp_not:n {#2} }
+  }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
