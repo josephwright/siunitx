@@ -667,7 +667,7 @@
       {
         \bool_if:NTF #2
           { \tl_put_right:Nn #1 { { } { } { } } }
-          { \@@_parse_loop_break:wN }
+          { \@@_parse_loop_break:wN \q_recursion_stop }
       }
     \tl_if_in:nNTF {#3} \l_@@_input_digit_tl
       {
@@ -863,7 +863,7 @@
 \cs_new_protected:Npn \@@_parse_loop_uncert:NNNNN #1#2#3#4#5
   {
     \quark_if_recursion_tail_stop_do:Nn
-      { \@@_parse_loop_break:wN }
+      { \@@_parse_loop_break:wN \q_recursion_stop }
     \tl_if_in:nNTF {#5} \l_@@_input_digit_tl
       {
         \bool_if:nTF
@@ -972,6 +972,7 @@
   #1 \q_recursion_stop
   {
     \tl_clear:N \l_@@_complex_tl
+    \tl_clear:N \l_@@_flex_tl
     \tl_clear:N \l_@@_real_tl
   }
 %    \end{macrocode}
