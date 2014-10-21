@@ -678,8 +678,7 @@
         \tl_if_in:nNTF {#3} \l_@@_input_decimal_tl
           {
             \tl_put_right:Nn #1 { { } }
-            \@@_parse_loop_main:NNNNN
-              #1 \c_false_bool \c_true_bool #2
+            \@@_parse_loop_main_after_decimal:NNN #1 #2
           }
           {
             \tl_if_in:nNTF {#3} \l_@@_input_complex_tl
@@ -795,7 +794,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_decimal:NN
   {
     \@@_parse_loop_main_store:NNN #1 \c_false_bool \c_false_bool
-    \@@_parse_loop_main:NNNNN #1 \c_false_bool \c_true_bool #2
+    \@@_parse_loop_main_after_decimal:NNN #1 #2
   }
 %    \end{macrocode}
 %   Starting an uncertainty part means storing the number to date as in other
@@ -852,6 +851,30 @@
         \bool_if:NT #3 { { } }
       }
     \tl_clear:N \l_@@_partial_tl
+  }
+%    \end{macrocode}
+%   After a decimal marker there has to be a digit if there wasn't one before
+%   it. That is handled by using a dedicated function, which checks for
+%   an empty integer part first then either simply hands off or looks for
+%   a digit.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_loop_main_after_decimal:NNN #1#2#3
+  {
+    \tl_if_blank:fT { \exp_after:wN \use_none:n #1 }
+      {
+        \quark_if_recursion_tail_stop_do:Nn #3
+          { \@@_parse_loop_break:wN \q_recursion_stop }
+        \tl_if_in:nNTF {#1} \l_@@_input_digit_tl
+          {
+            \tl_put_right:Nn \l_@@_partial_tl {#3}
+            \@@_parse_loop_main:NNNNN #1 \c_false_bool \c_true_bool #2
+          }
+          { \@@_parse_loop_break:wN}
+      }
+      {
+        \@@_parse_loop_main:NNNNN
+          #1 \c_false_bool \c_true_bool #2 #3
+      }
   }
 %    \end{macrocode}
 %   Inside the brackets for an uncertainty the range of valid choices is
