@@ -282,8 +282,8 @@
       {
         \tl_set:Nx \l_@@_tmp_tl
           { \exp_after:wN \use_i:nnnn \l_@@_flex_tl }
-        \tl_if_in:VNTF \l_@@_tmp_tl
-          \l_@@_input_uncert_sign_tl
+        \tl_if_in:NVTF \l_@@_input_uncert_sign_tl
+          \l_@@_tmp_tl
           { \@@_parse_combine_uncert: }
           { \tl_clear:N \l_@@_real_tl }
       }
@@ -493,7 +493,7 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
   {
-    \tl_if_in:VNTF \l_@@_input_sign_tl #1
+    \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
       { \@@_parse_exponent_aux:Nn #1 {#2} }
       { \@@_parse_exponent_aux:Nn + {#1#2} }
     \tl_if_empty:NT \l_@@_exponent_tl
@@ -516,7 +516,7 @@
 \cs_new_protected:Npn \@@_parse_exponent_check:N #1
   {
     \quark_if_recursion_tail_stop:N #1
-    \tl_if_in:nNTF {#1} \l_@@_digit_tl
+    \tl_if_in:NnTF \l_@@_digit_tl {#1}
       {
         \tl_put_right:Nn \l_@@_exponent_tl {#1}
         \@@_parse_exponent_check:N
@@ -671,19 +671,19 @@
           { \tl_put_right:Nn #1 { { } { } { } } }
           { \@@_parse_loop_break:wN \q_recursion_stop }
       }
-    \tl_if_in:nNTF {#3} \l_@@_input_digit_tl
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
       {
         \@@_parse_loop_main:NNNNN
           #1 \c_true_bool \c_false_bool #2 #3
       }
       {
-        \tl_if_in:nNTF {#3} \l_@@_input_decimal_tl
+        \tl_if_in:NnTF \l_@@_input_decimal_tl {#3}
           {
             \tl_put_right:Nn #1 { { } }
             \@@_parse_loop_main_after_decimal:NNN #1 #2
           }
           {
-            \tl_if_in:nNTF {#3} \l_@@_input_complex_tl
+            \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
               { \@@_parse_loop_root_swap:NNwNN #1 #3 }
               { \@@_parse_loop_break:wN }
           }
@@ -718,25 +718,25 @@
   {
     \quark_if_recursion_tail_stop_do:Nn #5
       { \@@_parse_loop_main_end:NN #1#2 }
-    \tl_if_in:nNTF {#5} \l_@@_input_digit_tl
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
       { \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5 }
       {
-        \tl_if_in:nNTF {#5} \l_@@_input_decimal_tl
+        \tl_if_in:NnTF \l_@@_input_decimal_tl {#5}
           {
             \bool_if:NTF #2
               { \@@_parse_loop_main_decimal:NN #1 #4 }
               { \@@_parse_loop_break:wN }
           }
           {
-            \tl_if_in:nNTF {#5} \l_@@_input_uncert_open_tl
+            \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#5}
               { \@@_parse_loop_main_uncert:NNN #1#2 #4 }
               {
-                \tl_if_in:nNTF {#5} \l_@@_input_complex_tl
+                \tl_if_in:NnTF \l_@@_input_complex_tl {#5}
                   { \@@_parse_loop_main_complex:NN #1#2 }
                   {
                     \bool_if:NTF #4
                       {
-                        \tl_if_in:nNTF {#5} \l_@@_input_sign_tl
+                        \tl_if_in:NnTF \l_@@_input_sign_tl {#5}
                           {
                             \@@_parse_loop_main_sign:NNN
                               #1#2 #5
@@ -866,7 +866,7 @@
       {
         \quark_if_recursion_tail_stop_do:Nn #3
           { \@@_parse_loop_break:wN \q_recursion_stop }
-        \tl_if_in:nNTF {#1} \l_@@_input_digit_tl
+        \tl_if_in:NnTF \l_@@_input_digit_tl {#1}
           {
             \tl_put_right:Nn \l_@@_partial_tl {#3}
             \@@_parse_loop_main:NNNNN #1 \c_false_bool \c_true_bool #2
@@ -889,7 +889,7 @@
   {
     \quark_if_recursion_tail_stop_do:Nn
       { \@@_parse_loop_break:wN \q_recursion_stop }
-    \tl_if_in:nNTF {#5} \l_@@_input_digit_tl
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
       {
         \bool_if:nTF
           {
@@ -907,7 +907,7 @@
           }
       }
       {
-        \tl_if_in:nNTF {#5} \l_@@_input_uncert_close_tl
+        \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#5}
           {
             \bool_if:NTF #2
               { \@@_parse_loop_break:wN }
@@ -931,12 +931,12 @@
 \cs_new_protected:Npn \@@_parse_loop_after_uncert:NNN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #3
-    \tl_if_in:nNTF {#3} \l_@@_input_complex_tl
+    \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
       { \@@_parse_loop_main_complex:NN #1 }
       {
         \bool_if:NTF #2
           {
-            \tl_if_in:nNTF {#3} \l_@@_input_sign_tl
+            \tl_if_in:NnTF \l_@@_input_sign_tl {#3}
               {
                 \tl_set:Nn \l_@@_flex_tl {#3}
                 \@@_parse_loop_first:NNN
@@ -1033,7 +1033,7 @@
   }
 \cs_new_protected:Npn \@@_parse_sign_aux:Nw #1#2 \q_stop
   {
-    \tl_if_in:nNTF {#1} \l_@@_sign_tl
+    \tl_if_in:NnTF \l_@@_sign_tl {#1}
       {
         \tl_set:Nn \l_@@_arg_tl {#2}
         \tl_set:Nn \l_@@_real_tl {#1}
