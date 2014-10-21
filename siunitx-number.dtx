@@ -273,21 +273,23 @@
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_check:
   {
-    \bool_if:nTF
+    \tl_if_empty:NF \l_@@_flex_tl
       {
-            ! ( \tl_if_empty_p:N \l_@@_flex_tl )
-        && \tl_if_blank_p:f { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
-        && \tl_if_blank_p:f { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
-      }
-      {
-        \tl_set:Nx \l_@@_tmp_tl
-          { \exp_after:wN \use_i:nnnn \l_@@_flex_tl }
-        \tl_if_in:NVTF \l_@@_input_uncert_sign_tl
-          \l_@@_tmp_tl
-          { \@@_parse_combine_uncert: }
+        \bool_if:nTF
+          {
+               \tl_if_blank_p:f { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
+            && \tl_if_blank_p:f { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
+          }
+          {
+            \tl_set:Nx \l_@@_tmp_tl
+              { \exp_after:wN \use_i:nnnn \l_@@_flex_tl }
+            \tl_if_in:NVTF \l_@@_input_uncert_sign_tl
+              \l_@@_tmp_tl
+              { \@@_parse_combine_uncert: }
+              { \tl_clear:N \l_@@_real_tl }
+          }
           { \tl_clear:N \l_@@_real_tl }
       }
-      { \tl_clear:N \l_@@_real_tl }
     \bool_if:nTF
       {
         \tl_if_empty_p:N \l_@@_real_tl  &&
