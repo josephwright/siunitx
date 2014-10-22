@@ -385,20 +385,41 @@
     \tl_set:Nx \l_@@_real_tl
       {
         \tl_head:V \l_@@_real_tl
-          { \exp_not:n  {#1} }
+          { \exp_not:n {#1} }
           {
             \bool_if:nTF
               {
                    \tl_if_blank_p:n {#2}
-                && ! (\tl_if_blank_p:n {#3} )
+                && ! ( \tl_if_blank_p:n {#3} )
               }
               { 0 }
               { \exp_not:n {#2} }  
           }
-          { \exp_not:n {#3#4} }
+          {
+            \@@_parse_combine_uncert_auxv:w #3
+              \q_recursion_tail \q_recursion_stop
+            \@@_parse_combine_uncert_auxv:w #4
+              \q_recursion_tail \q_recursion_stop
+          }
       }
   }
 %    \end{macrocode}
+%   A short routine to remove any leading zeros in the uncertainty part,
+%   which are not needed for the compact representation used by the module.
+%    \begin{macrocode}
+\cs_new:Npn \@@_parse_combine_uncert_auxv:w #1
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \str_if_eq:nnTF {#1} { 0 }
+      { \@@_parse_combine_uncert_auxv:w }
+      { \@@_parse_combine_uncert_auxvi:w #1 }
+  }
+\cs_new:Npn \@@_parse_combine_uncert_auxvi:w
+  #1 \q_recursion_tail \q_recursion_stop
+  { \exp_not:n {#1} }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
