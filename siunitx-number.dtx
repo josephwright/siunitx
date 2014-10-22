@@ -957,7 +957,7 @@
   {
     \quark_if_recursion_tail_stop:N #3
     \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
-      { \@@_parse_loop_main_complex:NN #1 }
+      { \@@_parse_loop_main_complex:NN #1 \c_false_bool }
       {
         \bool_if:NTF #2
           {
@@ -1008,7 +1008,7 @@
 %   kill the parsing.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_complex_cleanup:wN
-  #1 \q_recursion_stop
+  #1 \q_recursion_tail \q_recursion_stop
   {
     \tl_if_blank:nF {#1}
       { \@@_parse_loop_break:wN \q_recursion_stop }
@@ -1021,7 +1021,7 @@
 \cs_new_protected:Npn \@@_parse_loop_break:wN
   #1 \q_recursion_stop
   {
-    \tl_clear:N \l_@@_complex_tl
+    \tl_clear:N \l_@@_imaginary_tl
     \tl_clear:N \l_@@_flex_tl
     \tl_clear:N \l_@@_real_tl
   }
