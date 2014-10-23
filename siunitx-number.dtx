@@ -139,9 +139,6 @@
 % efficient approach is desirable (contrast parsing units, which is open-ended
 % and therefore fits well with using a property list).
 % 
-% In this version a hybrid approach is taken to storing the parsed data,
-% splitting the number into \enquote{fixed} and \enquote{flexible} parts.
-% 
 % To allow for complex numbers, two parallel data structures are used, one for
 % the real part and one for the imaginary part. If the part is entirely absent
 % then the data structures are left empty.
@@ -307,7 +304,7 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_combine_uncert:}
-% \begin{macro}[aux]{\@@_parse_combine_uncert_auxi:NnnnNnnn}
+% \begin{macro}[aux]{\@@_parse_combine_uncert_auxi:nnnnnnnn}
 % \begin{macro}[aux]
 %   {^^A
 %     \@@_parse_combine_uncert_auxii:nnnnn,
@@ -330,7 +327,7 @@
 \cs_new_protected_nopar:Npn \@@_parse_combine_uncert:
   {
     \exp_last_unbraced:NNNV \exp_last_unbraced:NV
-    \@@_parse_combine_uncert_auxi:NnnnNnnn
+    \@@_parse_combine_uncert_auxi:nnnnnnnn
       \l_@@_real_tl \l_@@_flex_tl
   }
 %    \end{macrocode}
@@ -344,7 +341,7 @@
 %  a test to avoid an empty main number.
 %    \begin{macrocode}
 \cs_new_protected:Npn
-  \@@_parse_combine_uncert_auxi:NnnnNnnn #1#2#3#4#5#6#7#8
+  \@@_parse_combine_uncert_auxi:nnnnnnnn #1#2#3#4#5#6#7#8
   {
     \int_compare:nNnTF { \tl_count:n {#6} } > { \tl_count:n {#2} }
       {
@@ -384,21 +381,21 @@
   {
     \tl_set:Nx \l_@@_real_tl
       {
-        \tl_head:V \l_@@_real_tl
-          { \exp_not:n {#1} }
-          {
-            \bool_if:nTF
-              {
-                   \tl_if_blank_p:n {#2}
-                && ! ( \tl_if_blank_p:n {#3} )
-              }
-              { 0 }
-              { \exp_not:n {#2} }  
-          }
-          {
-            \@@_parse_combine_uncert_auxv:w #3#4
-              \q_recursion_tail \q_recursion_stop
-          }
+        { \tl_head:V \l_@@_real_tl }
+        { \exp_not:n {#1} }
+        {
+          \bool_if:nTF
+            {
+                 \tl_if_blank_p:n {#2}
+              && ! ( \tl_if_blank_p:n {#3} )
+            }
+            { 0 }
+            { \exp_not:n {#2} }  
+        }
+        {
+          \@@_parse_combine_uncert_auxv:w #3#4
+            \q_recursion_tail \q_recursion_stop
+        }
       }
   }
 %    \end{macrocode}
@@ -451,10 +448,10 @@
 % \end{macro}
 % 
 % \begin{macro}[int]{\@@_parse_exponent:}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:w}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:nn}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:Nn}
+% \begin{macro}[aux]{\@@_parse_exponent_auxi:w}
+% \begin{macro}[aux]{\@@_parse_exponent_auxii:nn}
+% \begin{macro}[aux]{\@@_parse_exponent_auxiii:Nw}
+% \begin{macro}[aux]{\@@_parse_exponent_auxiv:nn}
 % \begin{macro}[aux]
 %   {\@@_parse_exponent_zero_test:N, \@@_parse_exponent_check:N}
 % \begin{macro}[aux]{\@@_parse_exponent_cleanup:N}
@@ -464,7 +461,7 @@
 %   part of the chain checks that there is some content in \cs{l_@@_arg_tl}
 %   before calling this function). After splitting, if there is no exponent
 %   then simply save a default. Otherwise, check for a sign and then store
-%   either this or an assumed |+| and the digits after a check that nothing
+%   either this or a blank and the digits after a check that nothing
 %   else is present after the~|e|. The only slight complication to all of
 %   this is allowing an arbitrary token in the input to represent the exponent:
 %   this is done by setting any exponent tokens to the first of the allowed
@@ -475,7 +472,7 @@
 \cs_new_protected_nopar:Npn \@@_parse_exponent:
   {
     \tl_if_empty:NTF \l_@@_input_exponent_tl
-      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { { } { } } }
       {
         \tl_set:Nx \l_@@_tmp_tl
           { \tl_head:V \l_@@_input_exponent_tl }
@@ -487,53 +484,57 @@
         \use:x
           {
             \cs_set_protected:Npn
-              \exp_not:N \@@_parse_exponent_aux:w
+              \exp_not:N \@@_parse_exponent_auxi:w
               ####1 \exp_not:V \l_@@_tmp_tl
               ####2 \exp_not:V \l_@@_tmp_tl
               ####3 \exp_not:N \q_stop
           }
-            { \@@_parse_exponent_aux:nn {##1} {##2} }
+            { \@@_parse_exponent_auxii:nn {##1} {##2} }
         \use:x
           {
-            \@@_parse_exponent_aux:w
+            \@@_parse_exponent_auxi:w
               \exp_not:V \l_@@_arg_tl
               \exp_not:V \l_@@_tmp_tl \exp_not:N \q_nil
               \exp_not:V \l_@@_tmp_tl \exp_not:N \q_stop
           }
       }
   }
-\cs_new_protected:Npn \@@_parse_exponent_aux:w  { }
-\cs_new_protected:Npn \@@_parse_exponent_aux:nn #1#2
+\cs_new_protected:Npn \@@_parse_exponent_auxi:w  { }
+\cs_new_protected:Npn \@@_parse_exponent_auxii:nn #1#2
   {
     \quark_if_nil:nTF {#2}
-      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { { } { } } }
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
         \tl_if_blank:nTF {#2}
           { \tl_clear:N \l_@@_real_tl }
-          { \@@_parse_exponent_aux:Nw #2 \q_stop }
+          { \@@_parse_exponent_auxiii:Nw #2 \q_stop }
       }
     \tl_if_empty:NF \l_@@_real_tl
       { \@@_parse_loop: }
   }
-\cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
+\cs_new_protected:Npn \@@_parse_exponent_auxiii:Nw #1#2 \q_stop
   {
     \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
-      { \@@_parse_exponent_aux:Nn #1 {#2} }
-      { \@@_parse_exponent_aux:Nn + {#1#2} }
+      { \@@_parse_exponent_auxiv:nn {#1} {#2} }
+      { \@@_parse_exponent_auxiv:nn { } {#1#2} }
     \tl_if_empty:NT \l_@@_exponent_tl
       { \tl_clear:N \l_@@_real_tl }
   }
-\cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
+\cs_new_protected:Npn \@@_parse_exponent_auxiv:nn #1#2
   {
-    \tl_set:Nn \l_@@_exponent_tl { #1 }
-    \@@_parse_exponent_zero_test:N #2
-      \q_recursion_tail \q_recursion_stop
+    \tl_if_blank:nTF {#2}
+      { \tl_clear:N \l_@@_real_tl }
+      {
+        \tl_set:Nn \l_@@_exponent_tl { {#1} }
+        \@@_parse_exponent_zero_test:N #2
+          \q_recursion_tail \q_recursion_stop
+      }
   }
 \cs_new_protected:Npn \@@_parse_exponent_zero_test:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1
-      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { { } 0 } }
     \str_if_eq:nnTF {#1} { 0 }
       { \@@_parse_exponent_zero_test:N }
       { \@@_parse_exponent_check:N #1 }
@@ -625,15 +626,15 @@
               {
                 { \exp_not:V \l_@@_comparator_tl }
                 \exp_not:V ##1
-                \exp_after:wN \@@_parse_finalise_aux:Nw
+                \exp_after:wN \@@_parse_finalise_aux:nw
                   \l_@@_exponent_tl \q_stop
               }
           }
       }
   }
-\cs_new:Npn \@@_parse_finalise_aux:Nw #1#2 \q_stop
+\cs_new:Npn \@@_parse_finalise_aux:nw #1#2 \q_stop
   {
-    \exp_not:N #1
+    { \exp_not:n {#1} }
     { \exp_not:n {#2} }
   }
 %    \end{macrocode}
@@ -857,7 +858,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_sign:NNN #1#2#3
   {
     \@@_parse_loop_main_store:NNN #1#2 \c_true_bool
-    \tl_set:Nn \l_@@_flex_tl {#3}
+    \tl_set:Nn \l_@@_flex_tl { {#3} }
     \@@_parse_loop_first:NNN
       \l_@@_flex_tl \c_false_bool
   }
@@ -1046,8 +1047,8 @@
 % \begin{macro}[int]{\@@_parse_sign:}
 % \begin{macro}[aux]{\@@_parse_sign_aux:Nw}
 %  The first token of a number after a comparator could be a sign. A quick
-%  check is made and if found stored; if there is no sign then the internal
-%  format requires that |+| is used. For the number to be valid it has to be
+%  check is made and if found stored; if there is no sign then an empty
+%  one is recorded. For the number to be valid it has to be
 %  more than just a sign, so the next part of the chain is only called if that
 %  is the case.
 %    \begin{macrocode}
@@ -1061,9 +1062,9 @@
     \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
       {
         \tl_set:Nn \l_@@_arg_tl {#2}
-        \tl_set:Nn \l_@@_real_tl {#1}
+        \tl_set:Nn \l_@@_real_tl { {#1} }
       }
-      { \tl_set:Nn \l_@@_real_tl { + } }
+      { \tl_set:Nn \l_@@_real_tl { { } } }
     \tl_if_empty:NTF \l_@@_arg_tl
       { \tl_clear:N \l_@@_real_tl }
       { \@@_parse_exponent: }
