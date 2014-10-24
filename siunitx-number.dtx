@@ -524,8 +524,12 @@
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
   {
     \tl_set:Nn \l_@@_exponent_tl { #1 }
-    \@@_parse_exponent_zero_test:N #2
-      \q_recursion_tail \q_recursion_stop
+    \tl_if_blank:nTF {#2}
+      { \tl_clear:N \l_@@_real_tl }
+      {
+        \@@_parse_exponent_zero_test:N #2
+          \q_recursion_tail \q_recursion_stop
+      }
   }
 \cs_new_protected:Npn \@@_parse_exponent_zero_test:N #1
   {
