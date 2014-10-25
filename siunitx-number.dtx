@@ -612,24 +612,26 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_parse_finalise:}
+% \begin{macro}[aux]{\@@_parse_finalise_aux:N}
 % \begin{macro}[aux]{\@@_parse_finalise_aux:Nw}
 %   Combine all of the bits of a number together: both the real and
 %   imaginary parts contain all of the data.
 %    \begin{macrocode}
 \cs_new_protected_nopar:Npn \@@_parse_finalise:
   {
-    \tl_map_inline:nn
-      { \l_@@_real_tl \l_@@_imaginary_tl }
+    \@@_parse_finalise_aux:N \l_@@_real_tl
+    \@@_parse_finalise_aux:N \l_@@_imaginary_tl
+  }
+\cs_new_protected:Npn \@@_parse_finalise_aux:N #1
+  {
+    \tl_if_empty:NF #1
       {
-        \tl_if_empty:NF ##1
+        \tl_set:Nx #1
           {
-            \tl_set:Nx ##1
-              {
-                { \exp_not:V \l_@@_comparator_tl }
-                \exp_not:V ##1
-                \exp_after:wN \@@_parse_finalise_aux:Nw
-                  \l_@@_exponent_tl \q_stop
-              }
+            { \exp_not:V \l_@@_comparator_tl }
+            \exp_not:V #1
+            \exp_after:wN \@@_parse_finalise_aux:Nw
+              \l_@@_exponent_tl \q_stop
           }
       }
   }
