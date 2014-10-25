@@ -120,13 +120,8 @@
 % \end{macro}
 % \end{macro}
 %
-% \subsection{Parsing numbers}
+% \subsection{Utilities for the internal number format}
 %
-% Before numbers can be manipulated or formatted they need to be parsed into
-% an internal form. In particular, if multiple code paths are to be avoided,
-% it is necessary to do such parsing even for relatively simple cases such
-% as converting |1e10| to |1 \times 10^{10}|.
-% 
 % Storing the result of such parsing can be done in a number of ways. In the
 % first version of \pkg{siunitx} a series of separate data stores were used.
 % This is potentially quite fast (as recovery of items relies only on \TeX{}'s
@@ -138,6 +133,111 @@
 % limited number of items to track for a \enquote{number} means that a more
 % efficient approach is desirable (contrast parsing units, which is open-ended
 % and therefore fits well with using a property list).
+%
+% In this version, the approach used is to provide a dedicated data structure
+% for numbers while avoiding the use of separate stores for each part. Two
+% token lists are used to hold the number: one for the real part and one for
+% the imaginary part. Within each token list, there are six entries: all are
+% mandatory, but may be empty groups.
+% \begin{itemize}
+%   \item Any comparator, which is optional and thus held as within a brace
+%     group.
+%   \item The sign, a mandatory single token.
+%   \item The integer digits, which must be populated with at least one
+%     digit.
+%   \item The decimal digits, which may be an empty group in the case of
+%     integer input.
+%   \item Any uncertainty, given working from the least significant digit
+%     of the input.
+%   \item The sign for the exponent part, a mandatory single token.
+%   \item The exponent part of the number, which must be populated with at
+%     least one digit.
+% \end{itemize}
+% Thus for example the number $1$ has representation
+% \begin{verbatim}
+%   { } + { 1 } { } { } + { 0 }
+% \end{verbatim}
+% while $1.23(4) \times 10^{-5}$ is
+% \begin{verbatim}
+%   { } + { 1 } { 23 } { 4 } - { 5 }
+% \end{verbatim}
+%
+% \begin{macro}[int, EXP]
+%   {
+%     \@@_use_comparator:N    ,
+%     \@@_use_sign:N          ,
+%     \@@_use_integer:N       ,
+%     \@@_use_decimal:N       ,
+%     \@@_use_uncert:N        ,
+%     \@@_use_exponent_sign:N ,
+%     \@@_use_exponent:N
+%   }
+% \begin{macro}[aux, EXP]
+%   {
+%     \@@_use_comparator:nNnnnNn    ,
+%     \@@_use_sign:nNnnnNn          ,
+%     \@@_use_integer:nNnnnNn       ,
+%     \@@_use_decimal:nNnnnNn       ,
+%     \@@_use_uncert:nNnnnNn        ,
+%     \@@_use_exponent_sign:nNnnnNn ,
+%     \@@_use_exponent:nNnnnNn
+%   }
+%   Accessor functions for the various components of a number: these are set
+%   up to return the token(s) protected from further expansion and so usable
+%   with for example \cs{str_if_eq_x:nn(TF)}.
+%    \begin{macrocode}
+\cs_new:Npn \@@_use_comparator:N #1
+  {
+    \exp_after:wN \@@_use_comparator:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_comparator:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n {#1} }
+\cs_new:Npn \@@_use_sign:N #1
+  {
+    \exp_after:wN \@@_use_sign:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_sign:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:N #2 }
+\cs_new:Npn \@@_use_integer:N #1
+  {
+    \exp_after:wN \@@_use_integer:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_integer:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n {#3} }
+\cs_new:Npn \@@_use_decimal:N #1
+  {
+    \exp_after:wN \@@_use_decimal:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_decimal:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n {#4} }
+\cs_new:Npn \@@_use_uncert:N #1
+  {
+    \exp_after:wN \@@_use_uncert:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_uncert:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n {#5} }
+\cs_new:Npn \@@_use_exponent_sign:N #1
+  {
+    \exp_after:wN \@@_use_exponent_sign:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_exponent_sign:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:N #6 }
+\cs_new:Npn \@@_use_exponent:N #1
+  {
+    \exp_after:wN \@@_use_exponent:nNnnnNn #1
+  }
+\cs_new:Npn \@@_use_exponent:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n {#7} }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Parsing numbers}
+%
+% Before numbers can be manipulated or formatted they need to be parsed into
+% an internal form. In particular, if multiple code paths are to be avoided,
+% it is necessary to do such parsing even for relatively simple cases such
+% as converting |1e10| to |1 \times 10^{10}|.
 % 
 % To allow for complex numbers, two parallel data structures are used, one for
 % the real part and one for the imaginary part. If the part is entirely absent
