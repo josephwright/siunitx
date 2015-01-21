@@ -621,6 +621,8 @@ This work consists of the file  siunitx.dtx
 %   is loaded but \pkg{unicode-math} is not}
 % \changes{v2.6d}{2014/10/07}{Fix conversion of \enquote{long} to 
 %   \enquote{short} uncertainty values with integer mantissas}
+% \changes{v2.6e}{2015/01/21}{Auto-detect some packages where \pkg{fontspec}
+%   should not affect default symbol use}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5282,16 +5284,25 @@ This work consists of the file  siunitx.dtx
 %}
 % To allow the correct symbol to appear in text mode: this is the same
 % as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
-% then the real character can be used.
+% then the real character can be used unless there's a good reason
+% to suspect 
 %    \begin{macrocode}
 \DeclareTextSymbolDefault \c_@@_minus_tl { TS1 }
 \DeclareTextSymbol \c_@@_minus_tl { TS1 } { 61 }
 \AtBeginDocument {
   \@ifpackageloaded { fontspec }
     {
-      \int_const:Nn \c_@@_minus_int { 8722 }
-      \tl_set:Nn \c_@@_minus_tl
-        { \tex_char:D \c_@@_minus_int }
+      \@ifpackageloaded { mathspec }
+        { }
+        {
+          \@ifpackageloaded { eulervm }
+            { }
+            {
+              \int_const:Nn \c_@@_minus_int { 8722 }
+              \tl_set:Nn \c_@@_minus_tl
+                { \tex_char:D \c_@@_minus_int }
+            }
+        }
     }
     { }
 }
