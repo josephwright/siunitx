@@ -624,6 +624,8 @@ This work consists of the file  siunitx.dtx
 %   \enquote{short} uncertainty values with integer mantissas}
 % \changes{v2.6e}{2015/01/21}{Auto-detect some packages where \pkg{fontspec}
 %   should not affect default symbol use}
+% \changes{v2.6f}{2015/04/01}{Fix \opt{table-sign-exponent} and
+%   \opt{table-sign-mantissa} options when set \opt{false}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -14177,10 +14179,18 @@ This work consists of the file  siunitx.dtx
     table-parse-only          .bool_set:N = \l_@@_table_parse_only_bool,
     table-space-text-pre      .tl_set:N   = \l_@@_table_pre_tl,
     table-space-text-post     .tl_set:N   = \l_@@_table_post_tl,
-    table-sign-exponent       .code:n     =
+    table-sign-exponent       .choice:,
+    table-sign-exponent / true .code:n  =
       { \prop_put:Nnn \l_@@_table_model_prop { exponent-sign } { - } },
-    table-sign-mantissa       .code:n     =
+    table-sign-exponent / false .code:n =
+      { \prop_remove:Nn \l_@@_table_model_prop { exponent-sign } },
+    table-sign-exponent       .default:n = true,
+    table-sign-mantissa       .choice:,
+    table-sign-mantissa / true .code:n  =
       { \prop_put:Nnn \l_@@_table_model_prop { mantissa-sign } { - } },
+    table-sign-mantissa / false .code:n =
+      { \prop_remove:Nn \l_@@_table_model_prop { mantissa-sign } },
+    table-sign-mantissa       .default:n = true,
   }
 %    \end{macrocode}
 % \end{variable}
