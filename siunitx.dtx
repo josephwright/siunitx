@@ -5675,11 +5675,19 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 % \begin{macro}{\@@_textsuperscript:n}
+% \changes{v2.6f}{2015/06/15}{FUse private copy of \cs{textsuperscript}}
 %   This function is set up here so that it can be redefined
 %   elsewhere as expandable. That is used in the bookmark system so
-%   that \pkg{hyperref} does not raise any unnecessary warnings.
+%   that \pkg{hyperref} does not raise any unnecessary warnings. With
+%   \pkg{fontspec} loaded the kernel defintion for \cs{textsuperscript}
+%   may get altered so a private copy of the orignal code is used. (Yes,
+%   this really should be done like Con\TeX{}t
 %    \begin{macrocode}
-\cs_new_eq:NN \@@_textsuperscript:n \textsuperscript
+\cs_new_protected:Npn \@@_textsuperscript:n #1
+  {
+    \m@th
+    \ensuremath { ^ { \mbox { \fontsize \sf@size \z@ \selectfont #1 }
+  }
 %    \end{macrocode}
 % \end{macro}
 %
