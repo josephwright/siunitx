@@ -20,8 +20,24 @@
 \OMIT
   \char_set_catcode_active:N \~
   \cs_set_eq:NN ~ \c_space_tl
-  \tl_set:Nn \l_tmpb_tl { J ~  mol ^ { -1 } ~ K  ^ { -1 } }
+  \tl_set:Nn \l_tmpb_tl { J ~ mol ^ { -1 } ~ K  ^ { -1 } }
   \char_set_catcode_space:N \~
+  \char_set_catcode_other:N \^
+  \tl_gset:Nn \g_tmpa_tl { J . mol ^ { -1 } . K  ^ { -1 } }
+  \tl_gset:Nx \g_tmpb_tl { kg \token_to_str:N _ { polymer } }
+  \tl_new:N \l_tmpc_tl
+  \group_begin:
+    \cs_set_eq:NN \detokenize \tl_to_str:n 
+    \cs_set_eq:NN \endgroup   \group_end:
+    \cs_set_eq:NN \tmp        \exp_not:c
+    \char_set_catcode_math_subscript:N \_
+  \use:x
+    {
+      \endgroup
+      \tmp { \detokenize { tl_set:Nn } }
+        \tmp { \detokenize { l_tmpc_tl } }
+        { kg _ { polymer } }
+    }
 \TIMO
 
 \TEST { Basic~unit~formatting }
@@ -32,7 +48,13 @@
     \tl_show:N \l_tmpa_tl
     \exp_args:NV \siunitx_unit_format:nN \l_tmpb_tl \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
+    \exp_args:NV \siunitx_unit_format:nN \g_tmpa_tl \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
     \siunitx_unit_format:nN { \joule . mol ^ { -1 } . K  ^ { -1 } } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \exp_args:NV  \siunitx_unit_format:nN \g_tmpb_tl \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \exp_args:NV  \siunitx_unit_format:nN \l_tmpc_tl \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
   }
 
