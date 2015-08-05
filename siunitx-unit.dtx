@@ -1034,28 +1034,28 @@
 %    \begin{macrocode}
 \group_begin:
   \char_set_catcode_active:n { `\~ }
-  \char_set_catcode_math_subscript:n { `\= }
-  \char_set_lccode:nn { `\+ } { `\^ }
-  \char_set_lccode:nn { `\= } { `\_ }
-  \tl_to_lowercase:n
+  \cs_new_protected:Npx \@@_format_literal:n #1
     {
-      \group_end:
-      \cs_new_protected:Npn \@@_format_literal:n #1
-        {
-          \group_begin:
-            \bool_set_false:N \l_@@_parsing_bool
-            \tl_set:Nn \l_@@_tmp_tl {#1}
-            \tl_replace_all:Nnn \l_@@_tmp_tl { ~ } { . }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { + } { ^ }
-            \tl_replace_all:Nnn \l_@@_tmp_tl { _ } { = }
-            \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
-            \tl_clear:N \l_@@_formatted_tl
-            \exp_after:wN \@@_format_literal_aux:w \l_@@_tmp_tl .
-              \q_recursion_tail . \q_recursion_stop
-          \exp_args:NNNV \group_end:
-          \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
-        }
+      \group_begin:
+        \exp_not:n { \bool_set_false:N \l_@@_parsing_bool }
+        \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#1}
+        \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+          { \exp_not:N ~ } { . }
+        \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+          { \token_to_str:N ^ } { ^ }
+        \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+          { \token_to_str:N _ } { \c_@@_math_subscript_tl }
+        \exp_not:n
+          {
+              \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
+              \tl_clear:N \l_@@_formatted_tl
+              \exp_after:wN \@@_format_literal_aux:w \l_@@_tmp_tl .
+                \q_recursion_tail . \q_recursion_stop
+            \exp_args:NNNV \group_end:
+            \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
+          }
     }
+\group_end:
 %    \end{macrocode}
 %   To introduce the font changing commands while still allowing for line
 %   breaks in literal units, a loop is needed to replace one |.| at a time. 
@@ -1714,25 +1714,18 @@
         \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
       }
   }
-\group_begin:
-  \char_set_catcode_math_subscript:n { `\= }
-  \char_set_lccode:nn { `\= } { `\_ }
-  \tl_to_lowercase:n
-    {
-      \group_end:
-      \cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
-        {
-          \@@_format_font:
-          \tl_set:Nx \l_@@_part_tl
-            {
-              =
-                {
-                  \exp_not:V \l_@@_font_tl
-                    { \exp_not:V \l_@@_part_tl }
-                }
-            }
-        }
-    }
+\cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
+  {
+    \@@_format_font:
+    \tl_set:Nx \l_@@_part_tl
+      {
+        \c_@@_math_subscript_tl
+          {
+            \exp_not:V \l_@@_font_tl
+              { \exp_not:V \l_@@_part_tl }
+          }
+      }
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2184,16 +2177,22 @@
 %   Natural units based on physical constants.
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \nuaction { \ensuremath { \mathit { \hbar } } }
-\group_begin:
-  \char_set_catcode_math_subscript:n { `\= }
-  \char_set_lccode:nn { `\= } { `\_ }
-  \tl_to_lowercase:n
-    {
-      \group_end:
-      \siunitx_unit_set:Nn \numass
-        { \ensuremath { \mathit { m } = { \mathrm { e } } } }
-      \siunitx_unit_set:Nn \nuspeed  { \ensuremath { \mathit { c } = { 0 } } }
-    }
+\use:x
+  {
+    \siunitx_unit_set:Nn \exp_not:N \numass
+      {
+        \exp_not:N \ensuremath
+          {
+            \exp_not:N \mathit { m }
+              \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
+          }
+      }
+    \siunitx_unit_set:Nn \exp_not:N \nuspeed
+      {
+        \exp_not:N \ensuremath
+          { \exp_not:N \mathit { c } \c_@@_math_subscript_tl { 0 } }
+      }
+  }
 \siunitx_unit_set:Nn \nutime
   { \numass \per \numass \per \nuspeed \squared }
 %    \end{macrocode}
@@ -2213,18 +2212,29 @@
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \auaction { \ensuremath { \mathit { \hbar } } }
 \siunitx_unit_set:Nn \aucharge { \ensuremath { \mathit { e } } }
-\group_begin:
-  \char_set_catcode_math_subscript:n { `\= }
-  \char_set_lccode:nn { `\= } { `\_ }
-  \tl_to_lowercase:n
-    {
-      \group_end:
-      \siunitx_unit_set:Nn \auenergy
-        { \ensuremath { \mathit { E } = { \mathrm { h } } } }
-      \siunitx_unit_set:Nn \aulength
-        { \ensuremath { \mathit { a } = { 0 } } }
-      \siunitx_unit_set:Nn \aumass
-        { \ensuremath { \mathit { m } = { \mathrm { e } } } }
+\use:x
+  {
+    \siunitx_unit_set:Nn \exp_not:N \auenergy
+      { 
+        \exp_not:N \ensuremath 
+          { 
+            \exp_not:N \mathit { E }
+              \c_@@_math_subscript_tl { \exp_not:N \mathrm { h } } 
+          }
+      }
+    \siunitx_unit_set:Nn \exp_not:N \aulength
+      {
+        \exp_not:N  \ensuremath
+          { \exp_not:N \mathit { a } \c_@@_math_subscript_tl { 0 } }
+      }
+    \siunitx_unit_set:Nn \exp_not:N \aumass
+      {
+        \exp_not:N \ensuremath
+          { 
+            \exp_not:N \mathit { m }
+              \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
+          }
+      }
   }
 \siunitx_unit_set:Nn \autime   { \auaction \per \auenergy }
 \siunitx_unit_set:Nn \bohr     { \aulength }
