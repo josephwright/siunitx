@@ -125,7 +125,8 @@ This work consists of the file  siunitx.dtx
 \fi
 %</internal>
 %<*driver|package>
-\RequirePackage{expl3,xparse}
+\RequirePackage{expl3}[2015/03/01]
+\RequirePackage{xparse}
 %</driver|package>
 %<*driver>
 \documentclass[german,french,spanish,english,UKenglish]{l3doc}
@@ -5160,7 +5161,7 @@ This work consists of the file  siunitx.dtx
 % This will also trap any problems with \pkg{l3packages} (as the two are now
 % tied together, version-wise).
 %    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2012/11/21 }
+\@ifpackagelater { expl3 } { 2015/03/01 }
   { }
   {
     \PackageError { siunitx } { Support~package~expl3~too~old }
@@ -5213,18 +5214,12 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-% \begin{macro}{\clist_map_function:nc}
+% Add some variants.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \clist_map_function:nN { nc }
-%    \end{macrocode}
-% \end{macro}
-% 
-% \begin{macro}{\tl_if_blank:VTF}
-%   Needed for the literal test.
-%    \begin{macrocode}
 \cs_generate_variant:Nn \tl_if_blank:nTF { V } 
+\cs_generate_variant:Nn \tl_replace_all:Nnn  { No, NV }
 %    \end{macrocode}
-% \end{macro}
 %
 %\begin{macro}{
 %  \l_@@_tmp_bool ,
@@ -5603,42 +5598,31 @@ This work consists of the file  siunitx.dtx
 %  \@@_cs_if_tl:N    ,
 %  \@@_cs_if_macro:N
 %}
-%\begin{macro}[aux]{\@@_cs_if_tl_aux:w}
-% This is basically a re-hash of stuff from \pkg{expl3}, but to test for
-% short macros only. The second test (with the \cs{cs_to_str:N} part)
-% is checking for \LaTeXe{} robust commands.
+%  Tests for macros which are not long.
 %    \begin{macrocode}
-\group_begin:
-\tl_map_inline:nn { \M \A \C \R \O }
-  { \char_set_catcode_other:n { `#1 } }
-\tl_map_inline:nn { \F \N \T }
-  { \char_set_lccode:nn { `#1 } { `#1 } }
-\tl_to_lowercase:n {
-  \group_end:
-  \prg_new_conditional:Npnn \@@_cs_if_tl:N #1 { T , F, TF , p }
-    {
-      \exp_last_unbraced:No \@@_cs_if_tl_aux:w
-        { \token_to_meaning:N #1 MACRO \q_stop }
-          {
-            \cs_if_exist:cTF { \cs_to_str:N #1 ~ }
-              { \prg_return_false: }
-              { \prg_return_true: }
-          }
-          { \prg_return_false: }
-    }
-  \cs_new:Npn \@@_cs_if_tl_aux:w #1 MACRO #2 \q_stop
-    { \tl_if_empty:nTF {#1} }
-  \prg_new_conditional:Npnn \@@_cs_if_macro:N #1
-    { T , F , TF , p }
-    {
-      \exp_last_unbraced:No \@@_cs_if_tl_aux:w
-        { \token_to_meaning:N #1 MACRO \q_stop }
-          { \prg_return_true: }
-          { \prg_return_false: }
-    }
-}
+\prg_new_conditional:Npnn \@@_cs_if_tl:N #1 { T, F , TF , p }
+  {
+    \bool_if:nTF
+      {
+             \@@_cs_if_macro_p:N #1
+        && ! \cs_if_exist_p:c { \cs_to_str:N #1 ~ }
+      }
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Npnn \@@_cs_if_macro:N #1 { T, F , TF , p }
+  {
+    \bool_if:nTF
+      {
+             \token_if_macro_p:N                #1
+        && ! \token_if_long_macro_p:N           #1
+        && ! \token_if_protected_macro_p:N      #1
+        && ! \token_if_protected_long_macro_p:N #1
+      }
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 % If \pkg{tex4ht} is in use, make a few changes to give nicer looking
@@ -6412,11 +6396,9 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \@@_print_math: ,
-%  \@@_print_text:,
-%  \@@_print_text_aux:
-%}
+% \begin{macro}{\@@_print_math:, \@@_print_text:}
+% \begin{macro}[aux]{\@@_print_text_aux:}
+% \begin{macro}[aux]{\@@_print_text_aux:NnN}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses "_" and
 % "^" to represent sub- and superscripts, respectively. In this way,
@@ -6438,42 +6420,38 @@ This work consists of the file  siunitx.dtx
             { \l_@@_print_arg_tl }
       }
   }
-\group_begin:
-  \char_set_lccode:nn { `\@ } { `\_ }
-  \char_set_catcode_math_subscript:N \@
-  \char_set_lccode:nn { `\! } { `\_ }
-  \char_set_catcode_active:N \!
-  \char_set_lccode:nn { `\= } { `\_ }
-  \char_set_lccode:nn { `\+ } { `\^ }
-\tl_to_lowercase:n {
-  \group_end:
-  \cs_new_protected:Npn \@@_print_text:
-    {
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
-        { \c_@@_minus_tl }
-      \@@_print_text_aux:  
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
-        { \ensuremath { \mp } }
-      \tl_remove_all:Nn \l_@@_print_arg_tl { \mathord }
-      \cs_set_eq:NN \PrintSubscript   \@@_print_text_sub:n
-      \cs_set_eq:NN \PrintSuperscript \@@_print_text_super:n
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { @ }
-        { \@@_print_text_sub:n }
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { ! }
-        { \@@_print_text_sub:n }
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { = }
-        { \@@_print_text_sub:n }
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { ^ }
-        { \@@_print_text_super:n }
-      \tl_replace_all:Nnn \l_@@_print_arg_tl { + }
-        { \@@_print_text_super:n }
-      \l_@@_print_arg_tl
-    }
-}
+\cs_new_protected_nopar:Npn \@@_print_text:
+  {
+    \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
+      { \c_@@_minus_tl }
+    \@@_print_text_aux:
+    \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
+      { \ensuremath { \mp } }
+    \tl_remove_all:Nn \l_@@_print_arg_tl { \mathord }
+    \cs_set_eq:NN \PrintSubscript   \@@_print_text_sub:n
+    \cs_set_eq:NN \PrintSuperscript \@@_print_text_super:n
+    \__siunitx_print_text_aux:NnN
+      _ { math_subscript }   \@@_print_text_sub:n
+      _ { active }           \@@_print_text_sub:n 
+      ^ { math_superscript } \@@_print_text_super:n 
+      ^ { active }           \@@_print_text_super:n
+      \q_recursion_tail ?  ?
+      \q_recursion_stop
+    \l_@@_print_arg_tl
+  }
 \cs_new_protected:Npn \@@_print_text_aux:
   {
     \tl_replace_all:Nnn \l_@@_print_arg_tl { \pm }
       { \ensuremath { \pm } }
+  }
+\cs_new_protected:Npn \@@_print_text_aux:NnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \tl_set_rescan:Nnn \l_@@_tmp_tl
+       { \use:c { char_set_catcode_ #2 :N } #1 }
+       {#1}
+    \tl_replace_all:NVn \l_@@_print_arg_tl \l_@@_tmp_tl {#3}
+    \_@@_print_text_aux:NnN
   }
 \AtBeginDocument
   {
@@ -6488,7 +6466,9 @@ This work consists of the file  siunitx.dtx
       { }
   }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{
 %  \@@_print_text_sub:n   ,
@@ -6984,28 +6964,41 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\@@_number_in_sign_replace:N}
-% A short spin-out to keep the replacement of tokens clear.
+% \begin{macro}[int]{\@@_number_in_sign_replace:N}
+% \begin{macro}[aux]{\@@_number_in_sign_replace_aux:N}
+% \begin{macro}[aux]{\@@_number_in_sign_replace_aux:NnN}
+%   A short spin-out to keep the replacement of tokens clear.
+%   The case where |-| is active needs special treatment and
+%   needs to come first.
 %    \begin{macrocode}
-\group_begin:
-\char_set_catcode_active:N \*
-\char_set_lccode:nn { `\* } { `\- }
-\tl_to_lowercase:n
+\cs_new_protected:Npn \@@_number_in_sign_replace:N #1
   {
-    \group_end:
-    \cs_new_protected:Npn \@@_number_in_sign_replace:N #1
-      {
-        \tl_replace_all:Nnn #1 { * }  { - }
-        \tl_replace_all:Nnn #1 { -+ } { \mp }
-        \tl_replace_all:Nnn #1 { +- } { \pm }
-        \tl_replace_all:Nnn #1 { << } { \ll }
-        \tl_replace_all:Nnn #1 { <= } { \le }
-        \tl_replace_all:Nnn #1 { >> } { \gg }
-        \tl_replace_all:Nnn #1 { >= } { \ge }
-      }
+    \@@_number_in_sign_replace_aux:N #1
+    \@@_number_in_sign_replace_aux:NnN #1
+      { -+ } \mp
+      { +- } \pm
+      { << } \ll
+      { <= } \le
+      { >> } \gg
+      { >= } \ge
+      { ?? } \q_recursion_tail
+      \q_recursion_stop
+  }
+\group_begin:
+  \char_set_catcode_active:N -
+  \cs_new_protected:Npx \_@@_number_in_sign_replace_aux:N #1
+    { \tl_replace_all:Nnn #1 { \exp_not:N - } { \token_to_str:N - } }
+\group_end:
+\cs_new_protected:Npn \@@_number_in_sign_replace_aux:NnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop:N #3
+    \tl_replace_all:Nnn #1 {#2} {#3}
+    \@@_number_in_sign_replace_aux:NnN #1
   }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %\begin{macro}{
 %  \@@_number_in_parse_error:nn ,
@@ -12277,29 +12270,27 @@ This work consists of the file  siunitx.dtx
 %   the outer level.
 %    \begin{macrocode}
 \group_begin:
-  \char_set_lccode:nn { `\+ } { `\^ }
   \char_set_catcode_active:N \~
-\tl_to_lowercase:n
-  {
-    \group_end:
-    \cs_new_protected:Npn \@@_unit_format_literal:n #1
-      {
-        \int_zero:N \l_@@_unit_prefix_int
-        \seq_map_inline:Nn \l_@@_declare_list_seq
-          { \@@_unit_print_literal_aux:N ##1 }
-        \tl_set:Nn \l_@@_unit_tl {#1}
-        \tl_replace_all:NnV \l_@@_unit_tl { . } \l_@@_unit_product_tl
-        \tl_replace_all:NnV \l_@@_unit_tl { ~ } \l_@@_unit_product_tl
-        \bool_if:NT \l_@@_literal_power_bool
-          {
-            \tl_replace_all:Nnn \l_@@_unit_tl { ^ }
-              { \@@_unit_format_literal_power:n }
-            \tl_replace_all:Nnn \l_@@_unit_tl { + }
-              { \@@_unit_format_literal_power:n }
-          }
-        \@@_unit_format_literal_extras:
-      }
-  }
+  \cs_new_protected:Npn \@@_unit_format_literal:n #1
+    {
+      \int_zero:N \l_@@_unit_prefix_int
+      \seq_map_inline:Nn \l_@@_declare_list_seq
+        { \@@_unit_print_literal_aux:N ##1 }
+      \tl_set:Nn \l_@@_unit_tl {#1}
+      \tl_replace_all:NnV \l_@@_unit_tl { . }
+        \l_@@_unit_product_tl
+      \tl_replace_all:NnV \l_@@_unit_tl { ~ }
+        \l_@@_unit_product_tl
+      \bool_if:NT \l_@@_literal_power_bool
+        {
+          \tl_replace_all:Nnn \l_@@_unit_tl { ^ }
+            { \@@_unit_format_literal_power:n }
+          \tl_replace_all:Non \l_@@_unit_tl { \token_to_str:N ^ }
+            { \@@_unit_format_literal_power:n }
+        }
+      \@@_unit_format_literal_extras:
+    }
+\group_end:
 \cs_new_protected:Npn \@@_unit_print_literal_aux:N #1
   { \cs_set_eq:Nc #1 { @@_ \token_to_str:N #1 _literal:w } }
 \cs_new_protected:Npn \@@_unit_format_literal_power:n #1
@@ -15388,19 +15379,25 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-%\begin{macro}{\@@_symbol_new:n}
-% For creating the outer symbol macro.
+% \begin{macro}{\@@_symbol_new:n}
+%   For creating the outer symbol macro.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_symbol_new:n #1 {
-  \cs_set_protected:cpn { SIUnitSymbol #1 }
-    {
-      \mode_if_math:TF
-        { \tl_to_lowercase:n { \use:c { l_@@_ #1 _math_tl } } }
-        { \tl_to_lowercase:n { \use:c { l_@@_ #1 _text_tl } } }
-    }
-}
+\cs_new_protected:Npn \@@_symbol_new:n #1
+  {
+    \cs_set_protected:cpn { SIUnitSymbol #1 }
+      {
+         \use:c
+           {
+             l__@@_
+             \str_fold_case:n {#1}
+             _
+             \mode_if_math:TF { math } { text }
+             _tl
+           }
+      }
+  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 %\begin{macro}{\SIUnitSymbolAngstrom}
 %\begin{macro}{\SIUnitSymbolArcminute}
@@ -16347,14 +16344,15 @@ This work consists of the file  siunitx.dtx
 % A set of \enquote{natural units}.
 %    \begin{macrocode}
 \group_begin:
-  \char_set_lccode:nn { `\@ } { `\_ }
-  \char_set_catcode_math_subscript:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \DeclareSIUnit \clight { \text { \ensuremath { c @ { 0 } } } }
-  \DeclareSIUnit \electronmass
-    { \text { \ensuremath { m @ { \text { e } } } } }
-}
+\cs_set_eq:NN \endgroup \group_end:
+\char_set_catcode_math_subscript:N \_
+\use:n
+  {
+    \endgroup
+    \DeclareSIUnit \clight { \text { \ensuremath { c _ { 0 } } } }
+    \DeclareSIUnit \electronmass
+      { \text { \ensuremath { m _ { \textup { e } } } } }
+  }
 \DeclareSIUnit \planckbar { \text { \ensuremath { \hbar } } }
 %    \end{macrocode}
 %\end{macro}
@@ -16367,15 +16365,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \DeclareSIUnit \elementarycharge { \text { \ensuremath { e } } }
 \group_begin:
-  \char_set_lccode:nn { `\@ } { `\_ }
-  \char_set_lccode:nn { `\E } { `\E }
-  \char_set_catcode_math_subscript:N \@
-\tl_to_lowercase:n {
-  \group_end:
-  \DeclareSIUnit \bohr { \text { \ensuremath { a @ { 0 } } } }
-  \DeclareSIUnit \hartree
-    { \text { \ensuremath { E @ { \textup { h } } } } }
-}
+\cs_set_eq:NN \endgroup \group_end:
+\char_set_catcode_math_subscript:N \_
+\use:n
+  {
+    \endgroup
+    \DeclareSIUnit \bohr { \text { \ensuremath { a _ { 0 } } } }
+    \DeclareSIUnit \hartree
+      { \text { \ensuremath { E _ { \textup { h } } } } }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
