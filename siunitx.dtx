@@ -632,6 +632,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6h}{2015/07/17}{Update internals to track \pkg{expl3} changes}
 % \changes{v2.6i}{2015/08/18}{Fix rounding of numbers with large numbers of
 %   digits}
+% \changes{v2.6i}{2015/08/18}{Fix behaviour of \cs{cancel} when printing
+%   in math mode}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -11330,6 +11332,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\cancel}
+%\begin{macro}[aux]{\@@_real_cancel:n}
 %\begin{macro}[aux]{\@@_cancel:n}
 % The \cs{cancel} macro is odd as it is only defined if the appropriate
 % package is loaded.
@@ -11337,7 +11340,9 @@ This work consists of the file  siunitx.dtx
 \AtBeginDocument {
   \cs_if_exist:NT \cancel
     {
-      \cs_set_eq:NN \@@_cancel:n \cancel
+      \cs_set_protected:Npn \@@_cancel:n #1
+        { \@@__real_cancel:n { \@@_print:nn { unit } {#1} } }
+      \cs_set_eq:NN \@@__real_cancel:n \cancel
       \seq_put_right:Nn \l_@@_declare_list_seq { \cancel }
       \cs_new_protected:cpn
         { @@_ \token_to_str:N \cancel _function:w }
@@ -11345,6 +11350,7 @@ This work consists of the file  siunitx.dtx
     }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %
