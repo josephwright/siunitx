@@ -5590,44 +5590,33 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\tl_if_in:NVTF, \tl_replace_all:NnV}
 %   Variants needed which are not in \pkg{expl3}.
 %    \begin{macrocode}
+\cs_generate_variant:Nn \tl_if_empty_p:n { f }
+\cs_generate_variant:Nn \tl_if_empty:nT  { f }
 \cs_generate_variant:Nn \tl_if_in:NnTF { NV }
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
-% \end{macro}
 %
-%\begin{macro}[pTF]{
-%  \@@_cs_if_tl:N    ,
-%  \@@_cs_if_macro:N
-%}
-%  Tests for macros which are not long.
+% \begin{macro}[pTF]{\@@_cs_if_tl:N}
+%   A test for token lists (more or less).
 %    \begin{macrocode}
 \prg_new_conditional:Npnn \@@_cs_if_tl:N #1 { T, F , TF , p }
   {
     \bool_if:nTF
       {
-             \@@_cs_if_macro_p:N #1
+        \tl_if_empty_p:f
+          {
+            \token_get_prefix_spec:N #1
+            \token_get_arg_spec:N    #1
+          }
         && ! \cs_if_exist_p:c { \cs_to_str:N #1 ~ }
       }
       { \prg_return_true: }
       { \prg_return_false: }
   }
-\prg_new_conditional:Npnn \@@_cs_if_macro:N #1 { T, F , TF , p }
-  {
-    \bool_if:nTF
-      {
-             \token_if_macro_p:N                #1
-        && ! \token_if_long_macro_p:N           #1
-        && ! \token_if_protected_macro_p:N      #1
-        && ! \token_if_protected_long_macro_p:N #1
-      }
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
 %    \end{macrocode}
-%\end{macro}
+% \end{macro}
 %
 % \begin{macro}[EXP]
 %   {\@@_number_if_zero:nTF, \@@_number_if_zero_p:n \@@_number_if_zero_p:V}
@@ -11559,7 +11548,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {
-      \@@_cs_if_macro:NT #1
+      \tl_if_empty:fT { \token_get_prefix_spec:N #1 }
         { \cs_set_protected:Npx #1 { \exp_not:V #1 } }
     }
 }
