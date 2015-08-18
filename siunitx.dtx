@@ -630,6 +630,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6f}{2015/04/04}{Further work on \pkg{mathspec}}
 % \changes{v2.6g}{2015/06/24}{Fix issue with empty table cells}
 % \changes{v2.6h}{2015/07/17}{Update internals to track \pkg{expl3} changes}
+% \changes{v2.6i}{2015/08/18}{Fix rounding of numbers with large numbers of
+%   digits}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5625,6 +5627,27 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
+% \begin{macro}[EXP]
+%   {\@@_number_if_zero:nTF, \@@_number_if_zero_p:n \@@_number_if_zero_p:V}
+% \begin{macro}[EXP, aux]{\@@_number_if_zero_aux:n}
+%   A test for all of the input to a function being made up of zeros:
+%   needed to avoid overflowing \TeX{}'s integer range.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \@@_number_if_zero:n #1 { p , TF }
+  {
+    \tl_map_function:nN {#1} \@@_number_if_zero_aux:n
+    \prg_return_true:
+  }
+\cs_generate_variant:Nn \@@_number_if_zero_p:n { V }
+\cs_new:Npn \@@_number_if_zero_aux:n #1
+  {
+    \token_if_eq_charcode:NNF #1 0
+      { \tl_map_break:n { \prg_return_false: \use_none:n } }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % If \pkg{tex4ht} is in use, make a few changes to give nicer looking
 % conversion to other formats.
 %    \begin{macrocode}
@@ -8357,7 +8380,7 @@ This work consists of the file  siunitx.dtx
               }
           }
           {
-            \int_compare:nNnTF { 0 #1 } = { 0 }
+            \@@_number_if_zero:nTF {#1}
               {
                 \@@_number_process_fixed_aux_ii:nnn {##1} {##2}
                   { #3 - 1 }
@@ -8797,12 +8820,11 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_round_tidy:n #1
   {
-    \int_compare:nNnTF
-      {
-        0 \l_@@_round_integer_out_tl +
-        0 \l_@@_round_decimal_out_tl
+    \bool_if:nTF
+      {  
+           \@@_number_if_zero_p:V \l_@@_round_integer_out_tl
+        && \@@_number_if_zero_p:V \l_@@_round_decimal_out_tl
       }
-        = \c_zero
       {
         \str_if_eq:VnTF \l_@@_process_round_min_tl { 0 }
           {
@@ -8847,6 +8869,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_number_process_scientific_aux_i:nnn           ,
 %  \@@_number_process_scientific_aux_ii:nnn          ,
 %  \@@_number_process_scientific_large:nnn           ,
+%  \@@_number_process_scientific_large_loop:nNN      ,
 %  \@@_number_process_scientific_small:wn            ,
 %  \@@_number_process_scientific_store:nnn           ,
 %  \@@_number_process_scientific_engineering:nnn     ,
@@ -8907,40 +8930,43 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn
   \@@_number_process_scientific_aux_ii:nnn #1#2#3 {
-  \int_compare:nNnTF {#1} > { 9 }
+  \int_compare:nNnTF { \tl_count:n {#1} } > \c_one
     { \@@_number_process_scientific_large:nnn {#1} {#2} {#3} }
     {
-      \int_compare:nNnTF {#1} > { 0 }
+      \@@_number_if_zero:nTF {#1}
+        {
+          \@@_number_process_scientific_small:wn
+            #2 \q_stop {#3}
+        }
         {
           \bool_if:NTF \l_@@_process_engineering_bool
             { \@@_number_process_scientific_engineering:nnn }
             { \@@_number_process_scientific_store:nnn }
                {#1} {#2} {#3}
         }
-        {
-          \@@_number_process_scientific_small:wn
-            #2 \q_stop {#3}
-        }
+
     }
 }
 %    \end{macrocode}
-% The fastest way to find the smallest digit of the integer part is
-% using some mathematics. This does limit the range of the input, but
-% in real cases this should not be an issue.
+%   A faster approach here is to use integer maths to do the digit move,
+%   but that runs into problems with the range available for the input.
+%   Instead, we use a loop to find the last digit.
 %    \begin{macrocode}
-\cs_new_protected:Npn
-  \@@_number_process_scientific_large:nnn #1#2#3 {
-  \int_set:Nn \l_@@_tmp_int { \int_div_truncate:nn {#1} { 10 } }
-  \tl_set:Nx \l_@@_tmpa_tl { \int_use:N \l_@@_tmp_int }
-  \int_set:Nn \l_@@_tmp_int { #1 - 10 * \l_@@_tmp_int }
-  \tl_set:Nx \l_@@_tmpa_tl
-    {
-      { \l_@@_tmpa_tl } { \int_use:N \l_@@_tmp_int #2 }
-      { #3 + 1 }
-    }
-  \exp_after:wN \@@_number_process_scientific_aux_ii:nnn
-    \l_@@_tmpa_tl
-}
+\cs_new_protected:Npn \@@_number_process_scientific_large:nnn #1#2#3
+  {
+    \cs_set_protected:Npn \@@_number_process_scientific_large_loop:nNN
+      ##1##2##3
+      {
+        \quark_if_recursion_tail_stop_do:Nn ##3
+          {
+            \@@_number_process_scientific_aux_ii:nnn {##1} { ##2 #2 }
+              { #3 + \c_one }
+          }
+        \@@_number_process_scientific_large_loop:nNN { ##1 ##2 } ##3
+      }
+    \@@_number_process_scientific_large_loop:nNN { } #1
+      \q_recursion_tail \q_recursion_stop
+  }
 %    \end{macrocode}
 % For small numbers, the important digit is easy to find.
 %    \begin{macrocode}
