@@ -6614,7 +6614,6 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process:
   {
-    \@@_number_process_sign:
     \@@_number_process_zero_fill:
     \@@_number_process_mantissa:
     \prop_if_in:NnF \l_@@_number_in_prop { symbolic }
@@ -7730,81 +7729,6 @@
       { #4 - 2 }
   }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
-%
-%\begin{macro}{\@@_number_process_sign:}
-%\begin{macro}[aux]{
-%  \@@_number_process_sign_add:n  ,
-%  \@@_number_process_sign_plus:n
-%}
-%\begin{macro}{\c_@@_plus_tl}
-% Sorting out signs consists of two parts: retaining a plus if necessary
-% and adding an explicit sign.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_number_process_sign: {
-  \bool_if:NF \l_@@_process_plus_bool
-    {
-      \prop_if_in:NnTF \l_@@_number_in_prop { mantissa-sign }
-        { \@@_number_process_sign_plus:n { mantissa } }
-        {
-          \prop_if_in:NnT \l_@@_number_in_prop { complex-sign }
-            {
-              \prop_if_in:NnF \l_@@_number_in_prop { mantissa }
-                { \@@_number_process_sign_plus:n { complex } }
-            }
-        }
-      \prop_if_in:NnT \l_@@_number_in_prop { exponent-sign }
-        { \@@_number_process_sign_plus:n { exponent } }
-    }
-  \tl_if_empty:NF \l_@@_process_sign_tl
-    {
-      \@@_number_process_sign_add:n { mantissa }
-      \prop_if_in:NnTF \l_@@_number_in_prop { complex }
-        { \@@_number_process_sign_add:n { complex } }
-    }
-}
-%    \end{macrocode}
-% Adding a sign to an existing number needs a couple of to make sure
-% there is a number to add to, and to see if there is a sign already.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_number_process_sign_add:n #1 {
-  \prop_if_in:NnF \l_@@_number_in_prop { #1 -sign }
-    {
-      \prop_if_in:NnF \l_@@_number_in_prop { #1 -had-sign }
-        {
-          \prop_get:NnN \l_@@_number_in_prop {#1}
-            \l_@@_tmpa_tl
-          \tl_if_empty:NTF \l_@@_tmpa_tl
-            {
-              \prop_put:NnV \l_@@_number_in_prop { sign }
-                \l_@@_process_sign_tl
-            }
-            {
-              \prop_put:NnV \l_@@_number_in_prop { #1 -sign }
-                \l_@@_process_sign_tl
-            }
-        }
-    }
-}
-%    \end{macrocode}
-% Holding onto a plus works very much in the same way as adding a sign:
-% some quick tests and an assignment. Using a pre-defined token list is
-% a speed-related choice: very slightly faster comparison.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_number_process_sign_plus:n #1 {
-  \prop_get:NnN \l_@@_number_in_prop { #1 -sign }
-    \l_@@_tmpa_tl
-  \tl_if_eq:NNT \c_@@_plus_tl \l_@@_tmpa_tl
-    {
-      \prop_remove:Nn \l_@@_number_in_prop { #1 -sign }
-      \prop_put:Nnn \l_@@_number_in_prop { #1 -had-sign } { true }
-    }
-}
-\tl_new:N \c_@@_plus_tl
-\tl_set:Nn \c_@@_plus_tl { + }
-%    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %\end{macro}
 %
