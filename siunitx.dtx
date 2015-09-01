@@ -636,6 +636,8 @@ This work consists of the file  siunitx.dtx
 %   in math mode}
 % \changes{v2.6j}{2015/09/01}{Print all units when \opt{exponent-to-prefix}
 %   is set}
+% \changes{v2.6j}{2015/09/01}{Print $\pm$ correctly when
+%   \opt{exponent-to-prefix} is set}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9393,7 +9395,9 @@ This work consists of the file  siunitx.dtx
               }
             \prop_get:NnN \l_@@_unit_prop { total-units } \l_@@_tmpa_tl
             \int_set:Nn \l_@@_unit_int \l_@@_tmpa_tl
+            \cs_set_eq:NN \@@_pm: \pm
             \@@_unit_format:
+            \cs_set_eq:NN \pm \@@_pm:
           }
           {
             \msg_error:nnx { siunitx } { non-convertible-exponent }
