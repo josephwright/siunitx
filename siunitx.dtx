@@ -634,6 +634,8 @@ This work consists of the file  siunitx.dtx
 %   digits}
 % \changes{v2.6i}{2015/08/18}{Fix behaviour of \cs{cancel} when printing
 %   in math mode}
+% \changes{v2.6j}{2015/09/01}{Print all units when \opt{exponent-to-prefix}
+%   is set}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9358,7 +9360,9 @@ This work consists of the file  siunitx.dtx
 % \begin{macro}{\@@_number_exp_to_prefix:}
 %   This function is a bit awkward, as it essentially cuts across the
 %   unit processor. The idea here is first to recover the numerical exponent,
-%   and sign if there is one.
+%   and sign if there is one. The earlier formatting run will have reset the
+%   total number of units to zero, so that has to be recovered before
+%   doing the format a second time.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_exp_to_prefix:
   {
@@ -9387,6 +9391,8 @@ This work consists of the file  siunitx.dtx
                 @@_ \exp_after:wN \token_to_str:N \l_@@_tmpb_tl
                 _function:w
               }
+            \prop_get:NnN \l_@@_unit_prop { total-units } \l_@@_tmpa_tl
+            \int_set:Nn \l_@@_unit_int \l_@@_tmpa_tl
             \@@_unit_format:
           }
           {
@@ -12064,6 +12070,8 @@ This work consists of the file  siunitx.dtx
 % has to be removed.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_unit_format: {
+  \prop_put:Nnx \l_@@_unit_prop { total-units }
+    { \int_use:N \l_@@_unit_int }
   \@@_unit_format_init:
   \int_while_do:nNnn { \l_@@_unit_int } > { 0 }
     {
