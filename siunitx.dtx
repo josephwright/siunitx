@@ -15096,7 +15096,8 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{macro}
 %   {
-%     \@@_table_print_S_direct_centered:    ,
+%     \@@_table_print_S_direct_centered:     ,
+%     @@_table_print_S_direct_centered_begin:,
 %     \@@_table_print_S_direct_centered_end:
 %   }
 % \begin{macro}[aux]{\@@_table_print_S_direct_centered_aux:N}
@@ -15105,7 +15106,6 @@ This work consists of the file  siunitx.dtx
 %   In that sense this is very similar to the normal method, except that
 %   it will work with non-numerical input.
 %    \begin{macrocode}
-\char_set_catcode_active:N \@
 \cs_new_protected:Npn \@@_table_print_S_direct_centered:
   {
     \cs_set_eq:NN \@@_table_print:
@@ -15123,19 +15123,18 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_centered_aux:N #1
   {
-    \char_set_lccode:nn { `\@ } { `#1 }
-    \char_set_mathcode:nn { `#1 } { 32768 }
-    \tl_to_lowercase:n { \cs_set:Npn @ }
-      {
-        \c_math_toggle_token
-        \c_group_end_token
-        \hbox_set:Nn \l_@@_table_post_box
-          \c_group_begin_token
-            \c_math_toggle_token
-            \l_@@_output_decimal_tl
-      }
+    \char_set_active_eq:NN #1 \@@_table_print_S_direct_centered_begin:
+    \char_set_mathcode:nn { `#1 } { "8000 }
   }
-\char_set_catcode_letter:N \@
+\cs_new_protected_nopar:Npn \@@_table_print_S_direct_centered_begin:
+  {
+    \c_math_toggle_token
+    \c_group_end_token
+    \hbox_set:Nn \l_@@_table_post_box
+      \c_group_begin_token
+        \c_math_toggle_token
+        \l_@@_output_decimal_tl
+  }
 \cs_new_protected:Npn \@@_table_print_S_direct_centered_end:
   {
       \c_math_toggle_token
@@ -15168,7 +15167,8 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{macro}
 %   {
-%     \@@_table_print_S_direct_reserved:    ,
+%     \@@_table_print_S_direct_reserved:      ,
+%     \@@_table_print_S_direct_reserved_begin:,
 %     \@@_table_print_S_direct_reserved_end:
 %   }
 % \begin{macro}[aux]{\@@_table_print_S_direct_reserved_aux:N}
@@ -15177,7 +15177,6 @@ This work consists of the file  siunitx.dtx
 %   but needs a bit of measuring. The first box here does need to use
 %   \cs{tex_hill:D} as \texttt{fil} glue will not work.
 %    \begin{macrocode}
-\char_set_catcode_active:N \@
 \cs_new_protected:Npn \@@_table_print_S_direct_reserved:
   {
     \cs_set_eq:NN \@@_table_print:
@@ -15221,20 +15220,19 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_reserved_aux:N #1
   {
-    \char_set_lccode:nn { `\@ } { `#1 }
-    \char_set_mathcode:nn { `#1 } { 32768 }
-    \tl_to_lowercase:n { \cs_set:Npn @ }
-      {
-          \c_math_toggle_token
-        \c_group_end_token
-        \hbox_set_to_wd:Nnn \l_@@_table_post_box
-          { \box_wd:N \l_@@_tmp_box }
-          \c_group_begin_token
-            \c_math_toggle_token
-            \l_@@_output_decimal_tl
-      }
+    \char_set_active_eq:NN #1 \@@_table_print_S_direct_reserved_begin:
+    \char_set_mathcode:nn { `#1 } { "8000 }
   }
-\char_set_catcode_letter:N \@
+\cs_new_protected_nopar:Npn \@@_table_print_S_direct_reserved_begin:
+  {
+      \c_math_toggle_token
+    \c_group_end_token
+    \hbox_set_to_wd:Nnn \l_@@_table_post_box
+      { \box_wd:N \l_@@_tmp_box }
+      \c_group_begin_token
+        \c_math_toggle_token
+        \l_@@_output_decimal_tl
+      }
 \cs_new_protected:Npn \@@_table_print_S_direct_reserved_end:
   {
       \c_math_toggle_token
