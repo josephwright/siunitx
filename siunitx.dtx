@@ -12348,12 +12348,11 @@ This work consists of the file  siunitx.dtx
     \@@_unit_format_literal_extras_aux:nN { 197 }
       \SIUnitSymbolAngstrom
   }
-\cs_new_protected:Npn
-  \@@_unit_format_literal_extras_aux:nN #1#2 {
-  \char_set_lccode:nn { `\@ } {#1}
-  \tl_to_lowercase:n
-    { \tl_replace_all:NnV \l_@@_unit_tl { @ } #2 }
-}
+\cs_new_protected:Npn \@@_unit_format_literal_extras_aux:nN #1#2
+  {
+    \tl_replace_all:Nnc \l_@@_unit_tl
+      { \char_generate:nn { #1 } { 12 } }
+  }
 \bool_if:nF
   {
     \sys_if_engine_luatex_p: ||
