@@ -5670,7 +5670,7 @@ This work consists of the file  siunitx.dtx
   {
      \@ifpackageloaded { bidi }
        {
-         \xetex_if_engine:T
+         \sys_if_engine_xetex:T
            { \cs_set_protected:Npn \@@_ensure_ltr:n #1 { \LRE {#1} } }
        }
        { }
@@ -12354,7 +12354,11 @@ This work consists of the file  siunitx.dtx
   \tl_to_lowercase:n
     { \tl_replace_all:NnV \l_@@_unit_tl { @ } #2 }
 }
-\pdftex_if_engine:T
+\bool_if:nF
+  {
+    \sys_if_engine_luatex_p: ||
+    \sys_if_engine_xetex_p:
+  }
   {
     \AtBeginDocument
       {
@@ -15472,7 +15476,11 @@ This work consists of the file  siunitx.dtx
 %   The single degree Celsius symbol is a compatibility character, and so
 %   the two separate glyphs \enquote{degree} and \enquote{C} are used.
 %    \begin{macrocode}
-\pdftex_if_engine:F
+\bool_if:nT
+  {
+    \sys_if_engine_luatex_p: ||
+    \sys_if_engine_xetex_p:
+  }
   {
     \AtBeginDocument
       {
