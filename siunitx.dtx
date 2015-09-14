@@ -639,6 +639,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6j}{2015/09/01}{Print $\pm$ correctly when
 %   \opt{exponent-to-prefix} is set}
 % \changes{v2.6k}{2015/09/12}{Track \pkg{expl3} changes}
+% \changes{v2.6l}{2015/09/14}{Fix an internal error}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5227,7 +5228,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_generate_variant:Nn \clist_map_function:nN { nc }
 \cs_generate_variant:Nn \tl_if_blank:nTF { V }
-\cs_generate_variant:Nn \tl_replace_all:Nnn  { No, NV }
+\cs_generate_variant:Nn \tl_replace_all:Nnn  { No, NV , Nx }
 %    \end{macrocode}
 %
 %\begin{macro}{
@@ -12351,8 +12352,9 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \@@_unit_format_literal_extras_aux:nN #1#2
   {
-    \tl_replace_all:Nnc \l_@@_unit_tl
+    \tl_replace_all:Nxn \l_@@_unit_tl
       { \char_generate:nn { #1 } { 12 } }
+      {#2}
   }
 \bool_if:nF
   {
