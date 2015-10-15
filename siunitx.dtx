@@ -640,6 +640,7 @@ This work consists of the file  siunitx.dtx
 %   \opt{exponent-to-prefix} is set}
 % \changes{v2.6k}{2015/09/12}{Track \pkg{expl3} changes}
 % \changes{v2.6l}{2015/09/14}{Fix an internal error}
+% \changes{v2.6m}{2015/10/15}{Address an issue with \pkg{mwtab}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -13699,7 +13700,10 @@ This work consists of the file  siunitx.dtx
                 \token_if_eq_meaning:NNF #1 \tex_unskip:D
                   {
                     \token_if_eq_meaning:NNF #1 \tab@setcr
-                      { \@@_table_collect_not_braced_aux_i:N #1 }
+                      {
+                        \token_if_eq_meaning:NNF #1 \@maybe@unskip
+                          { \@@_table_collect_not_braced_aux_i:N #1 }
+                      }
                   }
               }
             \@@_table_collect_next:
