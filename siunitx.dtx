@@ -642,6 +642,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6l}{2015/09/14}{Fix an internal error}
 % \changes{v2.6m}{2015/10/15}{Address an issue with \pkg{mwtab}}
 % \changes{v2.6n}{2015/12/31}{Improve defintion for degree Celsius}
+% \changes{v2.6n}{2015/12/31}{Fix angstrom symbol with \LuaTeX{}}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15493,9 +15494,12 @@ This work consists of the file  siunitx.dtx
           { \int_const:Nn \c_@@_micro_int { "000B5 } }
         \int_const:Nn \c_@@_angstrom_int  { "0212B }
         \int_const:Nn \c_@@_ohm_int       { "003A9 }
-        \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-          { \text { \AA } }
-          { \tex_char:D \c_@@_angstrom_int }
+        \bool_if:NT \c_sys_engine_xetex_bool
+          {
+            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
+              { \text { \AA } }
+              { \tex_char:D \c_@@_angstrom_int }
+          }
         \@@_option_unchanged:Nnn \l_@@_celsius_math_tl
           { { } ^ { \circ } \kern - \scriptspace C }
           {
@@ -15511,9 +15515,12 @@ This work consists of the file  siunitx.dtx
         \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
           { \text { \ensuremath { \c_@@_omega_tl } } }
           { \tex_char:D \c_@@_ohm_int }
-        \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-          { \AA }
-          { \tex_char:D \c_@@_angstrom_int }
+        \bool_if:NT \c_sys_engine_xetex_bool
+          {
+            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
+              { \AA }
+              { \tex_char:D \c_@@_angstrom_int }
+          }
         \@@_option_unchanged:Nnn \l_@@_celsius_text_tl
           {
             \ensuremath
