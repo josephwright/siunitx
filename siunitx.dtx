@@ -15483,86 +15483,79 @@ This work consists of the file  siunitx.dtx
 %   The single degree Celsius symbol is a compatibility character, and so
 %   the two separate glyphs \enquote{degree} and \enquote{C} are used.
 %    \begin{macrocode}
-\bool_if:nT
+\AtBeginDocument
   {
-    \sys_if_engine_luatex_p: ||
-    \sys_if_engine_xetex_p:
-  }
-  {
-    \AtBeginDocument
+    \@ifpackageloaded { fontspec }
       {
-        \@ifpackageloaded { fontspec }
+        \int_const:Nn \c_@@_degree_int    { 176 }
+        \@ifpackageloaded { unicode-math }
+          { \int_const:Nn \c_@@_micro_int { "003BC } }
+          { \int_const:Nn \c_@@_micro_int { "000B5 } }
+        \int_const:Nn \c_@@_angstrom_int  { "0212B }
+        \int_const:Nn \c_@@_ohm_int       { "003A9 }
+        \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
+          { \text { \AA } }
+          { \tex_char:D \c_@@_angstrom_int }
+        \@@_option_unchanged:Nnn \l_@@_celsius_math_tl
+          { { } ^ { \circ } \kern - \scriptspace C }
           {
-            \int_const:Nn \c_@@_degree_int    { 176 }
-            \@ifpackageloaded { unicode-math }
-              { \int_const:Nn \c_@@_micro_int { "003BC } }
-              { \int_const:Nn \c_@@_micro_int { "000B5 } }
-            \int_const:Nn \c_@@_angstrom_int  { "0212B }
-            \int_const:Nn \c_@@_ohm_int       { "003A9 }
-            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-              { \text { \AA } }
-              { \tex_char:D \c_@@_angstrom_int }
-            \@@_option_unchanged:Nnn \l_@@_celsius_math_tl
-              { { } ^ { \circ } \kern - \scriptspace C }
-              {
-                \tex_char:D \c_@@_degree_int
-                C
-              }
-            \@@_option_unchanged:Nnn \l_@@_degree_math_tl
-              { { } ^ { \circ } }
-              { \tex_char:D \c_@@_degree_int }
-            \@@_option_unchanged:Nnn \l_@@_micro_math_tl
-              { \text { \c_@@_mu_tl } }
-              { \tex_char:D \c_@@_micro_int }
-            \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-              { \text { \ensuremath { \c_@@_omega_tl } } }
-              { \tex_char:D \c_@@_ohm_int }
-            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-              { \AA }
-              { \tex_char:D \c_@@_angstrom_int }
-            \@@_option_unchanged:Nnn \l_@@_celsius_text_tl
-              {
-                \ensuremath
-                  { { } ^ { \circ } \kern - \scriptspace C }
-              }
-              {
-                \tex_char:D \c_@@_degree_int
-                C
-              }
-            \@@_option_unchanged:Nnn \l_@@_degree_text_tl
-              { \ensuremath { { } ^ { \circ } } }
-              { \tex_char:D \c_@@_degree_int }
-            \@@_option_unchanged:Nnn \l_@@_micro_text_tl
-              { \c_@@_mu_tl }
-              { \tex_char:D \c_@@_micro_int }
-            \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-              { \ensuremath { \c_@@_omega_tl } }
-              { \tex_char:D \c_@@_ohm_int }
+            \tex_char:D \c_@@_degree_int
+            C
           }
-          { }
+        \@@_option_unchanged:Nnn \l_@@_degree_math_tl
+          { { } ^ { \circ } }
+          { \tex_char:D \c_@@_degree_int }
+        \@@_option_unchanged:Nnn \l_@@_micro_math_tl
+          { \text { \c_@@_mu_tl } }
+          { \tex_char:D \c_@@_micro_int }
+        \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
+          { \text { \ensuremath { \c_@@_omega_tl } } }
+          { \tex_char:D \c_@@_ohm_int }
+        \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
+          { \AA }
+          { \tex_char:D \c_@@_angstrom_int }
+        \@@_option_unchanged:Nnn \l_@@_celsius_text_tl
+          {
+            \ensuremath
+              { { } ^ { \circ } \kern - \scriptspace C }
+          }
+          {
+            \tex_char:D \c_@@_degree_int
+            C
+          }
+        \@@_option_unchanged:Nnn \l_@@_degree_text_tl
+          { \ensuremath { { } ^ { \circ } } }
+          { \tex_char:D \c_@@_degree_int }
+        \@@_option_unchanged:Nnn \l_@@_micro_text_tl
+          { \c_@@_mu_tl }
+          { \tex_char:D \c_@@_micro_int }
+        \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
+          { \ensuremath { \c_@@_omega_tl } }
+          { \tex_char:D \c_@@_ohm_int }
+      }
+      { }
 %    \end{macrocode}
 %   Slightly more specialised: these only work in math mode with
 %   \pkg{unicode-math}.
 %    \begin{macrocode}
-        \@ifpackageloaded { unicode-math }
-          {
-            \int_const:Nn \c_@@_arcminute_int { 8242 }
-            \int_const:Nn \c_@@_arcsecond_int { 8243 }
-            \@@_option_unchanged:Nnn \l_@@_arcminute_math_tl
-              { { } ^ { \prime } }
-              { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-            \@@_option_unchanged:Nnn \l_@@_arcsecond_math_tl
-              { { } ^ { \prime \prime } }
-              { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-            \@@_option_unchanged:Nnn \l_@@_arcminute_text_tl
-              { \ensuremath { { } ^ { \prime } } }
-              { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-            \@@_option_unchanged:Nnn \l_@@_arcsecond_text_tl
-              { \ensuremath { { } ^ { \prime \prime } } }
-              { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-          }
-          { }
+    \@ifpackageloaded { unicode-math }
+      {
+        \int_const:Nn \c_@@_arcminute_int { 8242 }
+        \int_const:Nn \c_@@_arcsecond_int { 8243 }
+        \@@_option_unchanged:Nnn \l_@@_arcminute_math_tl
+          { { } ^ { \prime } }
+          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
+        \@@_option_unchanged:Nnn \l_@@_arcsecond_math_tl
+          { { } ^ { \prime \prime } }
+          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
+        \@@_option_unchanged:Nnn \l_@@_arcminute_text_tl
+          { \ensuremath { { } ^ { \prime } } }
+          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
+        \@@_option_unchanged:Nnn \l_@@_arcsecond_text_tl
+          { \ensuremath { { } ^ { \prime \prime } } }
+          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
       }
+      { }
   }
 %    \end{macrocode}
 % \end{variable}
