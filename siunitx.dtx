@@ -81,7 +81,7 @@ See http://www.latex-project.org/lppl.txt
 
 \endpreamble
 \postamble
-Copyright (C) 2008-2015 by
+Copyright (C) 2008-2016 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
@@ -643,6 +643,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6m}{2015/10/15}{Address an issue with \pkg{mwtab}}
 % \changes{v2.6n}{2015/12/31}{Improve defintion for degree Celsius}
 % \changes{v2.6n}{2015/12/31}{Fix angstrom symbol with \LuaTeX{}}
+% \changes{v2.6o}{2016/01/05}{Allow for unit powers when converting exponents
+%   to prefixes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9388,6 +9390,11 @@ This work consists of the file  siunitx.dtx
               \l_@@_tmpb_tl
             \tl_set:Nx \l_@@_tmpa_tl
               { \int_eval:n { \l_@@_tmpa_tl + \l_@@_tmpb_tl } }
+          }
+        \prop_get:NnNT \l_@@_unit_prop { power-1 } \l_@@_tmpb_tl
+          {
+            \tl_set:Nx \l_@@_tmpa_tl
+              { \int_eval:n { \l_@@_tmpa_tl / \l_@@_tmpb_tl } }
           }
         \prop_get:NVNTF \l_@@_prefix_reverse_prop \l_@@_tmpa_tl
           \l_@@_tmpb_tl
