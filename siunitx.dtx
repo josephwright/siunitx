@@ -645,6 +645,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6n}{2015/12/31}{Fix angstrom symbol with \LuaTeX{}}
 % \changes{v2.6o}{2016/01/05}{Allow for unit powers when converting exponents
 %   to prefixes}
+% \changes{v2.6p}{2016/01/13}{Allow for reciprocal powers when converting
+%   exponents to prefixes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -9395,6 +9397,11 @@ This work consists of the file  siunitx.dtx
           {
             \tl_set:Nx \l_@@_tmpa_tl
               { \int_eval:n { \l_@@_tmpa_tl / \l_@@_tmpb_tl } }
+          }
+        \prop_if_in:NnT \l_@@_unit_prop { per-1 }
+          {
+            \tl_set:Nx \l_@@_tmpa_tl
+              { \int_eval:n { - \l_@@_tmpa_tl } }
           }
         \prop_get:NVNTF \l_@@_prefix_reverse_prop \l_@@_tmpa_tl
           \l_@@_tmpb_tl
