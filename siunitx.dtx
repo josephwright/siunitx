@@ -9384,6 +9384,11 @@ This work consists of the file  siunitx.dtx
         \prop_get:NnNT \l_@@_number_in_prop { exponent-sign }
           \l_@@_tmpb_tl
           { \tl_put_left:NV \l_@@_tmpa_tl \l_@@_tmpb_tl }
+        \prop_if_in:NnT \l_@@_unit_prop { per-1 }
+          {
+            \tl_set:Nx \l_@@_tmpa_tl
+              { \int_eval:n { - \l_@@_tmpa_tl } }
+          }
         \prop_get:NnNT \l_@@_unit_prop { prefix-1 } \l_@@_tmpb_tl
           {
             \prop_remove:Nn \l_@@_unit_prop { prefix-1 }
@@ -9397,11 +9402,6 @@ This work consists of the file  siunitx.dtx
           {
             \tl_set:Nx \l_@@_tmpa_tl
               { \int_eval:n { \l_@@_tmpa_tl / \l_@@_tmpb_tl } }
-          }
-        \prop_if_in:NnT \l_@@_unit_prop { per-1 }
-          {
-            \tl_set:Nx \l_@@_tmpa_tl
-              { \int_eval:n { - \l_@@_tmpa_tl } }
           }
         \prop_get:NVNTF \l_@@_prefix_reverse_prop \l_@@_tmpa_tl
           \l_@@_tmpb_tl
