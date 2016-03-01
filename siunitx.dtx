@@ -5172,7 +5172,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2016/01/19} {2.6p}
+\ProvidesExplPackage {siunitx} {2016/03/01} {2.6q}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -16002,15 +16002,18 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \NewDocumentCommand \tablenum { o m } {
   \leavevmode
-  \IfNoValueF {#1}
-    { \keys_set:nn { siunitx } {#1} }
-  \bool_if:NTF \l_@@_number_parse_bool
-    {
-      \tl_set:Nn \l_@@_table_collect_tl {#2}
-      \bool_set_false:N \l_@@_table_collect_pre_bool
-      \@@_table_print_S:
-    }
-    { \@@_table_print_S_direct: #2 \@@_table_print: }
+  \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
+    \IfNoValueF {#1}
+      { \keys_set:nn { siunitx } {#1} }
+    \bool_if:NTF \l_@@_number_parse_bool
+      {
+        \tl_set:Nn \l_@@_table_collect_tl {#2}
+        \bool_set_false:N \l_@@_table_collect_pre_bool
+        \@@_table_print_S:
+      }
+      { \@@_table_print_S_direct: #2 \@@_table_print: }
+  \group_end:
 }
 %    \end{macrocode}
 %\end{macro}
@@ -16023,6 +16026,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \si { o m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueTF {#1}
       { \@@_unit_output:nn {#2} { } }
       {
@@ -16739,7 +16743,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2016/01/19} {2.6p}
+\ProvidesExplFile {siunitx-version-1.cfg} {2016/03/01} {2.6q}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17681,7 +17685,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2016/01/19} {2.6p}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2016/03/01} {2.6q}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17863,7 +17867,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2016/01/19} {2.6p}
+\ProvidesExplFile {siunitx-binary.cfg} {2016/03/01} {2.6q}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
