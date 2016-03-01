@@ -648,6 +648,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6p}{2016/01/13}{Allow for reciprocal powers when converting
 %   exponents to prefixes}
 % \changes{v2.6p}{2016/01/19}{Improve definition for degree Celsius}
+% \changes{v2.6q}{2016/03/01}{Correctly select font when document commands are
+%   used inside table cells in \texttt{S} columns}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15887,6 +15889,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \num { o m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
     \@@_number_output:n {#2}
@@ -15901,6 +15904,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \numlist { o > { \SplitList { ; } } m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
     \@@_list_numbers:n {#2}
@@ -15916,6 +15920,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \numrange { o m m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueF {#1}
       { \keys_set:nn { siunitx } {#1} }
     \@@_range_numbers:nn {#2} {#3}
@@ -15936,6 +15941,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \SIlist { o > { \SplitList { ; } } m m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueTF {#1}
       { \@@_list_units:nnn {#2} {#3} { }  }
       {
@@ -15947,6 +15953,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \SIrange { o m m m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueTF {#1}
       { \@@_range_unit:nnnn {#4} { } {#2} {#3} }
       {
@@ -15965,6 +15972,7 @@ This work consists of the file  siunitx.dtx
 \NewDocumentCommand \SI { o m o m } {
   \leavevmode
   \group_begin:
+    \bool_set_false:N \l_@@_font_set_bool
     \IfNoValueTF {#1}
       { \@@_combined:nnnn { } {#2} {#3} {#4} }
       {
