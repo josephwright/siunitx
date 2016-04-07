@@ -183,7 +183,7 @@
 %   the unit to which it applies.
 % \end{function}
 %
-% \begin{function}{\siunitx_unit_set:Nn}
+% \begin{function}{\siunitx_unit_set:Nn, \siunitx_unit_set:Nx}
 %   \begin{syntax}
 %     \cs{siunitx_unit_set:Nn} \meta{unit} \Arg{meaning}
 %   \end{syntax}
@@ -816,7 +816,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_unit_set:Nn}
+% \begin{macro}{\siunitx_unit_set:Nn, \siunitx_unit_set:Nx}
 %   For the unit parsing, allowing for variations in definition order requires
 %   that a test is made for the output of each unit at point of use.
 %    \begin{macrocode}
@@ -830,6 +830,7 @@
           { \@@_parse_unit:Nn #1 {#2} }
       }
   }
+\cs_generate_variant:Nn \siunitx_unit_set:Nn { Nx }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2176,21 +2177,18 @@
 %   Natural units based on physical constants.
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \nuaction { \ensuremath { \mathit { \hbar } } }
-\use:x
+\siunitx_unit_set:Nx \numass
   {
-    \siunitx_unit_set:Nn \exp_not:N \numass
+    \exp_not:N \ensuremath
       {
-        \exp_not:N \ensuremath
-          {
-            \exp_not:N \mathit { m }
-              \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
-          }
+        \exp_not:N \mathit { m }
+          \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
       }
-    \siunitx_unit_set:Nn \exp_not:N \nuspeed
-      {
-        \exp_not:N \ensuremath
-          { \exp_not:N \mathit { c } \c_@@_math_subscript_tl { 0 } }
-      }
+  }
+\siunitx_unit_set:Nx \nuspeed
+  {
+    \exp_not:N \ensuremath
+      { \exp_not:N \mathit { c } \c_@@_math_subscript_tl { 0 } }
   }
 \siunitx_unit_set:Nn \nutime
   { \numass \per \numass \per \nuspeed \squared }
@@ -2211,28 +2209,25 @@
 %    \begin{macrocode}
 \siunitx_unit_set:Nn \auaction { \ensuremath { \mathit { \hbar } } }
 \siunitx_unit_set:Nn \aucharge { \ensuremath { \mathit { e } } }
-\use:x
+\siunitx_unit_set:Nx \auenergy
   {
-    \siunitx_unit_set:Nn \exp_not:N \auenergy
+    \exp_not:N \ensuremath
       {
-        \exp_not:N \ensuremath
-          {
-            \exp_not:N \mathit { E }
-              \c_@@_math_subscript_tl { \exp_not:N \mathrm { h } }
-          }
+        \exp_not:N \mathit { E }
+          \c_@@_math_subscript_tl { \exp_not:N \mathrm { h } }
       }
-    \siunitx_unit_set:Nn \exp_not:N \aulength
+  }
+\siunitx_unit_set:Nx \aulength
+  {
+    \exp_not:N  \ensuremath
+      { \exp_not:N \mathit { a } \c_@@_math_subscript_tl { 0 } }
+  }
+\siunitx_unit_set:Nx \aumass
+  {
+    \exp_not:N \ensuremath
       {
-        \exp_not:N  \ensuremath
-          { \exp_not:N \mathit { a } \c_@@_math_subscript_tl { 0 } }
-      }
-    \siunitx_unit_set:Nn \exp_not:N \aumass
-      {
-        \exp_not:N \ensuremath
-          {
-            \exp_not:N \mathit { m }
-              \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
-          }
+        \exp_not:N \mathit { m }
+          \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
       }
   }
 \siunitx_unit_set:Nn \autime   { \auaction \per \auenergy }
