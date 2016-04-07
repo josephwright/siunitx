@@ -22,22 +22,11 @@
   \cs_set_eq:NN ~ \c_space_tl
   \tl_set:Nn \l_tmpb_tl { J ~ mol ^ { -1 } ~ K  ^ { -1 } }
   \char_set_catcode_space:N \~
-  \char_set_catcode_other:N \^
-  \tl_gset:Nn \g_tmpa_tl { J . mol ^ { -1 } . K  ^ { -1 } }
+  \tl_gset:Nx \g_tmpa_tl
+    { J . mol \token_to_str:N ^ { -1 } . K  \token_to_str:N ^ { -1 } }
   \tl_gset:Nx \g_tmpb_tl { kg \token_to_str:N _ { polymer } }
   \tl_new:N \l_tmpc_tl
-  \group_begin:
-    \cs_set_eq:NN \detokenize \tl_to_str:n 
-    \cs_set_eq:NN \endgroup   \group_end:
-    \cs_set_eq:NN \tmp        \exp_not:c
-    \char_set_catcode_math_subscript:N \_
-  \use:x
-    {
-      \endgroup
-      \tmp { \detokenize { tl_set:Nn } }
-        \tmp { \detokenize { l_tmpc_tl } }
-        { kg _ { polymer } }
-    }
+  \tl_set:Nx \l_tmpc_tl { kg \char_generate:nn { `\_ } { 8 } { polymer } }
 \TIMO
 
 \TEST { Basic~unit~formatting }
