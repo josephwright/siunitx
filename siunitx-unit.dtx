@@ -1016,7 +1016,9 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_format_literal:n}
-% \begin{macro}[aux]{\@@_format_literal_aux:w}
+% \begin{macro}[aux]{\@@_format_literal_auxi:w}
+% \begin{macro}[aux]{\@@_format_literal_auxii:w}
+% \begin{macro}[aux]{\@@_format_literal_auxiii:w}
 %   To format literal units, there are two tasks to do. The input is
 %   \texttt{x}-type expanded to force any symbolic units to be converted into
 %   their literal representation: this requires setting the appropriate
@@ -1048,7 +1050,7 @@
               \tl_clear:N \l_@@_formatted_tl
               \tl_if_empty:NF \l_@@_tmp_tl
                 {
-                  \exp_after:wN \@@_format_literal_aux:w \l_@@_tmp_tl .
+                  \exp_after:wN \@@_format_literal_auxi:w \l_@@_tmp_tl .
                     \q_recursion_tail . \q_recursion_stop
                 }
             \exp_args:NNNV \group_end:
@@ -1060,19 +1062,60 @@
 %   To introduce the font changing commands while still allowing for line
 %   breaks in literal units, a loop is needed to replace one |.| at a time.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_literal_aux:w #1 .
+\cs_new_protected:Npn \@@_format_literal_auxi:w #1 .
   {
     \quark_if_recursion_tail_stop:n {#1}
-    \tl_set:Nx \l_@@_formatted_tl
-      {
-        \exp_not:V \l_@@_formatted_tl
-        \tl_if_empty:NF \l_@@_formatted_tl
-          { \exp_not:V \l_@@_product_tl }
-        \exp_not:V \l_@@_font_tl { \exp_not:n {#1} }
-      }
-    \@@_format_literal_aux:w
+    \@@_format_literal_auxii:w #1 ^ ^ \q_stop
+    \@@_format_literal_auxi:w
   }
 %    \end{macrocode}
+%   Within each unit any sub- and superscript parts need to be separated out:
+%   wrapping everything in the font command is incorrect. The superscript part
+%   is relatively easy as there is no catcode issue or font command to add,
+%   while the subscript part needs a bit more work. As the user might have the
+%   two parts in either order, picking up the subscript needs to look in two
+%   places. We assume that only one is given: odd input here is simply accepted.
+%    \begin{macrocode}
+\use:x
+  {
+    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxii:w
+      ##1 ^ ##2 ^ ##3 \exp_not:N \q_stop
+      {
+        \exp_not:N \@@_format_literal_auxiii:w
+          ##1 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
+          \exp_not:N \q_mark
+          ##2 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
+          \exp_not:N \q_stop
+      }
+    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxiii:w
+      ##1 \c_@@_math_subscript_tl ##2 \c_@@_math_subscript_tl ##3
+      \exp_not:N \q_mark
+      ##4 \c_@@_math_subscript_tl ##5 \c_@@_math_subscript_tl ##6
+      \exp_not:N \q_stop
+      {
+        \tl_set:Nx \exp_not:N \l_@@_formatted_tl
+          {
+            \exp_not:N \exp_not:V \exp_not:N \l_@@_formatted_tl
+            \exp_not:N \tl_if_empty:NF \exp_not:N \l_@@_formatted_tl
+              { \exp_not:N \exp_not:V \exp_not:N \l_@@_product_tl }
+            \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
+              { \exp_not:N \exp_not:n {##1} }
+            \exp_not:N \tl_if_blank:nF {##4}
+              { ^ { \exp_not:N \exp_not:n {##4} } }
+            \exp_not:N \tl_if_blank:nF {##2##5}
+              {
+                \c_@@_math_subscript_tl
+                  {
+                    \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
+                      { \exp_not:N \exp_not:n {#2#5} }
+                  }
+              }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
