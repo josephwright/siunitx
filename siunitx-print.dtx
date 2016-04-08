@@ -81,12 +81,42 @@
 %<@@=siunitx_print>
 %    \end{macrocode}
 %
+% \begin{variable}[int]
+%   {
+%     \l_@@_number_color_tl ,
+%     \l_@@_number_mode_tl  ,
+%     \l_@@_unit_color_tl   ,
+%     \l_@@_unit_mode_tl  ,
+%   }
+%   Options which apply to the main formatting routine, and so are not tied
+%   to either symbolic or literal input.
+%    \begin{macrocode}
+\tl_new:N \l_@@_number_mode_tl
+\tl_new:N \l_@@_unit_mode_tl
+\keys_define:nn { siunitx / print }
+  {
+    number-color .tl_set:N = \l_@@_number_color_tl ,
+    number-mode .choices:nn =
+      { match , math , text }
+      { \tl_set_eq:NN \l_@@_number_mode_tl \l_keys_choice_tl } ,
+    unit-color .tl_set:N   = \l_@@_unit_color_tl   ,
+    unit-mode  .choices:nn =
+      { match , math , text }
+      { \tl_set_eq:NN \l_@@_unit_mode_tl \l_keys_choice_tl }
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_print:nn}
+%   The main printing function doesn't actually need to do very much: just set
+%   the color and select the correct sub-function.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print:nn #1#2
   {
     \group_begin:
-      #2
+      \tl_if_blank:cF { l_@@_ #1 _color_tl }
+        {  \exp_args:Nv \color { l_@@_ #1 _color_tl } }
+      \use:c { @@_ \tl_use:c { l_@@_ #1 _mode_tl } : n } {#2}
     \group_end:
   }
 %    \end{macrocode}
