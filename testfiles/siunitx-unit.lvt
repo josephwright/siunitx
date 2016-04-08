@@ -27,6 +27,13 @@
   \tl_gset:Nx \g_tmpb_tl { kg \token_to_str:N _ { polymer } }
   \tl_new:N \l_tmpc_tl
   \tl_set:Nx \l_tmpc_tl { kg \char_generate:nn { `\_ } { 8 } { polymer } }
+  \tl_new:N \l_tmpd_tl
+  \tl_set:Nx \l_tmpd_tl
+    { 
+      J. mol ^ { -1 } / 
+        K \char_generate:nn { `\_ } { 8 } { a } ^ { 2 } . 
+          K ^ { -1 } \char_generate:nn { `\_ } { 8 } { b }
+    }
 \TIMO
 
 \TEST { Basic~unit~formatting }
@@ -41,11 +48,13 @@
     \tl_show:N \l_tmpa_tl
     \siunitx_unit_format:nN { \joule . mol ^ { -1 } . K  ^ { -1 } } \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
-    \exp_args:NV  \siunitx_unit_format:nN \g_tmpb_tl \l_tmpa_tl
+    \exp_args:NV \siunitx_unit_format:nN \g_tmpb_tl \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
-    \exp_args:NV  \siunitx_unit_format:nN \l_tmpc_tl \l_tmpa_tl
+    \exp_args:NV \siunitx_unit_format:nN \l_tmpc_tl \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
     \siunitx_unit_format:nN { } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \exp_args:NV \siunitx_unit_format:nN \l_tmpd_tl \l_tmpa_tl
     \tl_show:N \l_tmpa_tl
   }
 

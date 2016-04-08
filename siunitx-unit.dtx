@@ -1019,6 +1019,9 @@
 % \begin{macro}[aux]{\@@_format_literal_auxi:w}
 % \begin{macro}[aux]{\@@_format_literal_auxii:w}
 % \begin{macro}[aux]{\@@_format_literal_auxiii:w}
+% \begin{macro}[aux]{\@@_format_literal_auxiv:w}
+% \begin{macro}[aux]{\@@_format_literal_auxv:w}
+% \begin{variable}[aux]{\l_@@_separator_tl}
 %   To format literal units, there are two tasks to do. The input is
 %   \texttt{x}-type expanded to force any symbolic units to be converted into
 %   their literal representation: this requires setting the appropriate
@@ -1061,12 +1064,27 @@
 %    \end{macrocode}
 %   To introduce the font changing commands while still allowing for line
 %   breaks in literal units, a loop is needed to replace one |.| at a time.
+%   To also allow for division, a second loop is used within that to handle
+%   |/|: as a result, the separator between parts has to be tracked.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_literal_auxi:w #1 .
   {
     \quark_if_recursion_tail_stop:n {#1}
-    \@@_format_literal_auxii:w #1 ^ ^ \q_stop
+    \@@_format_literal_auxii:n {#1}
+    \tl_set_eq:NN \l_@@_separator_tl \l_@@_product_tl
     \@@_format_literal_auxi:w
+  }
+\cs_set_protected:Npn \@@_format_literal_auxii:n #1
+  {
+    \@@_format_literal_auxiii:w
+      #1 / \q_recursion_tail / \q_recursion_stop
+  }
+\cs_new_protected:Npn \@@_format_literal_auxiii:w #1 /
+  {
+    \quark_if_recursion_tail_stop:n {#1}
+    \@@_format_literal_auxiv:w #1 ^ ^ \q_stop
+    \tl_set:Nn \l_@@_separator_tl { / }
+    \@@_format_literal_auxiii:w
   }
 %    \end{macrocode}
 %   Within each unit any sub- and superscript parts need to be separated out:
@@ -1078,16 +1096,16 @@
 %    \begin{macrocode}
 \use:x
   {
-    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxii:w
+    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxiv:w
       ##1 ^ ##2 ^ ##3 \exp_not:N \q_stop
       {
-        \exp_not:N \@@_format_literal_auxiii:w
+        \exp_not:N \@@_format_literal_auxv:w
           ##1 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
           \exp_not:N \q_mark
           ##2 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
           \exp_not:N \q_stop
       }
-    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxiii:w
+    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxv:w
       ##1 \c_@@_math_subscript_tl ##2 \c_@@_math_subscript_tl ##3
       \exp_not:N \q_mark
       ##4 \c_@@_math_subscript_tl ##5 \c_@@_math_subscript_tl ##6
@@ -1097,7 +1115,7 @@
           {
             \exp_not:N \exp_not:V \exp_not:N \l_@@_formatted_tl
             \exp_not:N \tl_if_empty:NF \exp_not:N \l_@@_formatted_tl
-              { \exp_not:N \exp_not:V \exp_not:N \l_@@_product_tl }
+              { \exp_not:N \exp_not:V \exp_not:N \l_@@_separator_tl }
             \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
               { \exp_not:N \exp_not:n {##1} }
             \exp_not:N \tl_if_blank:nF {##4}
@@ -1107,13 +1125,17 @@
                 \c_@@_math_subscript_tl
                   {
                     \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
-                      { \exp_not:N \exp_not:n {#2#5} }
+                      { \exp_not:N \exp_not:n {##2##5} }
                   }
               }
           }
       }
   }
+\tl_new:N \l_@@_separator_tl
 %    \end{macrocode}
+% \end{variable}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
