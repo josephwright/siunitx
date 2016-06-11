@@ -729,7 +729,7 @@
 %   macros. That is required so that the unit formatting system can be grouped.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_set_symbolic:Nnn #1
-  { \@@_set_symbolic:NNnnn \cs_set_nopar:cpn #1 { } }
+  { \@@_set_symbolic:NNnnn \cs_set:cpn #1 { } }
 \cs_new_protected:Npn \@@_set_symbolic:Npnn #1#2#
   { \@@_set_symbolic:NNnnn \cs_set:cpn #1 {#2} }
 \cs_new_protected:Npn \@@_set_symbolic:NNnnn #1#2#3#4#5
@@ -976,7 +976,7 @@
             { \@@_format_literal:n {#1} }
         }
         { \@@_format_literal:n {#1} }
-      \cs_set_protected_nopar:Npx \@@_format_aux:
+      \cs_set_protected:Npx \@@_format_aux:
         {
           \tl_set:Nn \exp_not:N #2
             { \exp_not:V \l_@@_formatted_tl }
@@ -986,7 +986,7 @@
     \exp_after:wN \group_end:
     \@@_format_aux:
   }
-\cs_new_protected_nopar:Npn \@@_format_aux: { }
+\cs_new_protected:Npn \@@_format_aux: { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1333,12 +1333,12 @@
 %   retrieval. If \cs{per} is set to be \enquote{sticky} then after parsing
 %   the first occurrence, any further uses are in error.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_parse_per:
+\cs_new_protected:Npn \@@_parse_per:
   {
     \bool_if:NTF \l_@@_sticky_per_bool
       {
         \bool_set_true:N \l_@@_per_bool
-        \cs_set_protected_nopar:Npn \per
+        \cs_set_protected:Npn \per
           { \msg_error:nn { siunitx / unit } { duplicate-sticky-per } }
       }
       {
@@ -1387,7 +1387,7 @@
 %   or prefix: these are added to the \enquote{next} unit so are easy to
 %   test for.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_parse_finalise:
+\cs_new_protected:Npn \@@_parse_finalise:
   {
     \clist_map_inline:nn { per , power , prefix }
       {
@@ -1580,7 +1580,7 @@
 %   reading the various parts of the unit to build up complete unit
 %   combination.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_parsed:
+\cs_new_protected:Npn \@@_format_parsed:
   {
     \int_set_eq:NN \l_@@_total_int \l_@@_position_int
     \tl_clear:N \l_@@_denominator_tl
@@ -1642,7 +1642,7 @@
 %   done using an \texttt{fp} function, but that would be slow compared to
 %   a dedicated if lower-level approach based on delimited arguments.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_power:
+\cs_new_protected:Npn \@@_format_power:
   {
     \@@_format_font:
     \exp_after:wN \@@_format_power_aux:wTF \l_@@_part_tl - \q_stop
@@ -1655,7 +1655,7 @@
 %   In the case of positive powers, there is little to do: add the power
 %   as a subscript (must be required as the parser ensures it's $\neq 1$).
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_power_positive:
+\cs_new_protected:Npn \@@_format_power_positive:
   { \@@_format_power_superscript: }
 %    \end{macrocode}
 %   Dealing with negative powers starts by flipping the switch used to track
@@ -1664,7 +1664,7 @@
 %   the result is not the trivial power~$1$. Assuming all is well, addition
 %   to the current unit combination goes ahead.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_power_negative:
+\cs_new_protected:Npn \@@_format_power_negative:
   {
     \bool_set_false:N \l_@@_numerator_bool
     \bool_if:NTF \l_@@_powers_positive_bool
@@ -1687,7 +1687,7 @@
 %   \cs{sp} as that avoids any category code issues and also allows redirection
 %   at a higher level more readily.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_power_superscript:
+\cs_new_protected:Npn \@@_format_power_superscript:
   {
     \tl_set:Nx \l_@@_current_tl
       {
@@ -1711,13 +1711,13 @@
 %   conversion is possible and allowing for any power that applies to the
 %   current unit.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_prefix:
+\cs_new_protected:Npn \@@_format_prefix:
   {
     \bool_if:NTF \l_@@_prefix_power_bool
       { \@@_format_prefix_power: }
       { \@@_format_prefix_symbol: }
   }
-\cs_new_protected_nopar:Npn \@@_format_prefix_power:
+\cs_new_protected:Npn \@@_format_prefix_power:
   {
     \prop_get:NVNTF \l_@@_prefixes_forward_prop
       \l_@@_part_tl \l_@@_part_tl
@@ -1732,7 +1732,7 @@
       }
       { \@@_format_prefix_symbol: }
   }
-\cs_new_protected_nopar:Npn \@@_format_prefix_symbol:
+\cs_new_protected:Npn \@@_format_prefix_symbol:
   { \tl_set_eq:NN \l_@@_current_tl \l_@@_part_tl }
 %    \end{macrocode}
 % \end{macro}
@@ -1754,12 +1754,12 @@
 %  qualifier is just treated as \enquote{text}, the auxiliary is actually
 %  a no-op.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_qualifier:
+\cs_new_protected:Npn \@@_format_qualifier:
   {
     \use:c { @@_format_qualifier_ \l_@@_qualifier_mode_tl : }
     \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl
   }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_bracket:
+\cs_new_protected:Npn \@@_format_qualifier_bracket:
   {
     \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
@@ -1769,8 +1769,8 @@
         \exp_not:V \l_@@_bracket_close_tl
       }
   }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_combine: { }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_phrase:
+\cs_new_protected:Npn \@@_format_qualifier_combine: { }
+\cs_new_protected:Npn \@@_format_qualifier_phrase:
   {
     \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
@@ -1779,7 +1779,7 @@
         \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
       }
   }
-\cs_new_protected_nopar:Npn \@@_format_qualifier_subscript:
+\cs_new_protected:Npn \@@_format_qualifier_subscript:
   {
     \@@_format_font:
     \tl_set:Nx \l_@@_part_tl
@@ -1799,7 +1799,7 @@
 %   Any special odds and ends are handled by simply making the current
 %   combination into an argument for the recovered code.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_special:
+\cs_new_protected:Npn \@@_format_special:
   {
     \tl_set:Nx \l_@@_current_tl
       {
@@ -1814,7 +1814,7 @@
 %   A very simple task: add the unit to the output currently being
 %   constructed.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_unit:
+\cs_new_protected:Npn \@@_format_unit:
   { \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl }
 %    \end{macrocode}
 % \end{macro}
@@ -1834,7 +1834,7 @@
 %   true then life is simple: add the current part to the numerator with
 %   a standard separator
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_output:
+\cs_new_protected:Npn \@@_format_output:
   {
     \@@_format_font:
     \bool_set_false:N \l_@@_bracket_bool
@@ -1846,7 +1846,7 @@
           { denominator: }
       }
   }
-\cs_new_protected_nopar:Npn \@@_format_output_aux:
+\cs_new_protected:Npn \@@_format_output_aux:
   {
     \@@_format_output_aux:nV { formatted }
       \l_@@_product_tl
@@ -1864,7 +1864,7 @@
 %   empty output in combination with the flag for using a symbol in the output
 %   but not a two-part strategy.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_output_denominator:
+\cs_new_protected:Npn \@@_format_output_denominator:
   {
     \bool_if:NTF \l_@@_two_part_bool
       {
@@ -1915,7 +1915,7 @@
 %   A short auxiliary which checks if the font has been applied to the
 %   main part of the output: if not, add it and set the flag.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_font:
+\cs_new_protected:Npn \@@_format_font:
   {
     \bool_if:NF \l_@@_font_bool
       {
@@ -1941,7 +1941,7 @@
 %   fractions: these require assembly of the parts with the need to add
 %   additional material in some cases
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_finalise:
+\cs_new_protected:Npn \@@_format_finalise:
   {
     \tl_if_empty:NF \l_@@_denominator_tl
       {
@@ -1958,7 +1958,7 @@
 %   to be used at the same time! Beyond that, the key here is to use a
 %   single \cs{tl_set:Nx} to keep down the number of assignments.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_finalise_fractional:
+\cs_new_protected:Npn \@@_format_finalise_fractional:
   {
     \tl_if_empty:NT \l_@@_formatted_tl
       { \tl_set:Nn \l_@@_formatted_tl { 1 } }
@@ -1977,7 +1977,7 @@
 %   receives the correct input. After that it is just a case of applying
 %   \cs{mathchoice} to the formatted output.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_finalise_autofrac:
+\cs_new_protected:Npn \@@_format_finalise_autofrac:
   {
     \group_begin:
       \@@_format_finalise_fraction:
@@ -1996,7 +1996,7 @@
 %    \end{macrocode}
 %   When using a fraction function the two parts are now assembled.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_finalise_fraction:
+\cs_new_protected:Npn \@@_format_finalise_fraction:
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
@@ -2005,7 +2005,7 @@
           { \exp_not:V \l_@@_denominator_tl }
       }
   }
-\cs_new_protected_nopar:Npn \@@_format_finalise_symbol:
+\cs_new_protected:Npn \@@_format_finalise_symbol:
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
@@ -2019,7 +2019,7 @@
 %   at least one positive power, and if so a simple join of the two parts
 %   with the appropriate product.
 %    \begin{macrocode}
-\cs_new_protected_nopar:Npn \@@_format_finalise_power:
+\cs_new_protected:Npn \@@_format_finalise_power:
   {
     \tl_if_empty:NTF \l_@@_formatted_tl
       { \tl_set_eq:NN \l_@@_formatted_tl \l_@@_denominator_tl }
