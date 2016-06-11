@@ -7703,8 +7703,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_if_single:NTF \l_@@_number_uncert_tl
         {
-          \int_compare:nNnTF
-            { \l_@@_number_uncert_tl } = { \c_zero }
+          \int_compare:nNnTF  \l_@@_number_uncert_tl = 0
             { \@@_number_in_complex_to_uncert_dec:n {#1} }
             { \@@_number_in_complex_to_uncert_int: }
         }
@@ -8084,7 +8083,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_figures:n #1
   {
-    \int_compare:nNnTF \l_@@_process_precision_int > \c_zero
+    \int_compare:nNnTF \l_@@_process_precision_int > 0
       {
         \prop_if_in:NnT \l_@@_number_in_prop {#1}
           { \@@_number_process_figures_aux:n {#1} }
@@ -8158,7 +8157,7 @@ This work consists of the file  siunitx.dtx
     \tl_put_left:cV { l_@@_round_ #1 _out_tl } \l_@@_tmp_int
     \bool_if:NF \l_@@_round_bool
       {
-        \int_compare:nNnF { \l_@@_tmp_int } = \c_zero
+        \int_compare:nNnF \l_@@_tmp_int = 0
           { \bool_set_true:N \l_@@_round_bool }
       }
     \bool_if:NT \l_@@_round_bool
@@ -8206,20 +8205,20 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_figures_integer:
   {
-    \int_compare:nNnT \l_@@_round_int > \c_zero
+    \int_compare:nNnT \l_@@_round_int > 0
       { \tl_put_left:Nn \l_@@_round_integer_out_tl { 0 } }
-    \int_compare:nNnF \l_@@_round_int > \c_one
+    \int_compare:nNnF \l_@@_round_int > 1
       {
         \int_set:Nn \l_@@_tmp_int
           { \tl_head:N \l_@@_round_integer_in_tl }
         \@@_number_process_round_up:
-        \int_compare:nNnTF \l_@@_round_int = \c_one
+        \int_compare:nNnTF \l_@@_round_int = 1
           {
-            \int_compare:nNnT \l_@@_tmp_int > \c_four
+            \int_compare:nNnT \l_@@_tmp_int > 4
               { \bool_set_true:N \l_@@_round_bool }
           }
           {
-            \int_compare:nNnT \l_@@_tmp_int = \c_ten
+            \int_compare:nNnT \l_@@_tmp_int = { 10 }
               {
                 \bool_set_true:N \l_@@_round_bool
                 \int_zero:N \l_@@_tmp_int
@@ -8300,7 +8299,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_number_process_fixed_aux_i:nnn #1#2#3
   {
     \prop_put:Nnn \l_@@_number_in_prop { exponent } { true }
-    \int_compare:nNnTF { \l_@@_process_fixed_int } > { \c_zero }
+    \int_compare:nNnTF \l_@@_process_fixed_int > 0
       {
         \prop_put:NnV \l_@@_number_in_prop { exponent-integer }
           \l_@@_process_fixed_int
@@ -8366,7 +8365,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_fixed_large:nnn #1
   {
-    \int_compare:nNnTF {#1} = \c_zero
+    \int_compare:nNnTF {#1} = 0
       { \@@_number_process_fixed_large_aux:nnn { } }
       { \@@_number_process_fixed_large_aux:nnn {#1} }
   }
@@ -8441,8 +8440,7 @@ This work consists of the file  siunitx.dtx
 % once the target is known.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_integer_digits: {
-  \int_compare:nNnT
-    { \l_@@_process_integer_min_int } > { \c_zero }
+  \int_compare:nNnT \l_@@_process_integer_min_int > 0
     {
       \prop_get:NnNT \l_@@_number_in_prop { mantissa-integer }
         \l_@@_tmpa_tl
@@ -8452,7 +8450,7 @@ This work consists of the file  siunitx.dtx
                  \l_@@_process_integer_min_int
               - \tl_count:N \l_@@_tmpa_tl
             }
-          \int_compare:nNnT { \l_@@_tmp_int } > { \c_zero }
+          \int_compare:nNnT \l_@@_tmp_int > 0            
             {
               \tl_set:Nx \l_@@_tmpa_tl
                 {
@@ -8548,7 +8546,7 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \@@_number_process_places_aux_i:n #1
   {
-    \int_compare:nNnTF \l_@@_process_precision_int = \c_zero
+    \int_compare:nNnTF \l_@@_process_precision_int = 0
       { \@@_number_process_places_none:n {#1} }
       {
         \prop_get:NnNT \l_@@_number_in_prop { #1 -decimal }
@@ -8580,7 +8578,7 @@ This work consists of the file  siunitx.dtx
     \bool_set_true:N \l_@@_tmp_bool
     \tl_map_inline:Nn \l_@@_tmpa_tl
       {
-        \int_compare:nNnF {##1} = \c_zero
+        \int_compare:nNnF {##1} = 0
           {
             \bool_set_false:N \l_@@_tmp_bool
             \tl_map_break:
@@ -8597,7 +8595,7 @@ This work consists of the file  siunitx.dtx
   {
     \prop_get:NnNT \l_@@_number_in_prop { #1 -decimal } \l_@@_tmpa_tl
       {
-        \int_compare:nNnTF { \tl_head:N \l_@@_tmpa_tl } > \c_four
+        \int_compare:nNnTF { \tl_head:N \l_@@_tmpa_tl } > 4
           {
             \prop_get:NnNTF \l_@@_number_in_prop { #1 -integer }
               \l_@@_tmpb_tl
@@ -8607,7 +8605,7 @@ This work consists of the file  siunitx.dtx
                 \bool_if:NF \l_@@_round_half_up_bool
                   {
                     \int_compare:nNnT
-                      { 0 \tl_tail:N \l_@@_tmpa_tl } = \c_zero
+                      { 0 \tl_tail:N \l_@@_tmpa_tl } = 0
                       {
                         \int_if_odd:nT \l_@@_tmpb_tl
                           {
@@ -8642,7 +8640,7 @@ This work consists of the file  siunitx.dtx
   {
     \int_sub:Nn \l_@@_round_int
       { \l_@@_process_precision_int }
-    \int_compare:nNnTF \l_@@_round_int < \c_zero
+    \int_compare:nNnTF \l_@@_round_int < 0
       {
         \int_set:Nn \l_@@_round_int { - \l_@@_round_int }
         \@@_number_process_pad:n {#1}
@@ -8707,7 +8705,7 @@ This work consists of the file  siunitx.dtx
       { \tl_tail:N \l_@@_round_integer_in_tl }
     \@@_number_process_round_up:
     \bool_set_false:N \l_@@_round_bool
-    \int_compare:nNnT \l_@@_tmp_int = \c_ten
+    \int_compare:nNnT \l_@@_tmp_int = { 10 }
       {
         \int_zero:N \l_@@_tmp_int
         \bool_set_true:N \l_@@_round_bool
@@ -8754,7 +8752,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_round_decimal:
   {
-    \int_compare:nNnF \l_@@_round_int > \c_one
+    \int_compare:nNnF \l_@@_round_int > 1
       { \@@_number_process_round_decimal_aux: }
     \tl_put_right:Nx \l_@@_round_discard_tl
       { \tl_head:N \l_@@_round_decimal_in_tl }
@@ -8775,22 +8773,21 @@ This work consists of the file  siunitx.dtx
     \int_set:Nn \l_@@_tmp_int
       { \tl_head:N \l_@@_round_decimal_in_tl }
     \@@_number_process_round_up:
-    \int_compare:nNnTF \l_@@_round_int = \c_one
+    \int_compare:nNnTF \l_@@_round_int = 1
       {
-        \int_compare:nNnT \l_@@_tmp_int > \c_four
+        \int_compare:nNnT \l_@@_tmp_int > 4
           {
             \bool_set_true:N \l_@@_round_bool
             \bool_if:NF \l_@@_round_half_up_bool
               {
                 \int_compare:nNnT
-                  { \l_@@_round_discard_tl \int_use:N \l_@@_tmp_int }
-                    = \c_five
+                  { \l_@@_round_discard_tl \int_use:N \l_@@_tmp_int } = 5
                   { \bool_set_true:N \l_@@_round_even_bool }
               }
           }
       }
       {
-        \int_compare:nNnT \l_@@_tmp_int = \c_ten
+        \int_compare:nNnT \l_@@_tmp_int = { 10 }
           {
             \bool_set_true:N \l_@@_round_bool
             \int_zero:N \l_@@_tmp_int
@@ -8939,7 +8936,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn
   \@@_number_process_scientific_aux_ii:nnn #1#2#3 {
-  \int_compare:nNnTF { \tl_count:n {#1} } > \c_one
+  \int_compare:nNnTF { \tl_count:n {#1} } > 1
     { \@@_number_process_scientific_large:nnn {#1} {#2} {#3} }
     {
       \@@_number_if_zero:nTF {#1}
@@ -8969,7 +8966,7 @@ This work consists of the file  siunitx.dtx
         \quark_if_recursion_tail_stop_do:Nn ##3
           {
             \@@_number_process_scientific_aux_ii:nnn {##1} { ##2 #2 }
-              { #3 + \c_one }
+              { #3 + 1 }
           }
         \@@_number_process_scientific_large_loop:nNN { ##1 ##2 } ##3
       }
@@ -13145,7 +13142,7 @@ This work consists of the file  siunitx.dtx
   {
     \bool_set_true:N \l_@@_list_first_bool
     \tl_clear:N \l_@@_list_current_tl
-    \int_compare:nNnTF { \tl_count:n {#1} } > \c_two
+    \int_compare:nNnTF { \tl_count:n {#1} } > 2
       {
         \tl_map_function:nN {#1} \@@_list_numbers_aux_ii:n
         \l_@@_list_tl
@@ -13153,7 +13150,7 @@ This work consists of the file  siunitx.dtx
         \l_@@_list_current_tl
       }
       {
-        \int_compare:nNnTF { \tl_count:n {#1} } = \c_two
+        \int_compare:nNnTF { \tl_count:n {#1} } = 2
           { \@@_list_numbers_aux:nn #1 }
           { \@@_combined_output:n #1 }
       }
@@ -13824,7 +13821,7 @@ This work consists of the file  siunitx.dtx
 %   A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
 \skip_new:N \c_@@_one_fill_skip
-\skip_set:Nn \c_@@_one_fill_skip { \c_zero_dim plus 1 fill }
+\skip_set:Nn \c_@@_one_fill_skip { 0pt plus 1fill }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -13838,7 +13835,7 @@ This work consists of the file  siunitx.dtx
       {
         \cs_new_protected:Npn \@@_table_colortbl_correction:
           {
-            \skip_horizontal:n { \c_zero_dim plus -0.5 fill }
+            \skip_horizontal:n { 0pt plus -0.5fill }
             \tex_kern:D \c_zero_skip
           }
       }
@@ -13938,7 +13935,7 @@ This work consists of the file  siunitx.dtx
       center             .code:n =
         {
           \skip_set:Nn \l_@@_table_unit_align_skip
-            { \c_zero_dim plus 0.5 fill }
+            { 0pt plus 0.5fill }
         },
     table-unit-alignment /
       left               .code:n =
@@ -13947,7 +13944,7 @@ This work consists of the file  siunitx.dtx
         right            .code:n =
           {
             \skip_set:Nn \l_@@_table_unit_align_skip
-              { \c_zero_dim plus 1 fill }
+              { 0pt plus 1fill }
           }
   }
 \keys_set:nn { siunitx } { table-unit-alignment = center }
@@ -14110,7 +14107,7 @@ This work consists of the file  siunitx.dtx
       center                  .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_dim plus 0.5 fill }
+            { 0pt plus 0.5fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_reserved:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -14120,7 +14117,7 @@ This work consists of the file  siunitx.dtx
       center-decimal-marker   .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_dim plus 0.5 fill }
+            { 0pt plus 0.5fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_centered:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -14139,7 +14136,7 @@ This work consists of the file  siunitx.dtx
       right                 .code:n     =
         {
           \skip_set:Nn \l_@@_table_number_align_skip
-            { \c_zero_dim plus 1 fill }
+            { 0pt plus 1fill }
           \cs_set_eq:NN \@@_table_print_S_direct_main:
             \@@_table_print_S_direct_reserved:
           \cs_set_eq:NN \@@_table_print_S_parsed:
@@ -14152,7 +14149,7 @@ This work consists of the file  siunitx.dtx
       center                  .code:n     =
         {
           \skip_set:Nn \l_@@_table_text_align_skip
-            { \c_zero_dim plus 0.5 fill }
+            { 0pt plus 0.5fill }
         },
     table-text-alignment /
       left                    .code:n     =
@@ -14161,7 +14158,7 @@ This work consists of the file  siunitx.dtx
       right                   .code:n     =
         {
           \skip_set:Nn \l_@@_table_text_align_skip
-            { \c_zero_dim plus 1 fill }
+            { 0pt plus 1fill }
         },
     table-comparator          .choice:,
     table-comparator /
@@ -14173,7 +14170,7 @@ This work consists of the file  siunitx.dtx
     table-comparator          .default:n  = true,
     table-figures-decimal     .code:n     =
       {
-        \int_compare:nNnTF {#1} = \c_zero
+        \int_compare:nNnTF {#1} = 0
           {
             \prop_remove:Nn \l_@@_table_model_prop { mantissa-decimal }
             \prop_remove:Nn \l_@@_table_model_prop { mantissa-decimal-raw }
@@ -14198,7 +14195,7 @@ This work consists of the file  siunitx.dtx
       },
     table-figures-exponent    .code:n     =
       {
-        \int_compare:nNnTF {#1} = \c_zero
+        \int_compare:nNnTF {#1} = 0
           { \prop_remove:Nn \l_@@_table_model_prop { exponent-integer } }
           {
             \prop_put:Nnx \l_@@_table_model_prop { exponent-integer }
@@ -14208,7 +14205,7 @@ This work consists of the file  siunitx.dtx
       },
     table-figures-integer     .code:n     =
       {
-        \int_compare:nNnTF {#1} = \c_zero
+        \int_compare:nNnTF {#1} = 0
           {
             \prop_remove:Nn \l_@@_table_model_prop { mantissa-integer }
             \prop_if_in:NnTF \l_@@_table_model_prop { mantissa-decimal }
@@ -14226,7 +14223,7 @@ This work consists of the file  siunitx.dtx
       },
     table-figures-uncertainty .code:n     =
       {
-        \int_compare:nNnTF {#1} = \c_zero
+        \int_compare:nNnTF {#1} = 0
           { \prop_remove:Nn \l_@@_table_model_prop { mantissa-uncertainty } }
           {
             \prop_put:Nnx \l_@@_table_model_prop { mantissa-uncertainty }
@@ -15614,7 +15611,7 @@ This work consists of the file  siunitx.dtx
     { set~thousands~separator = { \exp_not:V \l_@@_group_sep_tl } }
   \clist_put_right:Nx \l_@@_pgf_link_clist
     {
-       min~exponent~for~1000~sep = \int_eval:n { \l_@@_group_min_int - \c_one }
+       min~exponent~for~1000~sep = \int_eval:n { \l_@@_group_min_int - 1 }
     }
   \bool_if:nF
     {
