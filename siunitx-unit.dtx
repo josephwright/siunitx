@@ -1212,7 +1212,7 @@
     \bool_set_false:N \l_@@_test_bool
     \int_zero:N \l_@@_position_int
     #1
-    \int_step_inline:nnnn \c_one \c_one \l_@@_position_int
+    \int_step_inline:nnnn 1 1 \l_@@_position_int
       { \@@_parse_finalise:n {##1} }
     \@@_parse_finalise:
   }
@@ -1251,7 +1251,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_prefix:Nn #1#2
   {
-    \int_set:Nn \l_@@_tmp_int { \l_@@_position_int + \c_one }
+    \int_set:Nn \l_@@_tmp_int { \l_@@_position_int + 1 }
     \@@_parse_add:nnnn { prefix } { \int_use:N \l_@@_tmp_int }
       {#1} {#2}
   }
@@ -1266,7 +1266,7 @@
       }
       {
         \@@_parse_add:nnnn { power }
-          { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + \c_one } } }
+          { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + 1 } } }
           {#1} {#2}
       }
       {
@@ -1294,7 +1294,7 @@
 \cs_new_protected:Npn \@@_parse_special:n #1
   {
     \@@_parse_add:nnnn { special }
-      { \int_eval:n { \l_@@_position_int + \c_one } }
+      { \int_eval:n { \l_@@_position_int + 1 } }
       {#1} {#1}
   }
 %    \end{macrocode}
@@ -1343,7 +1343,7 @@
       }
       {
         \@@_parse_add:nnnn
-          { per } { \int_eval:n { \l_@@_position_int + \c_one } }
+          { per } { \int_eval:n { \l_@@_position_int + 1 } }
           { \per } { true }
       }
   }
@@ -1369,7 +1369,7 @@
           {
             \tl_set:Nx \l_@@_part_tl
               { \fp_eval:n { \l_@@_part_tl * -1 } }
-            \fp_compare:nNnTF \l_@@_part_tl = \c_one_fp
+            \fp_compare:nNnTF \l_@@_part_tl = 1
               { \prop_remove:NV \l_@@_parsed_prop \l_@@_tmp_tl }
               {
                 \prop_put:NVV \l_@@_parsed_prop
@@ -1392,7 +1392,7 @@
     \clist_map_inline:nn { per , power , prefix }
       {
         \tl_set:Nx \l_@@_tmp_tl
-          { ##1 - \int_eval:n { \l_@@_position_int + \c_one } }
+          { ##1 - \int_eval:n { \l_@@_position_int + 1 } }
         \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
           { \msg_error:nnn { siunitx / unit } { dangling-part } { ##1 } }
       }
