@@ -653,6 +653,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6r}{2016/06/06}{Address color safety issue}
 % \changes{v2.6r}{2016/08/14}{Minor \pkg{expl3} fixes}
 % \changes{v2.6r}{2016/08/21}{Correctly handle \texttt{e0}}
+% \changes{v2.6r}{2016/08/21}{Warn when color support is not available}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -6425,8 +6426,16 @@ This work consists of the file  siunitx.dtx
   \@ifpackageloaded { color }
     { \cs_new_eq:NN \@@_textcolor:n \textcolor }
     {
-      \cs_set_eq:NN \@@_print_color: \scan_stop:
-      \cs_new_eq:NN \@@_textcolor:n \use_none:n
+      \cs_set_protected:Npn \@@_print_color:
+        {
+          \cs_set_eq:NN \@@_print_color: \scan_stop:
+          \msg_warning:nn { siunitx } { color-not-loaded }
+        }
+      \cs_new_protected:Npn \@@_textcolor:n #1
+        {
+          \cs_set_eq:NN \@@_textcolor:n \use_none:n
+          \msg_warning:nn { siunitx } { color-not-loaded }
+        }
     }
 }
 %    \end{macrocode}
@@ -15669,6 +15678,9 @@ This work consists of the file  siunitx.dtx
 \msg_new:nnnn { siunitx } { bad-arc-sign }
   { Incorrect~use~of~sign~in~degree-minute-second~angle. }
   { Only~the~highest~value~part~of~an~angle~can~have~a~sign. }
+\msg_new:nnnn { siunitx } { color-not-loaded }
+  { Package~"color"~not~loaded. }
+  { The~command~\token_to_str:N \color \ is~not~available. }
 \msg_new:nnnn { siunitx } { duplicate-complex-root-token }
   { Duplicate~complex~root~token~'#1'~in~input. }
   { Only~one~complex~root~token~can~appear~in~a~single~number. }
