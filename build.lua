@@ -15,6 +15,10 @@ packtdszip = true
 -- No implementation as standard
 typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
 
+-- Restrict typesetting
+typesetfiles =
+  {"siunitx.tex", "siunitx.dtx", "siunitx-number.dtx", "siunitx-unit.dtx"}
+
 -- Find and run the build system
 kpse.set_program_name ("kpsewhich")
 dofile (kpse.lookup ("l3build.lua"))
