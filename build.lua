@@ -15,9 +15,8 @@ packtdszip = true
 -- No implementation as standard
 typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
 
--- Restrict typesetting
-typesetfiles =
-  {"siunitx.tex", "siunitx.dtx", "siunitx-number.dtx", "siunitx-unit.dtx"}
+-- Typeset only the .tex files
+typesetfiles = {"*.tex"}
 
 -- Find and run the build system
 kpse.set_program_name ("kpsewhich")
