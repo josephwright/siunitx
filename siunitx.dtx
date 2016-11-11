@@ -655,6 +655,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6r}{2016/08/21}{Correctly handle \texttt{e0}}
 % \changes{v2.6r}{2016/08/21}{Warn when color support is not available}
 % \changes{v2.6s}{2016/09/02}{Drop one excess warning}
+% \changes{v2.7}{2016/11/11}{Start adding documented code level interfaces}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5149,6 +5150,22 @@ This work consists of the file  siunitx.dtx
 % will also definitely get attention:
 % \href{mailto:joseph.wright@morningstar2.co.uk}
 % {\texttt{joseph.wright@morningstar2.co.uk}}.
+%
+% \section{Code level interfaces}
+%
+% At present, most interfaces in \pkg{siunitx} at the code level are internal.
+% This largely reflects the parallel between \pkg{siunitx} and core \pkg{expl3}
+% development: much of the code here was written whilst the \LaTeX{} team were
+% defining how best to handle this area. Development work on the next major
+% release of \pkg{siunitx} includes a full set of documented code level
+% interfaces. Some of these will be added to this (release) version of the
+% package over time, where this is appropriate.
+%
+% \begin{variable}{\l_siunitx_unit_symbolic_seq}
+%   This sequence contains all of the symbolic \meta{unit} names defined :
+%   these will be in the form of control sequences such as |\kilogram|.
+%   The order of the sequence is unimportant.
+% \end{function}
 %
 %\section{Thanks}
 %
@@ -11222,15 +11239,15 @@ This work consists of the file  siunitx.dtx
 % method only makes these available inside the unit-processing functions
 % (\cs{SI}, \cs{si} and the \texttt{S} column).
 %
-%\begin{macro}{\l_@@_declare_list_seq}
+%\begin{macro}{\l_siunitx_unit_symbolic_seq}
 % A list of all unit and related functions.
 %    \begin{macrocode}
-\seq_new:N \l_@@_declare_list_seq
-\seq_put_right:Nn \l_@@_declare_list_seq { \of }
-\seq_put_right:Nn \l_@@_declare_list_seq { \highlight }
-\seq_put_right:Nn \l_@@_declare_list_seq { \per }
-\seq_put_right:Nn \l_@@_declare_list_seq { \raiseto }
-\seq_put_right:Nn \l_@@_declare_list_seq { \tothe }
+\seq_new:N \l_siunitx_unit_symbolic_seq
+\seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \of }
+\seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \highlight }
+\seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \per }
+\seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \raiseto }
+\seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \tothe }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -11241,14 +11258,14 @@ This work consists of the file  siunitx.dtx
 % Creating powers is all about storing values.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_declare_power_after:Nn #1#2 {
-  \seq_put_right:Nn \l_@@_declare_list_seq {#1}
+  \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
   \cs_set:cpn { @@_ \token_to_str:N #1 _literal:w }
     { \@@_textsuperscript:n {#2} }
   \cs_set:cpn { @@_ \token_to_str:N #1 _function:w }
     { \@@_unit_parse_power_after:n {#2} }
 }
 \cs_new_protected:Npn \@@_declare_power_before:Nn #1#2 {
-  \seq_put_right:Nn \l_@@_declare_list_seq {#1}
+  \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
   \cs_set:cpn { @@_ \token_to_str:N #1 _literal:w } ##1
     { ##1 \@@_textsuperscript:n {#2} }
   \cs_set:cpn { @@_ \token_to_str:N #1 _function:w }
@@ -11266,7 +11283,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_declare_prefix:Nnnn #1#2#3#4
   {
-    \seq_put_right:Nn \l_@@_declare_list_seq {#1}
+    \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
     \prop_put:Nnn \l_@@_prefix_forward_prop {#1} {#4}
     \prop_put:Nnn \l_@@_prefix_reverse_prop {#4} {#1}
     \cs_set:cpn { @@_ \token_to_str:N #1 _literal:w } {#2}
@@ -11287,7 +11304,7 @@ This work consists of the file  siunitx.dtx
 % Qualifiers just need storing.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_declare_qualifier:Nn #1#2 {
-  \seq_put_right:Nn \l_@@_declare_list_seq {#1}
+  \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
   \cs_set:cpn { @@_ \token_to_str:N #1 _literal:w }
     { \text { ~ } ( #2 ) }
   \cs_set:cpn { @@_ \token_to_str:N #1 _function:w }
@@ -11304,7 +11321,7 @@ This work consists of the file  siunitx.dtx
 % problem with the creation order for units.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_declare_unit:Nnn #1#2#3 {
-  \seq_put_right:Nn \l_@@_declare_list_seq {#1}
+  \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
   \cs_set:cpn { @@_ \token_to_str:N #1 _literal:w } {#2}
   \cs_set_protected:cpn { @@_ \token_to_str:N #1 _function:w }
     {
@@ -11385,7 +11402,7 @@ This work consists of the file  siunitx.dtx
       \cs_set_protected:Npn \@@_cancel:n #1
         { \@@__real_cancel:n { \@@_print:nn { unit } {#1} } }
       \cs_set_eq:NN \@@__real_cancel:n \cancel
-      \seq_put_right:Nn \l_@@_declare_list_seq { \cancel }
+      \seq_put_right:Nn \l_siunitx_unit_symbolic_seq { \cancel }
       \cs_new_protected:cpn
         { @@_ \token_to_str:N \cancel _function:w }
         { \@@_unit_parse_special:n { \@@_cancel:n }  }
@@ -11449,7 +11466,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_unit_create_empty_functions:
   {
     \@@_unit_create_functions_aux_i:
-    \seq_map_function:NN \l_@@_declare_list_seq
+    \seq_map_function:NN \l_siunitx_unit_symbolic_seq
       \@@_unit_create_empty_functions_aux:N
     \@@_unit_create_functions_aux_ii:
   }
@@ -11474,14 +11491,14 @@ This work consists of the file  siunitx.dtx
   {
     \@@_unit_create_functions_aux_i:
     \bool_if:NT \l_@@_create_overwrite_bool
-      { \seq_map_function:NN \l_@@_declare_list_seq \cs_undefine:N }
+      { \seq_map_function:NN \l_siunitx_unit_symbolic_seq \cs_undefine:N }
     \bool_if:NTF \l_@@_create_optional_bool
       {
-        \seq_map_function:NN \l_@@_declare_list_seq
+        \seq_map_function:NN \l_siunitx_unit_symbolic_seq
           \@@_unit_create_with_arg:N
       }
       {
-        \seq_map_function:NN \l_@@_declare_list_seq
+        \seq_map_function:NN \l_siunitx_unit_symbolic_seq
           \@@_unit_create:N
       }
     \@@_unit_create_functions_aux_ii:
@@ -11686,7 +11703,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_unit_if_literal:nTF #1#2#3 {
   \group_begin:
-    \seq_map_function:NN \l_@@_declare_list_seq
+    \seq_map_function:NN \l_siunitx_unit_symbolic_seq
       \@@_unit_if_literal_aux:N
     \cs_set_eq:NN \of \use_none:n
     \cs_set_eq:NN \highlight \use_none:n
@@ -11775,7 +11792,7 @@ This work consists of the file  siunitx.dtx
     \prop_clear:N \l_@@_unit_prop
     \int_zero:N \l_@@_unit_int
     \bool_set_false:N \l_@@_per_bool
-    \seq_map_inline:Nn \l_@@_declare_list_seq
+    \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
       { \cs_set_eq:Nc ##1 { @@_ \token_to_str:N ##1 _function:w } }
   }
 %    \end{macrocode}
@@ -12331,7 +12348,7 @@ This work consists of the file  siunitx.dtx
   \int_zero:N \l_@@_unit_prefix_int
   \int_zero:N \l_@@_unit_denominator_int
   \int_zero:N \l_@@_unit_numerator_int
-  \seq_map_inline:Nn \l_@@_declare_list_seq
+  \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
     { \@@_unit_print_literal_aux:N ##1 }
 }
 %    \end{macrocode}
@@ -12350,7 +12367,7 @@ This work consists of the file  siunitx.dtx
   \cs_new_protected:Npn \@@_unit_format_literal:n #1
     {
       \int_zero:N \l_@@_unit_prefix_int
-      \seq_map_inline:Nn \l_@@_declare_list_seq
+      \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
         { \@@_unit_print_literal_aux:N ##1 }
       \tl_set:Nn \l_@@_unit_tl {#1}
       \tl_replace_all:NnV \l_@@_unit_tl { . }
@@ -16087,7 +16104,7 @@ This work consists of the file  siunitx.dtx
             \cs_set_eq:NN \label    \use_none:n
             \cs_set_eq:NN \index    \use_none:n
             \cs_set_eq:NN \glossary \use_none:n
-            \seq_map_inline:Nn \l_@@_declare_list_seq
+            \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
               { \@@_contents_add:N ##1 }
           }
           { \token_to_str:N \@writefile {#1} {#2} }
@@ -16114,7 +16131,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_contents_bookmarks:
   {
-    \seq_map_inline:Nn \l_@@_declare_list_seq
+    \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
       { \@@_unit_print_literal_aux:N ##1 }
     \cs_if_exist:NT \FB@fg
       { \cs_set_eq:NN \fg \FB@fg }
