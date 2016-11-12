@@ -20,8 +20,8 @@ if ! command -v texlua > /dev/null; then
   cd ..
 fi
 
-# Needed for any use of texlua even if not testing LuaTeX
-tlmgr install luatex
+# l3build itself and LuaTeX: need for texlua
+tlmgr install l3build luatex
 
 # Required to build plain and LaTeX formats:
 # TeX90 plain for unpacking
