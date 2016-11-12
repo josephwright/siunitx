@@ -18,18 +18,23 @@ if ! command -v texlua > /dev/null; then
   ./install-tl --profile=../texlive.profile
 
   cd ..
-  # Core requirements for the test system
-  tlmgr install babel babel-english l3build latex latex-bin latex-fonts \
-    latexconfig xetex
-  # tlmgr install --no-depends ptex uptex
 fi
 
-# Keep no backups (not required, simply makes cache bigger)
-tlmgr option autobackup 0
-# Update the TL install but add nothing new
-tlmgr update --self --all --no-auto-install
+# Needed for any use of texlua even if not testing LuaTeX
+tlmgr install luatex
+
+# Required to build plain and LaTeX formats:
+# TeX90 plain for unpacking
+tlmgr install cm etex knuth-lib latex-bin tex tex-ini-files unicode-data \
+  xetex
 
 # Dependencies
 tlmgr install \
   l3kernel     \
   l3packages
+
+# Keep no backups (not required, simply makes cache bigger)
+tlmgr option -- autobackup 0
+
+# Update the TL install but add nothing new
+tlmgr update --self --all --no-auto-install
