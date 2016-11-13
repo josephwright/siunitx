@@ -658,7 +658,7 @@
 % \begin{macro}[aux]{\@@_parse_loop_main_digit:NNNNN}
 % \begin{macro}[aux]{\@@_parse_loop_main_decimal:NN}
 % \begin{macro}[aux]{\@@_parse_loop_main_uncert:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_main_complex:NN}
+% \begin{macro}[aux]{\@@_parse_loop_main_complex:N}
 % \begin{macro}[aux]{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}[aux]{\@@_parse_loop_main_store:NNN}
 % \begin{macro}[aux]{\@@_parse_loop_after_decimal:NNN}
@@ -768,7 +768,10 @@
               { \@@_parse_loop_main_uncert:NNN #1#2 #4 }
               {
                 \tl_if_in:NnTF \l_@@_input_complex_tl {#5}
-                  { \@@_parse_loop_main_complex:NN #1#2 }
+                  {
+                    \@@_parse_loop_main_store:NNN #1 #2 \c_true_bool
+                    \@@_parse_loop_main_complex:N #1
+                  }
                   {
                     \bool_if:NTF #4
                       {
@@ -853,9 +856,8 @@
 %   complex root token was given is covered by
 %   \cs{@@_parse_loop_root_swap:NNwNN}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main_complex:NN #1#2
+\cs_new_protected:Npn \@@_parse_loop_main_complex:N #1
   {
-    \@@_parse_loop_main_store:NNN #1#2 \c_true_bool
     \tl_set_eq:NN \l_@@_imaginary_tl #1
     \tl_clear:N #1
     \@@_parse_loop_complex_cleanup:wN
@@ -968,7 +970,7 @@
   {
     \quark_if_recursion_tail_stop:N #3
     \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
-      { \@@_parse_loop_main_complex:NN #1 \c_false_bool }
+      { \@@_parse_loop_main_complex:N #1 }
       {
         \bool_if:NTF #2
           {
