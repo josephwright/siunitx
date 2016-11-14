@@ -1130,10 +1130,16 @@
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
-        \tl_if_empty:NF \l_@@_real_tl
-          { \@@_format:N \l_@@_real_tl }
-        \tl_if_empty:NF \l_@@_imaginary_tl
-          { \@@_format:N \l_@@_imaginary_tl }
+        \tl_if_empty:NTF \l_@@_real_tl
+          {
+            \tl_if_empty:NF \l_@@_imaginary_tl
+              { \@@_format:N \l_@@_imaginary_tl }
+          }
+          {
+            \tl_if_empty:NTF \l_@@_imaginary_tl
+              { \@@_format:N \l_@@_real_tl }
+              { ??? }
+          }
       }
   }
 %    \end{macrocode}
