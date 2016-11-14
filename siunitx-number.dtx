@@ -1100,6 +1100,10 @@
 %      \l_@@_explicit_plus_bool     ,
 %      \l_@@_exponent_base_tl       ,
 %      \l_@@_exponent_product_tl    ,
+%      \l_@@_group_decimal_bool     ,
+%      \l_@@_group_integer_bool     ,
+%      \l_@@_group_minimum_int      ,
+%      \l_@@_group_separator_tl     ,
 %      \l_@@_negative_color_tl      ,
 %      \l_@@_bracket_open_tl        ,
 %      \l_@@_output_uncert_close_tl ,
@@ -1119,6 +1123,31 @@
     explicit-plus            .bool_set:N = \l_@@_explicit_plus_bool     ,
     exponent-base            .tl_set:N   = \l_@@_exponent_base_tl       ,
     exponent-product         .tl_set:N   = \l_@@_exponent_product_tl    ,
+    group-digits             .choice:                                   ,
+    group-digits / all       .code:n     =
+      {
+        \bool_set_true:N \l_@@_group_decimal_bool
+        \bool_set_true:N \l_@@_group_integer_bool
+      } ,
+    group-digits / decimal   .code:n     =
+      {
+        \bool_set_true:N  \l_@@_group_decimal_bool
+        \bool_set_false:N \l_@@_group_integer_bool
+
+      } ,
+    group-digits / integer   .code:n     =
+      {
+        \bool_set_false:N \l_@@_group_decimal_bool
+        \bool_set_true:N  \l_@@_group_integer_bool
+      } ,
+    group-digits / none      .code:n     =
+      {
+        \bool_set_false:N \l_@@_group_decimal_bool
+        \bool_set_false:N \l_@@_group_integer_bool
+      } ,
+    group-digits             .default:n  = all                          ,
+    group-minimum-digits     .int_set:N  = \l_@@_group_minimum_int      ,
+    group-separator          .tl_set:N   = \l_@@_group_separator_tl     ,
     negative-color           .tl_set:N   = \l_@@_negative_color_tl      ,
     open-bracket             .tl_set:N   = \l_@@_bracket_open_tl        ,
     output-close-uncertainty .tl_set:N   = \l_@@_output_uncert_close_tl ,
@@ -1129,6 +1158,8 @@
     unity-mantissa           .bool_set:N = \l_@@_unity_mantissa_bool    ,
     zero-exponent            .bool_set:N = \l_@@_zero_exponent_bool     ,
   }
+\bool_new:N \l_@@_group_decimal_bool
+\bool_new:N \l_@@_group_integer_bool
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1325,7 +1356,10 @@
     close-bracket            = )                                      ,
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
-    exponent-product         = \times                                 , % (
+    exponent-product         = \times                                 ,
+    group-digits             = all                                    ,
+    group-minimum-digits     = 4                                      ,
+    group-separator          = \,                                     , % (
     input-close-uncertainty  = )                                      ,
     input-complex-roots      = ij                                     ,
     input-comparators        = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
