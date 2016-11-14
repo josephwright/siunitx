@@ -8319,70 +8319,7 @@
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{
-%  \@@_number_format_sign:n        ,
-%  \@@_number_format_sign_complex:
-%}
-%\begin{macro}[aux]{
-%  \@@_number_format_sign_aux:n               ,
-%  \@@_number_format_sign_negative_brackets:n ,
-%  \@@_number_format_sign_complex:n
-%}
-% Some simple sign manipulation: for tight signs, a little shuffling.
-% In the complex number case, there is a need for a correction to get
-% the right formatting in text mode. For speed reasons, this is done in
-% a separate function.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_number_format_sign:n #1 {
-  \prop_if_in:NnT \l_@@_number_out_prop {#1}
-    {
-      \prop_get:NnNT \l_@@_number_in_prop { #1 -sign }
-        \l_@@_tmpa_tl
-        {
-          \bool_if:NTF \l_@@_negative_bracket_bool
-            {
-              \str_if_eq:VnTF \l_@@_tmpa_tl { - }
-                { \@@_number_format_sign_negative_brackets:n {#1} }
-                { \@@_number_format_sign_aux:n {#1} }
-            }
-            { \@@_number_format_sign_aux:n {#1} }
-        }
-    }
-}
-\cs_new_protected:Npn \@@_number_format_sign_aux:n #1 {
-  \bool_if:NT \l_@@_tight_bool
-    {
-      \tl_set:Nx \l_@@_tmpa_tl
-        { { \exp_not:V \l_@@_tmpa_tl } }
-    }
-  \tl_clear:N \l_@@_tmpb_tl
-  \tl_put_left:NV \l_@@_tmpb_tl \l_@@_tmpa_tl
-  \prop_put:NnV \l_@@_number_out_prop { #1 -sign }
-    \l_@@_tmpb_tl
-  \prop_get:NnN \l_@@_number_out_prop {#1} \l_@@_tmpa_tl
-  \tl_put_left:NV \l_@@_tmpa_tl \l_@@_tmpb_tl
-  \prop_put:NnV \l_@@_number_out_prop {#1} \l_@@_tmpa_tl
-  \prop_get:NnNT \l_@@_number_out_prop { #1 -result }
-    \l_@@_tmpa_tl
-    {
-      \tl_put_left:NV \l_@@_tmpa_tl \l_@@_tmpb_tl
-      \prop_put:NnV \l_@@_number_out_prop { #1 -result }
-        \l_@@_tmpa_tl
-    }
-}
-\cs_new_protected:Npn
-  \@@_number_format_sign_negative_brackets:n #1
-  {
-    \@@_number_format_brackets_aux:n {#1}
-    \prop_get:NnNT \l_@@_number_out_prop { #1 }
-      \l_@@_tmpa_tl
-      {
-        \tl_put_left:NV \l_@@_tmpa_tl \l_@@_bracket_open_tl
-        \tl_put_right:NV \l_@@_tmpa_tl \l_@@_bracket_close_tl
-        \prop_put:NnV \l_@@_number_out_prop { #1  }
-          \l_@@_tmpa_tl
-      }
-  }
 \cs_new_protected:Npn \@@_number_format_sign_complex: {
   \@@_number_format_sign_complex:n { complex }
   \@@_number_format_sign_complex:n { complex-result }
@@ -8418,8 +8355,6 @@
     }
 }
 %    \end{macrocode}
-%\end{macro}
-%\end{macro}
 %
 %\begin{macro}{\@@_number_format_uncertainty:n}
 %\begin{macro}[aux]{
