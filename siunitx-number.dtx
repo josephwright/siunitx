@@ -1132,11 +1132,14 @@
 % \begin{macro}[int, EXP]{\@@_format:Nn}
 % \begin{macro}[aux, EXP]{\@@_format:nNnnnNn}
 % \begin{macro}[aux, EXP]{\@@_format_comparator:n}
-% \begin{macro}[aux, EXP]{\@@_format_sign:N}
+% \begin{macro}[aux, EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
+% \begin{macro}[aux, EXP]
+%   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
 % \begin{macro}[aux, EXP]{\@@_format_integer:n}
 % \begin{macro}[aux, EXP]{\@@_format_decimal:n}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nn}
+% \begin{macro}[aux, EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts
 %    \begin{macrocode}
@@ -1150,12 +1153,56 @@
     \@@_format_decimal:n {#4}
     \@@_format_uncertainty:nnn {#5} {#3} {#4}
     \@@_format_exponent:Nn #6 {#7}
+    \@@_format_end:
   }
 \cs_new:Npn \@@_format_comparator:n #1
   {
   }
+%    \end{macrocode}
+%  Formatting signs has to deal with some additional formatting requirements
+%  for negative numbers. Both making such numbers a fixed color and bracketing
+%  them needs some rearrangement of the order of tokens, which is set up in the
+%  main formatting macro by the dedicated do-nothing end function.
+%    \begin{macrocode}
 \cs_new:Npn \@@_format_sign:N #1
   {
+    \str_if_eq:nnTF {#1} { + }
+      {
+        \bool_if:NT \l_@@_explicit_plus_bool
+          { \@@_format_sign_aux:N #1 }
+      }
+      {
+        \str_if_eq:nnTF {#1} { - }
+          {
+            \tl_if_empty:NF \l_@@_negative_color_tl
+              { \@@_format_sign_color:w }
+            \bool_if:NT \l_@@_bracket_negative_bool
+              { \@@_format_sign_brackets:w }
+            \@@_format_sign_aux:N #1
+          }
+          { \@@_format_sign_aux:N #1 }
+      }
+  }
+\cs_new:Npn \@@_format_sign_aux:N #1
+  {
+    \bool_if:NTF \l_@@_tight_bool
+      { {#1} }
+      {#1}
+  }
+\cs_new:Npn \@@_format_sign_color:w #1 \@@_format_end:
+  {
+    \exp_not:N \textcolor { \exp_not:V \l_@@_negative_color_tl }
+      {
+        #1
+        \@@_format_end:
+      }
+  }
+\cs_new:Npn \@@_format_sign_brackets:w #1 \@@_format_end:
+  {
+    \l_@@_bracket_open_tl
+    #1
+    \l_@@_bracket_close_tl
+    \@@_format_end:
   }
 \cs_new:Npn \@@_format_integer:n #1
   {
@@ -1169,7 +1216,10 @@
 \cs_new:Npn \@@_format_exponent:Nn #1#2
   {
   }
+\cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
