@@ -1162,7 +1162,7 @@
 % \begin{macro}[aux, EXP]{\@@_format_integer:n}
 % \begin{macro}[aux, EXP]{\@@_format_decimal:n}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
-% \begin{macro}[aux, EXP]{\@@_format_exponent:Nn}
+% \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts
@@ -1176,7 +1176,7 @@
     \@@_format_integer:n {#3}
     \@@_format_decimal:n {#4}
     \@@_format_uncertainty:nnn {#5} {#3} {#4}
-    \@@_format_exponent:Nn #6 {#7}
+    \@@_format_exponent:Nnn #6 {#7} { #3 . #4 }
     \@@_format_end:
   }
 \cs_new:Npn \@@_format_comparator:n #1
@@ -1237,8 +1237,45 @@
 \cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
   {
   }
-\cs_new:Npn \@@_format_exponent:Nn #1#2
+%    \end{macrocode}
+%   Setting the exponent part requires some information about the mantissa:
+%   was it there or not. This means that whilst only the sign and value for
+%   the exponent are typeset here, there is a need to also have access to the
+%   combined mantissa part (with a decimal marker). The rest of the work is
+%   about picking up the various options and getting the combinations right.
+%   For signs, the auxiliary from the main sign routine can be used, but not
+%   the main function: negative exponents don't have special handling.
+%    \begin{macrocode}
+\cs_new:Npn \@@_format_exponent:Nnn #1#2#3
   {
+    \bool_if:nT
+      {
+            \l_@@_zero_exponent_bool
+        || ! ( \str_if_eq_p:nn {#2} { 0 } )
+      }
+      {
+        \bool_if:nF
+          {
+               \str_if_eq_p:nn {#3} { 1. }
+            && ! \l_@@_unity_mantissa_bool
+          }
+          {
+            \bool_if:NTF \l_@@_tight_bool
+              { { \exp_not:V \l_@@_exponent_product_tl } }
+              { \exp_not:V \l_@@_exponent_product_tl }
+          }
+        \exp_not:V \l_@@_exponent_base_tl
+        ^
+          {
+            \bool_if:nT
+              {
+                \l_@@_explicit_plus_bool
+                || ! ( \str_if_eq_p:nn {#1} { + } )
+              }
+              { \@@_format_sign_aux:N #1 }
+            \exp_not:n {#2}
+          }
+      }
   }
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
