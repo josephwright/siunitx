@@ -1190,8 +1190,9 @@
 % \begin{macro}[aux, EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
 % \begin{macro}[aux, EXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
-% \begin{macro}[aux, EXP]{\@@_format_digits:nn}
 % \begin{macro}[aux, EXP]{\@@_format_integer:n, \@@_format_decimal:n}
+% \begin{macro}[aux, EXP]{\@@_format_digits:nn}
+% \begin{macro}[aux, EXP]{\@@_format_integer_aux:n, \@@_format_decimal_aux:n}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
@@ -1204,8 +1205,8 @@
   {
     \@@_format_comparator:n {#1}
     \@@_format_sign:N #2
-    \@@_format_digits:nn { integer } {#3}
-    \@@_format_digits:nn { decimal } {#4}
+    \@@_format_integer:n {#3}
+    \@@_format_decimal:n {#4}
     \@@_format_uncertainty:nnn {#5} {#3} {#4}
     \@@_format_exponent:Nnn #6 {#7} { #3 . #4 }
     \@@_format_end:
@@ -1262,25 +1263,35 @@
     \@@_format_end:
   }
 %    \end{macrocode}
-%  Digit formatting starts of with some shared ideas: at the cost of a little
-%  function name generation, some repetition is avoided. Assuming grouping is
-%  request this is done by dedicated functions as the two parts need different
-%  approaches.
+%  Digit formatting leads off with separate functions to allow for a few
+%  \enquote{up front} items before using a common set of tests for some common
+%  cases. The code then splits again as the two types of grouping need
+%  different strategies.
 %    \begin{macrocode}
+\cs_new:Npn \@@_format_integer:n #1
+  {
+    \@@_format_digits:nn { integer } {#1}
+  }
+\cs_new:Npn \@@_format_decimal:n #1
+  {
+    \tl_if_blank:nF {#1}
+      { \exp_not:V \l_@@_output_decimal_tl }
+    \@@_format_digits:nn { decimal } {#1}
+  }
 \cs_new:Npn \@@_format_digits:nn #1#2
   {
     \bool_if:cTF { l_@@_group_ #1 _ bool }
       {
         \int_compare:nNnTF { \tl_count:n {#2} } < \l_@@_group_minimum_int
           { \exp_not:n {#2} }
-          { \use:c { @@_format_ #1 :n } {#2} }
+          { \use:c { @@_format_ #1 _aux:n } {#2} }
       }
       { \exp_not:n {#2} }
   }
-\cs_new:Npn \@@_format_integer:n #1
+\cs_new:Npn \@@_format_integer_aux:n #1
   {
   }
-\cs_new:Npn \@@_format_decimal:n #1
+\cs_new:Npn \@@_format_decimal_aux:n #1
   {
   }
 \cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
@@ -1332,6 +1343,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
