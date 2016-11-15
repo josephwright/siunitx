@@ -1193,6 +1193,14 @@
 % \begin{macro}[aux, EXP]{\@@_format_integer:n, \@@_format_decimal:n}
 % \begin{macro}[aux, EXP]{\@@_format_digits:nn}
 % \begin{macro}[aux, EXP]{\@@_format_integer_aux:n, \@@_format_decimal_aux:n}
+% \begin{macro}[aux, EXP]
+%   {
+%     \@@_format_integer_aux_0:n,
+%     \@@_format_integer_aux_1:n,
+%     \@@_format_decimal_aux_2:n
+%   }
+% \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
+% \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
@@ -1269,9 +1277,7 @@
 %  different strategies.
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_integer:n #1
-  {
-    \@@_format_digits:nn { integer } {#1}
-  }
+  { \@@_format_digits:nn { integer } {#1} }
 \cs_new:Npn \@@_format_decimal:n #1
   {
     \tl_if_blank:nF {#1}
@@ -1288,8 +1294,38 @@
       }
       { \exp_not:n {#2} }
   }
+%    \end{macrocode}
+%   For integers, we need to know how many digits there are to allow for the
+%   correct insertion of separators. That is done using a two-part set up such
+%   that there is no separator on the first pass.
+%    \begin{macrocode}
 \cs_new:Npn \@@_format_integer_aux:n #1
   {
+     \use:c
+       {
+         @@_format_integer_aux_
+         \int_eval:n { \int_mod:nn { \tl_count:n {#1} } { 3 } }
+         :n
+       } {#1}
+  }
+\cs_new:cpn { @@_format_integer_aux_0:n } #1
+  { \@@_format_integer_first:nnNN #1 \q_nil }
+\cs_new:cpn { @@_format_integer_aux_1:n } #1
+  { \@@_format_integer_first:nnNN { } { } #1 \q_nil }
+\cs_new:cpn { @@_format_integer_aux_2:n } #1
+  { \@@_format_integer_first:nnNN { } #1 \q_nil }
+\cs_new:Npn \@@_format_integer_first:nnNN #1#2#3#4
+  {
+    \exp_not:n {#1#2#3}
+    \quark_if_nil:NF #4
+      { \@@_format_integer_loop:NNNN #4 }
+  }
+\cs_new:Npn \@@_format_integer_loop:NNNN #1#2#3#4
+  {
+    \exp_not:V \l_@@_group_separator_tl
+    \exp_not:n {#1#2#3}
+    \quark_if_nil:NF #4
+      { \@@_format_integer_loop:NNNN #4 }
   }
 %    \end{macrocode}
 %   For decimals, no need to do any counting, just loop using enough markers to
@@ -1361,6 +1397,9 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
