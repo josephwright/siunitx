@@ -1190,7 +1190,8 @@
 % \begin{macro}[aux, EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
 % \begin{macro}[aux, EXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
-% \begin{macro}[aux, EXP]{\@@_format_integer:n, \@@_format_decimal:n}
+% \begin{macro}[aux, EXP]{\@@_format_integer:nnn}
+% \begin{macro}[aux, EXP]{\@@_format_decimal:n}
 % \begin{macro}[aux, EXP]{\@@_format_digits:nn}
 % \begin{macro}[aux, EXP]{\@@_format_integer_aux:n}
 % \begin{macro}[aux, EXP]
@@ -1215,7 +1216,7 @@
   {
     \@@_format_comparator:n {#1}
     \@@_format_sign:N #2
-    \@@_format_integer:n {#3}
+    \@@_format_integer:nnn {#3} {#4} {#7}
     \@@_format_decimal:n {#4}
     \@@_format_uncertainty:nnn {#5} {#3} {#4}
     \@@_format_exponent:Nnn #6 {#7} { #3 . #4 }
@@ -1278,8 +1279,17 @@
 %   cases. The code then splits again as the two types of grouping need
 %   different strategies.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_integer:n #1
-  { \@@_format_digits:nn { integer } {#1} }
+\cs_new:Npn \@@_format_integer:nnn #1#2#3
+  {
+    \bool_if:nF
+      {
+           \str_if_eq_p:nn {#1} { 1 }
+        && \tl_if_blank_p:n {#2}
+        && ! ( \str_if_eq_p:nn {#3} { 0 } )
+        && ! \l_@@_unity_mantissa_bool
+      }
+      { \@@_format_digits:nn { integer } {#1} }
+  }
 \cs_new:Npn \@@_format_decimal:n #1
   {
     \tl_if_blank:nF {#1}
@@ -1389,7 +1399,7 @@
                 || ! ( \str_if_eq_p:nn {#1} { + } )
               }
               { \@@_format_sign_aux:N #1 }
-            \@@_format_integer:n {#2}
+            \@@_format_digits:nn { integer } {#2}
           }
       }
   }
@@ -1399,6 +1409,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
