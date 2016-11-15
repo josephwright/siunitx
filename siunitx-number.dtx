@@ -1291,8 +1291,29 @@
 \cs_new:Npn \@@_format_integer_aux:n #1
   {
   }
+%    \end{macrocode}
+%   For decimals, no need to do any counting, just loop using enough markers to
+%   fnd the end of the list.
+%    \begin{macrocode}
 \cs_new:Npn \@@_format_decimal_aux:n #1
+  { \@@_format_decimal_loop:NNN #1 \q_nil \q_nil \q_nil \q_stop }
+\cs_new:Npn \@@_format_decimal_loop:NNN #1#2#3
   {
+    \quark_if_nil:NTF #3
+      {
+        \quark_if_nil:NTF #2
+          {
+            \quark_if_nil:NF #1
+              { \exp_not:n {#1} }
+          }
+          { \exp_not:n {#1#2} }
+        \use_none_delimit_by_q_stop:w
+      }
+      {
+        \exp_not:n {#1#2#3}
+        \exp_not:V \l_@@_group_separator_tl
+        \@@_format_decimal_loop:NNN
+      }
   }
 \cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
   {
