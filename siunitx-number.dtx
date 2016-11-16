@@ -1364,6 +1364,16 @@
   }
 \cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
   {
+    \tl_if_blank:nF {#1}
+      {
+        \bool_if:NTF \l_@@_uncert_separate_bool
+          { }
+          {
+            \exp_not:V \l_@@_output_uncert_open_tl
+            \exp_not:n {#1}
+            \exp_not:V \l_@@_output_uncert_close_tl
+          }
+      }
   }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
