@@ -1193,7 +1193,7 @@
 % \begin{macro}[aux, EXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
 % \begin{macro}[aux, EXP]{\@@_format_integer:nnn}
-% \begin{macro}[aux, EXP]{\@@_format_decimal:n}
+% \begin{macro}[aux, EXP]{\@@_format_decimal:n, \@@_format_decimal:f}
 % \begin{macro}[aux, EXP]{\@@_format_digits:nn}
 % \begin{macro}[aux, EXP]{\@@_format_integer_aux:n}
 % \begin{macro}[aux, EXP]
@@ -1207,6 +1207,8 @@
 % \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
+% \begin{macro}[aux, EXP]
+%   {\@@_format_uncertainty_aux:nnn, \@@_format_uncertainty_aux:fnn}
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
@@ -1298,6 +1300,7 @@
       { \exp_not:V \l_@@_output_decimal_tl }
     \@@_format_digits:nn { decimal } {#1}
   }
+\cs_generate_variant:Nn \@@_format_decimal:n { f }
 \cs_new:Npn \@@_format_digits:nn #1#2
   {
     \bool_if:cTF { l_@@_group_ #1 _ bool }
@@ -1362,12 +1365,22 @@
         \@@_format_decimal_loop:NNN
       }
   }
+%    \end{macrocode}
+%   Uncertainties which are directly attached are easy to deal with. For those
+%   that are separated, the first step is to find if they are entirely
+%   contained within the decimal part, and to pad if they are.
+%    \begin{macrocode}
 \cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
   {
     \tl_if_blank:nF {#1}
       {
         \bool_if:NTF \l_@@_uncert_separate_bool
-          { }
+          {
+            \@@_format_sign_aux:N \pm
+            \@@_format_uncertainty_aux:fnn
+              { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#3} } }
+              {#1} {#2}
+          }
           {
             \exp_not:V \l_@@_output_uncert_open_tl
             \exp_not:n {#1}
@@ -1375,6 +1388,20 @@
           }
       }
   }
+\cs_new:Npn \@@_format_uncertainty_aux:nnn #1#2#3
+  {
+    \int_compare:nNnTF {#1} > 0
+      { }
+      {
+        0
+        \@@_format_decimal:f
+          {
+            \prg_replicate:nn { \int_abs:n {#1} } { 0 }
+            #2
+          }
+      }
+  }
+\cs_generate_variant:Nn \@@_format_uncertainty_aux:nnn { f }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
 %   was it there or not. This means that whilst only the sign and value for
@@ -1421,6 +1448,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
