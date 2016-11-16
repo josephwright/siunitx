@@ -1211,9 +1211,12 @@
 % \begin{macro}[aux, EXP]{\@@_format_decimal_loop:NNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
-% \begin{macro}[aux, EXP]{\@@_format_uncertainty:nnn}
+% \begin{macro}[aux, EXP]{\@@_format_uncertainty:nn}
 % \begin{macro}[aux, EXP]
-%   {\@@_format_uncertainty_aux:nnn, \@@_format_uncertainty_aux:fnn}
+%   {\@@_format_uncertainty_aux:nn, \@@_format_uncertainty_aux:fn}
+% \begin{macro}[aux, EXP]
+%   {\@@_format_uncertainty:nnw, \@@_format_uncertainty:fnw}
+% \begin{macro}[aux, EXP]{\@@_format_uncertainty:nw}
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
@@ -1227,7 +1230,7 @@
     \@@_format_sign:N #2
     \@@_format_integer:nnn {#3} {#4} {#7}
     \@@_format_decimal:n {#4}
-    \@@_format_uncertainty:nnn {#5} {#3} {#4}
+    \@@_format_uncertainty:nn {#5} {#4}
     \@@_format_exponent:Nnn #6 {#7} { #3 . #4 }
     \@@_format_end:
   }
@@ -1376,18 +1379,21 @@
 %    \end{macrocode}
 %   Uncertainties which are directly attached are easy to deal with. For those
 %   that are separated, the first step is to find if they are entirely
-%   contained within the decimal part, and to pad if they are.
+%   contained within the decimal part, and to pad if they are. For the case
+%   where the boundary is crossed to the integer part, the correct number of
+%   digit tokens need to be removed from the start of the uncertainty and
+%   the split result sent to the appropriate auxiliaries.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
+\cs_new:Npn \@@_format_uncertainty:nn #1#2
   {
     \tl_if_blank:nF {#1}
       {
         \bool_if:NTF \l_@@_uncert_separate_bool
           {
             \@@_format_sign_aux:N \pm
-            \@@_format_uncertainty_aux:fnn
-              { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#3} } }
-              {#1} {#2}
+            \@@_format_uncertainty_aux:fn
+              { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#2} } }
+              {#1}
           }
           {
             \exp_not:V \l_@@_output_uncert_open_tl
@@ -1396,10 +1402,15 @@
           }
       }
   }
-\cs_new:Npn \@@_format_uncertainty_aux:nnn #1#2#3
+\cs_new:Npn \@@_format_uncertainty_aux:nn #1#2
   {
     \int_compare:nNnTF {#1} > 0
-      { }
+      {
+        \@@_format_uncertainty_aux:fnw
+          { \int_eval:n { #1 - 1 } }
+          { }
+          #2 \q_nil
+      }
       {
         0
         \@@_format_decimal:f
@@ -1409,7 +1420,26 @@
           }
       }
   }
-\cs_generate_variant:Nn \@@_format_uncertainty_aux:nnn { f }
+\cs_generate_variant:Nn \@@_format_uncertainty_aux:nn { f }
+\cs_new:Npn \@@_format_uncertainty_aux:nnw #1#2#3
+  {
+    \quark_if_nil:NF #3
+      {
+        \int_compare:nNnTF {#1} = 0
+          { \@@_format_uncertainty_aux:nw {#2#3} }
+          {
+            \@@_format_uncertainty_aux:fnw
+              { \int_eval:n { #1 - 1 } }
+              {#2#3}
+          }
+      }
+  }
+\cs_generate_variant:Nn \@@_format_uncertainty_aux:nnw { f }
+\cs_new:Npn \@@_format_uncertainty_aux:nw #1#2 \q_nil
+  {
+    \@@_format_digits:nn { integer } {#1}
+    \@@_format_decimal:n {#2}
+  }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
 %   was it there or not. This means that whilst only the sign and value for
@@ -1456,6 +1486,8 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
