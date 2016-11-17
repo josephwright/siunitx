@@ -1236,7 +1236,7 @@
     \tl_set:Nx \l_@@_tmp_tl { #1 - #2 }
     \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
       {
-        \msg_error:nnxx { siunitx / unit } { duplicate-part }
+        \msg_error:nnxx { siunitx } { unit / duplicate-part }
           { \exp_not:n {#1} } { \token_to_str:N #3 }
       }
       { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl {#4} }
@@ -1276,8 +1276,8 @@
           {#1} {#2}
       }
       {
-        \msg_error:nnxx { siunitx / unit }
-          { part-before-unit } { power } { \token_to_str:N #1 }
+        \msg_error:nnxx { siunitx }
+          { unit / part-before-unit } { power } { \token_to_str:N #1 }
       }
   }
 \cs_new_protected:Npn \@@_parse_qualifier:nn #1#2
@@ -1290,8 +1290,8 @@
           { \int_use:N \l_@@_position_int } {#1} {#2}
       }
       {
-        \msg_error:nnnn { siunitx / unit }
-          { part-before-unit } { qualifier } { \token_to_str:N #1 }
+        \msg_error:nnnn { siunitx }
+          { unit / part-before-unit } { qualifier } { \token_to_str:N #1 }
       }
   }
 %    \end{macrocode}
@@ -1345,7 +1345,7 @@
       {
         \bool_set_true:N \l_@@_per_bool
         \cs_set_protected:Npn \per
-          { \msg_error:nn { siunitx / unit } { duplicate-sticky-per } }
+          { \msg_error:nn { siunitx } { unit / duplicate-sticky-per } }
       }
       {
         \@@_parse_add:nnnn
@@ -1400,7 +1400,7 @@
         \tl_set:Nx \l_@@_tmp_tl
           { ##1 - \int_eval:n { \l_@@_position_int + 1 } }
         \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
-          { \msg_error:nnn { siunitx / unit } { dangling-part } { ##1 } }
+          { \msg_error:nnn { siunitx } { unit / dangling-part } { ##1 } }
       }
   }
 %    \end{macrocode}
@@ -2388,25 +2388,25 @@
 % \subsection{Messages}
 %
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx / unit } { dangling-part }
+\msg_new:nnnn { siunitx } { unit / dangling-part }
   { Found~#1~part~with~no~unit. }
   {
     Each~#1~part~must~be~associated~with~a~unit:~a~#1~part~was~found~
     but~no~following~unit~was~given.
   }
-\msg_new:nnnn { siunitx / unit } { duplicate-part }
+\msg_new:nnnn { siunitx } { unit / duplicate-part }
   { Duplicate~#1~part:~#2. }
   {
     Each~unit~may~have~only~one~#1:\\
     the~additional~#1~part~'#2'~will~be~ignored.
   }
-\msg_new:nnnn { siunitx / unit } { duplicate-sticky-per }
+\msg_new:nnnn { siunitx } { unit / duplicate-sticky-per }
   { Duplicate~\token_to_str:N \per. }
   {
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
-\msg_new:nnnn { siunitx / unit } { part-before-unit }
+\msg_new:nnnn { siunitx } { unit / part-before-unit }
   { Found~#1~part~before~first~unit:~#2. }
   {
     The~#1~part~'#2'~must~follow~after~a~unit:~
