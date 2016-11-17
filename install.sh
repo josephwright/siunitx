@@ -34,6 +34,8 @@ tlmgr install  \
   graphics     \
   graphics-cfg \
   graphics-def \
+  mptopdf      \
+  oberdiek     \
   l3kernel     \
   l3packages
 
