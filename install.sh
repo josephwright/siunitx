@@ -29,7 +29,11 @@ tlmgr install cm etex knuth-lib latex-bin tex tex-ini-files unicode-data \
   xetex
 
 # Dependencies
-tlmgr install \
+tlmgr install  \
+  amsmath      \
+  graphics     \
+  graphics-cfg \
+  graphics-def \
   l3kernel     \
   l3packages
 
