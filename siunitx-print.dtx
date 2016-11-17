@@ -81,6 +81,20 @@
 %<@@=siunitx_print>
 %    \end{macrocode}
 %
+% \subsection{Initial set up}
+%
+% The printing routines depend on \pkg{amstext} for text mode working.
+%    \begin{macrocode}
+\RequirePackage { amstext }
+%    \end{macrocode}
+%
+% Color support is always required
+%    \begin{macrocode}
+\RequirePackage { color }
+%    \end{macrocode}
+%
+% \subsection{Printing routines}
+%
 % \begin{variable}[int]
 %   {
 %     \l_@@_number_color_tl ,
@@ -113,17 +127,47 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print:nn #1#2
   {
-    \tl_if_blank:cTF { l_@@_ #1 _color_tl }
+    \tl_if_empty:cTF { l_@@_ #1 _color_tl }
       { \use:n }
       { \exp_args:Nv \textcolor { l_@@_ #1 _color_tl } }
-      {
-        \use:c
-          { @@_ \tl_use:c { l_@@_ #1 _mode_tl } : n }
-            {#2}
-      }
+        {
+          \use:c
+            { @@_ \tl_use:c { l_@@_ #1 _mode_tl } : n }
+              {#2}
+        }
   }
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}[int]{\@@_match:n, \@@_math:n, \@@_text:n}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_match:n #1
+  {
+    \mod_if_math:TF
+      { \@@_math:n {#1} }
+      { \@@_text:n {#1} }
+  }
+\cs_new_protected:Npn \@@_math:n #1
+  { \ensuremath {#1} }
+\cs_new_protected:Npn \@@_text:n #1
+  { \text {#1} }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Standard settings for module options}
+%
+% Some of these follow naturally from the point of definition
+% (\emph{e.g.}~boolean variables are always |false| to begin with),
+% but for clarity everything is set here.
+%    \begin{macrocode}
+\keys_set:nn { siunitx / print }
+  {
+    number-color =      ,
+    number-mode  = math ,
+    unit-color   =      ,
+    unit-mode    = math
+  }
+%    \end{macrocode}
 %
 %    \begin{macrocode}
 %</package>

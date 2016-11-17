@@ -1,0 +1,25 @@
+\input{regression-test}
+
+\RequirePackage{siunitx}
+
+\START
+\AUTHOR{Joseph Wright}
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Printing~units }
+  {
+    \test:nn { unit } { \mathrm {J}\,\mathrm {mol}^{-1}\,\mathrm {K}^{-1} }
+  }
+
+\END
