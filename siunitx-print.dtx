@@ -113,13 +113,14 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print:nn #1#2
   {
-    \group_begin:
-      \tl_if_blank:cF { l_@@_ #1 _color_tl }
-        {  \exp_args:Nv \color { l_@@_ #1 _color_tl } }
-      \use:c
-        { @@_ \tl_use:c { l_@@_ #1 _mode_tl } : n }
-          {#2}
-    \group_end:
+    \tl_if_blank:cTF { l_@@_ #1 _color_tl }
+      { \use:n }
+      { \exp_args:Nv \textcolor { l_@@_ #1 _color_tl } }
+      {
+        \use:c
+          { @@_ \tl_use:c { l_@@_ #1 _mode_tl } : n }
+            {#2}
+      }
   }
 %    \end{macrocode}
 % \end{macro}
