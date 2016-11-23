@@ -656,6 +656,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.6r}{2016/08/21}{Warn when color support is not available}
 % \changes{v2.6s}{2016/09/02}{Drop one excess warning}
 % \changes{v2.7}{2016/11/11}{Start adding documented code level interfaces}
+% \changes{v2.7}{2016/11/23}{Fix when \pkg{cellspace} is applied to
+%   math mode material}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -13400,6 +13402,18 @@ This work consists of the file  siunitx.dtx
         \msg_new:nnn { siunitx } { moved-cellspace-column }
           { Column~type~for~cellspace~package~moved~to~'#1'. }
         \msg_warning:nnn { siunitx } { moved-cellspace-column } { C }
+        \ifcellspace@m
+          \def \env@matrix
+            {
+              \hskip -\arraycolsep
+              \let \@ifnextchar \new@ifnextchar
+              \array
+                {
+                  * { \c@MaxMatrixCols }
+                    { > { \bcolumn c \@nil $ } c < { $ \ecolumn } } @ { }
+                }
+            }
+        \fi
       }
       { }
 }
