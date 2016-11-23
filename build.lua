@@ -18,6 +18,9 @@ typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
 -- Typeset only the .tex files
 typesetfiles = {"*.tex"}
 
+-- Auto-versioning
+versionform = "ProvidesExplPackage"
+
 -- Find and run the build system
 kpse.set_program_name ("kpsewhich")
 dofile (kpse.lookup ("l3build.lua"))
