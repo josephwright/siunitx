@@ -19,6 +19,7 @@ typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
 typesetfiles = {"*.tex"}
 
 -- Auto-versioning
+versionfiles = {"siunitx-v3.dtx"}
 versionform = "ProvidesExplPackage"
 
 -- Find and run the build system
