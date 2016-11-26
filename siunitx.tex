@@ -39,6 +39,72 @@ for those people who are interested.
 \NewDocumentCommand\ext{m}{\texttt{.#1}}
 \NewDocumentCommand\foreign{m}{\emph{#1}}
 
+% For creating code demonstrations
+% This needs access to some code-level interfaces in listings
+\usepackage{listings}
+\makeatletter
+\lst@RequireAspects{writefile}
+\newsavebox\LaTeXdemo@box
+\lstnewenvironment{LaTeXdemo}[1][code and example]
+  {%
+    \global\let\lst@intname\@empty
+    \edef\LaTeXdemo@end{%
+      \expandafter\noexpand\csname LaTeXdemo@@#1@end\endcsname
+    }%
+    \@nameuse{LaTeXdemo@@#1}%
+  }
+  {\LaTeXdemo@end}
+\newcommand\LaTeXdemo@new[3]{%
+  \@namedef{LaTeXdemo@@#1}{#2}%
+  \@namedef{LaTeXdemo@@#1@end}{#3}%
+}
+\newcommand*\LaTeXdemo@common{%
+  \setkeys{lst}
+    {%
+       basicstyle   = \small\ttfamily,
+       basewidth    = 0.51em,
+       gobble       = 2,
+       keywordstyle = \color{blue},
+       language     = [LaTeX]{TeX},
+       moretexcs    =
+         {%
+           num,
+           si
+         }
+    }%
+}
+\newcommand*\LaTeXdemo@input{%
+  \input{\jobname.tmp}%
+}
+\LaTeXdemo@new{code and example}{%
+  \setbox\LaTeXdemo@box=\hbox\bgroup
+    \lst@BeginAlsoWriteFile{\jobname.tmp}%
+    \LaTeXdemo@common
+}{%
+    \lst@EndWriteFile
+  \egroup
+  \begin{center}
+    \ifdim\wd\LaTeXdemo@box>0.48\linewidth
+      \begin{minipage}{\linewidth}
+        \usebox\LaTeXdemo@box
+      \end{minipage}%
+      \par
+      \begin{minipage}{\linewidth}
+        \LaTeXdemo@input
+      \end{minipage}
+    \else
+      \begin{minipage}{0.48\linewidth}
+        \LaTeXdemo@input
+      \end{minipage}%
+      \hfil
+      \begin{minipage}{0.48\linewidth}
+        \usebox\LaTeXdemo@box
+      \end{minipage}%
+    \fi
+  \end{center}
+}
+\makeatother
+
 \begin{document}
 
 \GetFileInfo{siunitx.sty}
