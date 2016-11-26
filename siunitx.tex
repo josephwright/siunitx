@@ -171,6 +171,35 @@ through option settings. In this way, users can use \pkg{siunitx} to follow the
 requirements of publishers, co-authors, universities, \foreign{etc}.\ without
 needing to alter the input at all.
 
+\section{Using the \pkg{siunitx} package}
+
+\DescribeMacro{\num}
+\begin{syntax}
+  \cs{num}\oarg{options}\marg{number}
+\end{syntax}
+Numbers are automatically formatted by the \cs{num} macro. This takes one
+optional argument, \meta{options}, and one mandatory one, \meta{number}. The
+contents of \meta{number} are automatically formatted. The formatter removes
+both \enquote{soft} (\verb*" ") and \enquote{hard} spaces ("\," and "~"),
+automatically identifies exponents (as standard marked using "e", "E", "d" or
+"D") and adds the appropriate spacing of large numbers. With the standard
+settings a leading zero is added before a decimal marker, if needed: both "."
+and "," are recognised as decimal markers.
+\begin{LaTeXdemo}
+  \num{123}     \\
+  \num{1234}    \\
+  \num{12345}   \\
+  \num{0.123}   \\
+  \num{0,1234}  \\
+  \num{.12345}  \\
+  \num{3.45d-4} \\
+  \num{-e10}
+\end{LaTeXdemo}
+
+Note that numbers are parsed before typesetting, which does have a performance
+overhead (only obvious with very large amounts of numerical input). The parser
+understands a range of input syntaxes, as demonstrated above.
+
 \section{Installation}
 
 For most users, there will be no need to explicitly install \pkg{siunitx}:
