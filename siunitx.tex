@@ -202,6 +202,46 @@ Note that numbers are parsed before typesetting, which does have a performance
 overhead (only obvious with very large amounts of numerical input). The parser
 understands a range of input syntaxes, as demonstrated above.
 
+\subsection{Units}
+
+\DescribeMacro{\unit}
+\begin{syntax}
+  \cs{unit}\oarg{options}\marg{unit}
+\end{syntax}
+The symbol for a unit can be typeset using the \cs{unit} macro: this provides
+full control over output format for the unit. Like the \cs{num} macro,
+\cs{unit} takes one optional and one mandatory argument. The unit formatting
+system can accept two types of input. When the \meta{unit} contains literal
+items (for example letters or numbers) then \pkg{siunitx} converts \texttt{.}
+and "~" into inter-unit product and correctly positions sub- and superscripts
+specified using "_" and "^". The formatting methods will work with both math
+and text mode.
+\begin{LaTeXdemo}
+  \unit{kg.m/s^2} \\
+  \unit{g_{polymer}~mol_{cat}.s^{-1}}
+\end{LaTeXdemo}
+
+The second operation mode for the \cs{unit} macro is an \enquote{interpreted}
+system, Here, each unit, SI multiple prefix and power is given a macro name.
+These are entered in a method very similar to the reading of the unit name in
+English.
+\begin{LaTeXdemo}
+  \unit{\kilo\gram\metre\per\square\second} \\
+  \unit{\gram\per\cubic\centi\metre}        \\
+  \unit{\square\volt\cubic\lumen\per\farad} \\
+  \unit{\metre\squared\per\gray\cubic\lux}  \\
+  \unit{\henry\second}
+\end{LaTeXdemo}
+
+On its own, this is less convenient than the direct method, although it does
+use meaning rather than appearance for input. However, the package allows you
+to define new unit macros; a large number of pre-defined abbreviations are also
+supplied. More importantly, by defining macros for units, instead of literal
+input, new functionality is made available. By altering the settings used by
+the package, the same input can yield a variety of different output formats.
+For example, the \cs{per} macro can give reciprocal powers, slashes or be used
+to construct units as fractions.
+
 \section{Installation}
 
 For most users, there will be no need to explicitly install \pkg{siunitx}:
