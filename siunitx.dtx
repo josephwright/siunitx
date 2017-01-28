@@ -658,6 +658,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7}{2016/11/11}{Start adding documented code level interfaces}
 % \changes{v2.7}{2016/11/23}{Fix when \pkg{cellspace} is applied to
 %   math mode material}
+% \changes{v2.7b}{2017/01/28}{Fix an issue with large numbers and
+%   scientific mode}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -8406,7 +8408,7 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_fixed_large:nnn #1
   {
-    \int_compare:nNnTF {#1} = 0
+    \@@_number_if_zero:nTF {#1}
       { \@@_number_process_fixed_large_aux:nnn { } }
       { \@@_number_process_fixed_large_aux:nnn {#1} }
   }
