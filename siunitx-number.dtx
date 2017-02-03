@@ -1241,10 +1241,13 @@
     \@@_format_end:
   }
 %    \end{macrocode}
-%    Not much exciting here!
+%   To get the spacing correct this needs to be an ordinary math character.
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_comparator:n #1
-  { \exp_not:n {#1} }
+  {
+    \tl_if_blank:nF {#1}
+      { \exp_not:n { \mathord {#1} } }
+  }
 %    \end{macrocode}
 %   Formatting signs has to deal with some additional formatting requirements
 %   for negative numbers. Both making such numbers a fixed color and bracketing
