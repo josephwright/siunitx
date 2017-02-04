@@ -161,6 +161,23 @@
 \RequirePackage{xparse}
 %    \end{macrocode}
 %
+% \begin{macro}{\qty}
+%    \begin{macrocode}
+\NewDocumentCommand \qty { O { } m m }
+  {
+    \leavevmode
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_number_format:nN {#2} \l_@@_tmp_tl
+      \siunitx_print:nV { number } \l_@@_tmp_tl
+      \, \nobreak % TEMP
+      \siunitx_unit_format:nN {#3} \l_@@_tmp_tl
+      \siunitx_print:nV { unit } \l_@@_tmp_tl
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\num}
 %    \begin{macrocode}
 \NewDocumentCommand \num { O { } m }
