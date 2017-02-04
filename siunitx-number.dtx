@@ -1102,6 +1102,45 @@
 %
 % \subsection{Processing numbers}
 %
+% \begin{variable}[int]
+%   {
+%     \l_@@_round_bool          ,
+%     \l_@@_round_half_up_bool  ,
+%     \l_@@_round_min_tl        ,
+%     \l_@@_round_places_bool   ,
+%     \l_@@_round_precision_int
+%   }
+%    \begin{macrocode}
+\keys_define:nn { siunitx / number }
+  {
+    round-half           .choice:                               ,
+    round-half / even    .code:n    =
+      { \bool_set_false:N \l_@@_round_half_up_bool } ,
+    round-half / up      .code:n    =
+      { \bool_set_true:N \l_@@_round_half_up_bool } ,
+    round-minimum        .tl_set:N  = \l_@@_round_min_tl        ,
+    round-mode           .choice:                               ,
+    round-mode / figures .code:n    =
+      {
+        \bool_set_true:N  \l_@@_round_bool
+        \bool_set_false:N \l_@@_round_places_bool
+      } ,
+    round-mode / none    .code:n    =
+      { \bool_set_false:N \l_@@_round_bool } ,
+    round-mode / places  .code:n    =
+      {
+        \bool_set_true:N \l_@@_round_bool
+        \bool_set_true:N \l_@@_round_places_bool
+      } ,
+    round-precision      .int_set:N = \l_@@_round_precision_int ,
+  }
+\bool_new:N \l_@@_round_bool
+\bool_new:N \l_@@_round_half_up_bool
+\tl_new:N \l_@@_round_min_tl
+\bool_new:N \l_@@_round_places_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \subsection{Formatting parsed numbers}
 %
 % \begin{variable}[int]
@@ -1567,6 +1606,8 @@
     output-complex-root      = \mathrm { i }                          ,
     output-decimal-marker    = .                                      ,
     output-open-uncertainty  = (                                      , % )
+    round-mode               = none                                   ,
+    round-precision          = 2                                      ,
     separate-uncertainty     = false                                  ,
     tight-spacing            = false                                  ,
     unity-mantissa           = false                                  ,
