@@ -69,6 +69,7 @@ for those people who are interested.
        moretexcs    =
          {%
            num,
+           qty,
            unit
          }
     }%
@@ -241,6 +242,29 @@ input, new functionality is made available. By altering the settings used by
 the package, the same input can yield a variety of different output formats.
 For example, the \cs{per} macro can give reciprocal powers, slashes or be used
 to construct units as fractions.
+
+\DescribeMacro{\qty}
+\begin{syntax}
+  \cs{qty}\oarg{options}\marg{number}\marg{unit}
+\end{syntax}
+Very often, numbers and units are given together. Formally, the value of a
+quantity is the product of the number and the unit, the space being regarded as
+a multiplication sign \cite{SI:5.3.3}. The \cs{SI} macro combines the
+functionality of \cs{num} and \cs{unit}, and makes this both possible and easy.
+The \meta{number} and \meta{unit} arguments work exactly like those for the
+\cs{num} and \cs{unit} macros, respectively.
+\begin{LaTeXdemo}
+  \qty{1.23}{J.mol^{-1}.K^{-1}}                            \\
+  \qty{.23e7}{\candela}                                    \\
+  \qty[unit/per-mode = symbol]{1.99}{\per\kilogram}        \\
+  \qty[unit/per-mode = fraction]{1,345}{\coulomb\per\mole}
+\end{LaTeXdemo}
+
+It is possible to set up the unit macros to be available outside of the
+\cs{qty} and \cs{unit} functions. This is not the standard behaviour as there
+is the risk of name clashes (for example, \cs{bar} is used by other packages,
+and several packages define \cs{degree}). Full details of using \enquote{stand
+alone} units are found in \ref{sec:units:creating}.
 
 \section{Installation}
 
