@@ -1136,7 +1136,8 @@
 % \end{variable}
 %
 % \begin{macro}[int]{\@@_round:}
-% \begin{macro}[aux]{\@@_round:N, \@@_round_:N}
+% \begin{macro}[aux]{\@@_round:N}
+% \begin{macro}[aux]{\@@_round_:nNnnnNn}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_round:
   {
@@ -1146,32 +1147,38 @@
 \cs_new_protected:Npn \@@_round:N #1
   {
     \tl_if_empty:NF #1
-      { \use:c { @@_round_ \_@@_round_mode_tl : N } #1 }
+      {
+        \cs:w
+          @@_round_ \_@@_round_mode_tl : nNnnnNn
+          \exp_after:wN
+        \cs_end: #1
+      }
   }
-\cs_new_protected:Npn \@@_round_:N #1 { }
+\cs_new_protected:Npn \@@_round_:nNnnnNn #1#2#3#4#5#6#7 { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}[int]{\@@_round_figures:N}
+% \begin{macro}[int]{\@@_round_figures:nNnnnNn}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_round_figures:N #1
+\cs_new_protected:Npn \@@_round_figures:nNnnnNn #1#2#3#4#5#6#7
   {
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_round_places:N}
+% \begin{macro}[int]{\@@_round_places:nNnnnNn}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_round_places:N #1
+\cs_new_protected:Npn \@@_round_places:nNnnnNn #1#2#3#4#5#6#7
   {
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_round_uncertainty:N}
+% \begin{macro}[int]{\@@_round_uncertainty:nNnnnNn}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_round_uncertainty:N #1
+\cs_new_protected:Npn \@@_round_uncertainty:nNnnnNn #1#2#3#4#5#6#7
   {
   }
 %    \end{macrocode}
