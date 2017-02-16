@@ -1181,14 +1181,29 @@
 % \end{macro}
 %
 % \begin{macro}[int, EXP]{\@@_round_places:nNnnnNn}
+% \begin{macro}[aux, EXP]
+%   {\@@_round_places_decimal:nNnnNn, \@@_round_places_integer:nNnnNn}
+%   The first step when rounding to a fixed number of places is to establish
+%   if this is in the decimal or integer parts. The two require different
+%   calculations for how many digits to drop from the input.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_places:nNnnnNn #1#2#3#4#5#6#7
   {
     \tl_if_blank:nTF {#5}
-      { }
+      {
+        \int_compare:nNnTF \l_@@_round_precision_int > 0
+          { \@@_round_places_decimal:nNnnNn }
+          { \@@_round_places_integer:nNnnNn }
+          {#1} #2 {#3} {#4}#6 {#7}
+      }
       { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
   }
+\cs_new:Npn \@@_round_places_decimal:nNnnNn #1#2#3#4#5#6
+  { }
+\cs_new:Npn \@@_round_places_integer:nNnnNn #1#2#3#4#5#6
+  { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[int, EXP]{\@@_round_uncertainty:nNnnnNn}
