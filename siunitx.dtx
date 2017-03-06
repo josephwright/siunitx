@@ -3455,6 +3455,7 @@ This work consists of the file  siunitx.dtx
 % reserved for them.
 %
 %\DescribeOption{table-format}
+% \changes{v2.7e}{2017/03/06}{Allow \texttt{+} to indicate a sign}
 % As a short cut for the preceding options, \pkg{siunitx} also
 % provides the \opt{table-format} option. This can be used to give the
 % same information about the space to reserve for a number in a
@@ -14329,6 +14330,8 @@ This work consists of the file  siunitx.dtx
   {
     table-format .code:n    =
       {
+        \bool_set_eq:NN \l_@@_process_plus_saved_bool \l_@@_process_plus_bool
+        \bool_set_true:N \l_@@_process_plus_bool
         \@@_number_in_parse:n {#1}
         \prop_set_eq:NN \l_@@_table_model_prop \l_@@_number_in_prop
         \tl_clear:N \l_@@_tmpa_tl
@@ -14350,17 +14353,37 @@ This work consists of the file  siunitx.dtx
             \clist_put_right:Nx \l_@@_tmpa_tl
               { table-figures-uncertainty = \l_@@_tmpb_tl }
           }
+        \prop_if_in:NnTF \l_@@_number_in_prop { mantissa-sign }
+          {
+            \clist_put_right:Nn \l_@@_tmpa_tl
+              { table-sign-mantissa =true }
+          }
+          {
+            \clist_put_right:Nn \l_@@_tmpa_tl
+              { table-sign-mantissa =false }
+          }
         \prop_get:NnNT \l_@@_number_in_prop { exponent-integer }
           \l_@@_tmpb_tl
           {
             \clist_put_right:Nx \l_@@_tmpa_tl
               { table-figures-exponent = \l_@@_tmpb_tl }
           }
+        \prop_if_in:NnTF \l_@@_number_in_prop { exponent-sign }
+          {
+            \clist_put_right:Nn \l_@@_tmpa_tl
+              { table-sign-exponent =true }
+          }
+          {
+            \clist_put_right:Nn \l_@@_tmpa_tl
+              { table-sign-exponent =false }
+          }
         \clist_put_right:Nn \l_@@_tmpa_tl
           { table-number-alignment = center }
         \keys_set:nV { siunitx } \l_@@_tmpa_tl
+        \bool_set_eq:NN \l_@@_process_plus_bool \l_@@_process_plus_saved_bool
       }
   }
+\bool_new:N \l_@@_process_plus_saved_bool
 %    \end{macrocode}
 %
 % \begin{macro}{\@@_table_print_S:}
