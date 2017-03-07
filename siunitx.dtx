@@ -16179,12 +16179,12 @@ This work consists of the file  siunitx.dtx
     \cs_if_exist:NT \FB@fg
       { \cs_set_eq:NN \fg \FB@fg }
     \msg_redirect_name:nnn { xparse } { redefine-command } { none }
-    \cs_set_eq:NN \num      \@@_bookmark_num:w
-    \cs_set_eq:NN \numrange \@@_bookmark_numrange:w
-    \cs_set_eq:NN \si       \@@_bookmark_si:w
-    \cs_set_eq:NN \SI       \@@_bookmark_SI:w
-    \cs_set_eq:NN \SIrange  \@@_bookmark_SIrange:w
-    \cs_set_eq:NN \si       \@@_bookmark_si:w
+    \cs_set_eq:NN \num      \numInBookmark
+    \cs_set_eq:NN \numrange \numrangeInBookmark
+    \cs_set_eq:NN \si       \siInBookmark
+    \cs_set_eq:NN \SI       \SIInBookmark
+    \cs_set_eq:NN \SIrange  \SIrangeInBookmark
+    \cs_set_eq:NN \si       \siInBookmark
     \cs_set_eq:NN \highlight \use_ii:nn
     \cs_set_eq:NN \@@_textsuperscript:n \use:n
     \cs_set:Npn \SIUnitSymbolAngstrom  { \AA }
@@ -16200,27 +16200,27 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{macro}
 %   {
-%     \@@_bookmark_num:w      ,
-%     \@@_bookmark_numrange:w ,
-%     \@@_bookmark_SIlist:w   ,
-%     \@@_bookmark_SIrange:w  ,
-%     \@@_bookmark_SI:w       ,
-%     \@@_bookmark_si:w
+%     \numInBookmark      ,
+%     \numrangeInBookmark ,
+%     \SIlistInBookmark   ,
+%     \SIrangeInBookmark  ,
+%     \SIInBookmark       ,
+%     \siInBookmark
 %   }
 %   To keep things fast, expandable versions of the document commands
 %   are created only once. These are then used if necessary to remove
 %   and re-order arguments in an expandable fashion.
 %    \begin{macrocode}
-\DeclareExpandableDocumentCommand \@@_bookmark_num:w { o m } {#2}
-\DeclareExpandableDocumentCommand \@@_bookmark_numrange:w { o m m }
+\DeclareExpandableDocumentCommand \numInBookmark { o m } {#2}
+\DeclareExpandableDocumentCommand \numrangeInBookmark { o m m }
   { #2 \l_@@_range_phrase_tl #3 }
-\DeclareExpandableDocumentCommand \@@_bookmark_SI:w { o m o m }
+\DeclareExpandableDocumentCommand \SIInBookmark { o m o m }
   { \IfNoValueF {#3} {#3} #2 ~ #4 }
-\DeclareExpandableDocumentCommand \@@_bookmark_SIlist:w
+\DeclareExpandableDocumentCommand \SIlistInBookmark
   { o m m } { \@@_bookmark_SIlist_map:nn {#1} {#2} }
-\DeclareExpandableDocumentCommand \@@_bookmark_SIrange:w
+\DeclareExpandableDocumentCommand \SIrangeInBookmark
   { o m m m } { #2 ~ #4 \l_@@_range_phrase_tl #3 ~ #4 }
-\DeclareExpandableDocumentCommand \@@_bookmark_si:w { o m } {#2}
+\DeclareExpandableDocumentCommand \siInBookmark { o m } {#2}
 %    \end{macrocode}
 % \end{macro}
 %
