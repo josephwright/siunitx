@@ -37,7 +37,8 @@ tlmgr install  \
   mptopdf      \
   oberdiek     \
   l3kernel     \
-  l3packages
+  l3packages   \
+  tools
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
