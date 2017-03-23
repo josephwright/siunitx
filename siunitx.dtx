@@ -2945,6 +2945,8 @@ This work consists of the file  siunitx.dtx
 %\changes{v2.2}{2011/04/05}{Include leading \( 1 \) when \opt{per-mode}
 %  is set to \opt{symbol} and there are no numerator units in \cs{si}
 %  arguments}
+% \changes{v2.7f}{2017/03/23}{Fix spacing with \opt{reciprocal-positive-first}
+%   setting}
 %\DescribeOption{per-symbol}
 %\DescribeOption{bracket-unit-denominator}
 % The handling of \cs{per} is altered using the \opt{per-mode} choice
@@ -5205,7 +5207,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2017/03/06} {2.7e}
+\ProvidesExplPackage {siunitx} {2017/03/23} {2.7f}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -12721,16 +12723,19 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_unit_format_sorted:
   {
-    \tl_set_eq:NN \l_@@_unit_tl \l_@@_unit_numerator_tl
-    \tl_if_empty:NT \l_@@_unit_tl
+    \tl_set:Nx \l_@@_unit_tl
       {
-        \tl_if_empty:NF \l_@@_unit_denominator_tl
+        \exp_not:V \l_@@_unit_numerator_tl
+        \bool_if:nF
           {
-            \tl_put_right:NV \l_@@_unit_tl
-              \l_@@_unit_product_tl
+            \tl_if_empty_p:N \l_@@_unit_numerator_tl ||
+            \tl_if_empty_p:N \l_@@_unit_denominator_tl
           }
+          {
+            \exp_not:N \l_@@_unit_product_tl
+          }
+        \exp_not:V \l_@@_unit_denominator_tl
       }
-    \tl_put_right:NV \l_@@_unit_tl \l_@@_unit_denominator_tl
   }
 %    \end{macrocode}
 % \end{macro}
@@ -16829,7 +16834,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2017/03/06} {2.7e}
+\ProvidesExplFile {siunitx-version-1.cfg} {2017/03/23} {2.7f}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17771,7 +17776,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2017/03/06} {2.7e}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2017/03/23} {2.7f}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17953,7 +17958,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2017/03/06} {2.7e}
+\ProvidesExplFile {siunitx-binary.cfg} {2017/03/23} {2.7f}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
