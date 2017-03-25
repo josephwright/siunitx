@@ -86,14 +86,37 @@
 %
 % \begin{macro}{\siunitx_table_begin:}
 % \begin{macro}{\siunitx_table_end:}
+%   Collecting a tabular cell means doing a token-by-token collection.
+%   In previous versions of \pkg{siunitx} that was done along with picking
+%   out the numerical part, but the code flow ends up very tricky. Here,
+%   therefore, we just collect up the unchanged tokens first. Some issues
+%   with the way that the \texttt{peek} functions are currently set up in
+%   \pkg{expl3} mean that at present there is a need to do stuff by hand
+%   here.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_table_begin:
   {
     \tl_clear:N \l_@@_collect_tl
+    \cs_set_protected:Npn \__peek_execute_branches:
+      {
+        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
+          \exp_after:wN \@@_collect_group:n
+        \else:
+          \exp_after:wN \@@_collect_token:N
+        \fi:
+      }
+    \@@_collect_loop:
   }
 \cs_new_protected:Npn \siunitx_table_end: { }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_collect_loop:}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_collect_loop:
+  { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Printing collected material}
