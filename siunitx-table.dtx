@@ -110,10 +110,58 @@
 % \end{macro}
 %
 % \begin{macro}[int]{\@@_collect_loop:}
+% \begin{macro}[aux]{\@@_collect_group:n}
+% \begin{macro}[aux]{\@@_collect_token:N}
+% \begin{macro}[aux]{\@@_collect_search:NnF}
+% \begin{macro}[aux]{\@@_collect_search_aux:NNn}
+%   Collecting up the cell content needs a loop: this is done using
+%   a |peek| approach as it's most natural. (A slower approach is possible
+%   using something like the |\tl_lower_case:n| loop code.) The set of
+%   possible tokens is somewhat limited compared to an arbitrary cell
+%   (\foreign{cf.}~the approach in \pkg{collcell}): the special cases are
+%   pulled out for manual handling. The flexible lookup approach is more-or-less
+%   the same idea as in the kernel |case| functions.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_loop:
   { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
+\cs_new_protected:Npn \@@_collect_group:n #1
+  {
+    \tl_put_right:Nn \l_@@_collect_tl { {#1} }
+    \@@_collect_loop:
+  }
+\cs_new_protected:Npn \@@_collect_token:N #1
+  {
+    \@@_collect_search:NnF #1
+      {
+        \ignorespaces         { \@@_collect_loop: }
+        \unskip               { \@@_collect_loop: }
+        \end                  { \siunitx_table_print: \end }
+        \tabularnewline       { \siunitx_table_print: \tabularnewline }
+        \siunitx_table_print: { \siunitx_table_print: }
+      }
+      {
+        \tl_put_right:Nn \l_@@_collect_tl {#1}
+        \@@_collect_loop:
+      }
+  }
+\cs_new_protected:Npn \@@_collect_search:NnF #1#2#3
+  {
+    \@@_collect_search_aux:NNn #1
+      #2
+      #1 {#3}
+    \q_stop
+  }
+\cs_new_protected:Npn \@@_collect_search_aux:NNn #1#2#3
+  {
+    \token_if_eq_meaning:NNTF #1 #2
+      { \use_i_delimit_by_q_stop:nw {#3} }
+      { \@@_collect_token_search_aux:NNn #1 }
+  }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Printing collected material}
