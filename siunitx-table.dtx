@@ -168,9 +168,22 @@
 %
 % \subsection{Printing collected material}
 %
+% \begin{variable}{\l_@@_print_bool}
+%   A flag to track whether to actually print anything.
+%    \begin{macrocode}
+\bool_new:N \l_@@_print_bool
+\bool_set_true:N \l_@@_print_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_table_print:}
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_table_print: { }
+\cs_new_protected:Npn \siunitx_table_print:
+  {
+    \bool_if:NT \l_@@_print_bool
+      { }
+    \bool_set_false:N \l_@@_print_bool
+  }
 %    \end{macrocode}
 % \end{macro}
 %
