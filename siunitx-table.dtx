@@ -120,7 +120,8 @@
 %   possible tokens is somewhat limited compared to an arbitrary cell
 %   (\foreign{cf.}~the approach in \pkg{collcell}): the special cases are
 %   pulled out for manual handling. The flexible lookup approach is more-or-less
-%   the same idea as in the kernel |case| functions.
+%   the same idea as in the kernel |case| functions. The |\relax| special case
+%   covers the case where |\\| has been expanded in an empty cell.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_loop:
   { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
@@ -136,6 +137,7 @@
         \ignorespaces         { \@@_collect_loop: }
         \unskip               { \@@_collect_loop: }
         \end                  { \siunitx_table_print: \end }
+        \relax                { \relax }
         \tabularnewline       { \siunitx_table_print: \tabularnewline }
         \siunitx_table_print: { \siunitx_table_print: }
       }
