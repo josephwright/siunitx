@@ -25,8 +25,8 @@ tlmgr install l3build luatex
 
 # Required to build plain and LaTeX formats:
 # TeX90 plain for unpacking
-tlmgr install cm etex knuth-lib latex-bin lmodern luaotfload tex \
-  tex-ini-files unicode-data xetex
+tlmgr install cm etex knuth-lib latex-bin lm luaotfload tex tex-ini-files \
+  unicode-data xetex
 
 # Dependencies
 tlmgr install  \
