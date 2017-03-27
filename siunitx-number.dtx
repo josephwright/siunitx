@@ -64,6 +64,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}[TF]{\siunitx_if_number:n}
+%   \begin{syntax}
+%     \cs{siunitx_if_number_token:NTF} \Arg{tokens}
+%       \Arg{true code} \Arg{false code}
+%   \end{syntax}
+%   Determines if the \meta{tokens} form a valid number which can be fully
+%   parsed by \pkg{siunitx}.
+% \end{function}
+%
 % \begin{function}[TF]{\siunitx_if_number_token:N}
 %   \begin{syntax}
 %     \cs{siunitx_if_number_token:NTF} \Arg{token}
@@ -266,6 +275,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_validate_bool}
+%   Used to set up for valiation with no error production.
+%    \begin{macrocode}
+\bool_new:N \l_@@_validate_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}[int]{\@@_parse:n}
 %   After some initial set up, the parser expands the input and then replaces
 %   as far as possible tricky tokens with ones that can be handled using
@@ -322,8 +338,11 @@
         \tl_if_empty_p:N \l_@@_imaginary_tl
       }
       {
-        \msg_error:nnx { siunitx } { number / invalid-input }
-          { \exp_not:V \l_@@_input_tl }
+        \bool_if:NF \l_@@_validate_bool
+          {
+            \msg_error:nnx { siunitx } { number / invalid-input }
+              { \exp_not:V \l_@@_input_tl }
+          }
       }
       { \@@_parse_finalise: }
   }
@@ -1644,6 +1663,33 @@
 \tl_new:N \l_@@_valid_tl
 %    \end{macrocode}
 % \end{variable}
+%
+% \begin{macro}[TF]{\siunitx_if_number:n}
+%   Test if an entire number is valid: this means parsing the number but not
+%   returning anything.
+%    \begin{macrocode}
+\prg_new_protected_conditional:Npnn \siunitx_if_number:n #1
+  { T , F , TF }
+  {
+    \group_begin:
+      \bool_set_true:N \l_@@_validate_bool
+      \@@_parse:n {#1}
+      \bool_if:nTF
+        {
+          \tl_if_empty_p:N \l_@@_real_tl &&
+          \tl_if_empty_p:N \l_@@_imaginary_tl
+        }
+        {
+          \group_end:
+          \prg_return_false:
+        }
+        {
+          \group_end:
+          \prg_return_true:
+        }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}[TF]{\siunitx_if_number_token:N}
 %   A simple conditional to answer the question of whether a specific token is
