@@ -180,12 +180,77 @@
 %
 % \subsection{Separating collected material}
 %
+% The inpout nees to be divided into numerical tokens and those which appear
+% before and after them. This needs a second loop and validation.
+%
+% \begin{variable}{\l_@@_pre_tl, \l_@@_number_tl, \l_@@_post_tl}
+%   Space for tokens.
+%    \begin{macrocode}
+\tl_new:N \l_@@_pre_tl
+\tl_new:N \l_@@_number_tl
+\tl_new:N \l_@@_post_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_cell_end:}
+%   At the end of the cell, expand all of the content as far as possible then
+%   split it up into numerical and non-numerical parts.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_cell_end:
   {
+    \protected@edef \l_@@_collect_tl { \l_@@_collect_tl }
+    \tl_clear:N \l_@@_pre_tl
+    \tl_clear:N \l_@@_number_tl
+    \tl_clear:N \l_@@_post_tl
+    \cs_set_protected:Npn \__peek_execute_branches:
+      {
+        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
+          \exp_after:wN \@@_split_group:n
+        \else:
+          \exp_after:wN \@@_split_token:N
+        \fi:
+      }
+    \exp_after:wN \@@_split_loop: \l_@@_collect_tl
+      \q_recursion_tail \q_recursion_stop
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_split_loop:}
+% \begin{macro}[aux]{\@@_split_group:n}
+% \begin{macro}[aux]{\@@_split_token:N}
+%   Splitting into parts uses the fact that numbers cannot contain groups
+%   and that we can track where we are up to based on the content of the
+%   token lists.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_split_loop:
+  { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
+\cs_new_protected:Npn \@@_split_group:n #1
+  {
+    \tl_if_empty:NTF \l_@@_number_tl
+      { \tl_put_right:Nn \l_@@_pre_tl { {#1} } }
+      { \tl_put_right:Nn \l_@@_post_tl { {#1} } }
+    \@@_split_loop:
+  }
+\cs_new_protected:Npn \@@_split_token:N #1
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \tl_if_empty:NTF \l_@@_post_tl
+      {
+        \siunitx_if_number_token:NTF
+          { \tl_put_right:Nn \l_@@_number_tl {#1} }
+          {
+            \tl_if_empty:NTF \l_@@_number_tl
+              { \tl_put_right \l_@@_pre_tl {#1} }
+              { \tl_put_right \l_@@_post_tl {#1} }
+          }
+      }
+      { \tl_put_right:Nn \l_@@_post_tl {#1} }
+    \@@_split_loop:
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 %    \begin{macrocode}
