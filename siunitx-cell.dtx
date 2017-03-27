@@ -337,6 +337,45 @@
 % which means there is \texttt{fill} stretch to worry about and the kern as
 % well.
 %
+% \begin{macro}{\@@_align_left:n, \@@_align_right:n}
+%   These are simple shortcuts to keep life clearer in the rest of the code.
+%   The correction for \pkg{colortbl} is separate as the  spacing needs to be
+%   explicitly deleted.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_align_left:n #1
+  {
+    \skip_horizontal:n {#1}
+    \tex_kern:D \c_zero_skip
+  }
+\cs_new_protected:Npn \@@_align_right:n #1
+  {
+    \skip_horizontal:n { 0pt plus 1fill - #1}
+    \tex_kern:D \c_zero_skip
+  }
+\AtBeginDocument
+  {
+    \@ifpackageloaded { colortbl }
+      {
+        \cs_set_protected:Npn \@@_align_left:n #1
+          {
+            \skip_horizontal:n { 0pt plus -0.5fill }
+            \tex_kern:D \c_zero_skip
+            \skip_horizontal:n {#1}
+            \tex_kern:D \c_zero_skip
+          }
+        \cs_set_protected:Npn \@@_align_right:n #1
+          {
+            \skip_horizontal:n { 0pt plus 1fill - #1}
+            \tex_kern:D \c_zero_skip
+            \skip_horizontal:n { 0pt plus -0.5fill }
+            \tex_kern:D \c_zero_skip
+          }
+      }
+      { }
+  }
+%    \end{macrocode}
+\end{macro}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
