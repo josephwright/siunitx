@@ -283,6 +283,7 @@
     \@@_parse_replace:
     \tl_if_empty:NF \l_@@_arg_tl
       { \@@_parse_comparator: }
+    \@@_parse_check:
   }
 %    \end{macrocode}
 % \end{macro}
@@ -578,11 +579,7 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_cleanup:wN
   #1 \q_recursion_stop
-  {
-    \msg_error:nnx { siunitx } { number / invalid-input }
-      { \exp_not:V \l_@@_input_tl }
-    \tl_clear:N \l_@@_exponent_tl
-  }
+  { \tl_clear:N \l_@@_real_tl }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -703,7 +700,6 @@
       \exp_after:wN \l_@@_real_tl \exp_after:wN \c_true_bool
         \l_@@_arg_tl
         \q_recursion_tail \q_recursion_stop
-    \@@_parse_check:
   }
 %    \end{macrocode}
 %   The very first token of the input is handled with a dedicated function.
