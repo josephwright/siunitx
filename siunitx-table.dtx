@@ -91,7 +91,12 @@
 %   therefore, we just collect up the unchanged tokens first. Some issues
 %   with the way that the \texttt{peek} functions are currently set up in
 %   \pkg{expl3} mean that at present there is a need to do stuff by hand
-%   here.
+%   here. The definition of \cs{cr} is used to allow collection of any tokens
+%   inserted after the main content when dealing with the last cell of a row:
+%   the \enquote{group} around it is needed to avoid issues with the underlying
+%   |\halign|. (The approach is based on that in \pkg{collcell}.) Notice that
+%   as each cell forms a group there is no need to reset the definition of
+%   \cs{cr}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_table_collect:
   {
@@ -104,6 +109,14 @@
           \exp_after:wN \@@_collect_token:N
         \fi:
       }
+    \if_false: { \fi:
+    \cs_set_protected:Npn \cr
+      {
+        \@@_collect_loop:
+        \tex_cr:D
+      }
+    \if_false: } \fi:
+    \cs_set_protected:Npn \cr
     \@@_collect_loop:
   }
 %    \end{macrocode}
