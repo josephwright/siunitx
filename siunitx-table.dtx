@@ -84,7 +84,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_table_collect:}
+% \begin{macro}{\siunitx_cell_begin:}
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
@@ -98,7 +98,7 @@
 %   as each cell forms a group there is no need to reset the definition of
 %   \cs{cr}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_table_collect:
+\cs_new_protected:Npn \siunitx_cell_begin:
   {
     \tl_clear:N \l_@@_collect_tl
     \cs_set_protected:Npn \__peek_execute_branches:
@@ -146,12 +146,12 @@
   {
     \@@_collect_search:NnF #1
       {
-        \ignorespaces         { \@@_collect_loop: }
-        \unskip               { \@@_collect_loop: }
-        \end                  { \tabularnewline \end }
-        \relax                { \relax }
-        \tabularnewline       { \tabularnewline }
-        \siunitx_table_print: { \siunitx_table_print: }
+        \ignorespaces      { \@@_collect_loop: }
+        \unskip            { \@@_collect_loop: }
+        \end               { \tabularnewline \end }
+        \relax             { \relax }
+        \tabularnewline    { \tabularnewline }
+        \siunitx_cell_end: { \siunitx_cell_end: }
       }
       {
         \tl_put_right:Nn \l_@@_collect_tl {#1}
@@ -180,9 +180,9 @@
 %
 % \subsection{Printing collected material}
 %
-% \begin{macro}{\siunitx_table_print:}
+% \begin{macro}{\siunitx_cell_end:}
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_table_print:
+\cs_new_protected:Npn \siunitx_cell_end:
   {
   }
 %    \end{macrocode}
