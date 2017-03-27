@@ -64,6 +64,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}[TF]{\siunitx_if_number_token:N}
+%   \begin{syntax}
+%     \cs{siunitx_if_number_token:NTF} \Arg{token}
+%       \Arg{true code} \Arg{false code}
+%   \end{syntax}
+%   Determines if the \meta{token} is valid in a number based on those
+%   tokens currently set up for detection in a number.
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -1629,6 +1638,42 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \subsection{Miscellaneous tools}
+%
+% \begin{variable}{\l_@@_valid_tl}
+%   The list of valid tokens.
+%    \begin{macrocode}
+\tl_new:N \l_@@_valid_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}[TF]{\siunitx_if_number_token:N}
+%   A simple conditional to answer the question of whether a specific token is
+%   possibly valid in a number.
+%    \begin{macrocode}
+\prg_new_protected_conditional:Npnn \siunitx_if_number_token:N #1
+  { T , F , TF }
+  {
+    \tl_set:Nx \l_@@_valid_tl
+      {
+        \exp_not:V \l_@@_input_uncert_close_tl
+        \exp_not:V \l_@@_input_complex_tl
+        \exp_not:V \l_@@_input_comparator_tl
+        \exp_not:V \l_@@_input_decimal_tl
+        \exp_not:V \l_@@_input_digit_tl
+        \exp_not:V \l_@@_input_exponent_tl
+        \exp_not:V \l_@@_input_ignore_tl
+        \exp_not:V \l_@@_input_uncert_open_tl
+        \exp_not:V \l_@@_input_sign_tl
+        \exp_not:V \l_@@_input_uncert_sign_tl
+      }
+    \tl_if_in:VnTF \l_@@_valid_tl {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Messages}
