@@ -380,6 +380,46 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[int]{\@@_fixed_width_begin:nn, \@@_fixed_width_end:nn}
+%   For a fixed-width column everything is done in a box. At present
+%   \pkg{expl3} doesn't have a function for this (there is one for a box
+%   to a size but only where one can absorb the entire argument in one go.
+%   Once again, there is a need to correct for \pkg{colortbl}.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_fixed_width_begin:nn #1#2
+  {
+    \tex_hbox:D to \dim_eval:n {#1}
+    \c_group_begin_token
+      \@@_skip:n {#2}
+  }
+\cs_new_protected:Npn \@@_fixed_width_end:nn #1#2
+  {
+     \@@_skip:n {#2} 
+    \c_group_end_token
+  }
+\AtBeginDocument
+  {
+    \@ifpackageloaded { colortbl }
+      {
+        \cs_new_protected:Npn \@@_fixed_width_begin:nn #1#2
+          {
+            \@@_skip:n{ 0pt plus -0.5fill }
+            \tex_hbox:D to \dim_eval:n {#1}
+            \c_group_begin_token
+              \@@_skip:n {#2}
+          }
+        \cs_new_protected:Npn \@@_fixed_width_end:nn #1#2
+          {
+             \@@_skip:n {#2}
+            \c_group_end_token
+            \@@_skip:n { 0pt plus -0.5fill }
+          }
+      }
+      { }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
