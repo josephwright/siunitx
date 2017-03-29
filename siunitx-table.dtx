@@ -424,6 +424,26 @@
 %
 % \subsection{Printing just text}
 %
+% In cases where there is no numerical part, \pkg{siunitx} allows alignment
+% of the \enquote{escaped} text independent of the underlying column type.
+%
+% \begin{macro}[int]{\l_@@_text_skip}
+%   Text alignment needs one variable: the skip size to use for placement.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / table }
+  {
+    text-alignment .choice:                                 ,
+    text-alignment / center .code:n =
+      { \skip_set:Nn \l_@@_text_skip { 0pt plus 0.5fill } } ,
+    text-alignment / left   .code:n =
+      { \skip_zero:N \l_@@_text_skip }                      ,
+    text-alignment / right  .code:n =
+      { \skip_set:Nn \l_@@_text_skip { 0pt plus 1fill } }   ,
+  }
+\skip_new:N \l_@@_text_skip
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[int]{\@@_print_text:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_text:
@@ -432,6 +452,19 @@
   }
 %    \end{macrocode}
 % \end{macro}
+%
+% \subsection{Standard settings for module options}
+%
+% Some of these follow naturally from the point of definition
+% (\emph{e.g.}~boolean variables are always |false| to begin with),
+% but for clarity everything is set here.
+%    \begin{macrocode}
+\keys_set:nn { siunitx / table }
+  {
+    text-alignment = center
+  }
+%    \end{macrocode}
+%
 %
 %    \begin{macrocode}
 %</package>
