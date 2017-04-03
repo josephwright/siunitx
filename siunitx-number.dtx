@@ -191,11 +191,14 @@
 %      \l_@@_input_sign_tl         ,
 %      \l_@@_input_uncert_sign_tl
 %   }
+%  \begin{macro}[int EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / number }
   {
     evaluate-expression     .bool_set:N = \l_@@_expression_bool       ,
+    expression              .code:n     =
+      \cs_set:Npn \@@_expression:n ##1 {#1}                           ,
     input-close-uncertainty .tl_set:N   = \l_@@_input_uncert_close_tl ,
     input-complex-roots     .tl_set:N   = \l_@@_input_complex_tl      ,
     input-comparators       .tl_set:N   = \l_@@_input_comparator_tl   ,
@@ -215,7 +218,9 @@
           }
       }
   }
+\cs_new:Npn \@@_expression:n #1 { }
 %    \end{macrocode}
+% \end{macro}
 % \end{variable}
 %
 % \begin{variable}[int]{\l_@@_arg_tl}
@@ -299,8 +304,7 @@
     \protected@edef \l_@@_arg_tl
       {
         \bool_if:NTF \l_@@_expression_bool
-          { \fp_eval:n }
-          { \use:n }
+          { \fp_eval:n { \@@_expression:n {#1} } }
           {#1}
       }
     \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
@@ -1750,6 +1754,7 @@
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
     exponent-product         = \times                                 ,
+    expression               = #1                                     ,
     group-digits             = all                                    ,
     group-minimum-digits     = 4                                      ,
     group-separator          = \,                                     , % (
