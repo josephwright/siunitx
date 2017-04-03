@@ -179,6 +179,7 @@
 %
 % \begin{variable}[int]
 %   {
+%      \l_@@_expression_bool       ,
 %      \l_@@_input_uncert_close_tl ,
 %      \l_@@_input_complex_tl      ,
 %      \l_@@_input_comparator_tl   ,
@@ -194,16 +195,17 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx / number }
   {
-    input-close-uncertainty .tl_set:N = \l_@@_input_uncert_close_tl ,
-    input-complex-roots     .tl_set:N = \l_@@_input_complex_tl      ,
-    input-comparators       .tl_set:N = \l_@@_input_comparator_tl   ,
-    input-decimal-markers   .tl_set:N = \l_@@_input_decimal_tl      ,
-    input-digits            .tl_set:N = \l_@@_input_digit_tl        ,
-    input-exponent-markers  .tl_set:N = \l_@@_input_exponent_tl     ,
-    input-ignore            .tl_set:N = \l_@@_input_ignore_tl       ,
-    input-open-uncertainty  .tl_set:N = \l_@@_input_uncert_open_tl  ,
-    input-signs             .tl_set:N = \l_@@_input_sign_tl         ,
-    input-uncertainty-signs .code:n   =
+    evaluate-expression     .bool_set:N = \l_@@_expression_bool       ,
+    input-close-uncertainty .tl_set:N   = \l_@@_input_uncert_close_tl ,
+    input-complex-roots     .tl_set:N   = \l_@@_input_complex_tl      ,
+    input-comparators       .tl_set:N   = \l_@@_input_comparator_tl   ,
+    input-decimal-markers   .tl_set:N   = \l_@@_input_decimal_tl      ,
+    input-digits            .tl_set:N   = \l_@@_input_digit_tl        ,
+    input-exponent-markers  .tl_set:N   = \l_@@_input_exponent_tl     ,
+    input-ignore            .tl_set:N   = \l_@@_input_ignore_tl       ,
+    input-open-uncertainty  .tl_set:N   = \l_@@_input_uncert_open_tl  ,
+    input-signs             .tl_set:N   = \l_@@_input_sign_tl         ,
+    input-uncertainty-signs .code:n     =
       {
         \tl_set:Nn \l_@@_input_uncert_sign_tl {#1}
         \tl_map_inline:nn {#1}
@@ -289,12 +291,18 @@
 %   is a real number. To avoid multiple conditionals here, the parser is
 %   set up as a chain of commands initially, with a loop only later. This
 %   avoids more conditionals than are necessary.
-%    \begin{macrocode}
+%    \begin{macrocode}q
 \cs_new_protected:Npn \@@_parse:n #1
   {
     \tl_clear:N \l_@@_imaginary_tl
     \tl_clear:N \l_@@_real_tl
-    \protected@edef \l_@@_arg_tl {#1}
+    \protected@edef \l_@@_arg_tl
+      {
+        \bool_if:NTF \l_@@_expression_bool
+          { \fp_eval:n }
+          { \use:n }
+          {#1}
+      }
     \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
     \@@_parse_replace:
     \tl_if_empty:NF \l_@@_arg_tl
@@ -1738,6 +1746,7 @@
   {
     bracket-negative         = false                                  , % (
     close-bracket            = )                                      ,
+    evaluate-expression      = false                                  ,
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
     exponent-product         = \times                                 ,
