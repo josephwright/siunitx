@@ -1361,7 +1361,7 @@
 %     \@@_format_integer_aux_2:n
 %   }
 % \begin{macro}[aux, EXP]{\@@_format_decimal_aux:n}
-% \begin{macro}[aux, EXP]{\@@_format_decimal_loop:NNN}
+% \begin{macro}[aux, EXP]{\@@_format_decimal_loop:NNNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nn}
@@ -1513,23 +1513,37 @@
   }
 %    \end{macrocode}
 %   For decimals, no need to do any counting, just loop using enough markers to
-%   find the end of the list.
+%   find the end of the list. The need to absorb |#4| here arises as the the
+%   group separator would otherwise be left dangling when the number of
+%   decimal digits is a mutiple of three.
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_decimal_aux:n #1
-  { \@@_format_decimal_loop:NNN #1 \q_nil \q_nil \q_stop }
-\cs_new:Npn \@@_format_decimal_loop:NNN #1#2#3
   {
-    \quark_if_nil:NTF #3
+    \@@_format_decimal_loop:NNNN \c_empty_tl
+      #1 \q_nil \q_nil \q_nil \q_stop 
+  }
+\cs_new:Npn \@@_format_decimal_loop:NNNN #1#2#3#4
+  {
+    \quark_if_nil:NTF #4
       {
-        \quark_if_nil:NTF #2
-          { \exp_not:n {#1} }
-          { \exp_not:n {#1#2} }
+        \quark_if_nil:NTF #3
+          {
+            \quark_if_nil:NF {#2}
+              {
+                \exp_not:V #1
+                \exp_not:n {#2}
+              }
+          }
+          {
+            \exp_not:V #1
+            \exp_not:n {#2#3}
+          }
         \use_none_delimit_by_q_stop:w
       }
       {
-        \exp_not:n {#1#2#3}
-        \exp_not:V \l_@@_group_separator_tl
-        \@@_format_decimal_loop:NNN
+        \exp_not:V #1
+        \exp_not:n {#2#3#4}
+        \@@_format_decimal_loop:NNNN \l_@@_group_separator_tl
       }
   }
 %    \end{macrocode}
