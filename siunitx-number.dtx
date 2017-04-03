@@ -1513,37 +1513,32 @@
   }
 %    \end{macrocode}
 %   For decimals, no need to do any counting, just loop using enough markers to
-%   find the end of the list. The need to absorb |#4| here arises as the the
-%   group separator would otherwise be left dangling when the number of
-%   decimal digits is a mutiple of three.
+%   find the end of the list. By passing the decimal marker, it is possible not
+%   to have to use a check on the content of the rest of the number. The
+%   |\use_none:n(n)| mop up the remaining |\q_nil| tokens.
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_decimal_aux:n #1
   {
     \@@_format_decimal_loop:NNNN \c_empty_tl
-      #1 \q_nil \q_nil \q_nil \q_stop 
+      #1 \q_nil \q_nil \q_nil 
   }
 \cs_new:Npn \@@_format_decimal_loop:NNNN #1#2#3#4
   {
-    \quark_if_nil:NTF #4
-      {
-        \quark_if_nil:NTF #3
-          {
-            \quark_if_nil:NF {#2}
-              {
-                \exp_not:V #1
-                \exp_not:n {#2}
-              }
-          }
-          {
-            \exp_not:V #1
-            \exp_not:n {#2#3}
-          }
-        \use_none_delimit_by_q_stop:w
-      }
+    \quark_if_nil:NF #2
       {
         \exp_not:V #1
-        \exp_not:n {#2#3#4}
-        \@@_format_decimal_loop:NNNN \l_@@_group_separator_tl
+        \exp_not:n {#2}
+        \quark_if_nil:NTF #3
+          { \use_none:n }
+          {
+            \exp_not:n {#3}
+            \quark_if_nil:NTF #4
+              { \use_none:nn }
+              {
+                \exp_not:n {#4}
+                \@@_format_decimal_loop:NNNN \l_@@_group_separator_tl
+              }
+          }
       }
   }
 %    \end{macrocode}
