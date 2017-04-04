@@ -5215,7 +5215,7 @@ This work consists of the file  siunitx.dtx
 % This will also trap any problems with \pkg{l3packages} (as the two are now
 % tied together, version-wise).
 %    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2015/09/11 }
+\@ifpackagelater { expl3 } { 2015/11/15 }
   { }
   {
     \PackageError { siunitx } { Support~package~expl3~too~old }
@@ -5653,15 +5653,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \prg_new_conditional:Npnn \@@_cs_if_tl:N #1 { T, F , TF , p }
   {
-    \bool_if:nTF
+    \bool_lazy_and:nnTF
       {
         \tl_if_empty_p:f
           {
             \token_get_prefix_spec:N #1
             \token_get_arg_spec:N    #1
           }
-        && ! \cs_if_exist_p:c { \cs_to_str:N #1 ~ }
       }
+      { \bool_not_p:n { \cs_if_exist_p:c { \cs_to_str:N #1 ~ } } }
       { \prg_return_true: }
       { \prg_return_false: }
   }
@@ -8876,11 +8876,9 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_round_tidy:n #1
   {
-    \bool_if:nTF
-      {
-           \@@_number_if_zero_p:V \l_@@_round_integer_out_tl
-        && \@@_number_if_zero_p:V \l_@@_round_decimal_out_tl
-      }
+    \bool_lazy_and:nnTF
+      { \@@_number_if_zero_p:V \l_@@_round_integer_out_tl }
+      { \@@_number_if_zero_p:V \l_@@_round_decimal_out_tl }
       {
         \str_if_eq:VnTF \l_@@_process_round_min_tl { 0 }
           {
@@ -10489,11 +10487,9 @@ This work consists of the file  siunitx.dtx
 % number formatter again.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_output_parts: {
-  \bool_if:nTF
-    {
-      \tl_if_empty_p:N \l_@@_pre_unit_tl &&
-      \tl_if_empty_p:N \l_@@_unit_tl
-    }
+  \bool_lazy_and:nnTF
+    { \tl_if_empty_p:N \l_@@_pre_unit_tl }
+    { \tl_if_empty_p:N \l_@@_unit_tl }
     { \@@_number_output_single: }
     { \@@_number_output_parts_aux: }
 }
@@ -10557,11 +10553,9 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_number_output_product: {
   \bool_if:NTF \l_@@_product_brackets_bool
     {
-      \bool_if:nTF
-        {
-          \tl_if_empty_p:N \l_@@_pre_unit_tl &&
-          \tl_if_empty_p:N \l_@@_unit_tl
-        }
+      \bool_lazy_and:nnTF
+        { \tl_if_empty_p:N \l_@@_pre_unit_tl }
+        { \tl_if_empty_p:N \l_@@_unit_tl }
         { \@@_number_output_product_aux: }
         { \@@_number_output_product_brackets: }
     }
@@ -10728,11 +10722,9 @@ This work consists of the file  siunitx.dtx
 % mathematically there is no need for brackets at this point.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_output_single: {
-  \bool_if:nF
-    {
-      \tl_if_empty_p:N \l_@@_pre_unit_tl &&
-      \tl_if_empty_p:N \l_@@_unit_tl
-    }
+  \bool_lazy_and:nnF
+    { \tl_if_empty_p:N \l_@@_pre_unit_tl }
+    { \tl_if_empty_p:N \l_@@_unit_tl }
     {
       \prop_if_in:NnF \l_@@_number_out_prop { exponent }
         { \@@_number_format_brackets:n { result } }
@@ -11026,22 +11018,18 @@ This work consists of the file  siunitx.dtx
 % correct places.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_angle_zero_fill: {
-  \bool_if:nT
-    {
-      \prop_if_empty_p:N \l_@@_angle_second_prop &&
-      \l_@@_angle_second_zero_bool
-    }
+  \bool_lazy_and:nnT
+    { \l_@@_angle_second_zero_bool }
+    { \prop_if_empty_p:N \l_@@_angle_second_prop }
     {
       \prop_put:Nnn \l_@@_angle_second_prop { mantissa }
         { true }
       \prop_put:Nnn \l_@@_angle_second_prop { mantissa-integer }
         { 0 }
     }
-  \bool_if:nT
-    {
-      \prop_if_empty_p:N \l_@@_angle_minute_prop &&
-      \l_@@_angle_minute_zero_bool
-    }
+  \bool_lazy_and:nnT
+    { \l_@@_angle_minute_zero_bool }
+    { \prop_if_empty_p:N \l_@@_angle_minute_prop }
     {
       \prop_put:Nnn \l_@@_angle_minute_prop { mantissa }
         { true }
@@ -11049,11 +11037,9 @@ This work consists of the file  siunitx.dtx
         { 0 }
       \@@_angle_sign_shuffle:nn { second } { minute }
     }
-  \bool_if:nT
-    {
-      \prop_if_empty_p:N \l_@@_angle_degree_prop &&
-      \l_@@_angle_degree_zero_bool
-    }
+  \bool_lazy_and:nnT
+    { \l_@@_angle_degree_zero_bool }
+    { \prop_if_empty_p:N \l_@@_angle_degree_prop }
     {
       \prop_put:Nnn \l_@@_angle_degree_prop { mantissa }
         { true }
@@ -12425,11 +12411,7 @@ This work consists of the file  siunitx.dtx
       { \char_generate:nn { #1 } { 12 } }
       {#2}
   }
-\bool_if:nF
-  {
-    \sys_if_engine_luatex_p: ||
-    \sys_if_engine_xetex_p:
-  }
+\bool_lazy_or:nnF { \sys_if_engine_luatex_p: } { \sys_if_engine_xetex_p: }
   {
     \AtBeginDocument
       {
@@ -12726,11 +12708,9 @@ This work consists of the file  siunitx.dtx
     \tl_set:Nx \l_@@_unit_tl
       {
         \exp_not:V \l_@@_unit_numerator_tl
-        \bool_if:nF
-          {
-            \tl_if_empty_p:N \l_@@_unit_numerator_tl ||
-            \tl_if_empty_p:N \l_@@_unit_denominator_tl
-          }
+        \bool_lazy_or:nnF
+          { \tl_if_empty_p:N \l_@@_unit_numerator_tl }
+          { \tl_if_empty_p:N \l_@@_unit_denominator_tl }
           {
             \exp_not:N \l_@@_unit_product_tl
           }
@@ -15701,11 +15681,8 @@ This work consists of the file  siunitx.dtx
     {
        min~exponent~for~1000~sep = \int_eval:n { \l_@@_group_min_int - 1 }
     }
-  \bool_if:nF
-    {
-      \l_@@_group_decimal_bool ||
-      \l_@@_group_integer_bool
-    }
+  \bool_lazy_or:nnF
+    { \l_@@_group_decimal_bool } { \l_@@_group_integer_bool }
     {
       \clist_put_right:Nn \l_@@_pgf_link_clist
         { min~exponent~for~1000~sep = 999 }
