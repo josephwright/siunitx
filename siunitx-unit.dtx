@@ -1265,11 +1265,8 @@
   {
     \tl_set:Nx \l_@@_tmp_tl
       { unit- \int_use:N \l_@@_position_int }
-    \bool_if:nTF
-      {
-          #3
-       || \prop_if_in_p:NV \l_@@_parsed_prop \l_@@_tmp_tl
-      }
+    \bool_lazy_or:nnTF
+      {#3} { \prop_if_in_p:NV \l_@@_parsed_prop \l_@@_tmp_tl }
       {
         \@@_parse_add:nnnn { power }
           { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + 1 } } }
@@ -1874,22 +1871,17 @@
   {
     \bool_if:NTF \l_@@_two_part_bool
       {
-        \bool_if:nT
-          {
-             ! ( \tl_if_empty_p:N \l_@@_denominator_tl )
-             &&
-             \l_@@_denominator_bracket_bool
-          }
+        \bool_lazy_and:nnT
+          { \l_@@_denominator_bracket_bool }
+          { \bool_not_p:n { \tl_if_empty_p:N \l_@@_denominator_tl } }
           { \bool_set_true:N \l_@@_bracket_bool }
         \@@_format_output_aux:nV { denominator }
           \l_@@_product_tl
       }
       {
-        \bool_if:nT
-          {
-               \l_@@_per_symbol_bool
-            && \tl_if_empty_p:N \l_@@_formatted_tl
-          }
+        \bool_lazy_and:nnT
+          { \l_@@_per_symbol_bool }
+          { \tl_if_empty_p:N \l_@@_formatted_tl }
           { \tl_set:Nn \l_@@_formatted_tl { 1 } }
         \@@_format_output_aux:nv { formatted }
           {

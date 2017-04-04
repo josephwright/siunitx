@@ -327,12 +327,14 @@
   {
     \tl_if_empty:NF \l_@@_flex_tl
       {
-        \bool_if:nTF
+        \bool_lazy_and:nnTF
           {
-               \tl_if_blank_p:f
-                 { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
-            && \tl_if_blank_p:f
-                 { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
+            \tl_if_blank_p:f
+              { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
+          }
+          {
+             \tl_if_blank_p:f
+               { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
           }
           {
             \tl_set:Nx \l_@@_tmp_tl
@@ -344,11 +346,9 @@
           }
           { \tl_clear:N \l_@@_real_tl }
       }
-    \bool_if:nTF
-      {
-        \tl_if_empty_p:N \l_@@_real_tl  &&
-        \tl_if_empty_p:N \l_@@_imaginary_tl
-      }
+    \bool_lazy_and:nnTF
+      { \tl_if_empty_p:N \l_@@_real_tl  }
+      { \tl_if_empty_p:N \l_@@_imaginary_tl }
       {
         \bool_if:NF \l_@@_validate_bool
           {
@@ -443,11 +443,9 @@
         \tl_head:V \l_@@_real_tl
           { \exp_not:n {#1} }
           {
-            \bool_if:nTF
-              {
-                   \tl_if_blank_p:n {#2}
-                && ! ( \tl_if_blank_p:n {#4} )
-              }
+            \bool_lazy_and:nnTF
+              { \tl_if_blank_p:n {#2} }
+              { \bool_not_p:n { \tl_if_blank_p:n {#4} } }
               { 0 }
               { \exp_not:n {#2} }
           }
@@ -847,8 +845,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main_end:NN #1#2
   {
-    \bool_if:nT
-      { #2 && \tl_if_empty_p:N \l_@@_partial_tl }
+    \bool_lazy_and:nnT
+      {#2} { \tl_if_empty_p:N \l_@@_partial_tl }
       { \tl_set:Nn \l_@@_partial_tl { 0 } }
     \tl_put_right:Nx #1
       {
@@ -865,11 +863,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5
   {
-    \bool_if:nTF
-      {
-           #3
-        || ! ( \str_if_eq_p:nn {#5} { 0 } )
-      }
+    \bool_lazy_or:nnTF
+      {#3} { \bool_not_p:n { \str_if_eq_p:nn {#5} { 0 } } }
       {
         \tl_put_right:Nn \l_@@_partial_tl {#5}
         \@@_parse_loop_main:NNNNN #1 #2 \c_true_bool #4
@@ -979,11 +974,8 @@
       { \@@_parse_loop_break:wN \q_recursion_stop }
     \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
       {
-        \bool_if:nTF
-          {
-               #3
-            || ! ( \str_if_eq_p:nn {#5} { 0 } )
-          }
+        \bool_lazy_or:nnTF
+          {#3} { \bool_not_p:n { \str_if_eq_p:nn {#5} { 0 } } }
           {
             \tl_put_right:Nn \l_@@_partial_tl {#5}
             \@@_parse_loop_uncert:NNNNN
@@ -1451,12 +1443,12 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_integer:nnn #1#2#3
   {
-    \bool_if:nF
+    \bool_lazy_all:nF
       {
-           \str_if_eq_p:nn {#1} { 1 }
-        && \tl_if_blank_p:n {#2}
-        && ! ( \str_if_eq_p:nn {#3} { 0 } )
-        && ! \l_@@_unity_mantissa_bool
+        { \str_if_eq_p:nn {#1} { 1 } }
+        { \tl_if_blank_p:n {#2} }
+        { \bool_not_p:n { \str_if_eq_p:nn {#3} { 0 } } }
+        { \bool_not_p:n { \l_@@_unity_mantissa_bool } }
       }
       { \@@_format_digits:nn { integer } {#1} }
   }
@@ -1616,17 +1608,13 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_exponent:Nnn #1#2#3
   {
-    \bool_if:nT
+    \bool_lazy_or:nnT
+      { \l_@@_zero_exponent_bool }
+      { \bool_not_p:n { \str_if_eq_p:nn {#2} { 0 } } }
       {
-            \l_@@_zero_exponent_bool
-        || ! ( \str_if_eq_p:nn {#2} { 0 } )
-      }
-      {
-        \bool_if:nF
-          {
-               \str_if_eq_p:nn {#3} { 1. }
-            && ! \l_@@_unity_mantissa_bool
-          }
+        \bool_lazy_and:nnF
+          { \str_if_eq_p:nn {#3} { 1. } }
+          { \bool_not_p:n { \l_@@_unity_mantissa_bool } }
           {
             \bool_if:NTF \l_@@_tight_bool
               {
@@ -1638,11 +1626,9 @@
         \exp_not:V \l_@@_exponent_base_tl
         ^
           {
-            \bool_if:nT
-              {
-                \l_@@_explicit_plus_bool
-                || ! ( \str_if_eq_p:nn {#1} { + } )
-              }
+            \bool_lazy_or:nnT
+              { \l_@@_explicit_plus_bool }
+              { \bool_not_p:n { \str_if_eq_p:nn {#1} { + } } }
               { \@@_format_sign_aux:N #1 }
             \@@_format_digits:nn { integer } {#2}
           }
@@ -1694,11 +1680,9 @@
     \group_begin:
       \bool_set_true:N \l_@@_validate_bool
       \@@_parse:n {#1}
-      \bool_if:nTF
-        {
-          \tl_if_empty_p:N \l_@@_real_tl &&
-          \tl_if_empty_p:N \l_@@_imaginary_tl
-        }
+      \bool_lazy_and:nnTF
+        { \tl_if_empty_p:N \l_@@_real_tl }
+        { \tl_if_empty_p:N \l_@@_imaginary_tl }
         {
           \group_end:
           \prg_return_false:
