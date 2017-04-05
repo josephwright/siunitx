@@ -351,29 +351,46 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_varwidth_begin:n, \@@_varwidth_end:n}
-%   The beginning and end of each table cell have to adjust the position of
-%   the content using glue. The exact details of the glue will be passed
-%   here as |#1|. When \pkg{colortbl} is loaded the glue is done in two
-%   parts: one for our positioning and one to explicitly override that from
-%   the package.
+% \begin{variable}[int]{\l_@@_column_width_dim, \l_@@_fixed_width_bool}
+%   Settings which apply to aligned columns in general.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_varwidth_begin:n #1
-  { \@@_skip:n {#1} }
-\cs_new_protected:Npn \@@_varwidth_end:n #1
-  { \@@_skip:n { 0pt plus 1fill - #1 } }
+\keys_define:nn { siunitx / table }
+  {
+    column-width .dim_set:N  = \l_@@_column_width_dim ,
+    fixed-width  .bool_set:N = \l_@@_fixed_width_bool
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@@_align_center:n, \@@_align_left:n, \@@_align_right:n}
+% \begin{macro}[aux]{\@@_align_auxi:nn, \@@_align_auxii:nn}
+%   The beginning and end of each table cell have to adjust the position of
+%   the content using glue. When \pkg{colortbl} is loaded the glue is done in
+%   two parts: one for our positioning and one to explicitly override that from
+%   the package. Using a two-step auxiliary chain avoids needing to repeat any
+%   code and the impact of the extra expansion should be trivial.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_align_center:n #1
+  { \@@_align_auxi:nn {#1} { 0pt plus 0.5fill } {#1} }
+\cs_new_protected:Npn \@@_align_left:n #1
+  { \@@_align_auxi:nn {#1} { 0pt } {#1} }
+\cs_new_protected:Npn \@@_align_right:n #1
+  { \@@_align_auxi:nn {#1} { 0pt plus 1fill } {#1} }
+\cs_new_protected:Npn \@@_align_auxi:nn #1#2
+  {
+    \@@_skip:n {#2}
+    #1
+    \@@_skip:n { 0pt plus 1fill - #2 }
+  }
 \AtBeginDocument
   {
     \@ifpackageloaded { colortbl }
       {
-        \cs_set_protected:Npn \@@_varwidth_begin:n #1
+        \cs_new_eq:NN \@@_align_auxii:nn \@@_align_auxi:nn
+        \cs_set_protected:Npn \@@_align_auxi:nn #1#2
           {
             \@@_skip:n{ 0pt plus -0.5fill }
-            \@@_skip:n {#1}
-          }
-        \cs_set_protected:Npn \@@_varwidth_end:n #1
-          {
-            \@@_skip:n { 0pt plus 1fill - #1 }
+            \@@_align_auxii:nn {#1} {#2}
             \@@_skip:n { 0pt plus -0.5fill }
           }
       }
@@ -427,28 +444,27 @@
 % In cases where there is no numerical part, \pkg{siunitx} allows alignment
 % of the \enquote{escaped} text independent of the underlying column type.
 %
-% \begin{macro}[int]{\l_@@_text_skip}
-%   Text alignment needs one variable: the skip size to use for placement.
+% \begin{variable}[int]{\l_@@_align_text_tl}
+%   Alignment is handled using a |tl| as this allows a fast lookup at the
+%   point of use.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / table }
   {
-    text-alignment .choice:                                 ,
-    text-alignment / center .code:n =
-      { \skip_set:Nn \l_@@_text_skip { 0pt plus 0.5fill } } ,
-    text-alignment / left   .code:n =
-      { \skip_zero:N \l_@@_text_skip }                      ,
-    text-alignment / right  .code:n =
-      { \skip_set:Nn \l_@@_text_skip { 0pt plus 1fill } }   ,
+    text-alignment .choices:nn =
+      { center , left , right }
+      { \tl_set:Nn \l_@@_align_text_tl {#1} } ,
   }
-\skip_new:N \l_@@_text_skip
 %    \end{macrocode}
-% \end{macro}
+% \end{variable}
 %
 % \begin{macro}[int]{\@@_print_text:}
+%   Printing escaped text is easy: just place it in correctly in the
+%   column.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_text:
   {
-    \l_@@_pre_tl
+    \use:c { @@_align_  \l_@@_align_text_tl :n }
+      { \l_@@_pre_tl }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -461,6 +477,8 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx / table }
   {
+    column-width   = 0pt    ,
+    fixed-width    = false  ,
     text-alignment = center
   }
 %    \end{macrocode}
