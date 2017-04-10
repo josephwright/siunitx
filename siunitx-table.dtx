@@ -450,22 +450,29 @@
 % \end{variable}
 %
 % \begin{macro}[int]{\@@_print:}
+% \begin{macro}[aux]{\@@_print_non_aligned:, \@@_print_aligned:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:
   {
     \use:c { @@_align_ \l_@@_align_tl :n }
       {
         \bool_if:NTF \l_@@_parse_only_bool
-          {
-            \tl_use:N \l_@@_pre_tl
-            \siunitx_number_format:VN \l_@@_number_tl \l_@@_tmp_tl
-            \siunitx_print:nV { number } \l_@@_tmp_tl
-            \tl_use:N \l_@@_post_tl
-          }
-          { }
+          { \@@_print_non_aligned: }
+          { \@@_print_aligned: }
       }
   }
+\cs_new_protected:Npn \@@_print_non_aligned:
+  {
+    \tl_use:N \l_@@_pre_tl
+    \siunitx_number_format:VN \l_@@_number_tl \l_@@_tmp_tl
+    \siunitx_print:nV { number } \l_@@_tmp_tl
+    \tl_use:N \l_@@_post_tl
+  }
+\cs_new_protected:Npn \@@_print_aligned:
+  {
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
