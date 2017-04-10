@@ -426,10 +426,27 @@
 %
 % \subsection{Printing numbers in cells: main functions}
 %
+% \begin{variable}[int]{\l_@@_align_tl}
+%   Alignment is handled using a |tl| as this allows a fast lookup at the
+%   point of use.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / table }
+  {
+    alignment .choices:nn =
+      { center , left , right }
+      { \tl_set:Nn \l_@@_align_tl {#1} } ,
+  }
+\tl_new:N \l_@@_align_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}[int]{\@@_print:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:
   {
+    \use:c { @@_align_ \l_@@_align_tl :n }
+      {
+      }
   }
 %    \end{macrocode}
 % \end{macro}
