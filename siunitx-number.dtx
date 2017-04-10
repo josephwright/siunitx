@@ -64,6 +64,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{\siunitx_number_format:nNN}
+%   \begin{syntax}
+%     \cs{siunitx_number_format:nNN} \Arg{number} \meta{tl~var} \meta{marker}
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}[TF]{\siunitx_if_number:n}
 %   \begin{syntax}
 %     \cs{siunitx_if_number_token:NTF} \Arg{tokens}
@@ -125,14 +131,29 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}[int]{\l_@@_tab_tl}
+%   A token list for marking the position of tabular alignments in formatted
+%   output.
+%    \begin{macrocode}
+\tl_new:N \l_@@_tab_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_number_format:nN, \siunitx_number_format:VN}
+% \begin{macro}{\siunitx_number_format:nNN}
 % \begin{macro}[aux]{\@@_format:nN}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_format:nN #1#2
   {
+    \tl_clear:N \l_@@_tab_tl
     \@@_format:nN {#1} #2
   }
 \cs_generate_variant:Nn \siunitx_number_format:nN { V }
+\cs_new_protected:Npn \siunitx_number_format:nNN #1#2#3
+  {
+    \tl_set:Nn \l_@@_tab_tl {#3}
+    \@@_format:nN {#1} #2
+  }
 \cs_new_protected:Npn \@@_format:nN #1#2
   {
     \group_begin:
@@ -142,6 +163,7 @@
     \tl_set:Nn #2 \l_@@_formatted_tl
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -1358,6 +1380,7 @@
 % \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
 % \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
 % \begin{macro}[aux, EXP]{\@@_format_uncertainty:nn}
+% \begin{macro}[aux, EXP]{\@@_format_uncertainty_unaligned:}
 % \begin{macro}[aux, EXP]
 %   {\@@_format_uncertainty_aux:nn, \@@_format_uncertainty_aux:fn}
 % \begin{macro}[aux, EXP]
@@ -1366,7 +1389,9 @@
 % \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[aux, EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
-%   the constituent parts
+%   the constituent parts. All of the parts are assembled including
+%   inserting tabular alignment markers (which may be empty) for each
+%   separate unit.
 %    \begin{macrocode}
 \cs_new:Npn \@@_format:N #1
   { \exp_after:wN \@@_format:nNnnnNn #1 }
@@ -1387,6 +1412,7 @@
   {
     \tl_if_blank:nF {#1}
       { \exp_not:n { \mathord {#1} } }
+    \exp_not:V \l_@@_tab_tl
   }
 %    \end{macrocode}
 %   Formatting signs has to deal with some additional formatting requirements
@@ -1455,8 +1481,10 @@
   }
 \cs_new:Npn \@@_format_decimal:n #1
   {
+    \exp_not:V \l_@@_tab_tl
     \tl_if_blank:nF {#1}
       { \exp_not:V \l_@@_output_decimal_tl }
+    \exp_not:V \l_@@_tab_tl
     \@@_format_digits:nn { decimal } {#1}
   }
 \cs_generate_variant:Nn \@@_format_decimal:n { f }
@@ -1544,11 +1572,14 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_uncertainty:nn #1#2
   {
-    \tl_if_blank:nF {#1}
+    \tl_if_blank:nTF {#1}
+      { \@@_format_uncertainty_unaligned: }
       {
         \bool_if:NTF \l_@@_uncert_separate_bool
           {
+            \exp_not:V \l_@@_tab_tl
             \@@_format_sign_aux:N \pm
+            \exp_not:V \l_@@_tab_tl
             \@@_format_uncertainty_aux:fn
               { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#2} } }
               {#1}
@@ -1557,8 +1588,16 @@
             \exp_not:V \l_@@_output_uncert_open_tl
             \exp_not:n {#1}
             \exp_not:V \l_@@_output_uncert_close_tl
+            \@@_format_uncertainty_unaligned:
           }
       }
+  }
+\cs_new:Npn \@@_format_uncertainty_unaligned:
+  {
+    \exp_not:V \l_@@_tab_tl
+    \exp_not:V \l_@@_tab_tl
+    \exp_not:V \l_@@_tab_tl
+    \exp_not:V \l_@@_tab_tl
   }
 \cs_new:Npn \@@_format_uncertainty_aux:nn #1#2
   {
@@ -1609,13 +1648,15 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_exponent:Nnn #1#2#3
   {
-    \bool_lazy_or:nnT
+    \exp_not:V \l_@@_tab_tl
+    \bool_lazy_or:nnTF
       { \l_@@_zero_exponent_bool }
       { \bool_not_p:n { \str_if_eq_p:nn {#2} { 0 } } }
       {
-        \bool_lazy_and:nnF
+        \bool_lazy_and:nnTF
           { \str_if_eq_p:nn {#3} { 1. } }
           { \bool_not_p:n { \l_@@_unity_mantissa_bool } }
+          { \exp_not:V \l_@@_tab_tl }
           {
             \bool_if:NTF \l_@@_tight_bool
               {
@@ -1623,6 +1664,7 @@
                   { \exp_not:V \l_@@_exponent_product_tl }
               }
               { \exp_not:V \l_@@_exponent_product_tl }
+            \exp_not:V \l_@@_tab_tl
           }
         \exp_not:V \l_@@_exponent_base_tl
         ^
@@ -1634,6 +1676,7 @@
             \@@_format_digits:nn { integer } {#2}
           }
       }
+      { \exp_not:V \l_@@_tab_tl }
   }
 %    \end{macrocode}
 %   A do-nothing marker used to allow shuffling of the output and so expandable
@@ -1641,6 +1684,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

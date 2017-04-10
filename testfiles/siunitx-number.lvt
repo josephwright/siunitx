@@ -86,6 +86,40 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \siunitx_number_format:nNN {#1} \l_tmpa_tl &
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
+\TEST { Formatting~for~tabular~alignment }
+  {
+    \test:n { >10 }
+    \test:n { 123 }
+    \test:n { 123.456 }
+    \test:n { 123.456(789) }
+    \group_begin:
+      \keys_set:nn { siunitx } { number / separate-uncertainty = true }
+      \test:n { 123.456 \pm 0.789 }
+    \group_end:
+    \test:n { 123e10 }
+    \test:n { +1 }
+    \test:n { e11 }
+    \test:n { -e11 }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \siunitx_number_format:nN {#1} \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
 \TEST { Option~setting~"bracket-negative" }
   {
     \test:n { -1234 }
