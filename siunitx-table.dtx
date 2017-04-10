@@ -427,22 +427,23 @@
 \cs_new_protected:Npn \@@_print_text:
   {
     \use:c { @@_align_ \l_@@_align_text_tl :n }
-      { \l_@@_pre_tl }
+      { \tl_use:N \l_@@_pre_tl }
   }
 %    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Printing numbers in cells: main functions}
 %
-% \begin{variable}[int]{\l_@@_align_tl}
+% \begin{variable}[int]{\l_@@_align_tl, \l_@@_parse_only_bool}
 %   Alignment is handled using a |tl| as this allows a fast lookup at the
 %   point of use.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / table }
   {
-    alignment .choices:nn =
+    alignment  .choices:nn =
       { center , left , right }
       { \tl_set:Nn \l_@@_align_tl {#1} } ,
+    parse-only .bool:N     = \l_@@_parse_only_bool
   }
 \tl_new:N \l_@@_align_tl
 %    \end{macrocode}
@@ -454,6 +455,15 @@
   {
     \use:c { @@_align_ \l_@@_align_tl :n }
       {
+        \bool_if:NTF \l_@@_parse_only_bool
+          {
+            \tl_use:N \l_@@_pre_tl
+            \siunitx_number_format:VN
+              \l_@@_number_tl \l_@@_tmp_tl
+            \siunitx_print:nV { number } \l_@@_tmp_tl
+            \tl_use:N \l_@@_post_tl
+          }
+          { }
       }
   }
 %    \end{macrocode}
