@@ -272,7 +272,7 @@
     \@@_split_tidy:N \l_@@_pre_tl
     \@@_split_tidy:N \l_@@_post_tl
     \tl_if_empty:NTF \l_@@_number_tl
-      { \@@_print_text: }
+      { \@@_print_text:V \l_@@_pre_tl }
       { \@@_print: }
   }
 %    \end{macrocode}
@@ -445,15 +445,15 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[int]{\@@_print_text:}
+% \begin{macro}[int]{\@@_print_text:n, \@@_print_text:V}
 %   Printing escaped text is easy: just place it in correctly in the
 %   column.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_text:
+\cs_new_protected:Npn \@@_print_text:n #1
   {
-    \use:c { @@_align_ \l_@@_align_text_tl :n }
-      { \tl_use:N \l_@@_pre_tl }
+    \use:c { @@_align_ \l_@@_align_text_tl :n } {#1}
   }
+\cs_generate_variant:Nn \@@_print_text:n { V }
 %    \end{macrocode}
 % \end{macro}
 %
