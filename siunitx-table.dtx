@@ -82,6 +82,19 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \subsection{Interface functions}
+%
+% \begin{macro}{\siunitx_cell_begin:, \siunitx_cell_end:}
+\cs_new_protected:Npn \siunitx_cell_begin:
+  {
+    \@@_collect_begin:
+  }
+\cs_new_protected:Npn \siunitx_cell_end:
+  {
+    \@@_collect_end:
+  }
+% \end{macro}
+%
 % \subsection{Collecting tokens}
 %
 % \begin{variable}{\l_@@_collect_tl}
@@ -91,7 +104,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_cell_begin:}
+% \begin{macro}{\@@_collect_begin:}
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
@@ -105,7 +118,7 @@
 %   as each cell forms a group there is no need to reset the definition of
 %   \cs{cr}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_cell_begin:
+\cs_new_protected:Npn \@@_collect_begin:
   {
     \tl_clear:N \l_@@_collect_tl
     \cs_set_protected:Npn \__peek_execute_branches:
@@ -224,11 +237,11 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_cell_end:}
+% \begin{macro}{\@@_collect_end:}
 %   At the end of the cell, expand all of the content as far as possible then
 %   split it up into numerical and non-numerical parts.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_cell_end:
+\cs_new_protected:Npn \@@_collect_end:
   {
     \protected@edef \l_@@_collect_tl { \l_@@_collect_tl }
     \tl_clear:N \l_@@_pre_tl
