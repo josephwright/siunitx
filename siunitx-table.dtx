@@ -84,10 +84,22 @@
 %
 % \subsection{Interface functions}
 %
+% \begin{variable}{\l_@@_parse_bool}
+%   One top-level setting applies to all number cells.
+%    \begin{macrocode}
+\keys_define:nn { siunitx / table }
+  {
+    parse .bool_set:N = \l_@@_parse_bool
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_cell_begin:, \siunitx_cell_end:}
 \cs_new_protected:Npn \siunitx_cell_begin:
   {
-    \@@_collect_begin:
+    \bool_if:NTF \l_@@_parse_bool
+      { \@@_collect_begin: }
+      { }
   }
 \cs_new_protected:Npn \siunitx_cell_end:
   {
@@ -515,6 +527,7 @@
     column-width      = 0pt    ,
     fixed-width       = false  ,
     format            =        ,
+    parse             = true   ,
     parse-only        = false  ,
     text-alignment    = center
   }
