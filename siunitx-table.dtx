@@ -273,7 +273,7 @@
     \@@_split_tidy:N \l_@@_post_tl
     \tl_if_empty:NTF \l_@@_number_tl
       { \@@_print_text:V \l_@@_pre_tl }
-      { \@@_print: }
+      { \@@_print:VVV \l_@@_pre_tl \l_@@_number_tl \l_@@_post_tl }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -486,26 +486,28 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[int]{\@@_print:}
-% \begin{macro}[aux]{\@@_print_non_aligned:, \@@_print_aligned:}
+% \begin{macro}[int]{\@@_print:nnn, \@@_print:VVV}
+% \begin{macro}[aux]{\@@_print_non_aligned:nnn, \@@_print_aligned:nnn}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print:
+\cs_new_protected:Npn \@@_print:nnn #1#2#3
   {
     \use:c { @@_align_ \l_@@_alignment_tl :n }
       {
         \bool_if:NTF \l_@@_parse_only_bool
-          { \@@_print_non_aligned: }
-          { \@@_print_aligned: }
+          { \@@_print_non_aligned:nnn }
+          { \@@_print_aligned:nnn }
+          {#1} {#2} {#3}
       }
   }
-\cs_new_protected:Npn \@@_print_non_aligned:
+\cs_generate_variant:Nn \@@_print:nnn { VVV }
+\cs_new_protected:Npn \@@_print_non_aligned:nnn #1#2#3
   {
-    \tl_use:N \l_@@_pre_tl
-    \siunitx_number_format:VN \l_@@_number_tl \l_@@_tmp_tl
+    #1
+    \siunitx_number_format:nN {#2} \l_@@_tmp_tl
     \siunitx_print:nV { number } \l_@@_tmp_tl
-    \tl_use:N \l_@@_post_tl
+    #3
   }
-\cs_new_protected:Npn \@@_print_aligned:
+\cs_new_protected:Npn \@@_print_aligned:nnn #1#2#3
   {
   }
 %    \end{macrocode}
