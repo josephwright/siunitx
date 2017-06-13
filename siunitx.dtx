@@ -666,6 +666,7 @@ This work consists of the file  siunitx.dtx
 %   tables}
 % \changes{v2.7g}{2017/05/19}{Avoid an issue with recent \pkg{expl3}
 %   update}
+% \changes{v2.7h}{2017/06/12}{Internal changes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5211,7 +5212,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2017/05/19} {2.7g}
+\ProvidesExplPackage {siunitx} {2017/06/13} {2.7h}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -15215,11 +15216,10 @@ This work consists of the file  siunitx.dtx
     \hbox_set_to_wd:Nnn \l_@@_table_post_box
       { \box_wd:N \l_@@_tmp_box }
       { \tex_hfil:D }
-    \hbox_set:Nn \l_@@_table_pre_box
-      \c_group_begin_token
-        \c_math_toggle_token
-        \tl_map_function:NN \l_@@_input_decimal_tl
-          \@@_table_print_S_direct_centered_aux:N
+    \hbox_set:Nw \l_@@_table_pre_box
+      \c_math_toggle_token
+      \tl_map_function:NN \l_@@_input_decimal_tl
+        \@@_table_print_S_direct_centered_aux:N
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_centered_aux:N #1
   {
@@ -15228,17 +15228,16 @@ This work consists of the file  siunitx.dtx
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_centered_begin:
   {
-    \c_math_toggle_token
-    \c_group_end_token
-    \hbox_set:Nn \l_@@_table_post_box
-      \c_group_begin_token
-        \c_math_toggle_token
-        \l_@@_output_decimal_tl
+      \c_math_toggle_token
+    \hbox_set_end:
+    \hbox_set:Nw \l_@@_table_post_box
+      \c_math_toggle_token
+      \l_@@_output_decimal_tl
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_centered_end:
   {
       \c_math_toggle_token
-    \c_group_end_token
+    \hbox_set_end:
     \dim_compare:nNnTF
       { \box_wd:N \l_@@_table_pre_box } >
         { \box_wd:N \l_@@_table_post_box }
@@ -15310,8 +15309,7 @@ This work consists of the file  siunitx.dtx
     \hbox_set_to_wd:Nnn \l_@@_table_post_box
       { \box_wd:N \l_@@_tmp_box }
       { \tex_hfil:D }
-    \hbox_set_to_wd:Nnn \l_@@_table_pre_box
-      { \l_@@_table_integer_dim }
+    \tex_setbox:D \l_@@_table_pre_box \tex_hbox:D to \l_@@_table_integer_dim
       \c_group_begin_token
         \c_math_toggle_token
         \tl_map_function:NN \l_@@_input_decimal_tl
@@ -15327,8 +15325,7 @@ This work consists of the file  siunitx.dtx
   {
       \c_math_toggle_token
     \c_group_end_token
-    \hbox_set_to_wd:Nnn \l_@@_table_post_box
-      { \box_wd:N \l_@@_tmp_box }
+    \tex_setbox:D \l_@@_table_post_box \tex_hbox:D to \box_wd:N \l_@@_tmp_box
       \c_group_begin_token
         \c_math_toggle_token
         \l_@@_output_decimal_tl
@@ -16815,7 +16812,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-version-1.cfg} {2017/05/19} {2.7g}
+\ProvidesExplFile {siunitx-version-1.cfg} {2017/06/13} {2.7h}
   {siunitx: Version 1 settings}
 %    \end{macrocode}
 %
@@ -17757,7 +17754,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-abbreviations.cfg} {2017/05/19} {2.7g}
+\ProvidesExplFile {siunitx-abbreviations.cfg} {2017/06/13} {2.7h}
   {siunitx: Abbreviated units}
 %    \end{macrocode}
 %
@@ -17939,7 +17936,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesExplFile {siunitx-binary.cfg} {2017/05/19} {2.7g}
+\ProvidesExplFile {siunitx-binary.cfg} {2017/06/13} {2.7h}
   {siunitx: Binary units}
 %    \end{macrocode}
 %
