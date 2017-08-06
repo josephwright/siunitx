@@ -114,7 +114,7 @@
 \cs_generate_variant:Nn \tl_if_in:NnTF { NV }
 %    \end{macrocode}
 %
-% \begin{variable}[int]{\l_@@_tmp_tl}
+% \begin{variable}{\l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
 \tl_new:N \l_@@_tmp_tl
@@ -123,7 +123,7 @@
 %
 % \subsection{Main formatting routine}
 %
-% \begin{variable}[int]{\l_@@_formatted_tl}
+% \begin{variable}{\l_@@_formatted_tl}
 %   A token list for the final formatted result: may or may not be generated
 %   by the parser, depending on settings which are active.
 %    \begin{macrocode}
@@ -131,7 +131,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_tab_tl}
+% \begin{variable}{\l_@@_tab_tl}
 %   A token list for marking the position of tabular alignments in formatted
 %   output.
 %    \begin{macrocode}
@@ -141,7 +141,7 @@
 %
 % \begin{macro}{\siunitx_number_format:nN, \siunitx_number_format:VN}
 % \begin{macro}{\siunitx_number_format:nNN}
-% \begin{macro}[aux]{\@@_format:nN}
+% \begin{macro}{\@@_format:nN}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_format:nN #1#2
   {
@@ -200,7 +200,7 @@
 % a stored number (\emph{i.e.}~at the end of parsing). The number must have
 % at least one digit for both the \meta{integer} and \meta{exponent} parts.
 %
-% \begin{variable}[int]
+% \begin{variable}
 %   {
 %      \l_@@_expression_bool       ,
 %      \l_@@_input_uncert_close_tl ,
@@ -214,7 +214,7 @@
 %      \l_@@_input_sign_tl         ,
 %      \l_@@_input_uncert_sign_tl
 %   }
-%  \begin{macro}[int, EXP]{\@@_expression:n}
+%  \begin{macro}[EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / number }
@@ -246,7 +246,7 @@
 % \end{macro}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_arg_tl}
+% \begin{variable}{\l_@@_arg_tl}
 %   The input argument or a part thereof, depending on the position in
 %   the parsing routine.
 %    \begin{macrocode}
@@ -254,14 +254,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_comparator_tl}
+% \begin{variable}{\l_@@_comparator_tl}
 %   A comparator, if found, is held here.
 %    \begin{macrocode}
 \tl_new:N \l_@@_comparator_tl
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_exponent_tl}
+% \begin{variable}{\l_@@_exponent_tl}
 %   The exponent part of a parsed number. It is easiest to find this
 %   relatively early in the parsing process, but as it needs to go at
 %   the end of the internal format is held separately until required.
@@ -270,7 +270,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_flex_tl}
+% \begin{variable}{\l_@@_flex_tl}
 %   When parsing for a separate uncertainty or complex number, the nature
 %   of the grabbed part cannot be determined until the end of the number.
 %   To avoid abusing the storage areas, this dedicated one is used for
@@ -280,7 +280,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_imaginary_tl, \l_@@_real_tl}
+% \begin{variable}{\l_@@_imaginary_tl, \l_@@_real_tl}
 %   Used to hold the real and imaginary parts of a number in the standardised
 %   format.
 %    \begin{macrocode}
@@ -289,14 +289,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_input_tl}
+% \begin{variable}{\l_@@_input_tl}
 %   The numerical input exactly as given by the user.
 %    \begin{macrocode}
 \tl_new:N \l_@@_input_tl
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_partial_tl}
+% \begin{variable}{\l_@@_partial_tl}
 %   To avoid needing to worry about the fact that the final data stores are
 %   somewhat tricky to add to token-by-token, a simple store is used to build
 %   up the parsed part of a number before transferring in one go.
@@ -305,14 +305,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}[int]{\l_@@_validate_bool}
+% \begin{variable}{\l_@@_validate_bool}
 %   Used to set up for valiation with no error production.
 %    \begin{macrocode}
 \bool_new:N \l_@@_validate_bool
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[int]{\@@_parse:n}
+% \begin{macro}{\@@_parse:n}
 %   After some initial set up, the parser expands the input and then replaces
 %   as far as possible tricky tokens with ones that can be handled using
 %   delimited arguments. The parser begins with the assumption that the input
@@ -339,7 +339,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_check:}
+% \begin{macro}{\@@_parse_check:}
 %   After the loop there is one case that might need tidying up. If a
 %   separated uncertainty was found it will be currently in \cs{l_@@_flex_tl}
 %   and needs moving. A series of tests pick up that case, then the check is
@@ -384,21 +384,21 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_combine_uncert:}
-% \begin{macro}[aux]{\@@_parse_combine_uncert_auxi:NnnnNnnn}
-% \begin{macro}[aux]
+% \begin{macro}{\@@_parse_combine_uncert:}
+% \begin{macro}{\@@_parse_combine_uncert_auxi:NnnnNnnn}
+% \begin{macro}
 %   {
 %     \@@_parse_combine_uncert_auxii:nnnnn,
 %     \@@_parse_combine_uncert_auxii:fnnnn
 %   }
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_parse_combine_uncert_auxiii:nnnnnn,
 %     \@@_parse_combine_uncert_auxiii:fnnnnn
 %   }
-% \begin{macro}[aux]{\@@_parse_combine_uncert_auxiv:nnnn}
-% \begin{macro}[aux, EXP]{\@@_parse_combine_uncert_auxv:w}
-% \begin{macro}[aux, EXP]{\@@_parse_combine_uncert_auxvi:w}
+% \begin{macro}{\@@_parse_combine_uncert_auxiv:nnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_auxv:w}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_auxvi:w}
 %   Conversion of a second numerical part to an uncertainty needs a bit of
 %   work. The first step is to extract the useful information from the two
 %   stores: the sign, integer and decimal parts from the real number and the
@@ -501,8 +501,8 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_comparator:}
-% \begin{macro}[aux]{\@@_parse_comparator_aux:Nw}
+% \begin{macro}{\@@_parse_comparator:}
+% \begin{macro}{\@@_parse_comparator_aux:Nw}
 %   A comparator has to be the very first token in the input. A such, the
 %   test for this can be very fast: grab the first token, do a check and
 %   if appropriate store the result.
@@ -527,14 +527,14 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_exponent:}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:w}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:nn}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:Nw}
-% \begin{macro}[aux]{\@@_parse_exponent_aux:Nn}
-% \begin{macro}[aux]
+% \begin{macro}{\@@_parse_exponent:}
+% \begin{macro}{\@@_parse_exponent_aux:w}
+% \begin{macro}{\@@_parse_exponent_aux:nn}
+% \begin{macro}{\@@_parse_exponent_aux:Nw}
+% \begin{macro}{\@@_parse_exponent_aux:Nn}
+% \begin{macro}
 %   {\@@_parse_exponent_zero_test:N, \@@_parse_exponent_check:N}
-% \begin{macro}[aux]{\@@_parse_exponent_cleanup:N}
+% \begin{macro}{\@@_parse_exponent_cleanup:N}
 %   An exponent part of a number has to come at the end and can only occur
 %   once. Thus it is relatively easy to parse. First, there is a check that
 %   an exponent part is allowed, and if so a split is made (the previous
@@ -640,10 +640,10 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_replace:}
-% \begin{macro}[aux]{\@@_parse_replace_aux:nN}
-% \begin{macro}[aux]{\@@_parse_replace_sign:}
-% \begin{variable}[aux]{\c_@@_parse_sign_replacement_tl}
+% \begin{macro}{\@@_parse_replace:}
+% \begin{macro}{\@@_parse_replace_aux:nN}
+% \begin{macro}{\@@_parse_replace_sign:}
+% \begin{variable}{\c_@@_parse_sign_replacement_tl}
 %   There are two parts to the replacement code. First, any active
 %   hyphens signs are normalised: these can come up with some packages and
 %   cause issues. Multi-token signs then are converted to the single token
@@ -687,9 +687,9 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_finalise:}
-% \begin{macro}[aux]{\@@_parse_finalise_aux:N}
-% \begin{macro}[aux]{\@@_parse_finalise_aux:Nw}
+% \begin{macro}{\@@_parse_finalise:}
+% \begin{macro}{\@@_parse_finalise_aux:N}
+% \begin{macro}{\@@_parse_finalise_aux:Nw}
 %   Combine all of the bits of a number together: both the real and
 %   imaginary parts contain all of the data.
 %    \begin{macrocode}
@@ -721,22 +721,22 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_loop:}
-% \begin{macro}[aux]{\@@_parse_loop_first:N}
-% \begin{macro}[aux]{\@@_parse_loop_main:NNNNN}
-% \begin{macro}[aux]{\@@_parse_loop_main_end:NN}
-% \begin{macro}[aux]{\@@_parse_loop_main_digit:NNNNN}
-% \begin{macro}[aux]{\@@_parse_loop_main_decimal:NN}
-% \begin{macro}[aux]{\@@_parse_loop_main_uncert:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_main_complex:N}
-% \begin{macro}[aux]{\@@_parse_loop_main_sign:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_main_store:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_after_decimal:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_uncert:NNNNN}
-% \begin{macro}[aux]{\@@_parse_loop_after_uncert:NNN}
-% \begin{macro}[aux]{\@@_parse_loop_root_swap:NNwNN}
-% \begin{macro}[aux]{\@@_parse_loop_complex_cleanup:wN}
-% \begin{macro}[aux]{\@@_parse_loop_break:wN}
+% \begin{macro}{\@@_parse_loop:}
+% \begin{macro}{\@@_parse_loop_first:N}
+% \begin{macro}{\@@_parse_loop_main:NNNNN}
+% \begin{macro}{\@@_parse_loop_main_end:NN}
+% \begin{macro}{\@@_parse_loop_main_digit:NNNNN}
+% \begin{macro}{\@@_parse_loop_main_decimal:NN}
+% \begin{macro}{\@@_parse_loop_main_uncert:NNN}
+% \begin{macro}{\@@_parse_loop_main_complex:N}
+% \begin{macro}{\@@_parse_loop_main_sign:NNN}
+% \begin{macro}{\@@_parse_loop_main_store:NNN}
+% \begin{macro}{\@@_parse_loop_after_decimal:NNN}
+% \begin{macro}{\@@_parse_loop_uncert:NNNNN}
+% \begin{macro}{\@@_parse_loop_after_uncert:NNN}
+% \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
+% \begin{macro}{\@@_parse_loop_complex_cleanup:wN}
+% \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
 %   mantissa, which may contain an uncertainty or complex part. Parsing this
 %   and allowing for all of the different formats possible is best done using
@@ -1121,8 +1121,8 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int]{\@@_parse_sign:}
-% \begin{macro}[aux]{\@@_parse_sign_aux:Nw}
+% \begin{macro}{\@@_parse_sign:}
+% \begin{macro}{\@@_parse_sign_aux:Nw}
 %   The first token of a number after a comparator could be a sign. A quick
 %   check is made and if found stored; if there is no sign then the internal
 %   format requires that |+| is used. For the number to be valid it has to be
@@ -1152,7 +1152,7 @@
 %
 % \subsection{Processing numbers}
 %
-% \begin{variable}[int]
+% \begin{variable}
 %   {
 %     \l_@@_round_half_up_bool  ,
 %     \l_@@_round_min_tl        ,
@@ -1184,9 +1184,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[int]{\@@_round:}
-% \begin{macro}[aux]{\@@_round:N}
-% \begin{macro}[aux]{\@@_round_none:nNnnnNn}
+% \begin{macro}{\@@_round:}
+% \begin{macro}{\@@_round:N}
+% \begin{macro}{\@@_round_none:nNnnnNn}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_round:
   {
@@ -1213,7 +1213,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int, EXP]{\@@_round_figures:nNnnnNn}
+% \begin{macro}[EXP]{\@@_round_figures:nNnnnNn}
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_figures:nNnnnNn #1#2#3#4#5#6#7
   {
@@ -1228,8 +1228,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int, EXP]{\@@_round_places:nNnnnNn}
-% \begin{macro}[aux, EXP]
+% \begin{macro}[EXP]{\@@_round_places:nNnnnNn}
+% \begin{macro}[EXP]
 %   {\@@_round_places_decimal:nNnnNn, \@@_round_places_integer:nNnnNn}
 %   The first step when rounding to a fixed number of places is to establish
 %   if this is in the decimal or integer parts. The two require different
@@ -1254,7 +1254,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[int, EXP]{\@@_round_uncertainty:nNnnnNn}
+% \begin{macro}[EXP]{\@@_round_uncertainty:nNnnnNn}
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nNnnnNn #1#2#3#4#5#6#7
   {
@@ -1267,7 +1267,7 @@
 %
 % \subsection{Formatting parsed numbers}
 %
-% \begin{variable}[int]
+% \begin{variable}
 %   {
 %      \l_@@_bracket_negative_bool  ,
 %      \l_@@_bracket_close_tl       ,
@@ -1338,7 +1338,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[int]{\@@_format:}
+% \begin{macro}{\@@_format:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format:
   {
@@ -1359,35 +1359,35 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[int, EXP]{\@@_format:N}
-% \begin{macro}[aux, EXP]{\@@_format:nNnnnNn}
-% \begin{macro}[aux, EXP]{\@@_format_comparator:n}
-% \begin{macro}[aux, EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
-% \begin{macro}[aux, EXP]
+% \begin{macro}[EXP]{\@@_format:N}
+% \begin{macro}[EXP]{\@@_format:nNnnnNn}
+% \begin{macro}[EXP]{\@@_format_comparator:n}
+% \begin{macro}[EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
+% \begin{macro}[EXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
-% \begin{macro}[aux, EXP]{\@@_format_integer:nnn}
-% \begin{macro}[aux, EXP]{\@@_format_decimal:n, \@@_format_decimal:f}
-% \begin{macro}[aux, EXP]{\@@_format_digits:nn}
-% \begin{macro}[aux, EXP]{\@@_format_integer_aux:n}
-% \begin{macro}[aux, EXP]
+% \begin{macro}[EXP]{\@@_format_integer:nnn}
+% \begin{macro}[EXP]{\@@_format_decimal:n, \@@_format_decimal:f}
+% \begin{macro}[EXP]{\@@_format_digits:nn}
+% \begin{macro}[EXP]{\@@_format_integer_aux:n}
+% \begin{macro}[EXP]
 %   {
 %     \@@_format_integer_aux_0:n,
 %     \@@_format_integer_aux_1:n,
 %     \@@_format_integer_aux_2:n
 %   }
-% \begin{macro}[aux, EXP]{\@@_format_decimal_aux:n}
-% \begin{macro}[aux, EXP]{\@@_format_decimal_loop:NNNN}
-% \begin{macro}[aux, EXP]{\@@_format_integer_first:nnNN}
-% \begin{macro}[aux, EXP]{\@@_format_integer_loop:NNNN}
-% \begin{macro}[aux, EXP]{\@@_format_uncertainty:nn}
-% \begin{macro}[aux, EXP]{\@@_format_uncertainty_unaligned:}
-% \begin{macro}[aux, EXP]
+% \begin{macro}[EXP]{\@@_format_decimal_aux:n}
+% \begin{macro}[EXP]{\@@_format_decimal_loop:NNNN}
+% \begin{macro}[EXP]{\@@_format_integer_first:nnNN}
+% \begin{macro}[EXP]{\@@_format_integer_loop:NNNN}
+% \begin{macro}[EXP]{\@@_format_uncertainty:nn}
+% \begin{macro}[EXP]{\@@_format_uncertainty_unaligned:}
+% \begin{macro}[EXP]
 %   {\@@_format_uncertainty_aux:nn, \@@_format_uncertainty_aux:fn}
-% \begin{macro}[aux, EXP]
+% \begin{macro}[EXP]
 %   {\@@_format_uncertainty:nnw, \@@_format_uncertainty:fnw}
-% \begin{macro}[aux, EXP]{\@@_format_uncertainty:nw}
-% \begin{macro}[aux, EXP]{\@@_format_exponent:Nnn}
-% \begin{macro}[aux, EXP]{\@@_format_end:}
+% \begin{macro}[EXP]{\@@_format_uncertainty:nw}
+% \begin{macro}[EXP]{\@@_format_exponent:Nnn}
+% \begin{macro}[EXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts. All of the parts are assembled including
 %   inserting tabular alignment markers (which may be empty) for each
