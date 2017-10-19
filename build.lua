@@ -12,9 +12,6 @@ installfiles = {"*.cfg", "*.sty"}
 -- Release a TDS-style zip
 packtdszip = true
 
--- No implementation as standard
-typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
-
 -- Typeset only the .tex files
 typesetfiles = {"*.tex"}
 
