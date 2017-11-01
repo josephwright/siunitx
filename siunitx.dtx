@@ -668,6 +668,7 @@ This work consists of the file  siunitx.dtx
 %   update}
 % \changes{v2.7h}{2017/06/12}{Internal changes}
 % \changes{v2.7i}{2017/07/23}{Rename an incorrect variable}
+% \changes{v2.7k}{2017/11/01}{Fix issues when units are not parsed}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -12884,7 +12885,10 @@ This work consists of the file  siunitx.dtx
       \str_if_eq:VnT \l_@@_per_mode_tl { symbol }
         {
           \int_compare:nNnT { \l_@@_unit_numerator_int } = { 0 }
-            { \@@_print:nn { unit } { 1 } }
+            {
+              \bool_if:NT \l_@@_unit_parse_bool
+                { \@@_print:nn { unit } { 1 } }
+            }
         }
     }
     {
