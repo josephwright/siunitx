@@ -668,6 +668,7 @@ This work consists of the file  siunitx.dtx
 %   update}
 % \changes{v2.7h}{2017/06/12}{Internal changes}
 % \changes{v2.7i}{2017/07/23}{Rename an incorrect variable}
+% \changes{v2.7k}{2017/11/01}{Fix issues when units are not parsed}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -2497,7 +2498,7 @@ This work consists of the file  siunitx.dtx
 %      add-arc-minute-zero       & Switch  & false        \\
 %      add-arc-second-zero       & Switch  & false        \\
 %      angle-symbol-over-decimal & Switch  & false        \\
-%      arc-separator             & Literal & false        \\
+%      arc-separator             & Literal & \meta{empty} \\
 %      number-angle-product      & Literal & \meta{empty} \\
 %    \bottomrule
 %  \end{tabular}
@@ -6530,10 +6531,10 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_print_text_aux:NnN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #1
-    \tl_set_rescan:Nnn \l_@@_tmp_tl
+    \tl_set_rescan:Nnn \l_@@_tmpa_tl
        { \use:c { char_set_catcode_ #2 :N } #1 }
        {#1}
-    \tl_replace_all:NVn \l_@@_print_arg_tl \l_@@_tmp_tl {#3}
+    \tl_replace_all:NVn \l_@@_print_arg_tl \l_@@_tmpa_tl {#3}
     \_@@_print_text_aux:NnN
   }
 \AtBeginDocument
@@ -12884,7 +12885,10 @@ This work consists of the file  siunitx.dtx
       \str_if_eq:VnT \l_@@_per_mode_tl { symbol }
         {
           \int_compare:nNnT { \l_@@_unit_numerator_int } = { 0 }
-            { \@@_print:nn { unit } { 1 } }
+            {
+              \bool_if:NT \l_@@_unit_parse_bool
+                { \@@_print:nn { unit } { 1 } }
+            }
         }
     }
     {
