@@ -155,7 +155,16 @@
 \cs_new_protected:Npn \@@_math:n #1
   { \ensuremath {#1} }
 \cs_new_protected:Npn \@@_text:n #1
-  { \text {#1} }
+  {
+    \text
+      {
+        \group_begin:
+          \bool_if:NF \l_@@_follow_shape_bool
+            { \upshape }
+          #1
+        \group_end:
+      }
+  }
 %    \end{macrocode}
 % \end{macro}
 %
