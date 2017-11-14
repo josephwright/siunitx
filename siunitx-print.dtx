@@ -101,7 +101,7 @@
 %     \l_@@_number_mode_tl   ,
 %     \l_@@_unit_color_tl    ,
 %     \l_@@_unit_mode_tl     ,
-%     \l_@@_follow_shape_bool
+%     \l_@@_control_shape_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
@@ -110,15 +110,15 @@
 \tl_new:N \l_@@_unit_mode_tl
 \keys_define:nn { siunitx / print }
   {
-    color        .meta:n     = { number-color = #1 , unit-color = #1 } ,
-    follow-shape .bool:N     = \l_@@_follow_shape_bool                 ,
-    mode         .meta:n     = { number-mode = #1 , unit-mode = #1 }   ,
-    number-color .tl_set:N   = \l_@@_number_color_tl                   ,
-    number-mode  .choices:nn =
+    color        .meta:n      = { number-color = #1 , unit-color = #1 } ,
+    control-shape .bool:N     = \l_@@_control_shape_bool                 ,
+    mode         .meta:n      = { number-mode = #1 , unit-mode = #1 }   ,
+    number-color .tl_set:N    = \l_@@_number_color_tl                   ,
+    number-mode  .choices:nn  =
       { match , math , text }
       { \tl_set_eq:NN \l_@@_number_mode_tl \l_keys_choice_tl }         ,
-    unit-color  .tl_set:N    = \l_@@_unit_color_tl                     ,
-    unit-mode   .choices:nn  =
+    unit-color  .tl_set:N     = \l_@@_unit_color_tl                     ,
+    unit-mode   .choices:nn   =
       { match , math , text }
       { \tl_set_eq:NN \l_@@_unit_mode_tl \l_keys_choice_tl }
   }
@@ -159,7 +159,7 @@
     \text
       {
         \group_begin:
-          \bool_if:NF \l_@@_follow_shape_bool
+          \bool_if:NF \l_@@_control_shape_bool
             { \upshape }
           #1
         \group_end:
@@ -176,13 +176,13 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx / print }
   {
-    color        =       ,
-    follow-shape = false ,
-    mode         = math  ,
-    number-color =       ,
-    number-mode  = math  ,
-    unit-color   =       ,
-    unit-mode    = math
+    color         =       ,
+    control-shape = false ,
+    mode          = math  ,
+    number-color  =       ,
+    number-mode   = math  ,
+    unit-color    =       ,
+    unit-mode     = math
   }
 %    \end{macrocode}
 %
