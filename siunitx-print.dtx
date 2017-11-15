@@ -101,7 +101,8 @@
 %     \l_@@_number_mode_tl   ,
 %     \l_@@_unit_color_tl    ,
 %     \l_@@_unit_mode_tl     ,
-%     \l_@@_control_shape_bool
+%     \l_@@_control_shape_bool ,
+%     \l_@@_control_weight_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
@@ -112,6 +113,7 @@
   {
     color        .meta:n      = { number-color = #1 , unit-color = #1 } ,
     control-shape .bool:N     = \l_@@_control_shape_bool                ,
+    control-weight .bool:N    = \l_@@_control_weight_bool               ,
     mode         .meta:n      = { number-mode = #1 , unit-mode = #1 }   ,
     number-color .tl_set:N    = \l_@@_number_color_tl                   ,
     number-mode  .choices:nn  =
@@ -161,6 +163,8 @@
         \group_begin:
           \bool_if:NT \l_@@_control_shape_bool
             { \upshape }
+          \bool_if:NT \l_@@_control_weight_bool
+            { \mdseries }
           #1
         \group_end:
       }
@@ -178,6 +182,7 @@
   {
     color         =       ,
     control-shape = false ,
+    control-weight = false ,
     mode          = math  ,
     number-color  =       ,
     number-mode   = math  ,
