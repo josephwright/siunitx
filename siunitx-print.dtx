@@ -189,12 +189,29 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_text:n}
+%   To allow propagation of math weight to text, there is some up-front work
+%   to do to check for the appropriate combination of conditions. If they
+%   apply, we locally set the weight \emph{before} forcing text mode so that
+%   it will carry through.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text:n #1
   {
-    \text
-      {
-        \group_begin:
+    \group_begin:
+      \bool_lazy_all:nT
+        {
+          { \mode_if_math_p: }
+          { ! \l_@@_control_weight_bool }
+          { ! \str_if_eq_p:Vn \math@version { normal } }
+        }
+        {
+          \str_case:Vn \math@version
+            {
+              { bold }  { \bfseries }
+              { light } { \lseries }
+            }
+        }
+      \text
+        {
           \bool_if:NT \l_@@_control_family_bool
             { \rmfamily }
           \bool_if:NT \l_@@_control_shape_bool
@@ -202,8 +219,8 @@
           \bool_if:NT \l_@@_control_weight_bool
             { \mdseries }
           #1
-        \group_end:
-      }
+        }
+    \group_end:
   }
 %    \end{macrocode}
 % \end{macro}
