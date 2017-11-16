@@ -100,6 +100,30 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\document}
+% \begin{variable}{\c_@@_mathrm_int}
+%   In order to correctly determine that |\mathrm| is in use, we need to know
+%   what math family it uses. That can be done by examining \tn{fam} at the
+%   start of the document. This is run as a hook onto \cs{document}, rather
+%   than using \tn{AtBeginDocument} as it has to come after anything that
+%   \pkg{fontspec} does (nasty errors arise otherwise). As this is a true
+%   one-off, we avoid wasting a box.
+%    \begin{macrocode}
+\tl_put_right:Nn \document
+  {
+    \group_begin:
+      \hbox_set:Nn \l_tmpa_box
+        {
+          \ensuremath
+            { \mathrm { \int_const:Nn \c_@@_mathrm_int { \fam } } }
+        }
+    \group_end:
+    \ignorespaces
+  }
+%    \end{macrocode}
+% \end{variable}
+% \end{macro}
+%
 % \subsection{Printing routines}
 %
 % \begin{variable}
