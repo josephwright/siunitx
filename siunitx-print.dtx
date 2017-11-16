@@ -93,10 +93,10 @@
 \RequirePackage { color }
 %    \end{macrocode}
 %
-% \begin{macro}{\str_case:Vn}
+% \begin{macro}{\str_case:VnF}
 %   Variants.
 %    \begin{macrocode}
-\cs_generate_variant:Nn \str_case:nn { V }
+\cs_generate_variant:Nn \str_case:nnF { V }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -196,40 +196,50 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_text:n}
+% \begin{macro}{\@@_text:nn}
 %   To allow propagation of math weight to text, there is some up-front work
 %   to do to check for the appropriate combination of conditions. If they
 %   apply, we locally set the weight \emph{before} forcing text mode so that
-%   it will carry through.
+%   it will carry through. That requires an auxiliary to pass the information
+%   into text mode.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text:n #1
   {
     \group_begin:
-      \bool_lazy_all:nT
+      \bool_lazy_all:nTF
         {
           { \mode_if_math_p: }
           { ! \l_@@_control_weight_bool }
           { ! \str_if_eq_p:Vn \math@version { normal } }
         }
         {
-          \str_case:Vn \math@version
+          \str_case:VnF \math@version
             {
-              { bold }  { \bfseries }
-              { light } { \lseries }
+              { bold }  { \@@_text:nn { \bfseries } }
+              { light } { \@@_text:nn { \lseries } }
             }
+            { \@@_text:nn { } }
         }
+        { \@@_text:nn { } }
+          {#1}
+  }
+\cs_new_protected:Npn \@@_text:nn #1#2
+  {
       \text
         {
+          #1
           \bool_if:NT \l_@@_control_family_bool
             { \rmfamily }
           \bool_if:NT \l_@@_control_shape_bool
             { \upshape }
           \bool_if:NT \l_@@_control_weight_bool
             { \mdseries }
-          #1
+          #2
         }
     \group_end:
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
