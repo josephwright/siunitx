@@ -162,10 +162,25 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_math:n}
+% \begin{macro}{\@@_math_aux:n}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_math:n #1
-  { \ensuremath {#1} }
+  {
+    \bool_lazy_all:nTF
+      {
+        { \mode_if_math_p: }
+        { \l_@@_control_weight_bool }
+        { ! \str_if_eq_p:Vn \math@version { normal } }
+      }
+      { \text { \mathversion { normal } \@@_math_aux:n {#1} } }
+      { \@@_math_aux:n {#1} }
+  }
+\cs_new_protected:Npn \@@_math_aux:n #1
+  {
+    \ensuremath {#1}
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_text:n}
