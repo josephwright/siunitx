@@ -260,6 +260,7 @@
 %
 % \begin{macro}{\@@_text:n}
 % \begin{macro}{\@@_text:nn}
+% \begin{macro}{\@@_text_replace:n}
 %   To allow propagation of math weight to text, there is some up-front work
 %   to do to check for the appropriate combination of conditions. If they
 %   apply, we locally set the weight \emph{before} forcing text mode so that
@@ -297,11 +298,38 @@
             { \upshape }
           \bool_if:NT \l_@@_control_weight_bool
             { \mdseries }
-          #2
+          \@@_text_replace:n {#2}
         }
     \group_end:
   }
 %    \end{macrocode}
+%   To get math mode material to print in text mode, various search-and-replace
+%   steps are needed.
+%    \begin{macrocode}
+\cs_new_protected:Npx \@@_text_replace:n #1
+  {
+    \group_begin:
+      \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#1}
+      \exp_not:N \@@_text_replace_aux:Nn
+        \exp_not:N \pm                  { \exp_not:N \textpm }
+        \exp_not:N \mp                  { \exp_not:n { \ensuremath { \mp } } }
+        -                               { \exp_not:N \textminus }
+        \char_generate:nn { `\_ } { 8 } { \exp_not:N \textsubscript }
+        ^                               { \exp_not:N \textsuperscript }
+        \exp_not:N \mathrm              { \exp_not:N \use:n }
+        \exp_not:N \q_recursion_tail    { ? }
+        \exp_not:N \q_recursion_stop
+      \exp_not:N \tl_use:N \exp_not:N \l_@@_tmp_tl
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_text_replace_aux:Nn #1#2
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \tl_replace_all:Nnn \l_@@_tmp_tl {#1} {#2}
+    \@@_text_replace_aux:Nn
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
