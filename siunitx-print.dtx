@@ -108,7 +108,7 @@
 % \end{variable}
 %
 % \begin{macro}{\document}
-% \begin{variable}{\c_@@_mathrm_int}
+% \begin{variable}{\c_@@_mathnormal_int, \c_@@_mathrm_int}
 %   In order to correctly determine that |\mathrm| is in use, we need to know
 %   what math family it uses. That can be done by examining \tn{fam} at the
 %   start of the document. This is run as a hook onto \cs{document}, rather
@@ -119,6 +119,11 @@
 \tl_put_right:Nn \document
   {
     \group_begin:
+      \hbox_set:Nn \l_@@_tmp_box
+        {
+          \ensuremath
+            { \int_const:Nn \c_@@_mathnormal_int { \fam } }
+        }
       \hbox_set:Nn \l_@@_tmp_box
         {
           \ensuremath
