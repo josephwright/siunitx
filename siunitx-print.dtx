@@ -223,9 +223,25 @@
       { \text { \mathversion { normal } \@@_math_aux:n {#1} } }
       { \@@_math_aux:n {#1} }
   }
+%    \end{macrocode}
+%   A second check is need for the case where we are already inside
+%   \latin{e.g.}~|\mathsf| but we have been asked to control the family:
+%   any numbers or other \enquote{free} text would otherwise be incorrect.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_math_aux:n #1
   {
-    \ensuremath {#1}
+    \bool_lazy_all:nTF
+      {
+        { \mode_if_math_p: }
+        { \l_@@_control_family_bool }
+        {
+          ! \bool_lazy_or_p:nn
+            { \int_compare_p:nNn \fam = \c_@@_mathnormal_int }
+            { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
+        }
+      }
+      { \mathrm {#1} }
+      { \ensuremath {#1} }
   }
 %    \end{macrocode}
 % \end{macro}
