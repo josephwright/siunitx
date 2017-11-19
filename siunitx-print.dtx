@@ -264,7 +264,12 @@
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
 % \begin{macro}{\@@_text_sub:n, \@@_text_super:n}
-% \begin{macro}{\@@_text_scripts:Nn}
+% \begin{macro}{\@@_text_scripts:NnN}
+% \begin{macro}{\@@_text_scripts:}
+% \begin{macro}{\@@_text_scripts_one:NnN}
+% \begin{macro}{\@@_text_scripts_two:NnNn}
+% \begin{macro}{\@@_text_scripts_two:nn}
+% \begin{macro}{\@@_text_scripts_two:n}
 %   To allow propagation of math weight to text, there is some up-front work
 %   to do to check for the appropriate combination of conditions. If they
 %   apply, we locally set the weight \emph{before} forcing text mode so that
@@ -337,14 +342,39 @@
     \@@_text_replace:NNn #1
   }
 %    \end{macrocode}
-%   Sub- and superscripts can contain additional items for replacement:
-%   there is therefore a layer of redirection.
+%   Sub- and superscripts can be in any order in the source. The first step
+%   of handling them is therefore to do a look-ahead to work out whether
+%   only one or both are present.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_sub:n #1
-  { \@@_text_scripts:Nn \textsubscript {#1} }
+  {
+    \@@_text_scripts:NnN
+      \textsubscript {#1} \@@_text_super:n
+  }
 \cs_new_protected:Npn \@@_text_super:n #1
-  { \@@_text_scripts:Nn \textsuperscript {#1} }
-\cs_new_protected:Npn \@@_text_scripts:Nn #1#2
+  {
+    \@@_text_scripts:NnN
+      \textsuperscript {#1} \@@_text_sub:n
+  }
+\cs_new_protected:Npn \@@_text_scripts:NnN #1#2#3
+  {
+    \cs_set_protected:Npn \@@_text_scripts:
+      {
+        \if_meaning:w \l_peek_token #3
+          \exp_after:wN \@@_text_scripts_two:NnNn
+        \else:
+          \exp_after:wN \@@_text_scripts_one:Nn
+        \fi:
+          #1 {#2}
+      }
+    \peek_after:Nw \@@_text_scripts:
+  }
+\cs_new_protected:Npn \@@_text_scripts: { }
+%    \end{macrocode}
+%   In the simple case of one script item, we have to do a search-and-replace
+%   to deal with anything inside the argument.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_text_scripts_one:Nn #1#2
   {
     \group_begin:
       \tl_set:Nn \l_@@_tmp_tl {#2}
@@ -353,6 +383,43 @@
     #1 \l_@@_tmp_tl
   }
 %    \end{macrocode}
+%   For the two scripts case, we cannot use |\textsubscript|/|\textsuperscript|
+%   as they don't stack directly. Instead, we sort out the ordering then use
+%   an implementation for both parts that is the same as the kernel text
+%   scripts.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_text_scripts_two:NnNn #1#2#3#4
+  {
+    \cs_if_eq:NNTF #1 \textsubscript
+      { \@@_text_scripts_two:nn {#4} {#2} }
+      { \@@_text_scripts_two:nn {#2} {#4} }
+  }
+\cs_new_protected:Npx \@@_text_scripts_two:nn #1#2
+  {
+    \group_begin:
+      \exp_not:N \m@th
+      \exp_not:N \ensuremath
+        {
+          ^ { \exp_not:N \@@_text_scripts_two:n {#1} }
+          \char_generate:nn { `\_ } { 8 }
+            { \exp_not:N \@@_text_scripts_two:n {#2} }
+        }
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_text_scripts_two:n #1
+  {
+    \mbox
+      {
+        \fontsize \sf@size \z@ \selectfont
+        \@@_text_scripts_one:Nn \use:n {#1}
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
