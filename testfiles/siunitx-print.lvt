@@ -15,9 +15,13 @@
   {
     \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
     \box_show:N \l_tmpa_box
+    \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
+    \box_show:N \l_tmpa_box
     \group_begin:
       \keys_set:nn { siunitx / print } { mode = text }
       \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+      \box_show:N \l_tmpa_box
+      \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
       \box_show:N \l_tmpa_box
     \group_end:
   }
@@ -28,13 +32,36 @@
 \TEST { Printing~numbers }
   {
       \test:nn { number } { 123\,456 }
-    $ \test:nn { number } { 123\,456 } $
   }
 
 \TEST { Printing~units }
   {
       \test:nn { unit } { \mathrm {J}\,\mathrm {mol}^{-1}\,\mathrm {K}^{-1} }
-    $ \test:nn { unit } { \mathrm {J}\,\mathrm {mol}^{-1}\,\mathrm {K}^{-1} } $
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"color" }
+  {
+    \keys_set:nn { siunitx / print } { color = red }
+    \test:nn { unit } { kg }
+    \keys_set:nn { siunitx / print } { color =  }
+    \test:nn { unit } { kg }
+  }
+
+\TEST { Option~setting~"control-family" }
+  {
+    \test:nn { unit } { \mathrm{kg} }
+    \group_begin:
+      \sffamily
+      \test:nn { unit } { \mathrm{kg} }
+    \group_end:
+    \keys_set:nn { siunitx / print } { control-family = false }
+    \test:nn { unit } { \mathrm{kg} }
+    \group_begin:
+      \sffamily
+      \test:nn { unit } { \mathrm{kg} }
+    \group_end:
   }
 
 \end{document}
