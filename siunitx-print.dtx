@@ -58,11 +58,45 @@
 %
 % \begin{documentation}
 %
+% This submodule is focussed on providing controlled printing for numbers and
+% units. Key to this is control of font: conventions for printing quantities
+% mean that the exact nature of the output is important. At the same time, this
+% module provides flexibility for the user in terms of which aspects of the font
+% are responsive to the surrounding general text. Printing material may also
+% take place in text or math mode.
+%
+% The printing routines assume that normal \LaTeXe{} font selection commands
+% are available, in particular \cs{bfsries}, \cs{mathrm}, \cs{mathversion},
+% \cs{mdseries}, \cs{rmfamily} and \cs{upshape}. It also requires the standard
+% \LaTeXe{} kernel commands \cs{ensuremath}, \cs{textsubscript} and
+% \cs{textsuperscript} for printing in text mode. The following packages are
+% also required to provide the functionality detailed.
+% \begin{itemize}
+%   \item \pkg{color}: support for color using \cs{textcolor}
+%   \item \pkg{textcomp}: \cs{textminus} and \cs{textpm} for printing
+%     in text mode
+%   \item \pkg{amstext}: the \cs{text} command for printing in text mode
+% \end{itemize}
+%
 % \begin{function}{\siunitx_print:nn, \siunitx_print:nV}
 %   \begin{syntax}
-%     \cs{siunitx_print:nn} \Arg{type} \meta{material}
+%     \cs{siunitx_print:nn} \Arg{type} \Arg{material}
 %   \end{syntax}
+%   Prints the \meta{material} according the the prevailing settings for the
+%   submodule as applicable to the \meta{type} of content: the latter should be
+%   either |number| or |unit|. The \meta{material} should comprise normal
+%   \LaTeX{} mark-up for numbers or units. In particular, units will typically
+%   use |\mathrm| to indicate material to be printed in the current upright
+%   roman font, and |^| and |_| will typically be used to indicate super- and
+%   subscripts, respectively. These elements will be correctly handled when
+%   printing for example using |\mathsf| in math mode, or using only text
+%   fonts.
 % \end{function}
+%
+% \subsection{Key--value options}
+%
+% The options defined by this submodule are available within the \pkg{l3keys}
+% |siunitx/print| tree.
 %
 % \end{documentation}
 %
