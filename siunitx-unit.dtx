@@ -650,7 +650,8 @@
 % \begin{variable}{\c_@@_math_subscript_tl}
 %   Useful tokens with awkward category codes.
 %    \begin{macrocode}
-\tl_const:Nx \c_@@_math_subscript_tl { \char_generate:nn { `\_ } { 8 } }
+\tl_const:Nx \c_@@_math_subscript_tl
+  { \char_generate:nn { `\_ } { 8 } }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1055,15 +1056,18 @@
           { \token_to_str:N _ } { \c_@@_math_subscript_tl }
         \exp_not:n
           {
-              \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
+              \protected@edef \l_@@_tmp_tl
+                { \l_@@_tmp_tl }
               \tl_clear:N \l_@@_formatted_tl
               \tl_if_empty:NF \l_@@_tmp_tl
                 {
-                  \exp_after:wN \@@_format_literal_auxi:w \l_@@_tmp_tl .
+                  \exp_after:wN \@@_format_literal_auxi:w
+                    \l_@@_tmp_tl .
                     \q_recursion_tail . \q_recursion_stop
                 }
             \exp_args:NNNV \group_end:
-            \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
+            \tl_set:Nn \l_@@_formatted_tl
+              \l_@@_formatted_tl
           }
     }
 \group_end:
@@ -1106,25 +1110,37 @@
       ##1 ^ ##2 ^ ##3 \exp_not:N \q_stop
       {
         \exp_not:N \@@_format_literal_auxv:w
-          ##1 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
+          ##1
+          \c_@@_math_subscript_tl
+          \c_@@_math_subscript_tl
           \exp_not:N \q_mark
-          ##2 \c_@@_math_subscript_tl \c_@@_math_subscript_tl
+          ##2
+          \c_@@_math_subscript_tl
+          \c_@@_math_subscript_tl
           \exp_not:N \q_stop
       }
     \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxv:w
-      ##1 \c_@@_math_subscript_tl ##2 \c_@@_math_subscript_tl ##3
+      ##1 \c_@@_math_subscript_tl
+      ##2 \c_@@_math_subscript_tl ##3
       \exp_not:N \q_mark
-      ##4 \c_@@_math_subscript_tl ##5 \c_@@_math_subscript_tl ##6
+      ##4 \c_@@_math_subscript_tl
+      ##5 \c_@@_math_subscript_tl ##6
       \exp_not:N \q_stop
       {
         \tl_set:Nx \exp_not:N \l_@@_formatted_tl
           {
-            \exp_not:N \exp_not:V \exp_not:N \l_@@_formatted_tl
-            \exp_not:N \tl_if_empty:NF \exp_not:N \l_@@_formatted_tl
-              { \exp_not:N \exp_not:V \exp_not:N \l_@@_separator_tl }
+            \exp_not:N \exp_not:V
+              \exp_not:N \l_@@_formatted_tl
+            \exp_not:N \tl_if_empty:NF
+              \exp_not:N \l_@@_formatted_tl
+              {
+                \exp_not:N \exp_not:V
+                  \exp_not:N \l_@@_separator_tl
+              }
             \exp_not:N \tl_if_blank:nF {##1}
               {
-                \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
+                \exp_not:N \exp_not:V
+                  \exp_not:N \l_@@_font_tl
                   { \exp_not:N \exp_not:n {##1} }
               }
             \exp_not:N \tl_if_blank:nF {##4}
@@ -1133,7 +1149,8 @@
               {
                 \c_@@_math_subscript_tl
                   {
-                    \exp_not:N \exp_not:V \exp_not:N \l_@@_font_tl
+                    \exp_not:N \exp_not:V
+                      \exp_not:N \l_@@_font_tl
                       { \exp_not:N \exp_not:n {##2##5} }
                   }
               }
@@ -1237,12 +1254,16 @@
 \cs_new_protected:Npn \@@_parse_add:nnnn #1#2#3#4
   {
     \tl_set:Nx \l_@@_tmp_tl { #1 - #2 }
-    \prop_if_in:NVTF \l_@@_parsed_prop \l_@@_tmp_tl
+    \prop_if_in:NVTF \l_@@_parsed_prop
+      \l_@@_tmp_tl
       {
         \msg_error:nnxx { siunitx } { unit / duplicate-part }
           { \exp_not:n {#1} } { \token_to_str:N #3 }
       }
-      { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl {#4} }
+      {
+        \prop_put:NVn \l_@@_parsed_prop
+          \l_@@_tmp_tl {#4}
+      }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1261,18 +1282,25 @@
 \cs_new_protected:Npn \@@_parse_prefix:Nn #1#2
   {
     \int_set:Nn \l_@@_tmp_int { \l_@@_position_int + 1 }
-    \@@_parse_add:nnnn { prefix } { \int_use:N \l_@@_tmp_int }
-      {#1} {#2}
+    \@@_parse_add:nnnn { prefix }
+      { \int_use:N \l_@@_tmp_int } {#1} {#2}
   }
 \cs_new_protected:Npn \@@_parse_power:nnN #1#2#3
   {
     \tl_set:Nx \l_@@_tmp_tl
       { unit- \int_use:N \l_@@_position_int }
     \bool_lazy_or:nnTF
-      {#3} { \prop_if_in_p:NV \l_@@_parsed_prop \l_@@_tmp_tl }
+      {#3}
+      {
+        \prop_if_in_p:NV
+          \l_@@_parsed_prop \l_@@_tmp_tl
+      }
       {
         \@@_parse_add:nnnn { power }
-          { \int_eval:n { \l_@@_position_int \bool_if:NT #3 { + 1 } } }
+          {
+            \int_eval:n
+              { \l_@@_position_int \bool_if:NT #3 { + 1 } }
+          }
           {#1} {#2}
       }
       {
@@ -1319,11 +1347,13 @@
 \cs_new_protected:Npn \@@_parse_unit:Nn #1#2
   {
     \int_incr:N \l_@@_position_int
-    \@@_parse_add:nnnn { unit } { \int_use:N \l_@@_position_int }
+    \@@_parse_add:nnnn { unit }
+      { \int_use:N \l_@@_position_int }
       {#1} {#2}
     \bool_if:NT \l_@@_per_bool
       {
-        \@@_parse_add:nnnn { per } { \int_use:N \l_@@_position_int }
+        \@@_parse_add:nnnn { per }
+          { \int_use:N \l_@@_position_int }
           { \per } { true }
       }
   }
@@ -1368,21 +1398,30 @@
     \tl_set:Nx \l_@@_tmp_tl { per- #1 }
     \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
       {
-        \prop_remove:NV \l_@@_parsed_prop \l_@@_tmp_tl
+        \prop_remove:NV \l_@@_parsed_prop
+          \l_@@_tmp_tl
         \tl_set:Nx \l_@@_tmp_tl { power- #1 }
-        \prop_get:NVNTF \l_@@_parsed_prop \l_@@_tmp_tl
+        \prop_get:NVNTF
+          \l_@@_parsed_prop
+          \l_@@_tmp_tl
           \l_@@_part_tl
           {
             \tl_set:Nx \l_@@_part_tl
               { \fp_eval:n { \l_@@_part_tl * -1 } }
             \fp_compare:nNnTF \l_@@_part_tl = 1
-              { \prop_remove:NV \l_@@_parsed_prop \l_@@_tmp_tl }
+              {
+                \prop_remove:NV \l_@@_parsed_prop
+                  \l_@@_tmp_tl
+              }
               {
                 \prop_put:NVV \l_@@_parsed_prop
                   \l_@@_tmp_tl \l_@@_part_tl
               }
           }
-          { \prop_put:NVn \l_@@_parsed_prop \l_@@_tmp_tl { -1 } }
+          {
+            \prop_put:NVn \l_@@_parsed_prop
+              \l_@@_tmp_tl { -1 }
+          }
       }
   }
 %    \end{macrocode}
@@ -1423,12 +1462,17 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx / unit }
   {
-    bracket-denominator .bool_set:N      = \l_@@_denominator_bracket_bool ,
-    fraction-command    .tl_set:N        = \l_@@_fraction_function_tl     ,
-    close-bracket       .tl_set:N        = \l_@@_bracket_close_tl         ,
-    open-bracket        .tl_set:N        = \l_@@_bracket_open_tl          ,
-    parse               .bool_set:N      = \l_@@_parse_bool               ,
-    per-mode            .choice:                                          ,
+    bracket-denominator .bool_set:N      =
+      \l_@@_denominator_bracket_bool ,
+    fraction-command    .tl_set:N        =
+      \l_@@_fraction_function_tl ,
+    close-bracket       .tl_set:N        =
+      \l_@@_bracket_close_tl ,
+    open-bracket        .tl_set:N        =
+      \l_@@_bracket_open_tl ,
+    parse               .bool_set:N      =
+      \l_@@_parse_bool ,
+    per-mode            .choice: ,
     per-mode / fraction             .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
@@ -1471,8 +1515,9 @@
         \bool_set_true:N \l_@@_powers_positive_bool
         \bool_set_true:N \l_@@_two_part_bool
       } ,
-    per-symbol          .tl_set:N        = \l_@@_per_symbol_tl             ,
-    qualifier-mode      .choice:                                           ,
+    per-symbol          .tl_set:N        =
+      \l_@@_per_symbol_tl ,
+    qualifier-mode      .choice: ,
     qualifier-mode / bracket        .code:n =
       { \tl_set:Nn \l_@@_qualifier_mode_tl { bracket  } }  ,
     qualifier-mode / combine        .code:n =
@@ -1481,7 +1526,8 @@
       { \tl_set:Nn \l_@@_qualifier_mode_tl { phrase } }    ,
     qualifier-mode / subscript      .code:n =
       { \tl_set:Nn \l_@@_qualifier_mode_tl { subscript } } ,
-    qualifier-phrase    .tl_set:N        = \l_@@_qualifier_phrase_tl
+    qualifier-phrase    .tl_set:N        =
+      \l_@@_qualifier_phrase_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -1593,7 +1639,8 @@
     \tl_clear:N \l_@@_formatted_tl
     \fp_zero:N \l_@@_prefix_fp
     \int_zero:N \l_@@_position_int
-    \int_do_while:nNnn \l_@@_position_int < \l_@@_total_int
+    \int_do_while:nNnn
+      \l_@@_position_int < \l_@@_total_int
       {
         \bool_set_false:N \l_@@_bracket_bool
         \tl_clear:N \l_@@_current_tl
@@ -1608,7 +1655,8 @@
   }
 \cs_new_protected:Npn \@@_format_parsed_aux:n #1
   {
-    \tl_set:Nx \l_@@_tmp_tl { #1 - \int_use:N \l_@@_position_int }
+    \tl_set:Nx \l_@@_tmp_tl
+      { #1 - \int_use:N \l_@@_position_int }
     \prop_get:NVNT \l_@@_parsed_prop
       \l_@@_tmp_tl \l_@@_part_tl
       { \use:c { @@_format_ #1 : } }
@@ -1651,7 +1699,8 @@
 \cs_new_protected:Npn \@@_format_power:
   {
     \@@_format_font:
-    \exp_after:wN \@@_format_power_aux:wTF \l_@@_part_tl - \q_stop
+    \exp_after:wN \@@_format_power_aux:wTF
+      \l_@@_part_tl - \q_stop
       { \@@_format_power_negative: }
       { \@@_format_power_positive: }
   }
@@ -1762,7 +1811,11 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_qualifier:
   {
-    \use:c { @@_format_qualifier_ \l_@@_qualifier_mode_tl : }
+    \use:c
+      {
+        @@_format_qualifier_
+        \l_@@_qualifier_mode_tl :
+      }
     \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl
   }
 \cs_new_protected:Npn \@@_format_qualifier_bracket:
@@ -1771,7 +1824,8 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_bracket_open_tl
-        \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
+        \exp_not:V \l_@@_font_tl
+          { \exp_not:V \l_@@_part_tl }
         \exp_not:V \l_@@_bracket_close_tl
       }
   }
@@ -1782,7 +1836,8 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_qualifier_phrase_tl
-        \exp_not:V \l_@@_font_tl { \exp_not:V \l_@@_part_tl }
+        \exp_not:V \l_@@_font_tl
+          { \exp_not:V \l_@@_part_tl }
       }
   }
 \cs_new_protected:Npn \@@_format_qualifier_subscript:
@@ -1821,7 +1876,10 @@
 %   constructed.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_unit:
-  { \tl_put_right:NV \l_@@_current_tl \l_@@_part_tl }
+  {
+    \tl_put_right:NV
+      \l_@@_current_tl \l_@@_part_tl
+  }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1876,7 +1934,10 @@
       {
         \bool_lazy_and:nnT
           { \l_@@_denominator_bracket_bool }
-          { \bool_not_p:n { \tl_if_empty_p:N \l_@@_denominator_tl } }
+          {
+            \bool_not_p:n
+              { \tl_if_empty_p:N \l_@@_denominator_tl }
+          }
           { \bool_set_true:N \l_@@_bracket_bool }
         \@@_format_output_aux:nV { denominator }
           \l_@@_product_tl
@@ -2023,7 +2084,11 @@
 \cs_new_protected:Npn \@@_format_finalise_power:
   {
     \tl_if_empty:NTF \l_@@_formatted_tl
-      { \tl_set_eq:NN \l_@@_formatted_tl \l_@@_denominator_tl }
+      {
+        \tl_set_eq:NN
+          \l_@@_formatted_tl
+          \l_@@_denominator_tl
+      }
       {
         \tl_set:Nx \l_@@_formatted_tl
           {

@@ -257,7 +257,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_end:
   {
-    \protected@edef \l_@@_collect_tl { \l_@@_collect_tl }
+    \protected@edef \l_@@_collect_tl
+      { \l_@@_collect_tl }
     \tl_clear:N \l_@@_pre_tl
     \tl_clear:N \l_@@_number_tl
     \tl_clear:N \l_@@_post_tl
@@ -275,7 +276,12 @@
     \@@_split_tidy:N \l_@@_post_tl
     \tl_if_empty:NTF \l_@@_number_tl
       { \@@_print_text:V \l_@@_pre_tl }
-      { \@@_print:VVV \l_@@_pre_tl \l_@@_number_tl \l_@@_post_tl }
+      {
+        \@@_print:VVV
+          \l_@@_pre_tl
+          \l_@@_number_tl
+          \l_@@_post_tl
+      }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -415,7 +421,9 @@
   {
     \@ifpackageloaded { colortbl }
       {
-        \cs_new_eq:NN \@@_align_auxii:nn \@@_align_auxi:nn
+        \cs_new_eq:NN
+          \@@_align_auxii:nn
+          \@@_align_auxi:nn
         \cs_set_protected:Npn \@@_align_auxi:nn #1#2
           {
             \@@_skip:n{ 0pt plus -0.5fill }
