@@ -249,9 +249,10 @@
 %     \l_@@_number_mode_tl      ,
 %     \l_@@_unit_color_tl       ,
 %     \l_@@_unit_mode_tl        ,
+%     \l_@@_ctrl_math_version ,
 %     \l_@@_ctrl_family_bool ,
 %     \l_@@_ctrl_shape_bool  ,
-%     \l_@@_ctrl_weight_bool
+%     \l_@@_ctrl_text_weight_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
@@ -264,10 +265,12 @@
       { number-color = #1 , unit-color = #1 } ,
     control-family .bool_set:N =
       \l_@@_ctrl_family_bool ,
+    control-math-version .bool_set:N =
+      \l_@@_ctrl_math_version_bool ,
     control-shape  .bool_set:N =
       \l_@@_ctrl_shape_bool ,
-    control-weight .bool_set:N =
-      \l_@@_ctrl_weight_bool ,
+    control-text-weight .bool_set:N =
+      \l_@@_ctrl_text_weight_bool ,
     mode           .meta:n     =
       { number-mode = #1 , unit-mode = #1 } ,
     number-color   .tl_set:N   =
@@ -338,7 +341,7 @@
     \bool_lazy_all:nTF
       {
         { \mode_if_math_p: }
-        { \l_@@_ctrl_weight_bool }
+        { \l_@@_ctrl_math_version_bool }
         { ! \str_if_eq_p:Vn \math@version { normal } }
       }
       { \text { \mathversion { normal } \@@_math_aux:n {#1} } }
@@ -392,7 +395,7 @@
       \bool_lazy_all:nTF
         {
           { \mode_if_math_p: }
-          { ! \l_@@_ctrl_weight_bool }
+          { ! \l_@@_ctrl_text_weight_bool }
           { ! \str_if_eq_p:Vn \math@version { normal } }
         }
         {
@@ -415,7 +418,7 @@
             { \rmfamily }
           \bool_if:NT \l_@@_ctrl_shape_bool
             { \upshape }
-          \bool_if:NT \l_@@_ctrl_weight_bool
+          \bool_if:NT \l_@@_ctrl_text_weight_bool
             { \mdseries }
           \@@_text_replace:n {#2}
         }
@@ -550,8 +553,9 @@
   {
     color          =       ,
     control-family = true  ,
+    control-math-version = true ,
     control-shape  = true  ,
-    control-weight = true  ,
+    control-text-weight = true  ,
     mode           = math  ,
     number-color   =       ,
     number-mode    = math  ,
