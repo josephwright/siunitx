@@ -249,8 +249,9 @@
 %     \l_@@_number_mode_tl        ,
 %     \l_@@_unit_color_tl         ,
 %     \l_@@_unit_mode_tl          ,
+%     \l_@@_ctrl_math_family_bool ,
 %     \l_@@_ctrl_math_version     ,
-%     \l_@@_ctrl_family_bool      ,
+%     \l_@@_ctrl_text_family_bool ,
 %     \l_@@_ctrl_text_shape_bool  ,
 %     \l_@@_ctrl_text_weight_bool
 %   }
@@ -263,10 +264,12 @@
   {
     color .meta:n =
       { number-color = #1 , unit-color = #1 } ,
-    control-family .bool_set:N =
-      \l_@@_ctrl_family_bool ,
+    control-math-family .bool_set:N =
+      \l_@@_ctrl_math_family_bool ,
     control-math-version .bool_set:N =
       \l_@@_ctrl_math_version_bool ,
+    control-text-family .bool_set:N =
+      \l_@@_ctrl_text_family_bool ,
     control-text-shape .bool_set:N =
       \l_@@_ctrl_text_shape_bool ,
     control-text-weight .bool_set:N =
@@ -357,7 +360,7 @@
     \bool_lazy_all:nTF
       {
         { \mode_if_math_p: }
-        { \l_@@_ctrl_family_bool }
+        { \l_@@_ctrl_math_family_bool }
         {
           ! \bool_lazy_or_p:nn
             { \int_compare_p:nNn \fam = \c_@@_mathnormal_int }
@@ -414,7 +417,7 @@
       \text
         {
           #1
-          \bool_if:NT \l_@@_ctrl_family_bool
+          \bool_if:NT \l_@@_ctrl_text_family_bool
             { \rmfamily }
           \bool_if:NT \l_@@_ctrl_text_shape_bool
             { \upshape }
@@ -552,9 +555,10 @@
 \keys_set:nn { siunitx / print }
   {
     color                =      ,
-    control-family       = true ,
+    control-math-family  = true ,
     control-math-version = true ,
     control-shape        = true ,
+    control-text-family  = true ,
     control-text-weight  = true ,
     mode                 = math ,
     number-color         =      ,
