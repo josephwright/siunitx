@@ -413,7 +413,6 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_text:n}
-% \begin{macro}{\@@_text:nn}
 % \begin{macro}{\@@_text_replace:n}
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
@@ -424,46 +423,21 @@
 % \begin{macro}{\@@_text_scripts_two:NnNn}
 % \begin{macro}{\@@_text_scripts_two:nn}
 % \begin{macro}{\@@_text_scripts_two:n}
-%   To allow propagation of math weight to text, there is some up-front work
-%   to do to check for the appropriate combination of conditions. If they
-%   apply, we locally set the weight \emph{before} forcing text mode so that
-%   it will carry through. That requires an auxiliary to pass the information
-%   into text mode.
+%   Typesetting in text mode is easy in font control terms but more tricky
+%   in the manipulation of the input. The easy part comes first.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text:n #1
   {
-    \group_begin:
-      \bool_lazy_all:nTF
-        {
-          { \mode_if_math_p: }
-          { ! \l_@@_ctrl_text_weight_bool }
-          { ! \str_if_eq_p:Vn \math@version { normal } }
-        }
-        {
-          \str_case:VnF \math@version
-            {
-              { bold }  { \@@_text:nn { \bfseries } }
-              { light } { \@@_text:nn { \lseries } }
-            }
-            { \@@_text:nn { } }
-        }
-        { \@@_text:nn { } }
-          {#1}
-  }
-\cs_new_protected:Npn \@@_text:nn #1#2
-  {
       \text
         {
-          #1
           \bool_if:NT \l_@@_ctrl_text_family_bool
             { \tl_use:N \l_@@_text_family_tl }
           \bool_if:NT \l_@@_ctrl_text_shape_bool
             { \tl_use:N \l_@@_text_shape_tl }
           \bool_if:NT \l_@@_ctrl_text_weight_bool
             { \tl_use:N \l_@@_text_weight_tl }
-          \@@_text_replace:n {#2}
+          \@@_text_replace:n {#1}
         }
-    \group_end:
   }
 %    \end{macrocode}
 %   To get math mode material to print in text mode, various search-and-replace
@@ -571,7 +545,6 @@
       }
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
