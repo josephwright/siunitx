@@ -138,6 +138,30 @@
 %   The standard setting is |math|.
 % \end{function}
 %
+% \begin{function}{text-family-command}
+%   \begin{syntax}
+%     |text-family-command| = \meta{command}
+%   \end{syntax}
+%   The \meta{command} used when control text font family. The standard
+%   setting is \cs{rmfamily}.
+% \end{function}
+%
+% \begin{function}{text-shape-command}
+%   \begin{syntax}
+%     |text-shape-command| = \meta{command}
+%   \end{syntax}
+%   The \meta{command} used when control text font shape. The standard
+%   setting is \cs{upshape}.
+% \end{function}
+%
+% \begin{function}{text-weight-command}
+%   \begin{syntax}
+%     |text-weight-command| = \meta{command}
+%   \end{syntax}
+%   The \meta{command} used when control text font weight. The standard
+%   setting is \cs{mdseries}.
+% \end{function}
+%
 % \begin{function}{unit-color}
 %   \begin{syntax}
 %     |unit-color| = \meta{color}
@@ -253,7 +277,10 @@
 %     \l_@@_ctrl_math_version     ,
 %     \l_@@_ctrl_text_family_bool ,
 %     \l_@@_ctrl_text_shape_bool  ,
-%     \l_@@_ctrl_text_weight_bool
+%     \l_@@_ctrl_text_weight_bool ,
+%     \l_@@_text_family_tl        ,
+%     \l_@@_text_shape_tl         ,
+%     \l_@@_text_weight_tl
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
@@ -284,6 +311,12 @@
         \tl_set_eq:NN
           \l_@@_number_mode_tl \l_keys_choice_tl
       } ,
+    text-family-command .tl_set:N =
+      \l_@@_text_family_tl ,
+    text-shape-command .tl_set:N =
+      \l_@@_text_shape_tl ,
+    text-weight-command .tl_set:N =
+      \l_@@_text_weight_tl ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -423,11 +456,11 @@
         {
           #1
           \bool_if:NT \l_@@_ctrl_text_family_bool
-            { \rmfamily }
+            { \tl_use:N \l_@@_text_family_tl }
           \bool_if:NT \l_@@_ctrl_text_shape_bool
-            { \upshape }
+            { \tl_use:N \l_@@_text_shape_tl }
           \bool_if:NT \l_@@_ctrl_text_weight_bool
-            { \mdseries }
+            { \tl_use:N \l_@@_text_weight_tl }
           \@@_text_replace:n {#2}
         }
     \group_end:
@@ -568,6 +601,9 @@
     mode                 = math ,
     number-color         =      ,
     number-mode          = math ,
+    text-family-command  = \rmfamily ,
+    text-shape-command   = \upshape  ,
+    text-weight-command  = \mdseries ,
     unit-color           =      ,
     unit-mode            = math
   }
