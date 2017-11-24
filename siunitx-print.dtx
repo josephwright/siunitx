@@ -341,13 +341,18 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_math:n #1
   {
-    \bool_lazy_all:nTF
+    \bool_lazy_and:nnTF
+      { \l_@@_ctrl_math_version_bool }
+      { ! \str_if_eq_p:Vn \math@version { normal } }
       {
-        { \mode_if_math_p: }
-        { \l_@@_ctrl_math_version_bool }
-        { ! \str_if_eq_p:Vn \math@version { normal } }
+        \mode_if_math:TF
+          { \text }
+          { \use:n }
+            {
+              \mathversion { normal }
+              \@@_math_aux:n {#1}
+            }
       }
-      { \text { \mathversion { normal } \@@_math_aux:n {#1} } }
       { \@@_math_aux:n {#1} }
   }
 %    \end{macrocode}
