@@ -428,16 +428,16 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text:n #1
   {
-      \text
-        {
-          \bool_if:NT \l_@@_ctrl_text_family_bool
-            { \tl_use:N \l_@@_text_family_tl }
-          \bool_if:NT \l_@@_ctrl_text_shape_bool
-            { \tl_use:N \l_@@_text_shape_tl }
-          \bool_if:NT \l_@@_ctrl_text_weight_bool
-            { \tl_use:N \l_@@_text_weight_tl }
-          \@@_text_replace:n {#1}
-        }
+    \text
+      {
+        \bool_if:NT \l_@@_ctrl_text_family_bool
+          { \tl_use:N \l_@@_text_family_tl }
+        \bool_if:NT \l_@@_ctrl_text_shape_bool
+          { \tl_use:N \l_@@_text_shape_tl }
+        \bool_if:NT \l_@@_ctrl_text_weight_bool
+          { \tl_use:N \l_@@_text_weight_tl }
+        \@@_text_replace:n {#1}
+      }
   }
 %    \end{macrocode}
 %   To get math mode material to print in text mode, various search-and-replace
@@ -453,17 +453,22 @@
   }
 \cs_new_protected:Npx \@@_text_replace:N #1
   {
-      \exp_not:N \@@_text_replace:NNn #1
-        \exp_not:N \pm                  { \exp_not:N \textpm }
-        \exp_not:N \mp                  { \exp_not:n { \ensuremath { \mp } } }
-        -                               { \exp_not:N \textminus }
-        \char_generate:nn { `\_ } { 8 }
-          { \exp_not:N \@@_text_sub:n }
-        ^
-          { \exp_not:N \@@_text_super:n }
-        \exp_not:N \mathrm              { \exp_not:N \use:n }
-        \exp_not:N \q_recursion_tail    { ? }
-        \exp_not:N \q_recursion_stop
+    \exp_not:N \@@_text_replace:NNn #1
+      \exp_not:N \pm
+        { \exp_not:N \textpm }
+      \exp_not:N \mp
+        { \exp_not:n { \ensuremath { \mp } } }
+      -
+        { \exp_not:N \textminus }
+      \char_generate:nn { `\_ } { 8 }
+        { \exp_not:N \@@_text_sub:n }
+      ^
+        { \exp_not:N \@@_text_super:n }
+      \exp_not:N \mathrm
+        { \exp_not:N \use:n }
+      \exp_not:N \q_recursion_tail
+        { ? }
+      \exp_not:N \q_recursion_stop
   }
 \cs_new_protected:Npn \@@_text_replace:NNn #1#2#3
   {
