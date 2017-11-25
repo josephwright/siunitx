@@ -138,30 +138,6 @@
 %   The standard setting is |math|.
 % \end{function}
 %
-% \begin{function}{text-family-command}
-%   \begin{syntax}
-%     |text-family-command| = \meta{command}
-%   \end{syntax}
-%   The \meta{command} used when control text font family. The standard
-%   setting is \cs{rmfamily}.
-% \end{function}
-%
-% \begin{function}{text-shape-command}
-%   \begin{syntax}
-%     |text-shape-command| = \meta{command}
-%   \end{syntax}
-%   The \meta{command} used when control text font shape. The standard
-%   setting is \cs{upshape}.
-% \end{function}
-%
-% \begin{function}{text-weight-command}
-%   \begin{syntax}
-%     |text-weight-command| = \meta{command}
-%   \end{syntax}
-%   The \meta{command} used when control text font weight. The standard
-%   setting is \cs{mdseries}.
-% \end{function}
-%
 % \begin{function}{unit-color}
 %   \begin{syntax}
 %     |unit-color| = \meta{color}
@@ -275,9 +251,6 @@
 %     \l_@@_unit_mode_tl          ,
 %     \l_@@_ctrl_math_family_bool ,
 %     \l_@@_ctrl_math_version     ,
-%     \l_@@_ctrl_text_family_bool ,
-%     \l_@@_ctrl_text_shape_bool  ,
-%     \l_@@_ctrl_text_weight_bool ,
 %     \l_@@_text_family_tl        ,
 %     \l_@@_text_shape_tl         ,
 %     \l_@@_text_weight_tl
@@ -311,12 +284,6 @@
         \tl_set_eq:NN
           \l_@@_number_mode_tl \l_keys_choice_tl
       } ,
-    text-family-command .tl_set:N =
-      \l_@@_text_family_tl ,
-    text-shape-command .tl_set:N =
-      \l_@@_text_shape_tl ,
-    text-weight-command .tl_set:N =
-      \l_@@_text_weight_tl ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -431,11 +398,11 @@
     \text
       {
         \bool_if:NT \l_@@_ctrl_text_family_bool
-          { \tl_use:N \l_@@_text_family_tl }
+          { \rmfamily }
         \bool_if:NT \l_@@_ctrl_text_shape_bool
-          { \tl_use:N \l_@@_text_shape_tl }
+          { \upshape }
         \bool_if:NT \l_@@_ctrl_text_weight_bool
-          { \tl_use:N \l_@@_text_weight_tl }
+          { \mdseries }
         \@@_text_replace:n {#1}
       }
   }
@@ -579,9 +546,6 @@
     mode                 = math      ,
     number-color         =           ,
     number-mode          = math      ,
-    text-family-command  = \rmfamily ,
-    text-shape-command   = \upshape  ,
-    text-weight-command  = \mdseries ,
     unit-color           =           ,
     unit-mode            = math
   }
