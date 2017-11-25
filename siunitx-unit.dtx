@@ -70,7 +70,8 @@
 % A small number of \LaTeXe{} math mode commands are assumed to be available
 % as part of the formatted output. The \cs{mathchoice} command
 % (normally the \TeX{} primitive) is needed when using
-% |per-mode = symbol-or-fraction|. The commands \cs{frac}, \cs{mathrm},
+% |per-mode = symbol-or-fraction|. The command \cs{mathrm} is used for
+% wrapping the text (letter) part of units. The commands \cs{frac},
 % \cs{mbox}, \verb*|\ | and \cs{,} are used by the standard module settings,
 % and \cs{ensuremath}, \cs{hbar}, \cs{mathit} and \cs{mathrm} in some standard
 % unit definitions (for atomic and natural units). For the display of colored
@@ -502,16 +503,6 @@
 %   |)|.
 % \end{function}
 %
-% \begin{function}{font-command}
-%   \begin{syntax}
-%     |font-command| = \meta{command}
-%   \end{syntax}
-%   Command applied to text during output of units: should be command usable
-%   in math mode for font selection. Notice that in a typical unit this does
-%   not (necessarily) apply to all output, for example powers or brackets.
-%   The standard setting is |\mathrm|.
-% \end{function}
-%
 % \begin{function}{fraction-command}
 %   \begin{syntax}
 %     |fraction-command| = \meta{command}
@@ -910,13 +901,12 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 %
-% \begin{variable}{\l_@@_font_tl, \l_@@_product_tl}
+% \begin{variable}{\l_@@_product_tl}
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
 \keys_define:nn { siunitx / unit }
   {
-    font-command .tl_set:N = \l_@@_font_tl    ,
     product      .tl_set:N = \l_@@_product_tl
   }
 %    \end{macrocode}
@@ -1139,8 +1129,8 @@
               }
             \exp_not:N \tl_if_blank:nF {##1}
               {
-                \exp_not:N \exp_not:V
-                  \exp_not:N \l_@@_font_tl
+                \exp_not:N \exp_not:N
+                  \exp_not:N \mathrm
                   { \exp_not:N \exp_not:n {##1} }
               }
             \exp_not:N \tl_if_blank:nF {##4}
@@ -1149,8 +1139,8 @@
               {
                 \c_@@_math_subscript_tl
                   {
-                    \exp_not:N \exp_not:V
-                      \exp_not:N \l_@@_font_tl
+                    \exp_not:N \exp_not:N
+                      \exp_not:N \mathrm
                       { \exp_not:N \exp_not:n {##2##5} }
                   }
               }
@@ -1824,7 +1814,7 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_bracket_open_tl
-        \exp_not:V \l_@@_font_tl
+        \exp_not:N \mathrm
           { \exp_not:V \l_@@_part_tl }
         \exp_not:V \l_@@_bracket_close_tl
       }
@@ -1836,7 +1826,7 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_qualifier_phrase_tl
-        \exp_not:V \l_@@_font_tl
+        \exp_not:N \mathrm
           { \exp_not:V \l_@@_part_tl }
       }
   }
@@ -1847,7 +1837,7 @@
       {
         \c_@@_math_subscript_tl
           {
-            \exp_not:V \l_@@_font_tl
+            \exp_not:N \mathrm
               { \exp_not:V \l_@@_part_tl }
           }
       }
@@ -1983,7 +1973,7 @@
       {
         \tl_set:Nx \l_@@_current_tl
           {
-            \exp_not:V \l_@@_font_tl
+            \exp_not:N \mathrm
               { \exp_not:V \l_@@_current_tl }
           }
         \bool_set_true:N \l_@@_font_bool
@@ -2484,7 +2474,6 @@
   {
     bracket-denominator = true          , % (
     close-bracket       = )             ,
-    font-command        = \mathrm       ,
     fraction-command    = \frac         ,
     open-bracket        = (             , % )
     parse               = true          ,

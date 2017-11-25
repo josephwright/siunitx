@@ -107,16 +107,6 @@
 %   color).
 % \end{function}
 %
-% \begin{function}{font-command}
-%   \begin{syntax}
-%     |unit-font-command| = \meta{command}
-%   \end{syntax}
-%   Command applied to text during output of units, as detailed for
-%   \opt{unit/font-command} option. The option s used to specify which
-%   math mode font command should be removed from output when printing in text
-%   mode. The standard setting is |\mathrm|.
-% \end{function}
-%
 % \begin{function}{mode}
 %   \begin{syntax}
 %     |mode| = \meta{choice}
@@ -208,11 +198,10 @@
   }
 %    \end{macrocode}
 %
-% \begin{macro}{\str_case:VnF, \tl_replace_all:NVn}
+% \begin{macro}{\str_case:VnF}
 %   Variants.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \str_case:nnF { V }
-\cs_generate_variant:Nn \tl_replace_all:Nnn { NV }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -265,7 +254,6 @@
 %     \l_@@_number_mode_tl        ,
 %     \l_@@_unit_color_tl         ,
 %     \l_@@_unit_mode_tl          ,
-%     \l_@@_font_tl               ,
 %     \l_@@_ctrl_math_font_bool   ,
 %     \l_@@_ctrl_math_version     ,
 %     \l_@@_text_family_tl        ,
@@ -291,8 +279,6 @@
       \l_@@_ctrl_text_series_bool ,
     control-text-shape .bool_set:N =
       \l_@@_ctrl_text_shape_bool ,
-    font-command .tl_set:N =
-      \l_@@_font_tl ,
     mode .meta:n =
       { number-mode = #1 , unit-mode = #1 } ,
     number-color .tl_set:N =
@@ -427,7 +413,8 @@
   }
 %    \end{macrocode}
 %   To get math mode material to print in text mode, various search-and-replace
-%   steps are needed.
+%   steps are needed. The \cs{mathrm} command is also disabled as it is
+%   invalid in text mode.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_replace:n #1
   {
@@ -440,6 +427,8 @@
 \cs_new_protected:Npx \@@_text_replace:N #1
   {
     \exp_not:N \@@_text_replace:NNn #1
+      \exp_not:N \mathrm
+        { \exp_not:N \use:n }
       \exp_not:N \pm
         { \exp_not:N \textpm }
       \exp_not:N \mp
@@ -453,12 +442,6 @@
       \exp_not:N \q_recursion_tail
         { ? }
       \exp_not:N \q_recursion_stop
-      \exp_not:N \tl_if_empty:NF \exp_not:N \l_@@_font_tl
-        {
-          \tl_replace_all:NVn #1
-            \exp_not:N \l_@@_font_tl
-            { \exp_not:N \use:n }
-        }
   }
 \cs_new_protected:Npn \@@_text_replace:NNn #1#2#3
   {
@@ -566,7 +549,6 @@
     control-text-shape   = true      ,
     control-text-series  = true      ,
     control-text-family  = true      ,
-    font-command         = \mathrm   ,
     mode                 = math      ,
     number-color         =           ,
     number-mode          = math      ,
