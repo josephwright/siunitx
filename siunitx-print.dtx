@@ -93,6 +93,18 @@
 %   fonts.
 % \end{function}
 %
+% \begin{variable}{\l_siunitx_print_series_prop}
+%   This properly list contains mappings from text mode font weights to math
+%   mode font versions. The standard settings here cover
+%   \begin{itemize}
+%     \item[\texttt{m}] Standard (mid) weight, mapping to math version
+%       |normal|.
+%     \item[\texttt{bx}] Bold exanded weight, mapping to math version |bold|.
+%     \item[\texttt{lt}] Light weight, mapping to math version |light|.
+%     \item[\texttt{l}] Light weight, mapping to math version |light|.
+%   \end{itemize}
+% \end{variable}
+%
 % \subsection{Key--value options}
 %
 % The options defined by this submodule are available within the \pkg{l3keys}
@@ -182,6 +194,26 @@
 %   \end{syntax}
 %   Switch to determine whether the active math shape is reset to
 %   \cs{upshape} when printing in text mode. The standard setting is |true|.
+% \end{function}
+%
+% \begin{function}{text-family-to-math}
+%   \begin{syntax}
+%     |text-family-to-math| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to determine if the family of the current text font should be
+%   applied (where possible) to printing in math mode. The standard setting is
+%   |false|.
+% \end{function}
+%
+% \begin{function}{text-weight-to-math}
+%   \begin{syntax}
+%     |text-weight-to-math| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to determine if the weight of the current text font should be
+%   applied (where possible) to printing in math mode. This is achieved by
+%   setting the \cs{mathversion}, and so will override \opt{reset-math-version}.
+%   The mappings between text and math weight are stored in
+%   \cs{l_siunitx_print_series_prop}. The standard setting is |false|.
 % \end{function}
 %
 % \begin{function}{unit-color}
@@ -295,6 +327,8 @@
 %     \l_@@_unit_mode_tl      ,
 %     \l_@@_math_font_bool    ,
 %     \l_@@_math_version_bool ,
+%     \l_@@_math_family_bool  ,
+%     \l_@@_math_weight_bool  ,
 %     \l_@@_text_family_tl    ,
 %     \l_@@_text_series_tl    ,
 %     \l_@@_text_shape_tl
@@ -328,6 +362,10 @@
       \l_@@_text_series_bool ,
     reset-text-shape .bool_set:N =
       \l_@@_text_shape_bool ,
+    text-family-to-math .bool_set:N =
+      \l_@@_math_family_bool ,
+    text-weight-to-math .bool_set:N =
+      \l_@@_math_weight_bool ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -375,64 +413,127 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{variable}{\l_siunitx_print_series_prop}
+%   Mapping data to relate text series to math version.
+%    \begin{macrocode}
+\prop_new:N \l_siunitx_print_series_prop
+\prop_put:Nnn \l_siunitx_print_series_prop { m }  { normal }
+\prop_put:Nnn \l_siunitx_print_series_prop { bx } { bold }
+\prop_put:Nnn \l_siunitx_print_series_prop { l }  { light }
+\prop_put:Nnn \l_siunitx_print_series_prop { lt } { light }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_math:n}
-% \begin{macro}{\@@_math_aux:n}
-% \begin{macro}{\@@_math_aux:Nn}
+% \begin{macro}{\@@_math_version:nn, \@@_math_version:Vn}
+% \begin{macro}
+%   {
+%     \@@_math_auxi:n,
+%     \@@_math_auxii:n,
+%     \@@_math_auxiii:n,
+%     \@@_math_auxiv:n,
+%     \@@_math_auxv:n
+%   }
+% \begin{macro}{\@@_math_aux:Nn, \@@_math_aux:cn}
 % \begin{macro}{\@@_math_sub:n, \@@_math_super:n, \@@_math_script:n}
-%   Any setting which changes the math weight can only be set from text mode
-%   (as it applies at the level of a formula). As such, the first test is to
-%   see if that needs to be to check if the math version is |normal|: if not,
-%   switch to text mode, sort it out and switch back. That of course means
-%   that in such cases, line breaking will not be possible.
+% \begin{macro}{\@@_math_text:n}
+%   The first step in setting in math mode is to check on the math version.
+%   The starting point is the question of whether text series needs to
+%   propagate to math mode: if so, check on the mapping, otherwise check on
+%   the current math version.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_math:n #1
   {
-    \bool_lazy_and:nnTF
-      { \l_@@_math_version_bool }
-      { ! \str_if_eq_p:Vn \math@version { normal } }
+    \bool_if:NTF \l_@@_math_weight_bool
+      {
+        \prop_get:NVNTF \l_siunitx_print_series_prop
+          \f@series \l_@@_tmp_tl
+          { \@@_math_version:Vn \l_@@_tmp_tl {#1} }
+          { \@@_math_auxi:n {#1} }
+      }
+      { \@@_math_auxi:n {#1} }
+  }
+\cs_new_protected:Npn \@@_math_auxi:n #1
+  {
+    \bool_if:NTF \l_@@_math_version_bool
+      { \@@_math_version:nn { normal } {#1} }
+      { \@@_math_auxii:n {#1} }
+  }
+%    \end{macrocode}
+%   Any setting which changes the math version can only be set from text mode
+%   (as it applies at the level of a formula). As such, the first test is to
+%   see if that needs to be to check if the math version has to be set: if so,
+%   switch to text mode, sort it out and switch back. That of course means
+%   that in such cases, line breaking will not be possible.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_math_version:nn #1#2
+  {
+    \str_if_eq_x:nnTF { \math@version } { #1 }
+      { \@@_math_auxii:n {#2} }
       {
         \mode_if_math:TF
           { \text }
           { \use:n }
             {
-              \mathversion { normal }
-              \@@_math_aux:n {#1}
+              \mathversion {#1}
+              \@@_math_auxii:n {#2}
             }
+       }
+  }
+\cs_generate_variant:Nn \@@_math_version:nn { V }
+%    \end{macrocode}
+%   At this point, force math mode then start dealing with setting math font
+%   based on text family. If the text family is roman, life is slightly
+%   different to if it is sanserif or monospaced. In all cases, the outcomes
+%   can be handled using the same routines as for normal math mode treatment.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_math_auxii:n #1
+  { \ensuremath { \@@_math_auxiii:n {#1} } }
+\cs_new_protected:Npn \@@_math_auxiii:n #1
+  {
+    \bool_if:NTF \l_@@_math_family_bool
+      {
+        \str_case_x:nnF { \f@family }
+          {
+            { \rmdefault } { \@@_math_auxv:n }
+            { \sfdefault } { \@@_math_aux:Nn \mathsf }
+            { \ttdefault } { \@@_math_aux:Nn \mathtt }
+          }
+          { \@@_math_auxiv:n }
       }
-      { \@@_math_aux:n {#1} }
+      { \@@_math_auxiv:n }
+        {#1}
   }
 %    \end{macrocode}
-%   Now we deal with the font selection in math mode. If we start in text
-%   mode, there is nothing to do. Otherwise, there are two possible cases.
-%   First, we are retaining the current math font, and the active one is
+%   Now we deal with the font selection in math mode. There are two possible
+%   cases. First, we are retaining the current math font, and the active one is
 %   \cs{mathsf} or \cs{mathtt}: that needs to be applied to the argument.
 %   Alternatively, if the current font is not retained, ensure that
-%   normal math mode rules are active.
+%   normal math mode rules are active. The parts here are split up to allow
+%   reuse when picking up the text family.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_math_aux:n #1
+\cs_new_protected:Npn \@@_math_auxiv:n #1
   {
-    \mode_if_math:TF
+    \bool_if:NTF \l_@@_math_font_bool
       {
-        \bool_if:NTF \l_@@_math_font_bool
+        \int_case:nnF \fam
           {
-            \int_case:nnF \fam
-              {
-                \c_@@_mathsf_int { \@@_math_aux:Nn \mathsf }
-                \c_@@_mathtt_int { \@@_math_aux:Nn \mathtt }
-              }
-              { \use:n }
-                {#1}
+            \c_@@_mathsf_int { \@@_math_aux:Nn \mathsf }
+            \c_@@_mathtt_int { \@@_math_aux:Nn \mathtt }
           }
-          {
-            \bool_lazy_or:nnTF
-              { \int_compare_p:nNn \fam = { -1 } }
-              { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
-              { \use:n }
-              { \mathrm }
-                {#1}
-          }
+          { \use:n }
       }
-      { \ensuremath {#1} }
+      { \@@_math_auxv:n }
+        {#1}
+  }
+\cs_new_protected:Npn \@@_math_auxv:n #1
+  {
+    \bool_lazy_or:nnTF
+      { \int_compare_p:nNn \fam = { -1 } }
+      { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
+      { \use:n }
+      { \mathrm }
+        {#1}
   }
 %    \end{macrocode}
 %   Search-and-replace fun: deal with any \cs{mathrm} in the argument and
@@ -453,6 +554,7 @@
       #1 { \exp_not:N \tl_use:N \exp_not:N \l_@@_tmp_tl }
     \group_end:
   }
+\cs_generate_variant:Nn \@@_math_aux:Nn { c }
 \cs_new_protected:Npx \@@_math_sub:n #1
   {
     \char_generate:nn { `\_ } { 8 }
@@ -469,6 +571,13 @@
     \group_end:
   }
 %    \end{macrocode}
+%   To match the text mode font, there is a simple look-up of the current
+%   font family. Luckily, mappings to math mode equivalents are easy. 
+%    \begin{macrocode}
+
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -642,6 +751,8 @@
     reset-text-shape    = true  ,
     reset-text-series   = true  ,
     reset-text-family   = true  ,
+    text-family-to-math = false ,
+    text-weight-to-math = false ,
     unit-color          =       ,
     unit-mode           = math
   }
