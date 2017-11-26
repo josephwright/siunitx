@@ -478,7 +478,7 @@
           {
             \bool_lazy_and:nnTF
               { \tl_if_blank_p:n {#2} }
-              { \bool_not_p:n { \tl_if_blank_p:n {#4} } }
+              { ! \tl_if_blank_p:n {#4} }
               { 0 }
               { \exp_not:n {#2} }
           }
@@ -897,7 +897,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5
   {
     \bool_lazy_or:nnTF
-      {#3} { \bool_not_p:n { \str_if_eq_p:nn {#5} { 0 } } }
+      {#3} { ! \str_if_eq_p:nn {#5} { 0 } }
       {
         \tl_put_right:Nn \l_@@_partial_tl {#5}
         \@@_parse_loop_main:NNNNN #1 #2 \c_true_bool #4
@@ -1008,7 +1008,7 @@
     \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
       {
         \bool_lazy_or:nnTF
-          {#3} { \bool_not_p:n { \str_if_eq_p:nn {#5} { 0 } } }
+          {#3} { ! \str_if_eq_p:nn {#5} { 0 } }
           {
             \tl_put_right:Nn \l_@@_partial_tl {#5}
             \@@_parse_loop_uncert:NNNNN
@@ -1503,8 +1503,8 @@
       {
         { \str_if_eq_p:nn {#1} { 1 } }
         { \tl_if_blank_p:n {#2} }
-        { \bool_not_p:n { \str_if_eq_p:nn {#3} { 0 } } }
-        { \bool_not_p:n { \l_@@_unity_mantissa_bool } }
+        { ! \str_if_eq_p:nn {#3} { 0 } }
+        { ! \l_@@_unity_mantissa_bool }
       }
       { \@@_format_digits:nn { integer } {#1} }
   }
@@ -1681,11 +1681,11 @@
     \exp_not:V \l_@@_tab_tl
     \bool_lazy_or:nnTF
       { \l_@@_zero_exponent_bool }
-      { \bool_not_p:n { \str_if_eq_p:nn {#2} { 0 } } }
+      { ! \str_if_eq_p:nn {#2} { 0 } }
       {
         \bool_lazy_and:nnTF
           { \str_if_eq_p:nn {#3} { 1. } }
-          { \bool_not_p:n { \l_@@_unity_mantissa_bool } }
+          { ! \l_@@_unity_mantissa_bool }
           { \exp_not:V \l_@@_tab_tl }
           {
             \bool_if:NTF \l_@@_tight_bool
@@ -1701,7 +1701,7 @@
           {
             \bool_lazy_or:nnT
               { \l_@@_explicit_plus_bool }
-              { \bool_not_p:n { \str_if_eq_p:nn {#1} { + } } }
+              { ! \str_if_eq_p:nn {#1} { + } }
               { \@@_format_sign_aux:N #1 }
             \@@_format_digits:nn { integer } {#2}
           }
