@@ -259,7 +259,7 @@
 %     \l_@@_number_mode_tl        ,
 %     \l_@@_unit_color_tl         ,
 %     \l_@@_unit_mode_tl          ,
-%     \l_@@_ctrl_math_version     ,
+%     \l_@@_math_version     ,
 %     \l_@@_text_family_tl        ,
 %     \l_@@_text_series_tl        ,
 %     \l_@@_text_shape_tl
@@ -274,14 +274,6 @@
 
     color .meta:n =
       { number-color = #1 , unit-color = #1 } ,
-    control-math-version .bool_set:N =
-      \l_@@_ctrl_math_version_bool ,
-    control-text-family .bool_set:N =
-      \l_@@_ctrl_text_family_bool ,
-    control-text-series .bool_set:N =
-      \l_@@_ctrl_text_series_bool ,
-    control-text-shape .bool_set:N =
-      \l_@@_ctrl_text_shape_bool ,
     mode .meta:n =
       { number-mode = #1 , unit-mode = #1 } ,
     number-color .tl_set:N =
@@ -294,6 +286,14 @@
       } ,
     propagate-math-font .bool_set:N =
       \l_@@_math_font_bool ,
+    reset-math-version .bool_set:N =
+      \l_@@_math_version_bool ,
+    reset-text-family .bool_set:N =
+      \l_@@_text_family_bool ,
+    reset-text-series .bool_set:N =
+      \l_@@_text_series_bool ,
+    reset-text-shape .bool_set:N =
+      \l_@@_text_shape_bool ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -353,7 +353,7 @@
 \cs_new_protected:Npn \@@_math:n #1
   {
     \bool_lazy_and:nnTF
-      { \l_@@_ctrl_math_version_bool }
+      { \l_@@_math_version_bool }
       { ! \str_if_eq_p:Vn \math@version { normal } }
       {
         \mode_if_math:TF
@@ -455,11 +455,11 @@
   {
     \text
       {
-        \bool_if:NT \l_@@_ctrl_text_family_bool
+        \bool_if:NT \l_@@_text_family_bool
           { \rmfamily }
-        \bool_if:NT \l_@@_ctrl_text_series_bool
+        \bool_if:NT \l_@@_text_series_bool
           { \mdseries }
-        \bool_if:NT \l_@@_ctrl_text_shape_bool
+        \bool_if:NT \l_@@_text_shape_bool
           { \upshape }
         \@@_text_replace:n {#1}
       }
@@ -597,14 +597,14 @@
 \keys_set:nn { siunitx / print }
   {
     color                =       ,
-    control-math-version = true  ,
-    control-text-shape   = true  ,
-    control-text-series  = true  ,
-    control-text-family  = true  ,
     mode                 = math  ,
     number-color         =       ,
     number-mode          = math  ,
     propagate-math-font  = false ,
+    reset-math-version   = true  ,
+    reset-text-shape     = true  ,
+    reset-text-series    = true  ,
+    reset-text-family    = true  ,
     unit-color           =       ,
     unit-mode            = math
   }
