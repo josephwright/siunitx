@@ -194,8 +194,12 @@
 %
 % \begin{macro}{\sisetup}
 %    \begin{macrocode}
-\NewDocumentCommand \sisetup { m }
-  { \keys_set:nn { siunitx } {#1} }
+\NewDocumentCommand \sisetup { o m }
+  {
+    \IfNoValueTF {#1}
+      { \keys_set:nn { siunitx } {#2} }
+      { \keys_set:nn { siunitx / #1 } {#2} }
+  }
 %    \end{macrocode}
 % \end{macro}
 %
