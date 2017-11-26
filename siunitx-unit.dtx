@@ -504,9 +504,9 @@
 %   |fraction|. The standard setting is |\frac|.
 % \end{function}
 %
-% \begin{function}{parse}
+% \begin{function}{parse-units}
 %   \begin{syntax}
-%     |parse| = |true|\verb"|"|false|
+%     |parse-units| = |true|\verb"|"|false|
 %   \end{syntax}
 %   Determines whether parsing of unit symbols is attempted or literal
 %   mode is used directly. The standard setting is |true|.
@@ -539,14 +539,6 @@
 %   Specifies the symbol to be used to denote negative powers when the option
 %   |per-mode| is set to |repeated-symbol|, |symbol| or |symbol-or-fraction|.
 %   The standard setting is |/|.
-% \end{function}
-%
-% \begin{function}{product}
-%   \begin{syntax}
-%     |product| = \meta{separator}
-%   \end{syntax}
-%   Inserted between unit combinations in parsed mode, and used to replace
-%   |.| and |~| in literal mode. The standard setting is |\,|.
 % \end{function}
 %
 % \begin{function}{qualifier-mode}
@@ -597,6 +589,14 @@
 %   \end{syntax}
 %   Bracket symbol used to open a matched pair around units when once is
 %   required to maintain mathematical logic. The standard setting is |(|. ^^A )
+% \end{function}
+%
+% \begin{function}{unit-product}
+%   \begin{syntax}
+%     |unit-product| = \meta{separator}
+%   \end{syntax}
+%   Inserted between unit combinations in parsed mode, and used to replace
+%   |.| and |~| in literal mode. The standard setting is |\,|.
 % \end{function}
 %
 % \end{documentation}
@@ -909,7 +909,7 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
-    product .tl_set:N = \l_@@_product_tl
+    unit-product .tl_set:N = \l_@@_product_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -1458,7 +1458,7 @@
       \l_@@_denominator_bracket_bool ,
     fraction-command .tl_set:N =
       \l_@@_fraction_function_tl ,
-    parse .bool_set:N =
+    parse-units .bool_set:N =
       \l_@@_parse_bool ,
     per-mode .choice: ,
     per-mode / fraction .code:n =
@@ -2473,15 +2473,15 @@
   {
     bracket-denominator = true      ,
     fraction-command    = \frac     ,
-    parse               = true      ,
+    parse-units         = true      ,
     per-mode            = power     ,
     per-symbol          = /         ,
-    product             = \,        ,
     qualifier-mode      = subscript ,
     qualifier-phrase    = \         ,
     sticky-per          = false     ,
     unit-close-bracket  = )         , % (
-    unit-open-bracket   = (           % )
+    unit-open-bracket   = (         , % )
+    unit-product        = \,
   }
 %    \end{macrocode}
 %
