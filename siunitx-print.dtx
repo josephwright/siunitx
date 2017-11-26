@@ -138,6 +138,18 @@
 %   The standard setting is |math|.
 % \end{function}
 %
+% \begin{function}{propagate-math-font}
+%   \begin{syntax}
+%     |propagate-math-font| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to determine if the currently-active math font is applied within
+%   printed output. This is relevant only when \cs{siunitx_print:nn} is
+%   called from within math mode: in text mode there is not active math
+%   font. When not active, math mode material will be typeset using
+%   standard math mode fonts without any changes being made to the
+%   supplied argument. The standard setting is |false|.
+% \end{function}
+%
 % \begin{function}{unit-color}
 %   \begin{syntax}
 %     |unit-color| = \meta{color}
@@ -247,7 +259,6 @@
 %     \l_@@_number_mode_tl        ,
 %     \l_@@_unit_color_tl         ,
 %     \l_@@_unit_mode_tl          ,
-%     \l_@@_ctrl_math_font_bool   ,
 %     \l_@@_ctrl_math_version     ,
 %     \l_@@_text_family_tl        ,
 %     \l_@@_text_series_tl        ,
@@ -260,10 +271,9 @@
 \tl_new:N \l_@@_unit_mode_tl
 \keys_define:nn { siunitx / print }
   {
+
     color .meta:n =
       { number-color = #1 , unit-color = #1 } ,
-    control-math-font .bool_set:N =
-      \l_@@_ctrl_math_font_bool ,
     control-math-version .bool_set:N =
       \l_@@_ctrl_math_version_bool ,
     control-text-family .bool_set:N =
@@ -282,6 +292,8 @@
         \tl_set_eq:NN
           \l_@@_number_mode_tl \l_keys_choice_tl
       } ,
+    propagate-math-font .bool_set:N =
+      \l_@@_math_font_bool ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -331,6 +343,7 @@
 %
 % \begin{macro}{\@@_math:n}
 % \begin{macro}{\@@_math_aux:n}
+% \begin{macro}{\@@_math_aux:Nn}
 %   Any setting which changes the math weight can only be set from text mode
 %   (as it applies at the level of a formula). As such, the first test is to
 %   see if that needs to be to check if the math version is |normal|: if not,
@@ -354,26 +367,73 @@
       { \@@_math_aux:n {#1} }
   }
 %    \end{macrocode}
-%   A second check is need for the case where we are already inside
-%   \foreign{e.g.}~|\mathsf| but we have been asked to control the family:
-%   any numbers or other \enquote{free} text would otherwise be incorrect.
+%   Now we deal with the font selection in math mode. If we start in text
+%   mode, there is nothing to do. Otherwise, there are two possible cases.
+%   First, we are retaining the current math font, and the active one is
+%   \cs{mathsf} or \cs{mathtt}: that needs to be applied to the argument.
+%   Alternatively, if the current font is not retained, ensure that
+%   normal math mode rules are active.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_math_aux:n #1
   {
-    \bool_lazy_all:nTF
+    \mode_if_math:TF
       {
-        { \mode_if_math_p: }
-        { \l_@@_ctrl_math_font_bool }
-        {
-          ! \bool_lazy_or_p:nn
-            { \int_compare_p:nNn \fam = { -1 } }
-            { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
-        }
+        \bool_if:NTF \l_@@_math_font_bool
+          {
+            \int_case:nnF \fam
+              {
+                \c_@@_mathsf_int { \@@_math_aux:Nn \mathsf }
+                \c_@@_mathtt_int { \@@_math_aux:Nn \mathtt }
+              }
+              { \use:n }
+                {#1}
+          }
+          {
+            \bool_lazy_or:nnTF
+              { \int_compare_p:nNn \fam = { -1 } }
+              { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
+              { \use:n }
+              { \mathrm }
+                {#1}
+          }
       }
-      { \mathrm {#1} }
       { \ensuremath {#1} }
   }
 %    \end{macrocode}
+%   Search-and-replace fun: deal with any \cs{mathrm} in the argument and
+%   also inside sub/superscripts.
+%    \begin{macrocode}
+\cs_new_protected:Npx \@@_math_aux:Nn #1#2
+  {
+    \group_begin:
+      \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#2}
+      \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+        { \exp_not:N \mathrm } { #1 }
+      \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+        { \char_generate:nn { `\_ } { 8 } }
+        \exp_not:N \@@_math_super:Nn
+      \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
+        { ^ } \exp_not:N \@@_math_super:Nn
+      #1 { \exp_not:N \tl_use:N \exp_not:N \l_@@_tmp_tl }
+    \group_end:
+  }
+\cs_new_protected:Npx \@@_math_sub:Nn #1#2
+  {
+    \char_generate_nn { `\_ } { 8 }
+      { \exp_not:N \@@_math_script:Nn #1 {#2} }
+  }
+\cs_new_protected:Npn \@@_math_super:Nn #1#2
+  { ^ { \@@_math_script:Nn #1 {#2} } }
+\cs_new_protected:Npn \@@_math_script:Nn #1#2
+  {
+    \group_begin:
+      \tl_set:Nn \l_@@_tmp_tl {#2}
+      \tl_replace_all:Nnn \l_@@_tmp_tl { \mathrm } { #1 }
+      #1 { \tl_use:N \l_@@_tmp_tl }
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -545,6 +605,7 @@
     mode                 = math      ,
     number-color         =           ,
     number-mode          = math      ,
+    propagate-math-font  = false     ,
     unit-color           =           ,
     unit-mode            = math
   }
