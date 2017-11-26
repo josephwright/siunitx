@@ -4,8 +4,6 @@
 
 \usepackage{siunitx}
 
-\usepackage{sansmath}
-
 \begin{document}
 
 \START
@@ -98,21 +96,34 @@
     \group_end:
   }
 
+\tl_set:Nx \l_tmpa_tl
+  {
+    \exp_not:N \mathrm { kg }
+    \char_generate:nn { `\_ } { 8 }
+    { \exp_not:N \mathrm { polymer } }
+  }
+\TIMO
+
 \TEST { Option~setting~"propagate-math-font" }
   {
-    \hbox_set:Nn \l_tmpa_box
-      { $ \mathsf { \siunitx_print:nn { unit } { \mathrm{kg} } } $ }
-    \box_show:N \l_tmpa_box
-    \hbox_set:Nn \l_tmpa_box
-      { $ \mathtt { \siunitx_print:nn { unit } { \mathrm{kg} } } $ }
-    \box_show:N \l_tmpa_box
+    \OMIT
+      \cs_set_protected:Npn \test:Nn #1#2
+        {
+          \hbox_set:Nn \l_tmpa_box
+            { $ #1 { \siunitx_print:nn { unit } { #2 } } $ }
+          \box_show:N \l_tmpa_box
+        }
+      \cs_generate_variant:Nn \test:Nn { NV }
+    \TIMO
+    \test:Nn \mathsf { \mathrm{kg} }
+    \test:Nn \mathsf { \mathrm{kg}^{2} }
+    \test:NV \mathsf \l_tmpa_tl
+    \test:Nn \mathtt { \mathrm{kg} }
     \keys_set:nn { siunitx } { propagate-math-font = true } 
-    \hbox_set:Nn \l_tmpa_box
-      { $ \mathsf { \siunitx_print:nn { unit } { \mathrm{kg} } } $ }
-    \box_show:N \l_tmpa_box
-    \hbox_set:Nn \l_tmpa_box
-      { $ \mathtt { \siunitx_print:nn { unit } { \mathrm{kg} } } $ }
-    \box_show:N \l_tmpa_box
+    \test:Nn \mathsf { \mathrm{kg} }
+    \test:Nn \mathsf { \mathrm{kg}^{2} }
+    \test:NV \mathsf \l_tmpa_tl
+    \test:Nn \mathtt { \mathrm{kg} }
   }
 
 \TEST { Option~setting~"reset-math-version" }
@@ -121,17 +132,9 @@
       \boldmath
       \test:nn { unit } { \mathrm{kg} }
     \group_end:
-    \group_begin:
-      \sansmath
-      \test:nn { unit } { \mathrm{kg} }
-    \group_end:
     \keys_set:nn { siunitx } { reset-math-version = false }
     \group_begin:
       \boldmath
-      \test:nn { unit } { \mathrm{kg} }
-    \group_end:
-    \group_begin:
-      \sansmath
       \test:nn { unit } { \mathrm{kg} }
     \group_end:
   }

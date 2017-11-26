@@ -377,6 +377,7 @@
 % \begin{macro}{\@@_math:n}
 % \begin{macro}{\@@_math_aux:n}
 % \begin{macro}{\@@_math_aux:Nn}
+% \begin{macro}{\@@_math_sub:n, \@@_math_super:n, \@@_math_script:n}
 %   Any setting which changes the math weight can only be set from text mode
 %   (as it applies at the level of a formula). As such, the first test is to
 %   see if that needs to be to check if the math version is |normal|: if not,
@@ -441,31 +442,33 @@
     \group_begin:
       \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#2}
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
-        { \exp_not:N \mathrm } { #1 }
+        { \exp_not:N \mathrm } { \exp_not:N \use:n }
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
         { \char_generate:nn { `\_ } { 8 } }
-        \exp_not:N \@@_math_super:Nn
+        { \exp_not:N \@@_math_sub:n }
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
-        { ^ } \exp_not:N \@@_math_super:Nn
+        { ^ }
+        { \exp_not:N \@@_math_super:n }
       #1 { \exp_not:N \tl_use:N \exp_not:N \l_@@_tmp_tl }
     \group_end:
   }
-\cs_new_protected:Npx \@@_math_sub:Nn #1#2
+\cs_new_protected:Npx \@@_math_sub:n #1
   {
     \char_generate:nn { `\_ } { 8 }
-      { \exp_not:N \@@_math_script:Nn #1 {#2} }
+      { \exp_not:N \@@_math_script:n {#1} }
   }
-\cs_new_protected:Npn \@@_math_super:Nn #1#2
-  { ^ { \@@_math_script:Nn #1 {#2} } }
-\cs_new_protected:Npn \@@_math_script:Nn #1#2
+\cs_new_protected:Npn \@@_math_super:n #1
+  { ^ { \@@_math_script:n {#1} } }
+\cs_new_protected:Npn \@@_math_script:n #1
   {
     \group_begin:
-      \tl_set:Nn \l_@@_tmp_tl {#2}
-      \tl_replace_all:Nnn \l_@@_tmp_tl { \mathrm } { #1 }
-      #1 { \tl_use:N \l_@@_tmp_tl }
+      \tl_set:Nn \l_@@_tmp_tl {#1}
+      \tl_replace_all:Nnn \l_@@_tmp_tl { \mathrm } { \use:n }
+      \tl_use:N \l_@@_tmp_tl
     \group_end:
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
