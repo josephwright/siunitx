@@ -40,6 +40,7 @@ tlmgr install  \
   oberdiek     \
   l3kernel     \
   l3packages   \
+  sansmath     \
   tools
 
 # Keep no backups (not required, simply makes cache bigger)
