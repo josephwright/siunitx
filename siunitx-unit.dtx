@@ -130,9 +130,9 @@
 %
 % \section{Defining symbolic units}
 %
-% \begin{function}{\siunitx_unit_prefix_set:Nnn}
+% \begin{function}{\siunitx_unit_prefix_declare:Nnn}
 %   \begin{syntax}
-%     \cs{siunitx_unit_prefix_set:Nnn} \meta{prefix} \Arg{symbol} \Arg{power}
+%     \cs{siunitx_unit_prefix_declare:Nnn} \meta{prefix} \Arg{symbol} \Arg{power}
 %   \end{syntax}
 %   Defines a symbolic \meta{prefix} (which should be a control sequence
 %   such as |\kilo|) to be converted by the parser to the \meta{symbol}.
@@ -144,7 +144,7 @@
 %   \cs{siunitx_unit_prefix_set:Nn}.
 % \end{function}
 %
-% \begin{function}{\siunitx_unit_prefix_set:Nn}
+% \begin{function}{\siunitx_unit_prefix_declare:Nn}
 %   \begin{syntax}
 %     \cs{siunitx_unit_prefix_set:Nn}  \meta{prefix} \Arg{symbol}
 %   \end{syntax}
@@ -152,13 +152,13 @@
 %   such as |\kilo|) to be converted by the parser to the \meta{symbol}.
 %   The latter should consist of literal content (\emph{e.g.}~|k|).
 %   In literal mode the \meta{symbol} will be typeset directly. In contrast
-%   to \cs{siunitx_unit_prefix_set:Nnn}, there is no assumption about the
+%   to \cs{siunitx_unit_prefix_declare:Nnn}, there is no assumption about the
 %   mathematical nature of the \meta{prefix}, \emph{i.e.}~the prefix may
 %   represent a power of any base. As a result, no conversion of the
 %   \meta{prefix} to a numerical power will be possible.
 % \end{function}
 %
-% \begin{function}{\siunitx_unit_power_set:NnN}
+% \begin{function}{\siunitx_unit_power_declare:NnN}
 %   \begin{syntax}
 %     \cs{siunitx_unit_set:Nn} \meta{power} \Arg{value} \meta{precedes}
 %   \end{syntax}
@@ -173,7 +173,7 @@
 %   false).
 % \end{function}
 %
-% \begin{function}{\siunitx_unit_qualifier_set:Nn}
+% \begin{function}{\siunitx_unit_qualifier_declare:Nn}
 %   \begin{syntax}
 %     \cs{siunitx_unit_qualifier_set:Nn} \meta{qualifier} \Arg{meaning}
 %   \end{syntax}
@@ -184,7 +184,7 @@
 %   the unit to which it applies.
 % \end{function}
 %
-% \begin{function}{\siunitx_unit_set:Nn, \siunitx_unit_set:Nx}
+% \begin{function}{\siunitx_unit_declare:Nn, \siunitx_unit_declare:Nx}
 %   \begin{syntax}
 %     \cs{siunitx_unit_set:Nn} \meta{unit} \Arg{meaning}
 %   \end{syntax}
@@ -750,14 +750,14 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_unit_power_set:NnN}
+% \begin{macro}{\siunitx_unit_power_declare:NnN}
 %   For powers, there is the slight complication that the symbolic name may
 %   appear either before or after the unit it applies to, and these two
 %   different cases need slightly different code for the literal case. A
 %   boolean is used to determine which case is in operation, and in parsing
 %   mode this data is passed directly to the underlying function.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_power_set:NnN #1#2#3
+\cs_new_protected:Npn \siunitx_unit_power_declare:NnN #1#2#3
   {
     \bool_if:NTF #3
       {
@@ -773,8 +773,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_unit_prefix_set:Nn}
-% \begin{macro}{\siunitx_unit_prefix_set:Nnn}
+% \begin{macro}{\siunitx_unit_prefix_declare:Nn}
+% \begin{macro}{\siunitx_unit_prefix_declare:Nnn}
 % \begin{variable}
 %   {\l_@@_prefixes_forward_prop, \l_@@_prefixes_reverse_prop}
 %   For prefixes there are a couple of options. In all cases, the basic
@@ -784,15 +784,15 @@
 %   That is handled using two properly lists which can be used to supply
 %   the conversion data later.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_prefix_set:Nn #1#2
+\cs_new_protected:Npn \siunitx_unit_prefix_declare:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       {#2}
       { \@@_parse_prefix:Nn #1 {#2} }
   }
-\cs_new_protected:Npn \siunitx_unit_prefix_set:Nnn #1#2#3
+\cs_new_protected:Npn \siunitx_unit_prefix_declare:Nnn #1#2#3
   {
-    \siunitx_unit_prefix_set:Nn #1 {#2}
+    \siunitx_unit_prefix_declare:Nn #1 {#2}
     \prop_put:Nnn \l_@@_prefixes_forward_prop {#2} {#3}
     \prop_put:Nnn \l_@@_prefixes_reverse_prop {#3} {#2}
   }
@@ -803,11 +803,11 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_unit_qualifier_set:Nn}
+% \begin{macro}{\siunitx_unit_qualifier_declare:Nn}
 %   Qualifiers are relatively easy to handle: nothing to do other than save
 %   the input appropriately.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_qualifier_set:Nn #1#2
+\cs_new_protected:Npn \siunitx_unit_qualifier_declare:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       { \  ( #2 ) }
@@ -816,11 +816,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_unit_set:Nn, \siunitx_unit_set:Nx}
+% \begin{macro}{\siunitx_unit_declare:Nn, \siunitx_unit_declare:Nx}
 %   For the unit parsing, allowing for variations in definition order requires
 %   that a test is made for the output of each unit at point of use.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_set:Nn #1#2
+\cs_new_protected:Npn \siunitx_unit_declare:Nn #1#2
   {
     \@@_set_symbolic:Nnn #1
       {#2}
@@ -830,7 +830,7 @@
           { \@@_parse_unit:Nn #1 {#2} }
       }
   }
-\cs_generate_variant:Nn \siunitx_unit_set:Nn { Nx }
+\cs_generate_variant:Nn \siunitx_unit_declare:Nn { Nx }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2111,21 +2111,21 @@
 %   The basic SI units: technically the correct spelling is \cs{metre} but
 %   US users tend to use \cs{meter}.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \kilogram { \kilo \gram }
-\siunitx_unit_set:Nn \metre    { m }
-\siunitx_unit_set:Nn \meter    { \metre }
-\siunitx_unit_set:Nn \mole     { mol }
-\siunitx_unit_set:Nn \second   { s }
-\siunitx_unit_set:Nn \ampere   { A }
-\siunitx_unit_set:Nn \kelvin   { K }
-\siunitx_unit_set:Nn \candela  { cd }
+\siunitx_unit_declare:Nn \kilogram { \kilo \gram }
+\siunitx_unit_declare:Nn \metre    { m }
+\siunitx_unit_declare:Nn \meter    { \metre }
+\siunitx_unit_declare:Nn \mole     { mol }
+\siunitx_unit_declare:Nn \second   { s }
+\siunitx_unit_declare:Nn \ampere   { A }
+\siunitx_unit_declare:Nn \kelvin   { K }
+\siunitx_unit_declare:Nn \candela  { cd }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\gram}
 %   The gram is an odd unit as it is needed for the base unit kilogram.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \gram { g }
+\siunitx_unit_declare:Nn \gram { g }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2145,16 +2145,16 @@
 %   The various SI multiple prefixes are defined here: first the small
 %   ones.
 %    \begin{macrocode}
-\siunitx_unit_prefix_set:Nnn \yocto { y } { -24 }
-\siunitx_unit_prefix_set:Nnn \zepto { z } { -21 }
-\siunitx_unit_prefix_set:Nnn \atto  { a } { -18 }
-\siunitx_unit_prefix_set:Nnn \femto { f } { -15 }
-\siunitx_unit_prefix_set:Nnn \pico  { p } { -12 }
-\siunitx_unit_prefix_set:Nnn \nano  { n } { -9 }
-\siunitx_unit_prefix_set:Nnn \micro { [micro] } { -6 }
-\siunitx_unit_prefix_set:Nnn \milli { m } { -3 }
-\siunitx_unit_prefix_set:Nnn \centi { c } { -2 }
-\siunitx_unit_prefix_set:Nnn \deci  { d } { -1 }
+\siunitx_unit_prefix_declare:Nnn \yocto { y } { -24 }
+\siunitx_unit_prefix_declare:Nnn \zepto { z } { -21 }
+\siunitx_unit_prefix_declare:Nnn \atto  { a } { -18 }
+\siunitx_unit_prefix_declare:Nnn \femto { f } { -15 }
+\siunitx_unit_prefix_declare:Nnn \pico  { p } { -12 }
+\siunitx_unit_prefix_declare:Nnn \nano  { n } { -9 }
+\siunitx_unit_prefix_declare:Nnn \micro { [micro] } { -6 }
+\siunitx_unit_prefix_declare:Nnn \milli { m } { -3 }
+\siunitx_unit_prefix_declare:Nnn \centi { c } { -2 }
+\siunitx_unit_prefix_declare:Nnn \deci  { d } { -1 }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}
@@ -2173,17 +2173,17 @@
 %   }
 %   Now the large ones.
 %    \begin{macrocode}
-\siunitx_unit_prefix_set:Nnn \deca  { da } { 1 }
-\siunitx_unit_prefix_set:Nnn \deka  { da } { 1 }
-\siunitx_unit_prefix_set:Nnn \hecto { h }  { 2 }
-\siunitx_unit_prefix_set:Nnn \kilo  { k }  { 3 }
-\siunitx_unit_prefix_set:Nnn \mega  { M }  { 6 }
-\siunitx_unit_prefix_set:Nnn \giga  { G }  { 9 }
-\siunitx_unit_prefix_set:Nnn \tera  { T }  { 12 }
-\siunitx_unit_prefix_set:Nnn \peta  { P }  { 15 }
-\siunitx_unit_prefix_set:Nnn \exa   { E }  { 18 }
-\siunitx_unit_prefix_set:Nnn \zetta { Z }  { 21 }
-\siunitx_unit_prefix_set:Nnn \yotta { Y }  { 24 }
+\siunitx_unit_prefix_declare:Nnn \deca  { da } { 1 }
+\siunitx_unit_prefix_declare:Nnn \deka  { da } { 1 }
+\siunitx_unit_prefix_declare:Nnn \hecto { h }  { 2 }
+\siunitx_unit_prefix_declare:Nnn \kilo  { k }  { 3 }
+\siunitx_unit_prefix_declare:Nnn \mega  { M }  { 6 }
+\siunitx_unit_prefix_declare:Nnn \giga  { G }  { 9 }
+\siunitx_unit_prefix_declare:Nnn \tera  { T }  { 12 }
+\siunitx_unit_prefix_declare:Nnn \peta  { P }  { 15 }
+\siunitx_unit_prefix_declare:Nnn \exa   { E }  { 18 }
+\siunitx_unit_prefix_declare:Nnn \zetta { Z }  { 21 }
+\siunitx_unit_prefix_declare:Nnn \yotta { Y }  { 24 }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2203,18 +2203,18 @@
 %  }
 %    Named derived units: first half of alphabet.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \becquerel { Bq }
-\siunitx_unit_set:Nn \degreeCelsius
+\siunitx_unit_declare:Nn \becquerel { Bq }
+\siunitx_unit_declare:Nn \degreeCelsius
   { \ensuremath { { } ^ { \circ } } \kern -\scriptspace C }
-\siunitx_unit_set:Nn \coulomb   { C }
-\siunitx_unit_set:Nn \farad     { F }
-\siunitx_unit_set:Nn \gray      { Gy }
-\siunitx_unit_set:Nn \hertz     { Hz }
-\siunitx_unit_set:Nn \henry     { H }
-\siunitx_unit_set:Nn \joule     { J }
-\siunitx_unit_set:Nn \katal     { kat }
-\siunitx_unit_set:Nn \lumen     { lm }
-\siunitx_unit_set:Nn \lux       { lx }
+\siunitx_unit_declare:Nn \coulomb   { C }
+\siunitx_unit_declare:Nn \farad     { F }
+\siunitx_unit_declare:Nn \gray      { Gy }
+\siunitx_unit_declare:Nn \hertz     { Hz }
+\siunitx_unit_declare:Nn \henry     { H }
+\siunitx_unit_declare:Nn \joule     { J }
+\siunitx_unit_declare:Nn \katal     { kat }
+\siunitx_unit_declare:Nn \lumen     { lm }
+\siunitx_unit_declare:Nn \lux       { lx }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}
@@ -2233,17 +2233,17 @@
 %  }
 %    Named derived units: second half of alphabet.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \newton    { N }
-\siunitx_unit_set:Nn \ohm       { \ensuremath { \Omega } }
-\siunitx_unit_set:Nn \pascal    { Pa }
-\siunitx_unit_set:Nn \radian    { rad }
-\siunitx_unit_set:Nn \siemens   { S }
-\siunitx_unit_set:Nn \sievert   { Sv }
-\siunitx_unit_set:Nn \steradian { sr }
-\siunitx_unit_set:Nn \tesla     { T }
-\siunitx_unit_set:Nn \volt      { V }
-\siunitx_unit_set:Nn \watt      { W }
-\siunitx_unit_set:Nn \weber     { Wb }
+\siunitx_unit_declare:Nn \newton    { N }
+\siunitx_unit_declare:Nn \ohm       { \ensuremath { \Omega } }
+\siunitx_unit_declare:Nn \pascal    { Pa }
+\siunitx_unit_declare:Nn \radian    { rad }
+\siunitx_unit_declare:Nn \siemens   { S }
+\siunitx_unit_declare:Nn \sievert   { Sv }
+\siunitx_unit_declare:Nn \steradian { sr }
+\siunitx_unit_declare:Nn \tesla     { T }
+\siunitx_unit_declare:Nn \volt      { V }
+\siunitx_unit_declare:Nn \watt      { W }
+\siunitx_unit_declare:Nn \weber     { Wb }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2260,13 +2260,13 @@
 %   Non-SI, but accepted for general use. Once again there are two
 %   spellings, here for litre and with different output in this case.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \day     { d }
-\siunitx_unit_set:Nn \hectare { ha }
-\siunitx_unit_set:Nn \hour    { h }
-\siunitx_unit_set:Nn \litre   { L }
-\siunitx_unit_set:Nn \liter   { \litre }
-\siunitx_unit_set:Nn \minute  { min }
-\siunitx_unit_set:Nn \tonne   { t }
+\siunitx_unit_declare:Nn \day     { d }
+\siunitx_unit_declare:Nn \hectare { ha }
+\siunitx_unit_declare:Nn \hour    { h }
+\siunitx_unit_declare:Nn \litre   { L }
+\siunitx_unit_declare:Nn \liter   { \litre }
+\siunitx_unit_declare:Nn \minute  { min }
+\siunitx_unit_declare:Nn \tonne   { t }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}
@@ -2277,9 +2277,9 @@
 %  }
 %   Arc units: again, non-SI, but accepted for general use.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \arcminute { \ensuremath { ^ { \prime } } }
-\siunitx_unit_set:Nn \arcsecond { \ensuremath { ^ { \prime \prime } } }
-\siunitx_unit_set:Nn \degree    { \ensuremath { ^ { \circ } } }
+\siunitx_unit_declare:Nn \arcminute { \ensuremath { ^ { \prime } } }
+\siunitx_unit_declare:Nn \arcsecond { \ensuremath { ^ { \prime \prime } } }
+\siunitx_unit_declare:Nn \degree    { \ensuremath { ^ { \circ } } }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2287,17 +2287,17 @@
 %   A few units based on physical measurements exist: these ones are accepted
 %   for use with the International System.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \astronomicalunit { ua }
-\siunitx_unit_set:Nn \atomicmassunit   { u }
-\siunitx_unit_set:Nn \dalton           { Da }
-\siunitx_unit_set:Nn \electronvolt     { eV }
+\siunitx_unit_declare:Nn \astronomicalunit { ua }
+\siunitx_unit_declare:Nn \atomicmassunit   { u }
+\siunitx_unit_declare:Nn \dalton           { Da }
+\siunitx_unit_declare:Nn \electronvolt     { eV }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\nuaction, \numass, \nuspeed, \nutime}
 %   Natural units based on physical constants.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \nuaction { \ensuremath { \mathit { \hbar } } }
-\siunitx_unit_set:Nx \numass
+\siunitx_unit_declare:Nn \nuaction { \ensuremath { \mathit { \hbar } } }
+\siunitx_unit_declare:Nx \numass
   {
     \exp_not:N \ensuremath
       {
@@ -2305,12 +2305,12 @@
           \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
       }
   }
-\siunitx_unit_set:Nx \nuspeed
+\siunitx_unit_declare:Nx \nuspeed
   {
     \exp_not:N \ensuremath
       { \exp_not:N \mathit { c } \c_@@_math_subscript_tl { 0 } }
   }
-\siunitx_unit_set:Nn \nutime
+\siunitx_unit_declare:Nn \nutime
   { \numass \per \numass \per \nuspeed \squared }
 %    \end{macrocode}
 % \end{macro}
@@ -2327,9 +2327,9 @@
 %   }
 %   Atomic units based on physical constants.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \auaction { \ensuremath { \mathit { \hbar } } }
-\siunitx_unit_set:Nn \aucharge { \ensuremath { \mathit { e } } }
-\siunitx_unit_set:Nx \auenergy
+\siunitx_unit_declare:Nn \auaction { \ensuremath { \mathit { \hbar } } }
+\siunitx_unit_declare:Nn \aucharge { \ensuremath { \mathit { e } } }
+\siunitx_unit_declare:Nx \auenergy
   {
     \exp_not:N \ensuremath
       {
@@ -2337,12 +2337,12 @@
           \c_@@_math_subscript_tl { \exp_not:N \mathrm { h } }
       }
   }
-\siunitx_unit_set:Nx \aulength
+\siunitx_unit_declare:Nx \aulength
   {
     \exp_not:N  \ensuremath
       { \exp_not:N \mathit { a } \c_@@_math_subscript_tl { 0 } }
   }
-\siunitx_unit_set:Nx \aumass
+\siunitx_unit_declare:Nx \aumass
   {
     \exp_not:N \ensuremath
       {
@@ -2350,9 +2350,9 @@
           \c_@@_math_subscript_tl { \exp_not:N \mathrm { e } }
       }
   }
-\siunitx_unit_set:Nn \autime   { \auaction \per \auenergy }
-\siunitx_unit_set:Nn \bohr     { \aulength }
-\siunitx_unit_set:Nn \hartree  { \auenergy }
+\siunitx_unit_declare:Nn \autime   { \auaction \per \auenergy }
+\siunitx_unit_declare:Nn \bohr     { \aulength }
+\siunitx_unit_declare:Nn \hartree  { \auenergy }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2371,15 +2371,15 @@
 %   There are then some day-to-day units which are accepted for use
 %   with SI, but are not part of the official specification.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \angstrom          { \mbox { \AA } }
-\siunitx_unit_set:Nn \bar               { bar }
-\siunitx_unit_set:Nn \barn              { b }
-\siunitx_unit_set:Nn \bel               { B }
-\siunitx_unit_set:Nn \decibel           { \deci \bel }
-\siunitx_unit_set:Nn \knot              { kn }
-\siunitx_unit_set:Nn \millimetremercury { mmHg }
-\siunitx_unit_set:Nn \nauticalmile      { M }
-\siunitx_unit_set:Nn \neper             { Np }
+\siunitx_unit_declare:Nn \angstrom          { \mbox { \AA } }
+\siunitx_unit_declare:Nn \bar               { bar }
+\siunitx_unit_declare:Nn \barn              { b }
+\siunitx_unit_declare:Nn \bel               { B }
+\siunitx_unit_declare:Nn \decibel           { \deci \bel }
+\siunitx_unit_declare:Nn \knot              { kn }
+\siunitx_unit_declare:Nn \millimetremercury { mmHg }
+\siunitx_unit_declare:Nn \nauticalmile      { M }
+\siunitx_unit_declare:Nn \neper             { Np }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2399,38 +2399,38 @@
 %   \textsc{cgs} units: similar to the set immediately above, these may be used
 %   for specific applications.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \dyne    { dyn  }
-\siunitx_unit_set:Nn \erg     { erg }
-\siunitx_unit_set:Nn \gal     { Gal }
-\siunitx_unit_set:Nn \gauss   { G }
-\siunitx_unit_set:Nn \maxwell { Mx }
-\siunitx_unit_set:Nn \oersted { Oe }
-\siunitx_unit_set:Nn \phot    { ph }
-\siunitx_unit_set:Nn \poise   { P }
-\siunitx_unit_set:Nn \stilb   { sb }
-\siunitx_unit_set:Nn \stokes  { St }
+\siunitx_unit_declare:Nn \dyne    { dyn  }
+\siunitx_unit_declare:Nn \erg     { erg }
+\siunitx_unit_declare:Nn \gal     { Gal }
+\siunitx_unit_declare:Nn \gauss   { G }
+\siunitx_unit_declare:Nn \maxwell { Mx }
+\siunitx_unit_declare:Nn \oersted { Oe }
+\siunitx_unit_declare:Nn \phot    { ph }
+\siunitx_unit_declare:Nn \poise   { P }
+\siunitx_unit_declare:Nn \stilb   { sb }
+\siunitx_unit_declare:Nn \stokes  { St }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\percent}
 %   For percent, the raw character is the most flexible way of handling output.
 %    \begin{macrocode}
-\siunitx_unit_set:Nn \percent  { \char "25 ~ }
+\siunitx_unit_declare:Nn \percent  { \char "25 ~ }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\square, \cubic}
 %  Basic powers which come before the unit.
 %    \begin{macrocode}
-\siunitx_unit_power_set:NnN \square { 2 } \c_true_bool
-\siunitx_unit_power_set:NnN \cubic  { 3 } \c_true_bool
+\siunitx_unit_power_declare:NnN \square { 2 } \c_true_bool
+\siunitx_unit_power_declare:NnN \cubic  { 3 } \c_true_bool
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\squared, \cubed}
 %   Basic powers which come after the unit.
 %    \begin{macrocode}
-\siunitx_unit_power_set:NnN \squared { 2 } \c_false_bool
-\siunitx_unit_power_set:NnN \cubed   { 3 } \c_false_bool
+\siunitx_unit_power_declare:NnN \squared { 2 } \c_false_bool
+\siunitx_unit_power_declare:NnN \cubed   { 3 } \c_false_bool
 %    \end{macrocode}
 % \end{macro}
 %
