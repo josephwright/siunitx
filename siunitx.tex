@@ -69,8 +69,10 @@ for those people who are interested.
        language     = [LaTeX]{TeX},
        moretexcs    =
          {%
+           kilogram,
            num,
            qty,
+           sansmath,
            sisetup,
            unit
          }
@@ -108,6 +110,8 @@ for those people who are interested.
   \end{center}
 }
 \makeatother
+
+\usepackage{sansmath}
 
 \begin{document}
 
@@ -295,30 +299,112 @@ alone} units are found in \ref{sec:units:creating}.
 The tables of option names use these descriptions to indicate how the keys
 should be used.
 
-\subsection{Controlling fonts}
+\subsection{Printing}
 
 The \pkg{siunitx} package can control the font used to print output
 independently of the surrounding material. Which aspects of the font follow
 those of the surroundings is influenced by a range of setting as detailed in
-Section~\ref{tab:opt:font:control}.
+Section~\ref{tab:opt:print}.
 \begin{table}
   \centering
-  \caption{Font control options.}
-  \label{tab:opt:font:control}
+  \caption{Print options.}
+  \label{tab:opt:print}
   \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
     \toprule
       \multicolumn{1}{l@{}}{Option name} &
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      propagate-math-font & Switch & false \\
-      reset-math-version  & Switch & true  \\
-      reset-text-family   & Switch & true  \\
-      reset-text-series   & Switch & true  \\
-      reset-text-shape    & Switch & true  \\
+      color               & Literal & \meta{none} \\
+      mode                & Choice  & math        \\
+      number-color        & Literal & \meta{none} \\
+      number-mode         & Choice  & math        \\
+      propagate-math-font & Switch  & false       \\
+      reset-math-version  & Switch  & true        \\
+      reset-text-family   & Switch  & true        \\
+      reset-text-series   & Switch  & true        \\
+      reset-text-shape    & Switch  & true        \\
+      unit-color          & Literal & \meta{none} \\
+      unit-mode           & Choice  & math        \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\DescribeOption{print/mode}
+\DescribeOption{print/number-mode}
+\DescribeOption{print/unit-mode}
+The \opt{mode} option determines whether \pkg{siunitx} uses math or text mode
+when printing output. The choices are \opt{match}, \opt{math}, \opt{text}. The
+\opt{match} setting means that printing uses the prevailing mode unchanged
+whereas \opt{math} and \opt{text} select the appropriate \TeX{} mode. It is
+possible to have different fonts in math and text modes, which will highlight
+the difference. The font settings which apply are also different depending on
+the mode. As well as the overall setting, it is possible to apply mode
+to numbers and units separately using the \opt{number-mode} and \opt{unit-mode}
+options.
+
+\DescribeOption{print/reset-text-family}
+\DescribeOption{print/reset-text-series}
+\DescribeOption{print/reset-text-shape}
+When printing in text mode, the options \opt{reset-text-family},
+\opt{reset-text-series} and \opt{reset-text-shape} apply. When these are
+active, \pkg{siunitx} resets the relevant font selection axis property
+when printing: the standard font setting is upright mid-weight roman
+(|\upshape| |\mdseries| |\rmfamily|).
+\begin{LaTeXdemo}
+  \sisetup{print/mode = text}
+  {\itshape  \num{1234}}\\
+  {\bfseries \num{1234}}\\
+  {\sffamily \num{1234}}\\
+  \sisetup[print]{
+    reset-text-family = false ,
+    reset-text-series = false ,
+    reset-text-shape  = false
+  }
+  {\itshape  \num{1234}}\\
+  {\bfseries \num{1234}}\\
+  {\sffamily \num{1234}}\\
+\end{LaTeXdemo}
+
+\DescribeOption{print/propagate-math-font}
+\DescribeOption{print/reset-math-version}
+In math mode, the font used by \LaTeX{} is \enquote{invariant}, and this is
+reflected in the options available. With the standard settings, in math mode
+printing uses the standard math font and version (weight). The option
+\opt{propagate-math-font} may be used to apply the a prevailing math font
+to the printed material. The setting \opt{reset-math-version} controls
+whether the math version is reset or not. Note that math version is typically
+used to set \enquote{bold math} but may also be used for other effects, for
+example all sanserif math.
+\begin{LaTeXdemo}
+  {\boldmath \unit{\kilogram}}\\
+  {\sansmath $\unit{\kilogram}$}\\
+  {$\mathsf{\unit{\kilogram}}$}\\
+  \sisetup[print]{
+    propagate-math-font = true  ,
+    reset-math-version  = false
+  }
+  {\boldmath \unit{\kilogram}}\\
+  {\sansmath $\unit{\kilogram}$}\\
+  {$\mathsf{\unit{\kilogram}}$}\\
+\end{LaTeXdemo}
+
+\DescribeOption{print/color}
+\DescribeOption{print/number-color}
+\DescribeOption{print/unit-color}
+The color of printed output can be set using the \opt{color} option. When no
+color is given, printing follows the surrounding text. In contrast, when a
+specific color is given, it is used irrespective of the surroundings. As with
+\opt{mode}, the \opt{color} setting may also be applied to numbers and units
+independently.
+\begin{LaTeXdemo}
+  \color{red}
+  Some text \\
+  \qty{4}{\kilogram} \\
+  More text \\
+  \qty[print/color = blue]{4}{\kilogram} \\
+  Still red here!
+\end{LaTeXdemo}
 
 \section{Installation}
 
