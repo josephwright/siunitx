@@ -1,0 +1,40 @@
+\input{regression-test}
+
+\documentclass{article}
+
+\usepackage{siunitx}
+
+\usepackage{sansmath}
+
+\begin{document}
+
+\START
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+    \box_show:N \l_tmpa_box
+    \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
+    \box_show:N \l_tmpa_box
+    \group_begin:
+      \keys_set:nn { siunitx } { mode = text }
+      \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+      \box_show:N \l_tmpa_box
+      \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
+      \box_show:N \l_tmpa_box
+    \group_end:
+  }
+\TIMO
+
+\TEST { Option~setting~"reset-math-version" }
+  {
+    \sansmath
+    \test:nn { unit } { \mathrm{kg} }
+    \keys_set:nn { siunitx } { reset-math-version = false }
+    \test:nn { unit } { \mathrm{kg} }
+  }
+
+\end{document}
