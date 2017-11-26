@@ -217,7 +217,7 @@
 %  \begin{macro}[EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / number }
+\keys_define:nn { siunitx }
   {
     evaluate-expression     .bool_set:N =
       \l_@@_expression_bool ,
@@ -1170,7 +1170,7 @@
 %     \l_@@_round_precision_int
 %   }
 %    \begin{macrocode}
-\keys_define:nn { siunitx / number }
+\keys_define:nn { siunitx }
   {
     round-half           .choice: ,
     round-half / even    .code:n      =
@@ -1303,12 +1303,10 @@
 %   }
 %   Keys producing tokens in the output.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / number }
+\keys_define:nn { siunitx }
   {
     bracket-negative         .bool_set:N =
       \l_@@_bracket_negative_bool ,
-    close-bracket            .tl_set:N   =
-      \l_@@_bracket_close_tl ,
     explicit-plus            .bool_set:N =
       \l_@@_explicit_plus_bool ,
     exponent-base            .tl_set:N   =
@@ -1343,7 +1341,9 @@
       \l_@@_group_separator_tl ,
     negative-color           .tl_set:N   =
     \l_@@_negative_color_tl ,
-    open-bracket             .tl_set:N   =
+    number-close-bracket      .tl_set:N   =
+      \l_@@_bracket_close_tl ,
+    number-open-bracket        .tl_set:N   =
       \l_@@_bracket_open_tl ,
     output-close-uncertainty .tl_set:N   =
       \l_@@_output_uncert_close_tl ,
@@ -1814,10 +1814,9 @@
 % (\emph{e.g.}~boolean variables are always |false| to begin with),
 % but for clarity everything is set here.
 %    \begin{macrocode}
-\keys_set:nn { siunitx / number }
+\keys_set:nn { siunitx }
   {
-    bracket-negative         = false                                  , % (
-    close-bracket            = )                                      ,
+    bracket-negative         = false                                  ,
     evaluate-expression      = false                                  ,
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
@@ -1835,9 +1834,10 @@
     input-ignore             = \,                                     ,
     input-open-uncertainty   = (                                      , % )
     input-signs              = +-\mp\pm                               ,
-    input-uncertainty-signs  = \pm                                    , % (
-    negative-color           =                                        ,
-    open-bracket             = (                                      , % )
+    input-uncertainty-signs  = \pm                                    ,
+    negative-color           =                                        , % (
+    number-close-bracket     = )                                      ,
+    number-open-bracket      = (                                      , % )
     output-close-uncertainty = )                                      ,
     output-complex-root      = \mathrm { i }                          ,
     output-decimal-marker    = .                                      ,

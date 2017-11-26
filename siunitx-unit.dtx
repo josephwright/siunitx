@@ -482,7 +482,7 @@
 % \subsection{Key--value options}
 %
 % The options defined by this submodule are available within the \pkg{l3keys}
-% |siunitx/unit| tree.
+% |siunitx| tree.
 %
 % \begin{function}{bracket-denominator}
 %   \begin{syntax}
@@ -494,29 +494,12 @@
 %   is |true|.
 % \end{function}
 %
-% \begin{function}{close-bracket}
-%   \begin{syntax}
-%     |close-bracket| = |true|\verb"|"|false|
-%   \end{syntax}
-%   Bracket symbol used to close a matched pair around units when once is
-%   required to maintain mathematical logic. The standard setting is ^^A (
-%   |)|.
-% \end{function}
-%
 % \begin{function}{fraction-command}
 %   \begin{syntax}
 %     |fraction-command| = \meta{command}
 %   \end{syntax}
 %   Command used to create fractional output when |per-mode| is set to
 %   |fraction|. The standard setting is |\frac|.
-% \end{function}
-%
-% \begin{function}{open-bracket}
-%   \begin{syntax}
-%     |open-bracket| = \meta{symbol}
-%   \end{syntax}
-%   Bracket symbol used to open a matched pair around units when once is
-%   required to maintain mathematical logic. The standard setting is |(|. ^^A )
 % \end{function}
 %
 % \begin{function}{parse}
@@ -595,6 +578,23 @@
 %   basis (when |false|) or should apply to all following units
 %   (when |true|). The latter mode is somewhat akin conceptually to the
 %   \TeX{} \cs{over} primitive. The standard setting is |false|.
+% \end{function}
+%
+% \begin{function}{unit-close-bracket}
+%   \begin{syntax}
+%     |unit-close-bracket| = \meta{symbol}
+%   \end{syntax}
+%   Bracket symbol used to close a matched pair around units when once is
+%   required to maintain mathematical logic. The standard setting is ^^A (
+%   |)|.
+% \end{function}
+%
+% \begin{function}{unit-open-bracket}
+%   \begin{syntax}
+%     |unit-open-bracket| = \meta{symbol}
+%   \end{syntax}
+%   Bracket symbol used to open a matched pair around units when once is
+%   required to maintain mathematical logic. The standard setting is |(|. ^^A )
 % \end{function}
 %
 % \end{documentation}
@@ -905,7 +905,7 @@
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / unit }
+\keys_define:nn { siunitx }
   {
     product      .tl_set:N = \l_@@_product_tl
   }
@@ -1190,7 +1190,7 @@
 %   There is one option when \emph{parsing} the input (as opposed to
 %   \emph{formatting} for output): how to deal with \cs{per}.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / unit }
+\keys_define:nn { siunitx }
   {
     sticky-per .bool_set:N = \l_@@_sticky_per_bool
   }
@@ -1450,16 +1450,12 @@
 %   }
 %   Set up the options which apply to formatting.
 %    \begin{macrocode}
-\keys_define:nn { siunitx / unit }
+\keys_define:nn { siunitx }
   {
     bracket-denominator .bool_set:N      =
       \l_@@_denominator_bracket_bool ,
     fraction-command    .tl_set:N        =
       \l_@@_fraction_function_tl ,
-    close-bracket       .tl_set:N        =
-      \l_@@_bracket_close_tl ,
-    open-bracket        .tl_set:N        =
-      \l_@@_bracket_open_tl ,
     parse               .bool_set:N      =
       \l_@@_parse_bool ,
     per-mode            .choice: ,
@@ -1517,7 +1513,11 @@
     qualifier-mode / subscript      .code:n =
       { \tl_set:Nn \l_@@_qualifier_mode_tl { subscript } } ,
     qualifier-phrase    .tl_set:N        =
-      \l_@@_qualifier_phrase_tl
+      \l_@@_qualifier_phrase_tl ,
+    unit-close-bracket       .tl_set:N        =
+      \l_@@_bracket_close_tl ,
+    unit-open-bracket        .tl_set:N        =
+      \l_@@_bracket_open_tl ,
   }
 %    \end{macrocode}
 % \end{variable}
@@ -2470,19 +2470,19 @@
 % (\emph{e.g.}~boolean variables are always |false| to begin with),
 % but for clarity everything is set here.
 %    \begin{macrocode}
-\keys_set:nn { siunitx / unit }
+\keys_set:nn { siunitx }
   {
-    bracket-denominator = true          , % (
-    close-bracket       = )             ,
+    bracket-denominator = true          ,
     fraction-command    = \frac         ,
-    open-bracket        = (             , % )
     parse               = true          ,
     per-mode            = power         ,
     per-symbol          = /             ,
     product             = \,            ,
     qualifier-mode      = subscript     ,
     qualifier-phrase    = \             ,
-    sticky-per          = false
+    sticky-per          = false         ,
+    unit-close-bracket  = )             , % (
+    unit-open-bracket   = (             , % )
   }
 %    \end{macrocode}
 %

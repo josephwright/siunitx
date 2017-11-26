@@ -253,8 +253,8 @@ The \meta{number} and \meta{unit} arguments work exactly like those for the
 \begin{LaTeXdemo}
   \qty{1.23}{J.mol^{-1}.K^{-1}}                            \\
   \qty{.23e7}{\candela}                                    \\
-  \qty[unit/per-mode = symbol]{1.99}{\per\kilogram}        \\
-  \qty[unit/per-mode = fraction]{1,345}{\coulomb\per\mole}
+  \qty[per-mode = symbol]{1.99}{\per\kilogram}        \\
+  \qty[per-mode = fraction]{1,345}{\coulomb\per\mole}
 \end{LaTeXdemo}
 
 It is possible to set up the unit macros to be available outside of the
@@ -320,9 +320,9 @@ Section~\ref{tab:opt:print}.
   \end{tabular}
 \end{table}
 
-\DescribeOption{print/mode}
-\DescribeOption{print/number-mode}
-\DescribeOption{print/unit-mode}
+\DescribeOption{mode}
+\DescribeOption{number-mode}
+\DescribeOption{unit-mode}
 The \opt{mode} option determines whether \pkg{siunitx} uses math or text mode
 when printing output. The choices are \opt{match}, \opt{math}, \opt{text}. The
 \opt{match} setting means that printing uses the prevailing mode unchanged
@@ -333,20 +333,20 @@ the mode. As well as the overall setting, it is possible to apply mode
 to numbers and units separately using the \opt{number-mode} and \opt{unit-mode}
 options.
 
-\DescribeOption{print/reset-text-family}
-\DescribeOption{print/reset-text-series}
-\DescribeOption{print/reset-text-shape}
+\DescribeOption{reset-text-family}
+\DescribeOption{reset-text-series}
+\DescribeOption{reset-text-shape}
 When printing in text mode, the options \opt{reset-text-family},
 \opt{reset-text-series} and \opt{reset-text-shape} apply. When these are
 active, \pkg{siunitx} resets the relevant font selection axis property
 when printing: the standard font setting is upright mid-weight roman
 (|\upshape| |\mdseries| |\rmfamily|).
 \begin{LaTeXdemo}
-  \sisetup{print/mode = text}
+  \sisetup{mode = text}
   {\itshape  \num{1234}}\\
   {\bfseries \num{1234}}\\
   {\sffamily \num{1234}}\\
-  \sisetup[print]{
+  \sisetup{
     reset-text-family = false ,
     reset-text-series = false ,
     reset-text-shape  = false
@@ -356,8 +356,8 @@ when printing: the standard font setting is upright mid-weight roman
   {\sffamily \num{1234}}\\
 \end{LaTeXdemo}
 
-\DescribeOption{print/propagate-math-font}
-\DescribeOption{print/reset-math-version}
+\DescribeOption{propagate-math-font}
+\DescribeOption{reset-math-version}
 In math mode, the font used by \LaTeX{} is \enquote{invariant}, and this is
 reflected in the options available. With the standard settings, in math mode
 printing uses the standard math font and version (weight). The option
@@ -370,7 +370,7 @@ example all sanserif math.
   {\boldmath \unit{\kilogram}}\\
   {\sansmath $\unit{\kilogram}$}\\
   {$\mathsf{\unit{\kilogram}}$}\\
-  \sisetup[print]{
+  \sisetup{
     propagate-math-font = true  ,
     reset-math-version  = false
   }
@@ -379,9 +379,9 @@ example all sanserif math.
   {$\mathsf{\unit{\kilogram}}$}\\
 \end{LaTeXdemo}
 
-\DescribeOption{print/color}
-\DescribeOption{print/number-color}
-\DescribeOption{print/unit-color}
+\DescribeOption{color}
+\DescribeOption{color}
+\DescribeOption{unit-color}
 The color of printed output can be set using the \opt{color} option. When no
 color is given, printing follows the surrounding text. In contrast, when a
 specific color is given, it is used irrespective of the surroundings. As with
@@ -392,7 +392,7 @@ independently.
   Some text \\
   \qty{4}{\kilogram} \\
   More text \\
-  \qty[print/color = blue]{4}{\kilogram} \\
+  \qty[color = blue]{4}{\kilogram} \\
   Still red here!
 \end{LaTeXdemo}
 
