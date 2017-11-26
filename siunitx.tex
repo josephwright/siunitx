@@ -33,6 +33,10 @@ for those people who are interested.
 % The next line is needed so that \GetFileInfo will be able to pick up
 % version data (quite apart from making the demos work).
 \usepackage{siunitx}
+\ExplSyntaxOn
+% TODO
+\siunitx_unit_set:Nn \noop { \relax } % For printing units
+\ExplSyntaxOff
 
 % Commands for this document
 \usepackage{xparse}
@@ -41,6 +45,17 @@ for those people who are interested.
 \NewDocumentCommand\ext{m}{\texttt{.#1}}
 \NewDocumentCommand\foreign{m}{\textit{#1}}
 \NewDocumentCommand\opt{m}{\texttt{#1}}
+
+\NewDocumentCommand\DescribePrefix{m}{%
+  #1 &
+  \cs{#1} &
+  \unit{\csname #1\endcsname\noop}
+}
+\NewDocumentCommand\DescribeUnit{O{#2}m}{%
+  #1 &
+  \cs{#2} &
+  \unit{\csname #2\endcsname}
+}
 
 % For creating code demonstrations
 % This needs access to some code-level interfaces in listings
@@ -259,13 +274,13 @@ to construct units as fractions.
 \end{syntax}
 Very often, numbers and units are given together. Formally, the value of a
 quantity is the product of the number and the unit, the space being regarded as
-a multiplication sign \cite{SI:5.3.3}. The \cs{SI} macro combines the
+a multiplication sign~\cite{SI:5.3.3}. The \cs{qty} macro combines the
 functionality of \cs{num} and \cs{unit}, and makes this both possible and easy.
 The \meta{number} and \meta{unit} arguments work exactly like those for the
 \cs{num} and \cs{unit} macros, respectively.
 \begin{LaTeXdemo}
-  \qty{1.23}{J.mol^{-1}.K^{-1}}                            \\
-  \qty{.23e7}{\candela}                                    \\
+  \qty[mode = text]{1.23}{J.mol^{-1}.K^{-1}}          \\
+  \qty{.23e7}{\candela}                               \\
   \qty[per-mode = symbol]{1.99}{\per\kilogram}        \\
   \qty[per-mode = fraction]{1,345}{\coulomb\per\mole}
 \end{LaTeXdemo}
@@ -275,6 +290,249 @@ It is possible to set up the unit macros to be available outside of the
 is the risk of name clashes (for example, \cs{bar} is used by other packages,
 and several packages define \cs{degree}). Full details of using \enquote{stand
 alone} units are found in \ref{sec:units:creating}.
+
+\subsection{The unit macros}
+
+The package always defines the basic set of SI units with macro names. This
+includes the base SI units, the derived units with special names and the
+prefixes. A small number of powers are also given pre-defined names. Full
+details of units in the SI are available on-line~\cite{BIPM}.
+
+\DescribeMacro{\meter}
+The seven base SI units are always defined (Table~\ref{tab:unit:base}). In
+addition, the macro \cs{meter} is available as an alias for \cs{metre}, for
+users of US spellings. The full details of the base units are given in the SI
+Brochure~\cite{SI:2.1}.
+\begin{table}
+  \caption{SI base units.}
+  \label{tab:unit:base}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+      Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit{ampere}   \\
+      \DescribeUnit{candela}  \\
+      \DescribeUnit{kelvin}   \\
+      \DescribeUnit{kilogram} \\
+      \DescribeUnit{metre}    \\
+      \DescribeUnit{mole}     \\
+      \DescribeUnit{second}   \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The SI also lists a number of units which have special names and
+symbols~\cite{SI:2.2.2}: these are listed in Table~\ref{tab:unit:derived}.
+\begin{table}
+  \caption{Coherent derived units in the SI with special names and
+    symbols.}
+  \label{tab:unit:derived}
+  \begin{tabular}{@{}lll>{\qquad}lll@{}}
+    \toprule
+      Unit & Command & Symbol & Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit{becquerel} &
+      \DescribeUnit{newton}    \\
+      \DescribeUnit[degree Celsius]{degreeCelsius} &
+      \DescribeUnit{ohm}       \\
+      \DescribeUnit{coulomb}   &
+      \DescribeUnit{pascal}    \\
+      \DescribeUnit{farad}     &
+      \DescribeUnit{radian}    \\
+      \DescribeUnit{gray}      &
+      \DescribeUnit{siemens}   \\
+      \DescribeUnit{hertz}     &
+      \DescribeUnit{sievert}   \\
+      \DescribeUnit{henry}     &
+      \DescribeUnit{steradian} \\
+      \DescribeUnit{joule}     &
+      \DescribeUnit{tesla}     \\
+      \DescribeUnit{lumen}     &
+      \DescribeUnit{volt}      \\
+      \DescribeUnit{katal}     &
+      \DescribeUnit{watt}      \\
+      \DescribeUnit{lux}       &
+      \DescribeUnit{weber}     \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+In addition to the official SI units, \pkg{siunitx} also provides macros for a
+number of units which are accepted for use in the SI although they are not SI
+units. Table~\ref{tab:unit:accepted} lists the \enquote{accepted}
+units~\cite{SI:T6}. Some units are fundamental physical quantities, and these
+are non-SI but can be used within the SI
+(Table~\ref{tab:unit:physical},~\cite{SI:T7}). There are also a set of non-SI
+units which are used in certain defined circumstances
+(Table~\ref{tab:unit:other}), although they are not necessarily officially
+sanctioned~\cite{SI:T8}. Finally, for specialist applications, a range of
+\acro{cgs} units are sanctioned (Table~\ref{tab:unit:CGS})~\cite{SI:T9}.
+\DescribeMacro{\percent}
+The command \cs{percent} is also provided for use in units: this is accepted
+with the SI as detailed in Section~5.3.7 of the Brochure~\cite{SI:5.3.7}.
+\begin{table}
+  \caption{Non-SI units accepted for use with the International System of
+    Units.}
+  \label{tab:unit:accepted}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+      Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit{day}     \\
+      \DescribeUnit{degree}  \\
+      \DescribeUnit{hectare} \\
+      \DescribeUnit{hour}    \\
+      \DescribeUnit{litre}   \\
+       & \cs{liter} & \unit{\liter} \\
+      \DescribeUnit[minute (plane angle)]{arcminute} \\
+      \DescribeUnit[minute (time)]{minute} \\
+      \DescribeUnit[second (plane angle)]{arcsecond} \\
+      \DescribeUnit{tonne}   \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\begin{table}
+  \caption{Non-SI units whose values in SI units must be obtained
+    experimentally.}
+  \label{tab:unit:physical}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+      Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit[astronomical unit]{astronomicalunit}\\
+      \DescribeUnit[atomic mass unit]{atomicmassunit} \\
+      \DescribeUnit[a.u.~of action]{auaction} \\
+      \DescribeUnit[a.u.~of charge]{aucharge} \\
+      \DescribeUnit[a.u.~of energy]{auenergy} \\
+      \DescribeUnit[a.u.~of length]{aulength} \\
+      \DescribeUnit[a.u.~of mass]{aumass} \\
+      \DescribeUnit[a.u.~of time]{autime} \\
+      \DescribeUnit{bohr} \\
+      \DescribeUnit{dalton} \\
+      \DescribeUnit{electronvolt} \\
+      \DescribeUnit{hartree} \\
+      \DescribeUnit[n.u.~of action]{nuaction} \\
+      \DescribeUnit[n.u.~of mass]{numass} \\
+      \DescribeUnit[n.u.~of speed]{nuspeed} \\
+      \DescribeUnit[n.u.~of time]{nutime} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\begin{table}
+  \caption{Other non-SI units.}
+  \label{tab:unit:other}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+      Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit[ångström]{angstrom} \\
+      \DescribeUnit{bar} \\
+      \DescribeUnit{barn} \\
+      \DescribeUnit{bel} \\
+      \DescribeUnit{decibel} \\
+      \DescribeUnit{knot} \\
+      \DescribeUnit[millimetre of mercury]{millimetremercury} \\
+      \DescribeUnit[nautical mile]{nauticalmile} \\
+      \DescribeUnit{neper} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\begin{table}
+  \caption{Non-SI units associated with the \acro{cgs}.}
+  \label{tab:unit:CGS}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+      Unit & Command & Symbol \\
+    \midrule
+      \DescribeUnit{dyne}    \\
+      \DescribeUnit{erg}     \\
+      \DescribeUnit{gal}     \\
+      \DescribeUnit{gauss}   \\
+      \DescribeUnit{maxwell} \\
+      \DescribeUnit{oersted} \\
+      \DescribeUnit{phot}    \\
+      \DescribeUnit{poise}   \\
+      \DescribeUnit{stilb}   \\
+      \DescribeUnit{stokes}  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeMacro{\deka}
+In addition to the units themselves, \pkg{siunitx} provides pre-defined macros
+for all of the SI prefixes (Table~\ref{tab:unit:prefix})~\cite{SI:3.1}. The
+spelling \enquote{\cs{deka}} is provided for US users as an alternative to
+\cs{deca}.
+\begin{table}
+  \caption{SI prefixes.}
+  \label{tab:unit:prefix}
+  \begin{tabular}{@{}llc>{$}r<{$}>{\qquad}llc>{$}r<{$}@{}} % TODO
+    \toprule
+      Prefix & Command & Symbol & \multicolumn{1}{l}{Power} &
+      Prefix & Command & Symbol & \multicolumn{1}{l@{}}{Power} \\
+    \midrule
+      \DescribePrefix{yocto} & -24 &
+      \DescribePrefix{deca}  &   1 \\
+      \DescribePrefix{zepto} & -21 &
+      \DescribePrefix{hecto} &   2 \\
+      \DescribePrefix{atto}  & -18 &
+      \DescribePrefix{kilo}  &   3 \\
+      \DescribePrefix{femto} & -15 &
+      \DescribePrefix{mega}  &   6 \\
+      \DescribePrefix{pico}  & -12 &
+      \DescribePrefix{giga}  &  9 \\
+      \DescribePrefix{nano}  &  -9 &
+      \DescribePrefix{tera}  &  12 \\
+      \DescribePrefix{micro} & -6 &
+      \DescribePrefix{peta}  &  15 \\
+      \DescribePrefix{milli} &  -3 &
+      \DescribePrefix{exa}   &  18 \\
+      \DescribePrefix{centi} &  -2 &
+      \DescribePrefix{zetta} &  21 \\
+      \DescribePrefix{deci}  &  -1 &
+      \DescribePrefix{yotta} &  24 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeMacro{\square}
+\DescribeMacro{\squared}
+\DescribeMacro{\cubic}
+\DescribeMacro{\cubed}
+A small number of pre-defined powers are provided as macros. \cs{square} and
+\cs{cubic} are intended for use before units, with \cs{squared} and \cs{cubed}
+going after the unit.
+\begin{LaTeXdemo}
+  \unit{\square\becquerel} \\
+  \unit{\joule\squared\per\lumen} \\
+  \unit{\cubic\lux\volt\tesla\cubed}
+\end{LaTeXdemo}
+\DescribeMacro{\tothe}
+\DescribeMacro{\raiseto}
+Generic powers can be inserted on a one-off basis using the \cs{tothe} and
+\cs{raiseto} macros. These are the only macros for units which take an
+argument:
+\begin{LaTeXdemo}
+  \unit{\henry\tothe{5}} \\
+  \unit{\raiseto{4.5}\radian}
+\end{LaTeXdemo}
+\DescribeMacro{\per}
+Reciprocal powers are indicated using the \cs{per} macro. This applies to the
+next unit only, unless the \opt{sticky-per} option is turned on.
+\begin{LaTeXdemo}
+  \unit{\joule\per\mole\per\kelvin} \\
+  \unit{\joule\per\mole\kelvin} \\
+  \unit{\per\henry\tothe{5}} \\
+  \unit{\per\square\becquerel}
+\end{LaTeXdemo}
+\DescribeMacro{\of}
+As for generic powers, generic qualifiers are also available using the \cs{of}
+function:
+\begin{LaTeXdemo}
+  \unit{\kilogram\of{metal}} \\
+  \qty[qualifier-mode = bracket]
+    {0.1}{\milli\mole\of{cat}\per\kilogram\of{prod}}
+\end{LaTeXdemo}
 
 \section{Package control options}
 
@@ -309,7 +567,6 @@ independently of the surrounding material. Which aspects of the font follow
 those of the surroundings is influenced by a range of setting as detailed in
 Section~\ref{tab:opt:print}.
 \begin{table}
-  \centering
   \caption{Print options.}
   \label{tab:opt:print}
   \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
@@ -485,6 +742,44 @@ opened there are visible to other users and makes sure that they cannot be
 forgotten.
 
 \end{documentation}
+
+\begin{thebibliography}{10}
+  \bibitem{BIPM}
+    \emph{The International System of Units (SI)},
+    \url{https://www.bipm.org/en/measurement-units/}.
+  \bibitem{SI:2.1}
+    \emph{SI base units},
+    \url{https://www.bipm.org/en/publications/si-brochure/section2-1.html}.
+  \bibitem{SI:2.2.2}
+    \emph{Units with special names and symbols; units that
+      incorporate special names and symbols},
+    \url{https://www.bipm.org/en/publications/si-brochure/section2-2-2.html}.
+  \bibitem{SI:3.1}
+    \emph{SI Prefixes},
+    \url{https://www.bipm.org/en/publications/si-brochure/chapter3.html}.
+  \bibitem{SI:5.3.3}
+    \emph{Formatting the value of a quantity},
+    \url{https://www.bipm.org/en/publications/si-brochure/section5-3-3.html}.
+  \bibitem{SI:5.3.7}
+    \emph{Stating values of dimensionless quantities, or quantities of
+      dimension one},
+    \url{https://www.bipm.org/en/publications/si-brochure/section5-3-7.html}.
+  \bibitem{SI:T6}
+    \emph{Non-SI units accepted for use with the International
+      System of Units},
+    \url{https://www.bipm.org/en/publications/si-brochure/table6.html}.
+  \bibitem{SI:T7}
+    \emph{Non-SI units whose values in SI units must be obtained
+      experimentally},
+    \url{https://www.bipm.org/en/publications/si-brochure/table7.html}.
+  \bibitem{SI:T8}
+    \emph{Other non-SI units},
+    \url{https://www.bipm.org/en/publications/si-brochure/table8.html}.
+  \bibitem{SI:T9}
+    \emph{Non-SI units associated with the CGS and the CGS-Gaussian
+      system of units},
+    \url{https://www.bipm.org/en/publications/si-brochure/table9.html}.
+\end{thebibliography}
 
 \PrintIndex
 
