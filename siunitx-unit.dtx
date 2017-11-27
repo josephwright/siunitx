@@ -158,19 +158,19 @@
 %   \meta{prefix} to a numerical power will be possible.
 % \end{function}
 %
-% \begin{function}{\siunitx_declare_power:NnN}
+% \begin{function}{\siunitx_declare_power:NNn}
 %   \begin{syntax}
-%     \cs{siunitx_declare_power:NnN} \meta{power} \Arg{value} \meta{precedes}
+%     \cs{siunitx_declare_power:NnN} \meta{pre-power} \meta{post-power} \Arg{value}
 %   \end{syntax}
-%   Defines a symbolic \meta{power} (which should be a control sequence
-%   such as |\squared|) to be converted by the parser to the \meta{value}.
-%   The latter should be an integer or floating point number in the format
-%   defined for \pkg{l3fp}. Powers may precede a unit or be given after it:
-%   which case applies to the \meta{power} is determined by the boolean
-%   \meta{precedes}. In literal mode, the \meta{value} will be applied as
-%   a superscript to either the next token in the input (\meta{precedes}
-%   true) or appended to the previously-typeset material (\meta{precedes}
-%   false).
+%   Defines \emph{two} symbolic \meta{powers} (which should be control
+%   sequences such as |\squared|) to be converted by the parser to the
+%   \meta{value}. The latter should be an integer or floating point number in
+%   the format defined for \pkg{l3fp}. Powers may precede a unit or be give
+%   after it: both forms are declared at once, as indicated by the argument
+%   naming. In literal mode, the \meta{value} will be applied as
+%   a superscript to either the next token in the input (for the
+%   \meta{pre-power}) or appended to the previously-typeset material
+%   (for the \meta{post-power}).
 % \end{function}
 %
 % \begin{function}{\siunitx_declare_qualifier:Nn}
@@ -750,25 +750,19 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_declare_power:NnN}
-%   For powers, there is the slight complication that the symbolic name may
-%   appear either before or after the unit it applies to, and these two
-%   different cases need slightly different code for the literal case. A
-%   boolean is used to determine which case is in operation, and in parsing
-%   mode this data is passed directly to the underlying function.
+% \begin{macro}{\siunitx_declare_power:NNn}
+%   Powers can come either before or after the unit. As they always come
+%   (logically) in matching, we handle this by declaring two commands,
+%   and setting each up separately.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_declare_power:NnN #1#2#3
+\cs_new_protected:Npn \siunitx_declare_power:NNn #1#2#3
   {
-    \bool_if:NTF #3
-      {
-        \@@_set_symbolic:Nnn #1
-          { \@@_literal_power:nN {#1} }
-      }
-      {
-        \@@_set_symbolic:Nnn #1
-          { ^ {#2} }
-      }
-        { \@@_parse_power:nnN {#1} {#2} #3 }
+    \@@_set_symbolic:Nnn #1
+      { \@@_literal_power:nN {#1} }
+      { \@@_parse_power:nnN {#1} {#3} \c_true_bool }
+    \@@_set_symbolic:Nnn #2
+      { ^ {#3} }
+      { \@@_parse_power:nnN {#2} {#3} \c_false_bool }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2419,18 +2413,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\square, \cubic}
-%  Basic powers which come before the unit.
+% \begin{macro}{\square, \squared, \cubic, \cubed}
+%   Basic powers.
 %    \begin{macrocode}
-\siunitx_declare_power:NnN \square { 2 } \c_true_bool
-\siunitx_declare_power:NnN \cubic  { 3 } \c_true_bool
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\squared, \cubed}
-%   Basic powers which come after the unit.
-%    \begin{macrocode}
-\siunitx_declare_power:NnN \squared { 2 } \c_false_bool
-\siunitx_declare_power:NnN \cubed   { 3 } \c_false_bool
+\siunitx_declare_power:NNn \square \squared { 2 }
+\siunitx_declare_power:NNn \cubic  \cubed   { 3 }
 %    \end{macrocode}
 % \end{macro}
 %
