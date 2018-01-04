@@ -5386,15 +5386,15 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %
-%\begin{macro}{\c_@@_omega_tl}
+%\begin{macro}{\g_@@_omega_tl}
 % Some package redefine \cs{Omega} to be slanted and move the original
 % symbol to \cs{upOmega}. This is handled here.
 %    \begin{macrocode}
-\tl_new:N \c_@@_omega_tl
-\tl_set:Nn \c_@@_omega_tl { \Omega }
+\tl_new:N \g_@@_omega_tl
+\tl_gset:Nn \g_@@_omega_tl { \Omega }
 \AtBeginDocument {
   \cs_if_exist:NT \upOmega
-    { \tl_set:Nn \c_@@_omega_tl { \upOmega } }
+    { \tl_set:Nn \g_@@_omega_tl { \upOmega } }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -5415,152 +5415,154 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\c_@@_old_options_seq}
 % To pick up old options, all of the names need to be known.
 %    \begin{macrocode}
-\seq_new:N \c_@@_old_options_seq
-\cs_set_protected:Npn \@@_tmp:w #1 {
-  \seq_put_right:No \c_@@_old_options_seq { \tl_to_str:n {#1} }
-}
-\@@_tmp:w { addsign }
-\@@_tmp:w { allowlitunits }
-\@@_tmp:w { allowoptarg }
-\@@_tmp:w { allowzeroexp }
-\@@_tmp:w { alsoload }
-\@@_tmp:w { angformat }
-\@@_tmp:w { anglesep }
-\@@_tmp:w { astroang }
-\@@_tmp:w { closeerr }
-\@@_tmp:w { closrfrac }
-\@@_tmp:w { closerange }
-\@@_tmp:w { colour }
-\@@_tmp:w { colorall }
-\@@_tmp:w { colourall }
-\@@_tmp:w { colorneg }
-\@@_tmp:w { colourneg }
-\@@_tmp:w { colourunits }
-\@@_tmp:w { colourunits }
-\@@_tmp:w { colorvalues }
-\@@_tmp:w { colourvalues }
-\@@_tmp:w { decimalsymbol }
-\@@_tmp:w { debug }
-\@@_tmp:w { detectdisplay }
-\@@_tmp:w { digitsep }
-\@@_tmp:w { dp }
-\@@_tmp:w { emulate }
-\@@_tmp:w { errspace }
-\@@_tmp:w { eVcorra }
-\@@_tmp:w { eVcorrb }
-\@@_tmp:w { expbase }
-\@@_tmp:w { expproduct }
-\@@_tmp:w { fixdp }
-\@@_tmp:w { fixsf }
-\@@_tmp:w { fraction }
-\@@_tmp:w { inlinebold }
-\@@_tmp:w { loctolang }
-\@@_tmp:w { log }
-\@@_tmp:w { load }
-\@@_tmp:w { mathOmega }
-\@@_tmp:w { mathcelsius }
-\@@_tmp:w { mathdegree }
-\@@_tmp:w { mathminute }
-\@@_tmp:w { mathmu }
-\@@_tmp:w { mathringA }
-\@@_tmp:w { mathrm }
-\@@_tmp:w { mathsOmega }
-\@@_tmp:w { mathscelsius }
-\@@_tmp:w { mathsdegree }
-\@@_tmp:w { mathsecond }
-\@@_tmp:w { mathsf }
-\@@_tmp:w { mathsminute }
-\@@_tmp:w { mathsmu }
-\@@_tmp:w { mathsringA }
-\@@_tmp:w { mathsrm }
-\@@_tmp:w { mathssecond }
-\@@_tmp:w { mathssf }
-\@@_tmp:w { mathstt }
-\@@_tmp:w { mathtt }
-\@@_tmp:w { negcolor }
-\@@_tmp:w { negcolour }
-\@@_tmp:w { noload }
-\@@_tmp:w { numaddn }
-\@@_tmp:w { numcloseerr }
-\@@_tmp:w { numdecimal }
-\@@_tmp:w { numdigits }
-\@@_tmp:w { numdiv }
-\@@_tmp:w { numexp }
-\@@_tmp:w { numgobble }
-\@@_tmp:w { numopenerr }
-\@@_tmp:w { numprod }
-\@@_tmp:w { numsign }
-\@@_tmp:w { obeyall }
-\@@_tmp:w { obeybold }
-\@@_tmp:w { obeyfamily }
-\@@_tmp:w { obeymode }
-\@@_tmp:w { obeyitalic }
-\@@_tmp:w { openerr }
-\@@_tmp:w { openfrac }
-\@@_tmp:w { openrange }
-\@@_tmp:w { padangle }
-\@@_tmp:w { padnumber }
-\@@_tmp:w { per }
-\@@_tmp:w { prefixbase }
-\@@_tmp:w { prefixproduct }
-\@@_tmp:w { prefixsymbolic }
-\@@_tmp:w { prespace }
-\@@_tmp:w { redefsymbols }
-\@@_tmp:w { repeatunits }
-\@@_tmp:w { retainplus }
-\@@_tmp:w { seperr }
-\@@_tmp:w { sepfour }
-\@@_tmp:w { sf }
-\@@_tmp:w { sign }
-\@@_tmp:w { slash }
-\@@_tmp:w { stickyper }
-\@@_tmp:w { strictarc }
-\@@_tmp:w { tabalign }
-\@@_tmp:w { tabalignexp }
-\@@_tmp:w { tabautofit }
-\@@_tmp:w { tabexpalign }
-\@@_tmp:w { tabformat }
-\@@_tmp:w { tabnumalign }
-\@@_tmp:w { tabparseonly }
-\@@_tmp:w { tabtextalign }
-\@@_tmp:w { textOmega }
-\@@_tmp:w { textcelsius }
-\@@_tmp:w { textdegree }
-\@@_tmp:w { textminute }
-\@@_tmp:w { textmode }
-\@@_tmp:w { textmu }
-\@@_tmp:w { textringA }
-\@@_tmp:w { textrm }
-\@@_tmp:w { textsecond }
-\@@_tmp:w { textsf }
-\@@_tmp:w { texttt }
-\@@_tmp:w { tightpm }
-\@@_tmp:w { tophrase }
-\@@_tmp:w { trapamigerr }
-\@@_tmp:w { trapambigfrac }
-\@@_tmp:w { trapambigrange }
-\@@_tmp:w { unitcolor }
-\@@_tmp:w { unitcolour }
-\@@_tmp:w { unitmathrm }
-\@@_tmp:w { unitmathsf }
-\@@_tmp:w { unitmathsrm }
-\@@_tmp:w { unitmathssf }
-\@@_tmp:w { unitmathstt }
-\@@_tmp:w { unitmathtt }
-\@@_tmp:w { unitmode }
-\@@_tmp:w { unitsep }
-\@@_tmp:w { unitspace }
-\@@_tmp:w { valuecolor }
-\@@_tmp:w { valuecolour }
-\@@_tmp:w { valuemathrm }
-\@@_tmp:w { valuemathsf }
-\@@_tmp:w { valuemathsrm }
-\@@_tmp:w { valuemathssf }
-\@@_tmp:w { valuemathstt }
-\@@_tmp:w { valuemathtt }
-\@@_tmp:w { valuemode }
-\@@_tmp:w { valuesep }
-\@@_tmp:w { xpace }
+\exp_args:NNx \seq_const_from_clist:Nn \c_@@_old_options_seq
+  {
+    \tl_to_str:n
+      {
+        addsign ,
+        allowlitunits ,
+        allowoptarg ,
+        allowzeroexp ,
+        alsoload ,
+        angformat ,
+        anglesep ,
+        astroang ,
+        closeerr ,
+        closrfrac ,
+        closerange ,
+        colour ,
+        colorall ,
+        colourall ,
+        colorneg ,
+        colourneg ,
+        colourunits ,
+        colourunits ,
+        colorvalues ,
+        colourvalues ,
+        decimalsymbol ,
+        debug ,
+        detectdisplay ,
+        digitsep ,
+        dp ,
+        emulate ,
+        errspace ,
+        eVcorra ,
+        eVcorrb ,
+        expbase ,
+        expproduct ,
+        fixdp ,
+        fixsf ,
+        fraction ,
+        inlinebold ,
+        loctolang ,
+        log ,
+        load ,
+        mathOmega ,
+        mathcelsius ,
+        mathdegree ,
+        mathminute ,
+        mathmu ,
+        mathringA ,
+        mathrm ,
+        mathsOmega ,
+        mathscelsius ,
+        mathsdegree ,
+        mathsecond ,
+        mathsf ,
+        mathsminute ,
+        mathsmu ,
+        mathsringA ,
+        mathsrm ,
+        mathssecond ,
+        mathssf ,
+        mathstt ,
+        mathtt ,
+        negcolor ,
+        negcolour ,
+        noload ,
+        numaddn ,
+        numcloseerr ,
+        numdecimal ,
+        numdigits ,
+        numdiv ,
+        numexp ,
+        numgobble ,
+        numopenerr ,
+        numprod ,
+        numsign ,
+        obeyall ,
+        obeybold ,
+        obeyfamily ,
+        obeymode ,
+        obeyitalic ,
+        openerr ,
+        openfrac ,
+        openrange ,
+        padangle ,
+        padnumber ,
+        per ,
+        prefixbase ,
+        prefixproduct ,
+        prefixsymbolic ,
+        prespace ,
+        redefsymbols ,
+        repeatunits ,
+        retainplus ,
+        seperr ,
+        sepfour ,
+        sf ,
+        sign ,
+        slash ,
+        stickyper ,
+        strictarc ,
+        tabalign ,
+        tabalignexp ,
+        tabautofit ,
+        tabexpalign ,
+        tabformat ,
+        tabnumalign ,
+        tabparseonly ,
+        tabtextalign ,
+        textOmega ,
+        textcelsius ,
+        textdegree ,
+        textminute ,
+        textmode ,
+        textmu ,
+        textringA ,
+        textrm ,
+        textsecond ,
+        textsf ,
+        texttt ,
+        tightpm ,
+        tophrase ,
+        trapamigerr ,
+        trapambigfrac ,
+        trapambigrange ,
+        unitcolor ,
+        unitcolour ,
+        unitmathrm ,
+        unitmathsf ,
+        unitmathsrm ,
+        unitmathssf ,
+        unitmathstt ,
+        unitmathtt ,
+        unitmode ,
+        unitsep ,
+        unitspace ,
+        valuecolor ,
+        valuecolour ,
+        valuemathrm ,
+        valuemathsf ,
+        valuemathsrm ,
+        valuemathssf ,
+        valuemathstt ,
+        valuemathtt ,
+        valuemode ,
+        valuesep ,
+        xspace
+    }
+  }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -5793,7 +5795,6 @@ This work consists of the file  siunitx.dtx
 % \pkg{fontspec} does (nasty errors arise otherwise).
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_set_math_fam:n #1 {
-  \int_new:c { c_@@_math #1 _int }
   \group_begin:
     \hbox_set:Nn \l_@@_tmp_box
       {
@@ -5801,7 +5802,7 @@ This work consists of the file  siunitx.dtx
           {
             \use:c { math #1 }
               {
-                \int_gset:cn { c_@@_math #1 _int } { \fam }
+                \int_const:cn { c_@@_math #1 _int } { \fam }
               }
           }
       }
@@ -5828,8 +5829,7 @@ This work consists of the file  siunitx.dtx
 % \cs{long}, whereas \cs{f@family} is not.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_set_text_fam:n #1 {
-  \tl_new:c { c_@@_text #1 _tl }
-  \tl_set:cx { c_@@_text #1 _tl } { \use:c { #1 default } }
+  \tl_const:cx { c_@@_text #1 _tl } { \use:c { #1 default } }
 }
 \AtBeginDocument {
   \@@_set_text_fam:n { sf }
@@ -6784,8 +6784,7 @@ This work consists of the file  siunitx.dtx
 % are done using stored text. To make them a little quicker, a
 % pre-stored version of the text is stored here.
 %    \begin{macrocode}
-\tl_new:N \c_@@_number_part_complex_tl
-\tl_set:Nn \c_@@_number_part_complex_tl { complex }
+\tl_const:Nn \c_@@_number_part_complex_tl { complex }
 %    \end{macrocode}
 %\end{macro}
 %
@@ -8553,8 +8552,7 @@ This work consists of the file  siunitx.dtx
         }
     }
 }
-\tl_new:N \c_@@_unity_tl
-\tl_set:Nn \c_@@_unity_tl { 1 }
+\tl_const:Nn \c_@@_unity_tl { 1 }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -9240,8 +9238,7 @@ This work consists of the file  siunitx.dtx
       \prop_put:Nnn \l_@@_number_in_prop { #1 -had-sign } { true }
     }
 }
-\tl_new:N \c_@@_plus_tl
-\tl_set:Nn \c_@@_plus_tl { + }
+\tl_const:Nn \c_@@_plus_tl { + }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
@@ -13878,8 +13875,7 @@ This work consists of the file  siunitx.dtx
 % \begin{variable}{\c_@@_one_fill_skip}
 %   A fixed skip of one \texttt{fill}.
 %    \begin{macrocode}
-\skip_new:N \c_@@_one_fill_skip
-\skip_set:Nn \c_@@_one_fill_skip { 0pt plus 1fill }
+\skip_const:Nn \c_@@_one_fill_skip { 0pt plus 1fill }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -15412,7 +15408,7 @@ This work consists of the file  siunitx.dtx
                   { }
                   {
                     \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-                      { \ensuremath { \c_@@_omega_tl } }
+                      { \ensuremath { \g_@@_omega_tl } }
                       { \textohm }
                   }
               }
@@ -15430,7 +15426,7 @@ This work consists of the file  siunitx.dtx
         \@ifpackageloaded { upgreek }
           {
             \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-              { \text { \ensuremath { \c_@@_omega_tl } } }
+              { \text { \ensuremath { \g_@@_omega_tl } } }
               { \Upomega }
           }
           { }
@@ -15468,7 +15464,7 @@ This work consists of the file  siunitx.dtx
   math-celsius   = { } ^ { \circ } \kern - \scriptspace \@@_unit_mathrm:n { C } ,
   math-degree    = { } ^ { \circ },
   math-micro     = \text { \c_@@_mu_tl },
-  math-ohm       = \text { \ensuremath { \c_@@_omega_tl } },
+  math-ohm       = \text { \ensuremath { \g_@@_omega_tl } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15504,7 +15500,7 @@ This work consists of the file  siunitx.dtx
     \ensuremath { { } ^ { \circ } } \kern -\scriptspace C ,
   text-degree    = \ensuremath { { } ^ { \circ } },
   text-micro     = \c_@@_mu_tl ,
-  text-ohm       = \ensuremath { \c_@@_omega_tl },
+  text-ohm       = \ensuremath { \g_@@_omega_tl },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15605,7 +15601,7 @@ This work consists of the file  siunitx.dtx
           { \text { \c_@@_mu_tl } }
           { \tex_char:D \c_@@_micro_int }
         \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-          { \text { \ensuremath { \c_@@_omega_tl } } }
+          { \text { \ensuremath { \g_@@_omega_tl } } }
           { \tex_char:D \c_@@_ohm_int }
         \sys_if_engine_xetex:T
           {
@@ -15629,7 +15625,7 @@ This work consists of the file  siunitx.dtx
           { \c_@@_mu_tl }
           { \tex_char:D \c_@@_micro_int }
         \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-          { \ensuremath { \c_@@_omega_tl } }
+          { \ensuremath { \g_@@_omega_tl } }
           { \tex_char:D \c_@@_ohm_int }
       }
       { }
