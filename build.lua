@@ -21,9 +21,22 @@ typesetcmds = "\\AtBeginDocument{\\DisableImplementation}"
 -- No tests for this bundle
 testfildir = ""
 
--- Auto-versioning
-versionform = "ProvidesExplPackage"
+-- Detail how to set the version automatically
+function update_tag(file,content,tagname,tagdate)
+  local iso = "%d%d%d%d%-%d%d%-%d%d"
+  return string.gsub(content,
+    "\n\\ProvidesExplPackage %{siunitx%} %{%d%d%d%d%-%d%d%-%d%d%} %{%d%.%d%w?%}\n",
+    "\n\\ProvidesExplPackage {siunitx} {"
+      .. tagdate .. "} {" .. string.gsub(tagname, "^v", "") .. "}\n")
+end
+
+function tag_hook(tagname)
+  os.execute('git commit -a -m "Step release tag"')
+  os.execute('git tag -a -m "" ' .. tagname)
+end
 
 -- Find and run the build system
 kpse.set_program_name ("kpsewhich")
-dofile (kpse.lookup ("l3build.lua"))
+if not release_date then
+  dofile(kpse.lookup("l3build.lua"))
+end
