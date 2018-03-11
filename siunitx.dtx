@@ -669,6 +669,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7h}{2017/06/12}{Internal changes}
 % \changes{v2.7i}{2017/07/23}{Rename an incorrect variable}
 % \changes{v2.7k}{2017/11/01}{Fix issues when units are not parsed}
+% \changes{v2.7l}{2018/03/11}{Track \pkg{unicode-math} changes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15567,8 +15568,9 @@ This work consists of the file  siunitx.dtx
 %   }
 %   For UTF-8 engines, it may be possible to use better symbols than those set
 %   up as standard. Unicode normalises both the ohm and {\aa}ngstr{\"{o}}m
-%   symbols to the appropriate letters, so these are used directly. On the
-%   other hand, micro is distinct from mu, so the proper symbol is selected.
+%   symbols to the appropriate letters, so these are used directly.
+%   Technically, we should hae a different slot for micro than for a mu, but
+%   for the broadest compatibility we go with the latter.
 %   The single degree Celsius symbol is a compatibility character, and so
 %   the two separate glyphs \enquote{degree} and \enquote{C} are used.
 %    \begin{macrocode}
@@ -15577,9 +15579,7 @@ This work consists of the file  siunitx.dtx
     \@ifpackageloaded { fontspec }
       {
         \int_const:Nn \c_@@_degree_int    { 176 }
-        \@ifpackageloaded { unicode-math }
-          { \int_const:Nn \c_@@_micro_int { "003BC } }
-          { \int_const:Nn \c_@@_micro_int { "000B5 } }
+        \int_const:Nn \c_@@_micro_int     { "000B5 }
         \int_const:Nn \c_@@_angstrom_int  { "0212B }
         \int_const:Nn \c_@@_ohm_int       { "003A9 }
         \sys_if_engine_xetex:T
