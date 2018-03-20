@@ -81,7 +81,7 @@ See https://www.latex-project.org/lppl.txt
 
 \endpreamble
 \postamble
-Copyright (C) 2008-2017 by
+Copyright (C) 2008-2018 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
@@ -669,6 +669,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7h}{2017/06/12}{Internal changes}
 % \changes{v2.7i}{2017/07/23}{Rename an incorrect variable}
 % \changes{v2.7k}{2017/11/01}{Fix issues when units are not parsed}
+% \changes{v2.7l}{2018/03/11}{Track \pkg{unicode-math} changes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -1104,6 +1105,7 @@ This work consists of the file  siunitx.dtx
 %\end{table}
 %\begin{table}
 %  \changes{v2.0j}{2010/06/30}{Correct \cs{hartree} unit appearance}
+%  \changes{v2.7m}{2018/03/20}{Update \cs{astronomicalunit} unit}
 %  \caption{Non-SI units whose values in SI units must be obtained
 %    experimentally.}
 %  \label{tab:unit:physical}
@@ -5216,7 +5218,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2017/11/26} {2.7k}
+\ProvidesExplPackage {siunitx} {2018-03-11} {2.7l}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -15567,8 +15569,9 @@ This work consists of the file  siunitx.dtx
 %   }
 %   For UTF-8 engines, it may be possible to use better symbols than those set
 %   up as standard. Unicode normalises both the ohm and {\aa}ngstr{\"{o}}m
-%   symbols to the appropriate letters, so these are used directly. On the
-%   other hand, micro is distinct from mu, so the proper symbol is selected.
+%   symbols to the appropriate letters, so these are used directly.
+%   Technically, we should hae a different slot for micro than for a mu, but
+%   for the broadest compatibility we go with the latter.
 %   The single degree Celsius symbol is a compatibility character, and so
 %   the two separate glyphs \enquote{degree} and \enquote{C} are used.
 %    \begin{macrocode}
@@ -15577,9 +15580,7 @@ This work consists of the file  siunitx.dtx
     \@ifpackageloaded { fontspec }
       {
         \int_const:Nn \c_@@_degree_int    { 176 }
-        \@ifpackageloaded { unicode-math }
-          { \int_const:Nn \c_@@_micro_int { "003BC } }
-          { \int_const:Nn \c_@@_micro_int { "000B5 } }
+        \int_const:Nn \c_@@_micro_int     { "000B5 }
         \int_const:Nn \c_@@_angstrom_int  { "0212B }
         \int_const:Nn \c_@@_ohm_int       { "003A9 }
         \sys_if_engine_xetex:T
@@ -16474,7 +16475,7 @@ This work consists of the file  siunitx.dtx
 %\begin{macro}{\dalton}
 % A few units based on physical measurements exist.
 %    \begin{macrocode}
-\DeclareSIUnit \astronomicalunit { ua }
+\DeclareSIUnit \astronomicalunit { au }
 \DeclareSIUnit \atomicmassunit   { u }
 \DeclareSIUnit \electronvolt     { eV }
 \DeclareSIUnit \dalton           { Da }
