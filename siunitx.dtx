@@ -13528,12 +13528,14 @@ This work consists of the file  siunitx.dtx
 % The collector starts by setting up local options, then clears and
 % initialises the storage and testing system. Font detection for the
 % \texttt{S} column happens here as this ensures that it is not inside
-% a box, which will give the wrong result for \opt{detect-mode}.
+% a box, which will give the wrong result for \opt{detect-mode}. The
+% |\use_i:nn| removes the |\ignorespaces| from the cell preamble.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_collect_begin:Nn #1#2 {
-  \keys_set:nn { siunitx } {#2}
-  \use:c { @@_table_collect_begin_ #1 : }
-}
+\cs_new_protected:Npn \@@_table_collect_begin:Nn #1#2
+  {
+    \keys_set:nn { siunitx } {#2}
+    \use_i:nn { \use:c { @@_table_collect_begin_ #1 : } }
+  }
 \cs_new_protected:Npn \@@_table_collect_begin_s: {
   \cs_set_eq:NN \@@_table_collect_token:N
     \@@_table_collect_token_s:N
@@ -13549,7 +13551,7 @@ This work consists of the file  siunitx.dtx
   \@@_detect_font:
   \bool_if:NTF \l_@@_number_parse_bool
     { \@@_table_collect_get: }
-    { \@@_table_print_S_direct:N }
+    { \@@_table_print_S_direct: }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -13634,7 +13636,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_get:}
-%\begin{macro}{\@@_table_collect_get_aux:}
 % The token collection system first has to check that the next argument
 % does not start with an opening-brace character.  If it does, the
 % testing is skipped and the braced token is stored.  Otherwise, a check
@@ -13644,16 +13645,11 @@ This work consists of the file  siunitx.dtx
   {
     \cs_set_eq:NN \@@_table_collect_next:
       \@@_table_collect_get:
-    \peek_after:Nw \@@_table_collect_get_aux:
-  }
-\cs_new_protected:Npn \@@_table_collect_get_aux:
-  {
     \peek_catcode_ignore_spaces:NTF \c_group_begin_token
       { \@@_table_collect_braced:n }
       { \@@_table_collect_not_braced:N }
   }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_init:}
@@ -15169,25 +15165,16 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{macro}{\@@_table_print_S_direct:N}
 % \begin{macro}{\@@_table_print_S_direct_text:n}
-%   The lead-off here first moves the \cs{ignorespaces} in the input to
-%   avoid picking it up. There is then a test to see if the very first item
+%   Test to see if the very first item
 %   in the cell is a |{|. If it is, then we use the same approach as for
 %   parsed columns and set the material as text. Otherwise, switch to math
 %   mode and hand off to the main routine.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_print_S_direct:N #1
+\cs_new_protected:Npn \@@_table_print_S_direct:
   {
-    #1
-    \cs_set:Npn \__peek_execute_branches:
-      {
-        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-          \exp_after:wN \@@_table_print_S_direct_text:n
-        \else:
-          \m@th
-          \exp_after:wN \@@_table_print_S_direct_main:
-        \fi:
-      }
-    \peek_after:Nw \__peek_ignore_spaces_execute_branches:
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_table_print_S_direct_text:n }
+      { \@@_table_print_S_direct_main: }
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_text:n #1
   {
