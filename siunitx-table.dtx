@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-table.dtx Copyright (C) 2016-2017 Joseph Wright
+% File: siunitx-table.dtx Copyright (C) 2016-2018 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -99,7 +99,7 @@
 \cs_new_protected:Npn \siunitx_cell_begin:
   {
     \bool_if:NTF \l_@@_parse_bool
-      { \@@_collect_begin: }
+      { \@@_collect_begin:N }
       { \@@_direct_begin: }
   }
 \cs_new_protected:Npn \siunitx_cell_end:
@@ -118,31 +118,23 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_collect_begin:}
+% \begin{macro}{\@@_collect_begin:N}
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
-%   therefore, we just collect up the unchanged tokens first. Some issues
-%   with the way that the \texttt{peek} functions are currently set up in
-%   \pkg{expl3} mean that at present there is a need to do stuff by hand
-%   here. The definition of \cs{cr} is used to allow collection of any tokens
+%   therefore, we just collect up the unchanged tokens first. The |#1| collects
+%   the leading |\ignorespaces| from the template: that has to go to
+%   avoid issues with the peek-ahead code. The definition of
+%   \cs{cr} is used to allow collection of any tokens
 %   inserted after the main content when dealing with the last cell of a row:
 %   the \enquote{group} around it is needed to avoid issues with the underlying
 %   |\halign|. (The approach is based on that in \pkg{collcell}.) Notice that
 %   as each cell forms a group there is no need to reset the definition of
 %   \cs{cr}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_collect_begin:
+\cs_new_protected:Npn \@@_collect_begin:N #1
   {
     \tl_clear:N \l_@@_collect_tl
-    \cs_set_protected:Npn \__peek_execute_branches:
-      {
-        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-          \exp_after:wN \@@_collect_group:n
-        \else:
-          \exp_after:wN \@@_collect_token:N
-        \fi:
-      }
     \if_false: { \fi:
     \cs_set_protected:Npn \cr
       {
@@ -170,7 +162,11 @@
 %   covers the case where |\\| has been expanded in an empty cell.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_loop:
-  { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
+  {
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_collect_group:n }
+      { \@@_collect_token:N }
+  }
 \cs_new_protected:Npn \@@_collect_group:n #1
   {
     \tl_put_right:Nn \l_@@_collect_tl { {#1} }
