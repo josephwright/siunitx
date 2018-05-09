@@ -129,9 +129,10 @@ This work consists of the file  siunitx.dtx
 \RequirePackage{xparse}
 %</driver|package>
 %<*driver>
-\documentclass[german,french,spanish,english,UKenglish]{l3doc}
+\documentclass{l3doc}
+\usepackage[german,french,spanish,UKenglish]{babel}
 \usepackage[table]{xcolor}
-\usepackage{amsmath,babel,booktabs,cancel,caption,colortbl,csquotes}
+\usepackage{amsmath,booktabs,cancel,caption,colortbl,csquotes}
 \usepackage{datatool,helvet,multirow,pgfplots,siunitx,xfrac,xtab}
 \usepackage[capitalise]{cleveref}
 \usepackage[final]{listings}
@@ -5220,7 +5221,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2018-04-27} {2.7n}
+\ProvidesExplPackage {siunitx} {2018-05-02} {2.7o}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -5618,7 +5619,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_option_deactivate:n}
-%\begin{macro}[aux]{\@@_option_deactivate_aux:n}
+%\begin{macro}{\@@_option_deactivate_aux:n}
 %\begin{macro}{\l_@@_option_deactivate_clist}
 % Some options need to be deactivated at the start of the document.
 %    \begin{macrocode}
@@ -6395,7 +6396,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_print:nn ,
 %  \@@_print:nV
 %}
-%\begin{macro}[aux]{\@@_print_aux:}
+%\begin{macro}{\@@_print_aux:}
 % The main printing function does everything inside a group, as
 % there are category code and definition changes to make. First, set
 % the fonts.  Then move on to printing mode, before moving to actual
@@ -6487,8 +6488,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_print_math:, \@@_print_text:}
-% \begin{macro}[aux]{\@@_print_text_aux:}
-% \begin{macro}[aux]{\@@_print_text_aux:NnN}
+% \begin{macro}{\@@_print_text_aux:}
+% \begin{macro}{\@@_print_text_aux:NnN}
 % Printing the text means replacing any awkward characters, which is
 % dependent on the output mode. The rest of the package uses "_" and
 % "^" to represent sub- and superscripts, respectively. In this way,
@@ -6564,9 +6565,9 @@ This work consists of the file  siunitx.dtx
 %  \@@_print_text_sub:n   ,
 %  \@@_print_text_super:n
 %}
-%\begin{macro}[aux]{\@@_print_text_sub_super:n}
-% \begin{macro}[aux]{\@@_print_text_sub_peek:}
-% \begin{macro}[aux]{\@@_peek_true:, \@@_peek_false:}
+%\begin{macro}{\@@_print_text_sub_super:n}
+% \begin{macro}{\@@_print_text_sub_peek:}
+% \begin{macro}{\@@_peek_true:, \@@_peek_false:}
 % The appropriate macros for sub- and superscript in text mode ensure
 % the appearance is the same as math mode. The search and replace
 % code for superscripts deals with the case where a literal number has
@@ -6714,7 +6715,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_preprocess_product:}
-%\begin{macro}[aux]{\@@_number_preprocess_product_aux:N}
+%\begin{macro}{\@@_number_preprocess_product_aux:N}
 % Rather than search through the entire argument, we use the
 % delimited-argument trick.
 %    \begin{macrocode}
@@ -6744,7 +6745,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_preprocess_quotient:}
-%\begin{macro}[aux]{\@@_number_preprocess_quotient_aux:N}
+%\begin{macro}{\@@_number_preprocess_quotient_aux:N}
 % For the quotient, only one token can appear in each part. So there
 % is an additional error check.
 %    \begin{macrocode}
@@ -6931,7 +6932,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_number_in_parse:n ,
 %  \@@_number_in_parse:V
 %}
-%\begin{macro}[aux]{\@@_number_in_parse_aux:n}
+%\begin{macro}{\@@_number_in_parse_aux:n}
 % The parsing routine starts by replacing any formatting in the input
 % using \cs{tl_set_rescan:Nnx}. Next, there is a quick routine to
 % ensure that all signs are single tokens. The main loop then takes
@@ -7037,7 +7038,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_in_protect:}
-%\begin{macro}[aux]{\@@_number_in_protect_aux:N}
+%\begin{macro}{\@@_number_in_protect_aux:N}
 % Under some circumstances (for example when loading \pkg{breqn})
 % some tokens do not behave safely under \texttt{x} expansion (at the
 % moment). To get round this, they are redefined here.
@@ -7054,8 +7055,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}[int]{\@@_number_in_sign_replace:N}
-% \begin{macro}[aux]{\@@_number_in_sign_replace_aux:N}
-% \begin{macro}[aux]{\@@_number_in_sign_replace_aux:NnN}
+% \begin{macro}{\@@_number_in_sign_replace_aux:N}
+% \begin{macro}{\@@_number_in_sign_replace_aux:NnN}
 %   A short spin-out to keep the replacement of tokens clear.
 %   The case where |-| is active needs special treatment and
 %   needs to come first.
@@ -7119,7 +7120,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_in_parse_relation:N}
-%\begin{macro}[aux]{\@@_number_in_parse_relation:w}
+%\begin{macro}{\@@_number_in_parse_relation:w}
 % The idea here is that a relation with be the very first token in the
 % input, or it is not valid. So the test for a relation can be very
 % simple and hopefully efficient.
@@ -7244,7 +7245,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_in_parse_mantissa:N}
-%\begin{macro}[aux]{\@@_number_in_parse_mantissa_aux:N}
+%\begin{macro}{\@@_number_in_parse_mantissa_aux:N}
 % For the mantissa, most things are valid. The procedure is split
 % into two parts, with the simple symbols handled here and the more
 % complex ones in a second part(which needs to be varied). Essentially
@@ -7389,7 +7390,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_in_complex:N}
-%\begin{macro}[aux]{\@@_number_in_complex_aux:nn}
+%\begin{macro}{\@@_number_in_complex_aux:nn}
 % Only one complex root token can be give, hence the initial test.
 % More tests are needed for complex numbers than other systems, so
 % the additional ones are turned on, followed by some flag setting.
@@ -7740,7 +7741,7 @@ This work consists of the file  siunitx.dtx
 %
 %
 %\begin{macro}{\@@_number_in_complex_to_uncert:n}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_in_complex_to_uncert_int: ,
 %  \@@_number_in_complex_to_uncert_dec:
 %}
@@ -8092,7 +8093,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 %\begin{macro}{\@@_number_process_exponent:}
-%\begin{macro}[aux]{\@@_number_process_exponent_aux:n}
+%\begin{macro}{\@@_number_process_exponent_aux:n}
 % To check for a totally zero exponent, the possibility that one or more
 % of the exponent storage areas is zero needs to be considered.
 %    \begin{macrocode}
@@ -8134,7 +8135,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_number_process_figures:n}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_number_process_figures_aux:n  ,
 %     \@@_number_process_figures_init:n
@@ -8198,7 +8199,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\@@_number_process_figures_count:n}
-% \begin{macro}[aux]{\@@_number_process_figures_count_aux:n}
+% \begin{macro}{\@@_number_process_figures_count_aux:n}
 %   The counting code has to check that characters are actually
 %   significant.
 %    \begin{macrocode}
@@ -8236,7 +8237,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\@@_number_process_figures_round:}
-% \begin{macro}[aux]{\@@_number_process_figures_round_loop:}
+% \begin{macro}{\@@_number_process_figures_round_loop:}
 %   The control macro for rounding to figures does the decimal part
 %   then the integer part as loops. There is then some tidying up if a
 %   digit is carried at the end.
@@ -8314,7 +8315,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_process_fixed:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_process_fixed_aux_i:nnn   ,
 %  \@@_number_process_fixed_aux_ii:nnn  ,
 %  \@@_number_process_fixed_aux_iii:nnn ,
@@ -8582,7 +8583,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_number_process_places:n}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %    \@@_number_process_places_init:n    ,
 %    \@@_number_process_places_aux_i:n   ,
@@ -8806,7 +8807,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\@@_number_process_round_decimal:}
-% \begin{macro}[aux]{\@@_number_process_round_decimal_aux:}
+% \begin{macro}{\@@_number_process_round_decimal_aux:}
 %   The rounding routine for decimals is the same for figures and places,
 %   so there is a generalised function here. Unfortunately, it is also
 %   complicated!
@@ -8881,7 +8882,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\@@_number_process_round_tidy:n}
-% \begin{macro}[aux]{\@@_number_process_round_tidy_aux:w}
+% \begin{macro}{\@@_number_process_round_tidy_aux:w}
 %   To put data back again: there is a check to see if the number has been
 % r  ounded to zero and a minimal value has been requested.
 %    \begin{macrocode}
@@ -8930,7 +8931,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 %\begin{macro}{\@@_number_process_scientific:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_process_scientific_aux_i:nnn           ,
 %  \@@_number_process_scientific_aux_ii:nnn          ,
 %  \@@_number_process_scientific_large:nnn           ,
@@ -9175,7 +9176,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_process_sign:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_process_sign_add:n  ,
 %  \@@_number_process_sign_plus:n
 %}
@@ -9249,7 +9250,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_process_uncertainty:}
-%\begin{macro}[aux]{\@@_number_process_uncertainty_aux:n}
+%\begin{macro}{\@@_number_process_uncertainty_aux:n}
 % There may be a need to expand uncertainties into a decimal and integer
 % part. This is done here so that the core \texttt{in} code is faster.
 %    \begin{macrocode}
@@ -9270,7 +9271,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\@@_number_process_uncertainty_decimal:n}
-%\begin{macro}[aux]{\@@_number_process_uncertainty_count:nn}
+%\begin{macro}{\@@_number_process_uncertainty_count:nn}
 % To deal with an error in the decimal part, care needs to be taken to
 % correctly pad with zeros and also to allow for the possibility that
 % the error crosses the decimal--integer boundary.
@@ -9326,7 +9327,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %\end{macro}
 %\begin{macro}{\@@_number_process_uncertainty_separate:}
-%\begin{macro}[aux]{\@@_number_process_uncertainty_separate_aux:N}
+%\begin{macro}{\@@_number_process_uncertainty_separate_aux:N}
 % Find the integer--decimal boundary and work appropriately.
 %    \begin{macrocode}
 \cs_new_protected:Npn
@@ -9361,7 +9362,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_process_zero_fill:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_process_zero_fill_aux:n  ,
 %  \@@_number_process_zero_fill_aux:nn
 %}
@@ -9393,7 +9394,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_number_process_zero_to_integer:}
-% \begin{macro}[aux]{\@@_number_process_zero_to_integer_aux:n}
+% \begin{macro}{\@@_number_process_zero_to_integer_aux:n}
 %   Look for a decimal part which is simply zero, and if found delete it.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_process_zero_to_integer:
@@ -9663,7 +9664,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_format_brackets:n}
-%\begin{macro}[aux]{\@@_number_format_brackets_aux:n}
+%\begin{macro}{\@@_number_format_brackets_aux:n}
 % There are various points at which brackets might be added to
 % avoid ambiguity. The function here adds the appropriate tokens
 % around whatever is in the supplied named store.
@@ -9698,7 +9699,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_format_color:}
-%\begin{macro}[aux]{\@@_number_format_color_aux:n}
+%\begin{macro}{\@@_number_format_color_aux:n}
 % If the mantissa is negative, then any colour for output might change.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_format_color: {
@@ -9723,7 +9724,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_format_complex:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_format_complex_aux:n ,
 %  \@@_number_format_complex_aux:
 %}
@@ -9918,7 +9919,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_format_group:n}
-%\begin{macro}[aux]{\@@_number_format_group_aux:nn}
+%\begin{macro}{\@@_number_format_group_aux:nn}
 % Grouping digits only happens if there are no symbols in the input, and
 % of course if grouping has been requested.
 %    \begin{macrocode}
@@ -9977,7 +9978,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 % \end{macro}
 %\begin{macro}{\@@_number_format_group_decimal:}
-%\begin{macro}[aux]{\@@_number_format_group_decimal_aux:}
+%\begin{macro}{\@@_number_format_group_decimal_aux:}
 % Using the \enquote{keep everything on the stack} approach, relatively
 % simple recursion is needed. This trick is taken more or less directly
 % from \pkg{numprint}.
@@ -10010,7 +10011,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\begin{macro}{\@@_number_format_group_integer:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_format_group_integer_setup:n        ,
 %  \@@_number_format_group_integer_setup:V        ,
 %  \@@_number_format_group_integer_setup_aux:NNNN ,
@@ -10097,7 +10098,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_number_format_join_uncert:  ,
 %  \@@_number_format_join_uncert:n
 %}
-%\begin{macro}[aux]{\@@_number_format_join_uncert_pm:N}
+%\begin{macro}{\@@_number_format_join_uncert_pm:N}
 % For adding separated uncertainties to the main part of a number.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_format_join_uncert: {
@@ -10180,7 +10181,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_number_format_sign:n        ,
 %  \@@_number_format_sign_complex:
 %}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_format_sign_aux:n               ,
 %  \@@_number_format_sign_negative_brackets:n ,
 %  \@@_number_format_sign_complex:n
@@ -10274,7 +10275,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_format_uncertainty:n}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_format_uncertainty_joined:n ,
 %  \@@_number_format_uncertainty_sep:n
 %}
@@ -10441,7 +10442,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_number_output_parse:n ,
 %  \@@_number_output_parse:V
 %}
-%\begin{macro}[aux]{\@@_number_output_parse_aux:}
+%\begin{macro}{\@@_number_output_parse_aux:}
 % The parsing system just has to check if there are multiple parts to
 % worry about.
 %    \begin{macrocode}
@@ -10487,7 +10488,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_output_parts:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_output_parts_aux:    ,
 %  \@@_number_output_parts_aux:n   ,
 %  \@@_number_output_parts_print:n
@@ -10587,7 +10588,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}[aux]{\@@_number_output_product_brackets:}
+%\begin{macro}{\@@_number_output_product_brackets:}
 % When printing products that have to be bracketed, there is a need to
 % shuffle the units about a bit.
 %    \begin{macrocode}
@@ -10606,7 +10607,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}[aux]{\@@_number_output_product_aux:}
+%\begin{macro}{\@@_number_output_product_aux:}
 % Printing the products needs a looping function.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_number_output_product_aux: {
@@ -10682,7 +10683,7 @@ This work consists of the file  siunitx.dtx
 }
 %    \end{macrocode}
 %\end{macro}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_number_output_quotient_aux_i:  ,
 %  \@@_number_output_quotient_aux_ii:
 %}
@@ -10723,7 +10724,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_number_output_single:}
-%\begin{macro}[aux]{\@@_number_output_single_aux:}
+%\begin{macro}{\@@_number_output_single_aux:}
 % Printing a number with no multiple parts is easy. There is a check for
 % any units, which if present may force the number to have brackets
 % added. there is then simply a short run to print the units and number.
@@ -10836,7 +10837,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_angle_output:nnn}
-%\begin{macro}[aux]{\@@_angle_output_aux:nnn}
+%\begin{macro}{\@@_angle_output_aux:nnn}
 % The input will have been split up by \pkg{xparse}, and so the various
 % possible inputs can be picked up. To keep to a minimal route through
 % the code, a decimal angle is simply treated like an arc, but with
@@ -10888,7 +10889,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_angle_direct:nnn}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_angle_direct_aux_i:nnn   ,
 %  \@@_angle_direct_aux_ii:nnn  ,
 %  \@@_angle_direct_aux_iii:nnn
@@ -10948,7 +10949,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_angle_zero_fill:      ,
 %  \@@_angle_sign_shuffle:nn
 %}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_angle_parse_aux:nnn        ,
 %  \@@_angle_check_sign:n         ,
 %  \@@_angle_sign_shuffle_aux:nnn
@@ -11079,7 +11080,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_angle_print:}
-%\begin{macro}[aux]{\@@_angle_print:nn}
+%\begin{macro}{\@@_angle_print:nn}
 % The standard printing routine examines each part of the arc in turn
 % and either does a standard format or calls the special astronomy-style
 % routine. There may also be some spaces to add.
@@ -11118,7 +11119,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_angle_print_astronomy:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_angle_print_astronomy_aux:    ,
 %  \@@_angle_print_astronomy_aux:n   ,
 %  \@@_angle_print_astronomy_marker: ,
@@ -11208,7 +11209,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_angle_print_direct:nnn}
-%\begin{macro}[aux]{\@@_angle_print_direct_aux:nn}
+%\begin{macro}{\@@_angle_print_direct_aux:nn}
 % The direct printing routine is rather similar to the standard
 % one, with just a modified final step.
 %    \begin{macrocode}
@@ -11321,7 +11322,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_declare_unit:Nnn}
-%\begin{macro}[aux]{\@@_unit_first_token:n}
+%\begin{macro}{\@@_unit_first_token:n}
 % Creating units requires various things to be stored.  This is done
 % with several storage bins to keep the code clear.  For the
 % \texttt{macro} definition, the test occurs at use so that there is no
@@ -11398,8 +11399,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\cancel}
-%\begin{macro}[aux]{\@@_real_cancel:n}
-%\begin{macro}[aux]{\@@_cancel:n}
+%\begin{macro}{\@@_real_cancel:n}
+%\begin{macro}{\@@_cancel:n}
 % The \cs{cancel} macro is odd as it is only defined if the appropriate
 % package is loaded.
 %    \begin{macrocode}
@@ -11466,7 +11467,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_create_empty_functions:}
-%\begin{macro}[aux]{\@@_unit_create_empty_functions_aux:N}
+%\begin{macro}{\@@_unit_create_empty_functions_aux:N}
 % Without this, horrible things happen with \pkg{memoir} and
 % \pkg{hyperref}.
 %    \begin{macrocode}
@@ -11487,7 +11488,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_unit_create_functions:}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_unit_create_functions_aux_i:,
 %     \@@_unit_create_functions_aux_ii:
@@ -11702,7 +11703,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_if_literal:nTF}
-%\begin{macro}[aux]{\@@_unit_if_literal_aux:N}
+%\begin{macro}{\@@_unit_if_literal_aux:N}
 % A test is needed to see if the input only contains unit macros. This
 % is done by altering setting all of the unit macros to expand to
 % nothing at all. Thus there will only be anything left if there is
@@ -11918,7 +11919,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_parse_unit:Nn}
-%\begin{macro}[aux]{\@@_unit_parse_unit_per:}
+%\begin{macro}{\@@_unit_parse_unit_per:}
 % For units, there is a check in case a prefix is present (which will
 % have incremented the counter). With the counter correct, simply add
 % the literal to the property list. There is also a check to see if
@@ -12164,7 +12165,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_add:}
-%\begin{macro}[aux]{\@@_unit_format_add_aux:n}
+%\begin{macro}{\@@_unit_format_add_aux:n}
 % Adding the current unit to the output means checking where it goes.
 % The odd code when adding a space is to pick up repeated per symbols,
 % which need to suppress the space.
@@ -12226,7 +12227,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_fraction:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_unit_format_fraction:       ,
 %  \@@_unit_format_auto:           ,
 %  \@@_unit_format_symbol:         ,
@@ -12362,8 +12363,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_unit_format_literal:n}
-% \begin{macro}[aux]{\@@_unit_format_literal_aux:N}
-% \begin{macro}[aux]{\@@_unit_format_literal_power:n}
+% \begin{macro}{\@@_unit_format_literal_aux:N}
+% \begin{macro}{\@@_unit_format_literal_power:n}
 %   If the unit given contains anything which is not a unit macro, then
 %   any unit macros that are there simply dump literal meanings. There is
 %   then a little work to do sorting out |~| and |.| characters at
@@ -12401,7 +12402,7 @@ This work consists of the file  siunitx.dtx
  %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_literal_extras:}
-%\begin{macro}[aux]{\@@_unit_format_literal_extras_aux:nN}
+%\begin{macro}{\@@_unit_format_literal_extras_aux:nN}
 % The code here deals with characters outside the normal range that
 % can appear in units in UTF-8 and related encodings. The idea is to
 % do a search and replace, thus avoiding any active characters.
@@ -12445,7 +12446,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_power:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_unit_format_power_aux:      ,
 %  \@@_unit_format_power_aux:n     ,
 %  \@@_unit_format_power_aux:nn    ,
@@ -12560,7 +12561,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_prefix:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_unit_format_prefix_number:      ,
 %  \@@_unit_format_prefix_number_calc: ,
 %  \@@_unit_format_prefix_symbol:
@@ -12651,7 +12652,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_unit_format_qualifier:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_unit_format_qualifier_brackets:  ,
 %  \@@_unit_format_qualifier_phrase:    ,
 %  \@@_unit_format_qualifier_space:     ,
@@ -12731,7 +12732,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 %\begin{macro}{\@@_unit_format_symbol:}
-%\begin{macro}[aux]{
+%\begin{macro}{
 %  \@@_unit_format_symbol_aux:     ,
 %  \@@_unit_format_symbol_aux_alt:
 %}
@@ -13083,7 +13084,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_combined_product_count:n}
-%\begin{macro}[aux]{\@@_combined_product_count_aux:n}
+%\begin{macro}{\@@_combined_product_count_aux:n}
 % For counting how many products are in a number, so that the unit
 % can be adjusted if needed.
 %    \begin{macrocode}
@@ -13171,7 +13172,7 @@ This work consists of the file  siunitx.dtx
 % \end{variable}
 %
 % \begin{macro}{\@@_list_numbers:n}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {\@@_list_numbers_aux_i:n, \@@_list_numbers_aux_ii:n}
 % \begin{macro}{\@@_list_numbers_aux:nn}
 %   Setting up lists is made slightly complicated by the need to handle the
@@ -13298,8 +13299,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 % \begin{macro}{\@@_range_numbers:nn}
-% \begin{macro}[aux]{\@@_range_numbers_core:nn}
-% \begin{macro}[aux]{\@@_range_numbers_aux:n}
+% \begin{macro}{\@@_range_numbers_core:nn}
+% \begin{macro}{\@@_range_numbers_aux:n}
 %   A range of numbers. This is more restrictive than the \cs{num}
 %   function: nothing compound.
 %    \begin{macrocode}
@@ -13425,7 +13426,7 @@ This work consists of the file  siunitx.dtx
 %    \end{macrocode}
 %
 %\begin{macro}{\@@_table_rewrite_create:N}
-%\begin{macro}[aux]{\@@_table_rewrite_create_aux:w}
+%\begin{macro}{\@@_table_rewrite_create_aux:w}
 % The \texttt{s} and \texttt{S} column types are both created using
 % the \pkg{array} package, but with the internal macros redefined
 % to work with optional argument. First, there is a need to do a
@@ -13523,17 +13524,19 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_begin:Nn}
-%\begin{macro}[aux]{\@@_table_collect_begin_s:}
-%\begin{macro}[aux]{\@@_table_collect_begin_S:}
+%\begin{macro}{\@@_table_collect_begin_s:}
+%\begin{macro}{\@@_table_collect_begin_S:}
 % The collector starts by setting up local options, then clears and
 % initialises the storage and testing system. Font detection for the
 % \texttt{S} column happens here as this ensures that it is not inside
-% a box, which will give the wrong result for \opt{detect-mode}.
+% a box, which will give the wrong result for \opt{detect-mode}. The
+% |\use_i:nn| removes the |\ignorespaces| from the cell preamble.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_collect_begin:Nn #1#2 {
-  \keys_set:nn { siunitx } {#2}
-  \use:c { @@_table_collect_begin_ #1 : }
-}
+\cs_new_protected:Npn \@@_table_collect_begin:Nn #1#2
+  {
+    \keys_set:nn { siunitx } {#2}
+    \use_i:nn { \use:c { @@_table_collect_begin_ #1 : } }
+  }
 \cs_new_protected:Npn \@@_table_collect_begin_s: {
   \cs_set_eq:NN \@@_table_collect_token:N
     \@@_table_collect_token_s:N
@@ -13549,7 +13552,7 @@ This work consists of the file  siunitx.dtx
   \@@_detect_font:
   \bool_if:NTF \l_@@_number_parse_bool
     { \@@_table_collect_get: }
-    { \@@_table_print_S_direct:N }
+    { \@@_table_print_S_direct: }
 }
 %    \end{macrocode}
 %\end{macro}
@@ -13565,7 +13568,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_expand:N}
-%\begin{macro}[aux]{\@@_table_collect_expand_math:N}
+%\begin{macro}{\@@_table_collect_expand_math:N}
 % The idea here is to expand content if possible.  There are a few
 % things to note. Only macros which are not long or protected are
 % expanded. There is the possibility that the macro may need the
@@ -13634,29 +13637,20 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_get:}
-%\begin{macro}{\@@_table_collect_get_aux:}
 % The token collection system first has to check that the next argument
 % does not start with an opening-brace character.  If it does, the
 % testing is skipped and the braced token is stored.  Otherwise, a check
-% is made against various ignored tokens. At present, things seem to be
-% broken with \pkg{expl3}'s \cs{peek_catcode_ignore_spaces:NTF}, so
-% everything is done by hand.
+% is made against various ignored tokens.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_collect_get: {
-  \cs_set_eq:NN \@@_table_collect_next:
-    \@@_table_collect_get:
-  \cs_set:Npn \__peek_execute_branches:
-    {
-      \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-        \exp_after:wN \@@_table_collect_braced:n
-      \else:
-        \exp_after:wN \@@_table_collect_not_braced:N
-      \fi:
-    }
-  \peek_after:Nw \__peek_ignore_spaces_execute_branches:
-}
+\cs_new_protected:Npn \@@_table_collect_get:
+  {
+    \cs_set_eq:NN \@@_table_collect_next:
+      \@@_table_collect_get:
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_table_collect_braced:n }
+      { \@@_table_collect_not_braced:N }
+  }
 %    \end{macrocode}
-%\end{macro}
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_init:}
@@ -13751,8 +13745,8 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_not_braced:N}
-%\begin{macro}[aux]{\@@_table_collect_not_braced_aux_i:N}
-%\begin{macro}[aux]{\@@_table_collect_not_braced_aux_ii:N}
+%\begin{macro}{\@@_table_collect_not_braced_aux_i:N}
+%\begin{macro}{\@@_table_collect_not_braced_aux_ii:N}
 % A few macros are simply passed through to be executed; this is mainly
 % so that the table actually works. The newline function needs its own
 % function, which is picked up by hand.
@@ -14607,7 +14601,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 % \begin{macro}{\@@_table_print_S_centered_measure:}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_table_print_S_centered_measure_int_part: ,
 %     \@@_table_print_S_centered_measure_marker:   ,
@@ -14861,7 +14855,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 % \begin{macro}{\@@_table_print_S_reserved_mantissa:}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_table_print_S_reserved_mantissa_parts:  ,
 %     \@@_table_print_S_reserved_mantissa_integer:
@@ -15034,7 +15028,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 % \begin{macro}{\@@_table_print_S_reserved_exponent:}
-% \begin{macro}[aux]
+% \begin{macro}
 %   {
 %     \@@_table_print_S_reserved_exponent_product:            ,
 %     \@@_table_print_S_reserved_exponent_product_correction: ,
@@ -15172,25 +15166,16 @@ This work consists of the file  siunitx.dtx
 %
 % \begin{macro}{\@@_table_print_S_direct:N}
 % \begin{macro}{\@@_table_print_S_direct_text:n}
-%   The lead-off here first moves the \cs{ignorespaces} in the input to
-%   avoid picking it up. There is then a test to see if the very first item
+%   Test to see if the very first item
 %   in the cell is a |{|. If it is, then we use the same approach as for
 %   parsed columns and set the material as text. Otherwise, switch to math
 %   mode and hand off to the main routine.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_print_S_direct:N #1
+\cs_new_protected:Npn \@@_table_print_S_direct:
   {
-    #1
-    \cs_set:Npn \__peek_execute_branches:
-      {
-        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-          \exp_after:wN \@@_table_print_S_direct_text:n
-        \else:
-          \m@th
-          \exp_after:wN \@@_table_print_S_direct_main:
-        \fi:
-      }
-    \peek_after:Nw \__peek_ignore_spaces_execute_branches:
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_table_print_S_direct_text:n }
+      { \@@_table_print_S_direct_main: }
   }
 \cs_new_protected:Npn \@@_table_print_S_direct_text:n #1
   {
@@ -15208,7 +15193,7 @@ This work consists of the file  siunitx.dtx
 %     @@_table_print_S_direct_centered_begin:,
 %     \@@_table_print_S_direct_centered_end:
 %   }
-% \begin{macro}[aux]{\@@_table_print_S_direct_centered_aux:N}
+% \begin{macro}{\@@_table_print_S_direct_centered_aux:N}
 %   When centring the content about a decimal marker, the trick is
 %   to collect everything into two boxes and then compare the sizes.
 %   In that sense this is very similar to the normal method, except that
@@ -15277,7 +15262,7 @@ This work consists of the file  siunitx.dtx
 %     \@@_table_print_S_direct_reserved_begin:,
 %     \@@_table_print_S_direct_reserved_end:
 %   }
-% \begin{macro}[aux]{\@@_table_print_S_direct_reserved_aux:N}
+% \begin{macro}{\@@_table_print_S_direct_reserved_aux:N}
 %   The plan here is to box up the entire number using the information
 %   available about the size of the two parts. Relatively easy,
 %   but needs a bit of measuring. The first box here does need to use
@@ -16214,7 +16199,7 @@ This work consists of the file  siunitx.dtx
 % \end{macro}
 %
 %\begin{macro}{\@@_bookmark_SIlist_map:nn}
-%\begin{macro}[aux]{\@@_bookmark_SIlist_map_aux:nw}
+%\begin{macro}{\@@_bookmark_SIlist_map_aux:nw}
 % An expandable mapping to replace the list separator in the
 % input by appropriate output version.
 %    \begin{macrocode}
@@ -16578,7 +16563,7 @@ This work consists of the file  siunitx.dtx
 %\subsection{Strict application of the rules}
 %
 %\begin{macro}{\@@_strict_option:n}
-%\begin{macro}[aux]{\@@_strict_option_aux:n}
+%\begin{macro}{\@@_strict_option_aux:n}
 % When sticking to the rules closely, a few options are not available.
 %    \begin{macrocode}
 \keys_define:nn { siunitx } {
