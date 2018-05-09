@@ -13638,23 +13638,20 @@ This work consists of the file  siunitx.dtx
 % The token collection system first has to check that the next argument
 % does not start with an opening-brace character.  If it does, the
 % testing is skipped and the braced token is stored.  Otherwise, a check
-% is made against various ignored tokens. At present, things seem to be
-% broken with \pkg{expl3}'s \cs{peek_catcode_ignore_spaces:NTF}, so
-% everything is done by hand.
+% is made against various ignored tokens.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_table_collect_get: {
-  \cs_set_eq:NN \@@_table_collect_next:
-    \@@_table_collect_get:
-  \cs_set:Npn \__peek_execute_branches:
-    {
-      \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-        \exp_after:wN \@@_table_collect_braced:n
-      \else:
-        \exp_after:wN \@@_table_collect_not_braced:N
-      \fi:
-    }
-  \peek_after:Nw \__peek_ignore_spaces_execute_branches:
-}
+\cs_new_protected:Npn \@@_table_collect_get:
+  {
+    \cs_set_eq:NN \@@_table_collect_next:
+      \@@_table_collect_get:
+    \peek_after:Nw \@@_table_collect_get_aux:
+  }
+\cs_new_protected:Npn \@@_table_collect_get_aux:
+  {
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_table_collect_braced:n }
+      { \@@_table_collect_not_braced:N }
+  }
 %    \end{macrocode}
 %\end{macro}
 %\end{macro}
