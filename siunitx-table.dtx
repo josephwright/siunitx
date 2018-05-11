@@ -75,9 +75,10 @@
 %<@@=siunitx_table>
 %    \end{macrocode}
 %
-% \begin{variable}{\l_@@_tmp_tl}
+% \begin{variable}{\l_@@_tmp_box, \l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\box_new:N \l_@@_tmp_box
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
 % \end{variable}
@@ -477,8 +478,25 @@
 % as simply aligning on the first token that is a decimal marker. The
 % strategy here is that used by \pkg{dcolumn}.
 %
+% \begin{variable}{\l_@@_integer_box, \l_@@_decimal_box}
+%   Boxes for the content before and after the decimal marker.
+%    \begin{macrocode}
+\box_new:N \l_@@_direct_integer_box
+\box_new:N \l_@@_direct_decimal_box
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_fil:}
+%    A primitive renamed
+%    \begin{macrocode}
+\cs_new_eq:NN \@@_fil: \tex_hfil:D
+%   \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\@@_direct_begin:N}
-% \begin{macro}{\@@_direct_begin_aux:}
+% \begin{macro}{\@@_direct_begin:}
+% \begin{macro}{\@@_direct_center:, \@@_direct_center_switch:}
+% \begin{macro}{\@@_direct_center_end:NN}
 %   After removing the |\ignorespaces| at the start of the cell, check to see
 %   if there is a |{| and branch as appropriate.
 %    \begin{macrocode}
@@ -488,13 +506,81 @@
       { \@@_print_text:n }
       {
         \m@th
-        \@@_direct_begin_aux:
+        \@@_direct_begin:
       }
   }
-\cs_new_protected:Npn \@@_direct_begin_aux:
+\cs_new_protected:Npn \@@_direct_begin:
+  {
+    \bool_if:NTF ???
+      { \@@_direct_center: }
+      { \@@_direct_fixed: }
+  }
+%    \end{macrocode}
+%   When centring the content about a decimal marker, the trick is
+%   to collect everything into two boxes and then compare the sizes.
+%   As we are always in math mode, we can use a math active token
+%   to make the switch. The up-front setting of the |decimal| box deals
+%   with the case where there is no decimal part.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_direct_center:
+  {
+    \hbox_set:Nn \l_@@_tmp_box
+      { \ensuremath { \l_siunitx_output_decimal_tl } }
+    \hbox_set_to_wd:Nnn \l_@@_decimal_box
+      { \box_wd:N \l_@@_tmp_box }
+      { \@@_fil: }
+    \hbox_set:Nw \l_@@_integer_box
+      \c_math_toggle_token
+      \tl_map_inline:Nn \l_siunitx_input_decimal_tl
+        {
+          \char_set_active_eq:NN #1 \@@_direct_center_switch:
+          \char_set_mathcode:nn { `#1 } { "8000 }
+        }
+  }
+\cs_new_protected:Npn \@@_direct_center_switch:
+  {
+      \c_math_toggle_token
+    \hbox_set_end:
+    \hbox_set:Nw \l_@@_decimal_box
+      \c_math_toggle_token
+      \l_siunitx_output_decimal_tl
+  }
+\cs_new_protected:Npn \@@_direct_center_end:
+  {
+      \c_math_toggle_token
+    \hbox_set_end:
+    \dim_compare:nNnTF
+      { \box_wd:N \l_@@_integer_box }
+        > { \box_wd:N \l_@@_decimal_box }
+      {
+        \@@_direct_end:NN
+          \l_@@_integer_box
+          \l_@@_decimal_box
+      }
+      {
+        \@@_direct_end:NN
+          \l_@@_integer_box
+          \l_@@_decimal_box
+      }
+    \box_use_drop:N \l_@@_integer_box
+    \box_use_drop:N \l_@@_decimal_box
+  }
+\cs_new_protected:Npn \@@_direct_center_end:NN #1#2
+  {
+    \hbox_set_to_wd:Nnn #2 { \box_wd:N #1 }
+      {
+        \hbox_unpack:N #2
+        \@@_fil:
+      }
+  }
+%    \end{macrocode}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_direct_fixed:
   {
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
