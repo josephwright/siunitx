@@ -75,6 +75,83 @@
 %<@@=siunitx_angle>
 %    \end{macrocode}
 %
+%  \begin{variable}{\l_@@_force_arc_bool, \l_@@_force_decimal_bool}
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    angle-format .choice: ,
+    angle-format / arc .code:n =
+      {
+        \bool_set_true:N \l_@@_force_arc_bool
+        \bool_set_false:N \l_@@_force_decimal_bool
+      } ,
+    angle-format / decimal .code:n =
+      {
+        \bool_set_false:N \l_@@_force_arc_bool
+        \bool_set_true:N \l_@@_force_decimal_bool
+      } ,
+    angle-format / input .code:n =
+      {
+        \bool_set_false:N \l_@@_force_arc_bool
+        \bool_set_false:N \l_@@_force_decimal_bool
+      }
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_angle:n}
+% \begin{macro}{\siunitx_angle:nnn}
+% \begin{macro}{\@@_arc_convert:n}
+% \begin{macro}{\@@_arc_convert:nn}
+%   The first step here is to force format conversion if required. Going to
+%   a decimal is easy, going to arc format is a bit more painful: avoid
+%   repeating calculations mainly for code readability.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_angle:n #1
+  {
+    \bool_if:NTF \l_@@_force_arc_bool
+      {
+        \use:x
+          { \@@_arc_convert:n { \fp_eval:n {#1} } }
+      }
+      { }
+  }
+\cs_new_protected:Npn \siunitx_angle:nnn #1#2#3
+  {
+    \bool_if:NTF \l_@@_force_decimal_bool
+      {
+        \exp_args:Nx \siunitx_angle:n
+          { \fp_eval:n { #1 + 60 * #2 + 360 * #3 } }
+      }
+      { }
+  }
+\cs_new_protected:Npn \@@_arc_convert:n #1
+  {
+    \use:x
+      {
+         \@@_arc_convert:nn
+           { \fp_eval:n { trunc(#1,0) } }
+           { \fp_eval:n { trunc( (#1 - trunc(#1,0)) * 60,0) } }
+      }
+  }
+\cs_new_protected:Npn \@@_arc_convert:nn #1#2
+  {
+    \exp_args:Nnnx\siunitx_angle:nnn {#1} {#2}
+      { \fp_eval:n { (#2 - trunc(#2,0)) * 60 } }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    angle-format = input
+  }
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
