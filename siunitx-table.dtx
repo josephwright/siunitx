@@ -100,7 +100,7 @@
   {
     \bool_if:NTF \l_@@_parse_bool
       { \@@_collect_begin:N }
-      { \@@_direct_begin: }
+      { \@@_direct_begin:N }
   }
 \cs_new_protected:Npn \siunitx_cell_end:
   {
@@ -256,14 +256,6 @@
     \tl_clear:N \l_@@_pre_tl
     \tl_clear:N \l_@@_number_tl
     \tl_clear:N \l_@@_post_tl
-    \cs_set_protected:Npn \__peek_execute_branches:
-      {
-        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-          \exp_after:wN \@@_split_group:n
-        \else:
-          \exp_after:wN \@@_split_token:N
-        \fi:
-      }
     \exp_after:wN \@@_split_loop: \l_@@_collect_tl
       \q_recursion_tail \q_recursion_stop
     \@@_split_tidy:N \l_@@_pre_tl
@@ -288,7 +280,11 @@
 %   token lists.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_split_loop:
-  { \peek_after:Nw \__peek_ignore_spaces_execute_branches: }
+  {
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_split_group:n }
+      { \@@_split_token:N }
+  }
 \cs_new_protected:Npn \@@_split_group:n #1
   {
     \tl_if_empty:NTF \l_@@_number_tl
@@ -488,16 +484,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_direct_begin: #1
   {
-    \cs_set:Npn \__peek_execute_branches:
+    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
+      { \@@_print_text:n }
       {
-        \if_catcode:w \exp_not:N \l_peek_token \c_group_begin_token
-          \exp_after:wN \@@_print_text:n
-        \else:
-          \m@th
-          \exp_after:wN \@@_direct_begin_aux:
-        \fi:
+        \m@th
+        \@@_direct_begin_aux:
       }
-    \peek_after:Nw \__peek_ignore_spaces_execute_branches:
   }
 \cs_new_protected:Npn \@@_direct_begin_aux:
   {
