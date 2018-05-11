@@ -252,42 +252,6 @@
 \RequirePackage { array }
 %    \end{macrocode}
 %
-% There is a slight problem with the \pkg{cellspace} package: it also uses
-% \texttt{S} for a column type  Here, \texttt{S} seems to make more sense for
-% \pkg{siunitx}, with \texttt{C} used for \pkg{cellspace}. To enable this to
-% work well, the column rewriting code happens \cs{AtBeginDocument}. The
-% \texttt{S} column is deleted from \cs{NC@list} so that no warning appears.
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \@ifpackageloaded { cellspace }
-      {
-        \newcolumntype { C } [ 1 ]
-          { > { \bcolumn #1 \@nil } #1 < { \ecolumn } }
-        \cs_set:Npn \@@_tmp:w #1 \NC@do S #2 \q_stop
-          { \NC@list { #1 #2 } }
-        \exp_after:wN \@@_tmp:w \tex_the:D \NC@list \q_stop
-        \cs_undefine:N \NC@find@S
-        \msg_warning:nnn { siunitx } { moved-cellspace-column } { C }
-        \ifcellspace@m
-          \def \env@matrix
-            {
-              \hskip -\arraycolsep
-              \let \@ifnextchar \new@ifnextchar
-              \array
-                {
-                  * { \c@MaxMatrixCols }
-                    { > { \bcolumn c \@nil $ } c < { $ \ecolumn } } @ { }
-                }
-            }
-        \fi
-      }
-      { }
-  }
-\msg_new:nnn { siunitx } { moved-cellspace-column }
-  { Column~type~for~cellspace~package~moved~to~'#1'. }
-%    \end{macrocode}
-%
 % \begin{macro}{\@@_declare_column:Nnn}
 %   Creating numerical columns requires that these are declared before anything
 %   else in \cs{NC@list}: this is necessary to work with optional arguments.
