@@ -29,6 +29,15 @@ function tag_hook(tagname)
   os.execute('git tag -a -m "" ' .. tagname)
 end
 
+function main(target,names)
+  if target == "ctan" then
+    print("Not a good idea")
+    os.exit(1)
+  else
+    stdmain(target,names)
+  end
+end
+
 -- Find and run the build system
 kpse.set_program_name ("kpsewhich")
 if not release_date then
