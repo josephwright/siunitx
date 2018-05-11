@@ -673,6 +673,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7l}{2018/03/11}{Track \pkg{unicode-math} changes}
 % \changes{v2.7n}{2018/04/27}{Fix issue with symbolic input
 %   and digit grouping}
+% \changes{v2.7q}{2018/05/11}{Patch \pkg{cellspace} only if required}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -4384,12 +4385,17 @@ This work consists of the file  siunitx.dtx
 %\subsection{Using \pkg{siunitx} with the \pkg{cellspace} package}
 %
 % Both \pkg{siunitx} and \pkg{cellspace} use the letter \texttt{S} for a
-% new column type. This obviously leads to a problem. If both are
-% loaded, \pkg{siunitx} will retain the \texttt{S} column, and moves the
-% functionality of \pkg{cellspace} to the letter \texttt{C}. This
+% new column type as standard. If \pkg{cellspace} loaded and is using the
+% \texttt{S} column specifier, \pkg{siunitx} will move the
+% functionality of \pkg{cellspace} to the letter \texttt{C}, and \texttt{S}
+% will be used by \pkg{siunitx}. This
 % allows the normal use of \pkg{cellspace} with standard column types:
 % it does \emph{not} work with the \pkg{siunitx} \texttt{S} or
-% \texttt{s} columns.
+% \texttt{s} columns. Note that \pkg{cellspace} can be loaded with a
+% user-selectable identifier, for example
+%\begin{LaTeXdemo}[code only]
+%  \usepackage[column=Q]{cellspace}
+%\end{LaTeXdemo}
 %
 %\subsection{Special considerations for the \cs{kWh} unit}
 %
@@ -5221,7 +5227,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2018-05-02} {2.7o}
+\ProvidesExplPackage {siunitx} {2018-05-11} {2.7q}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -13399,27 +13405,30 @@ This work consists of the file  siunitx.dtx
 \AtBeginDocument {
   \@ifpackageloaded { cellspace }
       {
-        \newcolumntype { C } [1]
-          { > { \bcolumn #1 \@nil } #1 < { \ecolumn } }
-        \cs_set:Npn \@@_tmp:w #1 \NC@do S #2 \q_stop
-          { \NC@list { #1 #2 } }
-        \exp_after:wN \@@_tmp:w \tex_the:D \NC@list \q_stop
-        \cs_undefine:N \NC@find@S
-        \msg_new:nnn { siunitx } { moved-cellspace-column }
-          { Column~type~for~cellspace~package~moved~to~'#1'. }
-        \msg_warning:nnn { siunitx } { moved-cellspace-column } { C }
-        \ifcellspace@m
-          \def \env@matrix
-            {
-              \hskip -\arraycolsep
-              \let \@ifnextchar \new@ifnextchar
-              \array
+        \cs_if_exist:NT \NC@find@S
+          {
+            \newcolumntype { C } [1]
+              { > { \bcolumn #1 \@nil } #1 < { \ecolumn } }
+            \cs_set:Npn \@@_tmp:w #1 \NC@do S #2 \q_stop
+              { \NC@list { #1 #2 } }
+            \exp_after:wN \@@_tmp:w \tex_the:D \NC@list \q_stop
+            \cs_undefine:N \NC@find@S
+            \msg_new:nnn { siunitx } { moved-cellspace-column }
+              { Column~type~for~cellspace~package~moved~to~'#1'. }
+            \msg_warning:nnn { siunitx } { moved-cellspace-column } { C }
+            \ifcellspace@m
+              \def \env@matrix
                 {
-                  * { \c@MaxMatrixCols }
-                    { > { \bcolumn c \@nil $ } c < { $ \ecolumn } } @ { }
+                  \hskip -\arraycolsep
+                  \let \@ifnextchar \new@ifnextchar
+                  \array
+                    {
+                      * { \c@MaxMatrixCols }
+                        { > { \bcolumn c \@nil $ } c < { $ \ecolumn } } @ { }
+                    }
                 }
-            }
-        \fi
+            \fi
+         }
       }
       { }
 }
