@@ -137,7 +137,12 @@
         \use:x
           { \@@_arc_convert:n { \fp_eval:n {#1} } }
       }
-      { }
+      {
+        \group_begin:
+          \@@_arc:nnn {#1} { } { }
+        \exp_args:NNNV \group_end:
+        \tl_set:Nn #2 \l_@@_formatted_tl
+      }
   }
 \cs_new_protected:Npn \siunitx_angle:nnn #1#2#3
   {
@@ -146,7 +151,12 @@
         \exp_args:Nx \siunitx_angle:n
           { \fp_eval:n { #1 + 60 * #2 + 360 * #3 } }
       }
-      { }
+      {
+        \group_begin:
+          \@@_arc_fill:nnn {#1} {#2} {#3}
+        \exp_args:NNNV \group_end:
+        \tl_set:Nn #2 \l_@@_formatted_tl
+      }
   }
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
@@ -168,10 +178,34 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{}
+% \begin{macro}{\@@_arc_fill:nnn}
+% \begin{macro}[EXP]{\@@_arc_fill:nn}
+% \begin{macro}{\@@_arc:nnn}
 %    \begin{macrocode}
-
+\cs_new_protected:Npn \@@_arc_fill:nnn #1#2#3
+  {
+    \use:x
+      {
+        \@@_arc:nnn
+          { \@@_arc_fill:nn { degree } {#1} }
+          { \@@_arc_fill:nn { minute } {#2} }
+          { \@@_arc_fill:nn { second } {#3} }
+      }
+  }
+\cs_new:Npn \@@_arc_fill:nn #1#2
+  {
+    \bool_lazy_and:nnTF
+      { \use:c { l_@@_fill_ #1 _bool } }
+      { \tl_if_blank_p:n {#2} }
+      { 0 }
+      {#2}
+  }
+\cs_new_protected:Npn \@@_arc:nnn #1#2#3
+  {
+  }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 %    \begin{macrocode}
