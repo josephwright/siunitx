@@ -58,6 +58,9 @@
 %
 % \begin{documentation}
 %
+% \begin{variable}{\l_siunitx_parse_numbers_bool}
+% \end{variable}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -149,6 +152,17 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Top-level options}
+%
+% \begin{variable}{\l_siunitx_parse_numbers_bool}
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    parse-numbers .bool_set:N = \l_siunitx_parse_numbers_bool
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \subsection{User interfaces}
 %
 % The user interfaces are defined in terms of documented code-level ones.
@@ -160,6 +174,7 @@
 %    \begin{macrocode}
 \RequirePackage { xparse }
 %    \end{macrocode}
+%
 %
 % \subsubsection{Preamble commands}
 %
@@ -200,7 +215,9 @@
     \mode_leave_vertical:
     \group_begin:
       \keys_set:nn { siunitx } {#1}
-      \siunitx_number_format:nN {#2} \l_@@_tmp_tl
+      \bool_if:NTF \l_siunitx_parse_numbers_bool
+        { \siunitx_number_format:nN {#2} \l_@@_tmp_tl }
+        { \tl_set:Nn \l_@@_tmp_tl {#2} }
       \siunitx_print:nV { number } \l_@@_tmp_tl
       \, \nobreak % TEMP
       \siunitx_unit_format:nN {#3} \l_@@_tmp_tl
@@ -228,7 +245,9 @@
     \mode_leave_vertical:
     \group_begin:
       \keys_set:nn { siunitx } {#1}
-      \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
+      \bool_if:NTF \l_siunitx_parse_numbers_bool
+        { \siunitx_number_format:nN {#2} \l_@@_tmp_tl }
+        { \tl_set:Nn \l_@@_tmp_tl {#2} }
       \siunitx_print:nV { unit } \l_@@_tmp_tl
     \group_end:
   }
