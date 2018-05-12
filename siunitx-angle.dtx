@@ -115,13 +115,6 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_formatted_tl}
-%   For data return.
-%    \begin{macrocode}
-\tl_new:N \l_@@_formatted_tl
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{macro}{\siunitx_angle:n}
 % \begin{macro}{\siunitx_angle:nnn}
 % \begin{macro}{\@@_arc_convert:n}
@@ -137,12 +130,7 @@
         \use:x
           { \@@_arc_convert:n { \fp_eval:n {#1} } }
       }
-      {
-        \group_begin:
-          \@@_arc:nnn {#1} { } { }
-        \exp_args:NNNV \group_end:
-        \tl_set:Nn #2 \l_@@_formatted_tl
-      }
+      { \@@_arc:nnn {#1} { } { } }
   }
 \cs_new_protected:Npn \siunitx_angle:nnn #1#2#3
   {
@@ -151,12 +139,7 @@
         \exp_args:Nx \siunitx_angle:n
           { \fp_eval:n { #1 + 60 * #2 + 360 * #3 } }
       }
-      {
-        \group_begin:
-          \@@_arc_fill:nnn {#1} {#2} {#3}
-        \exp_args:NNNV \group_end:
-        \tl_set:Nn #2 \l_@@_formatted_tl
-      }
+      { \@@_arc_fill:nnn {#1} {#2} {#3} }
   }
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
