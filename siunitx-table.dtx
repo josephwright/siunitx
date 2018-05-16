@@ -100,8 +100,8 @@
 \cs_new_protected:Npn \siunitx_cell_begin:
   {
     \bool_if:NTF \l_@@_parse_bool
-      { \@@_collect_begin:N }
-      { \@@_direct_begin:N }
+      { \@@_collect_begin: }
+      { \@@_direct_begin: }
   }
 \cs_new_protected:Npn \siunitx_cell_end:
   {
@@ -119,21 +119,24 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_collect_begin:N}
+% \begin{macro}{\@@_collect_begin:}
+% \begin{macro}{\@@_collect_begin:w}
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
-%   therefore, we just collect up the unchanged tokens first. The |#1| collects
-%   the leading |\ignorespaces| from the template: that has to go to
-%   avoid issues with the peek-ahead code. The definition of
+%   therefore, we just collect up the unchanged tokens first. The definition of
 %   \cs{cr} is used to allow collection of any tokens
 %   inserted after the main content when dealing with the last cell of a row:
 %   the \enquote{group} around it is needed to avoid issues with the underlying
 %   |\halign|. (The approach is based on that in \pkg{collcell}.) Notice that
 %   as each cell forms a group there is no need to reset the definition of
-%   \cs{cr}.
+%   \cs{cr}. We use an auxiliary to fish out the |\ignorespaces| from the
+%   template: that has to go to avoid issues with the peek-ahead code
+%   (everything before the |#| needs to be read \emph{before} the Appendix~D
+%   trick gets applied). Some packages add additional tokens before the
+%   |\ignorespaces|, which are dealt with by the delimited argument.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_collect_begin:N #1
+\cs_new_protected:Npn \@@_collect_begin:
   {
     \tl_clear:N \l_@@_collect_tl
     \if_false: { \fi:
@@ -143,9 +146,12 @@
         \tex_cr:D
       }
     \if_false: } \fi:
-    \@@_collect_loop:
+    \@@_collect_begin:w
   }
+\cs_new_protected:Npn \@@_collect_begin:w #1 \ignorespaces
+  { \@@_collect_loop: #1 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_collect_loop:}
@@ -509,15 +515,20 @@
 %   \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@@_direct_begin:N}
 % \begin{macro}{\@@_direct_begin:}
+% \begin{macro}{\@@_direct_begin:w}
+% \begin{macro}{\@@_direct_begin_aux:}
 % \begin{macro}{\@@_direct_center:, \@@_direct_center_switch:}
 % \begin{macro}{\@@_direct_center_end:NN}
-%   After removing the |\ignorespaces| at the start of the cell, check to see
-%   if there is a |{| and branch as appropriate.
+%   After removing the |\ignorespaces| at the start of the cell (see comments
+%   for \cs{@@_collect_begin:N}), check to see  if there is a |{| and branch
+%   as appropriate.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_direct_begin:N #1
+\cs_new_protected:Npn \@@_direct_begin:
+  { \@@_direct_begin:w }
+\cs_new_protected:Npn \@@_direct_begin:w #1 \ignorespaces
   {
+    #1
     \peek_catcode_ignore_spaces:NTF \c_group_begin_token
       { \@@_print_text:n }
       {
@@ -525,7 +536,7 @@
         \@@_direct_begin:
       }
   }
-\cs_new_protected:Npn \@@_direct_begin:
+\cs_new_protected:Npn \@@_direct_begin_aux:
   {
     \bool_if:NTF ???
       { \@@_direct_center: }
@@ -595,6 +606,7 @@
   {
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
