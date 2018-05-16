@@ -172,6 +172,10 @@
 % \begin{macro}{\@@_arc_fill:nnn}
 % \begin{macro}[EXP]{\@@_arc_fill:nn}
 % \begin{macro}{\@@_arc:nnn}
+% \begin{macro}{\@@_arc_aux:nnn}
+% \begin{macro}[EXP]{\@@_arc_aux:n}
+%   Zero-filling of values gets us to a common code path irrespective of
+%   the input format.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_fill:nnn #1#2#3
   {
@@ -193,10 +197,80 @@
   }
 \cs_new_protected:Npn \@@_arc:nnn #1#2#3
   {
+    \bool_if:NTF \l_siunitx_parse_numbers_bool
+      { \@@_arc_parse:nnn }
+      { \@@_arc_aux:nnn }
+        {#1} {#2} {#3}
+  }
+\cs_new_protected:Npn \@@_arc_aux:nnn #1#2#3
+  {
+    \use:x
+      {
+        \@@_arc_print:nnn
+          { \@@_arc_aux:n {#1} }
+          { \@@_arc_aux:n {#2} }
+          { \@@_arc_aux:n {#3} }
+      }
+  }
+\cs_new:Npn \@@_arc_aux:n #1
+  {
+    \tl_if_blank:nF {#1}
+      { \exp_not:n { \ensuremath {#1} } }
   }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{variable}{\l_@@_degrees_tl, \l_@@_minutes_tl, \l_@@_seconds_tl}
+%   Space for formatting parsed numbers.
+%   \begin{macrocode}
+\tl_new:N \l_@@_degrees_tl
+\tl_new:N \l_@@_minutes_tl
+\tl_new:N \l_@@_seconds_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_arc_parse:nnn}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_arc_parse:nnn #1#2#3
+  {
+    \siunitx_number_format:nN {#1} \l_@@_degrees_tl
+    \siunitx_number_format:nN {#2} \l_@@_minutes_tl
+    \siunitx_number_format:nN {#3} \l_@@_seconds_tl
+  }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print_aux:nnn}
+%   The final stage of printing an angle is to put together the three parts:
+%   this works even for decimal angles as they will blank arguments for the
+%   other two parts.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_arc_print:nnn #1#2#3
+  {
+    \@@_arc_print_aux:nnn {#1} { \degree } {#2#3}
+    \@@_arc_print_aux:nnn {#2} { \arcminute } {#3}
+    \@@_arc_print_aux:nnn {#3} { \arcsecond } { }
+  }
+\cs_new_protected:Npn \@@_arc_print_aux:nnn #1#2#3
+  {
+    \tl_if_blank:nF {#1}
+      {
+        \siunitx_print:nn { number } {#1}
+        \nobreak
+        \l_@@_product_tl
+        \siunitx_print:nn { unit } {#2}
+        \tl_if_blank:nF {#3}
+          {
+            \nobreak
+            \l_@@_separator_tl
+          }
+      }
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 %    \begin{macrocode}
