@@ -674,6 +674,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7n}{2018/04/27}{Fix issue with symbolic input
 %   and digit grouping}
 % \changes{v2.7q}{2018/05/11}{Patch \pkg{cellspace} only if required}
+% \changes{v2.7r}{2018/05/16}{Fix issue in tabulars when REV\TeX{} is in use}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5227,7 +5228,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2018-05-11} {2.7q}
+\ProvidesExplPackage {siunitx} {2018-05-16} {2.7r}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -13533,6 +13534,7 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %
 %\begin{macro}{\@@_table_collect_begin:Nn}
+%\begin{macro}{\@@_table_collect_begin:Nw}
 %\begin{macro}{\@@_table_collect_begin_s:}
 %\begin{macro}{\@@_table_collect_begin_S:}
 % The collector starts by setting up local options, then clears and
@@ -13540,12 +13542,19 @@ This work consists of the file  siunitx.dtx
 % \texttt{S} column happens here as this ensures that it is not inside
 % a box, which will give the wrong result for \opt{detect-mode}. The
 % |\use_i:nn| removes the |\ignorespaces| from the cell preamble.
+% In the basic \LaTeXe{} template there is only an |\ignorespaces|
+% before the content, but to deal with any other material we use
+% a delimited approach. It's important to grab everything up to the
+% end of the template-before-|#| to allow the Appendix~D trick to work
+% inside the |peek| code.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_table_collect_begin:Nn #1#2
   {
     \keys_set:nn { siunitx } {#2}
-    \use_i:nn { \use:c { @@_table_collect_begin_ #1 : } }
+    \@@_table_collect_begin:Nw #1
   }
+\cs_new_protected:Npn \@@_table_collect_begin:Nw #1#2 \ignorespaces
+  { \use:c { @@_table_collect_begin_ #1 : } #2 }
 \cs_new_protected:Npn \@@_table_collect_begin_s: {
   \cs_set_eq:NN \@@_table_collect_token:N
     \@@_table_collect_token_s:N
@@ -13564,6 +13573,7 @@ This work consists of the file  siunitx.dtx
     { \@@_table_print_S_direct: }
 }
 %    \end{macrocode}
+%\end{macro}
 %\end{macro}
 %\end{macro}
 %\end{macro}
@@ -15173,7 +15183,7 @@ This work consists of the file  siunitx.dtx
 % \pkg{dcolumn} can be applied, which requires the decimal marker to
 % be made active in math mode.
 %
-% \begin{macro}{\@@_table_print_S_direct:N}
+% \begin{macro}{\@@_table_print_S_direct:}
 % \begin{macro}{\@@_table_print_S_direct_text:n}
 %   Test to see if the very first item
 %   in the cell is a |{|. If it is, then we use the same approach as for
