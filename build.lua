@@ -17,9 +17,9 @@ typesetfiles = {"*.tex"}
 
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
-  local iso = "%d%d%d%d%-%d%d%-%d%d"
+  local tagdate = string.gsub(tagdate, "%-", "/")
   return string.gsub(content,
-    "\n\\ProvidesExplPackage %{siunitx%} %{%d%d%d%d%-%d%d%-%d%d%} %{%d%.%d%w?%}\n",
+    "\n\\ProvidesExplPackage %{siunitx%} %{%d%d%d%d%/%d%d%/%d%d%} %{%d%.%d%w?%}\n",
     "\n\\ProvidesExplPackage {siunitx} {"
       .. tagdate .. "} {" .. string.gsub(tagname, "^v", "") .. "}\n")
 end
