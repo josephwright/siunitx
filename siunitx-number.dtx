@@ -563,7 +563,11 @@
 \cs_new_protected:Npn \@@_parse_exponent:
   {
     \tl_if_empty:NTF \l_@@_input_exponent_tl
-      { \tl_set:Nn \l_@@_exponent_tl { +0 } }
+      {
+        \tl_set:Nn \l_@@_exponent_tl { +0 }
+        \tl_if_empty:NF \l_@@_real_tl
+          { \@@_parse_loop: }
+      }
       {
         \tl_set:Nx \l_@@_tmp_tl
           { \tl_head:V \l_@@_input_exponent_tl }
