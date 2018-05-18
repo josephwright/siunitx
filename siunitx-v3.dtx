@@ -233,10 +233,18 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\num, \unit}
+% \begin{macro}{\ang, \num, \unit}
 %   All of a standard form: start a paragraph (if required), set local
 %   key values, do the formatting, print the result.
 %    \begin{macrocode}
+\NewDocumentCommand \ang { O { } > { \SplitArgument { 2 } { ; } } m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \@@_angle:nnn #2
+    \group_end:
+  }
 \NewDocumentCommand \num { O { } m }
   {
     \mode_leave_vertical:
@@ -265,6 +273,25 @@
 %    \begin{macrocode}
 \NewDocumentCommand \sisetup { m }
   { \keys_set:nn { siunitx } {#1} }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{\enquote{Glue} commands}
+%
+% \begin{macro}{\@@_angle:nnn}
+%   The document level interface for \cs{ang} needs some \enquote{glue} to
+%   work with the code-level API.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_angle:nnn #1#2#3
+  {
+    \tl_if_novalue:nTF {#2}
+      { \siunitx_angle:n {#1} }
+      {
+        \tl_if_novalue:nTF {#3}
+          { \siunitx_angle:nnn {#1} {#2} { } }
+          { \siunitx_angle:nnn {#1} {#2} {#3} }
+      }
+  }
 %    \end{macrocode}
 % \end{macro}
 %
