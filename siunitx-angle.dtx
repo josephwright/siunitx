@@ -243,17 +243,56 @@
 % \end{variable}
 %
 % \begin{macro}{\@@_arc_parse:nnn}
+% \begin{macro}{\@@_arc_parse_restict:, \@@_arc_parse_restict_signs:}
+%   When parsing arc values, only real numbers are allowed: that is easily
+%   accomplished by setting other input types to have no valid tokens. Only
+%   the first part of an arc given can have a sign or comparator: this is
+%   slightly more complex as it needs to be applied at the right time.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_parse:nnn #1#2#3
   {
-    \siunitx_number_format:nN {#1} \l_@@_degrees_tl
-    \siunitx_number_format:nN {#2} \l_@@_minutes_tl
-    \siunitx_number_format:nN {#3} \l_@@_seconds_tl
+    \group_begin:
+      \@@_arc_parse_restict:
+      \tl_if_blank:nF {#1}
+        {
+          \siunitx_number_format:nN {#1} \l_@@_degrees_tl
+          \@@_arc_parse_restict_signs:
+        }
+      \tl_if_blank:nF {#2}
+        {
+          \siunitx_number_format:nN {#2} \l_@@_minutes_tl
+          \tl_if_blank:nF {#1}
+            { \@@_arc_parse_restict_signs: }
+        }
+      \tl_if_blank:nF {#3}
+        { \siunitx_number_format:nN {#3} \l_@@_seconds_tl }
+      \@@_arc_print:VVV
+        \l_@@_degrees_tl
+        \l_@@_minutes_tl
+        \l_@@_seconds_tl
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_arc_parse_restict:
+  {
+    \keys_set:nn { siunitx }
+      {
+        input-close-uncertainty = ,
+        input-complex-roots     = ,
+        input-exponent-markers  = ,
+        input-open-uncertainty  = ,
+        input-uncertainty-signs =
+      }
+  }
+\cs_new_protected:Npn \@@_arc_parse_restict_signs:
+  {
+    \keys_set:nn { siunitx }
+      { input-comparators = , input-signs = }
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print_aux:nnn}
+% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print:VVV, \@@_arc_print_aux:nnn}
 %   The final stage of printing an angle is to put together the three parts:
 %   this works even for decimal angles as they will blank arguments for the
 %   other two parts.
@@ -264,6 +303,7 @@
     \@@_arc_print_aux:nnn {#2} { \arcminute } {#3}
     \@@_arc_print_aux:nnn {#3} { \arcsecond } { }
   }
+\cs_generate_variant:Nn \@@_arc_print:nnn { VVV }
 \cs_new_protected:Npn \@@_arc_print_aux:nnn #1#2#3
   {
     \tl_if_blank:nF {#1}
