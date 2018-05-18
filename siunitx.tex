@@ -223,6 +223,27 @@ Note that numbers are parsed before typesetting, which does have a performance
 overhead (only obvious with very large amounts of numerical input). The parser
 understands a range of input syntaxes, as demonstrated above.
 
+\subsection{Angles}
+
+\DescribeMacro{\ang}
+\begin{syntax}
+  \cs{ang}\oarg{options}\marg{angle}
+\end{syntax}
+Angles can be typeset using the \cs{ang} command. The \meta{angle} can be given
+either as a decimal number or as a semi-colon separated list of degrees,
+minutes and seconds, which is called \enquote{arc format} in this document. The
+numbers which make up an angle are processed using the same system as other
+numbers.
+\begin{LaTeXdemo}
+  \ang{10}    \\
+  \ang{12.3}  \\
+  \ang{4,5}   \\
+  \ang{1;2;3} \\
+  \ang{;;1}   \\
+  \ang{+10;;} \\
+  \ang{-0;1;}
+\end{LaTeXdemo}
+
 \subsection{Units}
 
 \DescribeMacro{\unit}
@@ -679,6 +700,97 @@ independently.
   \qty[color = blue]{4}{\kilogram} \\
   Still red here!
 \end{LaTeXdemo}
+
+\subsection{Angles}
+
+Angle processing provided by the \cs{ang} function has a set of options which
+apply in addition to the general ones set up for number processing.
+\begin{table}
+  \caption{Angle options.}
+  \label{tab:opt:ang}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule
+      angle-format              & Choice  & input        \\
+      angle-symbol-over-decimal & Switch  & false        \\
+      arc-separator             & Literal & \meta{empty} \\
+      fill-arc-degrees          & Switch  & false        \\
+      fill-arc-minutes          & Switch  & false        \\
+      fill-arc-seconds          & Switch  & false        \\
+      number-angle-product      & Literal & \meta{empty} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{angle-format}
+The format in which angles are printed can be set using the \opt{angle-format}
+option. With the standard setting (\opt{input}), the angle is printed as-given.
+By setting the option to \opt{arc} or \opt{decimal}, the output format can
+be set to an arc (degrees/minutes/seconds) or decimal value. Conversion uses
+the \LaTeX3 floating-point unit, so is limited to $16$ decimal places.
+\begin{LaTeXdemo}
+  \ang{2.67} \\
+  \ang{2;3;4} \\
+  \ang[angle-format = arc]{2.67} \\
+  \ang[angle-format = arc]{2;3;4} \\
+  \ang[angle-format = decimal]{2.67} \\
+  \ang[angle-format = decimal]{2;3;4} \\
+\end{LaTeXdemo}
+
+\DescribeOption{number-angle-product}
+The separator between the number and angle symbol (degrees, minutes or seconds)
+can be set using the \opt{number-angle-product} option, independent of the
+related \opt{number-unit-product} option used by the \cs{qty} command.
+\begin{LaTeXdemo}
+  \ang{2.67} \\
+  \ang[number-angle-product = \,]{2.67}
+\end{LaTeXdemo}
+
+\DescribeOption{arc-separator}
+When angles are printed in arc format, the separation of the different parts is
+set up using the \opt{arc-separator} option.
+\begin{LaTeXdemo}
+  \ang{6;7;6.5} \\
+  \ang[arc-separator = \,]{6;7;6.5}
+\end{LaTeXdemo}
+
+\DescribeOption{fill-arc-degree}
+\DescribeOption{fill-arc-minute}
+\DescribeOption{fill-arc-second}
+Zero-filling for the degree, minute or second parts of an arc is controlled
+using the \opt{fill-arc-degree}, \opt{fill-arc-minute} and
+\opt{fill-arc-second} options. All are off as standard.
+\begin{LaTeXdemo}
+  \ang{-1;;} \\
+  \ang{;-2;} \\
+  \ang{;;-3} \\
+  \sisetup{fill-arc-degrees}
+  \ang{-1;;} \\
+  \ang{;-2;} \\
+  \ang{;;-3} \\
+  \sisetup{fill-arc-minutes}
+  \ang{-1;;} \\
+  \ang{;-2;} \\
+  \ang{;;-3} \\
+  \sisetup{fill-arc-seconds}
+  \ang{-1;;} \\
+  \ang{;-2;} \\
+  \ang{;;-3}
+\end{LaTeXdemo}
+
+\DescribeOption{angle-symbol-over-decimal}
+In some subject areas, most notably astronomy, the angle symbols are given over
+the decimal marker, rather than at the end of the number. This behaviour is
+available using the \opt{angle-symbol-over-decimal} option.
+%\begin{LaTeXdemo}
+%  \ang{45.697}  \\
+%  \ang{6;7;6.5} \\
+%  \ang[angle-symbol-over-decimal]{45.697} \\
+%  \ang[angle-symbol-over-decimal]{6;7;6.5}
+%\end{LaTeXdemo}
 
 \section{Installation}
 
