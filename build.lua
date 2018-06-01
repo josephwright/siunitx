@@ -15,9 +15,6 @@ packtdszip = true
 -- Typeset only the .tex files
 typesetfiles = {"*.tex"}
 
--- Unpack using a Unicode engine
-unpackexe = "luatex"
-
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
   local tagdate = string.gsub(tagdate, "%-", "/")

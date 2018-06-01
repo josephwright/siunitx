@@ -2081,6 +2081,39 @@
 % \end{macro}
 % \end{macro}
 %
+% \subsection{Non-Latin character support}
+%
+% \begin{macro}{\@@_non_latin:n}
+% \begin{macro}{\@@_non_latin:nnnn}
+%   A small amount of code to make it convenient to include non-Latin
+%   characters in units without having to directly include them in the
+%   sources directly.
+%    \begin{macrocode}
+\bool_lazy_or:nnTF
+  { \sys_if_engine_luatex_p: }
+  { \sys_if_engine_xetex_p: }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      { \char_generate:nn {#1} { \char_value_catcode:n {#1} } }
+  }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      {
+        \exp_last_unbraced:Nf \@@_non_latin:nnnn
+          { \char_codepoint_to_bytes:n {#1} }
+      }
+    \cs_new:Npn \@@_non_latin:nnnn #1#2#3#4
+      {
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#1} { 13 }
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#2} { 13 }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Pre-defined unit components}
 %
 % Quite a number of units can be predefined: while this is a code-level module,
@@ -2141,7 +2174,8 @@
 \siunitx_declare_prefix:Nnn \femto { f } { -15 }
 \siunitx_declare_prefix:Nnn \pico  { p } { -12 }
 \siunitx_declare_prefix:Nnn \nano  { n } { -9 }
-\siunitx_declare_prefix:Nnn \micro { μ } { -6 }
+\exp_args:NNx \siunitx_declare_prefix:Nnn
+    \micro { \@@_non_latin:n { "03BC } } { -6 }
 \siunitx_declare_prefix:Nnn \milli { m } { -3 }
 \siunitx_declare_prefix:Nnn \centi { c } { -2 }
 \siunitx_declare_prefix:Nnn \deci  { d } { -1 }
@@ -2224,7 +2258,7 @@
 %    Named derived units: second half of alphabet.
 %    \begin{macrocode}
 \siunitx_declare_unit:Nn \newton    { N }
-\siunitx_declare_unit:Nn \ohm       { Ω }
+\siunitx_declare_unit:Nx \ohm       { \@@_non_latin:n { "03A9 } }
 \siunitx_declare_unit:Nn \pascal    { Pa }
 \siunitx_declare_unit:Nn \radian    { rad }
 \siunitx_declare_unit:Nn \siemens   { S }
@@ -2361,7 +2395,7 @@
 %   There are then some day-to-day units which are accepted for use
 %   with SI, but are not part of the official specification.
 %    \begin{macrocode}
-\siunitx_declare_unit:Nn \angstrom          { Å }
+\siunitx_declare_unit:Nx \angstrom          { \@@_non_latin:n { "00C5 } }
 \siunitx_declare_unit:Nn \bar               { bar }
 \siunitx_declare_unit:Nn \barn              { b }
 \siunitx_declare_unit:Nn \bel               { B }
