@@ -29,19 +29,24 @@ tlmgr install cm etex knuth-lib latex-bin lm luaotfload tex tex-ini-files \
   unicode-data xetex
 
 # Dependencies
-tlmgr install  \
-  amsfonts     \
-  amsmath      \
-  ec           \
-  graphics     \
-  graphics-cfg \
-  graphics-def \
-  mptopdf      \
-  oberdiek     \
-  l3kernel     \
-  l3packages   \
-  sansmath     \
-  tools
+tlmgr install   \
+  amsfonts      \
+  amsmath       \
+  ec            \
+  etoolbox      \
+  filehook      \
+  graphics      \
+  graphics-cfg  \
+  graphics-def  \
+  mptopdf       \
+  oberdiek      \
+  l3kernel      \
+  l3packages    \
+  lm-math       \
+  lualatex-math \
+  sansmath      \
+  tools         \
+  unicode-math
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
