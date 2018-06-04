@@ -1,0 +1,39 @@
+\input{regression-test}
+
+\RequirePackage{expl3}
+
+\RequirePackage{siunitx}
+
+\documentclass{article}
+
+\ExplSyntaxOn
+\OMIT
+\cs_set_protected:Npn \testunit #1
+  {
+    \hbox_set:Nn \l_tmpa_box { \unit {#1} }
+    \box_use:N \l_tmpa_box
+    \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
+    \box_use:N \l_tmpa_box
+    \group_begin:
+      \keys_set:nn { siunitx } { mode = text }
+      \hbox_set:Nn \l_tmpa_box { \unit {#1} }
+      \box_use:N \l_tmpa_box
+      \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
+      \box_use:N \l_tmpa_box
+    \group_end:
+  }
+\TIMO
+\ExplSyntaxOff
+
+\usepackage{unicode-math}
+
+\begin{document}
+
+\START
+
+\TEST { Typesetting~micro }
+  {
+    \testunit { \micro \metre } 
+  }
+
+\end{document}
