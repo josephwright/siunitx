@@ -2,6 +2,10 @@
 
 \RequirePackage{expl3}
 
+\ExplSyntaxOn
+\sys_if_engine_pdftex:T { \tex_endinput:D }
+\ExplSyntaxOff
+
 \RequirePackage{siunitx}
 
 \documentclass{article}
@@ -11,15 +15,15 @@
 \cs_set_protected:Npn \testunit #1
   {
     \hbox_set:Nn \l_tmpa_box { \unit {#1} }
-    \box_use:N \l_tmpa_box
+    \box_show:N \l_tmpa_box
     \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
-    \box_use:N \l_tmpa_box
+    \box_show:N \l_tmpa_box
     \group_begin:
       \keys_set:nn { siunitx } { mode = text }
       \hbox_set:Nn \l_tmpa_box { \unit {#1} }
-      \box_use:N \l_tmpa_box
+      \box_show:N \l_tmpa_box
       \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
-      \box_use:N \l_tmpa_box
+      \box_show:N \l_tmpa_box
     \group_end:
   }
 \TIMO
