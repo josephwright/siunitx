@@ -75,6 +75,136 @@
 %<@@=siunitx_font>
 %    \end{macrocode}
 %
+% \begin{macro}{\@@_textmu:}
+%   Some of the \texttt{TS1} encoding is needed to provide symbols in
+%   text mode for 8-bit engines. If the user has not loaded the encoding
+%   themselves, it is done here before creating the required commands.
+%    \begin{macrocode}
+\bool_lazy_or:nnF
+  { \sys_if_engine_luatex_p: }
+  { \sys_if_engine_xetex_p: }
+  {
+    \AtBeginDocument
+      {
+        \cs_if_free:cT { T@TS1 }
+          {
+            \DeclareFontEncoding { TS1 } { } { }
+            \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
+          }
+        \cs_if_free:NTF \textmu
+          {
+            \DeclareTextSymbolDefault \@@_textmu: { TS1 }
+            \DeclareTextSymbol \@@_textmu: { TS1 } { "00B5 }
+          }
+          { \cs_new_eq:NN \@@_textmu: \textmu }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}{\l_@@_tmpa_tl}
+%   Scratch space.
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmpa_tl
+\tl_new:N \l_@@_tmpb_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_non_latin:n}
+% \begin{macro}{\@@_non_latin:nnnn}
+%   As in \pkg{siunutx-unit}, but internal in both cases as it's rather
+%   specialised.
+%    \begin{macrocode}
+\bool_lazy_or:nnTF
+  { \sys_if_engine_luatex_p: }
+  { \sys_if_engine_xetex_p: }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      { \char_generate:nn {#1} { \char_value_catcode:n {#1} } }
+  }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      {
+        \exp_last_unbraced:Nf \@@_non_latin:nnnn
+          { \char_codepoint_to_bytes:n {#1} }
+      }
+    \cs_new:Npn \@@_non_latin:nnnn #1#2#3#4
+      {
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#1} { 13 }
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#2} { 13 }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_if_replace_unitdef:NnT}
+%   A test to see if the unit definition which applies is still one we expect:
+%   here that means it is just using a (Unicode) codepoint. The comparison
+%   is string-based as \pkg{unicode-math} (at least) can alter some of them.
+%    \begin{macrocode}
+\prg_new_protected_conditional:Npnn \@@_if_replace_unitdef:Nn #1#2 { T , TF }
+  {
+    \group_begin:
+      \tl_set:Nx \l_@@_tmpa_tl { \@@_non_latin:n {#2} }
+      \protected@edef \l_@@_tmpa_tl
+        { \exp_not:N \mathrm { \l_@@_tmpa_tl } }
+      \keys_set:nn { siunitx } { parse-units = false }
+      \siunitx_unit_format:nN {#1} \l_@@_tmpb_tl
+      \str_if_eq_x:nnTF
+        { \tl_to_str:N \l_@@_tmpa_tl }
+        { \tl_to_str:N \l_@@_tmpb_tl }
+        {
+          \group_end:
+          \prg_return_true:
+        }
+        {
+          \group_end:
+          \prg_return_false:
+        }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[EXP]{\@@_text_only:n}
+%   A short auxiliary to set up text-only symbols.
+%    \begin{macrocode}
+\cs_new:Npn \@@_text_only:n #1
+  {
+    \exp_not:N \ifmmode
+      \exp_not:N \expandafter \exp_not:N \mbox
+    \exp_not:N \else
+      \exp_not:N \expandafter \exp_not:N \@firstofone
+    \exp_not:N \fi
+      {#1}
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% At the start of the document, fonts are fixed and the user may have
+% altered unit set up. If things are unchanged, we can alter the settings
+% such that they use something \enquote{more sensible}.
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \@@_if_replace_unitdef:NnT \micro { "03BC }
+      {
+        \exp_args:NNnx \siunitx_declare_prefix:Nnn \micro { -6 }
+          {
+            \@@_text_only:n
+              {
+                \bool_lazy_or:nnTF
+                  { \sys_if_engine_luatex_p: }
+                  { \sys_if_engine_xetex_p: }
+                  { \char "00B5 \relax }
+                  { \exp_not:N \@@_textmu: }
+              }
+          }
+      }
+  }
+%    \end{macrocode}
 %
 %    \begin{macrocode}
 %</package>
