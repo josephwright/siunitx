@@ -46,7 +46,8 @@ tlmgr install   \
   lualatex-math \
   sansmath      \
   tools         \
-  unicode-math
+  unicode-math  \
+  was
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
