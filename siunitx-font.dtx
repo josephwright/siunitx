@@ -189,6 +189,23 @@
 %    \begin{macrocode}
 \AtBeginDocument
   {
+    \@@_if_replace_unitdef:NnT \ohm { "03A9 }
+      {
+        \siunitx_declare_unit:Nx \ohm
+          {
+            \bool_lazy_or:nnTF
+              { \sys_if_engine_luatex_p: }
+              { \sys_if_engine_xetex_p: }
+              {
+                \@@_text_only:n
+                  {
+                    \char_generate:nn { "03A9 }
+                      { \char_value_catcode:n { "03A9 } }
+                  }
+              }
+              { \exp_not:N \ensuremath { \exp_not:N \Omega } }
+         }
+      }
     \@@_if_replace_unitdef:NnT \micro { "03BC }
       {
         \exp_args:NNnx \siunitx_declare_prefix:Nnn \micro { -6 }
