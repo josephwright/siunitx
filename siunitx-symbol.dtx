@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-font.dtx Copyright (C) 2018 Joseph Wright
+% File: siunitx-symbol.dtx Copyright (C) 2018 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -62,7 +62,7 @@
 %
 % \begin{implementation}
 %
-% \section{\pkg{siunitx-angle} implementation}
+% \section{\pkg{siunitx-symbol} implementation}
 %
 % Start the \pkg{DocStrip} guards.
 %    \begin{macrocode}
@@ -72,7 +72,7 @@
 % Identify the internal prefix (\LaTeX3 \pkg{DocStrip} convention): only
 % internal material in this \emph{submodule} should be used directly.
 %    \begin{macrocode}
-%<@@=siunitx_font>
+%<@@=siunitx_symbol>
 %    \end{macrocode}
 %
 % \begin{macro}{\@@_textmu:}
@@ -140,12 +140,12 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_if_replace_unitdef:NnT}
+% \begin{macro}{\@@_if_replace:NnT}
 %   A test to see if the unit definition which applies is still one we expect:
 %   here that means it is just using a (Unicode) codepoint. The comparison
 %   is string-based as \pkg{unicode-math} (at least) can alter some of them.
 %    \begin{macrocode}
-\prg_new_protected_conditional:Npnn \@@_if_replace_unitdef:Nn #1#2 { T , TF }
+\prg_new_protected_conditional:Npnn \@@_if_replace:Nn #1#2 { T , TF }
   {
     \group_begin:
       \tl_set:Nx \l_@@_tmpa_tl { \@@_non_latin:n {#2} }
@@ -189,7 +189,7 @@
 %    \begin{macrocode}
 \AtBeginDocument
   {
-    \@@_if_replace_unitdef:NnT \ohm { "03A9 }
+    \@@_if_replace:NnT \ohm { "03A9 }
       {
         \siunitx_declare_unit:Nx \ohm
           {
@@ -206,7 +206,7 @@
               { \exp_not:N \ensuremath { \exp_not:N \Omega } }
          }
       }
-    \@@_if_replace_unitdef:NnT \micro { "03BC }
+    \@@_if_replace:NnT \micro { "03BC }
       {
         \exp_args:NNnx \siunitx_declare_prefix:Nnn \micro { -6 }
           {
