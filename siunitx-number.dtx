@@ -213,8 +213,8 @@
 %      \l_@@_input_uncert_open_tl  ,
 %      \l_@@_input_sign_tl         ,
 %      \l_@@_input_uncert_sign_tl  ,
-%      \l_@@_decimal_digits_int    ,
-%      \l_@@_integer_digits_int
+%      \l_@@_min_decimal_int       ,
+%      \l_@@_min_integer_int
 %   }
 %  \begin{macro}[EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
@@ -223,7 +223,7 @@
   {
     evaluate-expression .bool_set:N =
       \l_@@_expression_bool ,
-    expression .code:n     =
+    expression .code:n =
       \cs_set:Npn \@@_expression:n ##1 {#1} ,
     input-close-uncertainty .tl_set:N =
       \l_@@_input_uncert_close_tl ,
@@ -241,7 +241,7 @@
       \l_@@_input_ignore_tl ,
     input-open-uncertainty .tl_set:N =
       \l_@@_input_uncert_open_tl  ,
-    input-signs .tl_set:N   =
+    input-signs .tl_set:N =
       \l_@@_input_sign_tl ,
     input-uncertainty-signs .code:n =
       {
@@ -253,9 +253,9 @@
           }
       },
     minimum-decimal-digits .int_set:N =
-      \l_@@_decimal_digits_int ,
+      \l_@@_min_decimal_int ,
     minimum-integer-digits .int_set:N =
-      \l_@@_integer_digits_int
+      \l_@@_min_integer_int
   }
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
@@ -373,8 +373,8 @@
               { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
           }
           {
-             \tl_if_blank_p:f
-               { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
+            \tl_if_blank_p:f
+              { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
           }
           {
             \tl_set:Nx \l_@@_tmp_tl
