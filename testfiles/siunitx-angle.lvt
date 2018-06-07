@@ -1,0 +1,90 @@
+\input{regression-test}
+
+\RequirePackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx}
+
+\begin{document}
+
+\START
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      { \siunitx_angle:n {#1} }
+    \box_show:N \l_tmpa_box
+  }
+\cs_set_protected:Npn \test:nnn #1#2#3
+  {
+    \hbox_set:Nn \l_tmpa_box
+      { \siunitx_angle:nnn {#1} {#2} {#3} }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Basic~formatting:~decimals }
+  {
+    \test:n { 1 }
+    \test:n { 0.123 }
+    \test:n { 1.23 }
+    \test:n { 1 }
+    \test:n { .2 }
+  }
+
+\TEST { Basic~formatting:~arcs }
+  {
+    \test:nnn { 1 } { } { }
+    \test:nnn { 1 } { 2 } { }
+    \test:nnn { 1 } { 2 } { 3 }
+    \test:nnn { 1 } { } { 3 }
+    \test:nnn { } { 2 } { }
+    \test:nnn { } { 2 } { 3 }
+    \test:nnn { } { } { 3 }
+    \test:nnn { } { } { 0.234 }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"angle-format" }
+  {
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { angle-format = arc }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { angle-format = decimal }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { angle-format = input }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+  }
+
+\TEST { Option~setting~"arc-separator" }
+  {
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { arc-separator = \, }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+  }
+
+\TEST { Option~setting~"number-angle-product" }
+  {
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { number-angle-product = \, }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+  }
+
+\END
