@@ -212,9 +212,7 @@
 %      \l_@@_input_ignore_tl       ,
 %      \l_@@_input_uncert_open_tl  ,
 %      \l_@@_input_sign_tl         ,
-%      \l_@@_input_uncert_sign_tl  ,
-%      \l_@@_min_decimal_int       ,
-%      \l_@@_min_integer_int
+%      \l_@@_input_uncert_sign_tl
 %   }
 %  \begin{macro}[EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
@@ -251,11 +249,7 @@
             \tl_if_in:NnF \l_@@_input_sign_tl {##1}
               { \tl_put_right:Nn \l_@@_input_sign_tl {##1} }
           }
-      },
-    minimum-decimal-digits .int_set:N =
-      \l_@@_min_decimal_int ,
-    minimum-integer-digits .int_set:N =
-      \l_@@_min_integer_int
+      }
   }
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
@@ -1175,6 +1169,8 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_min_decimal_int     ,
+%     \l_@@_min_integer_int     ,
 %     \l_@@_round_half_up_bool  ,
 %     \l_@@_round_min_tl        ,
 %     \l_@@_round_mode_tl       ,
@@ -1183,6 +1179,10 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    minimum-decimal-digits .int_set:N =
+      \l_@@_min_decimal_int ,
+    minimum-integer-digits .int_set:N =
+      \l_@@_min_integer_int ,
     round-half .choice: ,
     round-half / even .code:n =
       { \bool_set_false:N \l_@@_round_half_up_bool } ,
