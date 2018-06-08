@@ -1443,6 +1443,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\c_@@_zero_tl, \c_@@_zero_decimal_tl}
+%   The two possible forms for zero.
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_zero_tl { { } + { 0 } { } { } + { 0 } }
+\tl_const:Nn \c_@@_zero_decimal_tl { { } + { 0 } { 0 } { } + { 0 } }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_process:}
 % \begin{macro}{\@@_process:N}
 %   A top-level interface for the processing tools.
@@ -1456,8 +1464,19 @@
   {
     \tl_if_empty:NF #1
       {
-        \@@_round:N #1
-        \@@_digits:N #1
+        \bool_lazy_or:nnF
+          { \tl_if_eq_p:NN #1 \c_@@_zero_tl }
+          { \tl_if_eq_p:NN #1 \c_@@_zero_decimal_tl }
+          {
+            \@@_exponent:N #1
+            \@@_round:N #1
+            \@@_digits:N #1
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
       }
   }
 %    \end{macrocode}
