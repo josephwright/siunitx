@@ -117,6 +117,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{exponent-mode}
+%   \begin{syntax}
+%     |exponent-mode| = \meta{choice}
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{exponent-product}
 %   \begin{syntax}
 %     |exponent-product| = \meta{symbol}
@@ -126,6 +132,12 @@
 % \begin{function}{expression}
 %   \begin{syntax}
 %     |expression| = \meta{expression}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{fixed-exponent}
+%   \begin{syntax}
+%     |fixed-exponent| = \meta{exponent}
 %   \end{syntax}
 % \end{function}
 %
@@ -1391,6 +1403,8 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_exponent_mode_tl    ,
+%     \l_@@_exponent_fixed_int  ,
 %     \l_@@_min_decimal_int     ,
 %     \l_@@_min_integer_int     ,
 %     \l_@@_round_half_up_bool  ,
@@ -1401,6 +1415,11 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    exponent-mode .choices:nn =
+      { engineering , fixed , input , none , scientific }
+      { \tl_set_eq:NN \l_@@_exponent_mode_tl \l_keys_choice_tl } ,
+    fixed-exponent .int_set:N =
+      \l_@@_exponent_fixed_int ,
     minimum-decimal-digits .int_set:N =
       \l_@@_min_decimal_int ,
     minimum-integer-digits .int_set:N =
@@ -2095,8 +2114,10 @@
     evaluate-expression      = false                                  ,
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
+    exponent-mode            = input                                  ,
     exponent-product         = \times                                 ,
     expression               = #1                                     ,
+    fixed-exponent           = 0                                      ,
     group-digits             = all                                    ,
     group-minimum-digits     = 4                                      ,
     group-separator          = \,                                     , % (
