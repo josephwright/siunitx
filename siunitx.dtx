@@ -687,6 +687,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7q}{2018/05/11}{Fixed patching of \pkg{cellspace} columns}
 % \changes{v2.7r}{2018/05/16}{Fixed issue in tabulars when REV\TeX{} is in use}
 % \changes{v2.7s}{2018/05/17}{Modified package date format}
+% \changes{v2.7t}{2018/06/08}{Fix inclusion of sign in astronomy-style
+%   angles}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -11145,9 +11147,15 @@ This work consists of the file  siunitx.dtx
     { \@@_number_output_single: }
 }
 \cs_new_protected:Npn \@@_angle_print_astronomy_aux: {
-  \prop_get:NnNT \l_@@_number_out_prop { mantissa-integer }
+  \prop_get:NnNF \l_@@_number_out_prop { mantissa-sign }
     \l_@@_tmpa_tl
-    { \@@_print:nV { number } \l_@@_tmpa_tl }
+    { \tl_clear:N \l_@@_tmpa_tl }
+  \prop_get:NnNT \l_@@_number_out_prop { mantissa-integer }
+    \l_@@_tmpb_tl
+    {
+      \tl_put_right:NV \l_@@_tmpa_tl \l_@@_tmpb_tl
+      \@@_print:nV { number } \l_@@_tmpa_tl
+    }
   \hbox_set:Nn \l_@@_angle_marker_box
     {
       \@@_print:nn { number } { { \l_@@_output_decimal_tl } }
