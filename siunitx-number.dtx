@@ -158,6 +158,7 @@
   {
     \group_begin:
       \@@_parse:n {#1}
+      \@@_process:
       \@@_format:
     \exp_args:NNNV \group_end:
     \tl_set:Nn #2 \l_@@_formatted_tl
@@ -1207,32 +1208,42 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_round:}
-% \begin{macro}{\@@_round:N}
-% \begin{macro}{\@@_round_none:nNnnnNn}
+% \begin{macro}{\@@_process:}
+% \begin{macro}{\@@_process:N}
+%   A top-level interface for the processing tools.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_round:
+\cs_new_protected:Npn \@@_process:
   {
-    \@@_round:N \l_@@_real_tl
-    \@@_round:N \l_@@_imaginary_tl
+    \@@_process:N \l_@@_real_tl
+    \@@_process:N \l_@@_imaginary_tl
   }
-\cs_new_protected:Npn \@@_round:N #1
+\cs_new_protected:Npn \@@_process:N #1
   {
     \tl_if_empty:NF #1
       {
-        \tl_set:Nx #1
-          {
-            \cs:w
-              @@_round_ \l_@@_round_mode_tl :nNnnnNn
-              \exp_after:wN
-            \cs_end: #1
-          }
+        \@@_round:N #1
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_round:N}
+% \begin{macro}{\@@_round_none:nNnnnNn}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_round:N #1
+  {
+    \tl_set:Nx #1
+      {
+        \cs:w
+          @@_round_ \l_@@_round_mode_tl :nNnnnNn
+          \exp_after:wN
+        \cs_end: #1
       }
   }
 \cs_new:Npn \@@_round_none:nNnnnNn #1#2#3#4#5#6#7
   { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
