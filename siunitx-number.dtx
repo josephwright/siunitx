@@ -1486,6 +1486,7 @@
 %     \@@_exponent_input:nNnnnNn       ,
 %     \@@_exponent_scientific:nNnnnNn
 %   }
+% \begin{macro}[EXP]{\@@_exponent_scientific:nnnw}
 % \begin{macro}[EXP]{\@@_exponent_shift:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnnw}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnn}
@@ -1511,12 +1512,46 @@
     \@@_exponent_shift:nnn
       { \l_@@_exponent_fixed_int - (#6#7) } {#3} {#4}
     \exp_not:n { {#5} }
-    \exp_not:N #6 { \exp_not:V \l_@@_exponent_fixed_int }
+    \exp_not:N #6 { \int_use:N \l_@@_exponent_fixed_int }
   }
 \cs_new:Npn \@@_exponent_input:nNnnnNn #1#2#3#4#5#6#7
   { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
+%    \end{macrocode}
+%   To convert to scientific notation, the key question is to find the number
+%   of significant places. That is easy enough if the number has a non-zero
+%   integer component. For a pure decimal, we have to trim off leading
+%   zeros in a loop.
+%    \begin{macrocode}
 \cs_new:Npn \@@_exponent_scientific:nNnnnNn #1#2#3#4#5#6#7
-  { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
+  {
+    \exp_not:n { {#1} #2 }
+    \int_compare:nNnTF { \tl_count:n {#3} } = 1
+      {
+        \str_if_eq:nnTF {#3} { 0 }
+          {
+            \@@_exponent_scientific:nnnw
+              { 0 } {#5} { #6#7 } #4 \q_stop
+          }
+          { \exp_not:n { {#3} {#4} {#5} #6 {#7} } }
+      }
+      {
+        \@@_exponent_shift:nnn { \tl_count:n {#3} - 1 } {#3} {#4}
+        \exp_not:n { {#5} }
+        \@@_exponent_finalise:n { \tl_count:n {#3} + #6#7 - 1 }
+      }
+  }
+\cs_new:Npn \@@_exponent_scientific:nnnw #1#2#3#4#5 \q_stop
+  {
+    \str_if_eq:nnTF {#4} { 0 }
+      {
+        \@@_exponent_scientific:nnnw
+          { #1 - 1 } {#2} {#3} #5 \q_stop
+      }
+      {
+        \exp_not:n { {#4} {#5} {#2} }
+        \@@_exponent_finalise:n { #1 + #3 - 1 }
+      }
+  }
 %    \end{macrocode}
 %   When adjusting the exponent position, there are two paths depending on
 %   which way the shift takes place.
@@ -1574,6 +1609,17 @@
 \cs_new:Npn \@@_exponent_shift_up:nnw #1 #2#3#4 \q_stop
   { \@@_exponent_shift_up:nnn { #1 + 1 } { #2 #3 } {#4} }
 %    \end{macrocode}
+%   Tidy up the exponent to put the sign in the right place.
+%    \begin{macrocode}
+\cs_new:Npn \@@_exponent_finalise:n #1
+  {
+    \int_compare:nNnTF {#1} > 0
+      { + }
+      { - }
+      { \int_abs:n {#1} }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
