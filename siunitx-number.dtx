@@ -1493,6 +1493,20 @@
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nw}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnw}
+% \begin{macro}[EXP]{\@@_exponent_finaliise:n}
+% \begin{macro}[EXP]{\@@_exponent_engineering_aux:nNnnnNn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_exponent_engineering_0:nnnn ,
+%     \@@_exponent_engineering_1:nnnn ,
+%     \@@_exponent_engineering_2:nnnn
+%   }
+%  \begin{macro}[EXP]{\@@_exponent_engineering:nNw}
+%   Manipulating an exponent is done using a single expansion function
+%   \emph{unless} dealing with engineering-style output. The latter is easier
+%   to handle by first converting to scientific output, then post-processing.
+%   (Once \texttt{e}-type expansion is generally available, this will be
+%   handling using a single \cs{tl_set:Nx}.)
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_exponent:N #1
   {
@@ -1503,9 +1517,12 @@
           \exp_after:wN
         \cs_end: #1
       }
+    \str_if_eq:VnT \l_@@_exponent_mode_tl { engineering }
+      {
+        \tl_set:Nx #1
+         { \exp_after:wN \@@_exponent_engineering_aux:nNnnnNn #1 }
+      }
   }
-\cs_new:Npn \@@_exponent_engineering:nNnnnNn #1#2#3#4#5#6#7
-  { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
 \cs_new:Npn \@@_exponent_fixed:nNnnnNn #1#2#3#4#5#6#7
   {
     \exp_not:n { {#1} #2 }
@@ -1540,6 +1557,8 @@
         \@@_exponent_finalise:n { \tl_count:n {#3} + #6#7 - 1 }
       }
   }
+\cs_new_eq:NN \@@_exponent_engineering:nNnnnNn
+  \@@_exponent_scientific:nNnnnNn
 \cs_new:Npn \@@_exponent_scientific:nnnw #1#2#3#4#5 \q_stop
   {
     \str_if_eq:nnTF {#4} { 0 }
@@ -1619,6 +1638,70 @@
       { \int_abs:n {#1} }
   }
 %    \end{macrocode}
+%   This could (and eventually will) be combined with the main function above:
+%   that will need \texttt{e}-type expansion. The input has already been
+%   normalised such that the integer part is in the range $1 \le n < 10$.
+%   Thus there are only three cases to deal with, depending on the required
+%   adjustment to the exponent.
+%    \begin{macrocode}
+\cs_new:Npn \@@_exponent_engineering_aux:nNnnnNn #1#2#3#4#5#6#7
+  {
+    \exp_not:n { {#1} #2 }
+    \use:c
+      {
+        @@_exponent_engineering_
+	     \int_compare:nNnTF {#6#7} < { 0 }
+	       {
+	         \int_case:nnF { \int_mod:nn { #7 } { 3 } }
+	           {
+	             { 1 } { 2 }
+	             { 2 } { 1 }
+	           }
+	           { 0 }
+	       }
+	       { \int_mod:nn {#7} { 3 } }
+	       :nnnn
+      }
+        {#3} {#4} {#5} {#6#7}
+  }
+\cs_new:cpn { @@_exponent_engineering_0:nnnn } #1#2#3#4
+  {
+    \exp_not:n { {#1} {#2} {#3} }
+    \@@_exponent_finalise:n {#4}
+  }
+\cs_new:cpn { @@_exponent_engineering_1:nnnn } #1#2#3#4
+  {
+    \tl_if_blank:nTF {#2}
+      { { \exp_not:n { #1 0 } } { } }
+      {
+        { \exp_not:n {#1} \exp_not:o { \tl_head:w #2 \q_stop } }
+        { \exp_not:f { \tl_tail:n {#2} } }
+      }
+    \exp_not:n { {#3} }
+    \@@_exponent_finalise:n { #4 - 1 }
+  }
+\cs_new:cpn { @@_exponent_engineering_2:nnnn } #1#2#3#4
+  {
+    \tl_if_blank:nTF {#2}
+      { { \exp_not:n { #1 00 } } { } }
+      { \@@_exponent_engineering:nNw {#1} #2 \q_stop }
+    \exp_not:n { {#3} }
+    \@@_exponent_finalise:n { #4 - 2 }
+  }
+\cs_new:Npn \@@_exponent_engineering:nNw #1#2#3 \q_stop
+  {
+    \tl_if_blank:nTF {#3}
+      { { \exp_not:n { #1#2 0 } } { } }
+      {
+        { \exp_not:n {#1#2} \exp_not:o { \tl_head:w #3 \q_stop } }
+        { \exp_not:f { \tl_tail:n {#3} } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
