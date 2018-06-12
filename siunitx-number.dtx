@@ -1403,13 +1403,13 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_exponent_mode_tl    ,
-%     \l_@@_exponent_fixed_int  ,
-%     \l_@@_min_decimal_int     ,
-%     \l_@@_min_integer_int     ,
-%     \l_@@_round_half_up_bool  ,
-%     \l_@@_round_min_tl        ,
-%     \l_@@_round_mode_tl       ,
+%     \l_@@_exponent_mode_tl     ,
+%     \l_@@_exponent_fixed_int   ,
+%     \l_@@_min_decimal_int      ,
+%     \l_@@_min_integer_int      ,
+%     \l_@@_round_half_even_bool ,
+%     \l_@@_round_min_tl         ,
+%     \l_@@_round_mode_tl        ,
 %     \l_@@_round_precision_int
 %   }
 %    \begin{macrocode}
@@ -1426,9 +1426,9 @@
       \l_@@_min_integer_int ,
     round-half .choice: ,
     round-half / even .code:n =
-      { \bool_set_false:N \l_@@_round_half_up_bool } ,
+      { \bool_set_true:N \l_@@_round_half_even_bool } ,
     round-half / up .code:n =
-      { \bool_set_true:N \l_@@_round_half_up_bool } ,
+      { \bool_set_false:N \l_@@_round_half_even_bool } ,
     round-minimum .tl_set:N =
       \l_@@_round_min_tl ,
     round-mode .choices:nn =
@@ -1767,19 +1767,319 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}[EXP]{\@@_round_if_half_p:n}
+% \begin{macro}[EXP]{\@@_round_if_half:N}
+%   A simple test for a valuing being exactly half: we can only test
+%   digit-by-digit as there is no limit on the size of the value given.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \@@_round_if_half:n #1 { p }
+  {
+    \int_compare:nNnTF { \tl_head:n { #1 0 } } = 5
+      {
+        \exp_after:wN \@@_round_if_half:N \use_none:n #1 0
+          \q_recursion_tail \q_recursion_stop
+      }
+      { \prg_return_false: }
+  }
+\cs_new:Npn \@@_round_if_half:N #1
+  {
+    \quark_if_recursion_tail_stop_do:Nn #1
+      { \prg_return_true: }
+    \int_compare:nNnTF {#1} = 0
+      { \@@_round_if_half:N }
+      { \use_i_delimit_by_q_recursion_stop:nw { \prg_return_false: } }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}[EXP]{\@@_round_figures:nNnnnNn}
+% \begin{macro}[EXP]{\@@_round_figures_count:nnN}
+% \begin{macro}[EXP]{\@@_round_figures_count:nnnN}
+% \begin{macro}[EXP]{\@@_round_figures_pad:nnn}
+% \begin{macro}[EXP]{\@@_round_figures:nnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_figures_auxi:nnnN  ,
+%     \@@_round_figures_auxii:nnnN ,
+%     \@@_round_figures_auxiii:nnnN
+%   }
+%  \begin{macro}[EXP]{\@@_round_figures_auxiv:nnN, \@@_round_figures_auxv:nnN}
+%  \begin{macro}[EXP]{\@@_round_figures_auxvi:nN}
+%  \begin{macro}[EXP]
+%    {\@@_round_figures_auxvii:nnN, \@@_round_figures_auxviii:nnN}
+%  \begin{macro}[EXP]
+%    {\@@_round_figures_final_integer:nnw, \@@_round_figures_final_decimal:nnw}
+%  \begin{macro}[EXP]{\@@_round_figures_final:nn, \@@_round_figures_final:fn}
+%  \begin{macro}[EXP]{\@@_round_figures_truncate:n}
+%  \begin{macro}[EXP]{\@@_round_figures_truncate:nnN}
+%   Rounding to a fixed number of significant figures starts by checking that
+%   there is no uncertainty, and that the number of figures requested is
+%   positive: if not, the result is always fixed at zero.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_figures:nNnnnNn #1#2#3#4#5#6#7
   {
     \tl_if_blank:nTF {#5}
       {
         \int_compare:nNnTF \l_@@_round_precision_int > 0
-          { }
+          {
+            \exp_not:n { {#1} #2 }
+            \@@_round_figures_count:nnN {#3} {#4} #3#4
+              \q_recursion_tail \q_recursion_stop
+            \exp_not:n { { } #6 {#7} }
+          }
           { { } + { 0 } { } { } + { 0 } }
       }
       { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
   }
 %    \end{macrocode}
+%   The first real step is to count up the number of significant figures.
+%   The only tricky issue here is dealing with leading zeros.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_count:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      { { } + { 0 } { } { } + { 0 } }
+    \int_compare:nNnTF {#3} = 0
+      { \@@_round_figures_count:nnN {#1} {#2} }
+      { \@@_round_figures_count:nnnN { 1 } {#1} {#2} }
+  }
+\cs_new:Npn \@@_round_figures_count:nnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4
+      {
+        \int_compare:nNnTF {#1} > \l_@@_round_precision_int
+          {
+            \exp_args:Nf \@@_round_figures:nnn
+              { \int_eval:n { #1 - \l_@@_round_precision_int } }
+              {#2} {#3}
+          }
+          {
+            \@@_round_figures_pad:nnn
+              { \l_@@_round_precision_int - (#1) } {#2} {#3}
+          }
+      }
+    \exp_args:Nf \@@_round_figures_count:nnnN
+      { \int_eval:n { #1 + 1 } } {#2} {#3}
+  }
+%    \end{macrocode}
+%   The case where we are short of figures is easy enough to handle:
+%   generate zeros to pad it out.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_pad:nnn #1#2#3
+  {
+    {#2}
+    { #3 \prg_replicate:nn {#1} { 0 } }
+  }
+%    \end{macrocode}
+%   Actually doing the rounding needs us to work from the least significant
+%   digit, so we start by reversing the input. We \emph{could} also drop
+%   digits in this phase, but tracking everything would be horrible, so
+%   we go slightly slower but clearer and split the steps. First we reverse
+%   the decimal part, then the integer.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures:nnn #1#2#3
+  {
+    \@@_round_figures_auxi:nnnN {#1} {#2} { }
+      #3 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_figures_auxi:nnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4
+      {
+        \@@_round_figures_auxii:nnnN {#1} {#3} { } #2
+          \q_recursion_tail \q_recursion_stop
+      }
+    \@@_round_figures_auxi:nnnN {#1} {#2} {#4#3}
+  }
+\cs_new:Npn \@@_round_figures_auxii:nnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4
+      {
+        \tl_if_blank:nTF {#2}
+          {
+            \@@_round_figures_auxiv:nnnN {#1} { } { } #3
+              \q_recursion_tail \q_recursion_stop
+          }
+          {
+            \@@_round_figures_auxiii:nnnN {#1} {#3} { } #2
+              \q_recursion_tail \q_recursion_stop
+          }
+      }
+    \@@_round_figures_auxii:nnnN {#1} {#2} {#4#3}
+  }
+%    \end{macrocode}
+%   We now have the input reversed plus how many digits we need to discard
+%   (|#1|).  We have two functions, one which deals with the decimal part,
+%   one of which deals with the integer. In the latter, we should never hit
+%   the end before we've dropped all the digits: the fixed-zero is a
+%   fall-back in case something weird happens. For the integer case, we need
+%   to collect up zeros to pad the length back out correctly later.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_auxiii:nnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4
+      {
+        \@@_round_figures_auxiv:nnnN {#1} { } {#3} #2
+          \q_recursion_tail \q_recursion_stop
+      }
+    \int_compare:nNnTF {#1} > 0
+      {
+        \exp_args:Nf \@@_round_figures_auxiii:nnnN
+          { \int_eval:n { #1 - 1 } } {#2} { #4#3 }
+      }
+      { \@@_round_figures_auxv:nnN {#3} {#2} #4 }
+  }
+\cs_new:Npn \@@_round_figures_auxiv:nnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4
+      { { 0 } { } }
+    \int_compare:nNnTF {#1} > 0
+      {
+        \exp_args:Nf \@@_round_figures_auxiv:nnnN
+          { \int_eval:n { #1 - 1 } } { #2 0 } { #4#3 }
+      }
+      { \@@_round_figures_auxvi:nnnN {#3} {#2} #4 }
+  }
+%    \end{macrocode}
+%   The lead off to rounding proper needs to deal with the half-even rule:
+%   it can only apply at this stage, when the \emph{discarded} value can
+%   be exactly half.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_auxv:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      {
+        \@@_round_figures_auxvi:nnN
+          {#1} { } #2 \q_recursion_tail \q_recursion_stop
+      }
+    \bool_lazy_or:nnTF
+      { \int_compare_p:nNn { \tl_head:n {#1} } < 5 }
+      {
+        \bool_lazy_all_p:n
+          {
+            { \l_@@_round_half_even_bool }
+            { \int_if_odd_p:n {#3} }
+            { \@@_round_if_half_p:n {#1} }
+          }
+      }
+      { \@@_round_figures_final_decimal:nnw }
+      { \@@_round_figures_auxvii:nnN }
+        {#2} { } #3
+  }
+\cs_new:Npn \@@_round_figures_auxvi:nnnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      { { 0 } { } }
+    \bool_lazy_or:nnTF
+      { \int_compare_p:nNn { \tl_head:n {#1} } < 5 }
+      {
+        \bool_lazy_all_p:n
+          {
+            { \l_@@_round_half_even_bool }
+            { \int_if_odd_p:n {#3} }
+            { \@@_round_if_half_p:n {#1} }
+          }
+      }
+      { \@@_round_figures_final_integer:nnw }
+      { \@@_round_figures_auxviii:nnN }
+        { } {#2} #3
+  }
+%    \end{macrocode}
+%   The main rounding routines. These are only every called when there is
+%   rounding to do, so there is no need to carry a flag forward. Thus the
+%   question to ask is simple: is the next value a $9$ or not (as that
+%   continues the sequence). There is a general need to handle the case
+%   where a zero is rounded up: that automatically means a need to trim
+%   the other end.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_auxvii:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      {
+        \str_if_eq:nnTF {#1} { 0 }
+          {
+            { 1 }
+            { \@@_round_figures_trunctate:n {#2} }
+          }
+          {
+            \@@_round_figures_auxviii:nnN {#2} { } #1
+              \q_recursion_tail \q_recursion_stop
+          }
+      }
+    \int_compare:nNnTF {#3} = 9
+      { \@@_round_figures_auxvii:nnN {#1} { 0 #2 } }
+      {
+        \int_compare:nNnTF {#3} = 0
+          {
+            \@@_round_figures_final_decimal:nnw
+              {#1} { 1 \@@_round_figures_trunctate:n {#2} }
+          }
+          {
+            \@@_round_figures_final:fn
+              { \int_eval:n { #3 + 1 } }
+              { \@@_round_figures_final_decimal:nnw {#1} {#2} }
+          }
+      }
+  }
+\cs_new:Npn \@@_round_figures_auxviii:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      {
+        \tl_if_blank:nTF {#1}
+          {
+            { 1 \@@_round_figures_trunctate:n {#2} 0 }
+            { }
+          }
+          {
+            { 1 #2 }
+            { \@@_round_figures_trunctate:n {#1} }
+          }
+      }
+    \int_compare:nNnTF {#3} = 9
+      { \@@_round_figures_auxviii:nnN {#1} { 0 #2 } }
+      {
+        \@@_round_figures_final:fn
+          { \int_eval:n { #3 + 1 } }
+          { \@@_round_figures_final_integer:nnw {#1} {#2} }
+      }
+  }
+%    \end{macrocode}
+%   Tidying up means grabbing the remaining digits and undoing the reversal.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_final_decimal:nnw
+  #1#2#3 \q_recursion_tail \q_recursion_stop
+  {
+    { \tl_reverse:n {#1} }
+    { \tl_reverse:n {#3} #2 }
+  }
+\cs_new:Npn \@@_round_figures_final_integer:nnw
+  #1#2#3 \q_recursion_tail \q_recursion_stop
+  {
+    { \tl_reverse:n {#3} #2 }
+    {#1}
+  }
+\cs_new:Npn \@@_round_figures_final:nn #1#2
+  { #2 #1 }
+\cs_generate_variant:Nn \@@_round_figures_final:nn { f }
+%    \end{macrocode}
+%   When we have rounded up to the next power of ten, we need to go back and
+%   remove one more digit.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_figures_trunctate:n #1
+  {
+    \@@_round_figures_truncate:nnN { } { }
+      #1 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_figures_truncate:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3 { #1 }
+    \@@_round_figures_truncate:nnN {#1#2} {#3}   
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_places:nNnnnNn}
