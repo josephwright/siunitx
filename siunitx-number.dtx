@@ -99,6 +99,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{drop-uncertainty}
+%   \begin{syntax}
+%     |drop-uncertainty| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{evaluate-expression}
 %   \begin{syntax}
 %     |evaluate-expression| = |true|\verb"|"|false|
@@ -1403,18 +1409,21 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_exponent_mode_tl     ,
-%     \l_@@_exponent_fixed_int   ,
-%     \l_@@_min_decimal_int      ,
-%     \l_@@_min_integer_int      ,
-%     \l_@@_round_half_even_bool ,
-%     \l_@@_round_min_tl         ,
-%     \l_@@_round_mode_tl        ,
+%     \l_@@_uncertainty_drop_bool ,
+%     \l_@@_exponent_mode_tl      ,
+%     \l_@@_exponent_fixed_int    ,
+%     \l_@@_min_decimal_int       ,
+%     \l_@@_min_integer_int       ,
+%     \l_@@_round_half_even_bool  ,
+%     \l_@@_round_min_tl          ,
+%     \l_@@_round_mode_tl         ,
 %     \l_@@_round_precision_int
 %   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    drop-uncertainty .bool_set:N =
+      \l_@@_uncertainty_drop_bool ,
     exponent-mode .choices:nn =
       { engineering , fixed , input , scientific }
       { \tl_set_eq:NN \l_@@_exponent_mode_tl \l_keys_choice_tl } ,
@@ -1468,6 +1477,7 @@
           { \tl_if_eq_p:NN #1 \c_@@_zero_tl }
           { \tl_if_eq_p:NN #1 \c_@@_zero_decimal_tl }
           {
+            \@@_uncertainty:N #1
             \@@_exponent:N #1
             \@@_round:N #1
             \@@_digits:N #1
@@ -2119,6 +2129,24 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_uncertainty:N}
+% \begin{macro}[EXP]{\@@_uncertainty:nNnnnNn}
+%   Simple stripping of the uncertainty.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_uncertainty:N #1
+  {
+    \bool_if:NT \l_@@_uncertainty_drop_bool
+      {
+        \tl_set:Nx #1
+          { \exp_after:wN \@@_uncertainty:nNnnnNn #1 }
+      }
+  }
+\cs_new:Npn \@@_uncertainty:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Formatting parsed numbers}
 %
 % \begin{variable}
@@ -2659,6 +2687,7 @@
 \keys_set:nn { siunitx }
   {
     bracket-negative         = false                                  ,
+    drop-uncertainty         = false                                  ,
     evaluate-expression      = false                                  ,
     explicit-plus            = false                                  ,
     exponent-base            = 10                                     ,
