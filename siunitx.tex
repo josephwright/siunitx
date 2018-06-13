@@ -964,6 +964,162 @@ used to pad numbers to a given size. This applies independent of any rounding.
   \num[minimum-decimal-digits = 4]{0.123} \\
 \end{LaTeXdemo}
 
+\subsection{Printing numbers}
+
+Actually printing numbers is controlled by a number of settings, which apply
+ideas such as differing decimal markers, digit grouping and so on. All of these
+options are concerned with the appearance of output, rather than the data it
+conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
+\begin{table}
+  \caption{Output options for numbers.}
+  \label{tab:opt:num:out}
+  \begin{tabular}{>{\ttfamily}ll>{\ttfamily}l}
+    \toprule
+      \multicolumn{1}{l}{Option name} &
+      Type &
+      \multicolumn{1}{l}{Default} \\
+    \midrule
+      bracket-negative         & Switch  & false             \\ ^^A (
+      close-bracket            & Literal & )                 \\
+      exponent-base            & Literal & 10                \\
+      exponent-product         & Math    & \verb=\times=     \\
+      group-digits             & Choice  & all               \\
+      group-minimum-digits     & integer & 5                 \\
+      group-separator          & Literal & \cs{,}            \\
+      negative-color           & Literal & \meta{none}       \\
+      open-bracket             & Literal & (                 \\ ^^A ) (
+      output-close-uncertainty & Literal & )                 \\
+      output-complex-root      & Literal & \verb=\mathrm{i}= \\
+      output-decimal-marker    & Literal & .                 \\
+      output-open-uncertainty  & Literal & (                 \\ ^^A )
+      separate-uncertainty     & Switch  & false             \\
+      tight-spacing            & Switch  & false             \\
+      uncertainty-separator    & Literal & \meta{none}       \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{group-digits}
+\DescribeOption{group-four-digits}
+\DescribeOption{group-separator}
+Grouping digits into blocks of three is a common method to increase the ease of
+reading of numbers. The \opt{group-digits} choice controls whether this
+behaviour applies, and takes the values \opt{all}, \opt{none}, \opt{decimal}
+and \opt{integer}. Grouping can be activated separately for the integer and
+decimal parts of a number using the appropriately-named values.
+\begin{LaTeXdemo}
+  \num{12345.67890} \\
+  \num[group-digits = none]{12345.67890}   \\
+  \num[group-digits = decimal]{12345.67890} \\
+  \num[group-digits = integer]{12345.67890}
+\end{LaTeXdemo}
+The separator used between groups of digits is stored by the
+\opt{group-separator} option. This takes literal input and may be used in math
+mode: for a text-mode full space use \verb*|\ |.
+\begin{LaTeXdemo}
+  \num{12345} \\
+  \num[group-separator = {,}]{12345} \\
+  \num[group-separator = \ ]{12345}
+\end{LaTeXdemo}
+
+\DescribeOption{group-minimum-digits}
+Grouping is not always applied to smaller numbers, and the option
+\opt{group-minimum-digits} is available to specify how many digits must be
+present before grouping is applied. The number of digits is considered
+separately for the integer and decimal parts of the number: grouping does not
+\enquote{cross the boundary}.
+\begin{LaTeXdemo}
+  \num{1234} \\
+  \num{12345} \\
+  \num[group-minimum-digits = 5]{1234} \\
+  \num[group-minimum-digits = 5]{12345} \\
+  \num{1234.5678} \\
+  \num{12345.67890} \\
+  \num[group-minimum-digits = 5]{1234.5678} \\
+  \num[group-minimum-digits = 5]{12345.67890}
+\end{LaTeXdemo}
+
+\DescribeOption{output-complex-root}
+\DescribeOption{output-decimal-marker}
+The decimal marker used in output is set using the \opt{output-decimal-marker}
+option. This can differ from the input marker, as can the root of $\sqrt{-1}$,
+which is stored in the \opt{output-complex-root} option. The standard setting
+uses |\mathrm| in math mode to give an upright \enquote{i}: this can easily be
+altered.
+\begin{LaTeXdemo}
+  \num{1.23} \\
+  \num[output-decimal-marker = {,}]{1.23} \\
+  \num{1+2i} \\
+  \num[output-complex-root = \text{\ensuremath{i}}]{1+2i} \\
+  \num[output-complex-root = j]{1+2i} \\
+\end{LaTeXdemo}
+
+\DescribeOption{exponent-base}
+\DescribeOption{exponent-product}
+When exponents are present in the input, the \opt{exponent-base} and
+\opt{exponent-product} options set the obvious parts of the output.
+\begin{LaTeXdemo}
+  \num[exponent-product = \times]{1e2} \\
+  \num[exponent-product = \cdot]{1e2} \\
+  \num[exponent-base = 2]{1e2}
+\end{LaTeXdemo}
+
+\DescribeOption{separate-uncertainty}
+\DescribeOption{uncertainty-separator}
+\DescribeOption{output-open-uncertainty}
+\DescribeOption{output-close-uncertainty}
+When input is given including an uncertainty in a number, it can be printed
+either with the uncertainty in brackets or as a separate number. This behaviour
+is controlled by the \opt{separate-uncertainty} choice. If the uncertainty is
+given in brackets, a space may be added between the main number and the
+uncertainty: this is stored using the \opt{uncertainty-separator} option. The
+opening and closing brackets used are stored in \opt{output-open-uncertainty}
+and \opt{output-close-uncertainty}, respectively.
+\begin{LaTeXdemo}
+  \num{1.234(5)} \\
+  \num[separate-uncertainty = true]{1.234(5)} \\
+  \sisetup{
+    output-open-uncertainty  = [,
+    output-close-uncertainty = ],
+    uncertainty-separator    = \,
+  }%
+  \num{1.234(5)}
+\end{LaTeXdemo}
+Notice that \pkg{siunitx} correctly interprets uncertainties which cross the
+decimal marker position whether these are separated out or not.
+\begin{LaTeXdemo}
+  \num{8.2(13)} \\
+  \num[separate-uncertainty]{8.2(13)}
+\end{LaTeXdemo}
+
+\DescribeOption{negative-color}
+The package can detect negative mantissa values and alter print color
+accordingly. This is disabled by setting the option to an empty value.
+\begin{LaTeXdemo}
+  \num{-15673} \\
+  \num[negative-color = red]{-15673}
+\end{LaTeXdemo}
+
+\DescribeOption{bracket-negative}
+A common means to display negative numbers in financial situations is to place
+them in brackets. This can be carried out automatically using the
+\opt{bracket-negative-numbers} option.
+\begin{LaTeXdemo}
+  \num{-15673} \\
+  \num[bracket-negative]{-15673} \\
+  \qty{-10}{\metre} \\
+  \qty[bracket-negative]{-10}{\metre}
+\end{LaTeXdemo}
+
+\DescribeOption{tight-spacing}
+Under some circumstances is may be desirable to \enquote{squeeze} the output
+spacing. This is turned on using the \opt{tight-spacing} switch, which
+compresses spacing where possible.
+\begin{LaTeXdemo}
+  \num{2e3} \\
+  \num[tight-spacing = true]{2e3}
+\end{LaTeXdemo}
+
 \subsection{Angles}
 
 Angle processing provided by the \cs{ang} function has a set of options which
