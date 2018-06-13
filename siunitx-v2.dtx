@@ -88,6 +88,49 @@
   }
 %    \end{macrocode}
 %
+% \subsection{Number options}
+%
+% \begin{variable}
+%   {\l_@@_number_input_realdigits_tl, \l_@@_number_input_symbol_tl}
+%   Emulation for input options: |input-protect-tokens| is a simple no-op,
+%   whilst |input-symbols| is combined with |input-digits|, so the latter is
+%   also re-defined.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    input-digits code:n =
+      {
+        \tl_set:Nn \l_@@_number_input_realdigit_tl {#1}
+        \tl_set:Nx \l_@@_number_input_digit_tl
+          {
+            \exp_not:V \l_@@_number_input_realdigit_tl
+            \exp_not:V \l_@@_number_input_symbol_tl
+          }
+      } ,
+      \l_@@_number_input_digit_tl ,
+    input-protect-tokens .code:n = ,
+    input-symbols        .code:n =
+      {
+        \tl_set:Nn \l_@@_number_input_symbol_tl {#1}
+        \tl_set:Nx \l_@@_number_input_digit_tl
+          {
+            \exp_not:V \l_@@_number_input_realdigit_tl
+            \exp_not:V \l_@@_number_input_symbol_tl
+          }
+      }
+  }
+\tl_new:N \l_@@_number_input_realdigits_tl
+\tl_new:N \l_@@_number_input_symbol_tl
+%    \end{macrocode}
+% \end{variable}
+%
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    input-symbols = \dots\pi
+  }
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</cfg>
 %    \end{macrocode}
