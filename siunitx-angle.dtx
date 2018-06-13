@@ -252,9 +252,6 @@
 %
 % \begin{macro}{\@@_arc_fill:nnn}
 % \begin{macro}[EXP]{\@@_arc_fill:nn}
-% \begin{macro}{\@@_arc:nnn}
-% \begin{macro}{\@@_arc_aux:nnn}
-% \begin{macro}[EXP]{\@@_arc_aux:n}
 %   Zero-filling of values gets us to a common code path irrespective of
 %   the input format.
 %    \begin{macrocode}
@@ -276,32 +273,7 @@
       { 0 }
       {#2}
   }
-\cs_new_protected:Npn \@@_arc:nnn #1#2#3
-  {
-    \bool_if:NTF \l_siunitx_parse_numbers_bool
-      { \@@_arc_parse:nnn }
-      { \@@_arc_aux:nnn }
-        {#1} {#2} {#3}
-  }
-\cs_new_protected:Npn \@@_arc_aux:nnn #1#2#3
-  {
-    \use:x
-      {
-        \@@_arc_print:nnn
-          { \@@_arc_aux:n {#1} }
-          { \@@_arc_aux:n {#2} }
-          { \@@_arc_aux:n {#3} }
-      }
-  }
-\cs_new:Npn \@@_arc_aux:n #1
-  {
-    \tl_if_blank:nF {#1}
-      { \exp_not:n { \ensuremath {#1} } }
-  }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -314,27 +286,27 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_arc_parse:nnn}
-% \begin{macro}{\@@_arc_parse_restict:, \@@_arc_parse_restict_signs:}
+% \begin{macro}{\@@_arc:nnn}
+% \begin{macro}{\@@_arc_restrict:, \@@_arc_restrict_signs:}
 %   When parsing arc values, only real numbers are allowed: that is easily
 %   accomplished by setting other input types to have no valid tokens. Only
 %   the first part of an arc given can have a sign or comparator: this is
 %   slightly more complex as it needs to be applied at the right time.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_arc_parse:nnn #1#2#3
+\cs_new_protected:Npn \@@_arc:nnn #1#2#3
   {
     \group_begin:
-      \@@_arc_parse_restict:
+      \@@_arc_restrict:
       \tl_if_blank:nF {#1}
         {
           \siunitx_number_format:nN {#1} \l_@@_degrees_tl
-          \@@_arc_parse_restict_signs:
+          \@@_arc_restrict_signs:
         }
       \tl_if_blank:nF {#2}
         {
           \siunitx_number_format:nN {#2} \l_@@_minutes_tl
           \tl_if_blank:nF {#1}
-            { \@@_arc_parse_restict_signs: }
+            { \@@_arc_restrict_signs: }
         }
       \tl_if_blank:nF {#3}
         { \siunitx_number_format:nN {#3} \l_@@_seconds_tl }
@@ -344,7 +316,7 @@
         \l_@@_seconds_tl
     \group_end:
   }
-\cs_new_protected:Npn \@@_arc_parse_restict:
+\cs_new_protected:Npn \@@_arc_restrict:
   {
     \keys_set:nn { siunitx }
       {
@@ -355,7 +327,7 @@
         input-uncertainty-signs =
       }
   }
-\cs_new_protected:Npn \@@_arc_parse_restict_signs:
+\cs_new_protected:Npn \@@_arc_restrict_signs:
   {
     \keys_set:nn { siunitx }
       { input-comparators = , input-signs = }

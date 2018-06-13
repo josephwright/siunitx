@@ -152,24 +152,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \subsection{Top-level options}
-%
-% \begin{variable}{\l_siunitx_parse_numbers_bool}
-%    \begin{macrocode}
-\keys_define:nn { siunitx }
-  {
-    parse-numbers .bool_set:N = \l_siunitx_parse_numbers_bool
-  }
-%    \end{macrocode}
-% \end{variable}
-%
-% \begin{macrocode}
-\keys_set:nn { siunitx }
-  {
-    parse-numbers = true
-  }
-%    \end{macrocode}
-%
 % \subsection{User interfaces}
 %
 % The user interfaces are defined in terms of documented code-level ones.
@@ -221,9 +203,7 @@
     \mode_leave_vertical:
     \group_begin:
       \keys_set:nn { siunitx } {#1}
-      \bool_if:NTF \l_siunitx_parse_numbers_bool
-        { \siunitx_number_format:nN {#2} \l_@@_tmp_tl }
-        { \tl_set:Nn \l_@@_tmp_tl {#2} }
+      \siunitx_number_format:nN {#2} \l_@@_tmp_tl
       \siunitx_print:nV { number } \l_@@_tmp_tl
       \, \nobreak % TEMP
       \siunitx_unit_format:nN {#3} \l_@@_tmp_tl

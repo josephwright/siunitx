@@ -279,6 +279,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{parse-numbers}
+%   \begin{syntax}
+%     |parse-numbers| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{print-unity-mantissa}
 %   \begin{syntax}
 %     |print-unity-mantissa| = |true|\verb"|"|false|
@@ -378,6 +384,16 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_parse_bool}
+%   Top-level options.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    parse-numbers .bool_set:N = \l_@@_parse_bool
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_number_format:nN, \siunitx_number_format:VN}
 % \begin{macro}{\siunitx_number_format:nNN}
 % \begin{macro}{\@@_format:nN}
@@ -396,9 +412,13 @@
 \cs_new_protected:Npn \@@_format:nN #1#2
   {
     \group_begin:
-      \@@_parse:n {#1}
-      \@@_process:
-      \@@_format:
+      \bool_if:NTF \l_@@_parse_bool
+        {
+          \@@_parse:n {#1}
+          \@@_process:
+          \@@_format:
+        }
+        { \tl_set:Nn \l_@@_formatted_tl { \ensuremath {#1} } }
     \exp_args:NNNV \group_end:
     \tl_set:Nn #2 \l_@@_formatted_tl
   }
@@ -489,7 +509,9 @@
             \tl_if_in:NnF \l_@@_input_sign_tl {##1}
               { \tl_put_right:Nn \l_@@_input_sign_tl {##1} }
           }
-      }
+      } ,
+    parse-numbers .bool_set:N =
+      \l_@@_parse_bool
   }
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
@@ -2726,6 +2748,7 @@
     output-complex-root      = \mathrm { i }                          ,
     output-decimal-marker    = .                                      ,
     output-open-uncertainty  = (                                      , % )
+    parse-numbers            = true                                   ,
     print-unity-mantissa     = false                                  ,
     print-zero-exponent      = false                                  ,
     round-half               = up                                     ,
