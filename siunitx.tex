@@ -701,6 +701,127 @@ independently.
   Still red here!
 \end{LaTeXdemo}
 
+\subsection{Parsing numbers}
+
+The package uses a sophisticated parsing system to understand numbers. This
+allows \pkg{siunitx} to carry out a range of formatting, as described later.
+All of the input options take lists of literal tokens, and are summarised in
+Table~\ref{tab:opt:num:in}.
+\begin{table}
+  \centering
+  \caption{Options for number parsing.}
+  \label{tab:opt:num:in}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule 
+      evaluate-expression     & Switch  & false            \\
+      expression              & Literal & |#1|             \\^^A (
+      input-close-uncertainty & Literal & )                \\
+      input-comparators       & Literal &
+        <=>\cs{approx}\cs{ge}\cs{geq} \\
+        & & \cs{gg}\cs{le}\cs{leq}\cs{ll} \cs{sim} \\
+      input-complex-roots     & Literal & ij               \\
+      input-decimal-markers   & Literal & .,               \\
+      input-digits            & Literal & 0123456789       \\
+      input-exponent-markers  & Literal & dDeE             \\
+      input-ignore            & Literal & \meta{none}      \\
+      input-open-uncertainty  & Literal & (                \\ ^^A )
+      input-signs             & Literal & +-\cs{pm}\cs{mp} \\
+      input-uncertainty-signs & Literal & \cs{pm}          \\
+      parse-numbers           & Switch  & true             \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{input-digits}
+\DescribeOption{input-decimal-markers}
+\DescribeOption{input-signs}
+\DescribeOption{input-exponent-markers}
+The basic parts of a number are the digits, any sign and a separator between
+the integer and decimal parts. These are stored in the input options
+\opt{input-digits}, \opt{input-decimal-markers} and \opt{input-signs},
+respectively. More than one input decimal marker can be used: it will be
+converted by the package to the appropriate output marker. Numbers which
+include an exponent part also require a marker for the exponent: this again is
+taken from the range of tokens in the \opt{input-exponent-markers} option.
+
+\DescribeOption{input-ignore}
+Tokens given in the \opt{input-ignore} list are totally passed over by
+\pkg{siunitx}: they will be removed from the input with no further processing.
+
+\DescribeOption{input-comparators}
+In addition to signs, \pkg{siunitx} can recognise comparators, such as |<|. The
+package will automatically carry out conversions for |<<|, |>>|, |<=| and |>=|
+to |\ll|, |\gg|, |\le| and |\ge|, respectively.
+\begin{LaTeXdemo}
+  \num{< 10} \\
+  \qty{>> 5}{\metre} \\
+  \num{\le 0.12}
+\end{LaTeXdemo}
+
+\DescribeOption{input-open-uncertainty}
+\DescribeOption{input-close-uncertainty}
+\DescribeOption{input-uncertainty-signs}
+In some fields, it is common to give the uncertainty in a number in brackets
+after the main part of the number, for example \enquote{\num{1.234(5)}}. The
+opening and closing symbols used for this type of input are set as
+\opt{input-open-uncertainty} and \opt{input-close-uncertainty}. Alternatively,
+the uncertainty may be given as a separate part following a sign. Which signs
+are valid for this operation is determined by the \opt{input-uncertainty-signs}
+option. As with other signs, the combination |+-| will automatically be
+converted to |\pm| internally.
+\begin{LaTeXdemo}
+  \num{9.99(9)}       \\
+  \num{9.99 +- 0.09}  \\
+  \num{9.99 \pm 0.09} \\
+  \num{123 +- 4.5}    \\
+  \num{12.3 +- 6}
+\end{LaTeXdemo}
+
+\DescribeOption{input-complex-roots}
+When using complex numbers in input, the complex root $(\mathrm{i} =
+\sqrt{-1})$ is indicated by one of the tokens stored in
+\opt{input-complex-roots}. The parser understands complex root symbols given
+either before or after the associated number (but will detect any invalid
+arrangement).
+\begin{LaTeXdemo}
+  \num{9.99 + 88.8i} \\
+  \num{9.99 + i88.8}
+\end{LaTeXdemo}
+
+\DescribeOption{parse-numbers}
+The \opt{parse-numbers} option turns the entire parsing system on and off. The
+option is made available for two reasons. First, if all of the numbers in a
+document are to be reproduced \enquote{as given}, turning off the parser will
+represent a significant saving in processing required. Second, it allows the
+use of arbitrary \TeX{} code in numbers. If the parser is turned off, the input
+will be printed in math mode (requiring |\text| to protect any text in the
+number).
+\begin{LaTeXdemo}
+  \num[parse-numbers = false]{\sqrt{2}}        \\
+  \qty[parse-numbers = false]{\sqrt{3}}{\metre}
+\end{LaTeXdemo}
+
+\DescribeOption{evaluate-expression}
+\DescribeOption{expression}
+With the standard settings, numerical input is parsed \enquote{as is} with no
+attempt to interpret it mathematically. By enabling the
+\opt{evaluate-expression} option, the input can be processed by the standard
+\LaTeX3 FPU (see package \pkg{xfp} for more). The nature of the expression
+itself can be adjusted using the \opt{expression} setting: as standard, the
+entire input is simply parsed with no change, but this setting may be used to
+add additional steps. The \emph{input} in such an expression is represented
+by |#1|. Note that the FPU uses its own syntax for numbers, most notably
+in that a decimal marker must be |.|.
+\begin{LaTeXdemo}
+  \sisetup{evaluate-expression}
+  \qty{2 + 4 * 3}{\joule} \\
+  \qty[expression = 10 * (#1)]{2 + 4 * 3}{\joule}
+\end{LaTeXdemo}
+
 \subsection{Angles}
 
 Angle processing provided by the \cs{ang} function has a set of options which
