@@ -90,6 +90,12 @@
   }
 %    \end{macrocode}
 %
+% Some messages.
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { option-removed }
+  { Option~"#1"~has~been~removed~in~this~release. }
+%    \end{macrocode}
+%
 % \subsubsection{Number options}
 %
 % \begin{variable}
@@ -109,7 +115,6 @@
             \exp_not:V \l_@@_number_input_symbol_tl
           }
       } ,
-      \l_@@_number_input_digit_tl ,
     input-protect-tokens .code:n = ,
     input-symbols        .code:n =
       {
@@ -126,6 +131,55 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% Options for number processing: largely removals.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    add-decimal-zero .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { add-decimal-zero }
+      } ,
+    add-integer-zero .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { add-integer-zero }
+      } ,
+   explicit-sign .code:n =
+      {
+        \str_if_eq:nnTF {#1} { + }
+          { \keys_set:nn { siunitx } { explicit-plus = true } }
+          {
+            \msg_warning:nnn { siunitx } { option-removed }
+              { explicit-sign }
+          }
+      } ,
+    retain-explicit-plus .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { retain-explicit-plus }
+      } ,
+    retain-unity-mantissa .meta:n = print-unity-mantissa ,
+    retain-zero-exponent .meta:n = retain-zero-exponent ,
+    omit-uncertainty .meta:n = drop-uncertainty ,
+    scientific-notation .choice: ,
+    scientific-notation / engineering .code:n =
+      { \keys_set:nn { siunitx } { exponent-mode = engineering } } ,
+    scientific-notation / fixed .code:n =
+      { \keys_set:nn { siunitx } { exponent-mode = fixed } } ,
+    scientific-notation / false .code:n =
+      { \keys_set:nn { siunitx } { exponent-mode = input } } ,
+    scientific-notation / true .code:n =
+      { \keys_set:nn { siunitx } { exponent-mode = scientific } } ,
+    zero-decimal-to-integer .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { zero-decimal-to-integer }
+      }
+  }
+%    \end{macrocode}
+%
+% Standard settings where appropriate.
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
