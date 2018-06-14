@@ -42,6 +42,7 @@ tlmgr install   \
   oberdiek      \
   l3kernel      \
   l3packages    \
+  libertine     \
   lm-math       \
   lualatex-math \
   sansmath      \

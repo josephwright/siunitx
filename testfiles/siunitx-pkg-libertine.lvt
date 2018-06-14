@@ -1,0 +1,34 @@
+\input{regression-test}
+
+\documentclass{article}
+
+\ifx\Umathcode\undefined
+  \usepackage[osf]{libertine}
+\else
+  \usepackage{fontspec}
+  \setmainfont[Numbers={OldStyle}]{Linux Libertine O}
+\fi
+
+\usepackage{siunitx}
+
+\sisetup{
+  mode = match ,
+  reset-text-family = false ,
+  reset-text-series = false ,
+  reset-text-shape  = false
+}
+
+\begin{document}
+
+\START
+
+\begin{itemize}
+  \item Regular numbers in text mode: main font, as expected: 2469
+  \item SI numbers in text mode: main font, as expected: \num{2469}
+  \item Numbers in math mode: math font, as expected: $2469$
+  \item SI numbers in math mode: text font, not expected: $\num{2469}$
+\end{itemize}
+
+\showoutput
+
+\end{document}
