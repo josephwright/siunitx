@@ -35,10 +35,14 @@ tlmgr install   \
   ec            \
   etoolbox      \
   filehook      \
+  fontaxes      \
   graphics      \
   graphics-cfg  \
   graphics-def  \
+  ifluatex      \
+  ifxetex       \
   mptopdf       \
+  mweights      \
   oberdiek      \
   l3kernel      \
   l3packages    \
@@ -48,7 +52,8 @@ tlmgr install   \
   sansmath      \
   tools         \
   unicode-math  \
-  was
+  was           \
+  xkeyval
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
