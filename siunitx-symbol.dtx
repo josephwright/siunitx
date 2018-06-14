@@ -244,6 +244,46 @@
   }
 %    \end{macrocode}
 %
+% \begin{macro}{\@@_texttimes:}
+%   For the times symbol, only \LuaTeX{} allows us to use the math mode symbol
+%   directly: otherwise we load the |TS1| version for text. Otherwise much the
+%   same as |\textmu| support.
+%    \begin{macrocode}
+\sys_if_engine_luatex:F
+  {
+    \AtBeginDocument
+      {
+        \cs_if_free:cT { T@TS1 }
+          {
+            \DeclareFontEncoding { TS1 } { } { }
+            \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
+          }
+        \cs_if_free:NTF \texttimes
+          {
+            \DeclareTextSymbolDefault \@@_texttimes: { TS1 }
+            \DeclareTextSymbol \@@_texttimes: { TS1 } { "00D6 }
+          }
+          { \cs_new_eq:NN \@@_texttimes: \texttimes }
+        \group_begin:
+          \keys_set:nn { siunitx }
+            { input-exponent-markers = e , input-digits = 12 }
+            \siunitx_number_format:nN {2e1} \l_@@_tmpa_tl
+            \tl_set:Nn \l_@@_tmpb_tl { 2 \times 10 ^ { 1 } }
+            \tl_if_eq:NNTF \l_@@_tmpa_tl \l_@@_tmpb_tl
+              {
+                \group_end:
+                \keys_set:nn { siunitx }
+                  {
+                    exponent-product =
+                      \ifmmode \times \else \@@_texttimes: \fi
+                  }
+              }
+              { \group_end: }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
