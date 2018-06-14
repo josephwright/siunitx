@@ -49,6 +49,7 @@ tlmgr install   \
   libertine     \
   lm-math       \
   lualatex-math \
+  opensans      \
   sansmath      \
   tools         \
   unicode-math  \
