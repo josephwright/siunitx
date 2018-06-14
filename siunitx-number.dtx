@@ -2422,7 +2422,12 @@
   {
     \exp_not:V \l_@@_tab_tl
     \tl_if_blank:nF {#1}
-      { \exp_not:V \l_@@_output_decimal_tl }
+      {
+        \str_if_eq:VnTF \l_@@_output_decimal_tl { , }
+          { \exp_not:N \mathord }
+          { \use:n }
+            { \exp_not:V \l_@@_output_decimal_tl }
+      }
     \exp_not:V \l_@@_tab_tl
     \@@_format_digits:nn { decimal } {#1}
   }
