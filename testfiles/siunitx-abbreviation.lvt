@@ -1,0 +1,133 @@
+\input{regression-test }
+
+\RequirePackage[enable-debug ,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx }
+
+\START
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \siunitx_unit_format:nN {#1} \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Currents }
+  {
+    \clist_map_inline:nn
+      { \A , \pA , \nA , \uA , \mA , \kA }
+      { \test:n {#1} }
+  }
+
+\TEST { Frequencies }
+  {
+    \clist_map_inline:nn
+      { \Hz , \mHz , \kHz , \MHz , \GHz , \THz }
+      { \test:n {#1} }
+  }
+
+\TEST { Moles }
+  {
+    \clist_map_inline:nn
+      { \mol , \fmol , \pmol , \nmol , \umol , \mmol , \kmol }
+      { \test:n {#1} }
+  }
+
+\TEST { Potentials }
+  {
+    \clist_map_inline:nn
+      { \V , \pV , \nV , \uV , \mV , \kV }
+      { \test:n {#1} }
+  }
+
+\TEST { Volumes }
+  {
+    \clist_map_inline:nn
+      { \hl , \l , \ml , \ul , \hL , \L , \mL , \uL }
+      { \test:n {#1} }
+  }
+
+\TEST { Masses }
+  {
+    \clist_map_inline:nn
+      { \fg , \pg , \ng , \ug , \mg , \g , \kg , \amu }
+      { \test:n {#1} }
+  }
+
+\TEST { Powers }
+  {
+    \clist_map_inline:nn
+      { \W , \uW , \mW , \kW , \MW , \GW }
+      { \test:n {#1} }
+  }
+
+\TEST { Energies }
+  {
+    \clist_map_inline:nn
+      {
+        \kJ , \J , \mJ , \uJ ,
+        \eV , \meV , \keV , \MeV , \GeV , \TeV ,
+        \kWh
+      }
+      { \test:n {#1} }
+  }
+
+\TEST { Lengths }
+  {
+    \clist_map_inline:nn
+      { \m , \pm , \nm , \um , \mm , \cm , \dm , \km }
+      { \test:n {#1} }
+  }
+
+\TEST { Temperatures }
+  { \test:n { \K } }
+
+\TEST { Currents }
+  { \test:n { \dB } }
+
+\TEST { Capacitance }
+  {
+    \clist_map_inline:nn
+      { \F , \fF , \pF }
+      { \test:n {#1} }
+  }
+
+\TEST { Forces }
+  {
+    \clist_map_inline:nn
+      { \N , \mN , \kN , \MN }
+      { \test:n {#1} }
+  }
+
+\TEST { Pressures }
+  {
+    \clist_map_inline:nn
+      { \Pa , \kPa , \MPa , \GPa }
+      { \test:n {#1} }
+  }
+
+\TEST { Resistance }
+  {
+    \clist_map_inline:nn
+      { \mohm , \kohm , \Mohm }
+      { \test:n {#1} }
+  }
+
+\TEST { Time }
+  {
+    \clist_map_inline:nn
+      { \s , \as , \fs , \ps , \ns , \us , \ms }
+      { \test:n {#1} }
+  }
+
+\END
