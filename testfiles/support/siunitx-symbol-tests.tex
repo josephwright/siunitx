@@ -18,17 +18,18 @@
 
 \cs_set_protected:Npn \testunit #1
   {
+    \testunitauxi {#1}
+    \group_begin:
+      \keys_set:nn { siunitx } { mode = text }
+      \testunitauxi {#1}
+    \group_end:
+  }
+\cs_set_protected:Npn \testunitauxi #1
+  {
     \hbox_set:Nn \l_tmpa_box { \unit {#1} }
     \box_show:N \l_tmpa_box
     \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
     \box_show:N \l_tmpa_box
-    \group_begin:
-      \keys_set:nn { siunitx } { mode = text }
-      \hbox_set:Nn \l_tmpa_box { \unit {#1} }
-      \box_show:N \l_tmpa_box
-      \hbox_set:Nn \l_tmpa_box { $ \unit {#1} $ }
-      \box_show:N \l_tmpa_box
-    \group_end:
   }
 
 \TIMO
