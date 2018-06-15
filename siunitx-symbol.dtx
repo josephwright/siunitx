@@ -168,17 +168,15 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[EXP]{\@@_text_only:n}
+% \begin{macro}{\@@_text_only:n}
 %   A short auxiliary to set up text-only symbols.
 %    \begin{macrocode}
-\cs_new:Npn \@@_text_only:n #1
+\cs_new_protected:Npn \@@_text_only:n #1
   {
-    \exp_not:N \ifmmode
-      \exp_not:N \expandafter \exp_not:N \mbox
-    \exp_not:N \else
-      \exp_not:N \expandafter \exp_not:N \@firstofone
-    \exp_not:N \fi
-      {#1}
+    \mode_if_math:TF
+      { \mbox }
+      { \use:n }
+        {#1}
   }
 %    \end{macrocode}
 % \end{macro}
