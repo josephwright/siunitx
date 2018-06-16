@@ -1401,14 +1401,15 @@ the output directly (Table~\ref{tab:opt:units:out}).
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      bracket-unit-denominator & Switch  & true      \\
-      forbid-literal-units     & Switch  & false     \\
-      inter-unit-product       & Literal & \cs{,}    \\
-      parse-units              & Switch  & true      \\
-      per-mode                 & Choice  & power     \\
-      per-symbol               & Literal & /         \\
-      qualifier-mode           & Choice  & subscript \\
-      sticky-per               & Switch  & false     \\
+      bracket-unit-denominator & Switch  & true         \\
+      forbid-literal-units     & Switch  & false        \\
+      inter-unit-product       & Literal & \cs{,}       \\
+      parse-units              & Switch  & true         \\
+      per-mode                 & Choice  & power        \\
+      per-symbol               & Literal & /            \\
+      qualifier-mode           & Choice  & subscript    \\
+      qualifier-phrase         & Literal & \meta{empty} \\
+      sticky-per               & Switch  & false        \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1493,17 +1494,26 @@ that \cs{per} applies to all subsequent units.
 \end{LaTeXdemo}
 
 \DescribeOption{qualifier-mode}
- Unit qualifiers can be printed in three different formats, set by the
- \opt{qualifier-mode} option. The standard setting is \opt{subscript},
- while the options \opt{bracket} and \opt{combine}
- are also possible. With the last settings, powers can lead to ambiguity and
- are automatically detected and brackets added as appropriate.
+\DescribeOption{qualifier-phrase}
+Unit qualifiers can be printed in three different formats, set by the
+\opt{qualifier-mode} option. The standard setting is \opt{subscript}, while the
+options \opt{bracket}, \opt{combine} and \opt{phrase} are also possible. With
+the last settings, powers can lead to ambiguity and are automatically detected
+and brackets added as appropriate.
 \begin{LaTeXdemo}
   \unit{\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
   \unit[qualifier-mode = bracket]
     {\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
   \unit[qualifier-mode = combine]
-    {\deci\bel\of{i}} \\
+    {\deci\bel\of{i}}
+\end{LaTeXdemo}
+The \opt{phrase} option is used with \opt{qualifier-phrase}, which allows for
+example a space or other linking text to be inserted.
+\begin{LaTeXdemo}
+  \sisetup{qualifier-mode = phrase, qualifier-phrase = \ }%
+  \unit{\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
+  \sisetup{qualifier-phrase = \ \mbox{of}\ }%
+  \unit{\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour}
 \end{LaTeXdemo}
 
 \DescribeOption{parse-units}

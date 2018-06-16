@@ -559,13 +559,21 @@
 %
 % \begin{function}{qualifier-mode}
 %   \begin{syntax}
-%     |qualifier-mode| = |bracket|\verb"|"|combine|\verb"|"|subscript|
+%     |qualifier-mode| = |bracket|\verb"|"|combine|\verb"|"|phrase|\verb"|"|subscript|
 %   \end{syntax}
 %   Selects how qualifiers are formatted: a choice from the options |bracket|,
-%   |combine|, and |subscript|. The option |bracket| wraps the qualifier in
-%   parenthesis, |combine| joins the qualifier with the unit directly, and
+%   |combine|, |phrase| and |subscript|. The option |bracket| wraps the qualifier
+%   in parenthesis, |combine| joins the qualifier with the unit directly, |phrase|
+%   joins the material using |qualifier-phrase| as a link, and
 %   |subscript| formats the qualifier as a subscript. The standard setting is
 %   |subscript|.
+% \end{function}
+%
+% \begin{function}{qualifier-phrase}
+%   \begin{syntax}
+%     |qualifier-phrase| = \meta{phrase}
+%   \end{syntax}
+%   Defines the \meta{phrase} used when |qualifier-mode| is set to |phrase|.
 % \end{function}
 %
 % \begin{function}{sticky-per}
@@ -1438,7 +1446,8 @@
 %     \l_@@_bracket_open_tl          ,
 %     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
-%     \l_@@_qualifier_mode_tl
+%     \l_@@_qualifier_mode_tl        ,
+%     \l_@@_qualifier_phrase_tl
 %   }
 %   Set up the options which apply to formatting.
 %    \begin{macrocode}
@@ -1497,13 +1506,11 @@
       } ,
     per-symbol .tl_set:N =
       \l_@@_per_symbol_tl ,
-    qualifier-mode .choice: ,
-    qualifier-mode / bracket .code:n =
-      { \tl_set:Nn \l_@@_qualifier_mode_tl { bracket  } } ,
-    qualifier-mode / combine .code:n =
-      { \tl_set:Nn \l_@@_qualifier_mode_tl { combine } } ,
-    qualifier-mode / subscript .code:n =
-      { \tl_set:Nn \l_@@_qualifier_mode_tl { subscript } } ,
+    qualifier-mode .choices:nn =
+      { bracket , combine , phrase , subscript }
+      { \tl_set_eq:NN \l_@@_qualifier_mode_tl \l_keys_choice_tl } ,
+    qualifier-phrase .tl_set:N =
+      \l_@@_qualifier_phrase_tl ,
     unit-close-bracket .tl_set:N =
       \l_@@_bracket_close_tl ,
     unit-open-bracket .tl_set:N =
@@ -1776,8 +1783,9 @@
 % \begin{macro}{\@@_format_qualifier:}
 % \begin{macro}
 %   {
-%     \@@_format_qualifier_bracket :  ,
+%     \@@_format_qualifier_bracket:   ,
 %     \@@_format_qualifier_combine:   ,
+%     \@@_format_qualifier_phrase:    ,
 %     \@@_format_qualifier_subscript:
 %   }
 %  There are various ways that a qualifier can be added to the output. The
@@ -1806,6 +1814,16 @@
       }
   }
 \cs_new_protected:Npn \@@_format_qualifier_combine: { }
+\cs_new_protected:Npn \@@_format_qualifier_phrase:
+  {
+    \@@_format_font:
+    \tl_set:Nx \l_@@_part_tl
+      {
+        \exp_not:V \l_@@_qualifier_phrase_tl
+        \exp_not:N \mathrm
+          { \exp_not:V \l_@@_part_tl }
+      }
+  }
 \cs_new_protected:Npn \@@_format_qualifier_subscript:
   {
     \@@_format_font:
@@ -2487,6 +2505,7 @@
     per-mode                 = power     ,
     per-symbol               = /         ,
     qualifier-mode           = subscript ,
+    qualifier-phrase         =           ,
     sticky-per               = false     ,
     unit-close-bracket       = )         , % (
     unit-open-bracket        = (           % )
