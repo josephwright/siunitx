@@ -496,6 +496,14 @@
 %   is |true|.
 % \end{function}
 %
+% \begin{function}{forbid-literal-units}
+%   \begin{syntax}
+%     |forbid-literal-units| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines if literal units are allowed when parsing is
+%   active; does not apply when |parse-units| is |false|.
+% \end{function}
+%
 % \begin{function}{fraction-command}
 %   \begin{syntax}
 %     |fraction-command| = \meta{command}
@@ -950,7 +958,11 @@
               \prop_if_empty:NF \l_@@_parsed_prop
                 { \@@_format_parsed: }
             }
-            { \@@_format_literal:n {#1} }
+            {
+              \bool_if:NTF \l_@@_forbid_literal_bool
+                { \msg_error:nnn { siunitx } { unit / literal } {#1} }
+                { \@@_format_literal:n {#1} }
+            }
         }
         { \@@_format_literal:n {#1} }
       \cs_set_protected:Npx \@@_format_aux:
@@ -1420,6 +1432,7 @@
 % \begin{variable}
 %   {
 %     \l_@@_denominator_bracket_bool ,
+%     \l_@@_forbid_literal_bool      ,
 %     \l_@@_fraction_function_tl     ,
 %     \l_@@_bracket_close_tl         ,
 %     \l_@@_bracket_open_tl          ,
@@ -1433,6 +1446,8 @@
   {
     bracket-unit-denominator .bool_set:N =
       \l_@@_denominator_bracket_bool ,
+    forbid-literal-units .bool_set:N =
+      \l_@@_forbid_literal_bool ,
     fraction-command .tl_set:N =
       \l_@@_fraction_function_tl ,
     parse-units .bool_set:N =
@@ -2442,6 +2457,12 @@
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
+\msg_new:nnnn { siunitx } { unit / literal }
+  { Literal~units~disabled. }
+  {
+    You~gave~the~literal~input~'#1'~
+    but~literal~unit~output~is~disabled.
+  }
 \msg_new:nnnn { siunitx } { unit / part-before-unit }
   { Found~#1~part~before~first~unit:~#2. }
   {
@@ -2459,6 +2480,7 @@
 \keys_set:nn { siunitx }
   {
     bracket-unit-denominator = true      ,
+    forbid-literal-units     = false     ,
     fraction-command         = \frac     ,
     inter-unit-product       = \,        ,
     parse-units              = true      ,
