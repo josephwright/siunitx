@@ -1385,6 +1385,137 @@ available using the \opt{angle-symbol-over-decimal} option.
 %  \ang[angle-symbol-over-decimal]{6;7;6.5}
 %\end{LaTeXdemo}
 
+\subsection{Using units}
+
+Part of the power of \pkg{siunitx} is the ability to alter the output format
+for units without changing the input. The behaviour of units is therefore
+controlled by a number of options which alter either the processing of units or
+the output directly (Tble~\ref{tab:opt:units:out}).
+
+\begin{table}
+  \centering
+  \caption{Unit output options.}
+  \label{tab:opt:units:out}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule
+      bracket-denominator & Switch  & true      \\
+      inter-unit-product  & Literal & \cs{,}    \\
+      parse-units         & Switch  & true      \\
+      per-mode            & Choice  & power     \\
+      per-symbol          & Literal & /         \\
+      qualifier-mode      & Choice  & subscript \\
+      sticky-per          & Switch  & false     \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{inter-unit-product}
+The separator between each unit is stored using the \opt{inter-unit-product}
+option. The standard setting is a thin space: another common choice is a
+centred dot. To get the correct spacing it is necessary to use
+|\ensuremath{{}\cdot{}}| in the latter case.
+\begin{LaTeXdemo}
+  \unit{\farad\squared\lumen\candela} \\
+  \unit[inter-unit-product = \ensuremath{{}\cdot{}}]
+    {\farad\squared\lumen\candela}
+\end{LaTeXdemo}
+
+\DescribeOption{per-mode}
+\DescribeOption{per-symbol}
+\DescribeOption{bracket-denominator}
+The handling of \cs{per} is altered using the \opt{per-mode} choice option. The
+standard setting is \opt{power}, meaning that \cs{per} generates reciprocal
+powers for units. Setting the option to \opt{fraction} uses the |\frac|
+function to typeset the positive and negative powers of a unit separately.
+\begin{LaTeXdemo}
+  \unit{\joule\per\mole\per\kelvin} \\
+  \unit{\metre\per\second\squared} \\
+  \unit[per-mode = fraction]{\joule\per\mole\per\kelvin} \\
+  \unit[per-mode = fraction]{\metre\per\second\squared}
+\end{LaTeXdemo}
+The closely-related \opt{power-positive-first} setting acts in the same way but
+places all of the positive powers before any negative ones.
+\begin{LaTeXdemo}
+  \unit{\ampere\per\mole\second} \\
+  \unit[per-mode = power-positive-first]
+    {\ampere\per\mole\second}
+\end{LaTeXdemo}
+It is possible to use a symbol (usually |/|) to separate the two parts of a
+unit by setting \opt{per-mode} to \opt{symbol}; the symbol used is stored using
+the setting \opt{per-symbol}. This method for displaying units can be
+ambiguous, and so brackets are added unless \opt{bracket-unit-denominator} is
+set to \opt{false}. Notice that \opt{bracket-unit-denominator} only applies
+when \opt{per-mode} is set to \opt{symbol} or \opt{symbol-or-fraction}.
+\begin{LaTeXdemo}
+  \sisetup{per-mode = symbol}%
+  \unit{\joule\per\mole\per\kelvin} \\
+  \unit{\metre\per\second\squared} \\
+  \unit[per-symbol = \ \text{div}\ ]{\joule\per\mole\per\kelvin} \\
+  \unit[bracket-denominator = false]{\joule\per\mole\per\kelvin}
+\end{LaTeXdemo}
+The often-requested (but mathematically invalid) \opt{repeated-symbol} option
+is also available to repeat the symbol for each \cs{per}.
+\begin{LaTeXdemo}
+  \unit[per-mode = repeated-symbol]{\joule\per\mole\per\kelvin}
+\end{LaTeXdemo}
+Finally, it is possible for the behaviour of the \cs{per} function to depend on
+the prevailing math style. Setting \opt{per-mode} to \opt{symbol-or-fraction}
+will use the \opt{symbol} setting for in line math, and the \opt{fraction}
+setting when used in display math.
+\begin{LaTeXdemo}
+  \sisetup{per-mode = symbol-or-fraction}%
+  $ \unit{\joule\per\mole\per\kelvin} $
+  \[ \unit{\joule\per\mole\per\kelvin} \]
+     \unit{\joule\per\mole\per\kelvin} \\
+  $
+    \displaystyle
+    \unit{\joule\per\mole\per\kelvin}
+  $
+  \[
+    \textstyle
+    \unit{\joule\per\mole\per\kelvin}
+  \]
+\end{LaTeXdemo}
+
+\DescribeOption{sticky-per}
+By default, \cs{per} applies only to the next unit given.\footnote{This is the
+standard method of reading units in English: for example,
+\unit{\joule\per\mole\per\kelvin} is pronounced \enquote{joules per mole per
+kelvin}.} By setting the \opt{sticky-per} flag, this behaviour is changed so
+that \cs{per} applies to all subsequent units.
+\begin{LaTeXdemo}
+  \unit{\pascal\per\gray\henry} \\
+  \unit[sticky-per]{\pascal\per\gray\henry}
+\end{LaTeXdemo}
+
+\DescribeOption{qualifier-mode}
+ Unit qualifiers can be printed in three different formats, set by the
+ \opt{qualifier-mode} option. The standard setting is \opt{subscript},
+ while the options \opt{bracket} and \opt{combine}
+ are also possible. With the last settings, powers can lead to ambiguity and
+ are automatically detected and brackets added as appropriate.
+\begin{LaTeXdemo}
+  \unit{\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
+  \unit[qualifier-mode = bracket]
+    {\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
+  \unit[qualifier-mode = combine]
+    {\kilogram\of{pol}\squared\per\mole\of{cat}\per\hour} \\
+\end{LaTeXdemo}
+
+\DescribeOption{parse-units}
+Normally, \pkg{siunitx} is used with the unit parse enabled, and only prints
+units directly if there is literal input. However, if the input is known to be
+essentially consistent and high performance is desired, then the parser can be
+turned off using the \opt{parse-units} switch.
+\begin{LaTeXdemo}
+  \qty{300}{\MHz} \\
+  \qty[parse-units = false]{300}{\MHz}
+\end{LaTeXdemo}
+
 \section{Installation}
 
 For most users, there will be no need to explicitly install \pkg{siunitx}:
