@@ -315,6 +315,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{round-pad}
+%   \begin{syntax}
+%     |round-pad| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{round-precision}
 %   \begin{syntax}
 %     |round-precision| = \meta{precision}
@@ -1445,6 +1451,7 @@
 %     \l_@@_round_half_even_bool  ,
 %     \l_@@_round_min_tl          ,
 %     \l_@@_round_mode_tl         ,
+%     \l_@@_round_pad_bool        ,
 %     \l_@@_round_precision_int
 %   }
 %    \begin{macrocode}
@@ -1471,6 +1478,8 @@
     round-mode .choices:nn =
       { figures , none , places, uncertainty }
       { \tl_set_eq:NN \l_@@_round_mode_tl \l_keys_choice_tl } ,
+    round-pad .bool_set:N =
+      \l_@@_round_pad_bool ,
     round-precision .int_set:N =
       \l_@@_round_precision_int ,
   }
@@ -1833,10 +1842,25 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}[EXP]{\@@_round_pad:nnn}
+%   The case where we are short of digits is easy enough to handle:
+%   generate zeros to pad it out.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_pad:nnn #1#2#3
+  {
+    {#2}
+    {
+      #3
+      \bool_if:NT \l_@@_round_pad_bool
+        { \prg_replicate:nn {#1} { 0 } } 
+    }
+  }
+%   \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[EXP]{\@@_round_figures:nNnnnNn}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnN}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnnN}
-% \begin{macro}[EXP]{\@@_round_figures_pad:nnn}
 % \begin{macro}[EXP]{\@@_round_figures:nnn}
 % \begin{macro}[EXP]
 %   {
@@ -1895,21 +1919,12 @@
               {#2} {#3}
           }
           {
-            \@@_round_figures_pad:nnn
+            \@@_round_pad:nnn
               { \l_@@_round_precision_int - (#1) } {#2} {#3}
           }
       }
     \exp_args:Nf \@@_round_figures_count:nnnN
       { \int_eval:n { #1 + 1 } } {#2} {#3}
-  }
-%    \end{macrocode}
-%   The case where we are short of figures is easy enough to handle:
-%   generate zeros to pad it out.
-%    \begin{macrocode}
-\cs_new:Npn \@@_round_figures_pad:nnn #1#2#3
-  {
-    {#2}
-    { #3 \prg_replicate:nn {#1} { 0 } }
   }
 %    \end{macrocode}
 %   Actually doing the rounding needs us to work from the least significant
@@ -2117,7 +2132,6 @@
     \@@_round_figures_truncate:nnN {#1#2} {#3}   
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2771,6 +2785,7 @@
     round-half               = up                                     ,
     round-minimum            = 0                                      ,
     round-mode               = none                                   ,
+    round-pad                = true                                   ,
     round-precision          = 2                                      ,
     separate-uncertainty     = false                                  ,
     uncertainty-separator    =                                        ,
