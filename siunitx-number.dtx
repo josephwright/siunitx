@@ -1816,7 +1816,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[EXP]{\@@_round:nnn}
+% \begin{macro}[EXP]{\@@_round:nnn, \@@_round:fnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_auxi:nnnN  ,
@@ -1828,7 +1828,7 @@
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnN, \@@_round_auxviii:nnN}
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
 %  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:fn}
-%  \begin{macro}[EXP]{\@@_round_truncate:n}
+%  \begin{macro}[EXP]{\@@_round_truncate:n, \@@_round_truncate_direct:n}
 %  \begin{macro}[EXP]{\@@_round_truncate:nnN}
 %   Actually doing the rounding needs us to work from the least significant
 %   digit, so we start by reversing the input. We \emph{could} also drop
@@ -1841,6 +1841,7 @@
     \@@_round_auxi:nnnN {#1} {#2} { }
       #3 \q_recursion_tail \q_recursion_stop
   }
+\cs_generate_variant:Nn \@@_round:nnn { f }
 \cs_new:Npn \@@_round_auxi:nnnN #1#2#3#4
   {
     \quark_if_recursion_tail_stop_do:Nn #4
@@ -1912,7 +1913,7 @@
           {#1} { } #2 \q_recursion_tail \q_recursion_stop
       }
     \bool_lazy_or:nnTF
-      { \int_compare_p:nNn { \tl_head:n {#1} } < 5 }
+      { \int_compare_p:nNn { 0 \tl_head:n {#1} } < 5 }
       {
         \bool_lazy_all_p:n
           {
@@ -1986,7 +1987,7 @@
       {
         \tl_if_blank:nTF {#1}
           {
-            { 1 \@@_round_trunctate:n {#2} 0 }
+            { 1 \@@_round_trunctate_direct:n {#2} 0 }
             { }
           }
           {
@@ -2022,9 +2023,16 @@
 \cs_generate_variant:Nn \@@_round_final:nn { f }
 %    \end{macrocode}
 %   When we have rounded up to the next power of ten, we need to go back and
-%   remove one more digit.
+%   remove one more digit. That only happens when rounding to a number of
+%   figures or when dealing with an integer part.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_trunctate:n #1
+  {
+    \str_if_eq:VnTF \l_@@_round_mode_tl { figures }
+      { \@@_round_trunctate_direct:n {#1} }
+      {#1}
+  }
+\cs_new:Npn \@@_round_trunctate_direct:n #1
   {
     \@@_round_truncate:nnN { } { }
       #1 \q_recursion_tail \q_recursion_stop
@@ -2125,7 +2133,7 @@
       {
         \int_compare:nNnTF {#1} > \l_@@_round_precision_int
           {
-            \exp_args:Nf \@@_round:nnn
+            \@@_round:fnn
               { \int_eval:n { #1 - \l_@@_round_precision_int } }
               {#2} {#3}
           }
@@ -2143,8 +2151,7 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_places:nNnnnNn}
-% \begin{macro}[EXP]
-%   {\@@_round_places_decimal:nNnnNn, \@@_round_places_integer:nNnnNn}
+% \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
 %   The first step when rounding to a fixed number of places is to establish
 %   if this is in the decimal or integer parts. The two require different
 %   calculations for how many digits to drop from the input.
@@ -2153,17 +2160,43 @@
   {
     \tl_if_blank:nTF {#5}
       {
+        \exp_not:n { {#1} #2 }
         \int_compare:nNnTF \l_@@_round_precision_int > 0
-          { \@@_round_places_decimal:nNnnNn }
-          { \@@_round_places_integer:nNnnNn }
-          {#1} #2 {#3} {#4} #6 {#7}
+          { \@@_round_places_decimal:nn }
+          { \@@_round_places_integer:nn }
+            {#3} {#4}
+        { }
+        \exp_not:n { #6 {#7} }
       }
       { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
   }
-\cs_new:Npn \@@_round_places_decimal:nNnnNn #1#2#3#4#5#6
-  { }
-\cs_new:Npn \@@_round_places_integer:nNnnNn #1#2#3#4#5#6
-  { }
+\cs_new:Npn \@@_round_places_decimal:nn #1#2
+  {
+    \int_compare:nNnTF
+      { \l_@@_round_precision_int - 0 \tl_count:n {#2} } > 0
+      {
+        \@@_round_pad:nnn
+          { \l_@@_round_precision_int - 0 \tl_count:n {#2} }
+          {#1} {#2}
+      }
+      {
+        \@@_round:fnn
+           {
+             \int_eval:n
+               { 0 \tl_count:n {#2} - \l_@@_round_precision_int }
+           }
+           {#1} {#2}
+      }
+  }
+\cs_new:Npn \@@_round_places_integer:nn #1#2
+  {
+    \@@_round:fnn
+       {
+         \int_eval:n
+           { 0 \tl_count:n {#2} - \l_@@_round_precision_int }
+       }
+       {#1} {#2}
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
