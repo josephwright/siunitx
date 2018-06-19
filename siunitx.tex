@@ -1026,6 +1026,51 @@ attempted.
   \num[drop-uncertainty]{0.01(2)}
 \end{LaTeXdemo}
 
+\DescribeOption{exponent-mode}
+\DescribeOption{fixed-exponent}
+Numbers can be converted to scientific notation by the package. This is
+controlled by the \opt{exponent-mode} option, which takes choices \opt{input},
+\opt{fixed}, \opt{engineering} and \opt{scientific}. The \opt{fixed} setting
+will use the exponent value by the \opt{fixed-exponent} option. When
+\opt{engineering} is set, the exponent is always a power of three.
+\begin{LaTeXdemo}
+  \num{0.001}   \\
+  \num{0.0100} \\
+  \num{1200}    \\
+  \sisetup{exponent-mode = scientific}%
+  \num{0.001}   \\
+  \num{0.0100} \\
+  \num{1200}    \\
+  \sisetup{exponent-mode = engineering}%
+  \num{0.001}   \\
+  \num{0.0100} \\
+  \num{1200}    \\
+  \sisetup{
+    exponent-mode  = fixed,
+    fixed-exponent = 2,
+  }%
+  \num{0.001}   \\
+  \num{0.0100} \\
+  \num{1200}
+\end{LaTeXdemo}
+When used with a \opt{fixed-exponent} of zero, this may be used to remove
+scientific notation from the input
+\begin{LaTeXdemo}
+  \num{1.23e4} \\
+  \num[exponent-mode = fixed, fixed-exponent = 0]{1.23e4}
+\end{LaTeXdemo}
+Exponent mode applies \emph{after} rounding, such that the number of decimal
+places for rounding is those which appear in the output.
+
+\DescribeOption{drop-uncertainty}
+The use of an uncertainty can be suppressed entirely using the
+\opt{drop-uncertainty} option: this applies \emph{before} rounding is
+attempted.
+\begin{LaTeXdemo}
+  \num{0.01(2)} \\
+  \num[drop-uncertainty]{0.01(2)}
+\end{LaTeXdemo}
+
 \DescribeOption{round-mode}
 \DescribeOption{round-precision}
 \DescribeOption{round-pad}
@@ -1095,42 +1140,6 @@ possible to obtain the value zero in these cases.
   \num{0.0055} \\
   \num{0.0045}
 \end{LaTeXdemo}
-
-\DescribeOption{exponent-mode}
-\DescribeOption{fixed-exponent}
-Numbers can be converted to scientific notation by the package. This is
-controlled by the \opt{exponent-mode} option, which takes choices \opt{input},
-\opt{fixed}, \opt{engineering} and \opt{scientific}. The \opt{fixed} setting
-will use the exponent value by the \opt{fixed-exponent} option. When
-\opt{engineering} is set, the exponent is always a power of three.
-\begin{LaTeXdemo}
-  \num{0.001}   \\
-  \num{0.0100} \\
-  \num{1200}    \\
-  \sisetup{exponent-mode = scientific}%
-  \num{0.001}   \\
-  \num{0.0100} \\
-  \num{1200}    \\
-  \sisetup{exponent-mode = engineering}%
-  \num{0.001}   \\
-  \num{0.0100} \\
-  \num{1200}    \\
-  \sisetup{
-    exponent-mode  = fixed,
-    fixed-exponent = 2,
-  }%
-  \num{0.001}   \\
-  \num{0.0100} \\
-  \num{1200}
-\end{LaTeXdemo}
-When used with a \opt{fixed-exponent} of zero, this may be used to remove
-scientific notation from the input
-\begin{LaTeXdemo}
-  \num{1.23e4} \\
-  \num[exponent-mode = fixed, fixed-exponent = 0]{1.23e4}
-\end{LaTeXdemo}
-Exponent mode applies \emph{after} rounding, such that the number of decimal
-places for rounding is those which appear in the output.
 
 \DescribeOption{minimum-decimal-digits}
 \DescribeOption{minimum-integer-digits}
