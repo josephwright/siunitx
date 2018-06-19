@@ -105,6 +105,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{drop-zero-decimal}
+%   \begin{syntax}
+%     |drop-zero-decimal| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{evaluate-expression}
 %   \begin{syntax}
 %     |evaluate-expression| = |true|\verb"|"|false|
@@ -1443,22 +1449,25 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_uncertainty_drop_bool ,
-%     \l_@@_exponent_mode_tl      ,
-%     \l_@@_exponent_fixed_int    ,
-%     \l_@@_min_decimal_int       ,
-%     \l_@@_min_integer_int       ,
-%     \l_@@_round_half_even_bool  ,
-%     \l_@@_round_min_tl          ,
-%     \l_@@_round_mode_tl         ,
-%     \l_@@_round_pad_bool        ,
+%     \l_@@_drop_uncertainty_bool  ,
+%     \l_@@_drop_zero_decimal_bool ,
+%     \l_@@_exponent_mode_tl       ,
+%     \l_@@_exponent_fixed_int     ,
+%     \l_@@_min_decimal_int        ,
+%     \l_@@_min_integer_int        ,
+%     \l_@@_round_half_even_bool   ,
+%     \l_@@_round_min_tl           ,
+%     \l_@@_round_mode_tl          ,
+%     \l_@@_round_pad_bool         ,
 %     \l_@@_round_precision_int
 %   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
     drop-uncertainty .bool_set:N =
-      \l_@@_uncertainty_drop_bool ,
+      \l_@@_drop_uncertainty_bool ,
+    drop-zero-decimal .bool_set:N =
+      \l_@@_drop_zero_decimal_bool ,
     exponent-mode .choices:nn =
       { engineering , fixed , input , scientific }
       { \tl_set_eq:NN \l_@@_exponent_mode_tl \l_keys_choice_tl } ,
@@ -1517,6 +1526,7 @@
             \@@_uncertainty:N #1
             \@@_exponent:N #1
             \@@_round:N #1
+            \@@_zero_decimal:N #1
             \@@_digits:N #1
           }
       }
@@ -2220,7 +2230,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_uncertainty:N #1
   {
-    \bool_if:NT \l_@@_uncertainty_drop_bool
+    \bool_if:NT \l_@@_drop_uncertainty_bool
       {
         \tl_set:Nx #1
           { \exp_after:wN \@@_uncertainty:nNnnnNn #1 }
@@ -2228,6 +2238,32 @@
   }
 \cs_new:Npn \@@_uncertainty:nNnnnNn #1#2#3#4#5#6#7
   { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_zero_decimal:N}
+% \begin{macro}[EXP]{\@@_zero_decimal:nNnnnNn}
+%   Simple stripping of the decimal part if zero.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_zero_decimal:N #1
+  {
+    \bool_if:NT \l_@@_drop_zero_decimal_bool
+      {
+        \tl_set:Nx #1
+          { \exp_after:wN \@@_zero_decimal:nNnnnNn #1 }
+      }
+  }
+\cs_new:Npn \@@_zero_decimal:nNnnnNn #1#2#3#4#5#6#7
+  {
+    \exp_not:n { {#1} #2 {#3} }
+    \str_if_eq_x:nnTF
+      { \exp_not:n {#4} }
+      { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      { { } }
+      { \exp_not:n { {#4} } }
+    \exp_not:n { {#5}  #6 {#7} }
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2782,6 +2818,7 @@
   {
     bracket-negative         = false                                  ,
     drop-uncertainty         = false                                  ,
+    drop-zero-decimal        = false                                  ,
     evaluate-expression      = false                                  ,
     exponent-base            = 10                                     ,
     exponent-mode            = input                                  ,
