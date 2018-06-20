@@ -2217,7 +2217,13 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nNnnnNn #1#2#3#4#5#6#7
   {
-    \tl_if_blank:nTF {#5}
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#5} }
+      {
+        \str_if_eq_x_p:nn
+          { \exp_not:n {#5} }
+          { \prg_replicate:nn { \tl_count:n {#5} } { 0 } }
+      }
       { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
       { }
   }
