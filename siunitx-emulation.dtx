@@ -100,6 +100,47 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Document commands}
+%
+% \begin{macro}{\si}
+%   A straight copy of \cs{unit}.
+%    \begin{macrocode}
+\NewDocumentCommand \si { O { } m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
+      \siunitx_print:nV { unit } \l_@@_tmp_tl
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\SI}
+%   Almost the same as \cs{qty}, but with the addition pre-unit.
+%    \begin{macrocode}
+\NewDocumentCommand \SI { O { } m o m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \IfNoValueF {#3}
+        {
+          \siunitx_unit_format:nN {#3} \l_@@_tmp_tl
+          \siunitx_print:nV { unit } \l_@@_tmp_tl
+          \nobreak % TEMP
+        }
+      \siunitx_number_format:nN {#2} \l_@@_tmp_tl
+      \siunitx_print:nV { number } \l_@@_tmp_tl
+      \, \nobreak % TEMP
+      \siunitx_unit_format:nN {#4} \l_@@_tmp_tl
+      \siunitx_print:nV { unit } \l_@@_tmp_tl
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsubsection{Number options}
 % 
 % For the basic emualtion, just set up some information.
