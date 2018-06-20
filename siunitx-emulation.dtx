@@ -82,12 +82,23 @@
 %    \begin{macrocode}
 \msg_new:nnn { siunitx } { option-deprecated }
   {
-    Option~"#1"~has~been~deprecrated~in~this~release.\\ \\
+    Option~"#1"~has~been~deprecated~in~this~release.\\ \\
     Use~"#2"~as~a~replacement.
   }
 \msg_new:nnn { siunitx } { option-removed }
   { Option~"#1"~has~been~removed~in~this~release. }
 %    \end{macrocode}
+%
+% \begin{macro}{\@@_option_deprecated:nn}
+%   Abstract out a simple wrapper.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_option_deprecated:nn #1#2
+  {
+    \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2}
+    \keys_set:nn { siunitx } {#2}
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsubsection{Number options}
 %
@@ -109,6 +120,11 @@
           }
       } ,
     input-protect-tokens .code:n = ,
+      {
+        \msg_info:nn { siunitx } { option-deprecated }
+          { input-protect-tokens }
+          { input-digits }
+      } ,
     input-symbols        .code:n =
       {
         \tl_set:Nn \l_@@_number_input_symbol_tl {#1}
@@ -130,8 +146,9 @@
   {
     add-decimal-zero .code:n =
       {
-        \msg_warning:nnn { siunitx } { option-removed }
+        \@@_option_deprecated:nn
           { add-decimal-zero }
+          { minimum-decimal-digits~=~1 }
       } ,
     add-integer-zero .code:n =
       {
@@ -141,7 +158,11 @@
    explicit-sign .code:n =
       {
         \str_if_eq:nnTF {#1} { + }
-          { \keys_set:nn { siunitx } { print-explicit-plus = true } }
+          {
+            \@@_option_deprecated:nn
+              { explicit-sign }
+              { print-explicit-plus~=~true  }
+          }
           {
             \msg_warning:nnn { siunitx } { option-removed }
               { explicit-sign }
@@ -152,20 +173,55 @@
         \msg_warning:nnn { siunitx } { option-removed }
           { retain-explicit-plus }
       } ,
-    retain-unity-mantissa .meta:n = print-unity-mantissa ,
-    retain-zero-exponent .meta:n = retain-zero-exponent ,
-    omit-uncertainty .meta:n = drop-uncertainty ,
+    retain-unity-mantissa .code:n =
+      {
+        \@@_option_deprecated:nn
+          { retain-unity-mantissa }
+          { print-unity-mantissa }
+      } ,
+    retain-zero-exponent .code:n =
+      {
+        \@@_option_deprecated:nn
+          { retain-zero-exponent }
+          { print-zero-exponent }
+      } ,
+    omit-uncertainty .code:n =
+      {
+        \@@_option_deprecated:nn
+          { omit-uncertainty }
+          { drop-uncertainty }
+      } ,
     scientific-notation .choice: ,
     scientific-notation / engineering .code:n =
-      { \keys_set:nn { siunitx } { exponent-mode = engineering } } ,
+      {
+        \@@_option_deprecated:nn
+          { scientific-notation~=~engineering }
+          { exponent-mode~=~engineering }
+      } ,
     scientific-notation / fixed .code:n =
-      { \keys_set:nn { siunitx } { exponent-mode = fixed } } ,
+      {
+        \@@_option_deprecated:nn
+          { scientific-notation~=~fixed }
+          { exponent-mode~=~fixed }
+      } ,
     scientific-notation / false .code:n =
-      { \keys_set:nn { siunitx } { exponent-mode = input } } ,
+      {
+        \@@_option_deprecated:nn
+          { scientific-notation~=~false }
+          { exponent-mode~=~none }
+      } ,
     scientific-notation / true .code:n =
-      { \keys_set:nn { siunitx } { exponent-mode = scientific } } ,
+      {
+        \@@_option_deprecated:nn
+          { scientific-notation~=~true }
+          { exponent-mode~=~scientific }
+      } ,
     zero-decimal-to-integer .meta:n =
-      { drop-zero-decimal = #1 }
+      {
+        \@@_option_deprecated:nn
+          { zero-decimal-to-integer }
+          { drop-zero-decimal }
+      }
   }
 %    \end{macrocode}
 %
@@ -187,24 +243,44 @@
         \msg_warning:nnn { siunitx } { option-removed }
           { literal-superscript-as-power }
       } ,
-    per-mode / reciprocal .meta:n
-      = { per-mode = power } ,
-    per-mode / reciprocal-positive-first .meta:n
-      = { per-mode = power-positive-first } ,
+    per-mode / reciprocal .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal }
+          { per-mode~=~power }
+      } ,
+    per-mode / reciprocal-positive-first .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal-positive-first }
+          { per-mode~=~power-positive-first }
+      } ,
     power-font .code:n =
       {
         \msg_warning:nnn { siunitx } { option-removed }
           { power-font }
       } ,
-    qualifier-mode / brackets .meta:n =
-      { qualifier-mode = bracket } ,
+    qualifier-mode / brackets .code:n =
+      {
+        \@@_option_deprecated:nn
+          { qualifier-mode~=~brackets }
+          { qualifier-mode~=~bracket }
+      } ,
     qualifier-mode / space .meta:n =
       {
-        qualifier-mode   = phrase ,
-        qualifier-phrase = \  ,
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { qualifier-mode~=~space }
+          { qualifier-mode~=~phrase"~plus~"qualifier-phrase=\  }
+        \keys_set:nn
+          { siunitx }
+          { qualifier-mode = phrase, qualifier-phrase = \  }
       } ,
     qualifier-mode / text .meta:n =
-      { qualifier-mode = combine } ,
+      {
+        \@@_option_deprecated:nn
+          { qualifier-mode~=~text }
+          { qualifier-mode~=~combine }
+      }
   }
 %    \end{macrocode}
 %
