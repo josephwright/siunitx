@@ -1081,7 +1081,9 @@ takes the choices \opt{none}, \opt{figures}, \opt{places} and
 \opt{uncertainty}. When rounding is turned on, the number of digits used
 (either decimal places or significant figures in the mantissa) is set using the
 \opt{round-precision} option. Rounding numbers with uncertainties may be
-carried out using the \opt{uncertainty} setting to \opt{round-mode}.
+carried out using the \opt{uncertainty} setting to \opt{round-mode}. In this
+case the precision is used first to round the uncertainty itself (to a number
+of figures), before rounding the main value to follow.
 \begin{LaTeXdemo}
   \num{1.23456} \\
   \num{14.23} \\
@@ -1100,6 +1102,13 @@ carried out using the \opt{uncertainty} setting to \opt{round-mode}.
   \num{1.23456} \\
   \num{14.23} \\
   \num{0.12345(9)}
+  \sisetup{
+    round-mode      = uncertainty,
+    round-precision = 1
+  }%
+  \num{0.12345(9)}
+  \num{0.12345(23)}
+  \num{0.12345(234)}
 \end{LaTeXdemo}
 Rounding my \enquote{extend} a short number to more digits (or figures): this
 is controlled by the switch \opt{round-pad}, which is \opt{true} as standard.
