@@ -1310,8 +1310,12 @@
             \bool_if:NTF #2
               { \@@_parse_loop_break:wN }
               {
-                \@@_parse_loop_main_store:NNN #1
-                  \c_false_bool \c_false_bool
+                \tl_if_empty:NTF \l_@@_partial_tl
+                  { \tl_put_right:Nx #1 { { } } }
+                  {
+                    \@@_parse_loop_main_store:NNN #1
+                      \c_false_bool \c_false_bool
+                  }
                 \@@_parse_loop_after_uncert:NNN #1 #3
               }
           }
