@@ -1837,6 +1837,7 @@
 %  \begin{macro}[EXP]{\@@_round_auxvi:nN}
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnN, \@@_round_auxviii:nnN}
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
+%  \begin{macro}[EXP]{\@@_round_final_output:nn, \@@_round_final_output:ff}
 %  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:fn}
 %  \begin{macro}[EXP]{\@@_round_truncate:n, \@@_round_truncate_direct:n}
 %  \begin{macro}[EXP]{\@@_round_truncate:nnN}
@@ -1968,8 +1969,9 @@
       {
         \str_if_eq:nnTF {#1} { 0 }
           {
-            { 1 }
-            { \@@_round_trunctate:n {#2} }
+            \@@_round_final_output:ff
+              { 1 }
+              { \@@_round_trunctate:n {#2} }
           }
           {
             \@@_round_auxviii:nnN {#2} { } #1
@@ -1997,12 +1999,17 @@
       {
         \tl_if_blank:nTF {#1}
           {
-            { 1 \@@_round_trunctate_direct:n {#2} 0 }
-            { }
+            \@@_round_final_output:ff
+              {
+                \exp_last_unbraced:Nf 1
+                  { \@@_round_trunctate_direct:n {#2} } 0
+              }
+              { }
           }
           {
-            { 1 #2 }
-            { \@@_round_trunctate:n {#1} }
+            \@@_round_final_output:ff
+              { 1 #2 }
+              { \@@_round_trunctate:n {#1} }
           }
       }
     \int_compare:nNnTF {#3} = 9
@@ -2019,15 +2026,19 @@
 \cs_new:Npn \@@_round_final_decimal:nnw
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
-    { \tl_reverse:n {#1} }
-    { \tl_reverse:n {#3} #2 }
+    \@@_round_final_output:ff
+      { \tl_reverse:n {#1} }
+      { \tl_reverse:n {#3} #2 }
   }
 \cs_new:Npn \@@_round_final_integer:nnw
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
-    { \tl_reverse:n {#3} #2 }
-    {#1}
+    \@@_round_final_output:ff
+      { \tl_reverse:n {#3} #2 }
+      {#1}
   }
+\cs_new:Npn \@@_round_final_output:nn #1#2 { {#1} {#2} }
+\cs_generate_variant:Nn \@@_round_final_output:nn { ff }
 \cs_new:Npn \@@_round_final:nn #1#2
   { #2 #1 }
 \cs_generate_variant:Nn \@@_round_final:nn { f }
@@ -2053,6 +2064,7 @@
     \@@_round_truncate:nnN {#1#2} {#3}   
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
