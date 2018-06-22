@@ -90,14 +90,22 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\@@_option_deprecated:nn}
+% \begin{macro}{\@@_option_deprecated:nnn, \@@_option_deprecated:nnV}
 %   Abstract out a simple wrapper.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_option_deprecated:nn #1#2
   {
     \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2}
-    \exp_args:Nnx \keys_set:nn { siunitx } {#2}
+    \keys_set:nn { siunitx } {#2}
   }
+\cs_new_protected:Npn \@@_option_deprecated:nnn #1#2#3
+  {
+    \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2}
+    \keys_set:nn { siunitx } { #2 = #3 }
+  }
+\cs_generate_variant:Nn \@@_option_deprecated:nnn { nnV }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Document commands}
@@ -190,21 +198,24 @@
       } ,
     retain-unity-mantissa .code:n =
       {
-        \@@_option_deprecated:nn
+        \@@_option_deprecated:nnV
           { retain-unity-mantissa }
           { print-unity-mantissa }
+          \l_keys_value_tl
       } ,
     retain-zero-exponent .code:n =
       {
-        \@@_option_deprecated:nn
+        \@@_option_deprecated:nnV
           { retain-zero-exponent }
           { print-zero-exponent }
+          \l_keys_value_tl
       } ,
     omit-uncertainty .code:n =
       {
-        \@@_option_deprecated:nn
+        \@@_option_deprecated:nnV
           { omit-uncertainty }
           { drop-uncertainty }
+          \l_keys_value_tl
       } ,
     scientific-notation .choice: ,
     scientific-notation / engineering .code:n =
