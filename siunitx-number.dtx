@@ -1548,7 +1548,7 @@
 %     \@@_exponent_scientific:nNnnnNn
 %   }
 % \begin{macro}[EXP]{\@@_exponent_scientific:nnnw}
-% \begin{macro}[EXP]{\@@_exponent_shift:nnn}
+% \begin{macro}[EXP]{\@@_exponent_shift:nnn,\@@_exponent_shift:nnf}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnnw}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nw}
@@ -1642,6 +1642,7 @@
       { \@@_exponent_shift_down:nnnw {#1} {#3} { } #2 \q_stop }
       { \@@_exponent_shift_up:nnw {#1} {#2} #3 \q_stop}
   }
+\cs_generate_variant:Nn \@@_exponent_shift:nnn { nnf }
 %    \end{macrocode}
 %   For shifting the exponent down, there is first a loop to reserve the
 %   integer part before doing the work: that of course has to be undone
@@ -1843,6 +1844,17 @@
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
 %  \begin{macro}[EXP]{\@@_round_final_output:nn, \@@_round_final_output:ff}
 %  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:fn}
+%  \begin{macro}[EXP]{\@@_round_final_shift:nn, \@@_round_final_shift:ff}
+%  \begin{macro}[EXP]{\@@_round_final_shift:Nw}
+%  \begin{macro}[EXP]
+%    {
+%      \@@_round_engineering:nn ,
+%      \@@_round_fixed:nn       ,
+%      \@@_round_input:nn       ,
+%      \@@_round_scientifitc:nn
+%    }
+%  \begin{macro}[EXP]{\@@_round_engineering:NNNNn}
+%  \begin{macro}[EXP]{\@@_round_engineering:nnN}
 %  \begin{macro}[EXP]{\@@_round_truncate:n, \@@_round_truncate_direct:n}
 %  \begin{macro}[EXP]{\@@_round_truncate:nnN}
 %   Actually doing the rounding needs us to work from the least significant
@@ -2003,7 +2015,7 @@
       {
         \tl_if_blank:nTF {#1}
           {
-            \@@_round_final_output:ff
+            \@@_round_final_shift:ff
               {
                 \exp_last_unbraced:Nf 1
                   { \@@_round_truncate_direct:n {#2} } 0
@@ -2011,7 +2023,7 @@
               { }
           }
           {
-            \@@_round_final_output:ff
+            \@@_round_final_shift:ff
               { 1 #2 }
               { \@@_round_truncate:n {#1} }
           }
@@ -2047,6 +2059,61 @@
   { #2 #1 }
 \cs_generate_variant:Nn \@@_round_final:nn { f }
 %    \end{macrocode}
+%   Here we deal with the case where rounding applies along with an
+%   exponent set based on number of places. We can only get here if an
+%   additional integer digit has been added, so there is no need to test for
+%   that. There are two cases for action: when using |scientific| mode, where
+%   we always need to shift by one, and when using |engineering| mode if
+%   we now have four digits. The latter is a bit more work: we need to trim
+%   digits off as required.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_final_shift:nn #1#2
+  {
+    \str_if_eq:VnTF \l_@@_round_mode_tl { places }
+      {
+        \use:c
+          { @@_round_ \l_@@_exponent_mode_tl :nn }
+          {#1} {#2}
+      }
+      { {#1} {#2} }
+  }
+\cs_generate_variant:Nn \@@_round_final_shift:nn { ff }
+\cs_new:Npn \@@_round_engineering:nn #1#2
+  {
+    \int_compare:nNnTF { \tl_count:n {#1} } = 4
+      {
+        \@@_round_engineering:NNNNn #1 {#2}
+        { }
+        \@@_round_final_shift:Nw 3
+      }
+      { {#1} {#2} }
+  }
+\cs_new:Npn \@@_round_engineering:NNNNn #1#2#3#4#5
+  {
+    {#1}
+    \exp_args:NV \@@_round_engineering:nnN
+      { \l_@@_round_precision_int } { }
+      #2#3#4#5 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_engineering:nnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3 { {#2} }
+    \int_compare:nNnTF {#1} = { 0 }
+      { \use_i_delimit_by_q_recursion_stop:nw { {#2} } }
+      { \@@_round_engineering:nnN { #1 - 1 } { #2#3 } }
+  }
+\cs_new:Npn \@@_round_fixed:nn #1#2 { {#1} {#2} }
+\cs_new:Npn \@@_round_input:nn #1#2 { {#1} {#2} }
+\cs_new:Npn \@@_round_scientific:nn #1#2
+  {
+    \@@_exponent_shift:nnf
+      { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
+    { }
+    \@@_round_final_shift:Nw 1
+  }
+\cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_places_end:Nn #3#4
+  { \@@_exponent_finalise:n { #3#4 + #1 } }
+%    \end{macrocode}
 %   When we have rounded up to the next power of ten, we need to go back and
 %   remove one more digit. That only happens when rounding to a number of
 %   figures or when dealing with an integer part.
@@ -2068,6 +2135,8 @@
     \@@_round_truncate:nnN {#1#2} {#3}   
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2179,10 +2248,13 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_places:nNnnnNn}
+% \begin{macro}[EXP]{\@@_round_places_end:Nn}
 % \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
 %   The first step when rounding to a fixed number of places is to establish
 %   if this is in the decimal or integer parts. The two require different
-%   calculations for how many digits to drop from the input.
+%   calculations for how many digits to drop from the input. The no-op end
+%   function here is to allow tidying up in some cases: see the finalisation
+%   of rounding.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_places:nNnnnNn #1#2#3#4#5#6#7
   {
@@ -2193,11 +2265,11 @@
           { \@@_round_places_decimal:nn }
           { \@@_round_places_integer:nn }
             {#3} {#4}
-        { }
-        \exp_not:n { #6 {#7} }
+        \@@_round_places_end:Nn #6 {#7}
       }
       { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
   }
+\cs_new:Npn \@@_round_places_end:Nn #1#2 { { } \exp_not:n { #1 {#2} } }
 \cs_new:Npn \@@_round_places_decimal:nn #1#2
   {
     \int_compare:nNnTF
@@ -2226,6 +2298,7 @@
        {#1} {#2}
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
