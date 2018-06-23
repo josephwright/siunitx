@@ -517,7 +517,6 @@
 %
 % \begin{macro}{\@@_direct_begin:}
 % \begin{macro}{\@@_direct_begin:w}
-% \begin{macro}{\@@_direct_begin_aux:}
 % \begin{macro}{\@@_direct_end:}
 % \begin{macro}{\@@_direct_center:, \@@_direct_center_switch:}
 % \begin{macro}{\@@_direct_end:NN}
@@ -534,14 +533,10 @@
       { \@@_print_text:n }
       {
         \m@th
-        \@@_direct_begin_aux:
+        \bool_if:NTF \c_true_bool
+          { \@@_direct_center: }
+          { \@@_direct_fixed: }
       }
-  }
-\cs_new_protected:Npn \@@_direct_begin_aux:
-  {
-    \bool_if:NTF ???
-      { \@@_direct_center: }
-      { \@@_direct_fixed: }
   }
 \cs_new_protected:Npn \@@_direct_end:
   {
@@ -613,7 +608,6 @@
   {
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
