@@ -105,7 +105,9 @@
   }
 \cs_new_protected:Npn \siunitx_cell_end:
   {
-    \@@_collect_end:
+    \bool_if:NTF \l_@@_parse_bool
+      { \@@_collect_end: }
+      { \@@_direct_end: }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -516,6 +518,7 @@
 % \begin{macro}{\@@_direct_begin:}
 % \begin{macro}{\@@_direct_begin:w}
 % \begin{macro}{\@@_direct_begin_aux:}
+% \begin{macro}{\@@_direct_end:}
 % \begin{macro}{\@@_direct_center:, \@@_direct_center_switch:}
 % \begin{macro}{\@@_direct_end:NN}
 %   After removing the |\ignorespaces| at the start of the cell (see comments
@@ -539,6 +542,12 @@
     \bool_if:NTF ???
       { \@@_direct_center: }
       { \@@_direct_fixed: }
+  }
+\cs_new_protected:Npn \@@_direct_end:
+  {
+    \bool_if:NTF ???
+      { \@@_direct_center_end: }
+      { \@@_direct_fixed_end: }
   }
 %    \end{macrocode}
 %   When centring the content about a decimal marker, the trick is
@@ -604,6 +613,7 @@
   {
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
