@@ -95,19 +95,30 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_text_bool}
+%   Used to track that a cell is purely text.
+%    \begin{macrocode}
+\bool_new:N \l_@@_text_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_cell_begin:, \siunitx_cell_end:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_cell_begin:
   {
+    \bool_set_false:N \l_@@_text_bool
     \bool_if:NTF \l_@@_parse_bool
       { \@@_collect_begin: }
       { \@@_direct_begin: }
   }
 \cs_new_protected:Npn \siunitx_cell_end:
   {
-    \bool_if:NTF \l_@@_parse_bool
-      { \@@_collect_end: }
-      { \@@_direct_end: }
+    \bool_if:NF \l_@@_text_bool
+      {
+        \bool_if:NTF \l_@@_parse_bool
+          { \@@_collect_end: }
+          { \@@_direct_end: }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -461,6 +472,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_text:n #1
   {
+    \bool_set_true:N \l_@@_text_bool
     \use:c { @@_align_ \l_@@_align_text_tl :n } {#1}
   }
 \cs_generate_variant:Nn \@@_print_text:n { V }
