@@ -539,7 +539,6 @@
 % \begin{macro}{\@@_direct_begin:w}
 % \begin{macro}{\@@_direct_end:}
 % \begin{macro}{\@@_direct_marker:, \@@_direct_marker_switch:}
-% \begin{macro}{\@@_direct_end:NN}
 %   After removing the |\ignorespaces| at the start of the cell (see comments
 %   for \cs{@@_collect_begin:N}), check to see  if there is a |{| and branch
 %   as appropriate.
@@ -596,25 +595,23 @@
       { \box_wd:N \l_@@_integer_box }
         > { \box_wd:N \l_@@_decimal_box }
       {
-        \@@_direct_end:NN
-          \l_@@_integer_box
-          \l_@@_decimal_box
+        \hbox_set_to_wd:Nnn \l_@@_decimal_box
+          { \box_wd:N \l_@@_integer_box }
+          {
+            \hbox_unpack:N \l_@@_decimal_box
+            \@@_fil:
+          }
       }
       {
-        \@@_direct_end:NN
-          \l_@@_integer_box
-          \l_@@_decimal_box
+        \hbox_set_to_wd:Nnn \l_@@_integer_box
+          { \box_wd:N \l_@@_decimal_box }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_integer_box
+          }
       }
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
-  }
-\cs_new_protected:Npn \@@_direct_end:NN #1#2
-  {
-    \hbox_set_to_wd:Nnn #2 { \box_wd:N #1 }
-      {
-        \hbox_unpack:N #2
-        \@@_fil:
-      }
   }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -622,7 +619,6 @@
   {
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
