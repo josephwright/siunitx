@@ -526,7 +526,7 @@
 % \begin{macro}{\@@_direct_begin:}
 % \begin{macro}{\@@_direct_begin:w}
 % \begin{macro}{\@@_direct_end:}
-% \begin{macro}{\@@_direct_center:, \@@_direct_center_switch:}
+% \begin{macro}{\@@_direct_marker:, \@@_direct_marker_switch:}
 % \begin{macro}{\@@_direct_end:NN}
 %   After removing the |\ignorespaces| at the start of the cell (see comments
 %   for \cs{@@_collect_begin:N}), check to see  if there is a |{| and branch
@@ -541,17 +541,11 @@
       { \@@_print_text:n }
       {
         \m@th
-        \bool_if:NTF \c_true_bool
-          { \@@_direct_center: }
-          { \@@_direct_fixed: }
+        \use:c { @@_direct_ \l_@@_align_mode_tl : }
       }
   }
 \cs_new_protected:Npn \@@_direct_end:
-  {
-    \bool_if:NTF ???
-      { \@@_direct_center_end: }
-      { \@@_direct_fixed_end: }
-  }
+  { \use:c { @@_direct_ \l_@@_align_mode_tl _end: } }
 %    \end{macrocode}
 %   When centring the content about a decimal marker, the trick is
 %   to collect everything into two boxes and then compare the sizes.
@@ -559,7 +553,7 @@
 %   to make the switch. The up-front setting of the |decimal| box deals
 %   with the case where there is no decimal part.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_direct_center:
+\cs_new_protected:Npn \@@_direct_marker:
   {
     \hbox_set:Nn \l_@@_tmp_box
       { \ensuremath { \l_@@_output_align_tl } }
@@ -570,11 +564,11 @@
       \c_math_toggle_token
       \tl_map_inline:Nn \l_@@_input_align_tl
         {
-          \char_set_active_eq:NN ##1 \@@_direct_center_switch:
+          \char_set_active_eq:NN ##1 \@@_direct_marker_switch:
           \char_set_mathcode:nn { `##1 } { "8000 }
         }
   }
-\cs_new_protected:Npn \@@_direct_center_switch:
+\cs_new_protected:Npn \@@_direct_marker_switch:
   {
       \c_math_toggle_token
     \hbox_set_end:
@@ -582,7 +576,7 @@
       \c_math_toggle_token
       \l_@@_output_align_tl
   }
-\cs_new_protected:Npn \@@_direct_center_end:
+\cs_new_protected:Npn \@@_direct_marker_end:
   {
       \c_math_toggle_token
     \hbox_set_end:
@@ -696,7 +690,7 @@
     table-align-uncertainty  = false  ,
     table-alignment          = center ,
     table-alignment-mode     = marker ,
-    table-alignment-position = centre ,
+    table-alignment-position = center ,
     table-column-width       = 0pt    ,
     table-fixed-width        = false  ,
     table-format             =        ,
