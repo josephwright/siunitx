@@ -957,35 +957,29 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_finalise:}
-% \begin{macro}{\@@_parse_finalise_aux:N}
-% \begin{macro}{\@@_parse_finalise_aux:Nw}
+% \begin{macro}{\@@_parse_finalise:Nw}
 %   Combine all of the bits of a number together: both the real and
 %   imaginary parts contain all of the data.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_finalise:
   {
-    \@@_parse_finalise_aux:N \l_@@_parsed_tl
-  }
-\cs_new_protected:Npn \@@_parse_finalise_aux:N #1
-  {
-    \tl_if_empty:NF #1
+    \tl_if_empty:NF \l_@@_parsed_tl
       {
-        \tl_set:Nx #1
+        \tl_set:Nx \l_@@_parsed_tl
           {
             { \exp_not:V \l_@@_comparator_tl }
-            \exp_not:V #1
-            \exp_after:wN \@@_parse_finalise_aux:Nw
+            \exp_not:V \l_@@_parsed_tl
+            \exp_after:wN \@@_parse_finalise:Nw
               \l_@@_exponent_tl \q_stop
           }
       }
   }
-\cs_new:Npn \@@_parse_finalise_aux:Nw #1#2 \q_stop
+\cs_new:Npn \@@_parse_finalise:Nw #1#2 \q_stop
   {
     \exp_not:N #1
     { \exp_not:n {#2} }
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
