@@ -452,10 +452,7 @@
 % efficient approach is desirable (contrast parsing units, which is open-ended
 % and therefore fits well with using a property list).
 %
-% To allow for complex numbers, two parallel data structures are used, one for
-% the real part and one for the imaginary part. If the part is entirely absent
-% then the data structures are left empty. Within each part, the structure
-% is
+% In this relase, the structure of a valid number is:
 % \begin{quote}
 %   \marg{comparator}\meta{sign}\marg{integer}\marg{decimal}
 %     \marg{uncertainty}\\
@@ -471,7 +468,6 @@
 %      \l_@@_expression_bool       ,
 %      \l_@@_input_uncert_close_tl ,
 %      \l_@@_input_comparator_tl   ,
-%      \l_@@_input_complex_tl      ,
 %      \l_@@_input_decimal_tl      ,
 %      \l_@@_input_digit_tl        ,
 %      \l_@@_input_exponent_tl     ,
@@ -493,8 +489,6 @@
       \l_@@_input_uncert_close_tl ,
     input-comparators .tl_set:N =
       \l_@@_input_comparator_tl ,
-    input-complex-roots .tl_set:N =
-      \l_@@_input_complex_tl ,
     input-decimal-markers .tl_set:N =
       \l_@@_input_decimal_tl ,
     input-digits .tl_set:N =
@@ -550,21 +544,18 @@
 % \end{variable}
 %
 % \begin{variable}{\l_@@_flex_tl}
-%   When parsing for a separate uncertainty or complex number, the nature
-%   of the grabbed part cannot be determined until the end of the number.
-%   To avoid abusing the storage areas, this dedicated one is used for
-%   \enquote{flexible} cases.
+%   In a number with an uncertainty, the exact meaning of a second part is
+%   not fully resolved until parsing is complete. That is handled using
+%   this \enquote{flexible} store.
 %    \begin{macrocode}
 \tl_new:N \l_@@_flex_tl
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_imaginary_tl, \l_@@_real_tl}
-%   Used to hold the real and imaginary parts of a number in the standardised
-%   format.
+% \begin{variable}{\l_@@_parsed_tl}
+%   The number parsed into internal format.
 %    \begin{macrocode}
-\tl_new:N \l_@@_imaginary_tl
-\tl_new:N \l_@@_real_tl
+\tl_new:N \l_@@_parsed_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -594,15 +585,13 @@
 % \begin{macro}{\@@_parse:n}
 %   After some initial set up, the parser expands the input and then replaces
 %   as far as possible tricky tokens with ones that can be handled using
-%   delimited arguments. The parser begins with the assumption that the input
-%   is a real number. To avoid multiple conditionals here, the parser is
+%   delimited arguments. To avoid multiple conditionals here, the parser is
 %   set up as a chain of commands initially, with a loop only later. This
 %   avoids more conditionals than are necessary.
 %    \begin{macrocode}q
 \cs_new_protected:Npn \@@_parse:n #1
   {
-    \tl_clear:N \l_@@_imaginary_tl
-    \tl_clear:N \l_@@_real_tl
+    \tl_clear:N \l_@@_parsed_tl
     \protected@edef \l_@@_arg_tl
       {
         \bool_if:NTF \l_@@_expression_bool
@@ -622,8 +611,7 @@
 %   After the loop there is one case that might need tidying up. If a
 %   separated uncertainty was found it will be currently in \cs{l_@@_flex_tl}
 %   and needs moving. A series of tests pick up that case, then the check is
-%   made that some content was found for at least one of the real or imaginary
-%   parts of the number.
+%   made that some content was found
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_check:
   {
@@ -632,7 +620,7 @@
         \bool_lazy_and:nnTF
           {
             \tl_if_blank_p:f
-              { \exp_after:wN \use_iv:nnnn \l_@@_real_tl }
+              { \exp_after:wN \use_iv:nnnn \l_@@_parsed_tl }
           }
           {
             \tl_if_blank_p:f
@@ -644,13 +632,11 @@
             \tl_if_in:NVTF \l_@@_input_uncert_sign_tl
               \l_@@_tmp_tl
               { \@@_parse_combine_uncert: }
-              { \tl_clear:N \l_@@_real_tl }
+              { \tl_clear:N \l_@@_parsed_tl }
           }
-          { \tl_clear:N \l_@@_real_tl }
+          { \tl_clear:N \l_@@_parsed_tl }
       }
-    \bool_lazy_and:nnTF
-      { \tl_if_empty_p:N \l_@@_real_tl  }
-      { \tl_if_empty_p:N \l_@@_imaginary_tl }
+    \tl_if_empty:NTF \l_@@_parsed_tl
       {
         \bool_if:NF \l_@@_validate_bool
           {
@@ -688,11 +674,11 @@
   {
     \exp_after:wN \exp_after:wN \exp_after:wN
     \@@_parse_combine_uncert_auxi:NnnnNnnn
-      \exp_after:wN \l_@@_real_tl \l_@@_flex_tl
+      \exp_after:wN \l_@@_parsed_tl \l_@@_flex_tl
   }
 %    \end{macrocode}
 %   Here, |#4|, |#5| and |#8| are all junk arguments simply there to mop up
-%   tokens, while |#1| will be recovered later from \cs{l_@@_real_tl} so does
+%   tokens, while |#1| will be recovered later from \cs{l_@@_parsed_tl} so does
 %   not need to be passed about. The difference in places between the two
 %   decimal parts is now found: this is done just once to avoid having to
 %   parse token lists twice. The value is then used to generate a number of
@@ -705,7 +691,7 @@
   {
     \int_compare:nNnTF { \tl_count:n {#6} } > { \tl_count:n {#2} }
       {
-        \tl_clear:N \l_@@_real_tl
+        \tl_clear:N \l_@@_parsed_tl
         \tl_clear:N \l_@@_flex_tl
       }
       {
@@ -740,9 +726,9 @@
 \cs_new_protected:Npn
   \@@_parse_combine_uncert_auxiv:nnnn #1#2#3#4
   {
-    \tl_set:Nx \l_@@_real_tl
+    \tl_set:Nx \l_@@_parsed_tl
       {
-        \tl_head:V \l_@@_real_tl
+        \tl_head:V \l_@@_parsed_tl
           { \exp_not:n {#1} }
           {
             \bool_lazy_and:nnTF
@@ -833,7 +819,7 @@
     \tl_if_empty:NTF \l_@@_input_exponent_tl
       {
         \tl_set:Nn \l_@@_exponent_tl { +0 }
-        \tl_if_empty:NF \l_@@_real_tl
+        \tl_if_empty:NF \l_@@_parsed_tl
           { \@@_parse_loop: }
       }
       {
@@ -870,10 +856,10 @@
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
         \tl_if_blank:nTF {#2}
-          { \tl_clear:N \l_@@_real_tl }
+          { \tl_clear:N \l_@@_parsed_tl }
           { \@@_parse_exponent_aux:Nw #2 \q_stop }
       }
-    \tl_if_empty:NF \l_@@_real_tl
+    \tl_if_empty:NF \l_@@_parsed_tl
       { \@@_parse_loop: }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nw #1#2 \q_stop
@@ -882,13 +868,13 @@
       { \@@_parse_exponent_aux:Nn #1 {#2} }
       { \@@_parse_exponent_aux:Nn + {#1#2} }
     \tl_if_empty:NT \l_@@_exponent_tl
-      { \tl_clear:N \l_@@_real_tl }
+      { \tl_clear:N \l_@@_parsed_tl }
   }
 \cs_new_protected:Npn \@@_parse_exponent_aux:Nn #1#2
   {
     \tl_set:Nn \l_@@_exponent_tl { #1 }
     \tl_if_blank:nTF {#2}
-      { \tl_clear:N \l_@@_real_tl }
+      { \tl_clear:N \l_@@_parsed_tl }
       {
         \@@_parse_exponent_zero_test:N #2
           \q_recursion_tail \q_recursion_stop
@@ -914,7 +900,7 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_cleanup:wN
   #1 \q_recursion_stop
-  { \tl_clear:N \l_@@_real_tl }
+  { \tl_clear:N \l_@@_parsed_tl }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -978,8 +964,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_finalise:
   {
-    \@@_parse_finalise_aux:N \l_@@_real_tl
-    \@@_parse_finalise_aux:N \l_@@_imaginary_tl
+    \@@_parse_finalise_aux:N \l_@@_parsed_tl
   }
 \cs_new_protected:Npn \@@_parse_finalise_aux:N #1
   {
@@ -1011,14 +996,12 @@
 % \begin{macro}{\@@_parse_loop_main_digit:NNNNN}
 % \begin{macro}{\@@_parse_loop_main_decimal:NN}
 % \begin{macro}{\@@_parse_loop_main_uncert:NNN}
-% \begin{macro}{\@@_parse_loop_main_complex:N}
 % \begin{macro}{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
 % \begin{macro}{\@@_parse_loop_after_decimal:NNN}
 % \begin{macro}{\@@_parse_loop_uncert:NNNNN}
 % \begin{macro}{\@@_parse_loop_after_uncert:NNN}
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
-% \begin{macro}{\@@_parse_loop_complex_cleanup:wN}
 % \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
 %   mantissa, which may contain an uncertainty or complex part. Parsing this
@@ -1032,7 +1015,7 @@
   {
     \tl_clear:N \l_@@_partial_tl
     \exp_after:wN \@@_parse_loop_first:NNN
-      \exp_after:wN \l_@@_real_tl \exp_after:wN \c_true_bool
+      \exp_after:wN \l_@@_parsed_tl \exp_after:wN \c_true_bool
         \l_@@_arg_tl
         \q_recursion_tail \q_recursion_stop
   }
@@ -1047,7 +1030,6 @@
 %       routine.
 %     \item A decimal marker: store an empty integer part and move to
 %       the main collection routine for a decimal part.
-%     \item A complex root token: shuffle to the end of the input.
 %   \end{itemize}
 %   Anything else is invalid and sends the code to the abort function.
 %    \begin{macrocode}
@@ -1070,11 +1052,7 @@
             \tl_put_right:Nn #1 { { 0 } }
             \@@_parse_loop_after_decimal:NNN #1 #2
           }
-          {
-            \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
-              { \@@_parse_loop_root_swap:NNwNN #1 #3 }
-              { \@@_parse_loop_break:wN }
-          }
+          { \@@_parse_loop_break:wN }
       }
   }
 %    \end{macrocode}
@@ -1096,8 +1074,6 @@
 %       there leading to a store-and-switch situation.
 %     \item An open-uncertainty token: switch to the dedicated collector
 %       for uncertainties.
-%     \item A complex root token: store the current number as an imaginary
-%       part and terminate the loop.
 %     \item A sign token (if allowed): stop collecting this number and
 %       restart collection for the second part.
 %   \end{itemize}
@@ -1119,24 +1095,16 @@
             \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#5}
               { \@@_parse_loop_main_uncert:NNN #1#2 #4 }
               {
-                \tl_if_in:NnTF \l_@@_input_complex_tl {#5}
+                \bool_if:NTF #4
                   {
-                    \@@_parse_loop_main_store:NNN
-                      #1 #2 \c_true_bool
-                    \@@_parse_loop_main_complex:N #1
-                  }
-                  {
-                    \bool_if:NTF #4
+                    \tl_if_in:NnTF \l_@@_input_sign_tl {#5}
                       {
-                        \tl_if_in:NnTF \l_@@_input_sign_tl {#5}
-                          {
-                            \@@_parse_loop_main_sign:NNN
-                              #1#2 #5
-                          }
-                          { \@@_parse_loop_break:wN }
+                        \@@_parse_loop_main_sign:NNN
+                          #1#2 #5
                       }
                       { \@@_parse_loop_break:wN }
                   }
+                  { \@@_parse_loop_break:wN }
               }
           }
       }
@@ -1198,19 +1166,6 @@
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
     \@@_parse_loop_uncert:NNNNN
       #1 \c_true_bool \c_false_bool #3
-  }
-%    \end{macrocode}
-%   A complex root token has to be at the end of the input (leading ones
-%   are dealt with specially). Thus after moving the data to the correct
-%   place there is a hand-off to a cleanup function. The case where only the
-%   complex root token was given is covered by
-%   \cs{@@_parse_loop_root_swap:NNwNN}.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main_complex:N #1
-  {
-    \tl_set_eq:NN \l_@@_imaginary_tl #1
-    \tl_clear:N #1
-    \@@_parse_loop_complex_cleanup:wN
   }
 %    \end{macrocode}
 %   If a sign is found, terminate the current number, store the sign as the
@@ -1312,72 +1267,26 @@
   }
 %    \end{macrocode}
 %   After a bracketed uncertainty there are only a very small number of
-%   valid choices. The number can end, there can be a complex root token
-%   or there can be a sign. The latter is only allowed if the part being
-%   parsed at the moment was the first part of the number. The case where
-%   there is no root symbol but there should have been is cleared up after
-%   the loop code, so at this stage there is no check.
+%   valid choices. The number can end or there can be a sign. The latter is
+%   only allowed if the part being parsed at the moment was the first part of
+%   the number.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_after_uncert:NNN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #3
-    \tl_if_in:NnTF \l_@@_input_complex_tl {#3}
-      { \@@_parse_loop_main_complex:N #1 }
+    \bool_if:NTF #2
       {
-        \bool_if:NTF #2
+        \tl_if_in:NnTF \l_@@_input_sign_tl {#3}
           {
-            \tl_if_in:NnTF \l_@@_input_sign_tl {#3}
-              {
-                \tl_set:Nn \l_@@_flex_tl {#3}
-                \@@_parse_loop_first:NNN
-                  \l_@@_flex_tl \c_false_bool
-              }
-              { \@@_parse_loop_break:wN }
+            \tl_set:Nn \l_@@_flex_tl {#3}
+            \@@_parse_loop_first:NNN
+               \l_@@_flex_tl \c_false_bool
           }
           { \@@_parse_loop_break:wN }
       }
+      { \@@_parse_loop_break:wN }
   }
 %    \end{macrocode}
-%   When the complex root symbol comes at the start of the number rather than
-%   at the end, the easiest approach is to shuffle it to the \enquote{normal}
-%   position. As the exponent has already been removed, this must be the last
-%   token of the input and any duplication will be picked up. The case where
-%   just a complex root token has to be covered: in that situation, there is
-%   an implicit |1| to store after which the loop stops.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_root_swap:NNwNN #1#2#3
-  \q_recursion_tail \q_recursion_stop
-  {
-    \tl_if_blank:nTF {#3}
-      {
-        \tl_set:Nx \l_@@_imaginary_tl
-          {
-            \exp_not:V #1
-            { 1 } { } { }
-          }
-        \tl_clear:N #1
-      }
-      {
-        \use:x
-          {
-            \tl_clear:N \exp_not:N #1
-            \tl_set:Nn \exp_not:N \l_@@_flex_tl { \exp_not:V #1 }
-          }
-        \@@_parse_loop_first:NNN
-          \l_@@_flex_tl \c_false_bool
-          #3 #2 \q_recursion_tail \q_recursion_stop
-      }
-  }
-%    \end{macrocode}
-%   Nothing is allowed after a complex root token: check and if there is
-%   kill the parsing.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_complex_cleanup:wN
-  #1 \q_recursion_tail \q_recursion_stop
-  {
-    \tl_if_blank:nF {#1}
-      { \@@_parse_loop_break:wN \q_recursion_stop }
-  }
 %    \end{macrocode}
 %   Something is not right: remove all of the remaining tokens from the
 %   number and clear the storage areas as a signal for the next part of the
@@ -1386,13 +1295,10 @@
 \cs_new_protected:Npn \@@_parse_loop_break:wN
   #1 \q_recursion_stop
   {
-    \tl_clear:N \l_@@_imaginary_tl
     \tl_clear:N \l_@@_flex_tl
-    \tl_clear:N \l_@@_real_tl
+    \tl_clear:N \l_@@_parsed_tl
   }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1426,11 +1332,11 @@
     \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
       {
         \tl_set:Nn \l_@@_arg_tl {#2}
-        \tl_set:Nn \l_@@_real_tl {#1}
+        \tl_set:Nn \l_@@_parsed_tl {#1}
       }
-      { \tl_set:Nn \l_@@_real_tl { + } }
+      { \tl_set:Nn \l_@@_parsed_tl { + } }
     \tl_if_empty:NTF \l_@@_arg_tl
-      { \tl_clear:N \l_@@_real_tl }
+      { \tl_clear:N \l_@@_parsed_tl }
       { \@@_parse_exponent: }
   }
 %    \end{macrocode}
@@ -1504,8 +1410,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_process:
   {
-    \@@_process:N \l_@@_real_tl
-    \@@_process:N \l_@@_imaginary_tl
+    \@@_process:N \l_@@_parsed_tl
   }
 \cs_new_protected:Npn \@@_process:N #1
   {
@@ -2483,18 +2388,7 @@
 \cs_new_protected:Npn \@@_format:
   {
     \tl_set:Nx \l_@@_formatted_tl
-      {
-        \tl_if_empty:NTF \l_@@_real_tl
-          {
-            \tl_if_empty:NF \l_@@_imaginary_tl
-              { \@@_format:N \l_@@_imaginary_tl }
-          }
-          {
-            \tl_if_empty:NTF \l_@@_imaginary_tl
-              { \@@_format:N \l_@@_real_tl }
-              { ??? }
-          }
-      }
+      { \@@_format:N \l_@@_parsed_tl }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2875,9 +2769,7 @@
     \group_begin:
       \bool_set_true:N \l_@@_validate_bool
       \@@_parse:n {#1}
-      \bool_lazy_and:nnTF
-        { \tl_if_empty_p:N \l_@@_real_tl }
-        { \tl_if_empty_p:N \l_@@_imaginary_tl }
+      \tl_if_empty:NTF \l_@@_parsed_tl
         {
           \group_end:
           \prg_return_false:
@@ -2900,7 +2792,6 @@
     \tl_set:Nx \l_@@_valid_tl
       {
         \exp_not:V \l_@@_input_uncert_close_tl
-        \exp_not:V \l_@@_input_complex_tl
         \exp_not:V \l_@@_input_comparator_tl
         \exp_not:V \l_@@_input_decimal_tl
         \exp_not:V \l_@@_input_digit_tl
@@ -2949,7 +2840,6 @@
     group-minimum-digits     = 4                                      ,
     group-separator          = \,                                     , % (
     input-close-uncertainty  = )                                      ,
-    input-complex-roots      = ij                                     ,
     input-comparators        = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
     input-decimal-markers    = { ., }                                 ,
     input-digits             = 0123456789                             ,
