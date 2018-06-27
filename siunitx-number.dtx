@@ -1000,7 +1000,7 @@
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
 % \begin{macro}{\@@_parse_loop_after_decimal:NNN}
 % \begin{macro}{\@@_parse_loop_uncert:NNNNN}
-% \begin{macro}{\@@_parse_loop_after_uncert:NNN}
+% \begin{macro}{\@@_parse_loop_after_uncert:N}
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
 % \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
@@ -1259,32 +1259,19 @@
                     \@@_parse_loop_main_store:NNN #1
                       \c_false_bool \c_false_bool
                   }
-                \@@_parse_loop_after_uncert:NNN #1 #3
+                \@@_parse_loop_after_uncert:N
               }
           }
           { \@@_parse_loop_break:wN }
       }
   }
 %    \end{macrocode}
-%   After a bracketed uncertainty there are only a very small number of
-%   valid choices. The number can end or there can be a sign. The latter is
-%   only allowed if the part being parsed at the moment was the first part of
-%   the number.
+%   No further tokens are allowed after an uncertainty in parenthesis.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_after_uncert:NNN #1#2#3
+\cs_new_protected:Npn \@@_parse_loop_after_uncert:N #1
   {
-    \quark_if_recursion_tail_stop:N #3
-    \bool_if:NTF #2
-      {
-        \tl_if_in:NnTF \l_@@_input_sign_tl {#3}
-          {
-            \tl_set:Nn \l_@@_flex_tl {#3}
-            \@@_parse_loop_first:NNN
-               \l_@@_flex_tl \c_false_bool
-          }
-          { \@@_parse_loop_break:wN }
-      }
-      { \@@_parse_loop_break:wN }
+    \quark_if_recursion_tail_stop:N #1
+    \@@_parse_loop_break:wN
   }
 %    \end{macrocode}
 %    \end{macrocode}
