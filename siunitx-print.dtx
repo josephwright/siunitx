@@ -278,6 +278,13 @@
   }
 %    \end{macrocode}
 %
+% \begin{macro}{\tl_replace_all:NVn}
+%   Required variants.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \tl_replace_all:Nnn { NV }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{variable}{\l_@@_tmp_box, \l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
@@ -427,6 +434,21 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{macro}{\@@_replace_font:N}
+%   A simple auxiliary for \enquote{zapping} the unit font.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_replace_font:N #1
+  {
+    \tl_if_empty:NF \l_siunitx_unit_font_tl
+      {
+        \tl_replace_all:NVn #1
+          \l_siunitx_unit_font_tl
+          { \use:n }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\@@_math:n}
 % \begin{macro}{\@@_math_version:nn, \@@_math_version:Vn}
 % \begin{macro}
@@ -541,15 +563,14 @@
         {#1}
   }
 %    \end{macrocode}
-%   Search-and-replace fun: deal with any \cs{mathrm} in the argument and
+%   Search-and-replace fun: deal with any font commands  in the argument and
 %   also inside sub/superscripts.
 %    \begin{macrocode}
 \cs_new_protected:Npx \@@_math_aux:Nn #1#2
   {
     \group_begin:
       \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#2}
-      \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
-        { \exp_not:N \mathrm } { \exp_not:N \use:n }
+      \@@_replace_font:N \exp_not:N \l_siunitx_unit_font_tl
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
         { \char_generate:nn { `\_ } { 8 } }
         { \exp_not:N \@@_math_sub:n }
@@ -571,7 +592,7 @@
   {
     \group_begin:
       \tl_set:Nn \l_@@_tmp_tl {#1}
-      \tl_replace_all:Nnn \l_@@_tmp_tl { \mathrm } { \use:n }
+      \@@_replace_font:N \l_@@_tmp_tl
       \tl_use:N \l_@@_tmp_tl
     \group_end:
   }
@@ -617,8 +638,7 @@
   }
 %    \end{macrocode}
 %   To get math mode material to print in text mode, various search-and-replace
-%   steps are needed. The \cs{mathrm} command is also disabled as it is
-%   invalid in text mode.
+%   steps are needed.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_replace:n #1
   {
@@ -630,9 +650,8 @@
   }
 \cs_new_protected:Npx \@@_text_replace:N #1
   {
+    \@@_replace_font:N #1
     \exp_not:N \@@_text_replace:NNn #1
-      \exp_not:N \mathrm
-        { \exp_not:N \use:n }
       \exp_not:N \pm
         { \exp_not:N \textpm }
       \exp_not:N \mp

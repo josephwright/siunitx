@@ -70,8 +70,7 @@
 % A small number of \LaTeXe{} math mode commands are assumed to be available
 % as part of the formatted output. The \cs{mathchoice} command
 % (normally the \TeX{} primitive) is needed when using
-% |per-mode = symbol-or-fraction|. The command \cs{mathrm} is used for
-% wrapping the text (letter) part of units. The commands \cs{frac},
+% |per-mode = symbol-or-fraction|. The commands \cs{frac}, \cs{mathrm},
 % \cs{mbox}, \verb*|\ | and \cs{,} are used by the standard module settings,
 % and \cs{ensuremath}, \cs{hbar}, \cs{mathit} and \cs{mathrm} in some standard
 % unit definitions (for atomic and natural units). For the display of colored
@@ -194,6 +193,11 @@
 %   symbolic unit commands (\emph{e.g.}~|\kilo\gram|) or a mixture of the two.
 %   In literal mode the \meta{meaning} will be typeset directly.
 % \end{function}
+%
+% \begin{variable}{\l_siunitx_unit_font_tl}
+%    The font function which is applied to the text of units when constructing
+%    formatted units: set by |font-command|.
+% \end{variable}
 %
 % \begin{variable}{\l_siunitx_unit_symbolic_seq}
 %   This sequence contains all of the symbolic \meta{unit} names defined :
@@ -502,6 +506,16 @@
 %   \end{syntax}
 %   Switch which determines if literal units are allowed when parsing is
 %   active; does not apply when |parse-units| is |false|.
+% \end{function}
+%
+% \begin{function}{font-command}
+%   \begin{syntax}
+%     |font-command| = \meta{command}
+%   \end{syntax}
+%   Command applied to text during output of units: should be command usable
+%   in math mode for font selection. Notice that in a typical unit this does
+%   not (necessarily) apply to all output, for example powers or brackets.
+%   The standard setting is |\mathrm|.
 % \end{function}
 %
 % \begin{function}{fraction-command}
@@ -897,13 +911,16 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 %
-% \begin{variable}{\l_@@_product_tl}
+% \begin{variable}{\l_siunitx_unit_font_tl, \l_@@_product_tl}
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
-    inter-unit-product .tl_set:N = \l_@@_product_tl
+    font-command .tl_set:N =
+      \l_siunitx_unit_font_tl ,
+    inter-unit-product .tl_set:N =
+      \l_@@_product_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -1129,8 +1146,8 @@
               }
             \exp_not:N \tl_if_blank:nF {##1}
               {
-                \exp_not:N \exp_not:N
-                  \exp_not:N \mathrm
+                \exp_not:N \exp_not:V
+                  \exp_not:N \l_siunitx_unit_font_tl
                   { \exp_not:N \exp_not:n {##1} }
               }
             \exp_not:N \tl_if_blank:nF {##4}
@@ -1139,8 +1156,8 @@
               {
                 \c_@@_math_subscript_tl
                   {
-                    \exp_not:N \exp_not:N
-                      \exp_not:N \mathrm
+                    \exp_not:N \exp_not:V
+                      \exp_not:N \l_siunitx_unit_font_tl
                       { \exp_not:N \exp_not:n {##2##5} }
                   }
               }
@@ -1808,7 +1825,7 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_bracket_open_tl
-        \exp_not:N \mathrm
+        \exp_not:V \l_siunitx_unit_font_tl
           { \exp_not:V \l_@@_part_tl }
         \exp_not:V \l_@@_bracket_close_tl
       }
@@ -1820,7 +1837,7 @@
     \tl_set:Nx \l_@@_part_tl
       {
         \exp_not:V \l_@@_qualifier_phrase_tl
-        \exp_not:N \mathrm
+        \exp_not:V \l_siunitx_unit_font_tl
           { \exp_not:V \l_@@_part_tl }
       }
   }
@@ -1831,7 +1848,7 @@
       {
         \c_@@_math_subscript_tl
           {
-            \exp_not:N \mathrm
+            \exp_not:V \l_siunitx_unit_font_tl
               { \exp_not:V \l_@@_part_tl }
           }
       }
@@ -1964,7 +1981,7 @@
       {
         \tl_set:Nx \l_@@_current_tl
           {
-            \exp_not:N \mathrm
+            \exp_not:V \l_siunitx_unit_font_tl
               { \exp_not:V \l_@@_current_tl }
           }
         \bool_set_true:N \l_@@_font_bool
@@ -2497,6 +2514,7 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
+    font-command             = \mathrm   ,
     bracket-unit-denominator = true      ,
     forbid-literal-units     = false     ,
     fraction-command         = \frac     ,
@@ -2505,8 +2523,8 @@
     per-mode                 = power     ,
     per-symbol               = /         ,
     qualifier-mode           = subscript ,
-    qualifier-phrase         =           ,
     sticky-per               = false     ,
+    qualifier-phrase         =           ,
     unit-close-bracket       = )         , % (
     unit-open-bracket        = (           % )
   }
