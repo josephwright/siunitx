@@ -260,14 +260,10 @@
       }
       { \cs_new_eq:NN \@@_texttimes: \texttimes }
     \group_begin:
-      \keys_set:nn { siunitx }
-        {
-          print-explicit-plus    = false ,
-          round-mode             = none  ,
-          input-exponent-markers = e     ,
-          input-digits           = 12
-        }
-        \siunitx_number_format:nN {2e1} \l_@@_tmpa_tl
+        \tl_set:Nn \l_@@_tmpa_tl
+          { { } + { 2 } { } { } + { 1 } }
+        \tl_set:Nx \l_@@_tmpa_tl
+          { \siunitx_number_format:N \l_@@_tmpa_tl }
         \tl_set:Nn \l_@@_tmpb_tl { 2 \times 10 ^ { 1 } }
         \tl_if_eq:NNTF \l_@@_tmpa_tl \l_@@_tmpb_tl
           {

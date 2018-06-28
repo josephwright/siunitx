@@ -70,6 +70,19 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}[rEXP]{\siunitx_number_format:N}
+%   \begin{syntax}
+%     \cs{siunitx_number_format:N} \Arg{number}
+%   \end{syntax}
+%   Formats the \meta{number} (in the \pkg{siunitx} internal format),
+%   producing the result in a form suitable for typesetting in math mode.
+%   The details for the formatting are controlled by a number of key--value
+%   options. Note that \emph{formatting} does not apply any manipulation
+%   (processing) to the number. This function is usable in an \texttt{e}-
+%   or \texttt{x}-type expansion, and further uncontrolled expansion is
+%   prevented by appropriate use of |\exp_not:n| internally.
+% \end{function}
+%
 % \begin{function}[TF]{\siunitx_if_number:n}
 %   \begin{syntax}
 %     \cs{siunitx_if_number_token:NTF} \Arg{tokens}
@@ -422,7 +435,8 @@
         {
           \@@_parse:n {#1}
           \@@_process:
-          \@@_format:
+          \tl_set:Nx \l_@@_formatted_tl
+            { \siunitx_number_format:N \l_@@_parsed_tl }
         }
         { \tl_set:Nn \l_@@_formatted_tl { \ensuremath {#1} } }
     \exp_args:NNNV \group_end:
@@ -2364,51 +2378,41 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_format:}
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_format:
-  {
-    \tl_set:Nx \l_@@_formatted_tl
-      { \@@_format:N \l_@@_parsed_tl }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[EXP]{\@@_format:N}
-% \begin{macro}[EXP]{\@@_format:nNnnnNn}
-% \begin{macro}[EXP]{\@@_format_comparator:n}
-% \begin{macro}[EXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
-% \begin{macro}[EXP]
+% \begin{macro}[rEXP]{\siunitx_number_format:N}
+% \begin{macro}[rEXP]{\@@_format:nNnnnNn}
+% \begin{macro}[rEXP]{\@@_format_comparator:n}
+% \begin{macro}[rEXP]{\@@_format_sign:N, \@@_format_sign_aux:N}
+% \begin{macro}[rEXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
-% \begin{macro}[EXP]{\@@_format_integer:nnn}
-% \begin{macro}[EXP]{\@@_format_decimal:n, \@@_format_decimal:f}
-% \begin{macro}[EXP]{\@@_format_digits:nn}
-% \begin{macro}[EXP]{\@@_format_integer_aux:n}
-% \begin{macro}[EXP]
+% \begin{macro}[rEXP]{\@@_format_integer:nnn}
+% \begin{macro}[rEXP]{\@@_format_decimal:n, \@@_format_decimal:f}
+% \begin{macro}[rEXP]{\@@_format_digits:nn}
+% \begin{macro}[rEXP]{\@@_format_integer_aux:n}
+% \begin{macro}[rEXP]
 %   {
 %     \@@_format_integer_aux_0:n,
 %     \@@_format_integer_aux_1:n,
 %     \@@_format_integer_aux_2:n
 %   }
-% \begin{macro}[EXP]{\@@_format_decimal_aux:n}
-% \begin{macro}[EXP]{\@@_format_decimal_loop:NNNN}
-% \begin{macro}[EXP]{\@@_format_integer_first:nnNN}
-% \begin{macro}[EXP]{\@@_format_integer_loop:NNNN}
-% \begin{macro}[EXP]{\@@_format_uncertainty:nn}
-% \begin{macro}[EXP]{\@@_format_uncertainty_unaligned:}
-% \begin{macro}[EXP]
-%   {\@@_format_uncertainty_aux:nn, \@@_format_uncertainty_aux:fn}
-% \begin{macro}[EXP]
+% \begin{macro}[rEXP]{\@@_format_decimal_aux:n}
+% \begin{macro}[rEXP]{\@@_format_decimal_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_format_integer_first:nnNN}
+% \begin{macro}[rEXP]{\@@_format_integer_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_format_uncertainty:nn}
+% \begin{macro}[rEXP]{\@@_format_uncertainty_unaligned:}
+% \begin{macro}[rEXP]
+%   {\@@_format_runcertainty_aux:nn, \@@_format_uncertainty_aux:fn}
+% \begin{macro}[rEXP]
 %   {\@@_format_uncertainty:nnw, \@@_format_uncertainty:fnw}
-% \begin{macro}[EXP]{\@@_format_uncertainty:nw}
-% \begin{macro}[EXP]{\@@_format_exponent:Nnn}
-% \begin{macro}[EXP]{\@@_format_end:}
+% \begin{macro}[rEXP]{\@@_format_uncertainty:nw}
+% \begin{macro}[rEXP]{\@@_format_exponent:Nnn}
+% \begin{macro}[rEXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts. All of the parts are assembled including
 %   inserting tabular alignment markers (which may be empty) for each
 %   separate unit.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format:N #1
+\cs_new:Npn \siunitx_number_format:N #1
   {
     \tl_if_empty:NF #1
       { \exp_after:wN \@@_format:nNnnnNn #1 }
