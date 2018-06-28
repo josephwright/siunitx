@@ -70,6 +70,28 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}[rEXP]{\siunitx_number_parse:nN}
+%   \begin{syntax}
+%     \cs{siunitx_number_parse:nN} \Arg{number} \meta{tl~var}
+%   \end{syntax}
+%   Parses the \emph{number} and stores the resulting internal representation
+%   in the \meta{tl~var}. The parsing is influenced by the various key--value
+%   settings for numerical input. The \meta{number} should comprise a single
+%   real value, possibly with comparator, uncertainty and exponent parts.
+%   If the number is invalid, or if number parsing is disabled, the result will
+%   be an entirely empty \meta{tl~var}.
+%
+%   The structure of a valid number is:
+%   \begin{quote}
+%     \marg{comparator}\meta{sign}\marg{integer}\marg{decimal}
+%       \marg{uncertainty}\\
+%       \meta{exponent sign}\marg{exponent}
+%   \end{quote}
+%   where the two sign parts must be single tokens and all other components
+%   must be given in braces. The number will have at least one digit for both the
+%   \meta{integer} and \meta{exponent} parts: these are required.
+% \end{function}
+%
 % \begin{function}[rEXP]{\siunitx_number_format:N}
 %   \begin{syntax}
 %     \cs{siunitx_number_format:N} \Arg{number}
@@ -433,7 +455,7 @@
     \group_begin:
       \bool_if:NTF \l_@@_parse_bool
         {
-          \@@_parse:n {#1}
+          \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
           \@@_process:
           \tl_set:Nx \l_@@_formatted_tl
             { \siunitx_number_format:N \l_@@_parsed_tl }
@@ -466,7 +488,7 @@
 % efficient approach is desirable (contrast parsing units, which is open-ended
 % and therefore fits well with using a property list).
 %
-% In this relase, the structure of a valid number is:
+% In this release, the structure of a valid number is:
 % \begin{quote}
 %   \marg{comparator}\meta{sign}\marg{integer}\marg{decimal}
 %     \marg{uncertainty}\\
@@ -596,27 +618,30 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_parse:n}
+% \begin{macro}{\siunitx_number_parse:nN}
 %   After some initial set up, the parser expands the input and then replaces
 %   as far as possible tricky tokens with ones that can be handled using
 %   delimited arguments. To avoid multiple conditionals here, the parser is
 %   set up as a chain of commands initially, with a loop only later. This
 %   avoids more conditionals than are necessary.
-%    \begin{macrocode}q
-\cs_new_protected:Npn \@@_parse:n #1
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_parse:nN #1#2
   {
-    \tl_clear:N \l_@@_parsed_tl
-    \protected@edef \l_@@_arg_tl
-      {
-        \bool_if:NTF \l_@@_expression_bool
-          { \fp_eval:n { \@@_expression:n {#1} } }
-          {#1}
-      }
-    \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
-    \@@_parse_replace:
-    \tl_if_empty:NF \l_@@_arg_tl
-      { \@@_parse_comparator: }
-    \@@_parse_check:
+    \group_begin:
+      \tl_clear:N \l_@@_parsed_tl
+      \protected@edef \l_@@_arg_tl
+        {
+          \bool_if:NTF \l_@@_expression_bool
+            { \fp_eval:n { \@@_expression:n {#1} } }
+            {#1}
+        }
+      \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
+      \@@_parse_replace:
+      \tl_if_empty:NF \l_@@_arg_tl
+        { \@@_parse_comparator: }
+      \@@_parse_check:
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn #2 \l_@@_parsed_tl
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2753,7 +2778,7 @@
   {
     \group_begin:
       \bool_set_true:N \l_@@_validate_bool
-      \@@_parse:n {#1}
+      \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
       \tl_if_empty:NTF \l_@@_parsed_tl
         {
           \group_end:
