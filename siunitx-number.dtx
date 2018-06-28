@@ -619,6 +619,7 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_number_parse:nN}
+% \begin{macro}{\@@_parse:nN}
 %   After some initial set up, the parser expands the input and then replaces
 %   as far as possible tricky tokens with ones that can be handled using
 %   delimited arguments. To avoid multiple conditionals here, the parser is
@@ -626,6 +627,12 @@
 %   avoids more conditionals than are necessary.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_parse:nN #1#2
+  {
+    \bool_if:NTF \l_@@_parse_bool
+      { \@_parse:nN {#1} #2 }
+      { \tl_clear:N #2 }
+  }
+\cs_new_protected:Npn \@@_parse:nN #1#2
   {
     \group_begin:
       \tl_clear:N \l_@@_parsed_tl
@@ -644,6 +651,7 @@
     \tl_set:Nn #2 \l_@@_parsed_tl
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_check:}
