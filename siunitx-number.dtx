@@ -89,7 +89,14 @@
 %   \end{quote}
 %   where the two sign parts must be single tokens and all other components
 %   must be given in braces. The number will have at least one digit for both the
-%   \meta{integer} and \meta{exponent} parts: these are required.
+%   \meta{integer} and \meta{exponent} parts: these are required. The
+%   \meta{uncertainty} part should either be blank or contain an
+%   \meta{identifier} (as a brace group), followed by one or more data entries.
+%   Valid \meta{identifiers} currently are
+%   \begin{itemize}
+%     \item[\texttt{S}] A single symmetrical uncertainty (\foreign{e.g.}~a
+%       statistical standard uncertainty)
+%   \end{itemize}
 % \end{function}
 %
 % \begin{function}[rEXP]{\siunitx_number_format:N}
@@ -803,7 +810,10 @@
   }
 \cs_new:Npn \@@_parse_combine_uncert_auxvi:w
   #1 \q_recursion_tail \q_recursion_stop
-  { \exp_not:n {#1} }
+  {
+    \tl_if_blank:nF {#1}
+      { { S } { \exp_not:n {#1} } }
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1297,6 +1307,8 @@
                 \tl_if_empty:NTF \l_@@_partial_tl
                   { \tl_put_right:Nx #1 { { } } }
                   {
+                    \tl_set:Nx \l_@@_partial_tl
+                      { { S } { \exp_not:V \l_@@_partial_tl } }
                     \@@_parse_loop_main_store:NNN #1
                       \c_false_bool \c_false_bool
                   }
@@ -2230,7 +2242,8 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn}
 %   Rounding to an uncertainty can only happen where the result will have some
-%   uncertainty left: otherwise we simply drop the uncertainty entirely.
+%   uncertainty left: otherwise we simply drop the uncertainty entirely. Only
+%   |S|-type uncertainties can be used for rounding.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nNnnnNn #1#2#3#4#5#6#7
   {
@@ -2239,9 +2252,14 @@
       { ! \int_compare_p:nNn \l_@@_round_precision_int > 0 }
       { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
       {
-        \exp_not:n { {#1} #2 }
-        \@@_round_uncertainty:nnn {#3} {#4} {#5}
-        \exp_not:n { #6 {#7} }
+        \str_if_eq_x:nnTF { \tl_head:n {#5} } { S }
+          {
+            \exp_not:n { {#1} #2 }
+            \exp_args:Nnno \@@_round_uncertainty:nnn
+              {#3} {#4} { \use_ii:nn #5 }
+            \exp_not:n { #6 {#7} }
+          }
+          { \exp_not:n { {#1} #2 {#3} {#4} {#5} #6 {#7} } }
       }
   }
 %    \end{macrocode}
@@ -2264,12 +2282,12 @@
       {
         \@@_round:fnn
           { \tl_count:n {#5} - \tl_count:n {#2} } {#3} {#4}
-        {#2}
+        { { S } {#2} }
       }
       {
         \@@_round:fnn
           { \tl_count:n {#5} - \tl_count:n {#2} + 1 } {#3} {#4}
-        { #1 \@@_round_truncate_direct:n {#2} }
+        { { S } { #1 \@@_round_truncate_direct:n {#2} } }
       }
   }
 %    \end{macrocode}
@@ -2433,11 +2451,12 @@
 % \begin{macro}[rEXP]{\@@_format_integer_loop:NNNN}
 % \begin{macro}[rEXP]{\@@_format_uncertainty:nn}
 % \begin{macro}[rEXP]{\@@_format_uncertainty_unaligned:}
+% \begin{macro}[rEXP]{\@@_format_uncertainty_S:nnw}
 % \begin{macro}[rEXP]
-%   {\@@_format_runcertainty_aux:nn, \@@_format_uncertainty_aux:fn}
+%   {\@@_format_uncertainty_S_aux:nn, \@@_format_uncertainty_S_aux:fn}
 % \begin{macro}[rEXP]
-%   {\@@_format_uncertainty:nnw, \@@_format_uncertainty:fnw}
-% \begin{macro}[rEXP]{\@@_format_uncertainty:nw}
+%   {\@@_format_uncertainty_S:nnw, \@@_format_uncertainty_S:fnw}
+% \begin{macro}[rEXP]{\@@_format_uncertainty_S:nw}
 % \begin{macro}[rEXP]{\@@_format_exponent:Nnn}
 % \begin{macro}[rEXP]{\@@_format_end:}
 %   The approach to formatting a single number is to split into
@@ -2636,22 +2655,8 @@
     \tl_if_blank:nTF {#1}
       { \@@_format_uncertainty_unaligned: }
       {
-        \bool_if:NTF \l_@@_uncert_separate_bool
-          {
-            \exp_not:V \l_@@_tab_tl
-            \@@_format_sign_aux:N \pm
-            \exp_not:V \l_@@_tab_tl
-            \@@_format_uncertainty_aux:fn
-              { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#2} } }
-              {#1}
-          }
-          {
-            \exp_not:V \l_@@_uncert_separator_tl
-            \exp_not:V \l_@@_output_uncert_open_tl
-            \exp_not:n {#1}
-            \exp_not:V \l_@@_output_uncert_close_tl
-            \@@_format_uncertainty_unaligned:
-          }
+        \use:c { @@_format_uncertainty_ \tl_head:n {#1} :nnw }
+          {#2} #1
       }
   }
 \cs_new:Npn \@@_format_uncertainty_unaligned:
@@ -2661,11 +2666,30 @@
     \exp_not:V \l_@@_tab_tl
     \exp_not:V \l_@@_tab_tl
   }
-\cs_new:Npn \@@_format_uncertainty_aux:nn #1#2
+\cs_new:Npn \@@_format_uncertainty_S:nnw #1#2#3
+  {
+    \bool_if:NTF \l_@@_uncert_separate_bool
+      {
+        \exp_not:V \l_@@_tab_tl
+        \@@_format_sign_aux:N \pm
+        \exp_not:V \l_@@_tab_tl
+        \@@_format_uncertainty_S_aux:fn
+          { \int_eval:n { \tl_count:n {#3} - \tl_count:n {#1} } }
+          {#3}
+      }
+      {
+        \exp_not:V \l_@@_uncert_separator_tl
+        \exp_not:V \l_@@_output_uncert_open_tl
+        \exp_not:n {#3}
+        \exp_not:V \l_@@_output_uncert_close_tl
+        \@@_format_uncertainty_unaligned:
+      }
+  }
+\cs_new:Npn \@@_format_uncertainty_S_aux:nn #1#2
   {
     \int_compare:nNnTF {#1} > 0
       {
-        \@@_format_uncertainty_aux:fnw
+        \@@_format_uncertainty_S_aux:fnw
           { \int_eval:n { #1 - 1 } }
           { }
           #2 \q_nil
@@ -2679,22 +2703,22 @@
           }
       }
   }
-\cs_generate_variant:Nn \@@_format_uncertainty_aux:nn { f }
-\cs_new:Npn \@@_format_uncertainty_aux:nnw #1#2#3
+\cs_generate_variant:Nn \@@_format_uncertainty_S_aux:nn { f }
+\cs_new:Npn \@@_format_uncertainty_S_aux:nnw #1#2#3
   {
     \quark_if_nil:NF #3
       {
         \int_compare:nNnTF {#1} = 0
-          { \@@_format_uncertainty_aux:nw {#2#3} }
+          { \@@_format_uncertainty_S_aux:nw {#2#3} }
           {
-            \@@_format_uncertainty_aux:fnw
+            \@@_format_uncertainty_S_aux:fnw
               { \int_eval:n { #1 - 1 } }
               {#2#3}
           }
       }
   }
-\cs_generate_variant:Nn \@@_format_uncertainty_aux:nnw { f }
-\cs_new:Npn \@@_format_uncertainty_aux:nw #1#2 \q_nil
+\cs_generate_variant:Nn \@@_format_uncertainty_S_aux:nnw { f }
+\cs_new:Npn \@@_format_uncertainty_S_aux:nw #1#2 \q_nil
   {
     \@@_format_digits:nn { integer } {#1}
     \@@_format_decimal:n {#2}
@@ -2746,6 +2770,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
