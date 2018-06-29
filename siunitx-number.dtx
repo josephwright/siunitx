@@ -105,7 +105,7 @@
 %   prevented by appropriate use of |\exp_not:n| internally.
 % \end{function}
 %
-% \begin{function}[TF]{\siunitx_if_number:n}
+% \begin{function}[pTF, EXP]{\siunitx_if_number:n}
 %   \begin{syntax}
 %     \cs{siunitx_if_number_token:NTF} \Arg{tokens}
 %       \Arg{true code} \Arg{false code}
@@ -2801,30 +2801,58 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[TF]{\siunitx_if_number_token:N}
+% \begin{macro}[pTF, EXP]{\siunitx_if_number_token:N}
+% \begin{macro}[EXP]
+%   {
+%     \@@_if_number_token_auxi:NN   ,
+%     \@@_if_number_token_auxii:NN  ,
+%     \@@_if_number_token_auxiii:NN
+%   }
 %   A simple conditional to answer the question of whether a specific token is
 %   possibly valid in a number.
 %    \begin{macrocode}
-\prg_new_protected_conditional:Npnn \siunitx_if_number_token:N #1
-  { T , F , TF }
+\prg_new_conditional:Npnn \siunitx_if_number_token:N #1
+  { p , T , F , TF }
   {
-    \tl_set:Nx \l_@@_valid_tl
+    \@@_number_token_auxi:NN #1
+      \l_@@_input_uncert_close_tl
+      \l_@@_input_comparator_tl
+      \l_@@_input_decimal_tl
+      \l_@@_input_digit_tl
+      \l_@@_input_exponent_tl
+      \l_@@_input_ignore_tl
+      \l_@@_input_uncert_open_tl
+      \l_@@_input_sign_tl
+      \l_@@_input_uncert_sign_tl
+      \q_recursion_tail
+      \q_recursion_stop
+  }
+\cs_new:Npn \@@_number_token_auxi:NN #1#2
+  {
+    \quark_if_recursion_tail_stop_do:Nn #2 { \prg_return_false: }
+    \@@_number_token_auxii:NN #1 #2
+    \@@_number_token_auxi:NN #1
+  }
+\cs_new:Npn \@@_number_token_auxii:NN #1#2
+  {
+    \exp_after:wN \@@_number_token_auxiii:NN \exp_after:wN #1
+      #2 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_number_token_auxiii:NN #1#2
+  {
+    \quark_if_recursion_tail_stop:N #2
+    \str_if_eq:nnT {#1} {#2}
       {
-        \exp_not:V \l_@@_input_uncert_close_tl
-        \exp_not:V \l_@@_input_comparator_tl
-        \exp_not:V \l_@@_input_decimal_tl
-        \exp_not:V \l_@@_input_digit_tl
-        \exp_not:V \l_@@_input_exponent_tl
-        \exp_not:V \l_@@_input_ignore_tl
-        \exp_not:V \l_@@_input_uncert_open_tl
-        \exp_not:V \l_@@_input_sign_tl
-        \exp_not:V \l_@@_input_uncert_sign_tl
+        \use_i_delimit_by_q_recursion_stop:nw
+          {
+            \use_i_delimit_by_q_recursion_stop:nw
+              { \prg_return_true: }
+          }
       }
-    \tl_if_in:VnTF \l_@@_valid_tl {#1}
-      { \prg_return_true: }
-      { \prg_return_false: }
+    \@@_number_token_auxiii:NN #1
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Messages}
