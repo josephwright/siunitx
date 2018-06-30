@@ -598,7 +598,19 @@
 % \begin{macro}{\@@_direct_begin:}
 % \begin{macro}{\@@_direct_begin:w}
 % \begin{macro}{\@@_direct_end:}
-% \begin{macro}{\@@_direct_marker:, \@@_direct_marker_switch:}
+% \begin{macro}
+%   {
+%     \@@_direct_marker:        ,
+%     \@@_direct_marker_switch: ,
+%     \@@_direct_marker_end:
+%   }
+% \begin{macro}{\@@_direct_format:}
+% \begin{macro}{\@@_direct_format:w}
+% \begin{macro}
+%   {
+%     \@@_direct_format_switch: ,
+%     \@@_direct_format_end:
+%   }
 %   After removing the |\ignorespaces| at the start of the cell (see comments
 %   for \cs{@@_collect_begin:N}), check to see  if there is a |{| and branch
 %   as appropriate.
@@ -674,11 +686,57 @@
     \box_use_drop:N \l_@@_decimal_box
   }
 %    \end{macrocode}
+%   For the version where there is space reserved, first format and decompose
+%   that, then create appropriately-sized boxes. The token used there is
+%   |\relax| as it can be passed through to the output: only have to
+%   find \enquote{just enough} of the number to do the work.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_direct_fixed:
+\cs_new_protected:Npn \@@_direct_format:
   {
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:NN \l_@@_model_tl \relax }
+    \exp_after:wN \@@_direct_format_aux:w
+      \l_@@_tmp_tl \q_stop
+  }
+\cs_new_protected:Npn \@@_direct_format_aux:w
+  #1 \relax #2 \relax #3 \relax #4 \q_stop
+  {
+    \hbox_set:Nn \l_@@_tmp_box
+      { \ensuremath { \l_@@_output_align_tl #4 } }
+    \hbox_set_to_wd:Nnn \l_@@_decimal_box
+      { \box_wd:N \l_@@_tmp_box }
+      { \@@_fil: }
+    \hbox_set:Nn \l_@@_tmp_box { \ensuremath { #1#2 } }
+    \hbox_set_to_wd:Nnw \l_@@_integer_box
+      { \box_wd:N \l_@@_tmp_box }
+      \c_math_toggle_token
+      \tl_map_inline:Nn \l_@@_input_align_tl
+        {
+          \char_set_active_eq:NN ##1 \@@_direct_format_switch:
+          \char_set_mathcode:nn { `##1 } { "8000 }
+        }
+      \@@_fill:
+  }
+\cs_new_protected:Npn \@@_direct_format_switch:
+  {
+      \c_math_toggle_token
+    \hbox_set_end:
+    \hbox_set_to_wd:Nnw \l_@@_decimal_box
+      { \box_wd:N \l_@@_decimal_box }
+      \c_math_toggle_token
+      \l_@@_output_align_tl
+  }
+\cs_new_protected:Npn \@@_direct_format_end:
+  {
+      \c_math_toggle_token
+       \@@_fil:
+    \hbox_set_end:
+    \box_use_drop:N \l_@@_integer_box
+    \box_use_drop:N \l_@@_decimal_box
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
