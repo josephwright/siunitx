@@ -1573,6 +1573,79 @@ The command used to set unit themselves may be adjusted using the
   \unit[font-command = \mathit]{\lumen}
 \end{LaTeXdemo}
 
+\subsection{Tabular material}
+
+Processing of material in tables obeys the same settings as described for the
+functions already described. However, there are some settings which apply only
+to the layout of tabular material (Table~\ref{tab:opt:tables}).
+\begin{table}
+  \caption{Options for tabular material.}
+  \label{tab:opt:tables}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule ^^A (
+      table-align-comparator    & Switch  & true         \\
+      table-align-exponent      & Switch  & true         \\
+      table-align-text-pre      & Switch  & true         \\
+      table-align-text-post     & Switch  & true         \\
+      table-align-uncertainty   & Switch  & true         \\
+      table-auto-round          & Switch  & false        \\
+      table-column-width        & Length  & 0pt          \\
+      table-comparator          & Switch  & false        \\
+      table-format              & Special & \meta{none}  \\
+      table-number-alignment    & Choice  &
+        center-decimal-marker \\
+      table-parse-only          & Switch  & false        \\
+      table-space-text-pre      & Literal & \meta{empty} \\
+      table-space-text-post     & Literal & \meta{empty} \\
+      table-text-alignment      & Choice  & center       \\
+      table-unit-alignment      & Choice  & center       \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{table-parse}
+When the \opt{table-parse} option is set to \opt{false}, then the alignment
+code for tables takes a different approach. The output is always set in math
+mode, and alignment takes place at the first decimal marker. This is achieved
+by making it active in math mode. When reserving space for content only the
+integer and decimal values for the mantissa are considered
+(Table~\ref{tab:S:nonparsed}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Aligning without parsing.}
+    \label{tab:S:nonparsed}
+    \sisetup{
+      table-parse  = false,
+      table-format = 3.3
+    }
+    \centering
+    \begin{tabular}{@{}
+      S
+      S[table-number-alignment = center]
+      S[table-number-alignment = right]
+      S[table-number-alignment = left]
+      @{}}
+    \toprule
+        {Some values}
+      & {Some values}
+      & {Some values}
+      & {Some values} \\
+    \midrule
+       2.35  &    2.35  &    2.35  &   2.35   \\
+      34.234 &   34.234 &   34.234 &  34.234  \\
+      56.783 &   56.783 &   56.783 &  56.783  \\
+       3,762 &    3,762 &    3,762 &   3.762  \\
+    \sqrt{2} & \sqrt{2} & \sqrt{2} & \sqrt{2} \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+
 \section{Installation}
 
 For most users, there will be no need to explicitly install \pkg{siunitx}:
