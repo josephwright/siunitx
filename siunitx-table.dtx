@@ -734,8 +734,7 @@
 %   {
 %     \l_@@_align_comparator_bool  ,
 %     \l_@@_align_exponent_bool    ,
-%     \l_@@_align_uncertainty_bool ,
-%     \l_@@_parse_only_bool
+%     \l_@@_align_uncertainty_bool
 %   }
 %   Alignment is handled using a |tl| as this allows a fast lookup at the
 %   point of use.
@@ -753,28 +752,29 @@
 % \end{variable}
 %
 % \begin{macro}{\@@_print:nnn, \@@_print:VVV}
-% \begin{macro}{\@@_print_non_aligned:nnn, \@@_print_aligned:nnn}
+% \begin{macro}{\@@_print_format:nnn, \@@_print_marker:nnn, \@@_print_none:nnn}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:nnn #1#2#3
   {
-    \use:c { @@_align_ \l_@@_alignment_tl :n }
+    \use:c { @@_align_ \l_@@_align_number_tl :n }
       {
-        \bool_if:NTF \l_@@_parse_only_bool
-          { \@@_print_non_aligned:nnn }
-          { \@@_print_aligned:nnn }
+        \use:c { @@_print_ \l_@@_align_mode_tl :nnn }
           {#1} {#2} {#3}
       }
   }
 \cs_generate_variant:Nn \@@_print:nnn { VVV }
-\cs_new_protected:Npn \@@_print_non_aligned:nnn #1#2#3
+\cs_new_protected:Npn \@@_print_marker:nnn #1#2#3
+  {
+  }
+\cs_new_protected:Npn \@@_print_format:nnn #1#2#3
+  {
+  }
+\cs_new_protected:Npn \@@_print_none:nnn #1#2#3
   {
     #1
     \siunitx_number_format:nN {#2} \l_@@_tmp_tl
     \siunitx_print:nV { number } \l_@@_tmp_tl
     #3
-  }
-\cs_new_protected:Npn \@@_print_aligned:nnn #1#2#3
-  {
   }
 %    \end{macrocode}
 % \end{macro}
