@@ -93,6 +93,22 @@
 %   \end{itemize}
 % \end{function}
 %
+% \begin{function}{\siunitx_number_process:NN}
+%   \begin{syntax}
+%     \cs{siunitx_number_process:N} \meta{tl~var1} \meta{tl~var2}
+%   \end{syntax}
+%   Applies a set of number processing operations to the \meta{internal
+%   number} stored in the \meta{tl~var1}, \foreign{viz.}~in order
+%   \begin{enumerate}
+%     \item Dropping uncertainty
+%     \item Converting to scientific mode (or similar)
+%     \item Rounding
+%     \item Dropping zero decimal part
+%     \item Forcing a minimum number of digits
+%   \end{enumerate}
+%   with the result stored in \meta{tl~var2}.
+% \end{function}
+%
 % \begin{function}[rEXP]{\siunitx_number_format:N, \siunitx_number_format:NN}
 %   \begin{syntax}
 %     \cs{siunitx_number_format:N} \meta{number}
@@ -460,7 +476,7 @@
       \bool_if:NTF \l_siunitx_number_parse_bool
         {
           \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
-          \@@_process:
+          \siunitx_number_process:NN \l_@@_parsed_tl \l_@@_parsed_tl
           \tl_set:Nx \l_@@_formatted_tl
             { \siunitx_number_format:N \l_@@_parsed_tl }
         }
@@ -1446,15 +1462,10 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_process:}
-% \begin{macro}{\@@_process:N}
+% \begin{macro}{\siunitx_number_process:NN}
 %   A top-level interface for the processing tools.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_process:
-  {
-    \@@_process:N \l_@@_parsed_tl
-  }
-\cs_new_protected:Npn \@@_process:N #1
+\cs_new_protected:Npn \siunitx_number_process:NN #1#2
   {
     \tl_if_empty:NF #1
       {
@@ -1462,19 +1473,18 @@
           { \tl_if_eq_p:NN #1 \c_@@_zero_tl }
           { \tl_if_eq_p:NN #1 \c_@@_zero_decimal_tl }
           {
-            \@@_uncertainty:N #1
-            \@@_exponent:N #1
-            \@@_round:N #1
-            \@@_zero_decimal:N #1
-            \@@_digits:N #1
+            \@@_uncertainty:NN #1 #2
+            \@@_exponent:NN #2 #2
+            \@@_round:NN #2 #2
+            \@@_zero_decimal:NN #2 #2
+            \@@_digits:NN #2 #2
           }
       }
   }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
 %
-% \begin{macro}{\@@_exponent:N}
+% \begin{macro}{\@@_exponent:NN}
 % \begin{macro}[EXP]
 %   {
 %     \@@_exponent_engineering:nNnnnNn ,
@@ -1504,9 +1514,9 @@
 %   (Once \texttt{e}-type expansion is generally available, this will be
 %   handling using a single \cs{tl_set:Nx}.)
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_exponent:N #1
+\cs_new_protected:Npn \@@_exponent:NN #1#2
   {
-    \tl_set:Nx #1
+    \tl_set:Nx #2
       {
         \cs:w
           @@_exponent_ \l_@@_exponent_mode_tl :nNnnnNn
@@ -1709,16 +1719,16 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_digits:N}
+% \begin{macro}{\@@_digits:NN}
 % \begin{macro}[EXP]{\@@_digits:nNnnnNn}
 % \begin{macro}[EXP]{\@@_digits:Nn}
 %   Forcing a minimum number of digits in each part is quite easy. As
 %   the common case is that we don't do anything here, there is no real need
 %   to optimise the calculation (normally also numbers have only a few digits).
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_digits:N #1
+\cs_new_protected:Npn \@@_digits:NN #1#2
   {
-    \tl_set:Nx #1
+    \tl_set:Nx #2
       { \exp_after:wN \@@_digits:nNnnnNn #1 }
   }
 \cs_new:Npn \@@_digits:nNnnnNn #1#2#3#4#5#6#7
@@ -1745,14 +1755,14 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_round:N}
+% \begin{macro}{\@@_round:NN}
 % \begin{macro}[EXP]{\@@_round_none:nNnnnNn}
 %   Rounding is at the top level simple enough: fire off the expandable
 %   set up which does the work.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_round:N #1
+\cs_new_protected:Npn \@@_round:NN #1#2
   {
-    \tl_set:Nx #1
+    \tl_set:Nx #2
       {
         \cs:w
           @@_round_ \l_@@_round_mode_tl :nNnnnNn
@@ -2297,15 +2307,15 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_uncertainty:N}
+% \begin{macro}{\@@_uncertainty:NN}
 % \begin{macro}[EXP]{\@@_uncertainty:nNnnnNn}
 %   Simple stripping of the uncertainty.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_uncertainty:N #1
+\cs_new_protected:Npn \@@_uncertainty:NN #1#2
   {
     \bool_if:NT \l_@@_drop_uncertainty_bool
       {
-        \tl_set:Nx #1
+        \tl_set:Nx #2
           { \exp_after:wN \@@_uncertainty:nNnnnNn #1 }
       }
   }
@@ -2315,15 +2325,15 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_zero_decimal:N}
+% \begin{macro}{\@@_zero_decimal:NN}
 % \begin{macro}[EXP]{\@@_zero_decimal:nNnnnNn}
 %   Simple stripping of the decimal part if zero.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_zero_decimal:N #1
+\cs_new_protected:Npn \@@_zero_decimal:NN #1#2
   {
     \bool_if:NT \l_@@_drop_zero_decimal_bool
       {
-        \tl_set:Nx #1
+        \tl_set:Nx #2
           { \exp_after:wN \@@_zero_decimal:nNnnnNn #1 }
       }
   }
