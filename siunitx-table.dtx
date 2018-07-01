@@ -556,22 +556,6 @@
 % as simply aligning on the first token that is a decimal marker. The
 % strategy here is that used by \pkg{dcolumn}.
 %
-% \begin{variable}
-%   {
-%     \l_@@_input_align_tl  ,
-%     \l_@@_output_align_tl
-%   }
-%    \begin{macrocode}
-\keys_define:nn { siunitx }
-  {
-    input-alignment-markers .tl_set:N =
-      \l_@@_input_align_tl  ,
-    output-alignment-marker .tl_set:N =
-      \l_@@_output_align_tl
-  }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{variable}{\l_@@_integer_box, \l_@@_decimal_box}
 %   Boxes for the content before and after the decimal marker.
 %    \begin{macrocode}
@@ -632,13 +616,13 @@
 \cs_new_protected:Npn \@@_direct_marker:
   {
     \hbox_set:Nn \l_@@_tmp_box
-      { \ensuremath { \l_@@_output_align_tl } }
+      { \ensuremath { \mathord { \l_siunitx_number_output_decimal_tl } } }
     \hbox_set_to_wd:Nnn \l_@@_decimal_box
       { \box_wd:N \l_@@_tmp_box }
       { \@@_fil: }
     \hbox_set:Nw \l_@@_integer_box
       \c_math_toggle_token
-      \tl_map_inline:Nn \l_@@_input_align_tl
+      \tl_map_inline:Nn \l_siunitx_number_input_decimal_tl
         {
           \char_set_active_eq:NN ##1 \@@_direct_marker_switch:
           \char_set_mathcode:nn { `##1 } { "8000 }
@@ -702,7 +686,7 @@
     \hbox_set_to_wd:Nnw \l_@@_integer_box
       { \box_wd:N \l_@@_tmp_box }
       \c_math_toggle_token
-      \tl_map_inline:Nn \l_@@_input_align_tl
+      \tl_map_inline:Nn \l_siunitx_number_input_decimal_tl
         {
           \char_set_active_eq:NN ##1 \@@_direct_format_switch:
           \char_set_mathcode:nn { `##1 } { "8000 }
@@ -716,7 +700,7 @@
     \hbox_set_to_wd:Nnw \l_@@_decimal_box
       { \box_wd:N \l_@@_decimal_box }
       \c_math_toggle_token
-      \l_@@_output_align_tl
+      \mathord { \l_siunitx_number_output_decimal_tl }
   }
 \cs_new_protected:Npn \@@_direct_format_end:
   {
@@ -804,8 +788,6 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx  }
   {
-    input-alignment-markers = { ., } ,
-    output-alignment-marker = .      ,
     table-align-comparator  = false  ,
     table-align-exponent    = false  ,
     table-align-uncertainty = false  ,
