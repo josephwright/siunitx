@@ -481,7 +481,7 @@
 %
 % \subsection{Number alignment: core ideas}
 %
-% \begin{variable}{\l_@@_align_mode_tl, \l_@@_alignment_tl, \l_@@_format_tl}
+% \begin{variable}{\l_@@_align_mode_tl, \l_@@_align_number_tl, \l_@@_format_tl}
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
@@ -495,10 +495,10 @@
       } ,
     table-number-alignment .choices:nn =
       { center , left , right }
-      { \tl_set_eq:NN \l_@@_alignment_tl \l_keys_choice_tl } ,
+      { \tl_set_eq:NN \l_@@_align_number_tl \l_keys_choice_tl } ,
   }
-\tl_new:N \l_@@_alignment_tl
 \tl_new:N \l_@@_align_mode_tl
+\tl_new:N \l_@@_align_number_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -703,10 +703,9 @@
       \l_@@_tmp_tl \q_stop
   }
 \cs_new_protected:Npn \@@_direct_format_aux:w
-  #1 \relax #2 \relax #3 \relax #4 \q_stop
+  #1 \relax #2 \relax #3 \q_stop
   {
-    \hbox_set:Nn \l_@@_tmp_box
-      { \ensuremath { \l_@@_output_align_tl #4 } }
+    \hbox_set:Nn \l_@@_tmp_box { \ensuremath {#3} }
     \hbox_set_to_wd:Nnn \l_@@_decimal_box
       { \box_wd:N \l_@@_tmp_box }
       { \@@_fil: }
@@ -719,7 +718,7 @@
           \char_set_active_eq:NN ##1 \@@_direct_format_switch:
           \char_set_mathcode:nn { `##1 } { "8000 }
         }
-      \@@_fill:
+      \@@_fil:
   }
 \cs_new_protected:Npn \@@_direct_format_switch:
   {
@@ -735,8 +734,11 @@
       \c_math_toggle_token
       \@@_fil:
     \hbox_set_end:
-    \box_use_drop:N \l_@@_integer_box
-    \box_use_drop:N \l_@@_decimal_box
+    \use:c { @@_align_ \l_@@_align_number_tl :n }
+      {
+        \box_use_drop:N \l_@@_integer_box
+        \box_use_drop:N \l_@@_decimal_box
+      }
   }
 %    \end{macrocode}
 %   No parsing and no alignment is easy.
