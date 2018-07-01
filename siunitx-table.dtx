@@ -85,16 +85,6 @@
 %
 % \subsection{Interface functions}
 %
-% \begin{variable}{\l_@@_parse_bool}
-%   One top-level setting applies to all number cells.
-%    \begin{macrocode}
-\keys_define:nn { siunitx }
-  {
-    table-parse .bool_set:N = \l_@@_parse_bool
-  }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{variable}{\l_@@_text_bool}
 %   Used to track that a cell is purely text.
 %    \begin{macrocode}
@@ -107,7 +97,7 @@
 \cs_new_protected:Npn \siunitx_cell_begin:
   {
     \bool_set_false:N \l_@@_text_bool
-    \bool_if:NTF \l_@@_parse_bool
+    \bool_if:NTF \l_siunitx_number_parse_bool
       { \@@_collect_begin: }
       { \@@_direct_begin: }
   }
@@ -115,7 +105,7 @@
   {
     \bool_if:NF \l_@@_text_bool
       {
-        \bool_if:NTF \l_@@_parse_bool
+        \bool_if:NTF \l_siunitx_number_parse_bool
           { \@@_collect_end: }
           { \@@_direct_end: }
       }
@@ -521,7 +511,7 @@
 \cs_new_protected:Npn \@@_generate_model:n #1
   {
     \group_begin:
-      \keys_set:nn { siunitx } { parse-numbers = true }
+      \bool_set_true:N \l_siunitx_number_parse_bool
       \siunitx_number_parse:nN {#1} \l_@@_format_tl
     \exp_args:NNNV \group_end:
     \tl_set:Nn \l_@@_format_tl \l_@@_format_tl
@@ -824,7 +814,6 @@
     table-fixed-width       = false  ,
     table-format            = 2.2    ,
     table-number-alignment  = center ,
-    table-parse             = true   ,
     table-text-alignment    = center
   }
 %    \end{macrocode}

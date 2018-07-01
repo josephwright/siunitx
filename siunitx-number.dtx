@@ -129,6 +129,11 @@
 %   tokens currently set up for detection in a number.
 % \end{function}
 %
+% \begin{variable}{\l_siunitx_number_parse_bool}
+%   A switch to control whether any parsing is attempted for numbers.
+% \end{variable}
+%
+%
 % \subsection{Key--value options}
 %
 % The options defined by this submodule are available within the \pkg{l3keys}
@@ -424,12 +429,20 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_parse_bool}
+% \begin{variable}{\l_siunitx_number_parse_bool}
+%   Tracks whether to parse numbers: public as this may affect other
+%   behaviors.
+%    \begin{macrocode}
+\tl_new:N \l_siunitx_number_parse_bool
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_siunitx_number_parse_bool}
 %   Top-level options.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
-    parse-numbers .bool_set:N = \l_@@_parse_bool
+    parse-numbers .bool_set:N = \l_siunitx_number_parse_bool
   }
 %    \end{macrocode}
 % \end{variable}
@@ -440,7 +453,7 @@
 \cs_new_protected:Npn \siunitx_number_format:nN #1#2
   {
     \group_begin:
-      \bool_if:NTF \l_@@_parse_bool
+      \bool_if:NTF \l_siunitx_number_parse_bool
         {
           \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
           \@@_process:
@@ -534,7 +547,7 @@
           }
       } ,
     parse-numbers .bool_set:N =
-      \l_@@_parse_bool
+      \l_siunitx_number_parse_bool
   }
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
@@ -615,7 +628,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_parse:nN #1#2
   {
-    \bool_if:NTF \l_@@_parse_bool
+    \bool_if:NTF \l_siunitx_number_parse_bool
       { \@@_parse:nN {#1} #2 }
       { \tl_clear:N #2 }
   }
@@ -2794,7 +2807,7 @@
   {
     \group_begin:
       \bool_set_true:N \l_@@_validate_bool
-      \bool_set_true:N \l_@@_parse_bool
+      \bool_set_true:N \l_siunitx_number_parse_bool
       \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
       \tl_if_empty:NTF \l_@@_parsed_tl
         {
