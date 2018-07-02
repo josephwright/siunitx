@@ -765,6 +765,20 @@
 \cs_generate_variant:Nn \@@_print:nnn { VVV }
 \cs_new_protected:Npn \@@_print_marker:nnn #1#2#3
   {
+    \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:NN \l_@@_tmp_tl \relax }
+    \exp_after:wN \@@_print_marker_aux:w
+      \l_@@_tmp_tl \q_stop
+  }
+\cs_new_protected:Npn \@@_print_marker_aux:w
+  #1 \relax #2 \relax #3 \q_stop
+  {
+    \hbox_set:Nn \l_@@_integer_box
+      { \siunitx_print:nn { number } { #1#2 } }
+    \hbox_set:Nn \l_@@_decimal_box
+      { \siunitx_print:nn { number } {#3} }
   }
 \cs_new_protected:Npn \@@_print_format:nnn #1#2#3
   {
