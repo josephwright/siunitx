@@ -486,6 +486,36 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_center_marker:}
+%   When centering on the decimal marker, the easiest approach is to simply
+%   re-box the two parts. That is needed whether or not we are parsing numbers,
+%   so is best as a short auxiliary.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_center_marker:
+  {
+    \dim_compare:nNnTF
+      { \box_wd:N \l_@@_integer_box }
+        > { \box_wd:N \l_@@_decimal_box }
+      {
+        \hbox_set_to_wd:Nnn \l_@@_decimal_box
+          { \box_wd:N \l_@@_integer_box }
+          {
+            \hbox_unpack:N \l_@@_decimal_box
+            \@@_fil:
+          }
+      }
+      {
+        \hbox_set_to_wd:Nnn \l_@@_integer_box
+          { \box_wd:N \l_@@_decimal_box }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_integer_box
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{variable}{\l_@@_align_mode_tl, \l_@@_align_number_tl, \l_@@_format_tl}
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -640,25 +670,7 @@
   {
       \c_math_toggle_token
     \hbox_set_end:
-    \dim_compare:nNnTF
-      { \box_wd:N \l_@@_integer_box }
-        > { \box_wd:N \l_@@_decimal_box }
-      {
-        \hbox_set_to_wd:Nnn \l_@@_decimal_box
-          { \box_wd:N \l_@@_integer_box }
-          {
-            \hbox_unpack:N \l_@@_decimal_box
-            \@@_fil:
-          }
-      }
-      {
-        \hbox_set_to_wd:Nnn \l_@@_integer_box
-          { \box_wd:N \l_@@_decimal_box }
-          {
-            \@@_fil:
-            \hbox_unpack:N \l_@@_integer_box
-          }
-      }
+    \@@_center_marker:
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
   }
@@ -779,6 +791,7 @@
       { \siunitx_print:nn { number } { #1#2 } }
     \hbox_set:Nn \l_@@_decimal_box
       { \siunitx_print:nn { number } {#3} }
+    \@@_center_marker:
   }
 \cs_new_protected:Npn \@@_print_format:nnn #1#2#3
   {
