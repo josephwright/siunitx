@@ -486,6 +486,15 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_cleanup_decimal:w}
+%   To remove the excess marker tokens in a decimal part.
+%    \begin{macrocode}
+\cs_new:Npn \@@_cleanup_decimal:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil
+  { #1#2#3#4#5#6#7 }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\@@_center_marker:}
 %   When centering on the decimal marker, the easiest approach is to simply
 %   re-box the two parts. That is needed whether or not we are parsing numbers,
@@ -676,21 +685,20 @@
   }
 %    \end{macrocode}
 %   For the version where there is space reserved, first format and decompose
-%   that, then create appropriately-sized boxes. The token used there is
-%   |\relax| as it can be passed through to the output: only have to
-%   find \enquote{just enough} of the number to do the work.
+%   that, then create appropriately-sized boxes.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_direct_format:
   {
     \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_format:NN \l_@@_model_tl \relax }
+      { \siunitx_number_format:NN \l_@@_model_tl \q_nil }
     \exp_after:wN \@@_direct_format_aux:w
       \l_@@_tmp_tl \q_stop
   }
 \cs_new_protected:Npn \@@_direct_format_aux:w
-  #1 \relax #2 \relax #3 \q_stop
+  #1 \q_nil #2 \q_nil #3 \q_stop
   {
-    \hbox_set:Nn \l_@@_tmp_box { \ensuremath {#3} }
+    \hbox_set:Nn \l_@@_tmp_box
+      { \ensuremath { \@@_cleanup_decimal:w #3 } }
     \hbox_set_to_wd:Nnn \l_@@_decimal_box
       { \box_wd:N \l_@@_tmp_box }
       { \@@_fil: }
@@ -780,17 +788,17 @@
     \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
     \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_format:NN \l_@@_tmp_tl \relax }
+      { \siunitx_number_format:NN \l_@@_tmp_tl \q_nil }
     \exp_after:wN \@@_print_marker_aux:w
       \l_@@_tmp_tl \q_stop
   }
 \cs_new_protected:Npn \@@_print_marker_aux:w
-  #1 \relax #2 \relax #3 \q_stop
+  #1 \q_nil #2 \q_nil #3 \q_stop
   {
     \hbox_set:Nn \l_@@_integer_box
       { \siunitx_print:nn { number } { #1#2 } }
     \hbox_set:Nn \l_@@_decimal_box
-      { \siunitx_print:nn { number } {#3} }
+      { \siunitx_print:nn { number } { \@@_cleanup_decimal:w #3 } }
     \@@_center_marker:
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
