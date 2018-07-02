@@ -787,18 +787,50 @@
 \cs_generate_variant:Nn \@@_print:nnn { VVV }
 %    \end{macrocode}
 %   When centering on the decimal marker, alignment is relatively simple, and
-%   close in concept to that used without parsing. Format the number, and split
-%   at the decimal marker. Then box up the two parts, adjust the sizes and
-%   insert.
+%   close in concept to that used without parsing. First we need to deal with any
+%   text before or after the number. For text \emph{before}, there's the case
+%   where is has no width and might be a font or color change: that has to be
+%   filtered out first. Then we can adjust the size of this material and that
+%   after the number such that they are equal. The number itself can then be
+%   formatted, splitting at he decimal marker. A bit more size adjustment, then
+%   the number itself and any text at the end can be inserted.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_marker:nnn #1#2#3
   {
+    \hbox_set:Nn \l_@@_before_box {#1}
+    \dim_compare:nNnT { \box_wd:N \l_@@_before_box } = { 0pt }
+      {
+        \box_clear:N \l_@@_before_box
+        #1
+      }
+    \hbox_set:Nn \l_@@_after_box {#3}
+    \dim_compare:nNnTF
+      { \box_wd:N \l_@@_after_box }
+       > { \box_wd:N \l_@@_before_box }
+      {
+        \hbox_set_to_wd:Nnn \l_@@_before_box
+          { \box_wd:N \l_@@_after_box }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_before_box
+          }
+      }
+      {
+        \hbox_set_to_wd:Nnn \l_@@_after_box
+          { \box_wd:N \l_@@_before_box }
+          {
+            \hbox_unpack:N \l_@@_after_box
+            \@@_fil:
+          }
+      }
+    \box_use_drop:N \l_@@_before_box
     \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
     \tl_set:Nx \l_@@_tmp_tl
       { \siunitx_number_format:NN \l_@@_tmp_tl \q_nil }
     \exp_after:wN \@@_print_marker_aux:w
       \l_@@_tmp_tl \q_stop
+    \box_use_drop:N \l_@@_after_box
   }
 \cs_new_protected:Npn \@@_print_marker_aux:w
   #1 \q_nil #2 \q_nil #3 \q_stop
