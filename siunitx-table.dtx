@@ -246,12 +246,12 @@
 % The input needs to be divided into numerical tokens and those which appear
 % before and after them. This needs a second loop and validation.
 %
-% \begin{variable}{\l_@@_pre_tl, \l_@@_number_tl, \l_@@_post_tl}
+% \begin{variable}{\l_@@_before_tl, \l_@@_number_tl, \l_@@_after_tl}
 %   Space for tokens.
 %    \begin{macrocode}
-\tl_new:N \l_@@_pre_tl
+\tl_new:N \l_@@_before_tl
 \tl_new:N \l_@@_number_tl
-\tl_new:N \l_@@_post_tl
+\tl_new:N \l_@@_after_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -263,24 +263,24 @@
   {
     \protected@edef \l_@@_collect_tl
       { \l_@@_collect_tl }
-    \tl_clear:N \l_@@_pre_tl
+    \tl_clear:N \l_@@_before_tl
     \tl_clear:N \l_@@_number_tl
-    \tl_clear:N \l_@@_post_tl
+    \tl_clear:N \l_@@_after_tl
     \exp_after:wN \@@_split_loop:NNN
-      \exp_after:wN \l_@@_pre_tl
+      \exp_after:wN \l_@@_before_tl
       \exp_after:wN \l_@@_number_tl
-      \exp_after:wN \l_@@_post_tl
+      \exp_after:wN \l_@@_after_tl
         \l_@@_collect_tl
       \q_recursion_tail \q_recursion_stop
-    \@@_split_tidy:N \l_@@_pre_tl
-    \@@_split_tidy:N \l_@@_post_tl
+    \@@_split_tidy:N \l_@@_before_tl
+    \@@_split_tidy:N \l_@@_after_tl
     \tl_if_empty:NTF \l_@@_number_tl
-      { \@@_print_text:V \l_@@_pre_tl }
+      { \@@_print_text:V \l_@@_before_tl }
       {
         \@@_print:VVV
-          \l_@@_pre_tl
+          \l_@@_before_tl
           \l_@@_number_tl
-          \l_@@_post_tl
+          \l_@@_after_tl
       }
   }
 %    \end{macrocode}
@@ -309,7 +309,7 @@
 \cs_new_protected:Npn \@@_split_token:NNNN #1#2#3#4
   {
     \quark_if_recursion_tail_stop:N #4
-    \tl_if_empty:NTF \l_@@_post_tl
+    \tl_if_empty:NTF \l_@@_after_tl
       {
         \siunitx_if_number_token:NTF #4
           { \tl_put_right:Nn #2 {#4} }
