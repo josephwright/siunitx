@@ -266,7 +266,11 @@
     \tl_clear:N \l_@@_pre_tl
     \tl_clear:N \l_@@_number_tl
     \tl_clear:N \l_@@_post_tl
-    \exp_after:wN \@@_split_loop: \l_@@_collect_tl
+    \exp_after:wN \@@_split_loop:NNN
+      \exp_after:wN \l_@@_pre_tl
+      \exp_after:wN \l_@@_number_tl
+      \exp_after:wN \l_@@_post_tl
+        \l_@@_collect_tl
       \q_recursion_tail \q_recursion_stop
     \@@_split_tidy:N \l_@@_pre_tl
     \@@_split_tidy:N \l_@@_post_tl
@@ -282,41 +286,41 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@@_split_loop:}
-% \begin{macro}{\@@_split_group:n}
-% \begin{macro}{\@@_split_token:N}
+% \begin{macro}{\@@_split_loop:NNN}
+% \begin{macro}{\@@_split_group:NNNn}
+% \begin{macro}{\@@_split_token:NNNN}
 %   Splitting into parts uses the fact that numbers cannot contain groups
 %   and that we can track where we are up to based on the content of the
 %   token lists.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_split_loop:
+\cs_new_protected:Npn \@@_split_loop:NNN #1#2#3
   {
     \peek_catcode_ignore_spaces:NTF \c_group_begin_token
-      { \@@_split_group:n }
-      { \@@_split_token:N }
+      { \@@_split_group:NNNn #1#2#3 }
+      { \@@_split_token:NNNN #1#2#3 }
   }
-\cs_new_protected:Npn \@@_split_group:n #1
+\cs_new_protected:Npn \@@_split_group:NNNn #1#2#3#4
   {
-    \tl_if_empty:NTF \l_@@_number_tl
-      { \tl_put_right:Nn \l_@@_pre_tl { {#1} } }
-      { \tl_put_right:Nn \l_@@_post_tl { {#1} } }
-    \@@_split_loop:
+    \tl_if_empty:NTF #2
+      { \tl_put_right:Nn #1 { {#4} } }
+      { \tl_put_right:Nn #3 { {#4} } }
+    \@@_split_loop:NNN #1#2#3
   }
-\cs_new_protected:Npn \@@_split_token:N #1
+\cs_new_protected:Npn \@@_split_token:NNNN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop:N #1
+    \quark_if_recursion_tail_stop:N #4
     \tl_if_empty:NTF \l_@@_post_tl
       {
-        \siunitx_if_number_token:NTF #1
-          { \tl_put_right:Nn \l_@@_number_tl {#1} }
+        \siunitx_if_number_token:NTF #4
+          { \tl_put_right:Nn #2 {#4} }
           {
-            \tl_if_empty:NTF \l_@@_number_tl
-              { \tl_put_right:Nn \l_@@_pre_tl {#1} }
-              { \tl_put_right:Nn \l_@@_post_tl {#1} }
+            \tl_if_empty:NTF #2
+              { \tl_put_right:Nn #1 {#4} }
+              { \tl_put_right:Nn #3 {#4} }
           }
       }
-      { \tl_put_right:Nn \l_@@_post_tl {#1} }
-    \@@_split_loop:
+      { \tl_put_right:Nn #3 {#4} }
+    \@@_split_loop:NNN #1#2#3
   }
 %    \end{macrocode}
 % \end{macro}
