@@ -538,6 +538,16 @@
       { \tl_set_eq:NN \l_@@_align_mode_tl \l_keys_choice_tl } ,
     table-format .code:n =
       {
+        \tl_clear:N \l_@@_before_model_tl
+        \tl_clear:N \l_@@_model_tl
+        \tl_clear:N \l_@@_after_model_tl
+        \@@_split_loop:NNN
+          \l_@@_before_model_tl
+          \l_@@_model_tl
+          \l_@@_after_model_tl
+          #1 \q_recursion_tail \q_recursion_stop
+        \@@_split_tidy:N \l_@@_before_model_tl
+        \@@_split_tidy:N \l_@@_after_model_tl
         \@@_generate_model:n {#1}
         \tl_set:Nn \l_@@_align_mode_tl { format }
       } ,
@@ -554,7 +564,9 @@
 %   The input and output versions of the model entry in a table.
 %    \begin{macrocode}
 \tl_new:N \l_@@_format_tl
+\tl_new:N \l_@@_before_model_tl
 \tl_new:N \l_@@_model_tl
+\tl_new:N \l_@@_after_model_tl
 %    \end{macrocode}
 % \end{variable}
 %
