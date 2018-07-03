@@ -263,17 +263,11 @@
   {
     \protected@edef \l_@@_collect_tl
       { \l_@@_collect_tl }
-    \tl_clear:N \l_@@_before_tl
-    \tl_clear:N \l_@@_number_tl
-    \tl_clear:N \l_@@_after_tl
-    \exp_after:wN \@@_split_loop:NNN
-      \exp_after:wN \l_@@_before_tl
-      \exp_after:wN \l_@@_number_tl
-      \exp_after:wN \l_@@_after_tl
-        \l_@@_collect_tl
-      \q_recursion_tail \q_recursion_stop
-    \@@_split_tidy:N \l_@@_before_tl
-    \@@_split_tidy:N \l_@@_after_tl
+    \exp_args:NV \@@_split:nNNN
+      \l_@@_collect_tl
+      \l_@@_before_tl
+      \l_@@_number_tl
+      \l_@@_after_tl
     \tl_if_empty:NTF \l_@@_number_tl
       { \@@_print_text:V \l_@@_before_tl }
       {
@@ -286,6 +280,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_split:nNNN}
 % \begin{macro}{\@@_split_loop:NNN}
 % \begin{macro}{\@@_split_group:NNNn}
 % \begin{macro}{\@@_split_token:NNNN}
@@ -293,6 +288,15 @@
 %   and that we can track where we are up to based on the content of the
 %   token lists.
 %    \begin{macrocode}
+\cs_new_protected:Npn \@@_split:nNNN #1#2#3#4
+  {
+    \tl_clear:N #2
+    \tl_clear:N #3
+    \tl_clear:N #4
+    \@@_split_loop:NNN #2#3#4 #1 \q_recursion_tail \q_recursion_stop
+    \@@_split_tidy:N #2
+    \@@_split_tidy:N #4
+  }
 \cs_new_protected:Npn \@@_split_loop:NNN #1#2#3
   {
     \peek_catcode_ignore_spaces:NTF \c_group_begin_token
@@ -323,6 +327,7 @@
     \@@_split_loop:NNN #1#2#3
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -538,16 +543,10 @@
       { \tl_set_eq:NN \l_@@_align_mode_tl \l_keys_choice_tl } ,
     table-format .code:n =
       {
-        \tl_clear:N \l_@@_before_model_tl
-        \tl_clear:N \l_@@_model_tl
-        \tl_clear:N \l_@@_after_model_tl
-        \@@_split_loop:NNN
+        \@@_split:nNNN {#1}
           \l_@@_before_model_tl
           \l_@@_model_tl
           \l_@@_after_model_tl
-          #1 \q_recursion_tail \q_recursion_stop
-        \@@_split_tidy:N \l_@@_before_model_tl
-        \@@_split_tidy:N \l_@@_after_model_tl
         \@@_generate_model:n {#1}
         \tl_set:Nn \l_@@_align_mode_tl { format }
       } ,
