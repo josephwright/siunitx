@@ -802,10 +802,16 @@
 % \end{variable}
 %
 % \begin{macro}{\@@_print:nnn, \@@_print:VVV}
-% \begin{macro}{\@@_print_format:nnn, \@@_print_marker:nnn, \@@_print_none:nnn}
 % \begin{macro}{\@@_print_marker:nnn}
 % \begin{macro}{\@@_print_marker:w}
 % \begin{macro}{\@@_print_format:nnn}
+% \begin{macro}
+%   {
+%     \@@_print_marker_auxi:w,
+%     \@@_print_marker_auxii:w,
+%     \@@_print_marker_auxiii:w
+%   }
+% \begin{macro}{\@@_print_format_box:Nn}
 % \begin{macro}{\@@_print_none:nnn}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:nnn #1#2#3
@@ -869,8 +875,149 @@
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
   }
+%    \end{macrocode}
+%   For positioning based on a format, we have to work part-by-part as there
+%   are a number of alignment points to get right. As for the |marker| approach,
+%   first we check if the material before the numerical content is of zero
+%   width. Next we need to format the model and content numbers, before
+%   starting an auxiliary chain to pick out the various parts in order.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format:nnn #1#2#3
   {
+    \hbox_set:Nn \l_@@_before_box {#1}
+    \dim_compare:nNnTF { \box_wd:N \l_@@_before_box } = { 0pt }
+      {
+        \box_clear:N \l_@@_before_box
+        #1
+      }
+      { 
+        \hbox_set:Nn \l_@@_tmp_box { \l_@@_before_model_tl }
+        \hbox_set_to_wd:Nnn \l_@@_before_box
+          { \box_wd:N \l_@@_tmp_box }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_before_box
+          }
+      }
+    \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      {
+        \siunitx_number_format:NN \l_@@_model_tl \q_nil
+        \exp_not:N \q_mark
+        \siunitx_number_format:NN \l_@@_tmp_tl \q_nil
+      }
+    \exp_after:wN \@@_print_format_auxi:w
+      \l_@@_tmp_tl \q_stop
+    \box_use_drop:N \l_@@_before_box
+    \box_use_drop:N \l_@@_integer_box
+    \box_use_drop:N \l_@@_decimal_box
+    \hbox_set:Nn \l_@@_tmp_box { \l_@@_after_model_tl }
+    \hbox_set_to_wd:Nnn \l_@@_after_box
+      { \box_wd:N \l_@@_tmp_box }
+      {
+        #3
+        \@@_fil:
+      }
+     \box_use_drop:N \l_@@_after_box
+  }
+%    \end{macrocode}
+%   The first numerical part to handle is the comparator. Any whitespace we
+%   need to add goes into the text part \emph{if} alignment is not active
+%   (\foreign{i.e.}~we are looking \enquote{backwards} to place this filler).
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxi:w
+  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box {#1}
+    \@@_print_format_box:Nn \l_@@_integer_box {#3}
+    \bool_if:NTF \l_@@_align_before_bool
+      {
+        \hbox_set_to_wd:Nnn \l_@@_integer_box
+          { \box_wd:N \l_@@_tmp_box }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_integer_box
+          }
+      }
+      {
+        \hbox_set_to_wd:Nnn \l_@@_before_box
+          {
+            \box_wd:N \l_@@_before_box +
+            \box_wd:N \l_@@_tmp_box -
+            \box_wd:N \l_@@_integer_box
+          }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_before_box
+          }
+      }
+    \@@_print_format_auxii:w #2 \q_mark #4 \q_stop
+  }
+%    \end{macrocode}
+%   The integer part follows much the same pattern, except now it is control
+%   of the comparator alignment that determines where the whitespace goes.
+%   As we already have content in the |integer| box, we need to measure how
+%   much \emph{extra} material has been added. To avoid using more boxes
+%   or re-setting, we do that by recording sizes before and after the change.
+%   (In effect, \cs{l_@@_tmp_dim} is here \enquote{l_@@_comparator_dim}.)
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxii:w
+  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box {#1}
+    \bool_if:NTF \l_@@_align_comparator_bool
+      {
+        \hbox_set_to_wd:Nnn \l_@@_integer_box
+          { \box_wd:N \l_@@_tmp_box }
+          {
+            \hbox_unpack:N \l_@@_integer_box
+            \@@_fil:
+            \siunitx_print:nn { number } {#3}
+          }
+      }
+      {
+        \dim_set:Nn \l_@@_tmp_dim
+          { \box_wd:N \l_@@_integer_box }
+        \hbox_set:Nn \l_@@_integer_box
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_integer_box
+            \siunitx_print:nn { number } {#3}
+          }
+        \hbox_set_to_wd:Nnn \l_@@_before_box
+          {
+              \box_wd:N \l_@@_before_box
+            + \box_wd:N \l_@@_tmp_box
+            + \l_@@_tmp_dim
+            - \box_wd:N \l_@@_integer_box
+          }
+          {
+            \@@_fil:
+            \hbox_unpack:N \l_@@_before_box
+          }
+      }
+    \@@_print_format_auxiii:w #2 \q_mark #4 \q_stop
+  }
+\cs_new_protected:Npn \@@_print_format_auxiii:w
+  #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+    \hbox_set_to_wd:Nnn \l_@@_decimal_box
+      { \box_wd:N \l_@@_tmp_box }
+      { \siunitx_print:nn { number } {#4#5} \@@_fil: }
+  }
+%    \end{macrocode}
+%   A simple auxiliary to avoid relatively expensive use of the print routine
+%   for empty parts.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_box:Nn #1#2
+  {
+    \hbox_set:Nn #1
+      {
+        \tl_if_blank:nF {#2}
+          { \siunitx_print:nn { number } {#2} }
+      }
   }
 %    \end{macrocode}
 %   With no alignment, everything supplied is treated more-or-less the
@@ -884,6 +1031,8 @@
     #3
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
