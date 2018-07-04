@@ -893,20 +893,18 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format:nnn #1#2#3
   {
+    \hbox_set:Nn \l_@@_tmp_box { \l_@@_before_model_tl }
     \hbox_set:Nn \l_@@_before_box {#1}
-    \dim_compare:nNnTF { \box_wd:N \l_@@_before_box } = { 0pt }
+    \dim_compare:nNnT { \box_wd:N \l_@@_before_box } = { 0pt }
       {
         \box_clear:N \l_@@_before_box
         #1
       }
-      { 
-        \hbox_set:Nn \l_@@_tmp_box { \l_@@_before_model_tl }
-        \hbox_set_to_wd:Nnn \l_@@_before_box
-          { \box_wd:N \l_@@_tmp_box }
-          {
-            \@@_fil:
-            \hbox_unpack:N \l_@@_before_box
-          }
+    \hbox_set_to_wd:Nnn \l_@@_before_box
+      { \box_wd:N \l_@@_tmp_box }
+      {
+        \@@_fil:
+        \hbox_unpack:N \l_@@_before_box
       }
     \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
