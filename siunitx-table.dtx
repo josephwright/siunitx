@@ -774,6 +774,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_carry_dim}
+%   Used to \enquote{carry forward} the amount of whitespace which needs to
+%   be inserted after the decimal marker.
+%    \begin{macrocode}
+\dim_new:N \l_@@_carry_dim
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
 %     \l_@@_align_comparator_bool  ,
@@ -914,7 +922,7 @@
     \box_use_drop:N \l_@@_decimal_box
     \hbox_set:Nn \l_@@_tmp_box { \l_@@_after_model_tl }
     \hbox_set_to_wd:Nnn \l_@@_after_box
-      { \box_wd:N \l_@@_tmp_box }
+      { \box_wd:N \l_@@_tmp_box + \l_@@_carry_dim }
       {
         #3
         \@@_fil:
@@ -999,13 +1007,99 @@
       }
     \@@_print_format_auxiii:w #2 \q_mark #4 \q_stop
   }
+%    \end{macrocode}
+%   We now deal with the decimal part: there is nothing already in the
+%   |decimal| box, so the basics are easy. We need to \enquote{carry forward}
+%   any whitespace, as where it gets inserted depends on the options for
+%   subsequent parts.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format_auxiii:w
   #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
     \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
-    \hbox_set_to_wd:Nnn \l_@@_decimal_box
-      { \box_wd:N \l_@@_tmp_box }
-      { \siunitx_print:nn { number } {#4#5} \@@_fil: }
+    \@@_print_format_box:Nn \l_@@_decimal_box {#4#5}
+    \dim_set:Nn \l_@@_carry_dim
+      {
+          \box_wd:N \l_@@_tmp_box
+        - \box_wd:N \l_@@_decimal_box
+      }
+    \@@_print_format_auxiv:w #3 \q_mark #6 \q_stop
+  }
+%    \end{macrocode}
+%   Any separated uncertainty is now picked up. That has a number of parts, so
+%   the first step is to look for a sign (which will be |#1|). We then split,
+%   either simply tidying up the markers if there is no uncertainty, or
+%   setting it.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxiv:w
+  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  {
+    \tl_if_blank:nTF {#1}
+      { \@@_print_format_auxv:w }
+      { \@@_print_format_auxvi:w }
+        #1#2 \q_mark #3#4 \q_stop
+  }
+\cs_new_protected:Npn \@@_print_format_auxv:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_mark
+  #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_stop
+  { \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop }
+%    \end{macrocode}
+%   Sorting out the placement of the uncertainty requires both the model and
+%   real data widths, so we store the former to avoiding needing more boxes.
+%   It's then just a case of putting the carry-over whitespace in the right
+%   place.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxvi:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_mark
+  #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2#3 }
+    \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
+    \@@_print_format_box:Nn \l_@@_tmp_box { { } #5#6#7 }
+    \bool_if:NTF \l_@@_align_uncertainty_bool
+      {
+        \hbox_set_to_wd:Nnn \l_@@_decimal_box
+          {
+              \box_wd:N \l_@@_decimal_box
+            + \l_@@_carry_dim
+            + \box_wd:N \l_@@_tmp_box
+          }
+          {
+            \hbox_unpack:N \l_@@_decimal_box
+            \@@_fil:
+            \hbox_unpack:N \l_@@_tmp_box
+          }
+        \dim_set:Nn \l_@@_carry_dim
+          {
+              \l_@@_tmp_dim
+            - \box_wd:N \l_@@_tmp_box 
+          }
+      }
+      {
+        \hbox_set:Nn \l_@@_decimal_box
+          {
+            \hbox_unpack:N \l_@@_decimal_box
+            \hbox_unpack:N \l_@@_tmp_box
+          }
+        \dim_add:Nn \l_@@_carry_dim
+          {
+              \l_@@_tmp_dim
+            - \box_wd:N \l_@@_tmp_box
+          }
+      }
+    \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop
+  }
+%    \end{macrocode}
+%   Finally, we get to the exponent part: the multiplication symbol is
+%   |#1| and the number itself is |#2|.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxvii:w
+  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  {
+    \tl_if_blank:nF {#2}
+      {
+        \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+      }
   }
 %    \end{macrocode}
 %   A simple auxiliary to avoid relatively expensive use of the print routine
