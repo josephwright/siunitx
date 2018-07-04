@@ -923,6 +923,8 @@
     \hbox_set_to_wd:Nnn \l_@@_after_box
       { \box_wd:N \l_@@_tmp_box + \l_@@_carry_dim }
       {
+        \bool_if:NT \l_@@_align_after_bool
+          { \skip_horizontal:n { \l_@@_carry_dim } }
         #3
         \@@_fil:
       }
@@ -1068,7 +1070,7 @@
   {
     \tl_if_blank:nF {#2}
       {
-        \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2}
+        \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2 }
         \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
         \@@_print_format_box:Nn \l_@@_tmp_box { { } #3#4 }
         \@@_print_format_after:N \l_@@_align_exponent_bool
