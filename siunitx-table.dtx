@@ -939,17 +939,18 @@
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   {
     \@@_print_format_box:Nn \l_@@_tmp_box {#1}
-    \@@_print_format_box:Nn \l_@@_integer_box {#3}
     \bool_if:NTF \l_@@_align_before_bool
       {
         \hbox_set_to_wd:Nnn \l_@@_integer_box
           { \box_wd:N \l_@@_tmp_box }
           {
             \@@_fil:
-            \hbox_unpack:N \l_@@_integer_box
+            \tl_if_blank:nF {#3}
+             { \siunitx_print:nn { number } {#3} }
           }
       }
       {
+        \@@_print_format_box:Nn \l_@@_integer_box {#3}
         \hbox_set_to_wd:Nnn \l_@@_before_box
           {
             \box_wd:N \l_@@_before_box +
