@@ -819,6 +819,7 @@
 %     \@@_print_marker_auxii:w,
 %     \@@_print_marker_auxiii:w
 %   }
+% \begin{macro}{\@@_print_format_after:N}
 % \begin{macro}{\@@_print_format_box:Nn}
 % \begin{macro}{\@@_print_none:nnn}
 %    \begin{macrocode}
@@ -1056,7 +1057,44 @@
     \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2#3 }
     \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
     \@@_print_format_box:Nn \l_@@_tmp_box { { } #5#6#7 }
-    \bool_if:NTF \l_@@_align_uncertainty_bool
+    \@@_print_format_after:N \l_@@_align_uncertainty_bool
+    \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop
+  }
+%    \end{macrocode}
+%   Finally, we get to the exponent part: the multiplication symbol is
+%   |#1| and the number itself is |#2|. The code is almost the same as for
+%   uncertainties, which allows a shared auxiliary to be used.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxvii:w
+  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  {
+    \tl_if_blank:nF {#2}
+      {
+        \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2}
+        \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
+        \@@_print_format_box:Nn \l_@@_tmp_box { { } #3#4 }
+        \@@_print_format_after:N \l_@@_align_exponent_bool
+      }
+  }
+%    \end{macrocode}
+%   A simple auxiliary to avoid relatively expensive use of the print routine
+%   for empty parts.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_box:Nn #1#2
+  {
+    \hbox_set:Nn #1
+      {
+        \tl_if_blank:nF {#2}
+          { \siunitx_print:nn { number } {#2} }
+      }
+  }
+%    \end{macrocode}
+%   A common routine for placing material after the decimal marker and
+%   \enquote{shuffling}.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_after:N #1
+  {
+    \bool_if:NTF #1
       {
         \hbox_set_to_wd:Nnn \l_@@_decimal_box
           {
@@ -1087,31 +1125,6 @@
             - \box_wd:N \l_@@_tmp_box
           }
       }
-    \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop
-  }
-%    \end{macrocode}
-%   Finally, we get to the exponent part: the multiplication symbol is
-%   |#1| and the number itself is |#2|.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_format_auxvii:w
-  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
-  {
-    \tl_if_blank:nF {#2}
-      {
-        \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
-      }
-  }
-%    \end{macrocode}
-%   A simple auxiliary to avoid relatively expensive use of the print routine
-%   for empty parts.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_format_box:Nn #1#2
-  {
-    \hbox_set:Nn #1
-      {
-        \tl_if_blank:nF {#2}
-          { \siunitx_print:nn { number } {#2} }
-      }
   }
 %    \end{macrocode}
 %   With no alignment, everything supplied is treated more-or-less the
@@ -1125,6 +1138,7 @@
     #3
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
