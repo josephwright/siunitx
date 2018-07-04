@@ -976,10 +976,15 @@
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   {
     \@@_print_format_box:Nn \l_@@_tmp_box {#1}
-    \bool_if:NTF \l_@@_align_comparator_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_align_comparator_bool }
+      { \dim_compare_p:nNn { \box_wd:N \l_@@_integer_box } > { 0pt } }
       {
         \hbox_set_to_wd:Nnn \l_@@_integer_box
-          { \box_wd:N \l_@@_tmp_box }
+          {
+              \box_wd:N \l_@@_integer_box
+            + \box_wd:N \l_@@_tmp_box
+          }
           {
             \hbox_unpack:N \l_@@_integer_box
             \@@_fil:
@@ -987,24 +992,38 @@
           }
       }
       {
-        \dim_set:Nn \l_@@_tmp_dim
-          { \box_wd:N \l_@@_integer_box }
-        \hbox_set:Nn \l_@@_integer_box
+        \bool_if:NTF \l_@@_align_before_bool
           {
-            \@@_fil:
-            \hbox_unpack:N \l_@@_integer_box
-            \siunitx_print:nn { number } {#3}
-          }
-        \hbox_set_to_wd:Nnn \l_@@_before_box
-          {
-              \box_wd:N \l_@@_before_box
-            + \box_wd:N \l_@@_tmp_box
-            + \l_@@_tmp_dim
-            - \box_wd:N \l_@@_integer_box
+            \hbox_set_to_wd:Nnn \l_@@_integer_box
+              {
+                  \box_wd:N \l_@@_integer_box
+                + \box_wd:N \l_@@_tmp_box
+              }
+              {
+                \@@_fil:
+                \hbox_unpack:N \l_@@_integer_box
+                \siunitx_print:nn { number } {#3}
+              }
           }
           {
-            \@@_fil:
-            \hbox_unpack:N \l_@@_before_box
+            \dim_set:Nn \l_@@_tmp_dim
+              { \box_wd:N \l_@@_integer_box }
+            \hbox_set:Nn \l_@@_integer_box
+              {
+                \hbox_unpack:N \l_@@_integer_box
+                \siunitx_print:nn { number } {#3}
+              }
+            \hbox_set_to_wd:Nnn \l_@@_before_box
+              {
+                  \box_wd:N \l_@@_before_box
+                + \box_wd:N \l_@@_tmp_box
+                + \l_@@_tmp_dim
+                - \box_wd:N \l_@@_integer_box
+              }
+              {
+                \@@_fil:
+                \hbox_unpack:N \l_@@_before_box
+              }
           }
       }
     \@@_print_format_auxiii:w #2 \q_mark #4 \q_stop
