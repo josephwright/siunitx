@@ -916,9 +916,6 @@
       }
     \exp_after:wN \@@_print_format_auxi:w
       \l_@@_tmp_tl \q_stop
-    \box_use_drop:N \l_@@_before_box
-    \box_use_drop:N \l_@@_integer_box
-    \box_use_drop:N \l_@@_decimal_box
     \hbox_set:Nn \l_@@_tmp_box { \l_@@_after_model_tl }
     \hbox_set_to_wd:Nnn \l_@@_after_box
       { \box_wd:N \l_@@_tmp_box + \l_@@_carry_dim }
@@ -928,7 +925,13 @@
         #3
         \@@_fil:
       }
-     \box_use_drop:N \l_@@_after_box
+    \use:c { @@_align_ \l_@@_align_number_tl :n }
+      {
+        \box_use_drop:N \l_@@_before_box
+        \box_use_drop:N \l_@@_integer_box
+        \box_use_drop:N \l_@@_decimal_box
+         \box_use_drop:N \l_@@_after_box
+      }
   }
 %    \end{macrocode}
 %   The first numerical part to handle is the comparator. Any white space we
@@ -1152,10 +1155,13 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_none:nnn #1#2#3
   {
-    #1
-    \siunitx_number_format:nN {#2} \l_@@_tmp_tl
-    \siunitx_print:nV { number } \l_@@_tmp_tl
-    #3
+    \use:c { @@_align_ \l_@@_align_number_tl :n }
+      {
+        #1
+        \siunitx_number_format:nN {#2} \l_@@_tmp_tl
+        \siunitx_print:nV { number } \l_@@_tmp_tl
+        #3
+     }
   }
 %    \end{macrocode}
 % \end{macro}
