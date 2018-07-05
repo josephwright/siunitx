@@ -122,6 +122,7 @@ for those people who are interested.
 
 % For demos
 \usepackage{sansmath}
+\newlength{\mylength}
 
 % For the extra-long tables
 \usepackage{xtab}
@@ -1588,24 +1589,257 @@ to the layout of tabular material (Table~\ref{tab:opt:tables}).
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule ^^A (
-      table-align-comparator    & Switch  & true         \\
-      table-align-exponent      & Switch  & true         \\
-      table-align-text-pre      & Switch  & true         \\
-      table-align-text-post     & Switch  & true         \\
-      table-align-uncertainty   & Switch  & true         \\
-      table-auto-round          & Switch  & false        \\
-      table-column-width        & Length  & 0pt          \\
-      table-comparator          & Switch  & false        \\
-      table-format              & Special & \meta{none}  \\
-      table-number-alignment    & Choice  &
-        center-decimal-marker \\
-      table-space-text-pre      & Literal & \meta{empty} \\
-      table-space-text-post     & Literal & \meta{empty} \\
-      table-text-alignment      & Choice  & center       \\
-      table-unit-alignment      & Choice  & center       \\
+      table-align-comparator    & Switch  & true   \\
+      table-align-exponent      & Switch  & true   \\
+      table-align-text-after    & Switch  & true   \\
+      table-align-text-before   & Switch  & true   \\
+      table-align-uncertainty   & Switch  & true   \\
+      table-column-width        & Length  & 0pt    \\
+      table-format              & Special & 2.2    \\
+      table-mode                & Choice  & marker \\
+      table-number-alignment    & Choice  & center \\
+      table-text-alignment      & Choice  & center \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\DescribeOption{table-mode}
+The method used by \pkg{siunitx} to align numbers is selected using the
+\opt{table-mode} option, which may be one of \opt{marker}, \opt{format} or
+\meta{none}. With the standard setting, \meta{marker}, the package centers the
+decimal marker in a tabular column, potentially leaving white space at the
+shorter end of a number. The \meta{format} mode uses information from the
+\meta{table-format} key to construct a model: this is then used to define the
+space available to a number. For asymmetrical numbers, this method is strongly
+preferable. Finally, \opt{none} disables alignment entirely: numbers are simply
+parsed.
+
+\DescribeOption{table-number-alignment}
+When \opt{table-mode} is set to \meta{format} or \meta{none}, the placement of
+the number \enquote{block} within the cell as a whole is set by the
+\meta{table-number-alignment} option, which may be one of \meta{left},
+\meta{center} or \meta{right}. (When \opt{table-mode} is set to \meta{marker},
+the decimal marker is always centered in the cell.) The different alignment
+choices are illustrated in Table~\ref{tab:S:align}, which uses somewhat
+exaggerated column headings to show the relative position of the cell contents.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Aligning the \texttt{S} column.}
+    \label{tab:S:align}
+    \centering
+    \sisetup{table-format = 2.4, table-alignment-mode = format}
+    \begin{tabular}{@{}
+      S[table-alignment-mode = marker]
+      S[table-number-alignment = center]
+      S[table-number-alignment = left]
+      S[table-number-alignment = right]
+    @{}}
+    \toprule
+    {Some Values} & {Some Values} & {Some Values} & {Some Values} \\
+    \midrule
+       2.3456  &  2.3456  &  2.3456 &  2.3456 \\
+      34.2345  & 34.2345  & 34.2345 & 34.2345 \\
+      56.7835  & 56.7835  & 56.7835 & 56.7835 \\
+      90.473   & 90.473   & 90.473  & 90.473  \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+When the alignment mode is set to \opt{none}, number are simply collected and
+parsed without any further processing, as illustrated in
+Table~\ref{tab:S:parse}.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Parsing without aligning in an \texttt{S} column.}
+    \label{tab:S:parse}
+    \begin{tabular}
+      {@{}
+        S
+        S[table-alignment-mode = none]
+      @{}}
+      \toprule
+        {Decimal-centred} &
+        {Simple centring} \\
+      \midrule
+        12.345   & 12.345   \\
+        6,78     & 6,78     \\
+        -88.8(9) & -88.8(9) \\
+        4.5e3    & 4.5e3    \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+\DescribeOption{table-format}
+When the \opt{table-alignment-mode} is set to \opt{format}, \pkg{siunitx} uses
+the information set in \meta{table-format} to construct a \enquote{model} which
+defines the space to reserve for a number. The \opt{table-format} key is
+interpreted in much the same way as a table cell. The numerical part should
+consist of a number showing how many figures to reserve in each part of the
+input, plus any comparators, signs, \foreign{etc.} A variety of examples are
+given in Table~\ref{tab:S:format}.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Reserving space in \texttt{S} columns.}
+    \label{tab:S:format}
+    \sisetup{
+      table-alignment-mode   = format,
+      table-number-alignment = center,
+    }
+    \begin{tabular}{@{}
+      S[table-format = 2.2]
+      S[table-format = 2.2, table-number-alignment = right]
+      S[table-format = 2.2(1)]
+      S[table-format = 2.2(1), separate-uncertainty]
+      S[table-format = -2.2] % TODO
+      S[table-format = 2.2e1]
+     @{}}
+    \toprule
+        {Values}
+      & {Values}
+      & {Values}
+      & {Values}
+      & {Values}
+      & {Values} \\
+    \midrule
+       2.3  &  2.3  &  2.3(5)  &  2.3(5)  &   2.3  &  2.3e8  \\
+      34.23 & 34.23 & 34.23(4) & 34.23(4) &  34.23 & 34.23   \\
+      56.78 & 56.78 & 56.78(3) & 56.78(3) & -56.78 & 56.78e3 \\
+       3,76 &  3,76 &  3,76(2) &  3.76(2) & +-3.76 &      e6 \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+It is important to note that any parts of a number \emph{not} specified in the
+table format argument are set to be absent (the number of figures is set to
+zero). Setting the \opt{table-format} option also resets
+\opt{table-alignment-mode} to \opt{format}.
+
+Space for material before and after the \texttt{S} column can be reserved by
+giving model text as part of the \opt{table-format} key. This is then used to
+provide the necessary gap while maintaining alignment (Table~\ref{tab:S:ends}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Text before and after numbers.}
+    \label{tab:S:ends}
+    \sisetup{table-format = {now }2.4{\textsuperscript{\emph{a}}}}
+    \begin{tabular}{@{}S@{}}
+    \toprule
+    {Values} \\
+    \midrule
+            2.3456  \\
+           34.2345  \textsuperscript{\emph{a}}\\
+           56.7835  \\
+      now~ 90.473   \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+\DescribeOption{table-align-exponent}
+\DescribeOption{table-align-uncertainty}
+When printing exponents in tables, there is a choice of aligning the exponent
+parts or having these close up to the mantissa. This is controlled by the
+\opt{table-align-exponent} option (Table~\ref{tab:align:exp}). Similarly,
+uncertainty parts which are printed separately from the mantissa can be aligned
+or closed up. This is set by the \opt{table-align-uncertainty} option
+(Table~\ref{tab:align:uncert}). Finally, the same approach is available for the
+comparator with the \opt{table-align-comparator} option
+(Table~\ref{tab:align:comp}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{The \opt{table-align-exponent} option}
+    \label{tab:align:exp}
+    \sisetup{table-format = 1.3e2}
+    \begin{tabular}{@{}SS[table-align-exponent = false]@{}}
+      \toprule
+        {Header} & {Header} \\
+      \midrule
+        1.2e3    & 1.2e3    \\
+        1.234e56 & 1.234e56 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{The \opt{table-align-uncertainty} option}
+    \label{tab:align:uncert}
+    \sisetup{
+      separate-uncertainty,
+      table-format = 1.3(1),
+    }
+    \begin{tabular}{@{}SS[table-align-uncertainty = false]@{}}
+      \toprule
+        {Header} & {Header} \\
+      \midrule
+        1.2(1)   & 1.2(3)    \\
+        1.234(5) & 1.234(5) \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{The \opt{table-align-comparator} option}
+    \label{tab:align:comp}
+    \sisetup{table-format = >2.2}
+    \begin{tabular}{@{}SS[table-align-comparator = false]@{}}
+      \toprule
+        {Header} & {Header} \\
+      \midrule
+        >  1.2  & >  1.2  \\
+        < 12.34 & < 12.34 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+\DescribeOption{table-align-text-before}
+\DescribeOption{table-align-text-after}
+Note markers are often given in tables after the numerical content. It may be
+desirable for these to close up to the numbers. Whether this takes place is
+controlled by the \opt{table-align-text-before} and \opt{\ldots-after}
+ option (Table~\ref{tab:S:notes}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Closing notes up to text.}
+    \label{tab:S:notes}
+    \newrobustcmd\NoteMark[1]{%
+      \textsuperscript{\emph{#1}}%
+    }
+    \sisetup{table-format = {\NoteMark{a}}2.4}
+    \begin{tabular}{@{}
+      S
+      S[table-align-text-before = false]
+    @{}}
+    \toprule
+      {Values}             & {Values} \\
+    \midrule
+                    2.3456 &               2.3456 \\
+      \NoteMark{a}  4.234  & \NoteMark{a}  4.234 \\
+      \NoteMark{b}   .78   & \NoteMark{b}   .78  \\
+      \NoteMark{d} 88      & \NoteMark{d} 88     \\
+    \bottomrule
+    \end{tabular}
+    \hfil
+    \sisetup{table-format = 2.4\NoteMark{a}}
+    \begin{tabular}{
+      S
+      S[table-align-text-after = false]
+    }
+    \toprule
+      {Values}             & {Values} \\
+    \midrule
+       2.3456              & 2.3456 \\
+      34.234  \NoteMark{a} & 34.234 \NoteMark{a} \\
+      56.78   \NoteMark{b} & 56.78  \NoteMark{b} \\
+      90.4    \NoteMark{c} & 90.4   \NoteMark{c} \\
+      88      \NoteMark{d} & 88     \NoteMark{d} \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
 
 \DescribeOption{parse-numbers}
 When the \opt{parse-numbers} option is set to \opt{false}, then the alignment
@@ -1641,6 +1875,31 @@ integer and decimal values for the mantissa are considered
        3,762 &    3,762 &    3,762 &   3.762  \\
     \sqrt{2} & \sqrt{2} & \sqrt{2} & \sqrt{2} \\
     \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+The \opt{table-column-width} option can also be used to achieve special
+effects. One example is centring a column of numbers under a wide heading, with
+the numbers themselves right-aligned (Table~\ref{tab:width:special}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \centering
+    \caption{Right-aligning under a heading.}
+    \label{tab:width:special}
+    \settowidth{\mylength}{Long header}
+    \sisetup{
+      table-alignment-mode   = none      ,
+      table-column-width     = \mylength
+    }
+    \begin{tabular}{@{}S@{}}
+    \toprule
+    {Long header} \\
+    \midrule
+        12.33 \\
+         2    \\
+      1234    \\
+     \bottomrule
     \end{tabular}
   \end{table}
 \end{LaTeXdemo}
