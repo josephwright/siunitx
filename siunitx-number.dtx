@@ -165,6 +165,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{drop-exponent}
+%   \begin{syntax}
+%     |drop-exponent| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{drop-uncertainty}
 %   \begin{syntax}
 %     |drop-uncertainty| = |true|\verb"|"|false|
@@ -1405,6 +1411,7 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_drop_exponent_bool     ,
 %     \l_@@_drop_uncertainty_bool  ,
 %     \l_@@_drop_zero_decimal_bool ,
 %     \l_@@_exponent_mode_tl       ,
@@ -1420,6 +1427,8 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    drop-exponent .bool_set:N =
+      \l_@@_drop_exponent_bool ,
     drop-uncertainty .bool_set:N =
       \l_@@_drop_uncertainty_bool ,
     drop-zero-decimal .bool_set:N =
@@ -1475,6 +1484,7 @@
           {
             \@@_drop_uncertainty:NN #1 #2
             \@@_exponent:NN #2 #2
+            \@@_drop_exponent:NN #2 #2
             \@@_round:NN #2 #2
             \@@_zero_decimal:NN #2 #2
             \@@_digits:NN #2 #2
@@ -1752,6 +1762,24 @@
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_drop_exponent:NN}
+% \begin{macro}[EXP]{\@@drop_exponent:nNnnnNn}
+%   Simple stripping of the exponent.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_drop_exponent:NN #1#2
+  {
+    \bool_if:NT \l_@@_drop_exponent_bool
+      {
+        \tl_set:Nx #2
+          { \exp_after:wN \@@_drop_exponent:nNnnnNn #1 }
+      }
+  }
+\cs_new:Npn \@@_drop_exponent:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n { {#1} #2 {#3} {#4} {#5} + { 0 } } }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
@@ -2921,6 +2949,7 @@
 \keys_set:nn { siunitx }
   {
     bracket-negative         = false                                  ,
+    drop-exponent            = false                                  ,
     drop-uncertainty         = false                                  ,
     drop-zero-decimal        = false                                  ,
     evaluate-expression      = false                                  ,
