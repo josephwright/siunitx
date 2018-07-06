@@ -1463,35 +1463,36 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\c_@@_zero_tl, \c_@@_zero_decimal_tl}
-%   The two possible forms for zero.
-%    \begin{macrocode}
-\tl_const:Nn \c_@@_zero_tl { { } + { 0 } { } { } + { 0 } }
-\tl_const:Nn \c_@@_zero_decimal_tl { { } + { 0 } { 0 } { } + { 0 } }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{macro}{\siunitx_number_process:NN}
+% \begin{macro}{\@@_process:nNnnnNnNN}
 %   A top-level interface for the processing tools.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_process:NN #1#2
   {
     \tl_if_empty:NF #1
       {
-        \bool_lazy_or:nnF
-          { \tl_if_eq_p:NN #1 \c_@@_zero_tl }
-          { \tl_if_eq_p:NN #1 \c_@@_zero_decimal_tl }
-          {
-            \@@_drop_uncertainty:NN #1 #2
-            \@@_exponent:NN #2 #2
-            \@@_drop_exponent:NN #2 #2
-            \@@_round:NN #2 #2
-            \@@_zero_decimal:NN #2 #2
-            \@@_digits:NN #2 #2
-          }
+        \@@_drop_uncertainty:NN #1 #2
+        \exp_after:wN \@@_process:nNnnnNnNN #2 #2 #2
+        \@@_drop_exponent:NN #2 #2
+        \@@_zero_decimal:NN #2 #2
+        \@@_digits:NN #2 #2
+      }
+  }
+\cs_new_protected:Npn \@@_process:nNnnnNnNN #1#2#3#4#5#6#7#8#9
+  {
+    \bool_lazy_and:nnF
+      { \str_if_eq_p:nn {#3} { 0 } }
+      {
+        \str_if_eq_x_p:nn
+          { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      }
+      {
+        \@@_exponent:NN #8 #9
+        \@@_round:NN #9 #9
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_exponent:NN}
