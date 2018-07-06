@@ -345,9 +345,9 @@
 %   \end{syntax}
 % \end{function}
 %
-% \begin{function}{print-explicit-plus}
+% \begin{function}{print-implicit-plus}
 %   \begin{syntax}
-%     |print-explicit-plus| = |true|\verb"|"|false|
+%     |print-implicit-plus| = |true|\verb"|"|false|
 %   \end{syntax}
 % \end{function}
 %
@@ -2397,7 +2397,7 @@
 %   {
 %      \l_@@_bracket_negative_bool  ,
 %      \l_@@_bracket_close_tl       ,
-%      \l_@@_explicit_plus_bool     ,
+%      \l_@@_implicit_plus_bool     ,
 %      \l_@@_exponent_base_tl       ,
 %      \l_@@_exponent_product_tl    ,
 %      \l_@@_group_decimal_bool     ,
@@ -2462,8 +2462,8 @@
       \l_siunitx_number_output_decimal_tl ,
     output-open-uncertainty .tl_set:N =
       \l_@@_output_uncert_open_tl ,
-    print-explicit-plus .bool_set:N =
-      \l_@@_explicit_plus_bool ,
+    print-implicit-plus .bool_set:N =
+      \l_@@_implicit_plus_bool ,
     print-unity-mantissa .bool_set:N =
       \l_@@_unity_mantissa_bool ,
     print-zero-exponent .bool_set:N =
@@ -2554,7 +2554,7 @@
   {
     \str_if_eq:nnTF {#1} { + }
       {
-        \bool_if:NT \l_@@_explicit_plus_bool
+        \bool_if:NT \l_@@_implicit_plus_bool
           { \@@_format_sign_aux:N #1 }
       }
       {
@@ -2809,7 +2809,7 @@
         ^
           {
             \bool_lazy_or:nnT
-              { \l_@@_explicit_plus_bool }
+              { \l_@@_implicit_plus_bool }
               { ! \str_if_eq_p:nn {#1} { + } }
               { \@@_format_sign_aux:N #1 }
             \@@_format_digits:nn { integer } {#2}
