@@ -1591,6 +1591,7 @@ to the layout of tabular material (Table~\ref{tab:opt:tables}).
       table-align-text-after    & Switch  & true   \\
       table-align-text-before   & Switch  & true   \\
       table-align-uncertainty   & Switch  & true   \\
+      table-alignment           & Meta    & center \\
       table-column-width        & Length  & 0pt    \\
       table-format              & Special & 2.2    \\
       table-mode                & Choice  & marker \\
@@ -1959,6 +1960,43 @@ the numbers themselves right-aligned (Table~\ref{tab:width:special}).
     \end{tabular}
   \end{table}
 \end{LaTeXdemo}
+
+\DescribeOption{table-text-alignment}
+\DescribeOption{table-alignment}
+Cell contents which are not part of a number can be protected using braces, as
+illustrated. Cells which contain no numerical data at all are aligned using the
+setting specified by the \opt{table-text-alignment} option, which recognises
+the values \opt{center}, \opt{left} and \opt{right} (Table~\ref{tab:S:text}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Aligning text in \texttt{S} columns.}
+    \label{tab:S:text}
+    \sisetup{table-format = 4.4}
+    \centering
+    \begin{tabular}{@{}
+      S
+      S[table-text-alignment = left]
+      S[table-text-alignment = right]
+    @{}}
+    \toprule
+        {Values}
+      & {Values}
+      & {Values} \\
+    \midrule
+      992.435  &  992.435  &  992.435  \\
+     7734.2344 & 7734.2344 & 7734.2344 \\
+       56.7834 &   56.7834 &   56.7834 \\
+        3,7462 &    3,7462 &    3,7462 \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+\DescribeOption{table-alignment}
+The table alignment options \opt{table-number-alignment} and
+\opt{table-text-alignment} can be set to the same value using the
+\opt{table-alignment} option. This will set all three alignment options to the
+same value (one of \opt{center}, \opt{right} or \opt{left}).
 
 \section{Installation}
 
