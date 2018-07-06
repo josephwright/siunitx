@@ -1473,7 +1473,7 @@
           { \tl_if_eq_p:NN #1 \c_@@_zero_tl }
           { \tl_if_eq_p:NN #1 \c_@@_zero_decimal_tl }
           {
-            \@@_uncertainty:NN #1 #2
+            \@@_drop_uncertainty:NN #1 #2
             \@@_exponent:NN #2 #2
             \@@_round:NN #2 #2
             \@@_zero_decimal:NN #2 #2
@@ -1752,6 +1752,24 @@
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_drop_uncertainty:NN}
+% \begin{macro}[EXP]{\@@_drop_uncertainty:nNnnnNn}
+%   Simple stripping of the uncertainty.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_drop_uncertainty:NN #1#2
+  {
+    \bool_if:NT \l_@@_drop_uncertainty_bool
+      {
+        \tl_set:Nx #2
+          { \exp_after:wN \@@_drop_uncertainty:nNnnnNn #1 }
+      }
+  }
+\cs_new:Npn \@@_drop_uncertainty:nNnnnNn #1#2#3#4#5#6#7
+  { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
@@ -2304,24 +2322,6 @@
   }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
-% \end{macro}
-%
-% \begin{macro}{\@@_uncertainty:NN}
-% \begin{macro}[EXP]{\@@_uncertainty:nNnnnNn}
-%   Simple stripping of the uncertainty.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_uncertainty:NN #1#2
-  {
-    \bool_if:NT \l_@@_drop_uncertainty_bool
-      {
-        \tl_set:Nx #2
-          { \exp_after:wN \@@_uncertainty:nNnnnNn #1 }
-      }
-  }
-\cs_new:Npn \@@_uncertainty:nNnnnNn #1#2#3#4#5#6#7
-  { \exp_not:n { {#1} #2 {#3} {#4} { } #6 {#7} } }
-%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
