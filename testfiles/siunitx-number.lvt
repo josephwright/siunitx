@@ -101,8 +101,8 @@
   }
 
 \OMIT
-\tl_set:Nn \l_tmpa_tl { { } + { 123 } { 456 } { } + { 7 } }
-\tl_set:Nn \l_tmpb_tl { { < } - { 0 } { 12345 } { { S } { 6 } } - { 1 } }
+\tl_set:Nn \l_tmpa_tl { { } { } { 123 } { 456 } { } { } { 7 } }
+\tl_set:Nn \l_tmpb_tl { { < } { - } { 0 } { 12345 } { { S } { 6 } } { - } { 1 } }
 \TIMO
 
 \TESTEXP { Formatting~parsed~numbers }
@@ -555,6 +555,15 @@
     \keys_set:nn { siunitx } { print-zero-exponent = true }
     \test:n { 1234e0 }
     \test:n { 1234e-0 }
+  }
+
+\TEST { Option~setting~"record-explicit-plus" }
+  {
+    \test:n { +12.3 }
+    \test:n { 12e+3 }
+    \keys_set:nn { siunitx } { record-explicit-plus = true }
+    \test:n { +12.3 }
+    \test:n { 12e+3 }
   }
 
 \TEST { Option~setting~"round-mode" }
