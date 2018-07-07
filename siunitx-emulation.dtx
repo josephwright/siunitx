@@ -306,6 +306,7 @@
 %
 % \subsubsection{Table options}
 %
+%  All straight-forward emulation.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
@@ -378,6 +379,76 @@
           { table-format }
         \tl_set:Nn \l_@@_table_before_model_tl {#1}
       }
+  }
+%    \end{macrocode}
+%
+% \begin{macro}{\@@_option_table_format:n}
+% \begin{macro}
+%   {
+%     \@@_option_table_comparator:nnnnnnn           ,
+%     \@@_option_table_figures-decimal:nnnnnnnn     ,
+%     \@@_option_table_figures-exponent:nnnnnnnn    ,
+%     \@@_option_table_figures-integer:nnnnnnnn     ,
+%     \@@_option_table_figures-uncertainty:nnnnnnnn ,
+%     \@@_option_table_sign-exponent:nnnnnnnn       ,
+%     \@@_option_table_sign-mantissa:nnnnnnnn
+%   }
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_option_table_format:n #1
+  {
+    \msg_info:nnnn { siunitx } { option-deprecated }
+      { table- #1 }
+      { table-format }
+    \tl_set:Nx \l_@@_format_tl
+      {
+        \cs:w @@_option_table_ #1 :nnnnnnnn
+          \exp_after:wN \cs_end: \l_@@_table_format_tl {#1}
+      }
+    \exp_after:wN \@@_table_generate_model:nnnnnnn
+      \l_@@_table_format_tl
+  }
+\cs_new:Npn \@@_option_table_comparator:nnnnnnnn #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#8} {#2} {#3} {#4} {#5} {#6} {#7} } }
+\cs_new:cpn { @@_option_table_figures-decimal:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#2} {#3} {#8} {#5} {#6} {#7} } }
+\cs_new:cpn { @@_option_table_figures-exponent:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#8} } }
+\cs_new:cpn { @@_option_table_figures-integer:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#2} {#8} {#4} {#5} {#6} {#7} } }
+\cs_new:cpn { @@_option_table_figures-uncertainty:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#2} {#8} {#4} {#5} {#6} {#7} } }
+\cs_new:cpn { @@_option_table_sign-exponent:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#8} {#7} } }
+\cs_new:cpn { @@_option_table_sign-mantissa:nnnnnnnn }
+  #1#2#3#4#5#6#7#8
+  { \exp_not:n { {#1} {#8} {#3} {#4} {#5} {#6} {#7} } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% Options which all use the same emulation set up.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    table-comparator .code:n =
+      { \@@_option_table_format:n { comparator } } ,
+    table-figures-decimal .code:n =
+      { \@@_option_table_format:n { figures-decimal } } ,
+    table-figures-exponent .code:n =
+      { \@@_option_table_format:n { figures-exponent } } ,
+    table-figures-integer .code:n =
+      { \@@_option_table_format:n { figures-integer } } ,
+    table-figures-uncertainty .code:n =
+      { \@@_option_table_format:n { figures-uncertainty } } ,
+    table-sign-exponent .code:n =
+      { \@@_option_table_format:n { sign-exponent } } ,
+    table-sign-mantissa .code:n =
+      { \@@_option_table_format:n { sign-mantissa } }
   }
 %    \end{macrocode}
 %
