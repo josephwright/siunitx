@@ -535,7 +535,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{variable}{\l_@@_align_mode_tl, \l_@@_align_number_tl}
+% \begin{variable}
+%   {\l_@@_auto_round_bool, \l_@@_align_mode_tl, \l_@@_align_number_tl}
 %   Options for tables with defined space.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -545,6 +546,8 @@
     table-alignment-mode .choices:nn =
       { none , format , marker }
       { \tl_set_eq:NN \l_@@_align_mode_tl \l_keys_choice_tl } ,
+    table-auto-round .bool_set:N =
+      \l_@@_auto_round_bool ,
     table-format .code:n =
       {
         \@@_split:nNNN {#1}
@@ -640,6 +643,7 @@
 %     \@@_direct_marker_end:
 %   }
 % \begin{macro}{\@@_direct_format:}
+% \begin{macro}[EXP]{\@@_direct_format:nnnnnnn}
 % \begin{macro}{\@@_direct_format:w}
 % \begin{macro}
 %   {
@@ -759,6 +763,7 @@
 \cs_new_protected:Npn \@@_direct_none: { \c_math_toggle_token }
 \cs_new_protected:Npn \@@_direct_none_end: { \c_math_toggle_token }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -911,7 +916,21 @@
         \hbox_unpack:N \l_@@_before_box
       }
     \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \group_begin:
+      \bool_if:NT \l_@@_auto_round_bool
+        {
+          \exp_args:Nx \keys_set:nn { siunitx }
+            {
+              round-mode      = places ,
+              round-pad       = true   ,
+              round-precision =
+                \exp_after:wN \@@_print_format:nnnnnn
+                  \l_@@_format_tl
+            }
+        }
+      \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn \l_@@_tmp_tl \l_@@_tmp_tl
     \tl_set:Nx \l_@@_tmp_tl
       {
         \siunitx_number_format:NN \l_@@_model_tl \q_nil
@@ -937,6 +956,8 @@
          \box_use_drop:N \l_@@_after_box
       }
   }
+\cs_new:Npn \@@_print_format:nnnnnn #1#2#3#4#5#6#7
+  { 0 #4 }
 %    \end{macrocode}
 %   The first numerical part to handle is the comparator. Any white space we
 %   need to add goes into the text part \emph{if} alignment is not active
@@ -1191,6 +1212,7 @@
     table-align-text-before = true   ,
     table-align-uncertainty = true   ,
     table-alignment         = center ,
+    table-auto-round        = false  ,
     table-column-width      = 0pt    ,
     table-fixed-width       = false  ,
     table-format            = 2.2    ,
