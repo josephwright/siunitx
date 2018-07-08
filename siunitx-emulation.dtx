@@ -399,10 +399,13 @@
     \msg_info:nnnn { siunitx } { option-deprecated }
       { table- #1 }
       { table-format }
-    \tl_set:Nx \l_@@_format_tl
+    \tl_set:Nx \l_@@_table_format_tl
       {
         \cs:w @@_option_table_ #1 :nnnnnnnn
-          \exp_after:wN \cs_end: \l_@@_table_format_tl {#1}
+          \exp_after:wN \exp_after:wN \exp_after:wN \cs_end:
+          \exp_after:wN \l_@@_table_format_tl
+          \exp_after:wN { \l_keys_value_tl }
+          
       }
     \exp_after:wN \@@_table_generate_model:nnnnnnn
       \l_@@_table_format_tl
