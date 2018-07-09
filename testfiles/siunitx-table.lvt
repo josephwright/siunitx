@@ -10,8 +10,222 @@
 
 \documentclass{article}
 
-\begin{document}
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
 
 \START
 
-\end{document}
+\TEST { Basic~formatting }
+  {
+    \test:n { 2.345 }
+    \test:n { 123.456 }
+    \test:n { 1.2e3 }
+    \test:n { 12(3) }
+    \test:n { 12.34(5)e6 }
+  }
+
+\TEST { Text~before~and~after }
+  {
+    \test:n { a2.345b }
+    \test:n { {d}234.5{e} }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"table-align-comparator" }
+  {
+    \keys_set:nn { siunitx } { table-format = >2.2 }
+    \test:n { >1.2 }
+    \test:n { <12.34 }
+    \keys_set:nn { siunitx } { table-align-comparator = false }
+    \test:n { >1.2 }
+    \test:n { <12.34 }
+  }
+
+\TEST { Option~setting~"table-align-exponent" }
+  {
+    \keys_set:nn { siunitx } { table-format = 2.2e1 }
+    \test:n { 1.2e1 }
+    \test:n { 12.34e1 }
+    \keys_set:nn { siunitx } { table-align-exponent = false }
+    \test:n { 1.2e1 }
+    \test:n { 12.34e1 }
+  }
+
+\TEST { Option~setting~"table-align-text-after" }
+  {
+    \keys_set:nn { siunitx } { table-format = 2.2{a} }
+    \test:n { 1.2a }
+    \test:n { 12.34b }
+    \keys_set:nn { siunitx } { table-align-text-after = false }
+    \test:n { 1.2a }
+    \test:n { 12.34b }
+  }
+
+\TEST { Option~setting~"table-align-text-before" }
+  {
+    \keys_set:nn { siunitx } { table-format = {a}2.2 }
+    \test:n { a1.2 }
+    \test:n { b12.34 }
+    \keys_set:nn { siunitx } { table-align-text-before = false }
+    \test:n { a1.2 }
+    \test:n { b12.34 }
+  }
+
+\TEST { Option~setting~"table-align-uncertainty" }
+  {
+    \keys_set:nn { siunitx } { separate-uncertainty , table-format = 2.2(1) }
+    \test:n { 1.2(1) }
+    \test:n { 12.34(3) }
+    \keys_set:nn { siunitx } { table-align-uncertainty = false }
+    \test:n { 1.2(1) }
+    \test:n { 12.34(3) }
+  }
+
+\TEST { Option~setting~"table-alignment-mode" }
+  {
+    \keys_set:nn { siunitx } { table-format = 2.4e1 }
+    \test:n { 1.2345e6 }
+    \test:n { 12.345 }
+    \keys_set:nn { siunitx } { table-alignment-mode = format }
+    \test:n { 1.2345e6 }
+    \test:n { 12.345 }
+    \keys_set:nn { siunitx } { table-alignment-mode = marker }
+    \test:n { 1.2345e6 }
+    \test:n { 12.345 }
+    \keys_set:nn { siunitx } { table-alignment-mode = none }
+    \test:n { 1.2345e6 }
+    \test:n { 12.345 }
+  }
+
+\TEST { Option~setting~"table-auto-round" }
+  {
+    \keys_set:nn { siunitx } { table-format = 2.4 }
+    \test:n { 1.2345 }
+    \test:n { 12.345 }
+    \test:n { 12.345678 }
+    \test:n { 12 }
+    \test:n { 1234.56 }
+    \keys_set:nn { siunitx } { table-auto-round = true }
+    \test:n { 1.2345 }
+    \test:n { 12.345 }
+    \test:n { 12.345678 }
+    \test:n { 12 }
+    \test:n { 1234.56 }
+  }
+
+\TEST { Option~setting~"table-column-width" }
+  {
+    \keys_set:nn { siunitx } { table-fixed-width = true }
+    \test:n { 1.2345 }
+    \keys_set:nn { siunitx } { table-column-width = 2cm }
+    \test:n { 1.2345 }
+  }
+
+\TEST { Option~setting~"table-fixed-width" }
+  {
+    \keys_set:nn { siunitx } { table-column-width = 2cm }
+    \test:n { 1.2345 }
+    \keys_set:nn { siunitx } { table-fixed-width = true }
+    \test:n { 1.2345 }
+  }
+
+\TEST { Option~setting~"table-format" }
+  {
+    \keys_set:nn { siunitx } { table-format = 2.2 }
+    \test:n { 12.34 }
+    \test:n { 12 }
+    \test:n { 12.34e4 }
+    \test:n { -12.34 }
+    \keys_set:nn { siunitx } { table-format = +2.2 }
+    \test:n { 12.34 }
+    \test:n { 12 }
+    \test:n { 12.34e4 }
+    \test:n { -12.34 }
+    \keys_set:nn { siunitx } { table-format = +2.2e1 }
+    \test:n { 12.34 }
+    \test:n { 12 }
+    \test:n { 12.34e4 }
+    \test:n { -12.34 }
+  }
+
+\TEST { Option~setting~"table-number-alignment" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \hbox_set_to_wd:Nnn \l_tmpa_box { 5cm }
+          { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
+        \box_show:N \l_tmpa_box
+      }
+    \TIMO
+    \keys_set:nn { siunitx } { table-format = 2.2 }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+    \keys_set:nn { siunitx } { table-number-alignment = left }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+    \keys_set:nn { siunitx } { table-number-alignment = right }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+  }
+
+\TEST { Option~setting~"table-text-alignment" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \hbox_set_to_wd:Nnn \l_tmpa_box { 5cm }
+          { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
+        \box_show:N \l_tmpa_box
+      }
+    \TIMO
+    \test:n { Hello }
+    \keys_set:nn { siunitx } { table-text-alignment = left }
+    \test:n { Hello }
+    \keys_set:nn { siunitx } { table-text-alignment = right }
+    \test:n { Hello }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"parse-numbers"~in~tables }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \hbox_set_to_wd:Nnn \l_tmpa_box { 5cm }
+          { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
+        \box_show:N \l_tmpa_box
+      }
+    \TIMO
+    \keys_set:nn { siunitx } { parse-numbers = false }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+    \keys_set:nn { siunitx } { table-alignment-mode = format }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+    \keys_set:nn { siunitx } { table-number-alignment = left }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+    \keys_set:nn { siunitx } { table-number-alignment = right }
+    \test:n { 12.34 }
+    \test:n { 12.3 }
+    \test:n {  2.34 }
+  }
+
+\END
