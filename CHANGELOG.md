@@ -8,7 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v3.0]
+## [v3.0.0]
 
 ### Added
 - Modular re-write to provide code-level API
