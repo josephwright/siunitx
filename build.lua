@@ -15,6 +15,9 @@ packtdszip = true
 -- Typeset only the .tex files
 typesetfiles = {"*.tex"}
 
+-- Shorten the tagging list
+tagfiles = {"siunitx.dtx"}
+
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
   return string.gsub(content,
