@@ -125,6 +125,7 @@ for those people who are interested.
 \newlength{\mylength}
 
 % For table demos
+\usepackage{multirow}
 \usepackage[table]{xcolor}
 
 % For the extra-long tables
@@ -771,6 +772,45 @@ colour applied by \pkg{siunitx}.
       \color{purple} 975,31 \\
       44.268 \textsuperscript{\emph{a}} \\
     \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+\DescribeMacro{\tablenum}
+\begin{syntax}
+  \cs{tablenum}\oarg{options}\marg{number}
+\end{syntax}
+Within more complex tables, aligned numbers may be desirable within the
+argument of \cs{multicolumn} or \cs{multirow}.\footnote{Provided by the
+\pkg{multirow} package} The \cs{tablenum} function is available to achieve
+alignment in these situations: this is, in effect, a macro version of the
+\texttt{S} column (Table~\ref{tab:tablenum}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Controlling complex alignment with the \cs{tablenum}
+      macro.}
+    \label{tab:tablenum}
+    \begin{tabular}{@{}lr@{}}
+      \toprule
+      Heading & Heading \\
+      \midrule
+      Info & More info \\
+      Info & More info \\
+      \multicolumn{2}{c}{\tablenum[table-format = 4.4]{12,34}}    \\
+      \multicolumn{2}{c}{\tablenum[table-format = 4.4]{333.5567}} \\
+      \multicolumn{2}{c}{\tablenum[table-format = 4.4]{4563.21}}  \\
+      \bottomrule
+    \end{tabular}
+    \hfil
+    \begin{tabular}{@{}lr@{}}
+      \toprule
+      Heading & Heading \\
+      \midrule
+      \multirow{2}*{\tablenum{88,999}} & aaa \\
+                                       & bbb \\
+      \multirow{2}*{\tablenum{33,435}} & ccc \\
+                                       & ddd \\
+      \bottomrule
     \end{tabular}
   \end{table}
 \end{LaTeXdemo}
