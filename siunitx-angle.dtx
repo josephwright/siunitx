@@ -155,13 +155,13 @@
 %
 %  \begin{variable}
 %    {
-%      \l_@@_force_arc_bool     ,
-%      \l_@@_force_decimal_bool ,
-%      \l_@@_astronomy_bool     ,
-%      \l_@@_separator_tl       ,
-%      \l_@@_fill_degree_bool   ,
-%      \l_@@_fill_minute_bool   ,
-%      \l_@@_fill_second_bool   ,
+%      \l_@@_force_arc_bool      ,
+%      \l_@@_force_decimal_bool  ,
+%      \l_@@_astronomy_bool      ,
+%      \l_@@_separator_tl        ,
+%      \l_@@_fill_degrees_bool   ,
+%      \l_@@_fill_minutes_bool   ,
+%      \l_@@_fill_seconds_bool   ,
 %      \l_@@_product_tl
 %    }
 %    \begin{macrocode}
@@ -188,11 +188,11 @@
     arc-separator .tl_set:N =
       \l_@@_separator_tl ,
     fill-arc-degrees .bool_set:N =
-      \l_@@_fill_degree_bool ,
+      \l_@@_fill_degrees_bool ,
     fill-arc-minutes .bool_set:N =
-      \l_@@_fill_minute_bool ,
+      \l_@@_fill_minutes_bool ,
     fill-arc-seconds .bool_set:N =
-      \l_@@_fill_second_bool ,
+      \l_@@_fill_seconds_bool ,
     number-angle-product .tl_set:N =
       \l_@@_product_tl
   }
@@ -215,7 +215,13 @@
         \use:x
           { \@@_arc_convert:n { \fp_eval:n {#1} } }
       }
-      { \@@_arc:nnn {#1} { } { } }
+      {
+        \siunitx_number_format:nN {#1} \l_@@_degrees_tl
+        \@@_arc_print:VVV
+          \l_@@_degrees_tl
+          \c_empty_tl
+          \c_empty_tl
+      }
   }
 \cs_new_protected:Npn \siunitx_angle:nnn #1#2#3
   {
@@ -224,7 +230,7 @@
         \exp_args:Nx \siunitx_angle:n
           { \fp_eval:n { #1 + (#2) / 60 + (#3) / 3600 } }
       }
-      { \@@_arc_fill:nnn {#1} {#2} {#3} }
+      { \@@_arc_sign:nnn {#1} {#2} {#3} }
   }
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
@@ -250,33 +256,6 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_arc_fill:nnn}
-% \begin{macro}[EXP]{\@@_arc_fill:nn}
-%   Zero-filling of values gets us to a common code path irrespective of
-%   the input format.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_arc_fill:nnn #1#2#3
-  {
-    \use:x
-      {
-        \@@_arc:nnn
-          { \@@_arc_fill:nn { degree } {#1} }
-          { \@@_arc_fill:nn { minute } {#2} }
-          { \@@_arc_fill:nn { second } {#3} }
-      }
-  }
-\cs_new:Npn \@@_arc_fill:nn #1#2
-  {
-    \bool_lazy_and:nnTF
-      { \use:c { l_@@_fill_ #1 _bool } }
-      { \tl_if_blank_p:n {#2} }
-      { 0 }
-      {#2}
-  }
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-%
 % \begin{variable}{\l_@@_degrees_tl, \l_@@_minutes_tl, \l_@@_seconds_tl}
 %   Space for formatting parsed numbers.
 %   \begin{macrocode}
@@ -286,52 +265,103 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_arc:nnn}
-% \begin{macro}{\@@_arc_restrict:, \@@_arc_restrict_signs:}
-%   When parsing arc values, only real numbers are allowed: that is easily
-%   accomplished by setting other input types to have no valid tokens. Only
-%   the first part of an arc given can have a sign or comparator: this is
-%   slightly more complex as it needs to be applied at the right time.
+% \begin{variable}{\l_@@_sign_tl}
+%   For the \enquote{sign shuffle}.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_arc:nnn #1#2#3
+\tl_new:N \l_@@_sign_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_arc_sign:nnn}
+% \begin{macro}{\@@_arc_sign:nn}
+% \begin{macro}{\@@_extract_sign:nnnnnnnn}
+% \begin{macro}[EXP]{\@@_sign:nnnnnnn}
+%   To get the sign in the right place whilst dealing with zero filling
+%   means doing some shuffling. That means doing processing of each number
+%   manually.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_arc_sign:nnn #1#2#3
   {
     \group_begin:
-      \@@_arc_restrict:
-      \tl_if_blank:nF {#1}
+      \keys_set:nn { siunitx }
         {
-          \siunitx_number_format:nN {#1} \l_@@_degrees_tl
-          \@@_arc_restrict_signs:
+          input-close-uncertainty = ,
+          input-exponent-markers  = ,
+          input-open-uncertainty  = ,
+          input-uncertainty-signs =
         }
-      \tl_if_blank:nF {#2}
+      \tl_clear:N \l_@@_sign_tl
+      \@@_arc_sign:nn {#1} { degrees }
+      \@@_arc_sign:nn {#2} { minutes }
+      \@@_arc_sign:nn {#3} { seconds }
+      \tl_if_empty:NF \l_@@_sign_tl
         {
-          \siunitx_number_format:nN {#2} \l_@@_minutes_tl
-          \tl_if_blank:nF {#1}
-            { \@@_arc_restrict_signs: }
+          \clist_map_inline:nn { degrees , minutes , seconds }
+            {
+              \tl_if_empty:cF { l_@@_ ##1 _tl }
+                {
+                  \tl_set:cx { l_@@_ ##1 _tl }
+                    {
+                       { }
+                       { \exp_not:V \l_@@_sign_tl }
+                       \exp_after:wN \exp_after:wN \exp_after:wN
+                         \@@_sign:nnnnnnn
+                           \cs:w l_@@_ ##1 _tl \cs_end:
+                    }
+                  \clist_map_break:
+                }
+            }
         }
-      \tl_if_blank:nF {#3}
-        { \siunitx_number_format:nN {#3} \l_@@_seconds_tl }
+      \clist_map_inline:nn { degrees , minutes , seconds }
+        {
+          \tl_if_empty:cF { l_@@_ ##1 _tl }
+            {
+              \tl_set:cx { l_@@_ ##1 _tl }
+                {
+                  \exp_args:Nc \siunitx_number_format:N
+                    { l_@@_ ##1 _tl }
+                }
+            }
+        }
       \@@_arc_print:VVV
         \l_@@_degrees_tl
         \l_@@_minutes_tl
         \l_@@_seconds_tl
     \group_end:
   }
-\cs_new_protected:Npn \@@_arc_restrict:
+\cs_new_protected:Npn \@@_arc_sign:nn #1#2
   {
-    \keys_set:nn { siunitx }
+    \tl_if_blank:nTF {#1}
       {
-        input-close-uncertainty = ,
-        input-exponent-markers  = ,
-        input-open-uncertainty  = ,
-        input-uncertainty-signs =
+        \bool_if:cTF { l_@@_fill_ #2 _bool }
+          {
+            \tl_set:cn { l_@@_ #2 _tl }
+              { { } { } { 0 } { } { } { } { 0 } }
+          }
+          { \tl_clear:c { l_@@_ #2 _tl } }
+      }
+      {
+        \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+        \exp_after:wN \@@_extract_sign:nnnnnnnn \l_@@_tmp_tl {#2}
       }
   }
-\cs_new_protected:Npn \@@_arc_restrict_signs:
+\cs_new_protected:Npn \@@_extract_sign:nnnnnnnn #1#2#3#4#5#6#7#8
   {
-    \keys_set:nn { siunitx }
-      { input-comparators = , input-signs = }
+    \tl_if_blank:nTF {#2}
+      { \tl_set_eq:cN { l_@@_ #8 _tl } \l_@@_tmp_tl }
+      {
+        \tl_set:cn { l_@@_ #8 _tl }
+          { {#1} { } {#3} {#4} {#5} {#6} {#7} }
+        \tl_set:Nn \l_@@_sign_tl {#2}
+        \keys_set:nn { siunitx }
+          { input-comparators = , input-signs = }
+      }
   }
+\cs_new:Npn \@@_sign:nnnnnnn #1#2#3#4#5#6#7
+  { \exp_not:n { {#3} {#4} {#5} {#6} {#7} } }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
