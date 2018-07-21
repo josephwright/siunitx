@@ -146,9 +146,11 @@
 %<@@=siunitx_angle>
 %    \end{macrocode}
 %
-%  \begin{variable}{\l_@@_tmp_tl}
+%  \begin{variable}{\l_@@_tmp_bool, \l_@@_tmp_dim, \l_@@_tmp_tl}
 %    Scratch space.
 %    \begin{macrocode}
+\bool_new:N \l_@@_tmp_bool
+\dim_new:N \l_@@_tmp_dim
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
 %  \end{variable}
@@ -216,7 +218,9 @@
           { \@@_arc_convert:n { \fp_eval:n {#1} } }
       }
       {
-        \siunitx_number_format:nN {#1} \l_@@_degrees_tl
+        \siunitx_number_parse:nN {#1} \l_@@_degrees_tl
+        \tl_set:Nx \l_@@_degrees_tl
+          { \siunitx_number_format:NN \l_@@_degrees_tl \q_nil }
         \@@_arc_print:VVV
           \l_@@_degrees_tl
           \c_empty_tl
@@ -318,8 +322,8 @@
             {
               \tl_set:cx { l_@@_ ##1 _tl }
                 {
-                  \exp_args:Nc \siunitx_number_format:N
-                    { l_@@_ ##1 _tl }
+                  \exp_args:Nc \siunitx_number_format:NN
+                    { l_@@_ ##1 _tl } \q_nil
                 }
             }
         }
@@ -365,27 +369,42 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print:VVV, \@@_arc_print_aux:nnn}
+%  \begin{variable}{\l_@@_marker_box, \l_@@_unit_box}
+%    For \enquote{astronomy style} angles.
+%    \begin{macrocode}
+\box_new:N \l_@@_marker_box
+\box_new:N \l_@@_unit_box
+%    \end{macrocode}
+%  \end{variable}
+%
+% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print:VVV, \@@_arc_print_auxi:nnn}
+% \begin{macro}{\@@_arc_print_auxii:w}
+% \begin{macro}{\@@_arc_print_auxiii:n}
+% \begin{macro}{\@@_arc_print_auxiv:NN}
+% \begin{macro}{\@@_arc_print_auxv:w}
+% \begin{macro}{\@@_arc_print_auxvi:n}
 %   The final stage of printing an angle is to put together the three parts:
 %   this works even for decimal angles as they will blank arguments for the
-%   other two parts.
+%   other two parts The need to handle astronomy-style formatting means that
+%   the number has to be decomposed into parts.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_print:nnn #1#2#3
   {
-    \@@_arc_print_aux:nnn {#1} { \degree } {#2#3}
-    \@@_arc_print_aux:nnn {#2} { \arcminute } {#3}
-    \@@_arc_print_aux:nnn {#3} { \arcsecond } { }
+    \@@_arc_print_auxi:nnn {#1} { \degree } {#2#3}
+    \@@_arc_print_auxi:nnn {#2} { \arcminute } {#3}
+    \@@_arc_print_auxi:nnn {#3} { \arcsecond } { }
   }
 \cs_generate_variant:Nn \@@_arc_print:nnn { VVV }
-\cs_new_protected:Npn \@@_arc_print_aux:nnn #1#2#3
+\cs_new_protected:Npn \@@_arc_print_auxi:nnn #1#2#3
   {
     \tl_if_blank:nF {#1}
       {
-        \siunitx_print:nn { number } {#1}
-        \nobreak
-        \l_@@_product_tl
-        \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
-        \siunitx_print:nV { unit } \l_@@_tmp_tl
+        \bool_if:NTF \l_@@_astronomy_bool
+          { \@@_arc_print_auxii:nw {#2} #1 \q_stop }
+          {
+            \@@_arc_print_auxv:w #1 \q_stop
+            \@@_arc_print_auxvi:n {#2}
+          }
         \tl_if_blank:nF {#3}
           {
             \nobreak
@@ -393,7 +412,94 @@
           }
       }
   }
+%     \end{macrocode}
+%    To align the two parts of the astronomy-style marker, we need to allow
+%    for the |\scriptspace|.
+%     \begin{macrocode}
+\cs_new_protected:Npn \@@_arc_print_auxii:nw
+  #1#2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_stop
+  {
+    \mode_if_math:TF
+      { \bool_set_true:N \l_@@_tmp_bool }
+      { \bool_set_false:N \l_@@_tmp_bool }
+    \siunitx_print:nn { number } {#2#3}
+    \tl_if_blank:nTF {#5}
+      { \@@_arc_print_auxvi:n {#1} }
+      {
+        \hbox_set:Nn \l_@@_marker_box
+          {
+            \@@_arc_print_auxiii:n
+               { \siunitx_print:nn { number } {#4} }
+          }
+        \hbox_set:Nn \l_@@_unit_box
+          {
+            \@@_arc_print_auxiii:n
+              {
+                \siunitx_unit_format:nN {#1} \l_@@_tmp_tl
+                \siunitx_print:nV { unit } \l_@@_tmp_tl
+                \skip_horizontal:n { -\scriptspace }
+              }
+          }
+        \dim_compare:nNnTF { \box_wd:N \l_@@_marker_box } >
+          { \box_wd:N \l_@@_unit_box }
+          {
+            \@@_arc_print_auxiv:NN
+              \l_@@_marker_box
+              \l_@@_unit_box
+          }
+          {
+            \@@_arc_print_auxiv:NN
+              \l_@@_unit_box
+              \l_@@_marker_box
+          }
+        \hbox_set_to_wd:Nnn \l_@@_marker_box
+          \l_@@_tmp_dim
+          {
+            \hbox_overlap_right:n
+              { \box_use_drop:N \l_@@_marker_box }
+            \hbox_overlap_right:n
+              { \box_use_drop:N \l_@@_unit_box }
+            \tex_hfil:D
+          }
+        \box_use:N \l_@@_marker_box
+        \skip_horizontal:N \scriptspace
+        \siunitx_print:nn { number } {#5}
+      }
+  }
+\cs_new_protected:Npn \@@_arc_print_auxiii:n #1
+  {
+    \bool_if:NTF \l_@@_tmp_bool
+      { \ensuremath }
+      { \use:n }
+        {#1}
+  }
+\cs_new_protected:Npn \@@_arc_print_auxiv:NN #1#2
+  {
+    \dim_set:Nn \l_@@_tmp_dim { \box_wd:N #1 }
+    \hbox_set_to_wd:Nnn #2
+      \l_@@_tmp_dim
+      {
+        \tex_hss:D
+        \hbox_unpack:N #2
+        \tex_hss:D
+      }
+  }
+\cs_new_protected:Npn \@@_arc_print_auxv:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_stop
+  { \siunitx_print:nn { number } {#1#2#3#4#5} }
+\cs_new_protected:Npn \@@_arc_print_auxvi:n #1
+  {
+    \nobreak
+    \l_@@_product_tl
+    \siunitx_unit_format:nN {#1} \l_@@_tmp_tl
+    \siunitx_print:nV { unit } \l_@@_tmp_tl
+  }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 %    \begin{macrocode}
