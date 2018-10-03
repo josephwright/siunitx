@@ -676,6 +676,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_contents_bool}
+%   A switch for contexts where unit macros should be written as strings:
+%   this is normally required when creating table-of-contents files.
+%    \begin{macrocode}
+\bool_new:N \l_@@_contents_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_test_bool}
 %   A switch used to indicate that the code is testing the input to find
 %   if there is any typeset output from individual unit macros. This is needed
@@ -753,9 +761,16 @@
       {
         \bool_if:NF \l_@@_test_bool
           {
-            \bool_if:NTF \l_@@_parsing_bool
-              {#4}
-              {#3}
+            \bool_if:NTF \l_@@_contents_bool
+              {
+                \token_to_str:N #1
+                \c_space_tl
+              }
+              {
+                \bool_if:NTF \l_@@_parsing_bool
+                  {#4}
+                  {#3}
+              }
           }
       }
   }
