@@ -75,6 +75,65 @@
 %<@@=siunitx_compound>
 %    \end{macrocode}
 %
+% \begin{variable}
+%   {
+%     \l_@@_input_product_tl  ,
+%     \l_@@_input_quotient_tl
+%   }
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    input-product  .tl_set:N =
+      \l_@@_input_product_tl ,
+    input-quotient .tl_set:N =
+      \l_@@_input_quotient_tl
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_fraction:nn}
+%   For containing the fraction function used in output.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_fraction:nn #1#2 { }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}
+%   {
+%     \l_@@_output_product_tl  ,
+%     \l_@@_quotient_mode_tl   ,
+%     \l_@@_quotient_symbol_tl
+%   }
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    fraction-function .code:n = 
+      \cs_set_protected:Npn \@@_fraction:nn ##1##2
+        { #1 {##1} {##2} } ,
+    output-product  .tl_set:N =
+      \l_@@_output_product_tl ,
+    quotient-mode .choices:nn =
+     { fraction , symbol }
+     { \tl_set_eq:NN \l_@@_quotient_mode_tl \l_keys_choice_tl } ,
+    quotient-symbol .tl_set:N =
+      \l_@@_quotient_symbol_tl
+  }
+\tl_new:N \l_@@_quotient_mode_tl
+%    \end{macrocode}
+% \end{variable}
+%
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    fraction-function = \frac  ,
+    input-product     = x      ,
+    input-quotient    = /      ,
+    output-product    = \times ,
+    quotient-mode     = symbol ,
+    quotient-symbol   = /
+  }
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
