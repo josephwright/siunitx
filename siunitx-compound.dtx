@@ -58,6 +58,15 @@
 %
 % \begin{documentation}
 %
+% \begin{function}{\siunitx_number_range:nn}
+%   \begin{syntax}
+%     \cs{siunitx_number_range:nn} \Arg{start} \Arg{end}
+%   \end{syntax}
+%   Prints the range of numbers from the \meta{start} to the \meta{end},
+%   both of which are processed as described for
+%   \cs{siunitx_number_format:nN}.
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -141,6 +150,13 @@
 %<@@=siunitx_range>
 %    \end{macrocode}
 %
+% \begin{variable}{\l_@@_tmp_tl}
+%   Scratch space.
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
 %     \l_@@_phrase_tl     ,
@@ -170,6 +186,20 @@
   }
 %    \end{macrocode}
 % \end{variable}
+%
+% \begin{macro}{\siunitx_number_range:nn}
+%   A range of numbers is quite straight-forward.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_range:nn #1#2
+  {
+    \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+    \siunitx_print:nV { number } \l_@@_tmp_tl
+    \tl_use:N \l_@@_phrase_tl
+    \siunitx_number_format:nN {#2} \l_@@_tmp_tl
+    \siunitx_print:nV { number } \l_@@_tmp_tl
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsection{Standard settings for module options}
 %
