@@ -58,6 +58,15 @@
 %
 % \begin{documentation}
 %
+% \begin{function}{\siunitx_number_list:n}
+%   \begin{syntax}
+%     \cs{siunitx_number_list:n} \Arg{entries}
+%   \end{syntax}
+%   Prints the list of numbers in the \meta{entries}, each of which should
+%   be given as a \meta{balanced text}. Formatting of each number is carried
+%   out as described for \cs{siunitx_number_format:nN}.
+% \end{function}
+%
 % \begin{function}{\siunitx_number_range:nn}
 %   \begin{syntax}
 %     \cs{siunitx_number_range:nn} \Arg{start} \Arg{end}
@@ -85,6 +94,20 @@
 %    \begin{macrocode}
 %<@@=siunitx_list>
 %    \end{macrocode}
+%
+% \begin{variable}{\l_@@_tmp_seq, \l_@@_tmp_tl}
+%   Scratch space.
+%    \begin{macrocode}
+\seq_new:N \l_@@_tmp_seq
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\seq_use:NVVV}
+%    \begin{macrocode}
+\cs_generate_variant:Nn \seq_use:Nnnn { NVVV }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{variable}
 %   {
@@ -119,6 +142,29 @@
       }
   }
 %    \end{macrocode}
+%
+% \begin{macro}{\siunitx_number_list:n}
+%   The hard work here can be done using a sequence: just a question of
+%   adding the data there.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_list:n #1
+  {
+    \group_begin:
+      \seq_clear:N \l_@@_tmp_seq
+      \tl_map_inline:nn {#1}
+        {
+          \siunitx_number_format:nN {##1} \l_@@_tmp_tl
+          \seq_put_right:Nx \l_@@_tmp_seq
+            { \siunitx_print:nn { number } \exp_not:V \l_@@_tmp_tl }
+        }
+      \seq_use:NVVV \l_@@_tmp_seq
+        \l_@@_separator_pair_tl
+        \l_@@_separator_tl
+        \l_@@_separator_final_tl
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsection{Products}
 %
