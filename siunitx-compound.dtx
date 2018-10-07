@@ -196,13 +196,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\seq_use:Nv}
+% \begin{macro}{\seq_use:Nx}
 %    \begin{macrocode}
-\cs_generate_variant:Nn \seq_use:Nn { Nv }
-%    \end{macrocode}
+\cs_generate_variant:Nn \seq_use:Nn { Nx }
+%   \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\siunitx_number_product:n}
+% \begin{macro}{\@@_phrase:, \@@_symbol:}
 %   Much like lists, but with two possible output methods and a simpler
 %   loop.
 %    \begin{macrocode}
@@ -216,11 +217,16 @@
           \seq_put_right:Nx \l_@@_tmp_seq
             { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
         }
-      \seq_use:Nv \l_@@_tmp_seq
-        { l_@@_ \l_@@_mode_tl _ tl }
+      \seq_use:Nx \l_@@_tmp_seq
+        { \exp_not:c { @@_ \l_@@_mode_tl : } }
     \group_end:
   }
+\cs_new_protected:Npn \@@_phrase:
+  { \tl_use:N \l_@@_phrase_tl }
+\cs_new_protected:Npn \@@_symbol:
+  { \siunitx_print:nV { number } \l_@@_symbol_tl }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Ranges}
@@ -290,14 +296,14 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    list-final-separator = { ~ and ~ }            ,
-    list-pair-separator  = { ~ and ~ }            ,
-    list-separator       = { , ~ }                ,
-    list-mode            = repeat                 ,
-    product-mode         = symbol                 ,
-    product-phrase       = { ~ by ~ }             ,
-    product-symbol       = \ensuremath { \times } ,
-    range-phrase         = { ~ to ~ }             ,
+    list-final-separator = { ~ and ~ } ,
+    list-pair-separator  = { ~ and ~ } ,
+    list-separator       = { , ~ }     ,
+    list-mode            = repeat      ,
+    product-mode         = symbol      ,
+    product-phrase       = { ~ by ~ }  ,
+    product-symbol       = \times      ,
+    range-phrase         = { ~ to ~ }  ,
     range-mode           = repeat
   }
 %    \end{macrocode}
