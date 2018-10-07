@@ -232,6 +232,40 @@ Note that numbers are parsed before typesetting, which does have a performance
 overhead (only obvious with very large amounts of numerical input). The parser
 understands a range of input syntaxes, as demonstrated above.
 
+\DescribeMacro{\numlist}
+\begin{syntax}
+  \cs{numlist}\oarg{options}\marg{numbers}
+\end{syntax}
+Lists of numbers may be processed using the \cs{numlist} function. Each
+\meta{number} is given within the list of \meta{numbers} within a brace pair,
+as the list can have a flexible length.
+\begin{LaTeXdemo}
+  \numlist{10;30;50;70}
+\end{LaTeXdemo}
+
+\DescribeMacro{\numproduct}
+\begin{syntax}
+  \cs{numproduct}\oarg{options}\marg{numbers}
+\end{syntax}
+Runs of products of numbers may be inserted using the \cs{numproduct}
+function. This
+acts in the same way as \cs{num}, but inserts either a symbol or phrase
+between the entries. The latter should be separated by |x| tokens.
+\begin{LaTeXdemo}
+  \numproduct{10 x 30}
+\end{LaTeXdemo}
+
+\DescribeMacro{\numrange}
+\begin{syntax}
+  \cs{numrange}\oarg{options}\marg{number1}\marg{number2}
+\end{syntax}
+Simple ranges of numbers can be handled using the \cs{numrange} function. This
+acts in the same way as \cs{num}, but inserts a phrase or other text between
+the two entries.
+\begin{LaTeXdemo}
+  \numrange{10}{30}
+\end{LaTeXdemo}
+
 \subsection{Angles}
 
 \DescribeMacro{\ang}
@@ -1404,6 +1438,75 @@ compresses spacing where possible.
 \begin{LaTeXdemo}
   \num{2e3} \\
   \num[tight-spacing = true]{2e3}
+\end{LaTeXdemo}
+
+\subsection{Lists, products ranges of numbers}
+
+Lists, products and ranges of numbers have a small number of specialised
+options, which apply to these more unusual input forms
+(Table~\ref{tab:opt:num:list}).
+\begin{table}
+  \caption{Output options for lists, products ranges of numbers.}
+  \label{tab:opt:num:list}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{l}{Option name} &
+      Type &
+      \multicolumn{1}{l}{Default} \\
+    \midrule
+      list-final-separator & Literal & \verb*= and =                 \\
+      list-pair-separator  & Literal & \verb*= and =                 \\
+      list-separator       & Literal & \verb*=, =                    \\
+      product-symbol       & Literal & \cs{ensuremath}\{\cs{times}\} \\
+      product-phrase       & Literal & \verb*= by =                  \\
+      range-phrase         & Literal & \verb*= to =                  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{list-final-separator}
+\DescribeOption{list-pair-separator}
+\DescribeOption{list-separator}
+Lists of numbers are printed with a separator between each item, which is
+stored using the \opt{list-separator} option. The separator before the last
+item of a list may be different, and is therefore set using the
+\opt{list-final-separator} option. The separator used for exactly two items is
+set using the \opt{list-pair-separator} option. Any spaces needed should be
+included in the option settings: none are added within the code.
+\begin{LaTeXdemo}
+  \numlist{0.1;0.2;0.3}                              \\
+  \numlist[list-separator = {; }]{0.1;0.2;0.3}       \\
+  \numlist[list-final-separator = {, }]{0.1;0.2;0.3} \\
+  \numlist[
+    list-separator       = { and },
+    list-final-separator = { and finally }
+  ]{0.1;0.2;0.3} \\
+  \numlist{0.1;0.2} \\
+  \numlist[list-pair-separator = {, and }]{0.1;0.2}
+\end{LaTeXdemo}
+
+\DescribeOption{product-symbol}
+\DescribeOption{product-phrase}
+Ranges of numbers can be given as input. These will have an appropriate word or
+symbol inserted between the two entries: this is stored using the
+\opt{range-phrase} option. The phrase should include any necessary spaces: no
+extra space is added.
+\begin{LaTeXdemo}
+  \numproduct{5 x 100 x 2} \\
+  \numproduct[product-symbol = \ensuremath{\cdot}]{5 x 100 x 2} \\
+  \sisetup{product-mode = phrase}%
+  \numproduct{5 x 100 x 2}\\
+  \numproduct[product-phrase = { BY }]{5 x 100 x 2} \\
+\end{LaTeXdemo}
+
+\DescribeOption{range-phrase}
+Ranges of numbers can be given as input. These will have an appropriate word or
+symbol inserted between the two entries: this is stored using the
+\opt{range-phrase} option. The phrase should include any necessary spaces: no
+extra space is added.
+\begin{LaTeXdemo}
+  \numrange{5}{100} \\
+  \numrange[range-phrase = --]{5}{100}
 \end{LaTeXdemo}
 
 \subsection{Angles}
