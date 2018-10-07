@@ -77,6 +77,40 @@
 %<@@=siunitx_list>
 %    \end{macrocode}
 %
+% \begin{variable}
+%   {
+%     \l_@@_separator_tl       ,
+%     \l_@@_separator_final_tl ,
+%     \l_@@_separator_pair_tl  ,
+%     \l_@@_brackets_bool      ,
+%     \l_@@_repeat_bool
+%   }
+%   List options.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    list-final-separator .tl_set:N = \l_@@_separator_final_tl ,
+    list-pair-separator  .tl_set:N = \l_@@_separator_pair_tl  ,
+    list-separator       .tl_set:N = \l_@@_separator_tl       ,
+    list-mode .choice:,
+    list-mode / brackets .code:n =
+      {
+        \bool_set_true:N  \l_@@_brackets_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      } ,
+    list-mode / repeat .code:n   =
+      {
+        \bool_set_false:N \l_@@_brackets_bool
+        \bool_set_true:N  \l_@@_repeat_bool
+      } ,
+    list-mode / single .code:n   =
+      {
+        \bool_set_false:N \l_@@_brackets_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      }
+  }
+%    \end{macrocode}
+%
 % \subsection{Products}
 %
 % Identify the internal prefix (\LaTeX3 \pkg{DocStrip} convention): only
@@ -84,6 +118,20 @@
 %    \begin{macrocode}
 %<@@=siunitx_product>
 %    \end{macrocode}
+%
+% \begin{variable}{\l_@@_mode_tl, \l_@@_phrase_tl, \l_@@_symbol_tl}
+%   Options for products.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    product-mode .choices:nn =
+      { phrase , symbol }
+      { \tl_set_eq:NN \l_@@_mode_tl \l_keys_choice_tl } ,
+    product-phrase .tl_set:N = \l_@@_phrase_tl ,
+    product-symbol .tl_set:N = \l_@@_symbol_tl
+  }
+%    \end{macrocode}
+% \end{variable}
 %
 % \subsection{Ranges}
 %
@@ -93,6 +141,57 @@
 %<@@=siunitx_range>
 %    \end{macrocode}
 %
+% \begin{variable}
+%   {
+%     \l_@@_phrase_tl     ,
+%     \l_@@_brackets_bool ,
+%     \l_@@_repeat_bool
+%   }
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    range-phrase .tl_set:N = \l_@@_phrase_tl ,
+    range-mode .choice: ,
+    range-mode / brackets .code:n =
+      {
+        \bool_set_true:N  \l_@@_brackets_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      } ,
+    range-mode / repeat .code:n =
+      {
+        \bool_set_false:N \l_@@_brackets_bool
+        \bool_set_true:N  \l_@@_repeat_bool
+      } ,
+    range-mode / single .code:n =
+      {
+        \bool_set_false:N \l_@@_brackets_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      }
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \subsection{Standard settings for module options}
+%
+% Some of these follow naturally from the point of definition
+% (\foreign{e.g.}~boolean variables are always |false| to begin with),
+% but for clarity everything is set here.
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    list-final-separator = { ~ and ~ } ,
+    list-pair-separator  = { ~ and ~ } ,
+    list-separator       = { , ~ }     ,
+    list-mode            = repeat      ,
+    product-mode         = symbol      ,
+    product-phrase       = { ~ by ~ }  ,
+    product-symbol       = \times      ,
+    range-phrase         = { ~ to ~ }  ,
+    range-mode           = repeat
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
 %</package>
 %    \end{macrocode}
 %
