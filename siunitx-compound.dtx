@@ -174,6 +174,14 @@
 %<@@=siunitx_product>
 %    \end{macrocode}
 %
+% \begin{variable}{\l_@@_tmp_seq, \l_@@_tmp_tl}
+%   Scratch space.
+%    \begin{macrocode}
+\seq_new:N \l_@@_tmp_seq
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_mode_tl, \l_@@_phrase_tl, \l_@@_symbol_tl}
 %   Options for products.
 %    \begin{macrocode}
@@ -187,6 +195,33 @@
   }
 %    \end{macrocode}
 % \end{variable}
+%
+% \begin{macro}{\seq_use:Nv}
+%    \begin{macrocode}
+\cs_generate_variant:Nn \seq_use:Nn { Nv }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\siunitx_number_product:n}
+%   Much like lists, but with two possible output methods and a simpler
+%   loop.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_product:n #1
+  {
+    \group_begin:
+      \seq_clear:N \l_@@_tmp_seq
+      \tl_map_inline:nn {#1}
+        {
+          \siunitx_number_format:nN {##1} \l_@@_tmp_tl
+          \seq_put_right:Nx \l_@@_tmp_seq
+            { \siunitx_print:nn { number } \exp_not:V \l_@@_tmp_tl }
+        }
+      \seq_use:Nv \l_@@_tmp_seq
+        { l_@@_ \l_@@_mode_tl _ tl }
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsection{Ranges}
 %
