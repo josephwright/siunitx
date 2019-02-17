@@ -597,10 +597,24 @@
     \group_end:
   }
 %    \end{macrocode}
-%   To match the text mode font, there is a simple look-up of the current
-%   font family. Luckily, mappings to math mode equivalents are easy. 
+%   For \pkg{tex4ht}, we need to have category code $12$ |^| tokens in math
+%   mode. We handle that by intercepting at the first auxiliary that makes
+%   sense.
 %    \begin{macrocode}
-
+\AtBeginDocument
+  {
+    \@ifpackageloaded { tex4ht }
+      {
+        \cs_set_protected:Npn \@@_math_auxii:n #1
+          {
+            \tl_set:Nn \l_@@_tmp_tl {#1}
+            \exp_args:NNnx \tl_replace_all:Nnn \l_@@_tmp_tl
+              { ^ } { \token_to_str:N ^ }
+            \ensuremath { \exp_args:NV \@@_math_auxiii:n \l_@@_tmp_tl }
+          }
+      }
+      { }
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
