@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-symbol.dtx Copyright (C) 2018 Joseph Wright
+% File: siunitx-symbol.dtx Copyright (C) 2018,2019 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -83,29 +83,35 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_textmu:}
 %   Some of the \texttt{TS1} encoding is needed to provide symbols in
-%   text mode for 8-bit engines. If the user has not loaded the encoding
-%   themselves, it is done here before creating the required commands.
+%   text mode. Some of this is only for $8$-bit engines, but there are
+%   places we need this even with Unicode engines. If the user has not loaded
+%   the encoding themselves, it is done here before creating the required
+%   commands.
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \cs_if_free:cT { T@TS1 }
+      {
+        \DeclareFontEncoding { TS1 } { } { }
+        \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
+      }
+  }
+%    \end{macrocode}
+%
+% \begin{macro}{\@@_textmu:}
+%   For $8$-bit engines, we need an upright mu.
 %    \begin{macrocode}
 \bool_lazy_or:nnF
   { \sys_if_engine_luatex_p: }
   { \sys_if_engine_xetex_p: }
   {
-    \AtBeginDocument
+    \cs_if_free:NTF \textmu
       {
-        \cs_if_free:cT { T@TS1 }
-          {
-            \DeclareFontEncoding { TS1 } { } { }
-            \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
-          }
-        \cs_if_free:NTF \textmu
-          {
-            \DeclareTextSymbolDefault \@@_textmu: { TS1 }
-            \DeclareTextSymbol \@@_textmu: { TS1 } { "00B5 }
-          }
-          { \cs_new_eq:NN \@@_textmu: \textmu }
+        \DeclareTextSymbolDefault \@@_textmu: { TS1 }
+        \DeclareTextSymbol \@@_textmu: { TS1 } { "00B5 }
       }
+      { \cs_new_eq:NN \@@_textmu: \textmu }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -248,11 +254,6 @@
 %    \begin{macrocode}
 \AtBeginDocument
   {
-    \cs_if_free:cT { T@TS1 }
-      {
-        \DeclareFontEncoding { TS1 } { } { }
-        \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
-      }
     \cs_if_free:NTF \texttimes
       {
         \DeclareTextSymbolDefault \@@_texttimes: { TS1 }
