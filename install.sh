@@ -32,6 +32,7 @@ tlmgr install cm etex knuth-lib latex-bin lm luaotfload tex tex-ini-files \
 tlmgr install   \
   amsfonts      \
   amsmath       \
+  bidi          \
   ec            \
   etoolbox      \
   filehook      \
