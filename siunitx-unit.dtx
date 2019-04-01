@@ -1046,7 +1046,11 @@
 %
 % \begin{macro}{\@@_format_literal:n}
 % \begin{macro}
-%   {\@@_format_literal_subscript:, \@@_format_literal_superscript:}
+%   {
+%     \@@_format_literal_tilde:      ,
+%     \@@_format_literal_subscript:  ,
+%     \@@_format_literal_superscript:
+%   }
 % \begin{macro}{\@@_format_literal_auxi:w}
 % \begin{macro}{\@@_format_literal_auxii:w}
 % \begin{macro}{\@@_format_literal_auxiii:w}
@@ -1075,8 +1079,6 @@
         \exp_not:n { \bool_set_false:N \l_@@_parsing_bool }
         \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#1}
         \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
-          { \exp_not:N ~ } { . }
-        \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
           { \token_to_str:N ^ } { ^ }
         \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
           { \token_to_str:N _ } { \c_@@_math_subscript_tl }
@@ -1084,6 +1086,8 @@
           \exp_not:N \@@_format_literal_superscript:
         \char_set_active_eq:NN _
           \exp_not:N \@@_format_literal_subscript:
+        \char_set_active_eq:NN \exp_not:N ~
+          \exp_not:N \@@_format_literal_tilde:
         \exp_not:n
           {
             \protected@edef \l_@@_tmp_tl
@@ -1103,6 +1107,7 @@
 \group_end:
 \cs_new:Npx \@@_format_literal_subscript: { \c_@@_math_subscript_tl }
 \cs_new:Npn \@@_format_literal_superscript: { ^ }
+\cs_new:Npn \@@_format_literal_tilde: { . }
 %    \end{macrocode}
 %   To introduce the font changing commands while still allowing for line
 %   breaks in literal units, a loop is needed to replace one |.| at a time.
