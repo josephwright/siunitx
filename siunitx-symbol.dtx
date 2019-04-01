@@ -250,7 +250,8 @@
 %   For the times symbol, only \LuaTeX{} allows us to use the math mode symbol
 %   directly. However, that likely won't follow the surrounding font appearance,
 %   so in all cases we load the |TS1| version for text. Otherwise much the
-%   same as |\textmu| support.
+%   same as |\textmu| support. It's hard to check for the product symbol, so
+%   we just go with it an hope for the best!
 %    \begin{macrocode}
 \AtBeginDocument
   {
@@ -272,6 +273,8 @@
             \keys_set:nn { siunitx }
               {
                 exponent-product =
+                  \ifmmode \times \else \@@_texttimes: \fi ,
+                product-symbol =
                   \ifmmode \times \else \@@_texttimes: \fi
               }
           }
