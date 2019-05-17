@@ -213,10 +213,7 @@
 \cs_new_protected:Npn \siunitx_angle:n #1
   {
     \bool_if:NTF \l_@@_force_arc_bool
-      {
-        \use:x
-          { \@@_arc_convert:n { \fp_eval:n {#1} } }
-      }
+      { \exp_args:Ne \@@_arc_convert:n { \fp_eval:n {#1} } }
       {
         \siunitx_number_parse:nN {#1} \l_@@_degrees_tl
         \tl_set:Nx \l_@@_degrees_tl
@@ -231,7 +228,7 @@
   {
     \bool_if:NTF \l_@@_force_decimal_bool
       {
-        \exp_args:Nx \siunitx_angle:n
+        \exp_args:Ne \siunitx_angle:n
           { \fp_eval:n { #1 + (#2) / 60 + (#3) / 3600 } }
       }
       { \@@_arc_sign:nnn {#1} {#2} {#3} }
