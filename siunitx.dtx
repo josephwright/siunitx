@@ -689,6 +689,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7s}{2018/05/17}{Modified package date format}
 % \changes{v2.7t}{2018/06/08}{Fix inclusion of sign in astronomy-style
 %   angles}
+% \changes{v2.7t}{2019/10/10}{Fix \texttt{round-half = even} at zero precision}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -8667,8 +8668,15 @@ This work consists of the file  siunitx.dtx
                   { \int_eval:n { \l_@@_tmpb_tl + 1 } }
                 \bool_if:NF \l_@@_round_half_up_bool
                   {
-                    \int_compare:nNnT
-                      { 0 \tl_tail:N \l_@@_tmpa_tl } = 0
+                    \bool_lazy_and:nnT
+                      {
+                        \int_compare_p:nNn
+                          { 0 \tl_head:N \l_@@_tmpa_tl } = 5
+                      }
+                      {
+                        \int_compare_p:nNn
+                          { 0 \tl_tail:N \l_@@_tmpa_tl } = 0
+                      }
                       {
                         \int_if_odd:nT \l_@@_tmpb_tl
                           {
