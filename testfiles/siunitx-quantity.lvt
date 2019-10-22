@@ -1,0 +1,49 @@
+\input{regression-test}
+
+\RequirePackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx}
+
+\START
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box { \siunitx_quantity:nn {#1} {#2} }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Basic~formatting:~integers }
+  {
+    \test:nn { 1 } { m }
+    \test:nn { 123 } { \kilo \gram }
+    \test:nn { 123456789 } { }
+    \test:nn { } { \candela }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"allow-quantity-breaks" }
+  {
+    \test:nn { 123 } { \metre }
+    \keys_set:nn { siunitx } { allow-quantity-breaks = true }
+    \test:nn { 123 } { \metre }
+  }
+
+\TEST { Option~setting~"quantity-products" }
+  {
+    \test:nn { 123 } { \metre }
+    \keys_set:nn { siunitx } { quantity-product = \ensuremath { \times } }
+    \test:nn { 123 } { \metre }
+  }
+
+\END

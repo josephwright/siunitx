@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-quantity.dtx Copyright (C) 2018 Joseph Wright
+% File: siunitx-quantity.dtx Copyright (C) 2018-2019 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -58,6 +58,27 @@
 %
 % \begin{documentation}
 %
+% \begin{function}{\siunitx_quantity:nn}
+%   \begin{syntax}
+%     \cs{siunitx_quantity:nn} \Arg{number} \Arg{unit}
+%   \end{syntax}
+%   Parses the \meta{number} and the \meta{unit} as detailed for
+%   \cs{siunitx_number_parse:nN} and \cs{siunitx_unit_format:nN},
+%   the prints the results using \cs{siunitx_print:nn}.
+% \end{function}
+%
+% \begin{function}{allow-quantity-breaks}
+%   \begin{syntax}
+%     |allow-quantity-breaks| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{quantity-product}
+%   \begin{syntax}
+%     |quantity-product| = \meta{tokens}
+%   \end{syntax}
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -73,6 +94,55 @@
 % internal material in this \emph{submodule} should be used directly.
 %    \begin{macrocode}
 %<@@=siunitx_quantity>
+%    \end{macrocode}
+%
+% \subsection{Initial set-up}
+%
+% \begin{variable}{\l_@@_tmp_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \subsection{Main formatting routine}
+%
+% \begin{variable}{\l_@@_break_bool, \l_@@_product_tl}
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    allow-quantity-breaks .bool_set:N =
+      \l_@@_break_bool ,
+    quantity-product .tl_set:N =
+      \l_@@_product_tl
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_quantity:nn}
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_quantity:nn #1#2
+  {
+    \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+    \siunitx_print:nV { number } \l_@@_tmp_tl
+    \tl_use:N \l_@@_product_tl
+    \bool_if:NF \l_@@_break_bool { \nobreak }
+    \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
+    \siunitx_print:nV { unit } \l_@@_tmp_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Standard settings for module options}
+%
+% Some of these follow naturally from the point of definition
+% (\foreign{e.g.}~boolean variables are always |false| to begin with),
+% but for clarity everything is set here.
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    allow-quantity-breaks = false ,
+    quantity-product      = \,
+  }
 %    \end{macrocode}
 %
 %    \begin{macrocode}
