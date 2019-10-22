@@ -73,6 +73,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{prefix-mode}
+%   \begin{syntax}
+%     |prefix-mode| = |power|\verb"|"|symbol|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{quantity-product}
 %   \begin{syntax}
 %     |quantity-product| = \meta{tokens}
@@ -98,23 +104,43 @@
 %
 % \subsection{Initial set-up}
 %
-% \begin{variable}{\l_@@_tmp_tl}
+% \begin{variable}{\l_@@_tmp_fp, \l_@@_tmp_tl}
+%   Scratch space.
 %    \begin{macrocode}
+\tl_new:N \l_@@_tmp_fp
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
 % \end{variable}
 %
 % \subsection{Main formatting routine}
 %
-% \begin{variable}{\l_@@_break_bool, \l_@@_product_tl}
+% \begin{variable}
+%   {
+%     \l_@@_break_bool  ,
+%     \l_@@_prefix_bool ,
+%     \l_@@_product_tl
+%   }
 %    \begin{macrocode}
+\bool_new:N \l_@@_prefix_bool
 \keys_define:nn { siunitx }
   {
     allow-quantity-breaks .bool_set:N =
       \l_@@_break_bool ,
+    prefix-mode .choice:,
+    prefix-mode / power .code:n =
+     { \bool_set_false:N \l_@@_prefix_bool } ,
+    prefix-mode / symbol .code:n =
+     { \bool_set_true:N \l_@@_prefix_bool } ,
     quantity-product .tl_set:N =
       \l_@@_product_tl
   }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_number_tl, \l_@@_unit_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_number_tl
+\tl_new:N \l_@@_unit_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -122,14 +148,72 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_quantity:nn #1#2
   {
-    \siunitx_number_format:nN {#1} \l_@@_tmp_tl
-    \siunitx_print:nV { number } \l_@@_tmp_tl
-    \tl_use:N \l_@@_product_tl
-    \bool_if:NF \l_@@_break_bool { \nobreak }
-    \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
-    \siunitx_print:nV { unit } \l_@@_tmp_tl
+    \group_begin:
+      \bool_lazy_or:nnTF
+        { \l_@@_prefix_bool }
+        { ! \l_siunitx_number_parse_bool }
+        {
+          \siunitx_number_format:nN {#1} \l_@@_number_tl
+          \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+        }
+        { \@@_combine_prefix:nn {#1} {#2} }
+      \siunitx_print:nV { number } \l_@@_number_tl
+      \tl_use:N \l_@@_product_tl
+      \bool_if:NF \l_@@_break_bool { \nobreak }
+      \siunitx_print:nV { unit } \l_@@_unit_tl
+    \group_end:
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_combine_prefix:nn}
+%   Combining a prefix into the main number is basically the same as the
+%   parsed branch of \cs{siunitx_number_format:nN}.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_combine_prefix:nn #1#2
+  {
+    \siunitx_unit_format:nNN {#2}
+      \l_@@_unit_tl \l_@@_tmp_fp
+    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \exp_args:NV \@@_adjust_exp:nNN
+      \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_number_tl
+      { \siunitx_number_format:N \l_@@_tmp_tl }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_adjust_exp:nNN}
+% \begin{macro}{\@@_adjust_exp:nnnnnnnNN}
+% \begin{macro}[EXP]{\@@_adjust_exp:n}
+% \begin{macro}[EXP]{\@@_adjust_exp:Nw}
+%   To adjust the exponent part for a combined prefix, we decompose the value,
+%   just changing the exponent part. This allows things to work with an
+%   uncertainty.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_adjust_exp:nNN #1#2#3
+  { \@@_adjust_exp:nnnnnnnNN #1 #2 #3 }
+\cs_new_protected:Npn \@@_adjust_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
+  {
+    \tl_set:Nx #9
+      {
+        {#1} {#2} {#3} {#4} {#5}
+        \exp_args:Ne \@@_adjust_exp:n { \fp_eval:n { #6#7 + #8 } }
+      }
+  }
+\cs_new:Npn \@@_adjust_exp:n #1
+  { \@@_adjust_exp:Nw #1 \q_stop }
+\cs_new:Npn \@@_adjust_exp:Nw #1#2 \q_stop
+  {
+    \token_if_eq_meaning:NNTF #1 -
+      { {#1} {#2} }
+      { { } {#1#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
@@ -140,7 +224,8 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    allow-quantity-breaks = false ,
+    allow-quantity-breaks = false  ,
+    prefix-mode           = symbol ,
     quantity-product      = \,
   }
 %    \end{macrocode}

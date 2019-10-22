@@ -1,14 +1,14 @@
+\documentclass{article}
+
 \input{regression-test}
 
-\RequirePackage[enable-debug,check-declarations]{expl3}
+\usepackage[enable-debug,check-declarations]{expl3}
 
 \ExplSyntaxOn
 \debug_on:n { deprecation }
 \ExplSyntaxOff
 
-\RequirePackage{siunitx}
-
-\START
+\usepackage{siunitx}
 
 \ExplSyntaxOn
 
@@ -19,6 +19,14 @@
     \box_show:N \l_tmpa_box
   }
 \TIMO
+
+\ExplSyntaxOff
+
+\begin{document}
+
+\ExplSyntaxOn
+
+\START
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -44,6 +52,24 @@
     \test:nn { 123 } { \metre }
     \keys_set:nn { siunitx } { quantity-product = \ensuremath { \times } }
     \test:nn { 123 } { \metre }
+  }
+
+\TEST { Option~setting~"prefix-mode" }
+  {
+    \test:nn { 123 } { \kilo \gram }
+    \test:nn { 123e-3 } { \kilo \gram }
+    \test:nn { 1e-3 } { \micro \gram \per \milli \litre }
+    \test:nn { 100(2) } { \mega \pascal }
+    \keys_set:nn { siunitx } { prefix-mode = symbol }
+    \test:nn { 123 } { \kilo \gram }
+    \test:nn { 123e-3 } { \kilo \gram }
+    \test:nn { 1e-3 } { \micro \gram \per \milli \litre }
+    \test:nn { 100(2) } { \mega \pascal }
+    \keys_set:nn { siunitx } { prefix-mode = power }
+    \test:nn { 123 } { \kilo \gram }
+    \test:nn { 123e-3 } { \kilo \gram }
+    \test:nn { 1e-3 } { \micro \gram \per \milli \litre }
+    \test:nn { 100(2) } { \mega \pascal }
   }
 
 \END
