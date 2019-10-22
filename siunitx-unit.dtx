@@ -1890,15 +1890,22 @@
 %
 % \begin{macro}{\@@_format_special:}
 %   Any special odds and ends are handled by simply making the current
-%   combination into an argument for the recovered code.
+%   combination into an argument for the recovered code. Font control
+%   needs to be \emph{inside} the special formatting here.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_special:
   {
     \tl_set:Nx \l_@@_current_tl
       {
         \exp_not:V \l_@@_part_tl
-          { \exp_not:V \l_@@_current_tl }
+         {
+           \bool_if:NTF \l_@@_font_bool
+             { \use:n }
+             { \exp_not:V \l_siunitx_unit_font_tl }
+              { \exp_not:V \l_@@_current_tl }
+         }
       }
+    \bool_set_true:N \l_@@_font_bool
   }
 %    \end{macrocode}
 % \end{macro}
