@@ -34,6 +34,7 @@ tlmgr install   \
   amsmath       \
   bidi          \
   booktabs      \
+  caption       \
   colortbl      \
   csquotes      \
   ec            \
