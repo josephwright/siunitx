@@ -33,29 +33,45 @@ tlmgr install   \
   amsfonts      \
   amsmath       \
   bidi          \
+  booktabs      \
+  colortbl      \
+  csquotes      \
   ec            \
+  enumitem      \
   etoolbox      \
+  fancyvrb      \
   filehook      \
   fontaxes      \
   graphics      \
   graphics-cfg  \
   graphics-def  \
+  hyperref      \
   ifluatex      \
   ifxetex       \
-  mptopdf       \
-  mweights      \
-  oberdiek      \
   l3kernel      \
   l3packages    \
   libertine     \
+  listings      \
   lm-math       \
   lualatex-math \
+  makeindex     \
+  mptopdf       \
+  mweights      \
+  multirow      \
+  oberdiek      \
+  psnfss        \
   opensans      \
   sansmath      \
+  symbol        \
   tools         \
+  underscore    \
   unicode-math  \
+  url           \
   was           \
-  xkeyval
+  xcolor        \
+  xkeyval       \
+  xtab          \
+  zapfding
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
