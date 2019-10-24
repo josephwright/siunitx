@@ -149,6 +149,8 @@
 \cs_new_protected:Npn \siunitx_quantity:nn #1#2
   {
     \group_begin:
+      \tl_if_single_token:nT {#2}
+         { \siunitx_unit_options_apply:N #2 }
       \bool_lazy_or:nnTF
         { \l_@@_prefix_bool }
         { ! \l_siunitx_number_parse_bool }
@@ -229,6 +231,18 @@
     quantity-product      = \,
   }
 %    \end{macrocode}
+%
+% \subsection{Adjustments to units}
+%
+% \begin{macro}{\degree}
+%   The \cs{degree} unit is re-declared here: this is needed for using it
+%   in quantities. This is done here as it avoids a dependency in
+%   \pkg{siunitx-unit} on options it does not contain.
+%    \begin{macrocode}
+\siunitx_declare_unit:Nnn \degree { { } ^ { \circ } }
+  { quantity-product = { } }
+%    \end{macrocode}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</package>

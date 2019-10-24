@@ -183,15 +183,24 @@
 %   the unit to which it applies.
 % \end{function}
 %
-% \begin{function}{\siunitx_declare_unit:Nn, \siunitx_declare_unit:Nx}
+% \begin{function}
+%   {
+%     \siunitx_declare_unit:Nn,
+%     \siunitx_declare_unit:Nx,
+%     \siunitx_declare_unit:Nnn
+%   }
 %   \begin{syntax}
-%     \cs{siunitx_declare_unit:Nn} \meta{unit} \Arg{meaning}
+%     \cs{siunitx_declare_unit:Nn}  \meta{unit} \Arg{meaning}
+%     \cs{siunitx_declare_unit:Nnn} \meta{unit} \Arg{meaning} \Arg{options}
 %   \end{syntax}
 %   Defines a symbolic \meta{unit} (which should be a control sequence
 %   such as |\kilogram|) to be converted by the parser to the \meta{meaning}.
 %   The latter may consist of literal content (\emph{e.g.}~|kg|), other
 %   symbolic unit commands (\emph{e.g.}~|\kilo\gram|) or a mixture of the two.
-%   In literal mode the \meta{meaning} will be typeset directly.
+%   In literal mode the \meta{meaning} will be typeset directly. The version
+%   taking an \meta{options} argument may be used to support per-unit
+%   options: these are applied at the top level or using
+%   \cs{siunitx_unit_options_apply:N}.
 % \end{function}
 %
 % \begin{variable}{\l_siunitx_unit_font_tl}
@@ -204,6 +213,17 @@
 %   these will be in the form of control sequences such as |\kilogram|.
 %   The order of the sequence is unimportant.
 % \end{variable}
+%
+% \section{Per-unit options}
+%
+% \begin{function}{\siunitx_unit_options_apply:N}
+%   \begin{syntax}
+%     \cs{siunitx_unit_options_apply:N} \meta{unit}
+%   \end{syntax}
+%   Applies any unit-specific options set up using
+%   \cs{siunitx_declare_unit:Nnn}. This allows there use outside of unit
+%   formatting, for example to influence spacing in quantities.
+% \end{function}
 %
 % \section{Pre-defined symbolic unit components}
 %
@@ -840,10 +860,14 @@
 % \end{macro}
 %
 % \begin{macro}{\siunitx_declare_unit:Nn, \siunitx_declare_unit:Nx}
+% \begin{macro}{\siunitx_declare_unit:Nnn}
 %   For the unit parsing, allowing for variations in definition order requires
 %   that a test is made for the output of each unit at point of use.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_declare_unit:Nn #1#2
+  { \siunitx_declare_unit:Nnn #1 {#2} { } }
+\cs_generate_variant:Nn \siunitx_declare_unit:Nn { Nx }
+\cs_new_protected:Npn \siunitx_declare_unit:Nnn #1#2#3
   {
     \@@_set_symbolic:Nnn #1
       {#2}
@@ -852,8 +876,30 @@
           {#2}
           { \@@_parse_unit:Nn #1 {#2} }
       }
+    \tl_if_empty:nTF {#3}
+      { \cs_undefine:c { l_@@_options_ \token_to_str:N #1 _tl } }
+      {
+        \tl_clear_new:c { l_@@_options_ \token_to_str:N #1 _tl }
+        \tl_set:cn { l_@@_options_ \token_to_str:N #1 _tl } {#3}
+      }
   }
-\cs_generate_variant:Nn \siunitx_declare_unit:Nn { Nx }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Applying unit options}
+%
+% \begin{macro}{\siunitx_unit_options_apply:N}
+%   A simply API wrapper.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_options_apply:N #1
+  {
+    \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
+      {
+        \keys_set:nv { siunitx }
+          { l_@@_options_ \token_to_str:N #1 _tl }
+      }
+  }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1275,6 +1321,8 @@
     \bool_set_false:N \l_@@_per_bool
     \bool_set_false:N \l_@@_test_bool
     \int_zero:N \l_@@_position_int
+    \tl_if_single_token:nT {#1}
+      { \siunitx_unit_options_apply:N #1 }
     #1
     \int_step_inline:nn \l_@@_position_int
       { \@@_parse_finalise:n {##1} }
