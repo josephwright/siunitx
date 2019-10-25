@@ -209,9 +209,17 @@
 % \end{variable}
 %
 % \begin{variable}{\l_siunitx_unit_symbolic_seq}
-%   This sequence contains all of the symbolic \meta{unit} names defined :
+%   This sequence contains all of the symbolic names defined:
 %   these will be in the form of control sequences such as |\kilogram|.
-%   The order of the sequence is unimportant.
+%   The order of the sequence is unimportant. This includes prefixes and
+%   powers as well as units themselves.
+% \end{variable}
+%
+% \begin{variable}{\l_siunitx_unit_seq}
+%   This sequence contains all of the symbolic \emph{unit} names defined:
+%   these will be in the form of control sequences such as |\kilogram|.
+%   In contrast to \cs{l_siunitx_unit_symbolic_seq}, it \emph{only} holds
+%   units themselves
 % \end{variable}
 %
 % \section{Per-unit options}
@@ -753,6 +761,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_siunitx_unit_seq}
+%   A second list featuring only the units themselves.
+%    \begin{macrocode}
+\seq_new:N \l_siunitx_unit_seq
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_set_symbolic:Nnn}
 % \begin{macro}{\@@_set_symbolic:Npnn}
 % \begin{macro}{\@@_set_symbolic:Nnnn}
@@ -869,6 +884,7 @@
 \cs_generate_variant:Nn \siunitx_declare_unit:Nn { Nx }
 \cs_new_protected:Npn \siunitx_declare_unit:Nnn #1#2#3
   {
+    \seq_put_right:Nn \l_siunitx_unit_seq {#1}
     \@@_set_symbolic:Nnn #1
       {#2}
       {

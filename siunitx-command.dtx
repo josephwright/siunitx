@@ -58,6 +58,53 @@
 %
 % \begin{documentation}
 %
+% \section{Creating units as document commands}
+%
+% \begin{function}{\siunitx_command_create:}
+%   \begin{syntax}
+%     \cs{siunitx_command_create:}
+%   \end{syntax}
+%   Maps over the list of know unit commands and creates the appropriate
+%   document command to support them, as controlled by the options below.
+% \end{function}
+%
+% \subsection{Key--value options}
+%
+% The options defined by this submodule are available within the \pkg{l3keys}
+% |siunitx| tree.
+%
+% These options are all preamble-only.
+%
+% \begin{function}{free-standing-units}
+%   \begin{syntax}
+%     |free-standing-units| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{overwrite-commands}
+%   \begin{syntax}
+%     |overwrite-commands| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{space-before-unit}
+%   \begin{syntax}
+%     |space-before-unit| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{unit-optional-argument}
+%   \begin{syntax}
+%     |unit-optional-argument| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{use-xspace}
+%   \begin{syntax}
+%     |use-xspace| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -75,6 +122,130 @@
 %<@@=siunitx_command>
 %    \end{macrocode}
 %
+% \begin{macro}{\l_@@_tmp_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Options}
+%
+% \begin{variable}
+%   {
+%     \l_@@_create_bool    ,
+%     \l_@@_overwrite_bool ,
+%     \l_@@_prespace_bool  ,
+%     \l_@@_optarg_bool    ,
+%     \l_@@_xspace_bool
+%   }
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    free-standing-units .bool_set:N =
+      \l_@@_create_bool ,
+    overwrite-commands .bool_set:N =
+      \l_@@_overwrite_bool ,
+    space-before-unit .bool_set:N =
+      \l_@@_prespace_bool ,
+    unit-optional-argument .bool_set:N =
+      \l_@@_optarg_bool ,
+    use-xspace .bool_set:N =
+      \l_@@_xspace_bool
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% These preamble-only options are all disabled at the start of the document.
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \clist_map_inline:nn
+      {
+        free-standing-units    ,
+        overwrite-commands     ,
+        space-before-unit      ,
+        unit-optional-argument ,
+        use-xspace
+      }
+      {
+        \keys_define:nn { siunitx }
+          {
+            #1 .code:n =
+              { \msg_warning:nnn { siunitx } { option-preamble-only } {#1} }
+          }
+      }
+  }
+\msg_new:nnn { siunitx } { option-preamble-only }
+  { Option~'#1'~only~available~in~the~preamble. }
+%    \end{macrocode}
+%
+% \subsection{Creation of unit document commands}
+%
+% \begin{macro}{\siunitx_command_create:, \@@_create:}
+% \begin{macro}{\@@_create:N}
+%   Creating document commands is all done by a single function which is
+%   set up using expansion: that way the tests are only run once. Other than
+%   that, this is all just a question of picking up all the various routes.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_command_create:
+  {
+    \bool_if:NT \l_@@_create_bool
+      { \@@_create:} 
+  }
+\AtBeginDocument { \siunitx_command_create: }
+\cs_new_protected:Npn \@@_create:
+  {
+    \bool_if:NT \l_@@_xspace_bool
+      { \RequirePackage { xspace } }
+    \bool_if:NT \l_@@_overwrite_bool
+      {
+        \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
+          { \cs_undefine:N ##1 }
+      }
+    \cs_set_protected:Npx \@@_create:N ##1
+      {
+        \ProvideDocumentCommand ##1 { \bool_if:NT \l_@@_optarg_bool { o } }
+          {
+            \mode_leave_vertical:
+            \group_begin:
+              \bool_if:NTF \l_@@_optarg_bool
+                { \exp_not:N \IfNoValueTF {####1} }
+                { \use_i:nn }
+                {
+                  \siunitx_unit_options_apply:N ##1
+                  \bool_if:NT \l_@@_prespace_bool { \exp_not:N \  }
+                  \siunitx_unit_format:nN {##1}
+                    \exp_not:N \l_@@_tmp_tl
+                  \siunitx_print:nV { unit }
+                    \exp_not:N \l_@@_tmp_tl
+                }
+                { \siunitx_quantity:nn {####1} {##1} }
+            \group_end:
+            \bool_if:NT \l_@@_xspace_bool { \exp_not:N \xspace }
+          }
+      }
+    \seq_map_function:NN \l_siunitx_unit_seq \@@_create:N
+  }
+\cs_new_protected:Npn \@@_create:N #1 { }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Standard settings for module options}
+%
+% Some of these follow naturally from the point of definition
+% (\emph{e.g.}~boolean variables are always |false| to begin with),
+% but for clarity everything is set here.
+%    \begin{macrocode}
+\keys_set:nn { siunitx }
+  {
+    free-standing-units    = false ,
+    overwrite-commands     = false ,
+    space-before-unit      = false ,
+    unit-optional-argument = false ,
+    use-xspace             = false
+  }
+%    \end{macrocode}
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
