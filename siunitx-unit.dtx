@@ -200,7 +200,7 @@
 %   In literal mode the \meta{meaning} will be typeset directly. The version
 %   taking an \meta{options} argument may be used to support per-unit
 %   options: these are applied at the top level or using
-%   \cs{siunitx_unit_options_apply:N}.
+%   \cs{siunitx_unit_options_apply:n}.
 % \end{function}
 %
 % \begin{variable}{\l_siunitx_unit_font_tl}
@@ -224,13 +224,15 @@
 %
 % \section{Per-unit options}
 %
-% \begin{function}{\siunitx_unit_options_apply:N}
+% \begin{function}{\siunitx_unit_options_apply:n}
 %   \begin{syntax}
-%     \cs{siunitx_unit_options_apply:N} \meta{unit}
+%     \cs{siunitx_unit_options_apply:n} \meta{unit(s)}
 %   \end{syntax}
 %   Applies any unit-specific options set up using
 %   \cs{siunitx_declare_unit:Nnn}. This allows there use outside of unit
-%   formatting, for example to influence spacing in quantities.
+%   formatting, for example to influence spacing in quantities. The options
+%   are applied only once at a given group level, which allows for user
+%   over-ride \emph{via} |\keys_set:nn { siunitx } { ... }|.
 % \end{function}
 %
 % \section{Pre-defined symbolic unit components}
@@ -905,16 +907,30 @@
 %
 % \subsection{Applying unit options}
 %
-% \begin{macro}{\siunitx_unit_options_apply:N}
-%   A simply API wrapper.
+% \begin{variable}{\l_@@_options_bool}
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_unit_options_apply:N #1
+\bool_new:N \l_@@_options_bool
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_unit_options_apply:n}
+%   Options apply only if they have not already been set at this group
+%   level.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_options_apply:n #1
   {
-    \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
+    \bool_if:NF \l_@@_options_bool
       {
-        \keys_set:nv { siunitx }
-          { l_@@_options_ \token_to_str:N #1 _tl }
+        \tl_if_single_token:nT {#1}
+          {
+            \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
+              {
+                \keys_set:nv { siunitx }
+                  { l_@@_options_ \token_to_str:N #1 _tl }
+              }
+          }
       }
+    \bool_set_true:N \l_@@_options_bool
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1337,8 +1353,7 @@
     \bool_set_false:N \l_@@_per_bool
     \bool_set_false:N \l_@@_test_bool
     \int_zero:N \l_@@_position_int
-    \tl_if_single_token:nT {#1}
-      { \siunitx_unit_options_apply:N #1 }
+    \siunitx_unit_options_apply:n {#1}
     #1
     \int_step_inline:nn \l_@@_position_int
       { \@@_parse_finalise:n {##1} }
