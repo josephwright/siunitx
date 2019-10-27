@@ -108,7 +108,26 @@
 % \end{macro}
 % \end{macro}
 %
+% \subsection{Preamble commands}5
+%
 % \subsection{Document commands}
+%
+% \begin{macro}{\DeclareSIPrePower, \DeclareSIPostPower}
+%   Simply use a throw-away command for the part we do not need: this can
+%   be followed by some clean-up
+%    \begin{macrocode}
+\NewDocumentCommand \DeclareSIPrePower { +m m }
+  {
+    \siunitx_declare_power:NNn #1 \@@_tmp:w {#2}
+    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
+  }
+\NewDocumentCommand \DeclareSIPostPower { +m m }
+  {
+    \siunitx_declare_power:NNn \@@_tmp:w #1 {#2}
+    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\si}
 %   A straight copy of \cs{unit}.
