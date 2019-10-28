@@ -32,6 +32,9 @@ for those people who are interested.
 % version data (quite apart from making the demos work).
 \usepackage{siunitx}
 \DeclareSIUnit\noop{\relax} % For printing prefixes
+\DeclareSIPower\quartic\tothefourth{4} % For demos
+\DeclareSIQualifier\polymer{pol}
+\DeclareSIQualifier\catalyst{cat}
 
 % Commands for this document
 \usepackage{xparse}
@@ -118,6 +121,7 @@ for those people who are interested.
   \lst@EndWriteFile
   \LaTeXdemo@input
 }
+\LaTeXdemo@new{code only}{\LaTeXdemo@common}{}
 \makeatother
 
 % For demos
@@ -768,6 +772,90 @@ example with the standard \cs{pm} symbol).
 
   \end{xtabular}
 \end{center}
+
+\subsection{Creating new macros}
+
+The various macro components of a unit have to be defined before they can be
+used. The package supplies a number of common definitions, but new definitions
+are also possible. As the definition of a logical unit should remain the same
+in a single document, these creation functions are all preamble-only.
+
+\begin{function}{\DeclareSIUnit}
+  \begin{syntax}
+    \cs{DeclareSIUnit}\oarg{options}\marg{unit}\marg{symbol}
+  \end{syntax}
+\end{function}
+New units are produced using the \cs{DeclareSIUnit} macro. The \meta{symbol}
+can contain literal input, other units, multiple prefixes, powers and \cs{per},
+although literal text should not be intermixed with unit macros. Units can be
+created with \meta{options} from the usual list understood by \pkg{siunitx},
+and apply the specific unit macro only. The (first) optional argument to
+\cs{qty} and \cs{unit} can be used to override the settings for the unit: an
+example is the \cs{degree} unit.
+\begin{LaTeXdemo}
+  \qty{3.1415}{\degree}
+\end{LaTeXdemo}
+ This is declared in the package (effectively) as
+\begin{LaTeXdemo}[code only]
+  \DeclareSIUnit[quantity-product = {}]
+    \degree{{}^{\circ}}
+\end{LaTeXdemo}
+ The spacing can still be altered at point of use:
+\begin{LaTeXdemo}
+  \qty{67890}{\degree} \\
+  \qty[quantity-product = \,]{67890}{\degree}
+\end{LaTeXdemo}
+The meaning of a pre-defined unit can be altered by using \cs{DeclareSIUnit}
+after loading \pkg{siunitx}. This will overwrite the original definition with
+the newer version.
+
+\begin{function}{\DeclareSIPrefix}
+  \begin{syntax}
+    \cs{DeclareSIPrefix}\marg{prefix}\marg{symbol}\marg{powers-ten}
+  \end{syntax}
+\end{function}
+ The standard SI powers of ten are defined by the package, and are
+ described above.  However, the user can define new prefixes with
+ \cs{DeclareSIPrefix}. For example, \cs{kilo} is defined
+\begin{LaTeXdemo}[code only]
+  \DeclareSIPrefix\kilo{k}{3}
+\end{LaTeXdemo}
+
+\begin{function}{\DeclareSIPower}
+  \begin{syntax}
+    \cs{DeclareSIPower}\marg{symbol-before}\marg{symbol-after}\marg{power}
+  \end{syntax}
+\end{function}
+This function creates two symbols, one for use before a unit, the second
+for use after a unit, both of which are equivalent to the \meta{power}.
+For example, one might use
+\begin{LaTeXdemo}[code only]
+  \DeclareSIPower\quartic\tothefourth{4}
+\end{LaTeXdemo}
+ with the functions then used in the document as
+\begin{LaTeXdemo}
+  \unit{\kilogram\tothefourth}\\
+  \unit{\quartic\metre}
+\end{LaTeXdemo}
+
+\begin{function}{\DeclareSIQualifier}
+  \begin{syntax}
+    \cs{DeclareSIQualifier}\marg{qualifier}\marg{symbol}
+  \end{syntax}
+\end{function}
+Following the syntax of the other macros, qualifiers are created with the
+\cs{DeclareSIQualifier} command. In contrast to the other parts of a unit,
+there are no pre-defined qualifiers. It is therefore entirely up to the user to
+create these. For example, to identify the mass of a product created when using
+a particular catalyst, the preamble could contain:
+\begin{LaTeXdemo}[code only]
+  \DeclareSIQualifier\polymer{pol}
+  \DeclareSIQualifier\catalyst{cat}
+\end{LaTeXdemo}
+ and then in the body the document could read
+\begin{LaTeXdemo}
+  \qty{1.234}{\gram\polymer\per\mole\catalyst\per\hour}
+\end{LaTeXdemo}
 
 \subsection{Tabular material}
 
