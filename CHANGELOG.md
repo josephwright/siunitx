@@ -137,6 +137,157 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Allow for `cellspace` package in math mode
 
+## [v2.6s] - 2016-09-02
+
+### Changed
+
+- Improved a warning concerning `color` package
+
+## [v2.6r] - 2016-08-22
+
+### Changed
+- Warn if `color` is not loaded (issue #289)
+- Document some aspects of internal number processing (issue #294)
+- Minor `expl3` fixes including tracking deprecations
+
+### Fixed
+- Handling of `e0` input (issue #292)
+- Added some missing internal variable declarations
+
+## [v2.6q] - 2016-03-01
+
+### Fixed
+- Correct detection of font inside cells
+
+### Changed
+- Index formatting
+
+## [v2.6p] - 2016-01-19
+
+### Fixed
+- Formatting of `\degreeCelsius` (issue #285)
+- Allow input unit with prefix and `\per` in `exponent-to-prefix` (issue 283)
+
+## [v2.6o] - 2016-01-05
+
+### Fixed
+- Allow for unit powers when converting exponents to prefixes
+
+## [v2.6n] - 2015-12-31
+
+### Changed
+- Formatting of `\degreeCelsius` (issue #282)
+
+### Fixed
+- Appearance of ångström with LuaTeX (issue #280)
+
+## [v2.6m] - 2015-10-15
+
+### Fixed
+- Interaction with `mwtab` in some table cells
+
+## [v2.6l] - 2015-09-14
+
+### Fixed
+- An internal error in literal unit formatting
+
+## [v2.6k] - 2015-09-12
+
+### Changed
+- Track/exploit `expl3` updates
+
+## [v2.6j] - 2015-09-01
+
+### Fixed
+- Treatment of `\pm` when `exponent-to-prefix` is true
+- Print all units when `exponent-to-prefix` is true
+
+## [v2.6i] - 2015-08-18
+
+### Changed
+- Performance improvements
+- Removed one deprecated `expl3` functions
+
+### Fixed
+- Use of `\cancel` in math mode (issue #264)
+- Cope better with large numbers when rounding (issue #198)
+
+## [v2.6h] - 2015-07-17
+
+### Changed
+- Track `expl3` changes
+
+## [v2.6g] - 2015-06-25
+
+### Fixed
+-  Handling of empty table cells (issue #271)
+
+## [v2.6f] - 2015-06-16
+
+### Added
+- Spanish coverage for translations
+
+### Changed
+- Approach to supporting `mathspec`
+- Remove a (probably) misplaced `\scan_stop:`
+
+### Fixed
+- Behaviour of `table-sign-exponent` and `table-sign-mantissa` when set
+  false
+
+## [v2.6e] - 2015-01-21
+
+### Changed
+- Auto-detect `mathspec`/`eulervm`
+
+## [v2.6d] - 2014-10-28
+
+### Fixed
+- Fix conversation of uncertainty part with integer mantissas
+
+## [v2.6c] - 2014-10-01
+
+### Fixed
+- `\micro` when `fontspec` is loaded
+
+## [v2.6b] - 2014-09-27
+
+### Changed
+-  Method for font shape detection to allow for, _e.g._ `\scshape`
+
+### Fixed
+- Typo in standard `input-protect-tokens` options
+
+## [v2.6a] - 2014-09-15
+
+### Changed
+- Improved Unicode math symbol coverage
+
+## [v2.6] - 2014-09-05
+
+### Changes
+- Switch to math mode by default for all printing
+- Use `\mathord` before comparators
+- Only apply 'tight' spacing to `\mathbin` cases
+- Use a 'real' minus with `tex4ht`
+- Use a full width space between number and unit (issue #230)
+- Note that colour for printing powers is set by `power-font` (issue #240)
+- Use `\mathord` to get 'tight' spacing for signs (issue #241)
+- Old `repeatunits` option is partly coved by `range-units` (issue #254)
+
+### Fixed
+- Loading when `mdwtab` is in use
+- Appearance of minus sign when `tex4ht` is in use
+- Spacing when printing comparators
+- Preserve `\fg` in bookmarks (issue #226)
+- Allow for `output-exponent-marker` option in tables (issue #232)
+- Conversion of integer with separate uncertainty to 'compact' form
+  (issue #233)
+- Option name wrong in v1 table (issue #240)
+- Use `\textpm` in text mode if `textcomp` package is loaded (issue #249)
+- Ignore hard spaces in `\num` (issue #256)
+- Use `\mathord for tight spacing on 'in line' exponent (issue #257)
+
 ## [v2.0]
 
 ### Added
