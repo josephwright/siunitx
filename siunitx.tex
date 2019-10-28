@@ -1707,6 +1707,70 @@ available using the \opt{angle-symbol-over-decimal} option.
   \ang[angle-symbol-over-decimal]{6;7;6.5}
 \end{LaTeXdemo}
 
+\subsection{Creating units}
+\label{sec:units:creating}
+
+The various macro units are created at the start of the document. \pkg{siunitx}
+can define these such that they are only available for use within the \cs{unit}
+and \cs{qty} functions, or can make the unit macros available throughout the
+document body. There are a number of settings which control this creation
+process (\cref{tab:opt:units:def}). As a result, these options all apply in the
+preamble only.
+
+\begin{table}
+  \caption{Unit creation options.}
+  \label{tab:opt:units:def}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule ^^A (
+      free-standing-units    & Switch & false \\
+      overwrite-command      & Switch & false \\
+      space-before-unit      & Switch & false \\
+      unit-optional-argument & Switch & false \\
+      use-xspace             & Switch & false \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{free-standing-units}
+\DescribeOption{overwrite-functions}
+The \opt{free-standing-units} option controls whether the unit macros exist
+outside of the \cs{unit} and \cs{qty} arguments. When this option is
+\opt{true}, \pkg{siunitx} creates the macros for general use. The standard
+method to achieve this does not overwrite any existing macros: this behaviour
+can be altered using the \opt{overwrite-commands} switch.
+
+\DescribeOption{space-before-unit}
+\DescribeOption{unit-optional-argument}
+\DescribeOption{use-xspace}
+When \enquote{free standing} unit macros are created, their behaviour can be
+adjusted by a number of options. These are mainly intended for emulating the
+input syntax of older packages. The option \opt{unit-optional-argument} gives
+the same behaviour for the inputs
+\begin{LaTeXdemo}[code only]
+  \qty{10}{\metre}
+\end{LaTeXdemo}
+and
+\begin{LaTeXdemo}[code only]
+  \metre[10].
+\end{LaTeXdemo}
+The \opt{space-before-unit} and \opt{use-xspace} options control the behaviour
+at the \enquote{ends} of the unit macros. Activating \opt{space-before-unit}
+inserts the number--unit space before the unit is printed. This is suitable for
+the input syntax
+\begin{LaTeXdemo}[code only]
+  30\metre
+\end{LaTeXdemo}
+but does mean that the unit macros are incorrectly spaced in running text. On
+the other hand, the \opt{use-xspace} option attempts to correctly space input
+such as
+\begin{LaTeXdemo}[code only]
+  \metre is the symbol for metres.
+\end{LaTeXdemo}
+
 \subsection{Using units}
 
 Part of the power of \pkg{siunitx} is the ability to alter the output format
