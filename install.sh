@@ -64,6 +64,8 @@ tlmgr install   \
   psnfss        \
   opensans      \
   sansmath      \
+  soul          \
+  soulpos       \
   symbol        \
   tools         \
   underscore    \
