@@ -1,9 +1,17 @@
 install:
- - source ./install.sh
-
+- source ./install.sh
 cache:
   directories:
-    - /tmp/texlive
-
+  - "/tmp/texlive"
 script:
- - l3build ctan -q -H
+- l3build ctan -q -H
+deploy:
+  provider: releases
+  api_key:
+    secure: g1G/NQXHKchVRezhQot4DDI9qHZV8wO+YitZjGyxFWCM88CT2GP/kus0R59J8Nq0gSKN0v/PpKPGOfehwWLADTGPSeVnZVxlC2BJ8/6/sLM9Zv+bJFLV1Sq2MgEUnpCi7jxRVo0CWCbEuRAZcJQIRZgiUa5G8kjdf34TKMPZNDhfwDsNHNs5+o9RmUd8LpT1xbyqMibYzMM1BrPuYmocg8NKjFYbxvLFUvZzZe00/BQd6+VIe/EzD2tbl9127heyrgEWPDNSF/KqzW6Dkq6Xy+P4zlv2NBCI2kP+jo8E+1/HBMwhj7QTeMhZ+o1t0p2mU5AUXwupZXsNkKYX0fC21bnzOSyj1h6ZUngkBFixeKGRNjqRyVbfdWZpPmVN26wvxfcR48i/QmzaUP2AmS3ZDe4ScF/OZ868xmzfVqYw2Nn4kZW+46V4oaubuKjJkDiZG9HoLkki2GazuhBEkH1TT9Eh3i5e8GrKd2j8uwKxsYVF+bfH8ENSbZXT/gse+78YPS9P7kdmKA5AMjxtqxVdRjRMH5H++Hn0e0R26tRdTxFePTqQxbmzaamQ9+PZkigfOlq7TnAg3+TqIcZ56B2nY+zSjuw3WOMU4WTUIrj58vA1sbrURpC/zjEDb5sQN4/S22zj7scudwIKrsCgPxKA17IIrp+FgcoRcO2DLkzzUd0=
+  file: build/distrib/*.zip
+  skip_cleanup: true
+  on:
+    repo: josephwright/siunitx
+    tags: true
+  prerelease: true
