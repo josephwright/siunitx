@@ -288,6 +288,139 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Ignore hard spaces in `\num` (issue #256)
 - Use `\mathord for tight spacing on 'in line' exponent (issue #257)
 
+## [v2.5s] - 2013-07-31
+
+### Fixed
+- Internal issue with one key
+
+## [v2.5r] - 2013-07-11
+
+## Fixed
+- Update internals to remove deprecated key support
+
+## [v2.5q] - 2013-03-11
+
+### Changed
+- Issue warning if `cellspace` column letter is moved
+
+### Fixed
+- Reorder creation of unit wrappers and option setting (issue #218)
+- Replace active hyphen with 'other' one (issue #222)
+
+## [v2.5p] - 2013-02-01
+
+### Fixed
+- Search/replace `\pm` and `\mp` in text mode printing
+
+## [v2.5o] - 2013-01-09
+
+### Changed
+- Track `expl3` changes
+
+## [v2.5n] - 2012-12-29
+
+### Fixed
+- Correctly calculate grouping data to send to `pgf` (issue #211)
+
+## [v2.5m] - 2012-11-27
+
+### Fixed
+- Allow for `bidi`/RTL when applying `\text`
+- Search-and-replace in UTF-8 literal units
+- Load binary-units only when requested (issue #201)
+- Disable `\hightlight` in bookmarks (issue #207)
+
+## [v2.5l] - 2012-11-21
+
+### Changed
+- Track `expl3` changes
+
+## [v2.5k] - 2012-11-13
+
+### Changed
+- Explicitly require `xparse`
+
+### Fixed
+- Skip white space after `\begin{document}`
+- Correct use of fixed dimension/skip values internally
+- Store name of `\frac` function, don't `\let` it (issue #203)
+
+## [v2.5j] - 2012-09-18
+
+### Fixed
+- Erroneous branch in test for rounding removed (issue #202)
+
+## [v2.5i] - 2012-09-11
+
+### Changed
+- Internal search for first token in some strings
+
+### Fixed
+- Align numbers with no uncertainties correctly when space is reserved
+  for uncertainty part
+
+## [v2.5h] - 2012-08-28
+
+### Changed
+- Test literal units for being 'blank' not 'empty'
+
+## [v2.5g] - 2012-07-22
+
+### Fixed
+- Function of `binary-units` option
+
+## [v2.5f] - 2012-07-16
+
+### Changed
+- Track `expl3` changes
+
+## [v2.5e] - 2012-06-13
+
+### Fixed
+- An internal error in unit expansion (introduced in v2.4f)
+
+## [v2.5d] - 2012-06-11
+
+### Added
+- Extend qualifier system to cover 'phrases'
+
+### Changed
+- Extend UTF-8 support (issue #199)
+- Track `expl3` changes
+
+## [v2.5c] - 2012-05-03
+
+### Fixed
+- Detect and skip empty `s`-column cells (issue #197)
+- Detection of zero input with fixed exponent (issue #198)
+
+## [v2.5b] - 2012-04-21
+
+### Fixed
+- Detect eulervm package (issue #195)
+- Search-and-replace for category 'other' "_' and "^" in literal
+  units (issue #196)
+
+## [v2.5a] - 2012-04-19
+
+### Fixed
+- When creating free-standing unit, allow for dynamic nature of
+  spacing (bug introduced in v2.5)
+
+## [v2.5] - 2012-04-15
+
+### Added
+- Option `zero-decimal-to-integer` (issue #178)
+- Option to omit uncertainly entirely (issue #180)
+
+### Changed
+- Reduce use of implicit math mode
+- Document that `round-mode = places` acts on the mantissa (issue #193)
+- Rearrange processing code such that exponents can be dropped (issue #192)
+
+### Fixed
+- Use a standard-width comparator for tables (issue #183)
+
 ## [v2.0]
 
 ### Added
