@@ -1,0 +1,137 @@
+\documentclass{article}
+
+\input{regression-test}
+
+\usepackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\usepackage{siunitx}
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test #1
+  {
+    \hbox_set:Nn \l_tmpa_box {#1}
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\ExplSyntaxOff
+
+\OMIT
+% Preamble-only, but rest of tests are document body
+\DeclareSIPrePower\quartic{4}
+\DeclareSIPostPower\tothefourth{4}
+\TIMO
+
+\begin{document}
+
+\START
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST{Pre- and post-powers}
+  {%
+    \test{\qty{4}{\quartic\metre}}%
+    \test{\qty{4}{\metre\tothefourth}}%
+  }
+
+\TEST{Document commands}
+  {%
+    \test{\si{\metre\per\second}}%
+    \test{\si[per-mode = symbol]{\metre\per\second}}%
+    \test{\SI{2e3}{\metre}}%
+    \test{\SI{40}[\pounds]{\metre}}%
+    \test{\SI[per-mode = symbol]{40}{\metre\per\second}}%
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST{Option setting "input-protect-tokens"}
+  {\sisetup{input-protect-tokens = \$\"\*}}
+
+\TEST{Option setting "add-decimal-zero"}
+  {%
+    \sisetup{add-decimal-zero = false}%
+    \test{\num{1.}}%
+    \sisetup{add-decimal-zero = true}%
+    \test{\num{1.}}%
+  }
+
+\TEST{Option setting "add-integer-zero"}
+  {%
+    \sisetup{add-integer-zero = false}%
+    \test{\num{.1}}%
+    \sisetup{add-integer-zero = true}%
+    \test{\num{.1}}%
+  }
+
+\TEST{Option setting "explicit-sign"}
+  {%
+    \begingroup
+      \sisetup{explicit-sign = +}%
+      \test{\num{10}}%
+    \endgroup
+    \sisetup{explicit-sign = -}%
+    \test{\num{10}}%
+  }
+
+\TEST{Option setting "omit-uncertainty"}
+  {%
+    \sisetup{omit-uncertainty = true}%
+    \test{\num{10(1)}}%
+    \sisetup{omit-uncertainty = false}%
+    \test{\num{10(1)}}%
+  }
+
+\TEST{Option setting "retain-explicit-plus"}
+  {%
+    \sisetup{retain-explicit-plus = true}%
+    \test{\num{+10}}%
+    \sisetup{retain-explicit-plus = false}%
+    \test{\num{+10}}%
+  }
+
+\TEST{Option setting "retain-unity-mantissa"}
+  {%
+    \sisetup{retain-unity-mantissa = true}%
+    \test{\num{1e10}}%
+    \sisetup{retain-unity-mantissa = false}%
+    \test{\num{1e10}}%
+  }
+
+\TEST{Option setting "retain-zero-exponent"}
+  {%
+    \sisetup{retain-zero-exponent = true}%
+    \test{\num{1e0}}%
+    \sisetup{retain-zero-exponent = false}%
+    \test{\num{1e0}}%
+  }
+
+\TEST{Option setting "scientific-notation"}
+  {%
+    \sisetup{scientific-notation = engineering}%
+    \test{\num{1e4}}%
+    \sisetup{scientific-notation = fixed}%
+    \test{\num{1000}}%
+    \sisetup{scientific-notation = false}%
+    \test{\num{1e4}}%
+    \sisetup{scientific-notation = true}%
+    \test{\num{1000}}%
+  }
+
+\TEST{Option setting "zero-decimal-to-integer"}
+  {%
+    \sisetup{zero-decimal-to-integer = true}%
+    \test{\num{1.}}%
+    \sisetup{zero-decimal-to-integer = false}%
+    \test{\num{1.}}%
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\END
