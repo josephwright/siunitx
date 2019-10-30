@@ -194,4 +194,31 @@
     \test{\SI{10}{\kilo\metre\of{road}}}%
   }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST{Options for table-format components}
+  {
+    \OMIT
+    \newcommand{\testa}[2]
+      {%
+        \test{%
+          \begin{tabular}{@{}c@{}S@{}c@{}S[#1, table-alignment-mode = format]@{}c@{}}
+              M & #2 & M & #2 & M \\
+          \end{tabular}\par
+        }%
+      }
+    \sisetup{table-format = 2.2}
+    \TIMO
+    \testa{table-comparator = >}{>22.22}%
+    \testa{table-figures-decimal = 3}{12.345}%
+    \testa{table-figures-exponent = 2}{1e23}%
+    \testa{table-figures-integer = 3}{123.45}%
+    \testa{table-figures-uncertainty = 1}{12.23(4)}%
+    \begingroup
+      \sisetup{table-format = 2e1}
+      \testa{table-sign-exponent = +}{12e-3}%
+    \endgroup
+    \testa{table-sign-mantissa = +}{-12.34}%
+  }
+
 \END
