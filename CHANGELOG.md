@@ -9,10 +9,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 - Option `allow-quantity-breaks`
+- Option `angle-mode`
 - Option `drop-exponent`
 - Option `drop-uncertainty`
 - Option `drop-zero-decimal`
 - Option `exponent-mode`
+- Option `fill-arc-degrees`
+- Option `fill-arc-minutes`
+- Option `fill-arc-seconds`
 - Option `minimum-decimal-digits`
 - Option `prefix-mode`
 - Option `print-implicit-plus`
@@ -20,6 +24,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `print-zero-exponent`
 - Option `qualifier-phrase`
 - Option `quantity-product`
+- Option `number-angle-product`
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
@@ -38,8 +43,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `\DeclareSIPostPower`
 - Option `add-decimal-zero`
 - Option `allow-number-unit-break`
+- Option `add-arc-degree-zero`
+- Option `add-arc-minute-zero`
+- Option `add-arc-second-zero`
 - Option `explicit-sign`
 - Option `omit-uncertainty`
+- Option `number-angle-product`
 - Option `number-unit-product`
 - Option `prefixes-as-symbols`
 - Option `retain-explicit-plus`
