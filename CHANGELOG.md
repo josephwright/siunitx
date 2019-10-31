@@ -95,6 +95,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-integer-zero`
 - Option `input-protect-tokens`
 - Option `literal-superscript-as-power`
+- Option `table-unit-alignment`
 
 ## [v2.7t] - 2019-10-10
 
