@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `qualifier-phrase`
 - Option `quantity-product`
 - Option `number-angle-product`
+- Option `number-close-bracket`
+- Option `number-open-bracket`
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
@@ -47,8 +49,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-degree-zero`
 - Option `add-arc-minute-zero`
 - Option `add-arc-second-zero`
+- Option `close-bracket`
 - Option `explicit-sign`
 - Option `omit-uncertainty`
+- Option `open-bracket`
 - Option `overwrite-functions`
 - Option `number-angle-product`
 - Option `number-unit-product`
