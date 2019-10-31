@@ -2698,7 +2698,10 @@
   }
 \cs_new:Npn \@@_format_integer_loop:NNNN #1#2#3#4
   {
-    \exp_not:V \l_@@_group_separator_tl
+    \str_if_eq:VnTF \l_@@_group_separator_tl { , }
+      { \exp_not:N \mathord }
+      { \use:n }
+        { \exp_not:V \l_@@_group_separator_tl }
     \exp_not:n {#1#2#3}
     \quark_if_nil:NF #4
       { \@@_format_integer_loop:NNNN #4 }
