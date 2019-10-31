@@ -19,6 +19,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-arc-degrees`
 - Option `fill-arc-minutes`
 - Option `fill-arc-seconds`
+- Option `fraction-command`
 - Option `list-mode`
 - Option `minimum-decimal-digits`
 - Option `minimum-integer-digits`
@@ -60,6 +61,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-second-zero`
 - Option `close-bracket`
 - Option `explicit-sign`
+- Option `fraction-function`
 - Option `omit-uncertainty`
 - Option `open-bracket`
 - Option `overwrite-functions`
