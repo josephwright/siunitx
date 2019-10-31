@@ -164,6 +164,39 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Angle options}
+%
+%  All straight-forward emulation.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    add-arc-degree-zero .code:n =
+      {
+        \@@_option_deprecated:nnV
+          { add-arc-degree-zero }
+          { fill-arc-degrees }
+          \l_keys_value_tl
+      } ,
+    add-arc-degree-zero .default:n = true ,
+    add-arc-minute-zero .code:n =
+      {
+        \@@_option_deprecated:nnV
+          { add-arc-minute-zero }
+          { fill-arc-minutes }
+          \l_keys_value_tl
+      } ,
+    add-arc-minute-zero .default:n = true ,
+    add-arc-second-zero .code:n =
+      {
+        \@@_option_deprecated:nnV
+          { add-arc-second-zero }
+          { fill-arc-seconds }
+          \l_keys_value_tl
+      } ,
+    add-arc-second-zero .default:n = true
+  }
+%    \end{macrocode}
+%
 % \subsubsection{Number options}
 % 
 % For the basic emulation, just set up some information.
@@ -278,85 +311,6 @@
           \l_keys_value_tl
       } ,
     zero-decimal-to-integer .default:n = true
-  }
-%    \end{macrocode}
-%
-% \subsubsection{Unit options}
-%
-%    \begin{macrocode}
-\keys_define:nn { siunitx }
-  {
-    allow-number-unit-breaks .code:n =
-      {
-        \@@_option_deprecated:nnV
-          { allow-number-unit-breaks  }
-          { allow-quantity-breaks }
-          \l_keys_value_tl
-      } ,
-    allow-number-unit-breaks .default:n = true ,
-    literal-superscript-as-power .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { literal-superscript-as-power }
-      } ,
-    number-unit-product .code:n =
-      {
-        \@@_option_deprecated:nnV
-          { number-unit-product }
-          { quantity-product }
-          \l_keys_value_tl
-      } ,
-    per-mode / reciprocal .code:n =
-      {
-        \@@_option_deprecated:nn
-          { per-mode~=~reciprocal }
-          { per-mode~=~power }
-      } ,
-    per-mode / reciprocal-positive-first .code:n =
-      {
-        \@@_option_deprecated:nn
-          { per-mode~=~reciprocal-positive-first }
-          { per-mode~=~power-positive-first }
-      } ,
-    power-font .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { power-font }
-      } ,
-    prefixes-as-symbols .choice: ,
-    prefixes-as-symbols / false . code:n =
-      {
-        \@@_option_deprecated:nn
-          { prefixes-as-symbols~=~false }
-          { prefix-mode~=~power }
-      } ,
-    prefixes-as-symbols / true . code:n =
-      {
-        \@@_option_deprecated:nn
-          { prefixes-as-symbols~=~true }
-          { prefix-mode~=~symbol }
-      } ,
-    qualifier-mode / brackets .code:n =
-      {
-        \@@_option_deprecated:nn
-          { qualifier-mode~=~brackets }
-          { qualifier-mode~=~bracket }
-      } ,
-    qualifier-mode / space .code:n =
-      {
-        \msg_info:nnnn { siunitx } { option-deprecated }
-          { qualifier-mode~=~space }
-          { qualifier-mode~=~phrase"~plus~"qualifier-phrase=\  }
-        \keys_set:nn
-          { siunitx }
-          { qualifier-mode = phrase, qualifier-phrase = \  }
-      } ,
-    qualifier-mode / text .code:n =
-      {
-        \@@_option_deprecated:nn
-          { qualifier-mode~=~text }
-          { qualifier-mode~=~combine }
-      }
   }
 %    \end{macrocode}
 %
@@ -505,36 +459,82 @@
   }
 %    \end{macrocode}
 %
-% \subsection{Angle options}
+% \subsubsection{Unit options}
 %
-%  All straight-forward emulation.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
-    add-arc-degree-zero .code:n =
+    allow-number-unit-breaks .code:n =
       {
         \@@_option_deprecated:nnV
-          { add-arc-degree-zero }
-          { fill-arc-degrees }
+          { allow-number-unit-breaks  }
+          { allow-quantity-breaks }
           \l_keys_value_tl
       } ,
-    add-arc-degree-zero .default:n = true ,
-    add-arc-minute-zero .code:n =
+    allow-number-unit-breaks .default:n = true ,
+    literal-superscript-as-power .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { literal-superscript-as-power }
+      } ,
+    number-unit-product .code:n =
       {
         \@@_option_deprecated:nnV
-          { add-arc-minute-zero }
-          { fill-arc-minutes }
+          { number-unit-product }
+          { quantity-product }
           \l_keys_value_tl
       } ,
-    add-arc-minute-zero .default:n = true ,
-    add-arc-second-zero .code:n =
+    per-mode / reciprocal .code:n =
       {
-        \@@_option_deprecated:nnV
-          { add-arc-second-zero }
-          { fill-arc-seconds }
-          \l_keys_value_tl
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal }
+          { per-mode~=~power }
       } ,
-    add-arc-second-zero .default:n = true
+    per-mode / reciprocal-positive-first .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal-positive-first }
+          { per-mode~=~power-positive-first }
+      } ,
+    power-font .code:n =
+      {
+        \msg_warning:nnn { siunitx } { option-removed }
+          { power-font }
+      } ,
+    prefixes-as-symbols .choice: ,
+    prefixes-as-symbols / false . code:n =
+      {
+        \@@_option_deprecated:nn
+          { prefixes-as-symbols~=~false }
+          { prefix-mode~=~power }
+      } ,
+    prefixes-as-symbols / true . code:n =
+      {
+        \@@_option_deprecated:nn
+          { prefixes-as-symbols~=~true }
+          { prefix-mode~=~symbol }
+      } ,
+    qualifier-mode / brackets .code:n =
+      {
+        \@@_option_deprecated:nn
+          { qualifier-mode~=~brackets }
+          { qualifier-mode~=~bracket }
+      } ,
+    qualifier-mode / space .code:n =
+      {
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { qualifier-mode~=~space }
+          { qualifier-mode~=~phrase"~plus~"qualifier-phrase=\  }
+        \keys_set:nn
+          { siunitx }
+          { qualifier-mode = phrase, qualifier-phrase = \  }
+      } ,
+    qualifier-mode / text .code:n =
+      {
+        \@@_option_deprecated:nn
+          { qualifier-mode~=~text }
+          { qualifier-mode~=~combine }
+      }
   }
 %    \end{macrocode}
 %
