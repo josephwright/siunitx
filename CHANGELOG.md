@@ -18,6 +18,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-arc-minutes`
 - Option `fill-arc-seconds`
 - Option `minimum-decimal-digits`
+- Option `overwrite-commands`
 - Option `prefix-mode`
 - Option `print-implicit-plus`
 - Option `print-unity-mantissa`
@@ -48,6 +49,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-second-zero`
 - Option `explicit-sign`
 - Option `omit-uncertainty`
+- Option `overwrite-functions`
 - Option `number-angle-product`
 - Option `number-unit-product`
 - Option `prefixes-as-symbols`
