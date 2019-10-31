@@ -7,8 +7,70 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Option `allow-quantity-breaks`
+- Option `drop-exponent`
+- Option `drop-uncertainty`
+- Option `drop-zero-decimal`
+- Option `exponent-mode`
+- Option `minimum-decimal-digits`
+- Option `prefix-mode`
+- Option `print-implicit-plus`
+- Option `print-unity-mantissa`
+- Option `print-zero-exponent`
+- Option `qualifier-phrase`
+- Option `quantity-product`
+- Option `table-align-text-after`
+- Option `table-align-text-before`
+- Option `table-alignment-mode`
+- Option `track-explicit-plus`
+- Option setting `per-mode = power`
+- Option setting `per-mode = power-positive-first`
+- Option setting `qualifier-mode = bracket`
+- Option setting `qualifier-mode = phrase`
+- Option setting `qualifier-mode = combine`
+
 ### Changed
 - Modular re-write to provide code-level API
+
+### Deprecated
+- `\DeclareSIPrePower`
+- `\DeclareSIPostPower`
+- Option `add-decimal-zero`
+- Option `allow-number-unit-break`
+- Option `explicit-sign`
+- Option `omit-uncertainty`
+- Option `number-unit-product`
+- Option `prefixes-as-symbols`
+- Option `retain-explicit-plus`
+- Option `retain-unity-mantissa`
+- Option `retain-zero-exponent`
+- Option `scientific-notation`
+- Option `table-align-text-post`
+- Option `table-align-text-pre`
+- Option `table-comparator`
+- Option `table-figures-decimal`
+- Option `table-figures-exponent`
+- Option `table-figures-integer`
+- Option `table-figures-uncertainty`
+- Option `table-omit-exponent`
+- Option `table-parse-only`
+- Option `table-sign-exponent`
+- Option `table-sign-mantissa`
+- Option `table-space-text-post`
+- Option `table-space-text-pre`
+- Option `zero-decimal-to-integer`
+- Option setting `per-mode = reciprocal`
+- Option setting `per-mode = reciprocal-positive-first`
+- Option setting `qualifier-mode = brackets`
+- Option setting `qualifier-mode = space`
+- Option setting `qualifier-mode = text`
+- Option setting `table-number-alignment = center-decimal-marker`
+
+### Removed
+- Option `add-integer-zero`
+- Option `input-protect-tokens`
+- Option `literal-superscript-as-power`
 
 ## [v2.7t] - 2019-10-10
 
