@@ -62,6 +62,7 @@ tlmgr install   \
   mweights      \
   multirow      \
   oberdiek      \
+  palatino      \
   pgf           \
   pgfplots      \
   psnfss        \
