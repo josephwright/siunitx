@@ -6,9 +6,6 @@
 bundle = ""
 module = "siunitx"
 
--- Install config files
-installfiles = {"*.cfg", "*.sty"}
-
 -- Release a TDS-style zip
 packtdszip = true
 
