@@ -61,6 +61,7 @@ tlmgr install   \
   mweights      \
   multirow      \
   oberdiek      \
+  pgf           \
   pgfplots      \
   psnfss        \
   opensans      \
@@ -68,7 +69,6 @@ tlmgr install   \
   soul          \
   soulpos       \
   symbol        \
-  tikz          \
   tools         \
   underscore    \
   unicode-math  \
