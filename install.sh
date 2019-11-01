@@ -68,6 +68,7 @@ tlmgr install   \
   soul          \
   soulpos       \
   symbol        \
+  tikz          \
   tools         \
   underscore    \
   unicode-math  \
