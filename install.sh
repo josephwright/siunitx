@@ -45,6 +45,7 @@ tlmgr install   \
   fancyvrb      \
   filehook      \
   fontaxes      \
+  fpl           \
   graphics      \
   graphics-cfg  \
   graphics-def  \
