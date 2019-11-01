@@ -207,6 +207,15 @@
           }
           { }
       }
+%    \end{macrocode}
+%   At the beginning of table cells and inside \texttt{x}-type expansion,
+%   all symbolic units need to have \emph{some} definition. 
+%    \begin{macrocode}
+    \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
+      {
+        \cs_if_free:NT ##1
+          { \cs_set_protected:Npn ##1 { \ERROR } }
+      }
   }
 \AtBeginDocument { \siunitx_command_create: }
 \cs_new_protected:Npn \@@_create:
