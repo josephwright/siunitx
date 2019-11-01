@@ -106,9 +106,36 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 - Option `add-integer-zero`
+- Option `detect-all`
+- Option `detect-display-math`
+- Option `detect-family`
+- Option `detect-inline-family`
+- Option `detect-inline-weight`
+- Option `detect-mode`
+- Option `detect-none`
+- Option `detect-shape`
+- Option `detect-weight`
 - Option `input-protect-tokens`
 - Option `literal-superscript-as-power`
+- Option `math-rm`
+- Option `math-sf`
+- Option `math-tt`
+- Option `number-math-rm`
+- Option `number-math-sf`
+- Option `number-math-tt`
+- Option `number-text-rm`
+- Option `number-text-sf`
+- Option `number-text-tt`
 - Option `table-unit-alignment`
+- Option `text-rm`
+- Option `text-sf`
+- Option `text-tt`
+- Option `unit-math-rm`
+- Option `unit-math-sf`
+- Option `unit-math-tt`
+- Option `unit-text-rm`
+- Option `unit-text-sf`
+- Option `unit-text-tt`
 
 ## [v2.7t] - 2019-10-10
 
