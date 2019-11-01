@@ -38,6 +38,7 @@ tlmgr install   \
   caption       \
   colortbl      \
   csquotes      \
+  dvips         \
   ec            \
   enumitem      \
   etoolbox      \
