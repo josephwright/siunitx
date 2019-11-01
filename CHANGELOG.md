@@ -19,6 +19,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-arc-degrees`
 - Option `fill-arc-minutes`
 - Option `fill-arc-seconds`
+- Option `font-command`
 - Option `fraction-command`
 - Option `list-mode`
 - Option `minimum-decimal-digits`
