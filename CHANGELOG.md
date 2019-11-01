@@ -50,12 +50,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `text-family-to-math`
 - Option `text-weight-to-math`
 - Option `track-explicit-plus`
+- Option setting `list-mode = bracket`
 - Option setting `mode = match`
 - Option setting `number-mode = match`
 - Option setting `per-mode = power-positive-first`
 - Option setting `qualifier-mode = bracket`
 - Option setting `qualifier-mode = phrase`
 - Option setting `qualifier-mode = combine`
+- Option setting `range-mode = bracket`
 - Option setting `text-mode = match`
 - Option setting `unit-mode = match`
 
@@ -97,11 +99,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-space-text-post`
 - Option `table-space-text-pre`
 - Option `zero-decimal-to-integer`
+- Option setting `list-mode = brackets`
 - Option setting `per-mode = reciprocal`
 - Option setting `per-mode = reciprocal-positive-first`
 - Option setting `qualifier-mode = brackets`
 - Option setting `qualifier-mode = space`
 - Option setting `qualifier-mode = text`
+- Option setting `range-mode = brackets`
 - Option setting `table-number-alignment = center-decimal-marker`
 
 ### Removed
