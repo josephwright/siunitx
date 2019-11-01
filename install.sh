@@ -57,6 +57,7 @@ tlmgr install   \
   lm-math       \
   lualatex-math \
   makeindex     \
+  mathpazo      \
   mptopdf       \
   mweights      \
   multirow      \
