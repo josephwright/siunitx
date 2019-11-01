@@ -132,6 +132,9 @@ for those people who are interested.
 % For table demos
 \usepackage{multirow}
 \usepackage[table]{xcolor}
+% Has to come after xcolor
+\usepackage{pgfplots}
+\pgfplotsset{compat = 1.16, compat/show suggested version = false}
 
 % For the extra-long tables
 \usepackage{xtab}
@@ -2393,6 +2396,257 @@ provided: if you need non-standard font settings, you will need to adjust your
 source. See Section~\label{sec:print} for more details on the options available
 in this area.
 
+\section{Using (\acro{si}) units}
+
+Consistent and logical units are a necessity for scientific work, and have
+applicability everywhere. Historically, a number of systems have been used for
+physical units. SI units were introduced by the \foreign{Conférence Générale
+des Poids et Mesures} (\acro{cgpm}) in 1960. SI units are a coherent system
+based on seven base units, from which all other units may be derived.
+
+At the same time, physical quantities with units are mathematical entities, and
+as such way that they are typeset is important. In mathematics, changes of type
+(such as using bold, italic, sans serif typeface and so on) convey information.
+This means that rules exist not only for the type of units to be used under the
+SI system, but also the way they should appear in print. Advice on best
+practice has been made available by the \emph{National Institute of Standards
+and Technology} (\acro{nist})~\cite{NIST}.
+
+As befits an agreed international standard, the full rules are detailed. It is
+not appropriate to reproduce these in totality here; instead, a useful summary
+of the key points is provided. The full details are available from the
+\emph{Bureau International des Poids et Mesures}~\cite{BIPM}.
+
+The \pkg{siunitx} package takes account of the information given here, so far
+as is possible. Thus the package defaults follow the recommendations made for
+typesetting numbers and units. Spacing and so forth is handled in such a way as
+to make implementing the rules (relatively) easy.
+
+\subsection{Units}
+
+There are seven base \acro{si} units, listed in Section~\ref{tab:unit:base}.
+Apart from the kilogram, these are defined in terms of a measurable physical
+quantity needing the definition alone.\footnote{Some base units need others
+defined first; there is therefore a required order of definition.} The base
+units have been chosen such that all physical quantities can be expressed using
+an appropriative combination of these units, needing no others and with no
+redundancy.
+
+All other units within the \acro{si} system are regarded as \enquote{derived}
+from the seven base units. At the most basic, all other SI units can be
+expressed as combinations of the base units. However, many units (listed in
+SEction~\ref{tab:unit:derived,tab:unit:accepted}) have a special name and
+symbol. Most of these units are simple combinations of one or more base units
+(raised to powers as appropriate). A small number of units derived from
+experimental data are allowed as \acro{si} units
+(Section~\ref{tab:unit:physical}).
+
+A series of \acro{si} prefixes for decimal multiples and sub-multiples are
+provided, and can be used as modifiers for any SI unit (either base or derived
+units) with the exception of the kilogram. The prefixes are listed in
+Section~\ref{tab:unit:prefix}. No space should be used between a prefix and the
+unit, and only a single prefix should be used. Even the degree Celsius can be
+given a prefix, for example \qty{1}{\milli\degreeCelsius}.
+
+It is important to note that the kilogram is the only \acro{si} unit with a
+prefix as part of its name and symbol. Only single prefix may be used, and so
+in the case of the kilogram prefix names are used with the unit name
+\enquote{gram} and the prefix symbols are used with the unit symbol
+\unit{\gram}. For example $\qty[prefix-mode = power]{1}{\milli\gram} =
+\qty{1}{\milli\gram}$.
+
+The application of SI units is meant to provide a single set of units which
+ensure consistency and clarity across all areas. However, other units are
+common is many areas, and are not without merit. The units provided by
+\pkg{siunitx} by default do not include any of these; only units which are part
+of the SI set or are accepted for use with SI units are defined. However,
+several other sets of units can be loaded as optional modules. The binary
+prefixes and units (Section~\ref{tab:unit:binary}) are the most obvious
+example. These are \emph{not} part of the \acro{si} specifications, but the
+prefix names are derived from those in Section~\ref{tab:unit:prefix}.
+
+Other units are normally to be avoided where possible. SI units should, in the
+main, be preferred due to the advantages of clear definition and
+self-consistency this brings. However, there will probably always be a place
+for specialist or non-standard units. This is particularly true of units
+derived from basic physical constants.
+
+There are also many areas where non-standard units are used so commonly that to
+do otherwise is difficult or impossible. For example, most synthetic chemists
+measure the pressure inside vacuum apparatus in \unit{\millimetremercury},
+partly because the most common gauge for the task still uses a column of
+mercury metal. For these reasons, \pkg{siunitx} does define non-\acro{si}
+units.
+
+\subsection{Mathematical meaning}
+
+As explained earlier, a quantity combination is a single mathematical entity.
+This has implications for how both the number and the unit should be printed.
+Firstly, the two parts should not be separated: a quantity is a product of the
+number and the unit. With the exception of the symbols for plane angles
+(\unit{\degree}, \unit{\arcminute} and \unit{\arcsecond}), the \acro{bipm}
+specifies either a space or half-height (centred) dot should be
+used~\cite{BIPM}.
+\begin{LaTeXdemo}
+  A space for \qty{10}{\percent}\\
+  and also for \qty{100}{\degreeCelsius}\\
+  but not for \ang{1.23}.
+\end{LaTeXdemo}
+
+The mathematical meaning of units also means that the shape, weight and family
+are important. Units are supposed to be typeset in an upright, medium weight
+font. Italic, bold and sans serif are all used mathematically to convey other
+meanings. (In an all sanserif document, using sans serif for units is
+reasonable.) The \pkg{siunitx} package defaults again follow this convention:
+any local settings are ignored, and uses the current upright math font.
+However, there are occasions where this may not be the most desirable
+behaviour. A classic example would be in an all-bold section heading. As the
+surrounding text is bold, some people feel that any units should follow this.
+\begin{LaTeXdemo}
+  Units should \textbf{not be bold: \qty{54}{\farad}}\\
+  \textbf{But perhaps in a running block,\\
+  it might look better: \qty[reset-text-series = false]{54}{\farad}}
+\end{LaTeXdemo}
+
+Symbols for units formed from other units by multiplication are indicated by
+means of either a half-height (that is, centred) dot or a (thin) space.
+\begin{LaTeXdemo}
+  $\unit{\metre\second} = \text{metre second}$ \\
+  $\unit{\milli\second} = \text{millisecond}$ \\
+  \sisetup{inter-unit-product = \ensuremath { { } \cdot { } } }
+  $\unit{\metre\second} = \text{metre second}$ \\
+  $\unit{\milli\second} = \text{millisecond}$
+\end{LaTeXdemo}
+There are some circumstances under which it is common practice to omit any
+spaces. The classic example is \unit{\kWh}, where
+\enquote{\unit[inter-unit-product = \,]{\kWh}} does not add any useful
+information. If using such a unit repeatedly, users of \pkg{siunitx} are
+advised to create a custom unit to ensure consistency. It is important to note
+that while this is common practice, it is \emph{not} allowed by the
+\acro{bipm}~\cite{BIPM}.
+
+Symbols for units formed from other units by division are indicated by means of
+a virgule (oblique stroke, slash, "/"), a horizontal line, or negative
+exponents.\footnote{Notice that a virgule and a solidus are not the same
+symbol.} However, to avoid ambiguity, the virgule must not be repeated on the
+same line unless parentheses are used. This is ensured when using named unit
+macros in \pkg{siunitx}, which will \enquote{trap} repeated division and format
+it correctly. In complicated cases, negative exponents are to be preferred over
+other formats.
+\begin{LaTeXdemo}
+  \unit{\joule\per\mole\per\kelvin} \\
+  \unit[per-mode = fraction]{\joule\per\mole\per\kelvin} \\
+  \unit[per-mode = symbol]{\joule\per\mole\per\kelvin}
+\end{LaTeXdemo}
+
+Products and errors should show what unit applies to each number given. Thus
+\qtyproduct[product-mode = brackets]{2x3}{\metre} is an ordered set of lengths
+of a geometric area, whereas \qtyproduct[product-units = single]{2x3}{\metre}
+is a length (and equal to \qty{6}{\metre}). Thus, $\times$ is not a product but
+is a mathematical operator; in the same way, a $2 \times 3$ matrix is not a $6$
+matrix! In some areas, areas and volumes are given with separated units but a
+unit raised to the appropriate power: \qtyproduct[product-units = power]{2 x
+3}{\metre}. Although this does display the correct overall units, it is
+potentially-confusing and is not encouraged.
+
+Care must be taken when writing ranges of numbers. For purely numerical values,
+it is common to use a en-dash to show a range, for example \enquote{see pages
+1--5}. On the other hand, physical quantities could be misinterpret as negative
+values if written in this way. As the quantity is a single mathematical entity,
+writing the values with an en-dash followed by a single unit is also incorrect.
+As a result, using the word \enquote{to} is strongly recommended.
+\begin{LaTeXdemo}
+  \qtyrange{1}{5}{\metre} long.
+\end{LaTeXdemo}
+
+\subsection{Graphs and tables}
+
+In graphs and tables, repetition of the units following each entry or axis mark
+is confusing and repetitive. It is therefore best to place the unit in the
+label part of the information. Placing the unit in square brackets is common
+but mathematically poor.\footnote{For example, for an acceleration \(a\), the
+expression $[a]$ is the dimensions of $a$, \foreign{i.e.}~length per time
+squared in this case.} Much better is to show division of all quantities by the
+unit, which leaves the entries as unitless ratios. This is illustrated in
+Tables~\ref{tab:xmpl:unitless} and~\ref{fig:xmpl:unitless}.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{An example of table labelling.}
+    \label{tab:xmpl:unitless}
+    \sisetup{
+      table-number-alignment = center,
+      table-format = 1.4
+    }
+    \begin{tabular}{@{}cS@{}}
+      \toprule
+        Entry & {Length/\unit{\metre}} \\
+      \midrule
+        1 & 1.1234 \\
+        2 & 1.1425 \\
+        3 & 1.7578 \\
+        4 & 1.9560 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+\begin{LaTeXdemo}[code and float]
+  \begin{figure}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel = $t/\unit{\second}$,
+        xmax   = 6,
+        xmin   = 0,
+        ylabel = $d/\unit{\metre}$,
+        ymin   = 0
+      ]
+        \addplot[smooth,mark=*]
+          plot coordinates {
+            (0,0)
+            (1,5)
+            (2,8)
+            (3,9)
+            (4,8)
+            (5,5)
+            (6,0)
+           };
+      \end{axis}
+    \end{tikzpicture}
+    \caption{An example of graph labelling.}
+    \label{fig:xmpl:unitless}
+  \end{figure}
+\end{LaTeXdemo}
+
+ In most cases, adding exponent values in the body of a table is
+ less desirable than adding a fixed exponent to column headers.  An
+ example is shown in Section~\ref{tab:good}.  The use of \cs{multicolumn} is
+ needed here due to the \enquote{\texttt{<}}; without \cs{multicolumn},
+ the titles are followed by \enquote{\unit{\kilo\gram}}!
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Good and bad columns.}
+    \label{tab:good}
+    \sisetup{table-number-alignment = center}
+    \begin{tabular}{
+      @{}
+      c
+      S[table-format = 1.3e1]
+      @{\,\unit{\kilogram}}
+      S[table-format = 2.2]
+      @{}
+    }
+      \toprule
+        Entry & \multicolumn{1}{c}{Mass} &
+          {Mass/\qty{e3}{\kilogram}} \\
+      \midrule
+        1 & 4.56e3  & 4.56 \\
+        2 & 2.40e3  & 2.40 \\
+        3 & 1.345e4 & 13.45 \\
+        4 & 4.5e2   & 0.45 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
 \section{Installation}
 
 For most users, there will be no need to explicitly install \pkg{siunitx}:
@@ -2455,6 +2709,9 @@ forgotten.
   \bibitem{BIPM}
     \emph{The International System of Units (SI)},
     \url{https://www.bipm.org/en/measurement-units/}.
+  \bibitem{NIST}
+    \emph{International System of Units from \acro{nist}},
+    \url{http://physics.nist.gov/cuu/Units/index.html}.
   \bibitem{SI:2.1}
     \emph{SI base units},
     \url{https://www.bipm.org/en/publications/si-brochure/section2-1.html}.

@@ -61,6 +61,7 @@ tlmgr install   \
   mweights      \
   multirow      \
   oberdiek      \
+  pgfplots      \
   psnfss        \
   opensans      \
   sansmath      \
