@@ -39,15 +39,25 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `number-angle-product`
 - Option `number-close-bracket`
 - Option `number-open-bracket`
+- Option `propagate-math-font`
+- Option `reset-math-version`
+- Option `reset-text-family`
+- Option `reset-text-series`
+- Option `reset-text-shape`
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
+- Option `text-family-to-math`
+- Option `text-weight-to-math`
 - Option `track-explicit-plus`
-- Option setting `per-mode = power`
+- Option setting `mode = match`
+- Option setting `number-mode = match`
 - Option setting `per-mode = power-positive-first`
 - Option setting `qualifier-mode = bracket`
 - Option setting `qualifier-mode = phrase`
 - Option setting `qualifier-mode = combine`
+- Option setting `text-mode = match`
+- Option setting `unit-mode = match`
 
 ### Changed
 - Modular re-write to provide code-level API
