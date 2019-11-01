@@ -83,13 +83,15 @@ for those people who are interested.
        language     = [LaTeX]{TeX},
     }%
 }
+\newcount\LaTeXdemo@count
 \newcommand*\LaTeXdemo@input{%
   \catcode`\^^M = 10\relax
-  \input{\jobname.tmp}%
+  \input{\jobname-\number\LaTeXdemo@count.tmp}%
 }
 \LaTeXdemo@new{code and example}{%
   \setbox\LaTeXdemo@box=\hbox\bgroup
-    \lst@BeginAlsoWriteFile{\jobname.tmp}%
+    \global\advance\LaTeXdemo@count by 1 %
+    \lst@BeginAlsoWriteFile{\jobname-\number\LaTeXdemo@count.tmp}%
     \LaTeXdemo@common
 }{%
     \lst@EndWriteFile
@@ -115,7 +117,8 @@ for those people who are interested.
   \end{center}
 }
 \LaTeXdemo@new{code and float}{%
-  \lst@BeginAlsoWriteFile{siunitx.tmp}%
+  \global\advance\LaTeXdemo@count by 1 %
+  \lst@BeginAlsoWriteFile{\jobname-\number\LaTeXdemo@count.tmp}%
   \LaTeXdemo@common
 }{%
   \lst@EndWriteFile
