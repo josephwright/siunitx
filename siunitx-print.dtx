@@ -71,7 +71,9 @@
 %
 % The printing routines assume that normal \LaTeXe{} font selection commands
 % are available, in particular \cs{bfseries}, \cs{mathrm}, \cs{mathversion},
-% \cs{mdseries}, \cs{rmfamily} and \cs{upshape}. It also requires the standard
+% \cs{fontfamily}, \cs{fontseries} and \cs{fontshape}, \cs{familydefault},
+% \cs{seriesdefault}, \cs{shapedefault} and \cs{selectfont}.
+% It also requires the standard
 % \LaTeXe{} kernel commands \cs{ensuremath}, \cs{textsubscript} and
 % \cs{textsuperscript} for printing in text mode. The following packages are
 % also required to provide the functionality detailed.
@@ -644,11 +646,20 @@
     \text
       {
         \bool_if:NT \l_@@_text_family_bool
-          { \rmfamily }
+          {
+            \fontfamily { \familydefault }
+            \selectfont
+          }
         \bool_if:NT \l_@@_text_series_bool
-          { \mdseries }
+          {
+            \fontseries { \seriesdefault }
+            \selectfont
+          }
         \bool_if:NT \l_@@_text_shape_bool
-          { \upshape }
+          {
+            \fontshape { \shapedefault }
+            \selectfont
+          }
         \@@_text_replace:n {#1}
       }
   }
