@@ -50,8 +50,7 @@ tlmgr install   \
   graphics-cfg  \
   graphics-def  \
   hyperref      \
-  ifluatex      \
-  ifxetex       \
+  iftex         \
   l3kernel      \
   l3packages    \
   libertine     \
