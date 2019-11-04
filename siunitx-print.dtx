@@ -99,18 +99,6 @@
 %   fonts.
 % \end{function}
 %
-% \begin{variable}{\l_siunitx_print_series_prop}
-%   This properly list contains mappings from text mode font weights to math
-%   mode font versions. The standard settings here cover
-%   \begin{itemize}
-%     \item[\texttt{m}] Standard (mid) weight, mapping to math version
-%       |normal|.
-%     \item[\texttt{bx}] Bold expanded weight, mapping to math version |bold|.
-%     \item[\texttt{lt}] Light weight, mapping to math version |light|.
-%     \item[\texttt{l}] Light weight, mapping to math version |light|.
-%   \end{itemize}
-% \end{variable}
-%
 % \subsection{Key--value options}
 %
 % The options defined by this submodule are available within the \pkg{l3keys}
@@ -240,6 +228,29 @@
 %   the mode prevailing at the point \cs{siunitx_print:nn} is called. The
 %   |math| and |text| options choose the relevant \TeX{} mode for printing.
 %   The standard setting is |math|.
+% \end{function}
+%
+% \begin{function}{weight-version-mapping}
+%   \begin{syntax}
+%     |weight-version-mapping| |/| \meta{weight} = \meta{version}
+%   \end{syntax}
+%   Defines how \pkg{siunitx} maps from text font weight to math font
+%   version. The pre-defined weights are those used as-standard by
+%   \pkg{autoinst}:
+%   \begin{itemize}
+%     \item \texttt{ul}
+%     \item \texttt{el}
+%     \item \texttt{l}
+%     \item \texttt{sl}
+%     \item \texttt{m}
+%     \item \texttt{sb}
+%     \item \texttt{b}
+%     \item \texttt{eb}
+%     \item \texttt{ub}
+%   \end{itemize}
+%   As standard, the \texttt{m} weight maps to \texttt{normal} math version
+%   whilst all of the \texttt{b} weights map to \texttt{bold} and all of the
+%   \texttt{l} weights map to \texttt{light}.
 % \end{function}
 %
 % \end{documentation}
@@ -392,6 +403,35 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}
+%   {
+%      \l_@@_version_ul_tl ,
+%      \l_@@_version_el_tl ,
+%      \l_@@_version_l_tl ,
+%      \l_@@_version_sl_tl ,
+%      \l_@@_version_m_tl ,
+%      \l_@@_version_sb_tl ,
+%      \l_@@_version_b_tl ,
+%      \l_@@_version_eb_tl ,
+%      \l_@@_version_ub_tl
+%   }
+%    \begin{macrocode}
+%  One set of \enquoe{focussed} options.
+\keys_define:nn { siunitx / weight-version-mapping }
+  {
+    ul . tl_set:N = \l_@@_version_ul_tl ,
+    el . tl_set:N = \l_@@_version_el_tl ,
+    l  . tl_set:N = \l_@@_version_l_tl ,
+    sl . tl_set:N = \l_@@_version_sl_tl ,
+    m  . tl_set:N = \l_@@_version_m_tl ,
+    sb . tl_set:N = \l_@@_version_sb_tl ,
+    b  . tl_set:N = \l_@@_version_b_tl ,
+    eb . tl_set:N = \l_@@_version_eb_tl ,
+    ub . tl_set:N = \l_@@_version_ub_tl
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_print:nn, \siunitx_print:nV}
 %   The main printing function doesn't actually need to do very much: just set
 %   the color and select the correct sub-function.
@@ -427,17 +467,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{variable}{\l_siunitx_print_series_prop}
-%   Mapping data to relate text series to math version.
-%    \begin{macrocode}
-\prop_new:N \l_siunitx_print_series_prop
-\prop_put:Nnn \l_siunitx_print_series_prop { m }  { normal }
-\prop_put:Nnn \l_siunitx_print_series_prop { bx } { bold }
-\prop_put:Nnn \l_siunitx_print_series_prop { l }  { light }
-\prop_put:Nnn \l_siunitx_print_series_prop { lt } { light }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{macro}{\@@_replace_font:N}
 %   A simple auxiliary for \enquote{zapping} the unit font.
 %    \begin{macrocode}
@@ -453,7 +482,40 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{variable}
+%   {
+%      \c_@@_weight_uc_tl ,
+%      \c_@@_weight_ecl_tl ,
+%      \c_@@_weight_c_tl ,
+%      \c_@@_weight_sc_tl ,
+%      \c_@@_weight_sx_tl ,
+%      \c_@@_weight_x_tl ,
+%      \c_@@_weight_ex_tl ,
+%      \c_@@_weight_ux_tl
+%   }
+%  Font widths where the |m| for weight is omitted. 
+%    \begin{macrocode}
+\clist_map_inline:nn { uc , ec , c , sc , sx , x , ex , ux }
+  { \tl_const:cn { c_@@_weight_ #1 _tl } { m } }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}
+%   {
+%      \c_@@_weight_l_tl ,
+%      \c_@@_weight_m_tl ,
+%      \c_@@_weight_b_tl
+%   }
+%  Font widths with one letter.
+%    \begin{macrocode}
+\clist_map_inline:nn { l , m , b }
+  { \tl_const:cn { c_@@_weight_ #1 _tl } { #1 } }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_math:n}
+% \begin{macro}{\@@_extract_series:Nw}
+% \begin{macro}{\@@_convert_series:n}
 % \begin{macro}{\@@_math_version:nn, \@@_math_version:Vn}
 % \begin{macro}
 %   {
@@ -475,13 +537,32 @@
   {
     \bool_if:NTF \l_@@_math_weight_bool
       {
-        \prop_get:NVNTF \l_siunitx_print_series_prop
-          \f@series \l_@@_tmp_tl
-          { \@@_math_version:Vn \l_@@_tmp_tl {#1} }
+        \tl_set:Nx \l_@@_tmp_tl
+          { \exp_after:wN \@@_extract_series:Nw \f@series ? \q_stop }
+        \tl_if_empty:NTF \l_@@_tmp_tl
           { \@@_math_auxi:n {#1} }
+          { \@@_math_version:Vn \l_@@_tmp_tl {#1} }
       }
       { \@@_math_auxi:n {#1} }
   }
+%    \end{macrocode}
+%   Look up the math version from the text series. The weight is omitted
+%   if it is |m| plus there are either one or two letters, so we have a little
+%   work to do. To keep things fast, we use a hash table based lookup rather
+%   than a sequence or property list.
+%    \end{macrocode}
+\cs_new:Npn \@@_extract_series:Nw  #1#2 ? #3 \q_stop
+  {
+    \cs_if_exist:cTF { c_@@_weight_ #1#2 _tl }
+      { \@@_convert_series:n { m } }
+      {
+        \cs_if_exist:cTF { c_@@_weight_ #1 _tl }
+          { \@@_convert_series:n {#1} }
+          { \@@_convert_series:n {#1#2} }
+      }
+  }
+\cs_new:Npn \@@_convert_series:n #1
+  { \tl_use:c { l_@@_version_ #1 _tl } }
 \cs_new_protected:Npn \@@_math_auxi:n #1
   {
     \bool_if:NTF \l_@@_math_version_bool
@@ -620,6 +701,8 @@
       { }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -829,6 +912,22 @@
     text-weight-to-math = false ,
     unit-color          =       ,
     unit-mode           = math
+  }
+%    \end{macrocode}
+%
+% These are separate as they all fall inside the same key.
+%    \begin{macrocode}
+\keys_set:nn { siunitx / weight-version-mapping }
+  {
+    ul = light  ,
+    el = light  ,
+    l  = light  ,
+    sl = light  ,
+    m  = normal ,
+    sb = bold   ,
+    b  = bold   ,
+    eb = bold   ,
+    ub = bold
   }
 %    \end{macrocode}
 %
