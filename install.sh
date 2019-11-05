@@ -46,6 +46,7 @@ tlmgr install   \
   fancyvrb      \
   filehook      \
   fontaxes      \
+  fp            \
   fpl           \
   graphics      \
   graphics-cfg  \
@@ -72,6 +73,7 @@ tlmgr install   \
   sansmath      \
   soul          \
   soulpos       \
+  substr        \
   symbol        \
   tools         \
   underscore    \
@@ -79,6 +81,7 @@ tlmgr install   \
   url           \
   was           \
   xcolor        \
+  xfor          \
   xkeyval       \
   xtab          \
   zapfding
