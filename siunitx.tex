@@ -138,6 +138,7 @@ for those people who are interested.
 % Has to come after xcolor
 \usepackage{pgfplots}
 \pgfplotsset{compat = 1.16, compat/show suggested version = false}
+\usepackage{xfp}
 
 % For the extra-long tables
 \usepackage{xtab}
@@ -2413,6 +2414,72 @@ printing units). The easiest way to solve this is to use the construction
 mathematics font without affecting the rest of the output. In some cases,
 simply forcing \cs{mathnormal} will suffice, but this is less reliable with
 non-Latin characters.
+
+\subsection{Expanding content in tables}
+\label{sec:hint:expanding}
+
+When processing tables, \pkg{siunitx} will expand anything stored inside a
+macro, unless it is long or protected. \LaTeXe{} robust commands are also
+detected and are not expanded (Table~\ref{tab:xmpl:macro}). Values which would
+otherwise be expanded can be protected by wrapping them in a set of braces. As
+\TeX{} itself will expand the first token in a table cell before \pkg{siunitx}
+can act on it, using the \eTeX{} protected mechanism is the recommended course
+of action to prevent expansion of macros in table cells. (As is shown in the
+table, \TeX's expansion of \LaTeXe{} robust commands can lead to unexpected
+results.)
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Values as macros in \texttt{S} columns.}
+    \label{tab:xmpl:macro}
+    \newcommand*\myvaluea{1234}
+    \newcommand\myvalueb{1234}
+    \DeclareRobustCommand*\myvaluec{1234}
+    \protected\def\myvalued{1234}
+    \begin{tabular}{@{}S@{}}
+    \toprule
+      {Some Values} \\
+    \midrule
+       \myvaluea  8.8 \myvaluea  \\ % Both expanded
+       \myvalueb  8.8 \myvalueb  \\ % First expanded by TeX
+                                    % to numbers
+       \myvaluec  8.8 \myvaluec  \\ % First expanded by TeX
+                                    % but not to numbers!
+       \myvalued  8.8 \myvalued  \\ % Neither expanded
+      {\myvaluea\ 8.8 \myvaluea} \\ % Neither expanded
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+It is possible to use calculated values in tables. For this to work, the
+calculation must take place before attempting to parse the number (the parser
+cannot \enquote{know} all of the possible values inside an expression). This is
+most conveniently handled using the \pkg{xfp} package, which is distributed as
+part of the required support for \pkg{siunitx}. The general approach is
+illustrated in Table~\ref{tab:xmpl:calc}
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Calculated values.}
+    \label{tab:xmpl:calc}
+    \newcommand{\valuea}{66.7012}
+    \newcommand{\valueb}{66.0212}
+    \newcommand{\valuec}{64.9026}
+    \begin{tabular}{
+      @{}
+      S[table-format = 2.4]
+      S[table-format = 3.4]
+      @{}
+    }
+      \toprule
+        {Value} & {Doubled} \\
+      \midrule
+        \valuea & \fpeval{\valuea * 2} \\
+        \valueb & \fpeval{\valueb * 2} \\
+        \valuec & \fpeval{\valuec * 2} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
 
 \section{Using (\acro{si}) units}
 
