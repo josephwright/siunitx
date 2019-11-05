@@ -133,6 +133,7 @@ for those people who are interested.
 \newlength{\mylength}
 
 % For table demos
+\usepackage{datatool}
 \usepackage{multirow}
 \usepackage[table]{xcolor}
 % Has to come after xcolor
@@ -2476,6 +2477,63 @@ illustrated in Table~\ref{tab:xmpl:calc}
         \valuea & \fpeval{\valuea * 2} \\
         \valueb & \fpeval{\valueb * 2} \\
         \valuec & \fpeval{\valuec * 2} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
+A more sophisticated approach is to generate the rows themselves from a 
+database: this is illustrated in Section~\ref{sec:hint:datatool}.
+
+\subsection{Using \pkg{siunitx} with \pkg{datatool}}
+\label{sec:hint:datatool}
+
+As illustrated in Table~\ref{tab:xmpl:calc}, \pkg{siunitx} can be used to
+typeset data stored using \pkg{datatool}. For quickly displaying the contents
+of tables, \pkg{datatool} offers the \cs{DTLshowtable} macro. This will only
+work with \texttt{S} columns if number parsing is turned off
+(Table~\ref{tab:xmpl:datatool}).
+\begin{LaTeXdemo}[code and float]
+  \DTLnewdb{moredata}
+  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{ 6.7012}
+  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{66.0212}
+  \DTLnewrow{moredata}\DTLnewdbentry{moredata}{value}{64.902 }
+  \begin{table}
+    \caption{Displaying a \textsf{datatool} table.}
+    \label{tab:xmpl:datatool}
+    \sisetup{parse-numbers= false, table-format = 2.4}
+    \renewcommand*\dtlrealalign{S}
+    \DTLdisplaydb{moredata}
+  \end{table}
+\end{LaTeXdemo}
+
+The \pkg{datatool} package may also be used to create on-the-fly tables using
+calculations. For example, the demonstration in Table~\ref{tab:xmpl:calc} may
+be achieved without needing to write out each row, as shown in
+Table~\ref{tab:xmpl:datatool-calc}. An extra column is used to contain the
+calculations in this case.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Calculated values using \pkg{datatool}.}
+    \label{tab:xmpl:datatool-calc}
+    \DTLnewdb{data}
+    \DTLnewrow{data}\DTLnewdbentry{data}{value}{66.7012}
+    \DTLnewrow{data}\DTLnewdbentry{data}{value}{66.0212}
+    \DTLnewrow{data}\DTLnewdbentry{data}{value}{64.9026}
+    \begin{tabular}{
+      @{}
+      S[table-format = 2.4]
+      S[table-format = 3.4]
+      @{}l
+      @{}
+    }
+      \toprule
+        {Value} & {Doubled} & 
+      \DTLforeach{data}{\myvalue=value}{%
+        \DTLiffirstrow {\\ \midrule}{\\}%
+        \myvalue &            % First column
+        \fpeval{\myvalue * 2} % second column
+        & }\\
       \bottomrule
     \end{tabular}
   \end{table}
