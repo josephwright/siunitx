@@ -38,6 +38,7 @@ tlmgr install   \
   caption       \
   colortbl      \
   csquotes      \
+  datatool      \
   dvips         \
   ec            \
   enumitem      \
