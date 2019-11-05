@@ -38,7 +38,13 @@ for those people who are interested.
 
 % Commands for this document
 \usepackage{xparse}
-\NewDocumentCommand\acro{m}{\textsc{#1}}
+\ExplSyntaxOn
+\NewDocumentCommand \acro { m }
+  {
+    \exp_args:Ne \textsc
+      { \tl_lower_case:n {#1} }
+  }
+\ExplSyntaxOff
 \NewDocumentCommand\email{m}{\href{mailto:#1}{\nolinkurl{#1}}}
 \NewDocumentCommand\ext{m}{\texttt{.#1}}
 \NewDocumentCommand\foreign{m}{\textit{#1}}
@@ -444,7 +450,7 @@ are non-SI but can be used within the SI
 units which are used in certain defined circumstances
 (Table~\ref{tab:unit:other}), although they are not necessarily officially
 sanctioned~\cite{SI:T8}. Finally, for specialist applications, a range of
-\acro{cgs} units are sanctioned (Table~\ref{tab:unit:CGS})~\cite{SI:T9}.
+\acro{CGS} units are sanctioned (Table~\ref{tab:unit:CGS})~\cite{SI:T9}.
 The command \cs{percent} is also provided for use in units: this is accepted
 with the SI as detailed in Section~5.3.7 of the Brochure~\cite{SI:5.3.7}.
 \begin{table}
@@ -515,7 +521,7 @@ with the SI as detailed in Section~5.3.7 of the Brochure~\cite{SI:5.3.7}.
   \end{tabular}
 \end{table}
 \begin{table}
-  \caption{Non-SI units associated with the \acro{cgs}.}
+  \caption{Non-SI units associated with the \acro{CGS}.}
   \label{tab:unit:CGS}
   \begin{tabular}{@{}lll@{}}
     \toprule
@@ -2539,12 +2545,12 @@ calculations in this case.
   \end{table}
 \end{LaTeXdemo}
 
-\section{Using (\acro{si}) units}
+\section{Using (\acro{SI}) units}
 
 Consistent and logical units are a necessity for scientific work, and have
 applicability everywhere. Historically, a number of systems have been used for
 physical units. SI units were introduced by the \foreign{Conférence Générale
-des Poids et Mesures} (\acro{cgpm}) in 1960. SI units are a coherent system
+des Poids et Mesures} (\acro{CGPM}) in 1960. SI units are a coherent system
 based on seven base units, from which all other units may be derived.
 
 At the same time, physical quantities with units are mathematical entities, and
@@ -2553,7 +2559,7 @@ as such way that they are typeset is important. In mathematics, changes of type
 This means that rules exist not only for the type of units to be used under the
 SI system, but also the way they should appear in print. Advice on best
 practice has been made available by the \emph{National Institute of Standards
-and Technology} (\acro{nist})~\cite{NIST}.
+and Technology} (\acro{NIST})~\cite{NIST}.
 
 As befits an agreed international standard, the full rules are detailed. It is
 not appropriate to reproduce these in totality here; instead, a useful summary
@@ -2567,7 +2573,7 @@ to make implementing the rules (relatively) easy.
 
 \subsection{Units}
 
-There are seven base \acro{si} units, listed in Section~\ref{tab:unit:base}.
+There are seven base \acro{SI} units, listed in Section~\ref{tab:unit:base}.
 Apart from the kilogram, these are defined in terms of a measurable physical
 quantity needing the definition alone.\footnote{Some base units need others
 defined first; there is therefore a required order of definition.} The base
@@ -2575,23 +2581,23 @@ units have been chosen such that all physical quantities can be expressed using
 an appropriative combination of these units, needing no others and with no
 redundancy.
 
-All other units within the \acro{si} system are regarded as \enquote{derived}
+All other units within the \acro{SI} system are regarded as \enquote{derived}
 from the seven base units. At the most basic, all other SI units can be
 expressed as combinations of the base units. However, many units (listed in
 SEction~\ref{tab:unit:derived,tab:unit:accepted}) have a special name and
 symbol. Most of these units are simple combinations of one or more base units
 (raised to powers as appropriate). A small number of units derived from
-experimental data are allowed as \acro{si} units
+experimental data are allowed as \acro{SI} units
 (Section~\ref{tab:unit:physical}).
 
-A series of \acro{si} prefixes for decimal multiples and sub-multiples are
+A series of \acro{SI} prefixes for decimal multiples and sub-multiples are
 provided, and can be used as modifiers for any SI unit (either base or derived
 units) with the exception of the kilogram. The prefixes are listed in
 Section~\ref{tab:unit:prefix}. No space should be used between a prefix and the
 unit, and only a single prefix should be used. Even the degree Celsius can be
 given a prefix, for example \qty{1}{\milli\degreeCelsius}.
 
-It is important to note that the kilogram is the only \acro{si} unit with a
+It is important to note that the kilogram is the only \acro{SI} unit with a
 prefix as part of its name and symbol. Only single prefix may be used, and so
 in the case of the kilogram prefix names are used with the unit name
 \enquote{gram} and the prefix symbols are used with the unit symbol
@@ -2605,7 +2611,7 @@ common is many areas, and are not without merit. The units provided by
 of the SI set or are accepted for use with SI units are defined. However,
 several other sets of units can be loaded as optional modules. The binary
 prefixes and units (Section~\ref{tab:unit:binary}) are the most obvious
-example. These are \emph{not} part of the \acro{si} specifications, but the
+example. These are \emph{not} part of the \acro{SI} specifications, but the
 prefix names are derived from those in Section~\ref{tab:unit:prefix}.
 
 Other units are normally to be avoided where possible. SI units should, in the
@@ -2618,7 +2624,7 @@ There are also many areas where non-standard units are used so commonly that to
 do otherwise is difficult or impossible. For example, most synthetic chemists
 measure the pressure inside vacuum apparatus in \unit{\millimetremercury},
 partly because the most common gauge for the task still uses a column of
-mercury metal. For these reasons, \pkg{siunitx} does define non-\acro{si}
+mercury metal. For these reasons, \pkg{siunitx} does define non-\acro{SI}
 units.
 
 \subsection{Mathematical meaning}
@@ -2627,7 +2633,7 @@ As explained earlier, a quantity combination is a single mathematical entity.
 This has implications for how both the number and the unit should be printed.
 Firstly, the two parts should not be separated: a quantity is a product of the
 number and the unit. With the exception of the symbols for plane angles
-(\unit{\degree}, \unit{\arcminute} and \unit{\arcsecond}), the \acro{bipm}
+(\unit{\degree}, \unit{\arcminute} and \unit{\arcsecond}), the \acro{BIPM}
 specifies either a space or half-height (centred) dot should be
 used~\cite{BIPM}.
 \begin{LaTeXdemo}
@@ -2667,7 +2673,7 @@ spaces. The classic example is \unit{\kWh}, where
 information. If using such a unit repeatedly, users of \pkg{siunitx} are
 advised to create a custom unit to ensure consistency. It is important to note
 that while this is common practice, it is \emph{not} allowed by the
-\acro{bipm}~\cite{BIPM}.
+\acro{BIPM}~\cite{BIPM}.
 
 Symbols for units formed from other units by division are indicated by means of
 a virgule (oblique stroke, slash, "/"), a horizontal line, or negative
@@ -2798,14 +2804,14 @@ it is available from the package management system in current \TeX{} Live
 and MiK\TeX{} systems.
 
 For manual installation, the package is available from
-\href{http://ctan.org/pkg/siunitx}{\acro{ctan}}. As well as the raw source
-files, \acro{ctan} hold the package as a pre-extracted zip file,
+\href{http://ctan.org/pkg/siunitx}{\acro{CTAN}}. As well as the raw source
+files, \acro{CTAN} hold the package as a pre-extracted zip file,
 \file{siunitx.tds.zip}. The later is most convenient for most users: simply
 unzip this in your local \path{texmf} directory.
 
 The package requires \LaTeX3 support as provided in the \pkg{l3kernel} and
 \pkg{l3packages} bundles. Both of these are included in \TeX{} Live and
-MiK\TeX{}, or are again available in ready-to-install form from \acro{ctan}.
+MiK\TeX{}, or are again available in ready-to-install form from \acro{CTAN}.
 
 \section{Thanks}
 
@@ -2854,7 +2860,7 @@ forgotten.
     \emph{The International System of Units (SI)},
     \url{https://www.bipm.org/en/measurement-units/}.
   \bibitem{NIST}
-    \emph{International System of Units from \acro{nist}},
+    \emph{International System of Units from \acro{NIST}},
     \url{http://physics.nist.gov/cuu/Units/index.html}.
   \bibitem{SI:2.1}
     \emph{SI base units},
