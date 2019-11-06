@@ -20,6 +20,9 @@ if ! command -v texlua > /dev/null; then
   cd ..
 fi
 
+# Update tlmgr itself
+tlmgr update --self
+
 # l3build itself and LuaTeX: need for texlua
 tlmgr install l3build luatex
 
