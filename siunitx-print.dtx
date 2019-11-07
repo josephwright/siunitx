@@ -99,6 +99,20 @@
 %   fonts.
 % \end{function}
 %
+% \begin{function}
+%   {\siunitx_print_match:n, \siunitx_print_math:n, \siunitx_print_text:n}
+%   \begin{syntax}
+%     \cs{siunitx_print_match:n} \Arg{material}
+%     \cs{siunitx_print_math:n} \Arg{material}
+%     \cs{siunitx_print_text:n} \Arg{material}
+%   \end{syntax}
+%   Prints the \meta{material} as described for \cs{siunitx_print:nn} but
+%   with a fixed text or math mode output. The printing does \emph{not} set
+%   color (which is managed on a |unit|/|number| basis), but otherwise sets
+%   the font as described above. The |match| function uses either the prevailing
+%   math or text mode.
+% \end{function}
+%
 % \subsection{Key--value options}
 %
 % The options defined by this submodule are available within the \pkg{l3keys}
@@ -444,7 +458,7 @@
         {
           \use:c
             {
-              @@_
+              siunitx_print_
               \tl_use:c { l_@@_ #1 _mode_tl } :n
             }
               {#2}
@@ -454,15 +468,15 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@@_match:n}
+% \begin{macro}{\siunitx_print_match:n}
 %   When the \emph{output} mode should match the input, a simple selection of
 %   route can be made.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_match:n #1
+\cs_new_protected:Npn \siunitx_print_match:n #1
   {
     \mode_if_math:TF
-      { \@@_math:n {#1} }
-      { \@@_text:n {#1} }
+      { \siunitx_print_math:n {#1} }
+      { \siunitx_print_text:n {#1} }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -513,7 +527,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_math:n}
+% \begin{macro}{\siunitx_print_math:n}
 % \begin{macro}[EXP]{\@@_extract_series:Nw}
 % \begin{macro}[EXP]{\@@_convert_series:n}
 % \begin{macro}{\@@_math_version:nn, \@@_math_version:Vn}
@@ -533,7 +547,7 @@
 %   propagate to math mode: if so, check on the mapping, otherwise check on
 %   the current math version.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_math:n #1
+\cs_new_protected:Npn \siunitx_print_math:n #1
   {
     \bool_if:NTF \l_@@_math_weight_bool
       {
@@ -710,7 +724,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_text:n}
+% \begin{macro}{\siunitx_print_text:n}
 % \begin{macro}{\@@_text_replace:n}
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
@@ -724,7 +738,7 @@
 %   Typesetting in text mode is easy in font control terms but more tricky
 %   in the manipulation of the input. The easy part comes first.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_text:n #1
+\cs_new_protected:Npn \siunitx_print_text:n #1
   {
     \text
       {
