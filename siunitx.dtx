@@ -325,6 +325,74 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Document commands in bookmarks}
+%
+% In bookmarks, the \pkg{siunitx} document commands need to produce simple
+% strings that represent their input as far a possible.
+%
+% \begin{macro}
+%   {
+%     \qtyInBookmark        ,
+%     \angInBookmark        ,
+%     \numInBookmark        ,
+%     \unitInBookmark       ,
+%     \numlistInBookmark    ,
+%     \qtylistInBookmark    ,
+%     \numproductInBookmark ,
+%     \qtyproductInBookmark ,
+%     \numrangeInBookmark   ,
+%     \qtyrangeInBookmark
+%   }
+%   To keep things fast, expandable versions of the document commands
+%   are created only once. These are then used if necessary to remove
+%   and re-order arguments in an expandable fashion.
+%    \begin{macrocode}
+\DeclareExpandableDocumentCommand \qtyInBookmark { o m m }
+  { }
+\DeclareExpandableDocumentCommand \angInBookmark { o m }
+  { }
+\DeclareExpandableDocumentCommand \numInBookmark { o m }
+  { }
+\DeclareExpandableDocumentCommand \unitInBookmark { o m }
+  { }
+\DeclareExpandableDocumentCommand \numlistInBookmark { o m }
+  { }
+\DeclareExpandableDocumentCommand \qtylistInBookmark { o m m }
+  { }
+\DeclareExpandableDocumentCommand \numproductInBookmark { o m }
+  { }
+\DeclareExpandableDocumentCommand \qtyproductInBookmark { o m m }
+  { }
+\DeclareExpandableDocumentCommand \numrangeInBookmark { o m m }
+  { }
+\DeclareExpandableDocumentCommand \qtyrangeInBookmark { o m m m }
+  { }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \@ifpackageloaded { hyperref }
+      {
+        \pdfstringdefDisableCommands
+          {
+            \cs_set_eq:NN \qty        \qtyInBookmark
+            \cs_set_eq:NN \ang        \angInBookmark
+            \cs_set_eq:NN \num        \numInBookmark
+            \cs_set_eq:NN \unit       \unitInBookmark
+            \cs_set_eq:NN \numlist    \numlistInBookmark
+            \cs_set_eq:NN \qtylist    \qtylistInBookmark
+            \cs_set_eq:NN \numproduct \numproductInBookmark
+            \cs_set_eq:NN \qtyproduct \qtyproductInBookmark
+            \cs_set_eq:NN \numrange   \numrangeInBookmark
+            \cs_set_eq:NN \qtyrange   \qtyrangeInBookmark
+          }
+      }
+      { }
+  }
+%    \end{macrocode}
+%
 % \subsection{\enquote{Glue} commands}
 %
 % \begin{macro}{\@@_angle:nnn}
