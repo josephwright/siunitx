@@ -794,7 +794,7 @@
 \cs_new_protected:Npn \@@_set_symbolic:Nnnn #1#2#3#4
   {
     \seq_put_right:Nn \l_siunitx_unit_symbolic_seq {#1}
-    \cs_set:cpn { units ~ > ~ \token_to_str:N #1 } #2
+    \cs_set:cpn { @@_ \token_to_str:N #1 :w } #2
       {
         \bool_if:NF \l_@@_test_bool
           {
@@ -1065,7 +1065,7 @@
   {
     \group_begin:
       \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
-        { \cs_set_eq:Nc ##1 { units ~ > ~ \token_to_str:N ##1 } }
+        { \cs_set_eq:Nc ##1 { @@_ \token_to_str:N ##1 :w } }
       \tl_clear:N \l_@@_formatted_tl
       \fp_zero:N \l_@@_prefix_fp
       \bool_if:NTF \l_@@_parse_bool
