@@ -172,19 +172,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@@_text_only:n}
-%   A short auxiliary to set up text-only symbols.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_text_only:n #1
-  {
-    \mode_if_math:TF
-      { \mbox }
-      { \use:n }
-        {#1}
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % At the start of the document, fonts are fixed and the user may have
 % altered unit set up. If things are unchanged, we can alter the settings
 % such that they use something \enquote{more sensible}.
@@ -203,7 +190,7 @@
           {
             \siunitx_declare_unit:Nx \angstrom
               {
-                \@@_text_only:n
+                \siunitx_print_text:n
                   { \@@_non_latin:n { "00C5 } }
               }
          }
@@ -216,7 +203,7 @@
               { \sys_if_engine_luatex_p: }
               { \sys_if_engine_xetex_p: }
               {
-                \@@_text_only:n
+                \siunitx_print_text:n
                   { \@@_non_latin:n { "03A9 } }
               }
               {
@@ -233,7 +220,7 @@
       {
         \exp_args:NNnx \siunitx_declare_prefix:Nnn \micro { -6 }
           {
-            \@@_text_only:n
+            \siunitx_print_text:n
               {
                 \bool_lazy_or:nnTF
                   { \sys_if_engine_luatex_p: }
