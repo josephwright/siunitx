@@ -2545,6 +2545,28 @@ calculations in this case.
   \end{table}
 \end{LaTeXdemo}
 
+\subsection{Using units in section headings and bookmarks}
+\label{sec:hint:bookmarks}
+
+The \pkg{siunitx} code is designed to work correctly with functions in
+headings. They will print correctly in headings and in the table of contents.
+As illustrated here, the standard behaviour is to ignore font changes. When the
+\pkg{hyperref} package is loaded, the functions automatically \enquote{degrade
+gracefully} to produce useful information in \acro{pdf} bookmarks. If you want
+more control over the bookmark text, use the \cs{texorpdfstring} function from
+\pkg{hyperref}, for example:
+\begin{LaTeXdemo}[code only]
+  \section{Some text
+    \texorpdfstring
+      {\unit{\joule\per\mole\per\kelvin}}
+      {J mol-1 K-1}%
+    }
+\end{LaTeXdemo}
+
+You may find it useful to load \pkg{hyperref} with the \opt{unicode} option,
+as this will allow \unit{\Ohm} to appear in bookmarks. Without the option,
+the encoding used by \pkg{hyperref} does not support this symbol.
+
 \section{Using (\acro{SI}) units}
 
 Consistent and logical units are a necessity for scientific work, and have
