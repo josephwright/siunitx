@@ -330,6 +330,7 @@
 % In bookmarks, the \pkg{siunitx} document commands need to produce simple
 % strings that represent their input as far a possible.
 %
+% \begin{macro}{\@@_bookmark_cmd:Nn}
 % \begin{macro}
 %   {
 %     \qtyInBookmark        ,
@@ -343,31 +344,29 @@
 %     \numrangeInBookmark   ,
 %     \qtyrangeInBookmark
 %   }
-%   To keep things fast, expandable versions of the document commands
-%   are created only once. These are then used if necessary to remove
-%   and re-order arguments in an expandable fashion.
+%   To keep things fast, expandable versions of the document command are
+%   created only once. We do that by starting from the standard commands
+%   to avoid issues with signatures.
 %    \begin{macrocode}
-\DeclareExpandableDocumentCommand \qtyInBookmark { o m m }
-  { #2 ~ #3 }
-\DeclareExpandableDocumentCommand \angInBookmark { o m }
-  { }
-\DeclareExpandableDocumentCommand \numInBookmark { o m }
-  { #2 }
-\DeclareExpandableDocumentCommand \unitInBookmark { o m }
-  { #2 }
-\DeclareExpandableDocumentCommand \numlistInBookmark { o m }
-  { }
-\DeclareExpandableDocumentCommand \qtylistInBookmark { o m m }
-  { }
-\DeclareExpandableDocumentCommand \numproductInBookmark { o m }
-  { }
-\DeclareExpandableDocumentCommand \qtyproductInBookmark { o m m }
-  { }
-\DeclareExpandableDocumentCommand \numrangeInBookmark { o m m }
-  { }
-\DeclareExpandableDocumentCommand \qtyrangeInBookmark { o m m m }
-  { }
+\cs_new_protected:Npn \@@_bookmark_cmd:Nn #1#2
+  {
+    \GetDocumentCommandArgSpec #1
+    \exp_args:NcV \DeclareExpandableDocumentCommand
+      { \cs_to_str:N #1 InBookmark }
+      \ArgumentSpecification {#2}
+  }
+\@@_bookmark_cmd:Nn \qty { #2 ~ #3 }
+\@@_bookmark_cmd:Nn \ang { }
+\@@_bookmark_cmd:Nn \num { #2 }
+\@@_bookmark_cmd:Nn \unit { #2 }
+\@@_bookmark_cmd:Nn \numlist { }
+\@@_bookmark_cmd:Nn \qtylist { }
+\@@_bookmark_cmd:Nn \numproduct { }
+\@@_bookmark_cmd:Nn \qtyproduct { }
+\@@_bookmark_cmd:Nn \numrange { }
+\@@_bookmark_cmd:Nn \qtyrange { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{variable}{\c_@@_bookmark_seq}
