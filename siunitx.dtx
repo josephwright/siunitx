@@ -370,6 +370,14 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{variable}{\c_@@_bookmark_seq}
+%   Commands usable in bookmarks
+%    \begin{macrocode}
+\seq_const_from_clist:Nn \c_@@_bookmark_seq
+  { \qty , \num , \unit }
+%    \end{macrocode}
+% \end{variable}
+%
 %    \begin{macrocode}
 \AtBeginDocument
   {
@@ -377,17 +385,8 @@
       {
         \pdfstringdefDisableCommands
           {
-            \cs_set_eq:NN \qty        \qtyInBookmark
-            \cs_set_eq:NN \ang        \angInBookmark
-            \cs_set_eq:NN \num        \numInBookmark
-            \cs_set_eq:NN \unit       \unitInBookmark
-            \cs_set_eq:NN \numlist    \numlistInBookmark
-            \cs_set_eq:NN \qtylist    \qtylistInBookmark
-            \cs_set_eq:NN \numproduct \numproductInBookmark
-            \cs_set_eq:NN \qtyproduct \qtyproductInBookmark
-            \cs_set_eq:NN \numrange   \numrangeInBookmark
-            \cs_set_eq:NN \qtyrange   \qtyrangeInBookmark
-            \siunitx_unit_pdfstring_mode:
+            \seq_map_inline:Nn \c_@@_bookmark_seq
+              { \cs_set_eq:Nc #1 { \cs_to_str:N #1 InBookmark } }
           }
       }
       { }
