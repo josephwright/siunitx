@@ -23,68 +23,47 @@ fi
 # Update tlmgr itself
 tlmgr update --self
 
-# l3build itself and LuaTeX: need for texlua
-tlmgr install l3build luatex
+# l3build itself
+tlmgr install l3build
 
 # Required to build plain and LaTeX formats:
 # TeX90 plain for unpacking
-tlmgr install latex-bin lm luaotfload tex xetex
+tlmgr install latex-bin tex xetex
+
+# Dependencies of siunitx (have to be present in all cases)
+tlmgr install amsmath graphics l3packages tools
 
 # Dependencies
 tlmgr install   \
   amsfonts      \
-  amsmath       \
   bidi          \
   booktabs      \
   cancel        \
   caption       \
   colortbl      \
-  csquotes      \
   datatool      \
   dvips         \
   ec            \
   enumitem      \
-  etoolbox      \
   fancyvrb      \
-  filehook      \
-  fontaxes      \
-  fp            \
-  fpl           \
-  graphics      \
-  graphics-def  \
   hyperref      \
-  iftex         \
-  l3packages    \
   libertine     \
   listings      \
-  lm-math       \
   lualatex-math \
   makeindex     \
   mathpazo      \
   mptopdf       \
-  mweights      \
   multirow      \
-  oberdiek      \
-  palatino      \
-  pgf           \
   pgfplots      \
   psnfss        \
   opensans      \
   sansmath      \
-  soul          \
   soulpos       \
-  substr        \
-  symbol        \
-  tools         \
   underscore    \
   unicode-math  \
-  url           \
   was           \
   xcolor        \
-  xfor          \
-  xkeyval       \
-  xtab          \
-  zapfding
+  xtab
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
