@@ -235,6 +235,21 @@
 %   over-ride \emph{via} |\keys_set:nn { siunitx } { ... }|.
 % \end{function}
 %
+% \section{Units in (PDF) strings}
+%
+% \begin{function}{\siunitx_unit_pdfstring_mode:}
+%   \begin{syntax}
+%     \cs{group_begin:}
+%       \cs{siunitx_unit_pdfstring_mode:}
+%       \meta{Expansion context} \meta{units}
+%     \cs{group_end:}
+%   \end{syntax}
+%   Sets symbol unit macros to generate text directly. This is needed in
+%   expansion contexts where units must be converted to simple text. This
+%   function is itself not expandable, so must be using within a
+%   surrounding group as show in the example.
+% \end{function}
+%
 % \section{Pre-defined symbolic unit components}
 %
 % The unit parser is defined to recognise a number of pre-defined units,
@@ -1283,6 +1298,21 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \subsection{(PDF) String creation}
+%
+% \begin{macro}{\siunitx_unit_pdfstring_mode:}
+%   A simple function that sets up to make units equal to their text
+%   representation.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_pdfstring_mode:
+  {
+    \bool_set_false:N \l_@@_parsing_bool
+    \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
+      { \cs_set_eq:Nc ##1 { @@_ \token_to_str:N ##1 :w } }
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Parsing symbolic units}
