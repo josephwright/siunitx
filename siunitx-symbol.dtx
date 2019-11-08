@@ -286,6 +286,29 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Bookmark definitions}
+%
+% Inside PDF strings, the definitions for symbols need to be reset:
+% we keep things to a minimum and just reset the functions we know are
+% used above.
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \@ifpackageloaded { hyperref }
+      {
+        \pdfstringdefDisableCommands
+          {
+            \cs_set_eq:NN \siunitx_print_text:n \use:n
+            \cs_set:Npx \@@_textmu:
+              { \@@_non_latin:n { "00B5 } }
+            \cs_set:Npx \@@_mathOmega:
+              { \@@_non_latin:n { "03A9 } }
+          }
+      }
+      { }
+  }
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
