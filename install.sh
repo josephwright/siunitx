@@ -30,6 +30,9 @@ tlmgr install l3build
 # TeX90 plain for unpacking
 tlmgr install latex-bin tex xetex
 
+# Metafont
+tlmgr install metafont mfware
+
 # Dependencies of siunitx (have to be present in all cases)
 tlmgr install amsmath graphics l3packages tools
 
