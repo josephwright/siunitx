@@ -41,6 +41,7 @@ tlmgr install   \
   cancel        \
   caption       \
   colortbl      \
+  csquotes      \
   datatool      \
   dvips         \
   ec            \
