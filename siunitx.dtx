@@ -345,26 +345,24 @@
 %     \qtyrangeInBookmark
 %   }
 %   To keep things fast, expandable versions of the document command are
-%   created only once. We do that by starting from the standard commands
-%   to avoid issues with signatures.
+%   created only once.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_bookmark_cmd:Nn #1#2
+\cs_new_protected:Npn \@@_bookmark_cmd:Nnn #1#2#3
   {
-    \GetDocumentCommandArgSpec #1
-    \exp_args:NcV \DeclareExpandableDocumentCommand
+    \exp_args:Nc \DeclareExpandableDocumentCommand
       { \cs_to_str:N #1 ~ ( pdfstring ~ context ) }
-      \ArgumentSpecification {#2}
+      {#2} {#3}
   }
-\@@_bookmark_cmd:Nn \qty { #2 ~ #3 }
-\@@_bookmark_cmd:Nn \ang { }
-\@@_bookmark_cmd:Nn \num { #2 }
-\@@_bookmark_cmd:Nn \unit { #2 }
-\@@_bookmark_cmd:Nn \numlist { }
-\@@_bookmark_cmd:Nn \qtylist { }
-\@@_bookmark_cmd:Nn \numproduct { }
-\@@_bookmark_cmd:Nn \qtyproduct { }
-\@@_bookmark_cmd:Nn \numrange { }
-\@@_bookmark_cmd:Nn \qtyrange { }
+\@@_bookmark_cmd:Nnn \qty { o m m } { #2 ~ #3 }
+\@@_bookmark_cmd:Nnn \ang { m } { }
+\@@_bookmark_cmd:Nnn \num { o m } { #2 }
+\@@_bookmark_cmd:Nnn \unit { o m } { #2 }
+\@@_bookmark_cmd:Nnn \numlist { o m } { }
+\@@_bookmark_cmd:Nnn \qtylist { o m m } { }
+\@@_bookmark_cmd:Nnn \numproduct { o m } { }
+\@@_bookmark_cmd:Nnn \qtyproduct { o m m } { }
+\@@_bookmark_cmd:Nnn \numrange { o m m } { }
+\@@_bookmark_cmd:Nnn \qtyrange { o m m m } { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
