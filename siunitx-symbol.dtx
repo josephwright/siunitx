@@ -286,22 +286,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \subsection{\enquote{No change} redefinitions}
-%
-% \begin{macro}{\@@_degree:, \@@_degreeCelsius:}
-%   These are no-ops but provide a level of redirection: useful for
-%   handling bookmarks.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_degree:
-  { { } ^ { \circ } }
-\cs_new_protected:Npn \@@_degreeCelsius:
-  { \ensuremath { { } ^ { \circ } } \kern -\scriptspace C }
-\siunitx_declare_unit:Nnn \degree { \@@_degree: }
-  { quantity-product = { } }
-\siunitx_declare_unit:Nn \degreeCelsius { \@@_degreeCelsius: }
-%    \end{macrocode}
-% \end{macro}
-%
 % \subsection{Bookmark definitions}
 %
 % Inside PDF strings, the definitions for symbols need to be reset:
@@ -319,9 +303,9 @@
               { \@@_non_latin:n { "00B5 } }
             \cs_set:Npx \@@_mathOmega:
               { \@@_non_latin:n { "03A9 } }
-           \cs_set:Npx \@@_degree:
-             { \@@_non_latin:n { "00B0 } }
-           \cs_set:Npx \@@_degreeCelsius:
+            \siunitx_declare_unit:Nx \degree
+              { \@@_non_latin:n { "00B0 } }
+            \siunitx_declare_unit:Nx \degreeCelsius
              { \@@_non_latin:n { "00B0 } C }
           }
       }
