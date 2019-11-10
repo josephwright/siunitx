@@ -373,7 +373,7 @@
       {#2} {#3}
   }
 \@@_bookmark_cmd:Nnn \qty { o m m } { #2 ~ #3 }
-\@@_bookmark_cmd:Nnn \ang { m } { }
+\@@_bookmark_cmd:Nnn \ang { m } { \@@_angle:n {#1} }
 \@@_bookmark_cmd:Nnn \num { o m } { #2 }
 \@@_bookmark_cmd:Nnn \unit { o m } { #2 }
 \@@_bookmark_cmd:Nnn \numlist { o m } { }
@@ -390,7 +390,7 @@
 %   Commands usable in bookmarks
 %    \begin{macrocode}
 \seq_const_from_clist:Nn \c_@@_bookmark_seq
-  { \qty , \num , \unit }
+  { \ang , \qty , \num , \unit }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -410,6 +410,30 @@
       { }
   }
 %    \end{macrocode}
+%
+% \begin{macro}[EXP]{\@@_angle:n}
+% \begin{macro}[EXP]{\@@_angle:w}
+%   Expandable splitting of the angle: simply enough, also outputs the
+%    \begin{macrocode}
+\cs_new:Npn \@@_angle:n #1
+  { \@@_angle:w #1 ; ; ; \q_stop }
+\cs_new:Npn \@@_angle:w #1 ; #2 ; #3 ; #4 \q_stop
+  {
+    #1 \degree
+    \tl_if_blank:nF {#2}
+      { 
+        \tl_if_blank:nF {#1} { ~ } 
+        #2 \arcminute
+      }
+    \tl_if_blank:nF {#3}
+      { 
+        \tl_if_blank:nF {#1#2} { ~ } 
+        #3 \arcsecond
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Table column}
 %
