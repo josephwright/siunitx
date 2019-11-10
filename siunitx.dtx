@@ -325,6 +325,25 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{\enquote{Glue} commands}
+%
+% \begin{macro}{\@@_angle:nnn}
+%   The document level interface for \cs{ang} needs some \enquote{glue} to
+%   work with the code-level API.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_angle:nnn #1#2#3
+  {
+    \tl_if_novalue:nTF {#2}
+      { \siunitx_angle:n {#1} }
+      {
+        \tl_if_novalue:nTF {#3}
+          { \siunitx_angle:nnn {#1} {#2} { } }
+          { \siunitx_angle:nnn {#1} {#2} {#3} }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsection{Document commands in bookmarks}
 %
 % In bookmarks, the \pkg{siunitx} document commands need to produce simple
@@ -391,25 +410,6 @@
       { }
   }
 %    \end{macrocode}
-%
-% \subsection{\enquote{Glue} commands}
-%
-% \begin{macro}{\@@_angle:nnn}
-%   The document level interface for \cs{ang} needs some \enquote{glue} to
-%   work with the code-level API.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_angle:nnn #1#2#3
-  {
-    \tl_if_novalue:nTF {#2}
-      { \siunitx_angle:n {#1} }
-      {
-        \tl_if_novalue:nTF {#3}
-          { \siunitx_angle:nnn {#1} {#2} { } }
-          { \siunitx_angle:nnn {#1} {#2} {#3} }
-      }
-  }
-%    \end{macrocode}
-% \end{macro}
 %
 % \subsection{Table column}
 %
