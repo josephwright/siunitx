@@ -2567,6 +2567,44 @@ You may find it useful to load \pkg{hyperref} with the \opt{unicode} option,
 as this will allow \unit{\ohm} to appear in bookmarks. Without the option,
 the encoding used by \pkg{hyperref} does not support this symbol.
 
+\subsection{A left-aligned column visually centred under a heading}
+\label{sec:hint:left-column}
+
+When you have a column of non-related numbers, the usual advice is to make
+these left-aligned and then centre the resulting column under the heading. With
+the \pkg{dcolumn} package, that would be done with something like
+|D{x}{}{5.0}|. This is something of an abuse of the nature of a number, but can
+also be done using \pkg{siunitx} (Table~\ref{tbl:xmpl:unrel}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Formatting unrelated numbers}
+    \label{tbl:xmpl:unrel}
+    \centering
+    \begin{tabular}
+      {
+        @{}
+        S[
+          table-format = 5.0,
+          parse-numbers = false,
+          input-digits = .0123456789,
+          input-decimal-markers = x
+        ]
+        @{}
+      }
+      \toprule
+      \multicolumn{1}{@{}c@{}}{Header} \\
+      \midrule
+      120   \\
+      12.3  \\
+      12340 \\
+      12.02 \\
+      123   \\
+      1     \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
 \section{Using (\acro{SI}) units}
 
 Consistent and logical units are a necessity for scientific work, and have
@@ -2606,7 +2644,7 @@ redundancy.
 All other units within the \acro{SI} system are regarded as \enquote{derived}
 from the seven base units. At the most basic, all other SI units can be
 expressed as combinations of the base units. However, many units (listed in
-SEction~\ref{tab:unit:derived,tab:unit:accepted}) have a special name and
+Section~\ref{tab:unit:derived,tab:unit:accepted}) have a special name and
 symbol. Most of these units are simple combinations of one or more base units
 (raised to powers as appropriate). A small number of units derived from
 experimental data are allowed as \acro{SI} units
