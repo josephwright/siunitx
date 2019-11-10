@@ -369,7 +369,7 @@
 \cs_new_protected:Npn \@@_bookmark_cmd:Nnn #1#2#3
   {
     \exp_args:Nc \DeclareExpandableDocumentCommand
-      { \cs_to_str:N #1 ( pdfstring ~ context ) }
+      { \cs_to_str:N #1 \c_space_tl ( pdfstring ~ context ) }
       {#2} {#3}
   }
 \@@_bookmark_cmd:Nnn \qty { o m m } { #2 ~ #3 }
@@ -404,7 +404,10 @@
         \pdfstringdefDisableCommands
           {
             \seq_map_inline:Nn \c_@@_bookmark_seq
-              { \cs_set_eq:Nc #1 { \cs_to_str:N #1 ( pdfstring ~ context ) } }
+              {
+                \cs_set_eq:Nc #1
+                  { \cs_to_str:N #1 \c_space_tl ( pdfstring ~ context ) }
+              }
           }
       }
       { }
