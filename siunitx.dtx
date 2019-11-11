@@ -364,7 +364,9 @@
 %     \qtyrangeInBookmark
 %   }
 %   To keep things fast, expandable versions of the document command are
-%   created only once.
+%   created only once. As here we are at the top-level for internal names,
+%   we can use the various parts of \pkg{siunitx-compound} that would otherwise
+%   be inaccessible.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_bookmark_cmd:Nnn #1#2#3
   {
@@ -376,8 +378,20 @@
 \@@_bookmark_cmd:Nnn \ang { m } { \@@_angle:n {#1} }
 \@@_bookmark_cmd:Nnn \num { o m } { #2 }
 \@@_bookmark_cmd:Nnn \unit { o m } { #2 }
-\@@_bookmark_cmd:Nnn \numlist { o m } { }
-\@@_bookmark_cmd:Nnn \qtylist { o m m } { }
+\@@_bookmark_cmd:Nnn \numlist { o m }
+  {
+    \@@_list_use:nnVVV {#2} { }
+      \l_siunitx_list_separator_pair_tl
+      \l_siunitx_list_separator_tl
+      \l_siunitx_list_separator_final_tl
+  }
+\@@_bookmark_cmd:Nnn \qtylist { o m m }
+  {
+    \@@_list_use:nnVVV {#2} {#3}
+      \l_siunitx_list_separator_pair_tl
+      \l_siunitx_list_separator_tl
+      \l_siunitx_list_separator_final_tl
+  }
 \@@_bookmark_cmd:Nnn \numproduct { o m } { }
 \@@_bookmark_cmd:Nnn \qtyproduct { o m m } { }
 \@@_bookmark_cmd:Nnn \numrange { o m m } { }
@@ -390,7 +404,10 @@
 %   Commands usable in bookmarks
 %    \begin{macrocode}
 \seq_const_from_clist:Nn \c_@@_bookmark_seq
-  { \ang , \qty , \num , \unit }
+  {
+    \ang , \qty , \num , \unit ,
+    \numlist , \qtylist
+  }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -436,6 +453,69 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[EXP]
+%   {\@@_list_use:nnnnn, \@@_list_use:nnVVV, \@@_list_use_aux:nnnnn}
+% \begin{macro}[EXP]{\@@_list_use_auxi:w}
+% \begin{macro}[EXP]{\@@_list_use_auxii:nnw}
+% \begin{macro}[EXP]{\@@_list_use_auxiii:nnw}
+% \begin{macro}[EXP]{\@@_list_count:n}
+% \begin{macro}[EXP]{\@@_list_count:w}
+%   Copies of the ideas in the \pkg{l3clist} module but using |;| as a list
+%   separator. The functions have to be extended to allow for a unit argument.
+%    \begin{macrocode}
+\cs_new:Npn \@@_list_use:nnnnn #1#2#3#4#5
+  {
+    \tl_if_blank:nTF {#2}
+      { \@@_list_use_aux:nnnnn {#1} { } }
+      { \@@_list_use_aux:nnnnn {#1} { ~ #2 } }
+        {#3} {#4} {#5}
+  }
+\cs_generate_variant:Nn \@@_list_use:nnnnn { nnVVV }
+\cs_new:Npn \@@_list_use_aux:nnnnn #1#2#3#4#5
+  {
+    \int_case:nnF { \@@_list_count:n {#1} }
+      {
+        { 0 } { }
+        { 1 } { \@@_list_use_auxi:nw {#2} #1 ; ; { } }
+        { 2 } { \@@_list_use_auxi:nw {#2} #1 ; {#3} }
+      }
+      {
+        \@@_list_use_auxii:nnw {#2} { } #1 ;
+          \q_mark ; { \@@_list_use_auxii:nnw {#2} {#4} }
+          \q_mark ; { \@@_list_use_auxiii:nnw {#2} {#5} }
+          \q_stop { }
+      }
+  }
+\cs_new:Npn \@@_list_use_auxi:nw #1#2 ; #3 ; #4
+  { #2 #1 #4 #3 \tl_if_blank:nF {#3} {#1} }
+\cs_new:Npn \@@_list_use_auxii:nnw
+  #1#2#3 ; #4 ; #5 ; #6 \q_mark ; #7#8 \q_stop #9
+  { #7 {#4} ; {#5} ; #6 \q_mark ; {#7} #8 \q_stop { #9 #2 #3 #1 } }
+\cs_new:Npn \@@_list_use_auxiii:nnw #1#2#3 ; #4 \q_stop #5
+  { #5 #2 #3 #1 }
+\cs_new:Npx \@@_list_count:n #1
+  {
+    \exp_not:N \int_eval:n
+      {
+        0
+        \exp_not:N \@@_list_count:w \c_space_tl
+        #1 \exp_not:n { ; \q_recursion_tail ; \q_recursion_stop }
+      }
+  }
+\cs_new:Npx \@@_list_count:w #1 ;
+  {
+    \exp_not:n { \exp_args:Nf \quark_if_recursion_tail_stop:n } {#1}
+    \exp_not:N \tl_if_blank:nF {#1} { + 1 }
+    \exp_not:N \@@_list_count:w \c_space_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
