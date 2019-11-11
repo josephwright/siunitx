@@ -9,9 +9,6 @@ module = "siunitx"
 -- Release a TDS-style zip
 packtdszip = true
 
--- Two configs
-checkconfigs = {"build","config-pdfstring"}
-
 -- Typeset only the .tex files
 typesetfiles = {"*.tex"}
 
