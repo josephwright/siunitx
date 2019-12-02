@@ -49,6 +49,7 @@ tlmgr install   \
   dvips         \
   ec            \
   enumitem      \
+  epstopdf-pkg  \
   fancyvrb      \
   hyperref      \
   kvoptions     \
