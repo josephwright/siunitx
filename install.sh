@@ -51,6 +51,7 @@ tlmgr install   \
   enumitem      \
   fancyvrb      \
   hyperref      \
+  kvoptions     \
   libertine     \
   listings      \
   lualatex-math \
@@ -58,16 +59,19 @@ tlmgr install   \
   mathpazo      \
   mptopdf       \
   multirow      \
+  pdftexcmds    \
   pgfplots      \
   psnfss        \
   opensans      \
   sansmath      \
   soulpos       \
+  stringenc     \
   underscore    \
   unicode-math  \
   was           \
   xcolor        \
-  xtab
+  xtab          \
+  zref
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
