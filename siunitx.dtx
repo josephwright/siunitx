@@ -81,7 +81,7 @@ See http://www.latex-project.org/lppl.txt
 
 \endpreamble
 \postamble
-Copyright (C) 2008-2019 by
+Copyright (C) 2008-2020 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
@@ -125,7 +125,7 @@ This work consists of the file  siunitx.dtx
 \fi
 %</internal>
 %<*driver|package>
-\RequirePackage{expl3}[2015/09/11]
+\RequirePackage{expl3}[2020/01/12]
 \RequirePackage{xparse}
 %</driver|package>
 %<*driver>
@@ -690,6 +690,7 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7t}{2018/06/08}{Fix inclusion of sign in astronomy-style
 %   angles}
 % \changes{v2.7t}{2019/10/10}{Fix \opt{round-half} when \opt{even} at zero precision}
+% \changes{v2.7u}{2020/01/15}{Modified internals to track \pkg{expl3} changes}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5228,7 +5229,7 @@ This work consists of the file  siunitx.dtx
 % This will also trap any problems with \pkg{l3packages} (as the two are now
 % tied together, version-wise).
 %    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2015/11/15 }
+\@ifpackagelater { expl3 } { 2020/01/12 }
   { }
   {
     \PackageError { siunitx } { Support~package~expl3~too~old }
@@ -5672,8 +5673,8 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty_p:f
           {
-            \token_get_prefix_spec:N #1
-            \token_get_arg_spec:N    #1
+            \cs_prefix_spec:N   #1
+            \cs_argument_spec:N #1
           }
       }
       { \bool_not_p:n { \cs_if_exist_p:c { \cs_to_str:N #1 ~ } } }
@@ -11637,7 +11638,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {
-      \tl_if_empty:fT { \token_get_prefix_spec:N #1 }
+      \tl_if_empty:fT { \cs_prefix_spec:N #1 }
         { \cs_set_protected:Npx #1 { \exp_not:V #1 } }
     }
 }
@@ -15533,7 +15534,7 @@ This work consists of the file  siunitx.dtx
          \use:c
            {
              l__@@_
-             \str_fold_case:n {#1}
+             \str_foldcase:n {#1}
              _
              \mode_if_math:TF { math } { text }
              _tl
