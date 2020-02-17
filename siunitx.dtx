@@ -12462,6 +12462,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_unit_format_power_aux:      ,
 %  \@@_unit_format_power_aux:n     ,
 %  \@@_unit_format_power_aux:nn    ,
+%  \@@_unit_format_power_aux:w     ,
 %  \@@_unit_format_power_brackets: ,
 %  \@@_unit_format_power_per:      ,
 %  \@@_unit_format_power_repeat:
@@ -12505,7 +12506,10 @@ This work consists of the file  siunitx.dtx
           \exp_not:N \PrintSuperscript
             {
               \@@_unit_format_power_aux:n
-                { \exp_not:V \l_@@_tmpa_tl }
+                {
+                  \exp_after:wN \@@_unit_format_power:w
+                    \l_@@_tmpa_tl . . \q_Stop
+                }
             }
         }
     }
@@ -12525,6 +12529,15 @@ This work consists of the file  siunitx.dtx
       \@@_print:nV {#1} \l_@@_tmpa_tl
    }
 }
+\cs_new:Npn \@@_unit_format_power:w  #1 . #2 . #3 \q_stop
+  {
+    \exp_not:n {#1}
+    \tl_if_blank:nF {#2}
+      {
+        \exp_not:V \l_@@_output_decimal_tl
+        \exp_not:n {#2}
+      }
+  }
 %    \end{macrocode}
 % A check is made for a qualifier with a space, which needs brackets
 % if there is also a power.
