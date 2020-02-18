@@ -66,6 +66,7 @@ tlmgr install   \
   opensans      \
   sansmath      \
   soulpos       \
+  soulutf8      \
   stringenc     \
   underscore    \
   unicode-math  \
