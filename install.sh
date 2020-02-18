@@ -20,8 +20,8 @@ if ! command -v texlua > /dev/null; then
   cd ..
 fi
 
-# Update tlmgr itself
-tlmgr update --self
+# Update tlmgr itself then all installed packages
+tlmgr update --self --all --no-auto-install
 
 # l3build itself
 tlmgr install l3build
@@ -77,6 +77,3 @@ tlmgr install   \
 
 # Keep no backups (not required, simply makes cache bigger)
 tlmgr option -- autobackup 0
-
-# Update the TL install but add nothing new
-tlmgr update --self --all --no-auto-install
