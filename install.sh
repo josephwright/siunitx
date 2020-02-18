@@ -38,6 +38,7 @@ tlmgr install amsmath graphics l3packages tools
 
 # Dependencies
 tlmgr install   \
+  alphalph      \
   amsfonts      \
   atbegshi      \
   atveryend     \
@@ -57,6 +58,7 @@ tlmgr install   \
   etexcmds      \
   fancyvrb      \
   gettitlestring \
+  hologo        \
   hycolor       \
   hyperref      \
   intcalc       \
