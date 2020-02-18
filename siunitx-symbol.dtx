@@ -94,42 +94,6 @@
   }
 %    \end{macrocode}
 %
-% \begin{macro}{\@@_textmu:}
-%   For $8$-bit engines, we need an upright mu.
-%    \begin{macrocode}
-\bool_lazy_or:nnF
-  { \sys_if_engine_luatex_p: }
-  { \sys_if_engine_xetex_p: }
-  {
-    \AtBeginDocument
-      { \cs_new_eq:NN \@@_textmu: \textmu }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\@@_mathOmega:}
-%   Abstracted out to allow for safe redefinition.
-%    \begin{macrocode}
-\bool_lazy_or:nnF
-  { \sys_if_engine_luatex_p: }
-  { \sys_if_engine_xetex_p: }
-  {
-    \AtBeginDocument
-      {
-        \cs_new_protected:Npx \@@_mathOmega:
-          {
-            \exp_not:N \ensuremath
-              {
-                \cs_if_exist:NTF \upOmega
-                  { \exp_not:N \upOmega }
-                  { \exp_not:N \Omega }
-              }
-          }
-      }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{\@@_non_latin:n}
 % \begin{macro}{\@@_non_latin:nnnn}
 %   As in \pkg{siunitx-unit}, but internal in both cases as it's rather
@@ -241,29 +205,39 @@
               \siunitx_declare_unit:Nx \degreeCelsius
                 {
                   \siunitx_print_text:n
-                    { \@@_non_latin:n { "00B0 } C }
+                    { \@@_non_latin:n { "00B0 } } C
                 }
            }
         }
         { \group_end: }
 %    \end{macrocode}
-%   For |\ohm| and |\micro|, we potentially need to pick up the flexible
-%   symbols using the |TS| fonts.
+%   For |\ohm|, there is a math mode symbol we can use, so there has to be
+%   a mode-dependent definition.
 %    \begin{macrocode}
     \@@_if_replace:NnT \ohm { "03A9 }
       {
         \siunitx_declare_unit:Nx \ohm
           {
-            \bool_lazy_or:nnTF
-              { \sys_if_engine_luatex_p: }
-              { \sys_if_engine_xetex_p: }
-              {
-                \siunitx_print_text:n
-                  { \@@_non_latin:n { "03A9 } }
-              }
-              { \@@_mathOmega: }
-         }
+            \exp_not:N \ifmmode
+              \cs_if_exist:NTF \upOmega
+                { \exp_not:N \upOmega }
+                { \exp_not:N \Omega }
+            \exp_not:N \else
+              \siunitx_print_text:n
+                {
+                  \bool_lazy_or:nnTF
+                    { \sys_if_engine_luatex_p: }
+                    { \sys_if_engine_xetex_p: }
+                    { \@@_non_latin:n { "03A9 } }
+                    { \exp_not:N \textohm }
+                }
+            \exp_not:N \fi
+          }
       }
+%    \end{macrocode}
+%   Only a text mode command is available for |\micro| in the standard
+%   set up.
+%    \begin{macrocode}
     \@@_if_replace:NnT \micro { "03BC }
       {
         \siunitx_declare_prefix:Nnx \micro { -6 }
@@ -274,7 +248,7 @@
                   { \sys_if_engine_luatex_p: }
                   { \sys_if_engine_xetex_p: }
                   { \@@_non_latin:n { "00B5 } }
-                  { \exp_not:N \@@_textmu: }
+                  { \exp_not:N \textmu }
               }
           }
       }
@@ -315,9 +289,10 @@
 %
 % \subsection{Bookmark definitions}
 %
-% Inside PDF strings, the definitions for symbols need to be reset:
-% we keep things to a minimum and just reset the functions we know are
-% used above.
+% Inside PDF strings we disable the text printing function. The definition of
+% |\ohm| is also reset as otherwise engine-dependent strings are generated
+% (\XeTeX{} and \LuaTeX{} give different outcomes using for example
+% |\textohm|).
 %    \begin{macrocode}
 \AtBeginDocument
   {
@@ -326,14 +301,8 @@
         \exp_args:Nx \pdfstringdefDisableCommands
           {
             \cs_set_eq:NN \siunitx_print_text:n \exp_not:N \use:n
-            \cs_set:Npn \exp_not:N \@@_textmu:
-              { \@@_non_latin:n { "00B5 } }
-            \cs_set:Npn \exp_not:N \@@_mathOmega:
+            \siunitx_declare_unit:Nn \exp_not:N \ohm
               { \@@_non_latin:n { "03A9 } }
-            \siunitx_declare_unit:Nn \exp_not:N \degree
-              { \@@_non_latin:n { "00B0 } }
-            \siunitx_declare_unit:Nn \exp_not:N \degreeCelsius
-             { \@@_non_latin:n { "00B0 } C }
           }
       }
       { }
