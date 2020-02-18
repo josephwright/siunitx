@@ -193,9 +193,9 @@
 \AtBeginDocument
   {
 %    \end{macrocode}
-%   For |\angstrom|, direct input works in text mode so there is only a need
-%   to tidy up for math mode. If \pkg{fontspec} is loaded then that problem
-%   goes away, so nothing needs to be done.
+%   For |\angstrom| and |\degree|, direct input works in text mode so there is
+%   only a need to tidy up for math mode. If \pkg{fontspec} is loaded then that
+%   problem goes away, so nothing needs to be done.
 %    \begin{macrocode}
     \@@_if_replace:NnT \angstrom { "00C5 }
       {
@@ -209,6 +209,47 @@
               }
          }
       }
+    \@@_if_replace:NnT \degree { "00B0 }
+      {
+        \@ifpackageloaded { fontspec }
+          { }
+          {
+            \exp_args:NNx \siunitx_declare_unit:Nnn \degree
+              {
+                \siunitx_print_text:n
+                  { \@@_non_latin:n { "00B0 } }
+              }
+              { quantity-product = { } }
+         }
+      }
+%    \end{macrocode}
+%   For |\degreeCelsius|, much the same to think about but the comparison
+%   must be done by hand.
+%    \begin{macrocode}
+    \group_begin:
+      \tl_set:Nx \l_@@_tmpa_tl { \@@_non_latin:n { "00B0 } C }
+      \protected@edef \l_@@_tmpa_tl
+        { \exp_not:N \mathrm { \l_@@_tmpa_tl } }
+      \keys_set:nn { siunitx } { parse-units = false }
+      \siunitx_unit_format:nN { \degreeCelsius } \l_@@_tmpb_tl
+      \str_if_eq:VVTF \l_@@_tmpa_tl \l_@@_tmpb_tl
+        {
+          \group_end:
+          \@ifpackageloaded { fontspec }
+            { }
+            {
+              \siunitx_declare_unit:Nx \degreeCelsius
+                {
+                  \siunitx_print_text:n
+                    { \@@_non_latin:n { "00B0 } C }
+                }
+           }
+        }
+        { \group_end: }
+%    \end{macrocode}
+%   For |\ohm| and |\micro|, we potentially need to pick up the flexible
+%   symbols using the |TS| fonts.
+%    \begin{macrocode}
     \@@_if_replace:NnT \ohm { "03A9 }
       {
         \siunitx_declare_unit:Nx \ohm
