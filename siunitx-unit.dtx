@@ -1874,10 +1874,36 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_power_superscript:
   {
-    \tl_set:Nx \l_@@_current_tl
+    \exp_after:wN \@@_format_power_superscipt:w
+      \l_@@_part_tl . . \q_stop
+  }
+\cs_new_protected:Npn \@@_format_power_superscipt:w #1 . #2 . #3 \q_stop
+  {
+    \tl_if_blank:nTF {#2}
       {
-        \@@_format_bracket:N \l_@@_current_tl
-        ^ { \exp_not:V \l_@@_part_tl }
+        \tl_set:Nx \l_@@_current_tl
+          {
+            \@@_format_bracket:N \l_@@_current_tl
+            ^ { \exp_not:n {#1} }
+          }
+      }
+      {
+        \tl_set:Nx \l_@@_tmp_tl
+          {
+            { }
+            \tl_if_head_eq_charcode:nNTF {#1} -
+              { { - } { \exp_not:o { \use_none:n #1 } } }
+              { { } { \exp_not:n {#1} } }
+            {#2}
+            { }
+            { }
+            { 0 }
+          }
+        \tl_set:Nx \l_@@_current_tl
+          {
+            \@@_format_bracket:N \l_@@_current_tl
+            ^ { \siunitx_number_format:N \l_@@_tmp_tl }
+          }        
       }
     \bool_set_false:N \l_@@_bracket_bool
   }
