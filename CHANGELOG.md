@@ -681,7 +681,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.7t...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.7u...HEAD
+[v2.7v]: https://github.com/josephwright/siunitx/compare/v2.7u...v2.7v
+[v2.7u]: https://github.com/josephwright/siunitx/compare/v2.7u...v2.7v
 [v2.7t]: https://github.com/josephwright/siunitx/compare/v2.7s...v2.7t
 [v2.7s]: https://github.com/josephwright/siunitx/compare/v2.7r...v2.7s
 [v2.7r]: https://github.com/josephwright/siunitx/compare/v2.7q...v2.7r
@@ -757,7 +759,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [v2.4c]: https://github.com/josephwright/siunitx/compare/v2.4b...v2.4c
 [v2.4b]: https://github.com/josephwright/siunitx/compare/v2.4a...v2.4b
 [v2.4a]: https://github.com/josephwright/siunitx/compare/v2.4...v2.4a
-[v2.4]: https://github.com/josephwright/siunitx/compare/v2.4h...v2.4
+[v2.4]: https://github.com/josephwright/siunitx/compare/v2.3h...v2.4
 [v2.3h]: https://github.com/josephwright/siunitx/compare/v2.3g...v2.3h
 [v2.3g]: https://github.com/josephwright/siunitx/compare/v2.3f...v2.3g
 [v2.3f]: https://github.com/josephwright/siunitx/compare/v2.3e...v2.3f
