@@ -563,6 +563,109 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Use a standard-width comparator for tables (issue #183)
 
+## [v2.4n] - 2012-04-12
+
+### Changed
+- Extend scientific notation code to better handle large numbers of digits
+
+## [v2.4m] - 2012-04-04
+
+### Fixed
+- Handling of a single entry in `\SIlist`
+
+## [v2.4l] - 2012-03-23
+
+### Fixed
+- Load ordering with `soulpos`
+
+## [v2.4k] - 2012-03-22
+
+### Fixed
+- Interaction of `^` and `_` with `brenw (issue #191)
+- Adapted `list-pair-separator` for `translator` package (issue #190)
+- Check for `round-minimum` with large values
+
+## [v2.4j] - 2012-01-26
+
+### Fixed
+- Ensure that typesetting is in hmode
+
+## [v2.4i] - 2012-01-19
+
+### Fixed
+- Check for zero decimal part (issue #186)
+
+## [v2.4h] - 2012-01-15
+
+### Changed
+- Shortened an internal code path
+
+### Fixed
+- Bug in `reciprocal-positive-first` implementation
+
+## [v2.4g] - 2012-01-06
+
+### Changed
+- Internal changes due to update to `expl3` (issue #131)
+
+## [v2.4f] - 2011-12-24
+
+### Changed
+- Improve performance in an internal mapping
+- Use faster data structures internally
+
+### Fixed
+- Force font update in table cells
+- One incorrect internal variable name
+
+## [v2.4e] - 2011-12-11
+
+### Fixed
+- Replacements used with `latin1` encoding
+
+## [v2.4d] - 2011-12-09
+
+### Changed
+- Source formatting
+
+### Fixed
+- Free-standing units using `xspace` in captions
+
+## [v2.4c] - 2011-12-09
+
+### Fixed
+- Test for text mode font
+
+## [v2.4b] - 2011-12-09
+
+### Fixed
+- Incorrect doubling of `#` tokens
+
+## [v2.4a] - 2011-12-04
+
+### Changed
+- Extend search-and-replace in untis to cover UTF-8 symbols
+- Symbols used with UTF-8 engines (issue #176)
+
+### Fixed
+- Interaction of `textcomp` with user symbol changes (issue #181)
+
+## [v2.4] -  2012-04-15
+
+### Added
+- Option `round-half = even` (issue #40)
+- Option `list-pair-separator` (issue #136)
+- Auto-conversion for prefixes (issue #173)
+- Notes for upgraders
+
+### Changed
+- Automatically 'compress' exponents (issue #62)
+- Clean up internal `expl3` usage
+- Removed remaining 'math' options
+
+### Fixed
+- Replace minus sign in text mode (issue #161)
+
 ## [v2.0]
 
 ### Added
