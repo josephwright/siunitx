@@ -142,6 +142,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `unit-text-sf`
 - Option `unit-text-tt`
 
+## [v2.7v] - 2020-02-19
+
+### Fixed
+- Appearance of superscript decimals with comma decimal marker
+
+## [v2.7u] - 2020-01-15
+
+### Changed
+- Modified internals to track `expl3` changes
+
 ## [v2.7t] - 2019-10-10
 
 ### Fixed
