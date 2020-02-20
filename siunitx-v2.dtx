@@ -76,19 +76,19 @@ The siunitx package --- A comprehensive (SI) units package
 Maintained by Joseph Wright
 E-mail: joseph.wright@morningstar2.co.uk
 Released under the LaTeX Project Public License v1.3c or later
-See https://www.latex-project.org/lppl.txt
+See http://www.latex-project.org/lppl.txt
 ---------------------------------------------------------------
 
 \endpreamble
 \postamble
-Copyright (C) 2008-2018 by
+Copyright (C) 2008-2020 by
   Joseph Wright <joseph.wright@morningstar2.co.uk>
 
 It may be distributed and/or modified under the conditions of
 the LaTeX Project Public License (LPPL), either version 1.3c of
 this license or (at your option) any later version.  The latest
 version of this license is in the file:
-   https://www.latex-project.org/lppl.txt
+   http://www.latex-project.org/lppl.txt
 
 This work is "maintained" (as per LPPL maintenance status) by
   Joseph Wright.
@@ -125,7 +125,7 @@ This work consists of the file  siunitx.dtx
 \fi
 %</internal>
 %<*driver|package>
-\RequirePackage{expl3}[2015/09/11]
+\RequirePackage{expl3}[2020/01/12]
 \RequirePackage{xparse}
 %</driver|package>
 %<*driver>
@@ -687,6 +687,16 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7q}{2018/05/11}{Fixed patching of \pkg{cellspace} columns}
 % \changes{v2.7r}{2018/05/16}{Fixed issue in tabulars when REV\TeX{} is in use}
 % \changes{v2.7s}{2018/05/17}{Modified package date format}
+% \changes{v2.7t}{2018/06/08}{Fix inclusion of sign in astronomy-style
+%   angles}
+% \changes{v2.7t}{2019/10/10}{Fix \opt{round-half} when \opt{even} at zero precision}
+% \changes{v2.7u}{2020/01/15}{Modified internals to track \pkg{expl3} changes}
+% \changes{v2.7v}{2020/02/17}{Fix appearance of superscript decimals with
+%   comma decimal marker}
+% \changes{v2.8}{2020/02/20}{Use companion font symbols (now always loaded by
+%    the kernel)}
+% \changes{v2.8}{2020/02/20}{Allow \cs{ohm} to appear correctly in PDF
+%    bookmarks}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -840,10 +850,11 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Numbers}
 %
-%\DescribeMacro{\num}
-%\begin{syntax}
-%  \cs{num}\oarg{options}\marg{number}
-%\end{syntax}
+%\begin{function}{\num}
+%  \begin{syntax}
+%    \cs{num}\oarg{options}\marg{number}
+%  \end{syntax}
+%\end{function}
 % Numbers are automatically formatted by the \cs{num} macro.  This
 % takes one optional argument, \meta{options}, and one mandatory one,
 % \meta{number}.  The contents of \meta{number} are automatically
@@ -870,10 +881,11 @@ This work consists of the file  siunitx.dtx
 % of numerical input). The parser understands a range of input syntaxes,
 % as demonstrated above.
 %
-%\DescribeMacro{\numlist}
-%\begin{syntax}
-%  \cs{numlist}\oarg{options}\marg{numbers}
-%\end{syntax}
+%\begin{function}{\numlist}
+%  \begin{syntax}
+%    \cs{numlist}\oarg{options}\marg{numbers}
+%  \end{syntax}
+%\end{function}
 %\changes{v2.0}{2010/05/23}{Introduced \cs{numlist} and \cs{SIlist}
 %  functions}
 % Lists of numbers may be processed using the \cs{numlist} function.
@@ -888,10 +900,11 @@ This work consists of the file  siunitx.dtx
 %  \numlist{10;30;50;70}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\numrange}
-%\begin{syntax}
-%  \cs{numrange}\oarg{options}\marg{number1}\marg{number2}
-%\end{syntax}
+%\begin{function}{\numrange}
+%  \begin{syntax}
+%    \cs{numrange}\oarg{options}\marg{number1}\marg{number2}
+%  \end{syntax}
+%\end{function}
 % Simple ranges of numbers can be handled using the \cs{numrange}
 % function. This acts in the same way as \cs{num}, but inserts a
 % phrase or other text between the two entries. This function should
@@ -900,10 +913,11 @@ This work consists of the file  siunitx.dtx
 %  \numrange{10}{30}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\ang}
-%\begin{syntax}
-%  \cs{ang}\oarg{options}\marg{angle}
-%\end{syntax}
+%\begin{function}{\ang}
+%  \begin{syntax}
+%    \cs{ang}\oarg{options}\marg{angle}
+%  \end{syntax}
+%\end{function}
 % Angles can be typeset using the \cs{ang} command.  The
 % \meta{angle} can be given either as a decimal number or as a
 % semi-colon separated list of degrees, minutes and seconds, which
@@ -921,10 +935,11 @@ This work consists of the file  siunitx.dtx
 %
 %\subsection{Units}
 %
-%\DescribeMacro{\si}
-%\begin{syntax}
-%  \cs{si}\oarg{options}\marg{unit}
-%\end{syntax}
+%\begin{function}{\si}
+%  \begin{syntax}
+%    \cs{si}\oarg{options}\marg{unit}
+%  \end{syntax}
+%\end{function}
 % The symbol for a unit can be typeset using the \cs{si} macro: this
 % provides full control over output format for the unit. Like the
 % \cs{num} macro, \cs{si} takes  one optional and one mandatory
@@ -959,10 +974,11 @@ This work consists of the file  siunitx.dtx
 % formats. For example, the \cs{per} macro can give reciprocal powers,
 % slashes or be used to construct units as fractions.
 %
-%\DescribeMacro{\SI}
-%\begin{syntax}
-%  \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}
-%\end{syntax}
+%\begin{function}{\SI}
+%  \begin{syntax}
+%    \cs{SI}\oarg{options}\marg{number}\oarg{preunit}\marg{unit}
+%  \end{syntax}
+%\end{function}
 % Very often, numbers and units are given together. Formally, the
 % value of a quantity is the product of the number and the unit, the
 % space being regarded as a multiplication sign \cite{SI:5.3.3}. The
@@ -985,10 +1001,11 @@ This work consists of the file  siunitx.dtx
 % Full details of using \enquote{stand alone} units are found in
 % \cref{sec:units:creating}.
 %
-%\DescribeMacro{\SIlist}
-%\begin{syntax}
-%  \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
-%\end{syntax}
+%\begin{function}{\SIlist}
+%  \begin{syntax}
+%    \cs{SIlist}\oarg{options}\marg{numbers}\marg{unit}
+%  \end{syntax}
+%\end{function}
 % Lists of numbers with units can be handled using the \cs{SIlist}
 % function. The behaviour of this function is similar to \cs{numlist},
 % but with the addition of a unit to each number.  This function should
@@ -997,10 +1014,11 @@ This work consists of the file  siunitx.dtx
 %  \SIlist{10;30;45}{\metre}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\SIrange}
-%\begin{syntax}
-%  \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit}
-%\end{syntax}
+%\begin{function}{\SIrange}
+%  \begin{syntax}
+%    \cs{SIrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit}
+%  \end{syntax}
+%\end{function}
 % Ranges of numbers with units can be handled using the \cs{SIrange}
 % function. The behaviour of this function is similar to \cs{numrange},
 % but with the addition of a unit to each number.  This function should
@@ -1017,7 +1035,6 @@ This work consists of the file  siunitx.dtx
 % names. Full details of units in the SI are available
 % on-line~\cite{BIPM}.
 %
-%\DescribeMacro{\meter}
 % The seven base SI units are always defined
 % (\cref{tab:unit:base}). In addition, the macro \cs{meter} is
 % available as an alias for \cs{metre}, for users of US spellings.
@@ -1042,7 +1059,6 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeMacro{\celsius}
 % The SI also lists a number of units which have special names and
 % symbols \cite{SI:2.2.2}: these are listed in
 % \cref{tab:unit:derived}. As a short-cut for the degree Celsius,
@@ -1162,7 +1178,6 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeMacro{\deka}
 % In addition to the units themselves, \pkg{siunitx} provides
 % pre-defined macros for all of the SI prefixes
 % (\cref{tab:unit:prefix}, \cite{SI:3.1}). The spelling
@@ -1201,10 +1216,6 @@ This work consists of the file  siunitx.dtx
 %  \end{tabular}
 %\end{table}
 %
-%\DescribeMacro{\square}
-%\DescribeMacro{\squared}
-%\DescribeMacro{\cubic}
-%\DescribeMacro{\cubed}
 % A small number of pre-defined powers are provided as macros.
 % \cs{square} and \cs{cubic} are intended for use before units, with
 % \cs{squared} and \cs{cubed} going after the unit.
@@ -1213,8 +1224,6 @@ This work consists of the file  siunitx.dtx
 %  \si{\joule\squared\per\lumen} \\
 %  \si{\cubic\lux\volt\tesla\cubed}
 %\end{LaTeXdemo}
-%\DescribeMacro{\tothe}
-%\DescribeMacro{\raiseto}
 % Generic powers can be inserted on a one-off basis using the \cs{tothe}
 % and \cs{raiseto} macros. These are the only macros for units which
 % take an argument:
@@ -1222,7 +1231,6 @@ This work consists of the file  siunitx.dtx
 %  \si{\henry\tothe{5}} \\
 %  \si{\raiseto{4.5}\radian}
 %\end{LaTeXdemo}
-%\DescribeMacro{\per}
 % Reciprocal powers are indicated using the \cs{per} macro. This applies
 % to the next unit only, unless the \opt{sticky-per} option
 % is turned on.
@@ -1232,7 +1240,6 @@ This work consists of the file  siunitx.dtx
 %  \si{\per\henry\tothe{5}} \\
 %  \si{\per\square\becquerel}
 %\end{LaTeXdemo}
-%\DescribeMacro{\of}
 %\changes{v2.0i}{2010/06/29}{Correct behaviour of \cs{of} function
 %  so it actually works (bug introduced in v2.0d)}
 % As for generic powers, generic qualifiers are also available using
@@ -1243,8 +1250,6 @@ This work consists of the file  siunitx.dtx
 %    {0.1}{\milli\mole\of{cat}\per\kilogram\of{prod}}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\cancel}
-%\DescribeMacro{\highlight}
 %\changes{v2.2}{2011/04/05}{Support use of \cs{cancel} macro in units}
 %\changes{v2.2}{2011/04/06}{New \cs{highlight} macro for selective
 %  colour in units}
@@ -1425,10 +1430,11 @@ This work consists of the file  siunitx.dtx
 %  \end{table}
 %\end{LaTeXdemo}
 %
-%\DescribeMacro{\tablenum}
-%\begin{syntax}
-%  \cs{tablenum}\oarg{options}\marg{number}
-%\end{syntax}
+%\begin{function}{\tablenum}
+%  \begin{syntax}
+%    \cs{tablenum}\oarg{options}\marg{number}
+%  \end{syntax}
+%\end{function}
 %\changes{v2.2}{2011/03/20}{Add new \cs{tablenum} macro to allow
 %  complex table alignments}
 %\changes{v2.2g}{2011/06/02}{Ensure \cs{tablenum} works correctly when
@@ -3972,19 +3978,18 @@ This work consists of the file  siunitx.dtx
 %      math-arcminute   & Literal & \verb={}^{\prime}=                \\
 %      math-arcsecond   & Literal & \verb={}^{\prime\prime}=          \\
 %      math-celsius     & Literal & \meta{see text}                   \\
-%      math-degree      & Literal & \verb={}^{\circ}=                 \\
-%      math-micro       & Literal & \meta{see text}                   \\
-%      math-ohm         & Literal & \cs{Omega}                        \\
+%      math-degree      & Literal & \verb=\text{\textdegree}=         \\
+%      math-micro       & Literal & \verb=\text{\textmu}=             \\
+%      math-ohm         & Literal & \verb=\text{\ensuremath{\Omega}}= \\
 %      redefine-symbols & Switch & true \\
 %      text-angstrom    & Literal & \cs{AA}                           \\
 %      text-arcminute   & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
 %      text-arcsecond   & Literal &
 %        \verb=\ensuremath{{}^{\prime\prime}}= \\
-%      text-celsius     & Literal &  \verb=\ensuremath{{}^{\circ}}=    \\
-%        & & \verb=\kern -\scriptspace C= \\
-%      text-degree      & Literal & \verb=\ensuremath{{}^{\circ}}=    \\
-%      text-micro       & Literal & \meta{see text}                   \\
-%      text-ohm         & Literal & \verb=\ensuremath{\Omega}=        \\
+%      text-celsius     & Literal & \verb=\textdegree C=              \\
+%      text-degree      & Literal & \verb=\textdegree=                \\
+%      text-micro       & Literal & \verb=\textmu=                    \\
+%      text-ohm         & Literal & \verb=\textohm=                   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -4003,11 +4008,6 @@ This work consists of the file  siunitx.dtx
 % Notice that these names capitalise the unit name (to make reading
 % the macro name easier!).\footnote{The function
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
-%
-% \changes{v2.4a}{2011/12/04}{Use UTF-8 symbols with \XeTeX{} and \LuaTeX{}
-%   if \pkg{fontspec} is loaded}
-% When using \XeTeX{} or \LuaTeX{}, if \pkg{fontspec} is loaded these options
-% are redefined to use UTF-8 characters directly.
 %
 %\subsection{Other options}
 %
@@ -5221,7 +5221,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2018/05/17} {2.7s}
+\ProvidesExplPackage {siunitx} {2020/02/20} {2.8}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -5229,7 +5229,7 @@ This work consists of the file  siunitx.dtx
 % This will also trap any problems with \pkg{l3packages} (as the two are now
 % tied together, version-wise).
 %    \begin{macrocode}
-\@ifpackagelater { expl3 } { 2015/11/15 }
+\@ifpackagelater { expl3 } { 2020/01/12 }
   { }
   {
     \PackageError { siunitx } { Support~package~expl3~too~old }
@@ -5331,78 +5331,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-% Some of the \texttt{TS1} encoding is needed to provide symbols in
-% text mode. If the user has not loaded the encoding themselves, it is
-% done here.
+% Ensure that the companion font is loaded.
 %    \begin{macrocode}
 \AtBeginDocument {
   \cs_if_free:cT { T@TS1 }
-    {
-      \DeclareFontEncoding { TS1 } { } { }
-      \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
-    }
+    { \RequirePackage { textcomp } }
 }
 %    \end{macrocode}
-%
-%\begin{macro}{
-%  \c_@@_minus_tl  ,
-%  \c_@@_minus_int
-%}
-% To allow the correct symbol to appear in text mode: this is the same
-% as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
-% then the real character can be used unless there's a good reason
-% to suspect
-%    \begin{macrocode}
-\DeclareTextSymbolDefault \c_@@_minus_tl { TS1 }
-\DeclareTextSymbol \c_@@_minus_tl { TS1 } { 61 }
-\AtBeginDocument {
-  \@ifpackageloaded { fontspec }
-    {
-      \@ifpackageloaded { eulervm }
-        { }
-        {
-          \int_const:Nn \c_@@_minus_int { 8722 }
-          \tl_set:Nn \c_@@_minus_tl
-            { \tex_char:D \c_@@_minus_int }
-        }
-    }
-    { }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{
-%  \c_@@_mu_tl  ,
-%  \c_@@_mu_int
-%}
-% The lack of an upright mu has to be sorted out. The same consideration
-% for \pkg{fontspec} as above.
-%    \begin{macrocode}
-\DeclareTextSymbol \c_@@_mu_tl { TS1 } { 181 }
-\DeclareTextSymbolDefault \c_@@_mu_tl { TS1 }
-\AtBeginDocument {
-  \@ifpackageloaded { fontspec }
-    {
-      \int_const:Nn \c_@@_mu_int { 181 }
-      \tl_set:Nn \c_@@_mu_tl { \tex_char:D \c_@@_mu_int }
-    }
-    { }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\g_@@_omega_tl}
-% Some package redefine \cs{Omega} to be slanted and move the original
-% symbol to \cs{upOmega}. This is handled here.
-%    \begin{macrocode}
-\tl_new:N \g_@@_omega_tl
-\tl_gset:Nn \g_@@_omega_tl { \Omega }
-\AtBeginDocument {
-  \cs_if_exist:NT \upOmega
-    { \tl_set:Nn \g_@@_omega_tl { \upOmega } }
-}
-%    \end{macrocode}
-%\end{macro}
 %
 % \begin{macro}
 %   {
@@ -5673,8 +5608,8 @@ This work consists of the file  siunitx.dtx
       {
         \tl_if_empty_p:f
           {
-            \token_get_prefix_spec:N #1
-            \token_get_arg_spec:N    #1
+            \cs_prefix_spec:N   #1
+            \cs_argument_spec:N #1
           }
       }
       { \bool_not_p:n { \cs_if_exist_p:c { \cs_to_str:N #1 ~ } } }
@@ -5716,7 +5651,6 @@ This work consists of the file  siunitx.dtx
         \@@_option_unchanged:Nnn \l_@@_qualifier_mode_tl
           { subscript } { brackets }
         \keys_set:nn { siunitx } { mode = text }
-        \tl_set:Nn \c_@@_minus_tl { \HCode { &\#x2212; } }
       }
       { }
   }
@@ -6513,7 +6447,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_print_text:
   {
     \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
-      { \c_@@_minus_tl }
+      { \textminus }
     \@@_print_text_aux:
     \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
       { \ensuremath { \mp } }
@@ -6607,7 +6541,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_print_text_super:n #1 {
   \tl_set:Nn \l_@@_tmpa_tl {#1}
   \tl_replace_all:Nnn \l_@@_tmpa_tl { - }
-    { \c_@@_minus_tl }
+    { \textminus }
   \tl_set:Nx \l_@@_tmpa_tl
     {
       \exp_not:N \ensuremath
@@ -8512,7 +8446,7 @@ This work consists of the file  siunitx.dtx
                  \l_@@_process_integer_min_int
               - \tl_count:N \l_@@_tmpa_tl
             }
-          \int_compare:nNnT \l_@@_tmp_int > 0            
+          \int_compare:nNnT \l_@@_tmp_int > 0
             {
               \tl_set:Nx \l_@@_tmpa_tl
                 {
@@ -8665,8 +8599,15 @@ This work consists of the file  siunitx.dtx
                   { \int_eval:n { \l_@@_tmpb_tl + 1 } }
                 \bool_if:NF \l_@@_round_half_up_bool
                   {
-                    \int_compare:nNnT
-                      { 0 \tl_tail:N \l_@@_tmpa_tl } = 0
+                    \bool_lazy_and:nnT
+                      {
+                        \int_compare_p:nNn
+                          { 0 \tl_head:N \l_@@_tmpa_tl } = 5
+                      }
+                      {
+                        \int_compare_p:nNn
+                          { 0 \tl_tail:N \l_@@_tmpa_tl } = 0
+                      }
                       {
                         \int_if_odd:nT \l_@@_tmpb_tl
                           {
@@ -11145,9 +11086,15 @@ This work consists of the file  siunitx.dtx
     { \@@_number_output_single: }
 }
 \cs_new_protected:Npn \@@_angle_print_astronomy_aux: {
-  \prop_get:NnNT \l_@@_number_out_prop { mantissa-integer }
+  \prop_get:NnNF \l_@@_number_out_prop { mantissa-sign }
     \l_@@_tmpa_tl
-    { \@@_print:nV { number } \l_@@_tmpa_tl }
+    { \tl_clear:N \l_@@_tmpa_tl }
+  \prop_get:NnNT \l_@@_number_out_prop { mantissa-integer }
+    \l_@@_tmpb_tl
+    {
+      \tl_put_right:NV \l_@@_tmpa_tl \l_@@_tmpb_tl
+      \@@_print:nV { number } \l_@@_tmpa_tl
+    }
   \hbox_set:Nn \l_@@_angle_marker_box
     {
       \@@_print:nn { number } { { \l_@@_output_decimal_tl } }
@@ -11625,7 +11572,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {
-      \tl_if_empty:fT { \token_get_prefix_spec:N #1 }
+      \tl_if_empty:fT { \cs_prefix_spec:N #1 }
         { \cs_set_protected:Npx #1 { \exp_not:V #1 } }
     }
 }
@@ -12449,6 +12396,7 @@ This work consists of the file  siunitx.dtx
 %  \@@_unit_format_power_aux:      ,
 %  \@@_unit_format_power_aux:n     ,
 %  \@@_unit_format_power_aux:nn    ,
+%  \@@_unit_format_power_aux:w     ,
 %  \@@_unit_format_power_brackets: ,
 %  \@@_unit_format_power_per:      ,
 %  \@@_unit_format_power_repeat:
@@ -12492,7 +12440,10 @@ This work consists of the file  siunitx.dtx
           \exp_not:N \PrintSuperscript
             {
               \@@_unit_format_power_aux:n
-                { \exp_not:V \l_@@_tmpa_tl }
+                {
+                  \exp_after:wN \@@_unit_format_power:w
+                    \l_@@_tmpa_tl . . \q_stop
+                }
             }
         }
     }
@@ -12508,10 +12459,19 @@ This work consists of the file  siunitx.dtx
     {
       \tl_set:Nn \l_@@_tmpa_tl {#2}
       \tl_replace_all:Nnn \l_@@_tmpa_tl { - }
-        { \text { \c_@@_minus_tl } }
+        { \text { \textminus } }
       \@@_print:nV {#1} \l_@@_tmpa_tl
    }
 }
+\cs_new:Npn \@@_unit_format_power:w  #1 . #2 . #3 \q_stop
+  {
+    \exp_not:n {#1}
+    \tl_if_blank:nF {#2}
+      {
+        \exp_not:V \l_@@_output_decimal_tl
+        \exp_not:n {#2}
+      }
+  }
 %    \end{macrocode}
 % A check is made for a qualifier with a space, which needs brackets
 % if there is also a power.
@@ -15390,44 +15350,34 @@ This work consists of the file  siunitx.dtx
   {
     \bool_if:NT \l_@@_redefine_symbols_bool
       {
-        \@ifpackageloaded { textcomp }
+        \@ifpackageloaded { fourier }
           {
-            \@@_option_unchanged:Nnn \l_@@_degree_math_tl
-              { { } ^ { \circ } }
-              { \text { \textdegree } }
-            \@@_option_unchanged:Nnn \l_@@_degree_text_tl
-              { \ensuremath { { } ^ { \circ } } }
-              { \textdegree }
-            \@ifpackageloaded { mathptmx }
-              { }
-              {
-                \@@_option_unchanged:Nnn \l_@@_micro_text_tl
-                  { \c_@@_mu_tl }
-                  { \textmu }
-                \@ifpackageloaded { fourier }
-                  { }
-                  {
-                    \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-                      { \ensuremath { \g_@@_omega_tl } }
-                      { \textohm }
-                  }
-              }
-            \str_if_eq:VnT \encodingdefault { OT1 }
-              {
-                \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-                  { \text { \AA } }
-                  { \text { \capitalring { A } } }
-                \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-                  { \AA }
-                  { \capitalring { A } }
-              }
+            \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
+              { \textohm }
+              { \text { \ensuremath { \l_@@_ohm_math_tl } } }
           }
           { }
+        \@ifpackageloaded { mathptmx }
+          {
+            \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
+              { \textohm }
+              { \text { \ensuremath { \l_@@_ohm_math_tl } } }
+          }
+          { }
+        \str_if_eq:VnT \encodingdefault { OT1 }
+          {
+            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
+              { \text { \AA } }
+              { \text { \capitalring { A } } }
+            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
+              { \AA }
+              { \capitalring { A } }
+          }
         \@ifpackageloaded { upgreek }
           {
             \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-              { \text { \ensuremath { \g_@@_omega_tl } } }
-              { \Upomega }
+              { \text { \ensuremath { \Omega } } }
+              { \text { \ensuremath { \Upomega } } }
           }
           { }
       }
@@ -15461,10 +15411,10 @@ This work consists of the file  siunitx.dtx
   math-angstrom  = \text { \AA },
   math-arcminute = { } ^ { \prime },
   math-arcsecond = { } ^ { \prime \prime },
-  math-celsius   = { } ^ { \circ } \kern - \scriptspace \@@_unit_mathrm:n { C } ,
-  math-degree    = { } ^ { \circ },
-  math-micro     = \text { \c_@@_mu_tl },
-  math-ohm       = \text { \ensuremath { \g_@@_omega_tl } },
+  math-celsius   = \text { \textdegree } \@@_unit_mathrm:n { C } ,
+  math-degree    = \text { \textdegree },
+  math-micro     = \text { \textmu },
+  math-ohm       = \text { \ensuremath { \Omega } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15496,11 +15446,10 @@ This work consists of the file  siunitx.dtx
   text-angstrom  = \AA,
   text-arcminute = \ensuremath { { } ^ { \prime } },
   text-arcsecond = \ensuremath { { } ^ { \prime \prime } },
-  text-celsius   =
-    \ensuremath { { } ^ { \circ } } \kern -\scriptspace C ,
-  text-degree    = \ensuremath { { } ^ { \circ } },
-  text-micro     = \c_@@_mu_tl ,
-  text-ohm       = \ensuremath { \g_@@_omega_tl },
+  text-celsius   = \text { \textdegree } C,
+  text-degree    = \text { \textdegree },
+  text-micro     = \textmu ,
+  text-ohm       = \textohm
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15521,7 +15470,7 @@ This work consists of the file  siunitx.dtx
          \use:c
            {
              l__@@_
-             \str_fold_case:n {#1}
+             \str_foldcase:n {#1}
              _
              \mode_if_math:TF { math } { text }
              _tl
@@ -15555,104 +15504,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%
-% \begin{variable}
-%   {
-%     \c_@@_degree_int   ,
-%     \c_@@_micro_int    ,
-%     \c_@@_angstrom_int ,
-%     \c_@@_ohm_int      ,
-%     \c_@@_arcminute_int,
-%     \c_@@_arcsecond_int
-%   }
-%   For UTF-8 engines, it may be possible to use better symbols than those set
-%   up as standard. Unicode normalises both the ohm and {\aa}ngstr{\"{o}}m
-%   symbols to the appropriate letters, so these are used directly.
-%   Technically, we should hae a different slot for micro than for a mu, but
-%   for the broadest compatibility we go with the latter.
-%   The single degree Celsius symbol is a compatibility character, and so
-%   the two separate glyphs \enquote{degree} and \enquote{C} are used.
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \@ifpackageloaded { fontspec }
-      {
-        \int_const:Nn \c_@@_degree_int    { 176 }
-        \int_const:Nn \c_@@_micro_int     { "000B5 }
-        \int_const:Nn \c_@@_angstrom_int  { "0212B }
-        \int_const:Nn \c_@@_ohm_int       { "003A9 }
-        \sys_if_engine_xetex:T
-          {
-            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-              { \text { \AA } }
-              { \tex_char:D \c_@@_angstrom_int }
-          }
-        \@@_option_unchanged:Nnn \l_@@_celsius_math_tl
-          { { } ^ { \circ } \kern - \scriptspace C }
-          {
-            \tex_char:D \c_@@_degree_int
-            C
-          }
-        \@@_option_unchanged:Nnn \l_@@_degree_math_tl
-          { { } ^ { \circ } }
-          { \tex_char:D \c_@@_degree_int }
-        \@@_option_unchanged:Nnn \l_@@_micro_math_tl
-          { \text { \c_@@_mu_tl } }
-          { \tex_char:D \c_@@_micro_int }
-        \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-          { \text { \ensuremath { \g_@@_omega_tl } } }
-          { \tex_char:D \c_@@_ohm_int }
-        \sys_if_engine_xetex:T
-          {
-            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-              { \AA }
-              { \tex_char:D \c_@@_angstrom_int }
-          }
-        \@@_option_unchanged:Nnn \l_@@_celsius_text_tl
-          {
-            \ensuremath
-              { { } ^ { \circ } \kern - \scriptspace C }
-          }
-          {
-            \tex_char:D \c_@@_degree_int
-            C
-          }
-        \@@_option_unchanged:Nnn \l_@@_degree_text_tl
-          { \ensuremath { { } ^ { \circ } } }
-          { \tex_char:D \c_@@_degree_int }
-        \@@_option_unchanged:Nnn \l_@@_micro_text_tl
-          { \c_@@_mu_tl }
-          { \tex_char:D \c_@@_micro_int }
-        \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-          { \ensuremath { \g_@@_omega_tl } }
-          { \tex_char:D \c_@@_ohm_int }
-      }
-      { }
-%    \end{macrocode}
-%   Slightly more specialised: these only work in math mode with
-%   \pkg{unicode-math}.
-%    \begin{macrocode}
-    \@ifpackageloaded { unicode-math }
-      {
-        \int_const:Nn \c_@@_arcminute_int { 8242 }
-        \int_const:Nn \c_@@_arcsecond_int { 8243 }
-        \@@_option_unchanged:Nnn \l_@@_arcminute_math_tl
-          { { } ^ { \prime } }
-          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcsecond_math_tl
-          { { } ^ { \prime \prime } }
-          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcminute_text_tl
-          { \ensuremath { { } ^ { \prime } } }
-          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcsecond_text_tl
-          { \ensuremath { { } ^ { \prime \prime } } }
-          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-      }
-      { }
-  }
-%    \end{macrocode}
-% \end{variable}
 %
 %\subsection{Working with other packages}
 %
@@ -16178,7 +16029,7 @@ This work consists of the file  siunitx.dtx
     \cs_set:Npn \SIUnitSymbolCelsius   { \textcelsius }
     \cs_set:Npn \SIUnitSymbolDegree    { \textdegree }
     \cs_set:Npn \SIUnitSymbolMicro     { \textmu }
-    \cs_set:Npn \SIUnitSymbolOhm       { [ohm] }
+    \cs_set:Npn \SIUnitSymbolOhm       { \textohm }
   }
 %    \end{macrocode}
 % \end{macro}
