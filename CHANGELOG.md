@@ -683,7 +683,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 [Unreleased]: https://github.com/josephwright/siunitx/compare/v2.7u...HEAD
 [v2.7v]: https://github.com/josephwright/siunitx/compare/v2.7u...v2.7v
-[v2.7u]: https://github.com/josephwright/siunitx/compare/v2.7u...v2.7v
+[v2.7u]: https://github.com/josephwright/siunitx/compare/v2.7t...v2.7u
 [v2.7t]: https://github.com/josephwright/siunitx/compare/v2.7s...v2.7t
 [v2.7s]: https://github.com/josephwright/siunitx/compare/v2.7r...v2.7s
 [v2.7r]: https://github.com/josephwright/siunitx/compare/v2.7q...v2.7r
