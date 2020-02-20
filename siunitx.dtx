@@ -693,6 +693,8 @@ This work consists of the file  siunitx.dtx
 % \changes{v2.7u}{2020/01/15}{Modified internals to track \pkg{expl3} changes}
 % \changes{v2.7v}{2020/02/17}{Fix appearance of superscript decimals with
 %   comma decimal marker}
+% \changes{v2.8}{2020/02/20}{Use companion font symbols (now always loaded by
+%    the kernel)}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -3974,19 +3976,18 @@ This work consists of the file  siunitx.dtx
 %      math-arcminute   & Literal & \verb={}^{\prime}=                \\
 %      math-arcsecond   & Literal & \verb={}^{\prime\prime}=          \\
 %      math-celsius     & Literal & \meta{see text}                   \\
-%      math-degree      & Literal & \verb={}^{\circ}=                 \\
-%      math-micro       & Literal & \meta{see text}                   \\
-%      math-ohm         & Literal & \cs{Omega}                        \\
+%      math-degree      & Literal & \verb=\text{\textdegree}=         \\
+%      math-micro       & Literal & \verb=\text{\textmu}=             \\
+%      math-ohm         & Literal & \verb=\text{\ensuremath{\Omega}}= \\
 %      redefine-symbols & Switch & true \\
 %      text-angstrom    & Literal & \cs{AA}                           \\
 %      text-arcminute   & Literal & \verb=\ensuremath{{}^{\prime}}=   \\
 %      text-arcsecond   & Literal &
 %        \verb=\ensuremath{{}^{\prime\prime}}= \\
-%      text-celsius     & Literal &  \verb=\ensuremath{{}^{\circ}}=    \\
-%        & & \verb=\kern -\scriptspace C= \\
-%      text-degree      & Literal & \verb=\ensuremath{{}^{\circ}}=    \\
-%      text-micro       & Literal & \meta{see text}                   \\
-%      text-ohm         & Literal & \verb=\ensuremath{\Omega}=        \\
+%      text-celsius     & Literal & \verb=\textdegree C=              \\
+%      text-degree      & Literal & \verb=\textdegree=                \\
+%      text-micro       & Literal & \verb=\textmu=                    \\
+%      text-ohm         & Literal & \verb=\textohm=                   \\
 %    \bottomrule
 %  \end{tabular}
 %\end{table}
@@ -4005,11 +4006,6 @@ This work consists of the file  siunitx.dtx
 % Notice that these names capitalise the unit name (to make reading
 % the macro name easier!).\footnote{The function
 % \cs{SIUnitSymbolAngstrom} uses the name without accents.}
-%
-% \changes{v2.4a}{2011/12/04}{Use UTF-8 symbols with \XeTeX{} and \LuaTeX{}
-%   if \pkg{fontspec} is loaded}
-% When using \XeTeX{} or \LuaTeX{}, if \pkg{fontspec} is loaded these options
-% are redefined to use UTF-8 characters directly.
 %
 %\subsection{Other options}
 %
@@ -5333,78 +5329,13 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %
-% Some of the \texttt{TS1} encoding is needed to provide symbols in
-% text mode. If the user has not loaded the encoding themselves, it is
-% done here.
+% Ensure that the companion font is loaded.
 %    \begin{macrocode}
 \AtBeginDocument {
   \cs_if_free:cT { T@TS1 }
-    {
-      \DeclareFontEncoding { TS1 } { } { }
-      \DeclareFontSubstitution { TS1 } { cmr } { m } { n }
-    }
+    { \RequirePackage { textcomp } }
 }
 %    \end{macrocode}
-%
-%\begin{macro}{
-%  \c_@@_minus_tl  ,
-%  \c_@@_minus_int
-%}
-% To allow the correct symbol to appear in text mode: this is the same
-% as \cs{textminus} from \pkg{textcomp}. If \pkg{fontspec} is loaded
-% then the real character can be used unless there's a good reason
-% to suspect
-%    \begin{macrocode}
-\DeclareTextSymbolDefault \c_@@_minus_tl { TS1 }
-\DeclareTextSymbol \c_@@_minus_tl { TS1 } { 61 }
-\AtBeginDocument {
-  \@ifpackageloaded { fontspec }
-    {
-      \@ifpackageloaded { eulervm }
-        { }
-        {
-          \int_const:Nn \c_@@_minus_int { 8722 }
-          \tl_set:Nn \c_@@_minus_tl
-            { \tex_char:D \c_@@_minus_int }
-        }
-    }
-    { }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{
-%  \c_@@_mu_tl  ,
-%  \c_@@_mu_int
-%}
-% The lack of an upright mu has to be sorted out. The same consideration
-% for \pkg{fontspec} as above.
-%    \begin{macrocode}
-\DeclareTextSymbol \c_@@_mu_tl { TS1 } { 181 }
-\DeclareTextSymbolDefault \c_@@_mu_tl { TS1 }
-\AtBeginDocument {
-  \@ifpackageloaded { fontspec }
-    {
-      \int_const:Nn \c_@@_mu_int { 181 }
-      \tl_set:Nn \c_@@_mu_tl { \tex_char:D \c_@@_mu_int }
-    }
-    { }
-}
-%    \end{macrocode}
-%\end{macro}
-%
-%\begin{macro}{\g_@@_omega_tl}
-% Some package redefine \cs{Omega} to be slanted and move the original
-% symbol to \cs{upOmega}. This is handled here.
-%    \begin{macrocode}
-\tl_new:N \g_@@_omega_tl
-\tl_gset:Nn \g_@@_omega_tl { \Omega }
-\AtBeginDocument {
-  \cs_if_exist:NT \upOmega
-    { \tl_set:Nn \g_@@_omega_tl { \upOmega } }
-}
-%    \end{macrocode}
-%\end{macro}
 %
 % \begin{macro}
 %   {
@@ -5718,7 +5649,6 @@ This work consists of the file  siunitx.dtx
         \@@_option_unchanged:Nnn \l_@@_qualifier_mode_tl
           { subscript } { brackets }
         \keys_set:nn { siunitx } { mode = text }
-        \tl_set:Nn \c_@@_minus_tl { \HCode { &\#x2212; } }
       }
       { }
   }
@@ -6515,7 +6445,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_print_text:
   {
     \tl_replace_all:Nnn \l_@@_print_arg_tl { - }
-      { \c_@@_minus_tl }
+      { \textminus }
     \@@_print_text_aux:
     \tl_replace_all:Nnn \l_@@_print_arg_tl { \mp }
       { \ensuremath { \mp } }
@@ -6609,7 +6539,7 @@ This work consists of the file  siunitx.dtx
 \cs_new_protected:Npn \@@_print_text_super:n #1 {
   \tl_set:Nn \l_@@_tmpa_tl {#1}
   \tl_replace_all:Nnn \l_@@_tmpa_tl { - }
-    { \c_@@_minus_tl }
+    { \textminus }
   \tl_set:Nx \l_@@_tmpa_tl
     {
       \exp_not:N \ensuremath
@@ -12527,7 +12457,7 @@ This work consists of the file  siunitx.dtx
     {
       \tl_set:Nn \l_@@_tmpa_tl {#2}
       \tl_replace_all:Nnn \l_@@_tmpa_tl { - }
-        { \text { \c_@@_minus_tl } }
+        { \text { \textminus } }
       \@@_print:nV {#1} \l_@@_tmpa_tl
    }
 }
@@ -15418,44 +15348,34 @@ This work consists of the file  siunitx.dtx
   {
     \bool_if:NT \l_@@_redefine_symbols_bool
       {
-        \@ifpackageloaded { textcomp }
+        \@ifpackageloaded { fourier }
           {
-            \@@_option_unchanged:Nnn \l_@@_degree_math_tl
-              { { } ^ { \circ } }
-              { \text { \textdegree } }
-            \@@_option_unchanged:Nnn \l_@@_degree_text_tl
-              { \ensuremath { { } ^ { \circ } } }
-              { \textdegree }
-            \@ifpackageloaded { mathptmx }
-              { }
-              {
-                \@@_option_unchanged:Nnn \l_@@_micro_text_tl
-                  { \c_@@_mu_tl }
-                  { \textmu }
-                \@ifpackageloaded { fourier }
-                  { }
-                  {
-                    \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-                      { \ensuremath { \g_@@_omega_tl } }
-                      { \textohm }
-                  }
-              }
-            \str_if_eq:VnT \encodingdefault { OT1 }
-              {
-                \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-                  { \text { \AA } }
-                  { \text { \capitalring { A } } }
-                \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-                  { \AA }
-                  { \capitalring { A } }
-              }
+            \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
+              { \textohm }
+              { \text { \ensuremath { \l_@@_ohm_math_tl } } }
           }
           { }
+        \@ifpackageloaded { mathptmx }
+          {
+            \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
+              { \textohm }
+              { \text { \ensuremath { \l_@@_ohm_math_tl } } }
+          }
+          { }
+        \str_if_eq:VnT \encodingdefault { OT1 }
+          {
+            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
+              { \text { \AA } }
+              { \text { \capitalring { A } } }
+            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
+              { \AA }
+              { \capitalring { A } }
+          }
         \@ifpackageloaded { upgreek }
           {
             \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-              { \text { \ensuremath { \g_@@_omega_tl } } }
-              { \Upomega }
+              { \text { \ensuremath { \Omega } } }
+              { \text { \ensuremath { \Upomega } } }
           }
           { }
       }
@@ -15489,10 +15409,10 @@ This work consists of the file  siunitx.dtx
   math-angstrom  = \text { \AA },
   math-arcminute = { } ^ { \prime },
   math-arcsecond = { } ^ { \prime \prime },
-  math-celsius   = { } ^ { \circ } \kern - \scriptspace \@@_unit_mathrm:n { C } ,
-  math-degree    = { } ^ { \circ },
-  math-micro     = \text { \c_@@_mu_tl },
-  math-ohm       = \text { \ensuremath { \g_@@_omega_tl } },
+  math-celsius   = \text { \textdegree } \@@_unit_mathrm:n { C } ,
+  math-degree    = \text { \textdegree },
+  math-micro     = \text { \textmu },
+  math-ohm       = \text { \ensuremath { \Omega } },
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15524,11 +15444,10 @@ This work consists of the file  siunitx.dtx
   text-angstrom  = \AA,
   text-arcminute = \ensuremath { { } ^ { \prime } },
   text-arcsecond = \ensuremath { { } ^ { \prime \prime } },
-  text-celsius   =
-    \ensuremath { { } ^ { \circ } } \kern -\scriptspace C ,
-  text-degree    = \ensuremath { { } ^ { \circ } },
-  text-micro     = \c_@@_mu_tl ,
-  text-ohm       = \ensuremath { \g_@@_omega_tl },
+  text-celsius   = \text { \textdegree } C,
+  text-degree    = \text { \textdegree },
+  text-micro     = \textmu ,
+  text-ohm       = \textohm
 }
 %    \end{macrocode}
 %\end{macro}
@@ -15583,104 +15502,6 @@ This work consists of the file  siunitx.dtx
 %\end{macro}
 %\end{macro}
 %\end{macro}
-%
-% \begin{variable}
-%   {
-%     \c_@@_degree_int   ,
-%     \c_@@_micro_int    ,
-%     \c_@@_angstrom_int ,
-%     \c_@@_ohm_int      ,
-%     \c_@@_arcminute_int,
-%     \c_@@_arcsecond_int
-%   }
-%   For UTF-8 engines, it may be possible to use better symbols than those set
-%   up as standard. Unicode normalises both the ohm and {\aa}ngstr{\"{o}}m
-%   symbols to the appropriate letters, so these are used directly.
-%   Technically, we should hae a different slot for micro than for a mu, but
-%   for the broadest compatibility we go with the latter.
-%   The single degree Celsius symbol is a compatibility character, and so
-%   the two separate glyphs \enquote{degree} and \enquote{C} are used.
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \@ifpackageloaded { fontspec }
-      {
-        \int_const:Nn \c_@@_degree_int    { 176 }
-        \int_const:Nn \c_@@_micro_int     { "000B5 }
-        \int_const:Nn \c_@@_angstrom_int  { "0212B }
-        \int_const:Nn \c_@@_ohm_int       { "003A9 }
-        \sys_if_engine_xetex:T
-          {
-            \@@_option_unchanged:Nnn \l_@@_angstrom_math_tl
-              { \text { \AA } }
-              { \tex_char:D \c_@@_angstrom_int }
-          }
-        \@@_option_unchanged:Nnn \l_@@_celsius_math_tl
-          { { } ^ { \circ } \kern - \scriptspace C }
-          {
-            \tex_char:D \c_@@_degree_int
-            C
-          }
-        \@@_option_unchanged:Nnn \l_@@_degree_math_tl
-          { { } ^ { \circ } }
-          { \tex_char:D \c_@@_degree_int }
-        \@@_option_unchanged:Nnn \l_@@_micro_math_tl
-          { \text { \c_@@_mu_tl } }
-          { \tex_char:D \c_@@_micro_int }
-        \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
-          { \text { \ensuremath { \g_@@_omega_tl } } }
-          { \tex_char:D \c_@@_ohm_int }
-        \sys_if_engine_xetex:T
-          {
-            \@@_option_unchanged:Nnn \l_@@_angstrom_text_tl
-              { \AA }
-              { \tex_char:D \c_@@_angstrom_int }
-          }
-        \@@_option_unchanged:Nnn \l_@@_celsius_text_tl
-          {
-            \ensuremath
-              { { } ^ { \circ } \kern - \scriptspace C }
-          }
-          {
-            \tex_char:D \c_@@_degree_int
-            C
-          }
-        \@@_option_unchanged:Nnn \l_@@_degree_text_tl
-          { \ensuremath { { } ^ { \circ } } }
-          { \tex_char:D \c_@@_degree_int }
-        \@@_option_unchanged:Nnn \l_@@_micro_text_tl
-          { \c_@@_mu_tl }
-          { \tex_char:D \c_@@_micro_int }
-        \@@_option_unchanged:Nnn \l_@@_ohm_text_tl
-          { \ensuremath { \g_@@_omega_tl } }
-          { \tex_char:D \c_@@_ohm_int }
-      }
-      { }
-%    \end{macrocode}
-%   Slightly more specialised: these only work in math mode with
-%   \pkg{unicode-math}.
-%    \begin{macrocode}
-    \@ifpackageloaded { unicode-math }
-      {
-        \int_const:Nn \c_@@_arcminute_int { 8242 }
-        \int_const:Nn \c_@@_arcsecond_int { 8243 }
-        \@@_option_unchanged:Nnn \l_@@_arcminute_math_tl
-          { { } ^ { \prime } }
-          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcsecond_math_tl
-          { { } ^ { \prime \prime } }
-          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcminute_text_tl
-          { \ensuremath { { } ^ { \prime } } }
-          { \ensuremath { \tex_char:D \c_@@_arcminute_int } }
-        \@@_option_unchanged:Nnn \l_@@_arcsecond_text_tl
-          { \ensuremath { { } ^ { \prime \prime } } }
-          { \ensuremath { \tex_char:D \c_@@_arcsecond_int } }
-      }
-      { }
-  }
-%    \end{macrocode}
-% \end{variable}
 %
 %\subsection{Working with other packages}
 %
