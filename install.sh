@@ -40,11 +40,8 @@ tlmgr install amsmath graphics l3packages tools
 tlmgr install   \
   alphalph      \
   amsfonts      \
-  atbegshi      \
   atveryend     \
   bidi          \
-  bigintcalc    \
-  bitset        \
   booktabs      \
   cancel        \
   caption       \
@@ -55,31 +52,21 @@ tlmgr install   \
   ec            \
   enumitem      \
   epstopdf-pkg  \
-  etexcmds      \
   fancyvrb      \
-  gettitlestring \
   hologo        \
   hycolor       \
   hyperref      \
-  intcalc       \
-  kvdefinekeys  \
   kvoptions     \
-  kvsetkeys     \
-  letltxmacro   \
   libertine     \
   listings      \
-  ltxcmds       \
   lualatex-math \
   makeindex     \
   mathpazo      \
   mptopdf       \
   multirow      \
-  pdfescape     \
   pdftexcmds    \
   pgfplots      \
   psnfss        \
-  refcount      \
-  rerunfilecheck \
   opensans      \
   sansmath      \
   soulpos       \
@@ -87,7 +74,6 @@ tlmgr install   \
   stringenc     \
   underscore    \
   unicode-math  \
-  uniquecounter \
   was           \
   xcolor        \
   xtab          \
