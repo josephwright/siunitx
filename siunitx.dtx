@@ -697,6 +697,8 @@ This work consists of the file  siunitx.dtx
 %    the kernel)}
 % \changes{v2.8}{2020/02/20}{Allow \cs{ohm} to appear correctly in PDF
 %    bookmarks}
+% \changes{v2.8a}{2020/02/23}{Correct appearance of ohm when
+%    \pkg{unicode-math} is loaded}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15373,13 +15375,21 @@ This work consists of the file  siunitx.dtx
               { \AA }
               { \capitalring { A } }
           }
+        \@ifpackageloaded { unicode-math }
+          {
+            \exp_args:NNnx
+              \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
+              { \text { \ensuremath { \Omega } } }
+              {  \char_generate:nn { "03A9 } { 12 } }
+          }
+          { }
         \@ifpackageloaded { upgreek }
           {
             \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
               { \text { \ensuremath { \Omega } } }
               { \text { \ensuremath { \Upomega } } }
           }
-          { }
+        { }
       }
   }
 %    \end{macrocode}
