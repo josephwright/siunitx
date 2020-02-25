@@ -743,12 +743,26 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v2.3] - 2011-07-09
 
+### Added
+- Supported for powers in literal units (issue #152)
+- Unit abbreviation `\hl`/`\hL`
+- Demo for 'closing up' not after an integer (issue #151)
+
 ### Changed
 - Load binary units as an option
+- Used an internal version of `\textsuperscript`
+- Internal `expl3` style
+- Revised `s`-column printing
+
+###  Deprecated
+- Option `load-configurations`
 
 ### Fixed
-- Behavior of `table-auto-round` options
+- Behavior of `table-auto-round` option
 - Missing deactivation in `strict` option
+- Grouping digits (issue #133)
+- Addition of explicit sign to mantissa (issue #139)
+- Various issues with tabular alignment
 
 ## v2.0
 
