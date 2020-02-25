@@ -699,6 +699,8 @@ This work consists of the file  siunitx.dtx
 %    bookmarks}
 % \changes{v2.8a}{2020/02/23}{Correct appearance of ohm when
 %    \pkg{unicode-math} is loaded}
+% \changes{v2.8b}{2020/02/25}{Correct appearance of ohm when
+%    \pkg{newtxmath} is loaded}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -15389,7 +15391,14 @@ This work consists of the file  siunitx.dtx
               { \text { \ensuremath { \Omega } } }
               { \text { \ensuremath { \Upomega } } }
           }
-        { }
+          {
+            \cs_if_exist:NT \upOmega
+              {
+                \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
+                  { \text { \ensuremath { \Omega } } }
+                  { \text { \ensuremath { \upOmega } } }
+              }
+          }
       }
   }
 %    \end{macrocode}
