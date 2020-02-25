@@ -843,16 +843,29 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.2] - 2011-04-13
 
 ### Added
-- `\highlight` for selective unit color
-- Option `minimum-integer-digits` (issue #112)
+- `\tablenum` command (issue ##117)
+- Parse separated uncertainties (issue #57)
+- Allow `\cancel` in units (issue #4)
+- Allow `\highlight` in units
+- Option `table-column-width` (issue #105)
+- Option `bracket-negative-numbers` (issue #5)
 - Option `table-align-comparators` (issue #86)
+- Option `minimum-integer-digits` (issue #112)
+- Option to print exponent marker literally (issue #113)
+- Support for engineering-style number output (issue #114)
+- Example of centring a right-aligned column (issue #85)
 - Various unit abbreviations
 
+### Changed
+- Renamed `...-separator` options to `...-product` where appropriate
+
 ### Fixed
-- Print `\tablenum` prints inside column (issue #127)
+- Allow `\DeclareSIUnit` to take optional argument (issue #121)
+- Latent issue with micro symbol when `fontspec` is loaded
+- Right-alignment in fixed-width columns
 - Print leading `1` when units start `\per` and `per-mode = symbol`
   (issue #125)
-- Allow `\cancel` in all units (issue #4)
+
 
 ## v2.0
 
