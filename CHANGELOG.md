@@ -659,7 +659,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.4a] - 2011-12-04
 
 ### Changed
-- Extend search-and-replace in untis to cover UTF-8 symbols
+- Extend search-and-replace in units to cover UTF-8 symbols
 - Symbols used with UTF-8 engines (issue #176)
 
 ### Fixed
