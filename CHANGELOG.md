@@ -866,6 +866,138 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Print leading `1` when units start `\per` and `per-mode = symbol`
   (issue #125)
 
+## [v2.1p] - 2011-04-04
+
+### Fixed
+- Two bugs in comparator code
+
+## [v2.1o] - 2011-04-03
+
+### Fixed
+- Detect arev package (issue #122)
+- Allow for negative fixed exponents (issue #123)
+
+## [v2.1n] - 2011-03-31
+
+### Fixed
+- Rounding to zero significant figures should always give a 0 (issue #119)
+- `round-integer-to-decimal` when `round-precision = 0`
+
+## [v2.1m] - 2011-03-20
+
+### Added
+- `\J` as an abbreviation for `\joule`
+
+### Changed
+- Various improvements to documentation
+- Avoid expanding units when written to log as 'invalid literals'
+
+### Fixed
+- Ensure that some output occurs in when `round-precision = 0` and
+  `round-mode = places` (issue #111)
+
+## [v2.1l] - 2011-02-10
+
+### Fixed
+- A couple of errant 'weight' => 'family' changes
+
+## [v2.1k] - 2011-02-09
+
+### Added
+- Option `detect-inine-family`
+
+### Changed
+- Use an internal integer for text minus
+
+## [v2.1j] - 2011-02-01
+
+### Fixed
+- Check for `\inputencodingname` macro rather than `inputenc` package
+  (issue #107)
+
+## [v2.1i] - 2011-01-27
+
+### Changed
+- New approach for `detect-display-math`
+
+### Fixed
+- New approach to `symbol-or-fraction` (issue #104)
+
+## [v2.1h] - 2011-01-18
+
+### Changed
+- Detect AMS display-like environments
+
+## [v2.1g] - 2010-12-21
+
+### Changed
+- Update test for `expl3` and `xparse`
+
+## [v2.1f] - 2010-11-24
+
+### Fixed
+- One-letter typo (issue #101)
+
+## [v2.1e] - 2010-11-22
+
+### Fixed
+- Issue with free-standing unit options (issue #99)
+- Text mode symbols with `fontspec` (issue #98)
+
+## [v2.1d] - 2010-11-14
+
+### Fixed
+- Apply options for units when in free-standing mode (issue #97)
+- Typo in v1 configuration file
+
+## [v2.1c] - 2010-11-14
+
+### Added
+- Choice `text` for `qualifier-mode` option (issue #95)
+
+### Changed
+- Discourage line break between number and unit even when it is permitted
+  (issue #92)
+- Ensure that lists can break across lines
+- Restrict range and list functions to text mode
+- Auto-detect math mode in tables (issue #94)
+
+## [v2.1b] - 2010-11-05
+
+### Changed
+- Improve hyphen to minus correction (issue #89) 
+
+### Fixed
+- One wrong variable used (issue #90) 
+
+## [v2.1a] - 2010-11-05
+
+### Changed
+- Internal `expl3` improvements
+
+### Fixed
+- Print list separators in text mode (issue #87)
+- Add in some missing `\ensuremath` statements (issue #88)
+
+## [v2.1] - 2010-10-31
+
+### Added
+- Option `copy-complex-root` (issue #63)
+- Option `table-align-exponent` and `table-align-uncertainty` (issue #60)
+- Option `power-font` (issue #69)
+- Option `scientific-notation` (issue #11)
+- Option `round-integer-to-decimal` (issue #55)
+- Option `input-comparators` (issue #16)
+- Option `round-minimum` (issue #17) 
+
+### Changed
+- Internal `expl3` improvements
+
+### Fixed
+- Correct abbreviation for `\kelvin`
+- Bug in conversion code for 'large' numbers to scientific format
+- Bug with rounding check if decimal part is empty
+- Remove decimal marker if rounding gives an empty decimal part 
 
 ## v2.0
 
