@@ -764,6 +764,96 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Addition of explicit sign to mantissa (issue #139)
 - Various issues with tabular alignment
 
+## [v2.2l] - 2011-06-30
+
+### Fixed
+- Group pre-unit parsing (issue #158)
+
+## [v2.2k] - 2011-06-27
+
+### Fixed
+- Avoid `\peek_...` inside the print routine (issue #157)
+
+## [v2.2j] - 2011-06-26
+
+### Fixed
+- Avoid box for range phrase (issue #156)
+
+## [v2.2i] - 2011-06-15
+
+### Fixed
+- Detect font in table cells before boxing up (issue #153)
+
+## [v2.2h] - 2011-06-03
+
+### Fixed
+- Deal correctly with 'roll-over' in rounding integer part (issue #150)
+
+## [v2.2g] - 2011-06-02
+
+### Fixed
+- Set per-unit options for list/range units when a single unit is used
+  (issue #149)
+- Add test for `parse-numbers = false` to `\tablenum` code
+
+## [v2.2f] - 2011-05-25
+
+### Fixed
+- `table-column-width = 0pt` (issue #146)
+
+## [v2.2e] - 2011-05-23
+
+### Fixed
+- Remove 'mantissa' marker for numbers with no real part (issue #145)
+
+## [v2.2d] - 2011-04-28
+
+### Fixed
+- The `strict` option (issue #143)
+- Add `\dots` to protected symbols (issue #131)
+
+## [v2.2c] - 2011-04-20
+
+### Fixed
+- Bad expansion of toks (issue #141)
+
+## [v2.2b] - 2011-04-19
+
+### Fixed
+- Bad formatting of negative exponents when using 'E' output
+- Internally one argument if `color` is not loaded (issue #138)
+- Make `\of` expandable in literal contexts (issue #137)
+
+## [v2.2a] - 2011-04-16
+
+### Changed
+- Make full text for tables, etc., hyperlinks in docs
+- Re-arrange docs
+- Performance enhancements
+
+### Fixed
+- Auto-insertion of "1" when literal mode is on (issue #135)
+- Detect `\end` macro and print output correctly (issue #134)
+- Group digits for input containing symbolic entries (issue #131)
+- Specify a default for `group-digits` (issue #130)
+- Correctly expand macros with arguments in tables (issue #129)
+- Ensure that `*` in tabular preamble works correctly with `S`/`s` columns
+  (issue #128)
+
+## [v2.2] - 2011-04-13
+
+### Added
+- `\highlight` for selective unit color
+- Option `minimum-integer-digits` (issue #112)
+- Option `table-align-comparators` (issue #86)
+- Various unit abbreviations
+
+### Fixed
+- Print `\tablenum` prints inside column (issue #127)
+- Print leading `1` when units start `\per` and `per-mode = symbol`
+  (issue #125)
+- Allow `\cancel` in all units (issue #4)
+
 ## v2.0
 
 ### Added
