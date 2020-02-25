@@ -666,6 +666,75 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Replace minus sign in text mode (issue #161)
 
+## [v2.3h] - 2011-10-14
+
+### Changed
+- Internal logic improved
+- Explicitly load `xfac` as part of documentation
+
+### Fixed
+- Select math mode with `tex4ht`  (issue #170)
+- Print superscripts using HTML tags with `tex4ht` (issue #171)
+
+## [v2.3g] - 2011-10-06
+
+### Changed
+- Mark-up in documentation
+
+### Fixed
+- Check for leading zero when dealing with rounding 'large' exponents
+  (issue #168)
+- Internal issue with undeclared variable
+
+## [v2.3f] - 2011-09-13
+
+### Fixed
+- Trap erroneous numbers in tables (issue #167)
+
+## [v2.3e] - 2011-09-09
+
+### Added
+- Advice on local installation
+
+### Changed
+- Remove deprecated `expl3` functions
+- Performance improvements
+
+## [v2.3d] - 2011-08-18
+
+### Fixed
+- Bad csname for superscripts in literal mode
+
+## [v2.3c] - 2011-08-12
+
+### Fixed
+- Use correct `\pm` for units in literal mode (issue #163)
+
+## [v2.3b] - 2011-08-08
+
+### Added
+- Additional abbreviated units (issue #162)
+
+### Fixed
+- Definition of abbreviations using option `free-standing-units`
+
+## [v2.3a] - 2011-07-17
+
+### Changed
+- Internal `expl3` updates
+
+### Fixed
+- Restore changes from v2.2l, missed in v2.3
+
+## [v2.3] - 2011-07-09
+
+### Changed
+- Load binary units as an option
+
+### Fixed
+- Behavior of `table-auto-round` options
+- Missing deactivation in `strict` option
+
 ## [v2.0]
 
 ### Added
