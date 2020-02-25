@@ -965,10 +965,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.1b] - 2010-11-05
 
 ### Changed
-- Improve hyphen to minus correction (issue #89) 
+- Improve hyphen to minus correction (issue #89)
 
 ### Fixed
-- One wrong variable used (issue #90) 
+- One wrong variable used (issue #90)
 
 ## [v2.1a] - 2010-11-05
 
@@ -988,7 +988,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `scientific-notation` (issue #11)
 - Option `round-integer-to-decimal` (issue #55)
 - Option `input-comparators` (issue #16)
-- Option `round-minimum` (issue #17) 
+- Option `round-minimum` (issue #17)
 
 ### Changed
 - Internal `expl3` improvements
@@ -997,7 +997,168 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Correct abbreviation for `\kelvin`
 - Bug in conversion code for 'large' numbers to scientific format
 - Bug with rounding check if decimal part is empty
-- Remove decimal marker if rounding gives an empty decimal part 
+- Remove decimal marker if rounding gives an empty decimal part
+
+## [v2.0y] - 2010-10-11
+
+### Fixed
+- Bug with `tight-spacing` option
+
+## [v2.0x] - 2010-10-05
+
+### Fixed
+- Make single-prefix detection work with non-symbolic prefixes
+  (issue #81)
+
+## [v2.0w] - 2010-09-29
+
+### Fixed
+- Problem with REVTeX and S columns (issue #80)
+
+## [v2.0v] - 2010-09-26
+
+### Changed
+- Track `expl3` changes
+
+## [v2.0u] - 2010-09-14
+
+### Fixed
+- Issue with `textpos` (issue #74)
+- Prevent infinite loop when using `\SI{}{...}` (issue #78)
+
+## [v2.0t] - 2010-08-24
+
+### Fixed
+- Correct `\exp_after:wN` (issue #77)
+
+## [v2.0s] - 2010-08-12
+
+### Added
+- Demo for headers in tables
+
+### Fixed
+- Bug in rounding code for zero decimal place (issue #76)
+
+## [v2.0r] - 2010-08-02
+
+### Fixed
+- Bug in v1 `decimalsymbol` emulation
+
+## [v2.0q] - 2010-07-29
+
+### Fixed
+- Errors with free-standing units
+
+## [v2.0p] - 2010-07-28
+
+### Fixed
+- Shape detection
+
+## [v2.0o] - 2010-07-22
+
+### Added
+- Extend detect-italic to slanted shape (issue #73)
+
+## [v2.0n] - 2010-07-15
+
+### Added
+- Various abbreviations
+
+### Changed
+- Documentation section on tables where rows have different units
+
+## [v2.0m] - 2010-07-09
+
+### Added
+- Option `locale` and notes on use with `babel`
+
+## [v2.0l] - 2010-07-07
+
+### Changed
+- Updated documentation for v1 options
+
+### Fixed
+- Move test for `\fg` so that it works independent of `babel` load order
+
+## [v2.0k] - 2010-07-04
+
+### Fixed
+- Issue with `babel` (issue #68)
+
+## [v2.0j] - 2010-06-30
+
+### Changed
+- Force `input-symbols` to print in math mode
+
+### Fixed
+- Correct appearance of `\hartree`
+
+## [v2.0i] - 2010-06-29
+
+### Fixed
+-  Two missed `_` from `expl3` style switch (issue #67)
+
+## [v2.0h] - 2010-06-29
+
+### Fixed
+- Issue with localisation
+
+## [v2.0g] - 2010-06-28
+
+### Added
+- First approach to localisation (issue #61)
+- Restore 'bracket-numbers' option (issue #65)
+
+### Changed
+- Alter complex root output so that it always resets the math font
+
+### Fixed
+- Bracket complex numbers in numerator of quotient (issue #66)
+
+## [v2.0f] - 2010-06-27
+
+### Fixed
+- Spacing with `\times` in text mode (issue #64)
+
+## [v2.0e] - 2010-06-20
+
+### Fixed
+- Move save/restore of `\pm` (issue #58)
+
+## [v2.0d] - 2010-06-10
+
+### Changed
+- Document use of `\cr` in tables (issue #53)
+- Internal `expl3` improvements
+
+### Fixed
+- `table-exponent` option's handling of exponent signs (issue #56)
+
+## [v2.0c] - 2010-06-07
+
+### Changed
+- Improve emulation of v1 material
+- Performance improvements
+- Internal `expl3` improvements
+- Move `\requiresiconfigs` to v1 file
+
+### Fixed
+- Test for bottoming-out units and ensure that any 'hidden' literal units
+  print (issue #50)
+
+## [v2.0b] - 2010-06-01
+
+### Added
+- Complete emulation of v1 options
+
+## [v2.0a] - 2010-05-28
+
+### Changed
+- Allow `\SendSettingsToPgf` in the document body
+- Several improvements in v1 emulation
+
+### Fixed
+- Allow `\newunit` to take optional arguments (issue #45)
 
 ## v2.0
 
