@@ -142,7 +142,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `unit-text-sf`
 - Option `unit-text-tt`
 
-## [v2.7v] - 2020-02-19
+## [v2.7v] - 2020-02-19 [UNUSED]
 
 ### Fixed
 - Appearance of superscript decimals with comma decimal marker
