@@ -750,17 +750,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Behavior of `table-auto-round` options
 - Missing deactivation in `strict` option
 
-## [v2.0]
+## v2.0
 
 ### Added
 - Complete re-write of package to add many new features
 
-## [v1.0]
+## v1.0
 
 ### Added
 - First official release
 
-## [v0.6]
+## v0.6
 
 ### Added
 - First public testing release (as `si`)
