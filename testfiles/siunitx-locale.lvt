@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\input{regression-test}
+
+\usepackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\usepackage{siunitx}
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box { \siunitx_quantity:nn {#1} {#2} }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\ExplSyntaxOff
+
+\begin{document}
+
+\ExplSyntaxOn
+
+\START
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"locale" }
+  {
+    \test:nn { 1.23e4 } { \metre\per\second }
+    \keys_set:nn { siunitx } { locale = DE }
+    \test:nn { 1.23e4 } { \metre\per\second }
+    \keys_set:nn { siunitx } { locale = FR }
+    \test:nn { 1.23e4 } { \metre\per\second }
+    \keys_set:nn { siunitx } { locale = UK }
+    \test:nn { 1.23e4 } { \metre\per\second }
+    \keys_set:nn { siunitx } { locale = US }
+    \test:nn { 1.23e4 } { \metre\per\second }
+    \keys_set:nn { siunitx } { locale = ZA }
+    \test:nn { 1.23e4 } { \metre\per\second }
+  }
+
+\END
