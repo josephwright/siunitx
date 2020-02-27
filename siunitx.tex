@@ -142,6 +142,7 @@ for those people who are interested.
 \AtBeginDocument{\shorthandoff{:<>}}
 \usepackage{translations}
 \usepackage{cancel}
+\usepackage{collcell}
 \usepackage{sansmath}
 \newlength{\mylength}
 
@@ -2711,6 +2712,60 @@ need to be written out in full or the \opt{sticky-per} option should be used.
 \begin{LaTeXdemo}
   \unit{\candela\per\kilo\watt\per\hour} \\
   \unit[sticky-per]{\candela\per\kWh}
+\end{LaTeXdemo}
+
+\subsection{Creating a column with numbers and units}
+\label{sec:hint:mixed}
+
+Usually, numbers in a table should be given with the units in the column
+heading. However, there are cases where a series of data are best presented in
+a table but have different units. There are two ways to do this
+(Table~\ref{tab:xmpl:mixed}). The first is to place the units in the first
+column of the table, which makes sense if there are several related items in
+the table. The second method is to generate two columns, one for numbers and a
+second for units, and then to format these to give the visual effect of a
+single column. The later effect is most appropriate when only one set of
+numbers are presented in a table. This method requires cell content is
+collected, easiest to do using the \pkg{collcell} package.
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Tables where numbers have different units}
+    \label{tab:xmpl:mixed}
+    \hfil
+    \begin{tabular}
+      {
+        @{}
+        >{$}l<{$}
+        S[table-format = 2.3(1)]
+        S[table-format = 3.3(1)]
+        @{}
+      }
+      \toprule
+        & {One} & {Two} \\
+      \midrule
+      a / \unit{\angstrom}   &  1.234(2) &   5.678(4) \\
+      \beta / \unit{\degree} & 90.34(4)  & 104.45(5)  \\
+      \mu / \unit{\per\mm}   &  0.532    &   0.894    \\
+      \bottomrule
+    \end{tabular}
+    \hfil
+    \begin{tabular}
+      {
+        @{}
+        S[table-format=1.3]@{\,}
+        >{\collectcell\unit}l<{\endcollectcell}
+        @{}
+      }
+      \toprule
+      \multicolumn{2}{@{}c}{Heading} \\
+      \midrule
+      1.234 & \metre   \\
+      0.835 & \candela \\
+      4.23  & \joule\per\mole \\
+      \bottomrule
+    \end{tabular}
+    \hfil
+  \end{table}
 \end{LaTeXdemo}
 
 \subsection{Associating a locale with a \pkg{babel} language}

@@ -50,6 +50,7 @@ tlmgr install   \
   cancel        \
   caption       \
   carlisle      \
+  collcell      \
   colortbl      \
   csquotes      \
   datatool      \
