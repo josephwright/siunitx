@@ -78,6 +78,7 @@ tlmgr install   \
   soulpos       \
   soulutf8      \
   stringenc     \
+  translations  \
   underscore    \
   unicode-math  \
   was           \
