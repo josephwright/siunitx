@@ -10,9 +10,19 @@
 
 \usepackage{siunitx}
 
+\usepackage[english,french,german,spanish]{babel}
+
 \ExplSyntaxOn
 
 \OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \selectlanguage {#1}
+    \hbox_set:Nn \l_tmpa_box { \siunitx_number_list:n { { 1 } { 2  } { 3 } } }
+    \box_show:N \l_tmpa_box
+    \hbox_set:Nn \l_tmpa_box { \siunitx_number_range:nn { 1 } { 2 } }
+    \box_show:N \l_tmpa_box
+  }
 \cs_set_protected:Npn \test:nn #1#2
   {
     \hbox_set:Nn \l_tmpa_box { \siunitx_quantity:nn {#1} {#2} }
@@ -29,6 +39,12 @@
 \START
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Translated~strings }
+  {
+    \clist_map_function:nN { english , french , german , spanish }
+      \test:n
+  }
 
 \TEST { Option~setting~"locale" }
   {
