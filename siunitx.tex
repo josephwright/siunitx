@@ -33,6 +33,7 @@ for those people who are interested.
 \usepackage{siunitx}
 \DeclareSIUnit\noop{\relax} % For printing prefixes
 \DeclareSIPower\quartic\tothefourth{4} % For demos
+\DeclareSIUnit\KWH{kWh}
 \DeclareSIQualifier\polymer{pol}
 \DeclareSIQualifier\catalyst{cat}
 
@@ -2672,6 +2673,44 @@ systems:
     parse-numbers = false,
     parse-units   = false
   ]{7.3}{\Hz}
+\end{LaTeXdemo}
+
+\subsection{Special considerations for the \cs{kWh} unit}
+\label{sec:hint:kWh}
+
+The standard settings provide the \cs{kWh} unit set up with no spacing between
+the \enquote{\unit{\kilo\watt}} and the \enquote{\unit{\hour}} unit to give
+\enquote{\unit{\kWh}}. However, this only applies when the unit is given on its
+own: combinations will follow the normal rules
+\begin{LaTeXdemo}
+  \unit{\kWh} \\
+  \unit{\kWh\per\metre}
+\end{LaTeXdemo}
+This is because the unit \cs{kWh} is defined so that it can still be varied by
+altering \cs{kilo}, \cs{watt} and \cs{hour}, and so that the prefix can still
+be turned into a number. However, some users may prefer to have a non-flexible
+macro which never adds a space. This can be achieved by redefining \cs{kWh}
+with \cs{DeclareSIUnit}, by added an alternative definition
+\begin{LaTeXdemo}[code only]
+  \DeclareSIUnit\kWh{kWh}
+  \DeclareSIUnit\KWH{kWh}
+\end{LaTeXdemo}
+ or of course by using literal unit input.
+\begin{LaTeXdemo}
+  \unit{\KWH\per\metre}\\
+  \unit{kWh.m^{-1}}
+\end{LaTeXdemo}
+
+Another point to notice is that the \cs{per} macro applies to the next unit,
+and not an entire unit combination. Thus in
+\begin{LaTeXdemo}
+  \unit{\candela\per\kWh}
+\end{LaTeXdemo}
+\cs{per} applies to the watts but not to the hours. In this case, the units
+need to be written out in full or the \opt{sticky-per} option should be used.
+\begin{LaTeXdemo}
+  \unit{\candela\per\kilo\watt\per\hour} \\
+  \unit[sticky-per]{\candela\per\kWh}
 \end{LaTeXdemo}
 
 \subsection{Associating a locale with a \pkg{babel} language}
