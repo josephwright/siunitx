@@ -1,6 +1,6 @@
 \iffalse meta-comment
 
-File: siunitx.tex Copyright (C) 2014-2019 Joseph Wright
+File: siunitx.tex Copyright (C) 2014-2020 Joseph Wright
 
 It may be distributed and/or modified under the conditions of the
 LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -137,6 +137,9 @@ for those people who are interested.
 \makeatother
 
 % For demos
+\usepackage[french,german,spanish,UKenglish]{babel}
+\AtBeginDocument{\shorthandoff{:<>}}
+\usepackage{translations}
 \usepackage{cancel}
 \usepackage{sansmath}
 \newlength{\mylength}
@@ -2421,6 +2424,42 @@ method used in entirely different from version~$2$. Emulation is therefore not
 provided: if you need non-standard font settings, you will need to adjust your
 source. See Section~\label{sec:print} for more details on the options available
 in this area.
+
+\section{Localisation}
+
+The \pkg{translations} package provides a structured framework for localisation
+of words and phrases, and is part of the larger \pkg{beamer} bundle. The
+\pkg{translations} package provides the \cs{translate} macro, which will provide
+appropriate translations based on the current \pkg{babel} or \pkg{polyglossia}
+language setting.
+
+If \pkg{translations} is available, \pkg{siunitx} will load it and alter the
+standard settings for the \opt{list-final-separator} and \opt{range-phrase}
+options to read:
+\begin{LaTeXdemo}[code only]
+  \sisetup{
+    list-final-separator = { \GetTranslation{and} },
+    list-pair-separator  = { \GetTranslation{and} },
+    range-phrase         = { \GetTranslation{to (numerical range)} },
+  }
+\end{LaTeXdemo}
+If the current language is known to the \pkg{translator} package then the
+result will be localised text. The preamble for this manual loads English,
+French, German and Spanish as options, and also loads the \pkg{babel} package:
+\begin{LaTeXdemo}
+  % In English by default
+  \numlist{1;2;3} \\
+  \numrange{1}{10} \\
+  \selectlanguage{french}%
+  \numlist{1;2;3} \\
+  \numrange{1}{10} \\
+  \selectlanguage{german}%
+  \numlist{1;2;3} \\
+  \numrange{1}{10} \\
+  \selectlanguage{spanish}%
+  \numlist{1;2;3} \\
+  \numrange{1}{10}
+\end{LaTeXdemo}
 
 \section{Hints for using \pkg{siunitx}}
 

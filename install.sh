@@ -41,6 +41,10 @@ tlmgr install   \
   alphalph      \
   amsfonts      \
   atveryend     \
+  babel-english \
+  babel-french  \
+  babel-german  \
+  babel-spanish \
   bidi          \
   booktabs      \
   cancel        \
@@ -57,6 +61,7 @@ tlmgr install   \
   hycolor       \
   hyperref      \
   kvoptions     \
+  koma-script   \
   libertine     \
   listings      \
   lualatex-math \
