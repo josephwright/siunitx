@@ -49,6 +49,7 @@ tlmgr install   \
   booktabs      \
   cancel        \
   caption       \
+  carlisle      \
   colortbl      \
   csquotes      \
   datatool      \
