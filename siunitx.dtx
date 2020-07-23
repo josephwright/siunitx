@@ -5750,11 +5750,21 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\tl_put_right:Nn \document
+\cs_if_exist:NTF \AddToHook
   {
-    \@@_set_math_fam:n { sf }
-    \@@_set_math_fam:n { tt }
-    \ignorespaces
+    \AddToHook { begindocument / end } [ siunitx ]
+      {
+        \@@_set_math_fam:n { sf }
+        \@@_set_math_fam:n { tt }
+      }
+  }
+  {
+    \tl_put_right:Nn \document
+      {
+        \@@_set_math_fam:n { sf }
+        \@@_set_math_fam:n { tt }
+        \ignorespaces
+      }
   }
 %    \end{macrocode}
 %\end{macro}
@@ -11572,7 +11582,18 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:nN { \bar \color \ng \pm \array@row@rst }
     \@@_protect_symbols:N
 }
-\tl_put_right:Nn \document { \@@_protect_symbols:N \fg }
+\cs_if_exist:NTF \AddToHook
+  {
+    \AddToHook { begindocument / end } [ siunitx ]
+      { \@@_protect_symbols:N \fg }
+  }
+  {
+    \tl_put_right:Nn \document
+      {
+        \@@_protect_symbols:N \fg
+        \ignorespaces
+      }
+  }
 \cs_new_protected:Npn \@@_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {

@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Updates to follow LaTeX2e kernel revisions
+
 ## [v2.8b] - 2020-02-25
 
 ### Fixed
