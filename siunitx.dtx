@@ -16008,38 +16008,6 @@ This work consists of the file  siunitx.dtx
 % \pkg{hyperref}, and ensure that everything works cleanly and with
 % no unnecessary warnings.
 %
-% \begin{macro}{\@@_contents_add:N}
-%   An updated version of \cs{addtocontents} which will ensure that
-%   everything works properly. Using \cs{token_to_str:N} means that
-%   there is no problem with the asynchronous nature of \TeX{}'s writing
-%   mechanism.
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \cs_set:Npn \addtocontents #1#2
-      {
-        \protected@write \@auxout
-          {
-            \cs_set_eq:NN \label    \use_none:n
-            \cs_set_eq:NN \index    \use_none:n
-            \cs_set_eq:NN \glossary \use_none:n
-            \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
-              { \@@_contents_add:N ##1 }
-          }
-          { \token_to_str:N \@writefile {#1} {#2} }
-      }
-  }
-\cs_new_protected:Npn \@@_contents_add:N #1
-  {
-    \cs_set:Npn #1
-      {
-        \token_to_str:N #1
-        \c_space_tl
-      }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{\@@_contents_bookmarks:}
 %   The idea here is two-fold. First, all of the unit macros are set
 %   up to simply print their literal interpretation: this is hopefully

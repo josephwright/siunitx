@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Updates to follow LaTeX2e kernel revisions
+- No longer apply `\addtocontents` patch
 
 ## [v2.8b] - 2020-02-25
 
