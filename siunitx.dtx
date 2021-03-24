@@ -5279,6 +5279,15 @@ This work consists of the file  siunitx.dtx
 \RequirePackage{ amstext , array , l3keys2e }
 %    \end{macrocode}
 %
+% \begin{macro}{@@_if_hooks:TF}
+%   To work with updated hooks if available.
+%    \begin{macrocode}
+\@ifl@t@r \fmtversion { 2020-10-01 }
+  { \use_new_eq:NN \@@_if_hooks:TF \use_i:nn }
+  { \use_new_eq:NN \@@_if_hooks:TF \use_ii:nn }
+%    \end{macrocode}
+% \end{macro}
+%
 %\begin{macro}{\@@_tmp:w}
 % A scratch function.
 %    \begin{macrocode}
@@ -5750,7 +5759,7 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\cs_if_exist:NTF \AddToHook
+\@@_if_hooks:TF
   {
     \AddToHook { begindocument / end } [ siunitx ]
       {
@@ -11582,7 +11591,7 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:nN { \bar \color \ng \pm \array@row@rst }
     \@@_protect_symbols:N
 }
-\cs_if_exist:NTF \AddToHook
+\@@_if_hooks:TF
   {
     \AddToHook { begindocument / end } [ siunitx ]
       { \@@_protect_symbols:N \fg }
