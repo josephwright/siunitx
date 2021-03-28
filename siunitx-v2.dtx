@@ -697,6 +697,10 @@ This work consists of the file  siunitx.dtx
 %    the kernel)}
 % \changes{v2.8}{2020/02/20}{Allow \cs{ohm} to appear correctly in PDF
 %    bookmarks}
+% \changes{v2.8a}{2020/02/23}{Correct appearance of ohm when
+%    \pkg{unicode-math} is loaded}
+% \changes{v2.8b}{2020/02/25}{Correct appearance of ohm when
+%    \pkg{newtxmath} is loaded}
 %
 %\begin{abstract}
 % Physical quantities have both numbers and units, and each physical
@@ -5221,7 +5225,7 @@ This work consists of the file  siunitx.dtx
 %
 % The usual preliminaries.
 %    \begin{macrocode}
-\ProvidesExplPackage {siunitx} {2020/02/20} {2.8}
+\ProvidesExplPackage {siunitx} {2021/03/27} {2.8c}
   {A comprehensive (SI) units package}
 %    \end{macrocode}
 %
@@ -5274,6 +5278,15 @@ This work consists of the file  siunitx.dtx
 %    \begin{macrocode}
 \RequirePackage{ amstext , array , l3keys2e }
 %    \end{macrocode}
+%
+% \begin{macro}{@@_if_hooks:TF}
+%   To work with updated hooks if available.
+%    \begin{macrocode}
+\@ifl@t@r \fmtversion { 2020-10-01 }
+  { \cs_new_eq:NN \@@_if_hooks:TF \use_i:nn }
+  { \cs_new_eq:NN \@@_if_hooks:TF \use_ii:nn }
+%    \end{macrocode}
+% \end{macro}
 %
 %\begin{macro}{\@@_tmp:w}
 % A scratch function.
@@ -5746,11 +5759,21 @@ This work consists of the file  siunitx.dtx
       }
   \group_end:
 }
-\tl_put_right:Nn \document
+\@@_if_hooks:TF
   {
-    \@@_set_math_fam:n { sf }
-    \@@_set_math_fam:n { tt }
-    \ignorespaces
+    \AddToHook { begindocument / end } [ siunitx ]
+      {
+        \@@_set_math_fam:n { sf }
+        \@@_set_math_fam:n { tt }
+      }
+  }
+  {
+    \tl_put_right:Nn \document
+      {
+        \@@_set_math_fam:n { sf }
+        \@@_set_math_fam:n { tt }
+        \ignorespaces
+      }
   }
 %    \end{macrocode}
 %\end{macro}
@@ -11568,7 +11591,18 @@ This work consists of the file  siunitx.dtx
   \tl_map_function:nN { \bar \color \ng \pm \array@row@rst }
     \@@_protect_symbols:N
 }
-\tl_put_right:Nn \document { \@@_protect_symbols:N \fg }
+\@@_if_hooks:TF
+  {
+    \AddToHook { begindocument / end } [ siunitx ]
+      { \@@_protect_symbols:N \fg }
+  }
+  {
+    \tl_put_right:Nn \document
+      {
+        \@@_protect_symbols:N \fg
+        \ignorespaces
+      }
+  }
 \cs_new_protected:Npn \@@_protect_symbols:N #1 {
   \cs_if_exist:NT #1
     {
@@ -15373,13 +15407,28 @@ This work consists of the file  siunitx.dtx
               { \AA }
               { \capitalring { A } }
           }
+        \@ifpackageloaded { unicode-math }
+          {
+            \exp_args:NNnx
+              \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
+              { \text { \ensuremath { \Omega } } }
+              {  \char_generate:nn { "03A9 } { 12 } }
+          }
+          { }
         \@ifpackageloaded { upgreek }
           {
             \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
               { \text { \ensuremath { \Omega } } }
               { \text { \ensuremath { \Upomega } } }
           }
-          { }
+          {
+            \cs_if_exist:NT \upOmega
+              {
+                \@@_option_unchanged:Nnn \l_@@_ohm_math_tl
+                  { \text { \ensuremath { \Omega } } }
+                  { \text { \ensuremath { \upOmega } } }
+              }
+          }
       }
   }
 %    \end{macrocode}
@@ -15967,38 +16016,6 @@ This work consists of the file  siunitx.dtx
 % need to be \cs{protected}. Secondly, there is a need to worry about
 % \pkg{hyperref}, and ensure that everything works cleanly and with
 % no unnecessary warnings.
-%
-% \begin{macro}{\@@_contents_add:N}
-%   An updated version of \cs{addtocontents} which will ensure that
-%   everything works properly. Using \cs{token_to_str:N} means that
-%   there is no problem with the asynchronous nature of \TeX{}'s writing
-%   mechanism.
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \cs_set:Npn \addtocontents #1#2
-      {
-        \protected@write \@auxout
-          {
-            \cs_set_eq:NN \label    \use_none:n
-            \cs_set_eq:NN \index    \use_none:n
-            \cs_set_eq:NN \glossary \use_none:n
-            \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
-              { \@@_contents_add:N ##1 }
-          }
-          { \token_to_str:N \@writefile {#1} {#2} }
-      }
-  }
-\cs_new_protected:Npn \@@_contents_add:N #1
-  {
-    \cs_set:Npn #1
-      {
-        \token_to_str:N #1
-        \c_space_tl
-      }
-  }
-%    \end{macrocode}
-% \end{macro}
 %
 % \begin{macro}{\@@_contents_bookmarks:}
 %   The idea here is two-fold. First, all of the unit macros are set
