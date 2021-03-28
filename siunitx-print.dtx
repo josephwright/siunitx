@@ -315,18 +315,22 @@
 % \begin{macro}{\@@_store_fam:n}
 % \begin{variable}{\c_@@_mathrm_int, \c_@@_mathsf_int, \c_@@_mathtt_int}
 %   In order to test math fonts, we need information about the \cs{fam} used
-%   by the various options. This is run as a hook onto \cs{document}, rather
-%   than using \tn{AtBeginDocument} as it has to come after anything that
-%   \pkg{fontspec} does (nasty errors arise otherwise). As this is a true
-%   one-off, we avoid wasting a box.
+%   by the various options. As we are doing typesetting (if only in a box), we
+%   need to be right at the start of the document: this also avoids any issue
+%   with \pkg{fontspec}. With a sufficiently recent \LaTeXe{} this is easy;
+%   for older kernels, we have to do things manually.
 %    \begin{macrocode}
-\tl_put_right:Nn \document
-  {
-    \@@_store_fam:n { rm }
-    \@@_store_fam:n { sf }
-    \@@_store_fam:n { tt }
-    \ignorespaces
-  }
+\IfFormatAtLeastTF { 2020-10-01 }
+  { \hook_gput_code:nnn { begindocument/end } { siunitx } }
+  { \tl_put_right:Nn \document }
+    {
+      \@@_store_fam:n { rm }
+      \@@_store_fam:n { sf }
+      \@@_store_fam:n { tt }
+    }
+\IfFormatAtLeastTF { 2020-10-01 }
+  { }
+  { \tl_put_right:Nn \document { \ignorespaces } }
 \cs_new_protected:Npn \@@_store_fam:n #1
   {
     \group_begin:
