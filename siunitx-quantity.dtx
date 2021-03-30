@@ -152,18 +152,28 @@
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#2}
-      \bool_lazy_or:nnTF
-        { \l_@@_prefix_bool }
-        { ! \l_siunitx_number_parse_bool }
+      \tl_if_blank:nTF {#1}
         {
-          \siunitx_number_format:nN {#1} \l_@@_number_tl
           \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+          \siunitx_print:nV { unit } \l_@@_unit_tl
         }
-        { \@@_combine_prefix:nn {#1} {#2} }
-      \siunitx_print:nV { number } \l_@@_number_tl
-      \tl_use:N \l_@@_product_tl
-      \bool_if:NF \l_@@_break_bool { \nobreak }
-      \siunitx_print:nV { unit } \l_@@_unit_tl
+        {
+          \bool_lazy_or:nnTF
+            { \l_@@_prefix_bool }
+            { ! \l_siunitx_number_parse_bool }
+            {
+              \siunitx_number_format:nN {#1} \l_@@_number_tl
+              \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+            }
+            { \@@_combine_prefix:nn {#1} {#2} }
+          \siunitx_print:nV { number } \l_@@_number_tl
+          \tl_if_empty:NF \l_@@_unit_tl
+            {
+              \tl_use:N \l_@@_product_tl
+              \bool_if:NF \l_@@_break_bool { \nobreak }
+              \siunitx_print:nV { unit } \l_@@_unit_tl
+            }
+      }
     \group_end:
   }
 %    \end{macrocode}
