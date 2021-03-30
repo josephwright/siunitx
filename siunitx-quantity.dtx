@@ -87,6 +87,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{separate-uncertainty-units}
+%   \begin{syntax}
+%     |separate-uncertainty-units| = |bracket|\verb"|"|repeat|\verb"|"|single|
+%   \end{syntax}
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -118,12 +124,16 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_break_bool  ,
-%     \l_@@_prefix_bool ,
-%     \l_@@_product_tl
+%     \l_@@_break_bool          ,
+%     \l_@@_prefix_bool         ,
+%     \l_@@_product_tl          ,
+%     \l_@@_uncert_bracket_bool ,
+%     \l_@@_uncert_repeat_bool
 %   }
 %    \begin{macrocode}
 \bool_new:N \l_@@_prefix_bool
+\bool_new:N \l_@@_uncert_bracket_bool
+\bool_new:N \l_@@_uncert_repeat_bool
 \keys_define:nn { siunitx }
   {
     allow-quantity-breaks .bool_set:N =
@@ -134,7 +144,23 @@
     prefix-mode / symbol .code:n =
      { \bool_set_true:N \l_@@_prefix_bool } ,
     quantity-product .tl_set:N =
-      \l_@@_product_tl
+      \l_@@_product_tl ,
+    separate-uncertainty-units .choice: ,
+    separate-uncertainty-units / bracket .code:n =
+      {
+        \bool_set_true:N \l_@@_uncert_bracket_bool
+        \bool_set_false:N \l_@@_uncert_repeat_bool
+      } ,
+    separate-uncertainty-units / repeat .code:n =
+      {
+        \bool_set_false:N \l_@@_uncert_bracket_bool
+        \bool_set_true:N \l_@@_uncert_repeat_bool
+      } ,
+    separate-uncertainty-units / single .code:n =
+      {
+        \bool_set_false:N \l_@@_uncert_bracket_bool
+        \bool_set_false:N \l_@@_uncert_repeat_bool
+      }
   }
 %    \end{macrocode}
 % \end{variable}
@@ -146,7 +172,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_quantity:nn}
+% \begin{macro}{\siunitx_quantity:nn, \@@_parsed:nn}
+%   For quantities, there is bit to do to combine things. The first question is
+%   whether we are parsing at all: if not, things are quite short.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_quantity:nn #1#2
   {
@@ -158,41 +186,63 @@
           \siunitx_print:nV { unit } \l_@@_unit_tl
         }
         {
-          \bool_lazy_or:nnTF
-            { \l_@@_prefix_bool }
-            { ! \l_siunitx_number_parse_bool }
+          \bool_if:NTF \l_siunitx_number_parse_bool
+            { \@@_parsed:nn {#1} {#2} }
             {
-              \siunitx_number_format:nN {#1} \l_@@_number_tl
+              \tl_set:Nn \l_@@_number_tl { \ensuremath {#1} }
               \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+              \exp_args:NV \@@_single:n \l_@@_number_tl
             }
-            { \@@_combine_prefix:nn {#1} {#2} }
-          \siunitx_print:nV { number } \l_@@_number_tl
-          \tl_if_empty:NF \l_@@_unit_tl
-            {
-              \tl_use:N \l_@@_product_tl
-              \bool_if:NF \l_@@_break_bool { \nobreak }
-              \siunitx_print:nV { unit } \l_@@_unit_tl
-            }
-      }
+        }
     \group_end:
   }
 %    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\@@_combine_prefix:nn}
-%   Combining a prefix into the main number is basically the same as the
-%   parsed branch of \cs{siunitx_number_format:nN}.
+%   For parsed numbers, we have two major questions to think about: whether we
+%   are combining prefixes, and whether we have a multi-part numbers to handle.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_combine_prefix:nn #1#2
+\cs_new_protected:Npn \@@_parsed:nn #1#2
   {
-    \siunitx_unit_format:nNN {#2}
-      \l_@@_unit_tl \l_@@_tmp_fp
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \exp_args:NV \@@_adjust_exp:nNN
-      \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+    \bool_if:NTF \l_@@_prefix_bool
+      { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
+      {
+        \siunitx_unit_format:nNN {#2}
+          \l_@@_unit_tl \l_@@_tmp_fp
+        \exp_args:NV \@@_adjust_exp:nNN
+          \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+      }
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-    \tl_set:Nx \l_@@_number_tl
-      { \siunitx_number_format:N \l_@@_tmp_tl }
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:NN \l_@@_tmp_tl \q_nil }
+    \exp_after:wN \@@_parsed_aux:w \l_@@_tmp_tl \q_stop
+  }
+%    \end{macrocode}
+%   To find out if we need to work harder, we first need to split the formatted
+%   number into the constituent parts. That is done using the table-like
+%   approach: that avoids needing to both check the settings and break down
+%   the input separately.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parsed_aux:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_nil #9 \q_stop
+  { \@@_parsed_aux:nnw {#1#2#3#4} {#5#6#7#8} #9 \q_stop }
+\cs_new_protected:Npn \@@_parsed_aux:nnw #1#2 #3 \q_nil #4 \q_stop
+  { \@@_parsed_aux:nnn {#1} {#2} {#3#4} }
+\cs_new_protected:Npn \@@_parsed_aux:nnn #1#2#3
+  {
+    \tl_if_blank:nTF {#2}
+      { \@@_single:n {#1#3} }
+      {
+        \bool_if:NTF \l_@@_uncert_bracket_bool
+          { \@@_single:n { ( #1#2 ) #3 } }
+          {
+            \bool_if:NTF \l_@@_uncert_repeat_bool
+              {
+                \@@_single:n {#1}
+                \@@_single:n { { } #2#3}
+              }
+              { \@@_single:n {#1#2#3} }
+          }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -229,6 +279,24 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\@@_single:n}
+%   When there is a single part to the number, printing is quite
+%   straight-forward. The number is passed explicitly as that makes life
+%   easier combining the routes.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_single:n #1
+  {
+    \siunitx_print:nn { number } {#1}
+    \tl_if_empty:NF \l_@@_unit_tl
+      {
+        \tl_use:N \l_@@_product_tl
+        \bool_if:NF \l_@@_break_bool { \nobreak }
+        \siunitx_print:nV { unit } \l_@@_unit_tl
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsection{Standard settings for module options}
 %
 % Some of these follow naturally from the point of definition
@@ -237,9 +305,10 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    allow-quantity-breaks = false  ,
-    prefix-mode           = symbol ,
-    quantity-product      = \,
+    allow-quantity-breaks      = false  ,
+    prefix-mode                = symbol ,
+    quantity-product           = \,     ,
+    separate-uncertainty-units = bracket
   }
 %    \end{macrocode}
 %

@@ -44,6 +44,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `reset-text-family`
 - Option `reset-text-series`
 - Option `reset-text-shape`
+- Option `separate-uncertainty-units`
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
@@ -79,6 +80,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `omit-uncertainty`
 - Option `open-bracket`
 - Option `overwrite-functions`
+- Option `multi-part-units`
 - Option `number-angle-product`
 - Option `number-unit-product`
 - Option `prefixes-as-symbols`
