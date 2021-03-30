@@ -1951,6 +1951,66 @@ The command used to set unit themselves may be adjusted using the
   \unit[font-command = \mathit]{\lumen}
 \end{LaTeXdemo}
 
+\section{Quantities}
+
+Some options apply to quantities (the combination of a number and a unit),
+rather than to the numbers or units alone (Table~\ref{tab:opt:quantities}).
+\begin{table}
+  \centering
+  \caption{Options for quantities.}
+  \label{tab:opt:quantities}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{@{}l}{Default} \\
+    \midrule
+      allow-quantity-breaks      & Switch  & false   \\
+      quantity-product           & Literal & \cs{,}  \\
+      separate-uncertainty-units & Choice  & bracket \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{allow-quantity-breaks}
+Usually, the combination of a number and unit is regarded as a single
+mathematical entity which should not be split across lines. However, there are
+cases (very long units, narrow columns, \foreign{etc}.) where breaks may be
+needed. This can be turned on using the \opt{allow-quantity-breaks} option.
+\begin{LaTeXdemo}
+  \begin{minipage}{2.55cm}
+    % Gives an underfull hbox
+    Some filler text \qty{10}{\metre} \\
+    \sisetup{allow-quantity-breaks}
+    Some filler text \qty{10}{\metre}
+  \end{minipage}
+\end{LaTeXdemo}
+
+\DescribeOption{number-unit-product}
+The product symbol between the number and unit is set using the
+\opt{quantity-product} option.
+\begin{LaTeXdemo}
+  \qty{2.67}{\farad} \\
+  \qty[quantity-product = \ ]{2.67}{\farad} \\
+  \qty[quantity-product = ]{2.67}{\farad}
+\end{LaTeXdemo}
+
+\DescribeOption{separate-uncertainty-units}
+When a number has multiple parts (such as a separate uncertainty) then the unit
+must apply to all parts of the number. How this is shown is controlled using
+the \opt{separate-uncertainty-units} options. The standard setting is
+\opt{brackets}, which will place the entire numerical part in brackets and use
+a single unit symbol. Alternative options are \opt{repeat} (print the unit for
+each part of the number) and \opt{single} (print only one unit symbol:
+mathematically incorrect).
+\begin{LaTeXdemo}
+  \sisetup{separate-uncertainty}
+  \qty{12.3(4)}{\kilo\gram} \\
+  \qty[separate-uncertainty-units = bracket]{12.3(4)}{\kilo\gram} \\
+  \qty[separate-uncertainty-units = repeat]{12.3(4)}{\kilo\gram}  \\
+  \qty[separate-uncertainty-units = single]{12.3(4)}{\kilo\gram}
+\end{LaTeXdemo}
+
 \subsection{Tabular material}
 
 Processing of material in tables obeys the same settings as described for the
