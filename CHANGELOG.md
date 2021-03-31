@@ -451,7 +451,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option name wrong in v1 table (issue #240)
 - Use `\textpm` in text mode if `textcomp` package is loaded (issue #249)
 - Ignore hard spaces in `\num` (issue #256)
-- Use `\mathord for tight spacing on 'in line' exponent (issue #257)
+- Use `\mathord` for tight spacing on 'in line' exponent (issue #257)
 
 ## [v2.5s] - 2013-07-31
 
