@@ -121,6 +121,16 @@
 %
 % \subsection{Main formatting routine}
 %
+% \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
+%   Purely internal for the present.
+%    \begin{macrocode}
+\tl_new:N \l_@@_bracket_close_tl
+\tl_new:N \l_@@_bracket_open_tl
+\tl_set:Nn \l_@@_bracket_open_tl { ( }
+\tl_set:Nn \l_@@_bracket_close_tl { ) }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
 %     \l_@@_break_bool          ,
@@ -232,7 +242,15 @@
       { \@@_single:n {#1#3} }
       {
         \bool_if:NTF \l_@@_uncert_bracket_bool
-          { \@@_single:n { ( #1#2 ) #3 } }
+          {
+            \exp_args:Nx \@@_single:n
+              {
+                \exp_not:V \l_@@_bracket_open_tl
+                \exp_not:n {#1#2}
+                \exp_not:V \l_@@_bracket_close_tl
+                \exp_not:n {#3}
+              }
+          }
           {
             \bool_if:NTF \l_@@_uncert_repeat_bool
               {

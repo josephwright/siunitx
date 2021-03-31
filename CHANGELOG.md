@@ -37,8 +37,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `range-mode`
 - Option `round-pad`
 - Option `number-angle-product`
-- Option `number-close-bracket`
-- Option `number-open-bracket`
 - Option `propagate-math-font`
 - Option `reset-math-version`
 - Option `reset-text-family`
@@ -74,11 +72,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-degree-zero`
 - Option `add-arc-minute-zero`
 - Option `add-arc-second-zero`
-- Option `close-bracket`
 - Option `explicit-sign`
 - Option `fraction-function`
 - Option `omit-uncertainty`
-- Option `open-bracket`
 - Option `overwrite-functions`
 - Option `multi-part-units`
 - Option `number-angle-product`
@@ -113,6 +109,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 - Option `add-integer-zero`
+- Option `close-bracket`
 - Option `detect-all`
 - Option `detect-display-math`
 - Option `detect-family`
@@ -124,6 +121,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `detect-weight`
 - Option `input-protect-tokens`
 - Option `literal-superscript-as-power`
+- Option `open-bracket`
 - Option `math-rm`
 - Option `math-sf`
 - Option `math-tt`
