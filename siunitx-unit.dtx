@@ -547,6 +547,14 @@
 %   is |true|.
 % \end{function}
 %
+% \begin{function}{extract-mass-in-kilograms}
+%   \begin{syntax}
+%     |extract-mass-in-kilograms| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Determines whether prefix extraction treats kilograms as a base unit; when
+%   set |false|, grams are used. The standard setting is |true|.
+% \end{function}
+%
 % \begin{function}{forbid-literal-units}
 %   \begin{syntax}
 %     |forbid-literal-units| = |true|\verb"|"|false|
@@ -1005,12 +1013,15 @@
 % parsing or typesetting is carried out, a small amount of pre-parsing has to
 % be carried out to decide which of these cases applies.
 %
-% \begin{variable}{\l_siunitx_unit_font_tl, \l_@@_product_tl}
+% \begin{variable}
+%   {\l_siunitx_unit_font_tl, \l_@@_product_tl, \l_@@_mass_kilogram_bool}
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    extract-mass-in-kilograms .bool_set:N =
+      \l_@@_mass_kilogram_bool ,
     font-command .tl_set:N =
       \l_siunitx_unit_font_tl ,
     inter-unit-product .tl_set:N =
@@ -1054,12 +1065,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_format:nN #1#2
   {
-    \bool_set_false:N \l_@@_prefix_power_bool
+    \bool_set_false:N \l_@@_prefix_exp_bool
     \@@_format:nNN {#1} #2 \l_@@_tmp_fp
   }
 \cs_new_protected:Npn \siunitx_unit_format_extract_prefixes:nNN #1#2#3
   {
-    \bool_set_true:N \l_@@_prefix_power_bool
+    \bool_set_true:N \l_@@_prefix_exp_bool
     \@@_format:nNN {#1} #2 #3
   }
 \cs_new_protected:Npn \@@_format:nNN #1#2#3
@@ -1327,6 +1338,8 @@
 %     unit.
 %   \item \texttt{special-$n$} Any \enquote{special effect} to apply to the
 %     current unit.
+%   \item \texttt{command-$1$} The command corresponding to \texttt{unit-$n$}:
+%     needed to track base units; used for \cs{gram} only.
 % \end{itemize}
 %
 % \begin{variable}{\l_@@_sticky_per_bool}
@@ -1481,6 +1494,12 @@
 \cs_new_protected:Npn \@@_parse_unit:Nn #1#2
   {
     \int_incr:N \l_@@_position_int
+    \tl_if_eq:nnT {#1} { \gram }
+      {
+        \@@_parse_add:nnnn { command }
+          { \int_use:N \l_@@_position_int }
+          {#1} {#1}
+      }
     \@@_parse_add:nnnn { unit }
       { \int_use:N \l_@@_position_int }
       {#1} {#2}
@@ -1711,13 +1730,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_prefix_power_bool}
+% \begin{variable}{\l_@@_prefix_exp_bool}
 %   Used to determine if prefixes are converted into powers. Note that
 %   while this may be set as an option \enquote{higher up}, at this point it
 %   is handled as an internal switch (see the two formatting interfaces for
 %   reasons).
 %    \begin{macrocode}
-\bool_new:N \l_@@_prefix_power_bool
+\bool_new:N \l_@@_prefix_exp_bool
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1759,6 +1778,7 @@
 %
 % \begin{macro}{\@@_format_parsed:}
 % \begin{macro}{\@@_format_parsed_aux:n}
+% \begin{macro}{\@@_format_mass_to_kilogram:}
 %   The main formatting routine is essentially a loop over each position,
 %   reading the various parts of the unit to build up complete unit
 %   combination.
@@ -1770,6 +1790,10 @@
     \tl_clear:N \l_@@_formatted_tl
     \fp_zero:N \l_@@_prefix_fp
     \int_zero:N \l_@@_position_int
+    \bool_lazy_and:nnT
+      { \l_@@_prefix_exp_bool }
+      { \l_@@_mass_kilogram_bool }
+      { \@@_format_mass_to_kilogram: }
     \int_do_while:nNnn
       \l_@@_position_int < \l_@@_total_int
       {
@@ -1793,6 +1817,38 @@
       { \use:c { @@_format_ #1 : } }
   }
 %    \end{macrocode}
+%   To deal correctly with prefix extraction in combination with kilograms, we
+%   need to coerce the prefix for grams. Currently, only this one special case
+%   is recorded in the property list, so we do not actually need to check the
+%   value. If there is then no prefix we do a bit of gymnastics to create one
+%   and then shift the starting point for the prefix extraction.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_mass_to_kilogram:
+  {
+    \int_step_inline:nn \l_@@_total_int
+      {
+        \prop_if_in:NnT \l_@@_parsed_prop { command- ##1 }
+          {
+            \prop_if_in:NnF \l_@@_parsed_prop { prefix- ##1 }
+              {
+                \group_begin:
+                  \bool_set_false:N \l_@@_parsing_bool
+                  \tl_set:Nx \l_@@_tmp_tl { \kilo }
+                \exp_args:NNNV \group_end:
+                \tl_set:Nn \l_@@_tmp_tl \l_@@_tmp_tl
+                \prop_put:NnV \l_@@_parsed_prop { prefix- ##1 }
+                  \l_@@_tmp_tl
+                \prop_get:NnNF \l_@@_parsed_prop { power- ##1 }
+                  \l_@@_tmp_tl
+                  { \tl_set:Nn \l_@@_tmp_tl { 1 } }
+                \fp_set:Nn \l_@@_prefix_fp
+                  { \l_@@_prefix_fp - 3 * \l_@@_tmp_tl }
+              }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -1916,7 +1972,12 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_format_prefix:}
-% \begin{macro}{\@@_format_prefix_power:, \@@_format_prefix_symbol:}
+% \begin{macro}
+%   {
+%     \@@_format_prefix_exp:   ,
+%     \@@_format_prefix_gram:  ,
+%     \@@_format_prefix_symbol:
+%   }
 %   Formatting for prefixes depends on whether they are to be expressed as
 %   symbols or collected up to be returned as a power of $10$. The latter
 %   case requires a bit of processing, which includes checking that the
@@ -1925,15 +1986,22 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_prefix:
   {
-    \bool_if:NTF \l_@@_prefix_power_bool
-      { \@@_format_prefix_power: }
+    \bool_if:NTF \l_@@_prefix_exp_bool
+      { \@@_format_prefix_exp: }
       { \@@_format_prefix_symbol: }
   }
-\cs_new_protected:Npn \@@_format_prefix_power:
+\cs_new_protected:Npn \@@_format_prefix_exp:
   {
     \prop_get:NVNTF \l_@@_prefixes_forward_prop
       \l_@@_part_tl \l_@@_part_tl
       {
+        \bool_if:NT \l_@@_mass_kilogram_bool
+          {
+            \tl_set:Nx \l_@@_tmp_tl
+              { command- \int_use:N \l_@@_position_int }
+            \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
+              { \@@_format_prefix_gram: }
+          }
         \tl_set:Nx \l_@@_tmp_tl
           { power- \int_use:N \l_@@_position_int }
         \prop_get:NVNF \l_@@_parsed_prop
@@ -1943,6 +2011,20 @@
           { \l_@@_tmp_tl * \l_@@_part_tl }
       }
       { \@@_format_prefix_symbol: }
+  }
+%    \end{macrocode}
+%   When the units in use are grams, we may need to deal with conversion to
+%   kilograms.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_prefix_gram:
+  {
+    \tl_set:Nx \l_@@_part_tl
+      { \int_eval:n { \l_@@_part_tl - 3 } }
+    \group_begin:
+      \bool_set_false:N \l_@@_parsing_bool
+      \tl_set:Nx \l_@@_current_tl { \kilo }
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn \l_@@_current_tl \l_@@_current_tl
   }
 \cs_new_protected:Npn \@@_format_prefix_symbol:
   { \tl_set_eq:NN \l_@@_current_tl \l_@@_part_tl }
@@ -2672,19 +2754,20 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    font-command             = \mathrm   ,
-    bracket-unit-denominator = true      ,
-    forbid-literal-units     = false     ,
-    fraction-command         = \frac     ,
-    inter-unit-product       = \,        ,
-    parse-units              = true      ,
-    per-mode                 = power     ,
-    per-symbol               = /         ,
-    qualifier-mode           = subscript ,
-    qualifier-phrase         =           ,
-    sticky-per               = false     ,
-    unit-close-bracket       = )         , % (
-    unit-open-bracket        = (           % )
+    font-command              = \mathrm   ,
+    bracket-unit-denominator  = true      ,
+    forbid-literal-units      = false     ,
+    fraction-command          = \frac     ,
+    inter-unit-product        = \,        ,
+    extract-mass-in-kilograms = true      ,
+    parse-units               = true      ,
+    per-mode                  = power     ,
+    per-symbol                = /         ,
+    qualifier-mode            = subscript ,
+    qualifier-phrase          =           ,
+    sticky-per                = false     ,
+    unit-close-bracket        = )         , % (
+    unit-open-bracket         = (           % )
   }
 %    \end{macrocode}
 %

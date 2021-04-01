@@ -409,6 +409,27 @@
     \test:n { \kilo \gram \metre \per \second \per \kelvin }
   }
 
+\TEST { Option~setting~"extract-mass-in-kilograms" }
+  {
+    \cs_set_protected:Npn \test:n #1
+      {
+        \siunitx_unit_format_extract_prefixes:nNN {#1} \l_tmpa_tl \l_tmpa_fp
+        \tl_show:N \l_tmpa_tl
+        \fp_show:N \l_tmpa_fp
+      }
+    \test:n {       \gram }
+    \test:n { \kilo \gram }
+    \test:n { \micro \gram }
+    \test:n {       \gram \squared }
+    \test:n { \kilo \gram \squared }
+    \keys_set:nn { siunitx } { extract-mass-in-kilograms = false }
+    \test:n {       \gram }
+    \test:n { \kilo \gram }
+    \test:n { \micro \gram }
+    \test:n {       \gram \squared }
+    \test:n { \kilo \gram \squared }
+  }
+
 \TEST { Option~setting~"forbid-literal-units" }
   {
     \test:n { \kilo \gram \metre \per \second \per \kelvin }

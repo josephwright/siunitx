@@ -73,6 +73,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-minute-zero`
 - Option `add-arc-second-zero`
 - Option `explicit-sign`
+- Option `extract-mass-in-kilograms`
 - Option `fraction-function`
 - Option `omit-uncertainty`
 - Option `overwrite-functions`
