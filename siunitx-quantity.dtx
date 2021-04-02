@@ -211,19 +211,19 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:nn #1#2
   {
-    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \siunitx_number_parse:nN {#1} \l_@@_number_tl
     \bool_if:NTF \l_@@_prefix_bool
       { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
       {
         \siunitx_unit_format_extract_prefixes:nNN {#2}
           \l_@@_unit_tl \l_@@_tmp_fp
         \exp_args:NV \@@_adjust_exp:nNN
-          \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+          \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
       }
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-    \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_format:NN \l_@@_tmp_tl \q_nil }
-    \exp_after:wN \@@_parsed_aux:w \l_@@_tmp_tl \q_stop
+    \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
+    \tl_set:Nx \l_@@_number_tl
+      { \siunitx_number_format:NN \l_@@_number_tl \q_nil }
+    \exp_after:wN \@@_parsed_aux:w \l_@@_number_tl \q_stop
   }
 %    \end{macrocode}
 %   To find out if we need to work harder, we first need to split the formatted
