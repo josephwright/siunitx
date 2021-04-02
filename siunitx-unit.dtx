@@ -135,7 +135,7 @@
 %   This function formats the \meta{units} in the same way as described for
 %   \cs{siunitx_unit_format:nN}. The \meta{exponent} is combined with any
 %   prefix for the \emph{first} unit of the \meta{units}, and an updated
-%   prefix is introduced. The \meta{exponent} must be an integer.
+%   prefix is introduced.
 %
 %   For example,
 %   \begin{verbatim}
@@ -1087,19 +1087,19 @@
 \cs_new_protected:Npn \siunitx_unit_format:nN #1#2
   {
     \bool_set_false:N \l_@@_prefix_exp_bool
-    \int_zero:N \l_@@_combine_exp_int
+    \fp_zero:N \l_@@_combine_exp_fp
     \@@_format:nNN {#1} #2 \l_@@_tmp_fp
   }
 \cs_new_protected:Npn \siunitx_unit_format_extract_prefixes:nNN #1#2#3
   {
     \bool_set_true:N \l_@@_prefix_exp_bool
-    \int_zero:N \l_@@_combine_exp_int
+    \fp_zero:N \l_@@_combine_exp_fp
     \@@_format:nNN {#1} #2 #3
   }
 \cs_new_protected:Npn \siunitx_unit_format_combine_exponent:nnN #1#2#3
   {
     \bool_set_false:N \l_@@_prefix_exp_bool
-    \int_set:Nn \l_@@_combine_exp_int {#2}
+    \fp_set:Nn \l_@@_combine_exp_fp {#2}
     \@@_format:nNN {#1} #3 \l_@@_tmp_fp
   }
 \cs_new_protected:Npn \@@_format:nNN #1#2#3
@@ -1764,11 +1764,10 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_combine_exp_int}
-%   For combining an exponent with the first unit: an integer as we don't have
-%   arbitrary prefixes.
+% \begin{variable}{\l_@@_combine_exp_fp}
+%   For combining an exponent with the first unit.
 %    \begin{macrocode}
-\int_new:N \l_@@_combine_exp_int
+\fp_new:N \l_@@_combine_exp_fp
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1831,7 +1830,7 @@
     \tl_clear:N \l_@@_formatted_tl
     \fp_zero:N \l_@@_prefix_fp
     \int_zero:N \l_@@_position_int
-    \int_compare:nNnF \l_@@_combine_exp_int = { 0 }
+    \fp_compare:nNnF \l_@@_combine_exp_fp = \c_zero_fp
       { \@@_format_combine_exp: }
     \bool_lazy_and:nnT
       { \l_@@_prefix_exp_bool }
@@ -1873,7 +1872,7 @@
     \prop_get:NnNF \l_@@_parsed_prop { power-1 } \l_@@_tmp_tl
       { \tl_set:Nn \l_@@_tmp_tl { 1 } }
     \fp_set:Nn \l_@@_tmp_fp
-      { \l_@@_combine_exp_int / \l_@@_tmp_tl }
+      { \l_@@_combine_exp_fp / \l_@@_tmp_tl }
     \prop_get:NnNTF \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl
       {
         \prop_get:NVNF \l_@@_prefixes_forward_prop
