@@ -1605,8 +1605,6 @@
 %     \l_@@_denominator_bracket_bool ,
 %     \l_@@_forbid_literal_bool      ,
 %     \l_@@_fraction_function_tl     ,
-%     \l_@@_bracket_close_tl         ,
-%     \l_@@_bracket_open_tl          ,
 %     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
 %     \l_@@_qualifier_mode_tl        ,
@@ -1673,11 +1671,7 @@
       { bracket , combine , phrase , subscript }
       { \tl_set_eq:NN \l_@@_qualifier_mode_tl \l_keys_choice_tl } ,
     qualifier-phrase .tl_set:N =
-      \l_@@_qualifier_phrase_tl ,
-    unit-close-bracket .tl_set:N =
-      \l_@@_bracket_close_tl ,
-    unit-open-bracket .tl_set:N =
-      \l_@@_bracket_open_tl
+      \l_@@_qualifier_phrase_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -1687,6 +1681,16 @@
 %   brackets if a power is added.
 %    \begin{macrocode}
 \bool_new:N \l_@@_bracket_bool
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_bracket_open_tl, \l_@@_bracket_close_tl}
+%   Abstracted out but currently purely internal.
+%    \begin{macrocode}
+\tl_new:N \l_@@_bracket_open_tl
+\tl_new:N \l_@@_bracket_close_tl
+\tl_set:Nn \l_@@_bracket_open_tl { ( }
+\tl_set:Nn \l_@@_bracket_close_tl { ) }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -2765,9 +2769,7 @@
     per-symbol                = /         ,
     qualifier-mode            = subscript ,
     qualifier-phrase          =           ,
-    sticky-per                = false     ,
-    unit-close-bracket        = )         , % (
-    unit-open-bracket         = (           % )
+    sticky-per                = false
   }
 %    \end{macrocode}
 %
