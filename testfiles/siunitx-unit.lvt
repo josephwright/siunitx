@@ -96,6 +96,25 @@
     \fp_show:N \l_tmpa_fp
   }
 
+\TEST { Unit~formatting~with~exponent~combination }
+  {
+    \siunitx_unit_format_combine_exponent:nnN { \metre } { 3 } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \kilo \metre } { 3 } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \milli \metre } { 3 }
+      \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \metre \squared } { 6 }
+      \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \per \metre } { 3 } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \gram \per \milli \mole }
+      { 3 } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \TEST { Creating~units }
@@ -602,4 +621,14 @@
       }
   }
 
+\TEST { Non-convertable~exponents }
+  {
+    \siunitx_unit_format_combine_exponent:nnN { \metre } { 4 } \l_tmpa_tl
+    \siunitx_unit_format_combine_exponent:nnN { \metre \squared } { 1 }
+      \l_tmpa_tl
+    \OMIT
+      \siunitx_declare_prefix:Nn \XXX { X }
+    \TIMO
+    \siunitx_unit_format_combine_exponent:nnN { \XXX \metre } { 3 } \l_tmpa_tl
+  }
 \END
