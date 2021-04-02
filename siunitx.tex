@@ -1997,19 +1997,25 @@ The product symbol between the number and unit is set using the
 \DescribeOption{extract-mass-in-kilograms}
 The unit prefixes (\cs{kilo}, \foreign{etc}.) are normally given as letters.
 However, the package can convert these into numerical powers. This is
-controlled by the \opt{prefix-mode} option, which takes the values \opt{input}
-and \opt{extract}. The treatment of kilograms can be set using
-\opt{extract-mass-in-kilograms}: when \opt{true}, the \emph{kilo} prefix is
-retained as part of the unit. This will mean that all grams are converted to
-kilograms.
+controlled by the \opt{prefix-mode} option, which takes the values \opt{input},
+\opt{combine-exponent} and \opt{extract-exponent}. The \opt{input} setting
+leaves the prefixes unchanged. Using \opt{combine-exponent} will add any
+exponent amount from the number to the first unit: this will modify any
+existing prefix. Finally, using \opt{extract-exponent} will remove all prefixes
+and express them as an exponent. The treatment of kilograms in this case can be
+set using \opt{extract-mass-in-kilograms}: when \opt{true}, the \emph{kilo}
+prefix is retained as part of the unit. This will mean that all grams are
+converted to kilograms.
 \begin{LaTeXdemo}
+  \qty{1e3}{\metre\second} \\
+  \qty[prefix-mode = combine-exponent]{1e3}{\metre\second} \\
   \qty{10}{\kilo\gram\squared\deci\second} \\
-  \qty[prefix-mode = extract]{10}{\kilo\gram\squared\deci\second}\\
-  \qty[prefix-mode = extract]{7.5}{\gram} \\
+  \qty[prefix-mode = extract-exponent]{10}{\kilo\gram\squared\deci\second}\\
+  \qty[prefix-mode = extract-exponent]{7.5}{\gram} \\
   \sisetup{extract-mass-in-kilograms = false}
   \qty{10}{\kilo\gram\squared\deci\second} \\
-  \qty[prefix-mode = extract]{10}{\kilo\gram\squared\deci\second} \\
-  \qty[prefix-mode = extract]{7.5}{\gram}
+  \qty[prefix-mode = extract-exponent]{10}{\kilo\gram\squared\deci\second} \\
+  \qty[prefix-mode = extract-exponent]{7.5}{\gram} \\
 \end{LaTeXdemo}
 
 \DescribeOption{separate-uncertainty-units}

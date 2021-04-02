@@ -76,7 +76,7 @@
 %
 % \begin{function}{prefix-mode}
 %   \begin{syntax}
-%     |prefix-mode| = |extract|\verb"|"|input|
+%     |prefix-mode| = |combine-exponent|\verb"|"|extract-exponent|\verb"|"|input|
 %   \end{syntax}
 % \end{function}
 %
@@ -134,12 +134,14 @@
 % \begin{variable}
 %   {
 %     \l_@@_break_bool          ,
+%     \l_@@_combine_exp_bool    ,
 %     \l_@@_prefix_bool         ,
 %     \l_@@_product_tl          ,
 %     \l_@@_uncert_bracket_bool ,
 %     \l_@@_uncert_repeat_bool
 %   }
 %    \begin{macrocode}
+\bool_new:N \l_@@_combine_exp_bool
 \bool_new:N \l_@@_prefix_bool
 \bool_new:N \l_@@_uncert_bracket_bool
 \bool_new:N \l_@@_uncert_repeat_bool
@@ -148,10 +150,21 @@
     allow-quantity-breaks .bool_set:N =
       \l_@@_break_bool ,
     prefix-mode .choice:,
-    prefix-mode / extract .code:n =
-     { \bool_set_false:N \l_@@_prefix_bool } ,
+    prefix-mode / combine-exponent .code:n =
+      {
+        \bool_set_true:N \l_@@_combine_exp_bool
+        \bool_set_true:N \l_@@_prefix_bool
+      } ,
+    prefix-mode / extract-exponent .code:n =
+     {
+       \bool_set_false:N \l_@@_combine_exp_bool
+       \bool_set_false:N \l_@@_prefix_bool
+     } ,
     prefix-mode / input .code:n =
-     { \bool_set_true:N \l_@@_prefix_bool } ,
+     {
+       \bool_set_false:N \l_@@_combine_exp_bool
+       \bool_set_true:N \l_@@_prefix_bool
+     } ,
     quantity-product .tl_set:N =
       \l_@@_product_tl ,
     separate-uncertainty-units .choice: ,
@@ -213,7 +226,16 @@
   {
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
     \bool_if:NTF \l_@@_prefix_bool
-      { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
+      {
+        \bool_if:NTF \l_@@_combine_exp_bool
+          {
+            \exp_args:NV \@@_extract_exp:nNN
+              \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
+            \siunitx_unit_format_combine_exponent:nnN {#2}
+              \l_@@_tmp_fp \l_@@_unit_tl
+          }
+          { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
+      }
       {
         \siunitx_unit_format_extract_prefixes:nNN {#2}
           \l_@@_unit_tl \l_@@_tmp_fp
@@ -262,6 +284,23 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_extract_exp:nNN}
+% \begin{macro}{\@@_extract_exp:nnnnnnnNN}
+%   To extract the exponent part for a combined prefix, we decompose the value
+%   and remove it.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_extract_exp:nNN #1#2#3
+  { \@@_extract_exp:nnnnnnnNN #1 #2 #3 }
+\cs_new_protected:Npn \@@_extract_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
+  {
+    \fp_set:Nn #8 {#6#7}
+    \tl_set:Nx #9
+      { {#1} {#2} {#3} {#4} {#5} { } { 0 } }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_adjust_exp:nNN}
