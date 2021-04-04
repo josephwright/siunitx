@@ -2386,14 +2386,11 @@
   }
 %    \end{macrocode}
 %   To finalise rounding to places, we have to worry about a minimum value:
-%   that is basically a case of looking for value of zero and rearranging. 
+%   that is basically a case of looking for value of zero and rearranging. We
+%   also need to worry about a \enquote{negative zero} arising.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_places_finalise:n #1
-  {
-    \tl_if_empty:NTF \l_@@_round_min_tl
-      { \exp_not:n {#1} }
-      { \@@_round_places_finalise:nnnnnnn #1 }
-  }
+  { \@@_round_places_finalise:nnnnnnn #1 }
 \cs_new:Npn \@@_round_places_finalise:nnnnnnn #1#2#3#4#5#6#7
   {
     \bool_lazy_and:nnTF
@@ -2403,14 +2400,27 @@
           { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
       }
       {
-        \exp_after:wN \@@_round_places_finalise:nnnnn
-          \l_@@_round_min_tl {#2} {#6} {#7}
+        \tl_if_empty:NTF \l_@@_round_min_tl
+          {
+            \exp_not:n { {#1} }
+            { \str_if_eq:nnF {#2} { - } { \exp_not:n {#2} } }
+            \exp_not:n { {#3} {#4} {#5} {#6} {#7} }
+          }
+          {
+            \exp_after:wN \@@_round_places_finalise:nnnnn
+              \l_@@_round_min_tl {#2} {#6} {#7}
+          }
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
 \cs_new:Npn \@@_round_places_finalise:nnnnn #1#2#3#4#5
   {
-    \exp_not:n { { < } {#3} {#1} {#2} { } {#4} {#5} }
+    {
+      \str_if_eq:nnTF {#3} { - }
+        { > }
+        { < }
+    }
+    \exp_not:n { {#3} {#1} {#2} { } {#4} {#5} }
   }
 %    \end{macrocode}
 % \end{macro}
