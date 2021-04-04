@@ -1457,7 +1457,6 @@
 %     \l_@@_min_decimal_int        ,
 %     \l_@@_min_integer_int        ,
 %     \l_@@_round_half_even_bool   ,
-%     \l_@@_round_min_tl           ,
 %     \l_@@_round_mode_tl          ,
 %     \l_@@_round_pad_bool         ,
 %     \l_@@_round_precision_int
@@ -1485,8 +1484,8 @@
       { \bool_set_true:N \l_@@_round_half_even_bool } ,
     round-half / up .code:n =
       { \bool_set_false:N \l_@@_round_half_even_bool } ,
-    round-minimum .tl_set:N =
-      \l_@@_round_min_tl ,
+    round-minimum .code:n =
+      { \@@_set_round_min:n {#1} } ,
     round-mode .choices:nn =
       { figures , none , places, uncertainty }
       { \tl_set_eq:NN \l_@@_round_mode_tl \l_keys_choice_tl } ,
@@ -1500,6 +1499,42 @@
 \tl_new:N \l_@@_round_mode_tl
 %    \end{macrocode}
 % \end{variable}
+%
+% \begin{variable}{\l_@@_round_min_tl}
+%   For storing the minimum for rounding.
+%   \begin{macrocode}
+\tl_new:N \l_@@_round_min_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_set_round_min:n}
+% \begin{macro}[EXP]{\@@_set_round_min:nnnnnnn}
+%  For setting the rounding minimum, the aim is to do as much of the work
+%  now as possible. That's mainly a question of checking if there are any
+%  significant digits in the mantissa given.
+%   \begin{macrocode}
+\cs_new_protected:Npn \@@_set_round_min:n #1
+  {
+    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \exp_after:wN \@@_set_round_min:nnnnnnn \l_@@_tmp_tl
+  }
+\cs_new:Npn \@@_set_round_min:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \tl_set:Nx \l_@@_round_min_tl
+      {
+        \bool_lazy_and:nnF
+          { \str_if_eq_p:nn {#3} { 0 } }
+          {
+            \str_if_eq_p:ee
+              { \exp_not:n {#4} }
+              { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+          }
+          { \exp_not:n { {#3} {#4} } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\siunitx_number_process:NN}
 % \begin{macro}{\@@_process:nnnnnnn}
@@ -2296,6 +2331,9 @@
 % \begin{macro}[EXP]{\@@_round_places:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_places_end:nn}
 % \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
+% \begin{macro}[EXP]{\@@_round_places_finalise:n}
+% \begin{macro}[EXP]{\@@_round_places_finalise:nnnnnnn}
+% \begin{macro}[EXP]{\@@_round_places_finalise:nnnnn}
 %   The first step when rounding to a fixed number of places is to establish
 %   if this is in the decimal or integer parts. The two require different
 %   calculations for how many digits to drop from the input. The no-op end
@@ -2306,12 +2344,15 @@
   {
     \tl_if_blank:nTF {#5}
       {
-        \exp_not:n { {#1} {#2} }
-        \int_compare:nNnTF \l_@@_round_precision_int > 0
-          { \@@_round_places_decimal:nn }
-          { \@@_round_places_integer:nn }
-            {#3} {#4}
-        \@@_round_places_end:nn {#6} {#7}
+        \exp_args:Ne \@@_round_places_finalise:n
+          {
+            \exp_not:n { {#1} {#2} }
+            \int_compare:nNnTF \l_@@_round_precision_int > 0
+              { \@@_round_places_decimal:nn }
+              { \@@_round_places_integer:nn }
+                {#3} {#4}
+            \@@_round_places_end:nn {#6} {#7}
+          }
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
@@ -2344,6 +2385,37 @@
        {#1} {#2}
   }
 %    \end{macrocode}
+%   To finalise rounding to places, we have to worry about a minimum value:
+%   that is basically a case of looking for value of zero and rearranging. 
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_places_finalise:n #1
+  {
+    \tl_if_empty:NTF \l_@@_round_min_tl
+      { \exp_not:n {#1} }
+      { \@@_round_places_finalise:nnnnnnn #1 }
+  }
+\cs_new:Npn \@@_round_places_finalise:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \bool_lazy_and:nnTF
+      { \str_if_eq_p:nn {#3} { 0 } }
+      {
+        \str_if_eq_p:ee
+          { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      }
+      {
+        \exp_after:wN \@@_round_places_finalise:nnnnn
+          \l_@@_round_min_tl {#2} {#6} {#7}
+      }
+      { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
+  }
+\cs_new:Npn \@@_round_places_finalise:nnnnn #1#2#3#4#5
+  {
+    \exp_not:n { { < } {#3} {#1} {#2} { } {#4} {#5} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
