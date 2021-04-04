@@ -48,7 +48,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-alignment-mode`
 - Option `text-family-to-math`
 - Option `text-weight-to-math`
-- Option `track-explicit-plus`
 - Option setting `list-mode = bracket`
 - Option setting `mode = match`
 - Option setting `number-mode = match`
@@ -81,7 +80,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `number-angle-product`
 - Option `number-unit-product`
 - Option `prefixes-as-symbols`
-- Option `retain-explicit-plus`
 - Option `retain-unity-mantissa`
 - Option `retain-zero-exponent`
 - Option `scientific-notation`
