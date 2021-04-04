@@ -1149,6 +1149,7 @@ Table~\ref{tab:opt:num:in}.
       input-uncertainty-signs & Literal & \cs{pm}          \\
       parse-numbers           & Switch  & true             \\
       retain-explicit-plus    & Switch  & false            \\
+      retain-zero-uncertainty & Switch  & false            \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1229,12 +1230,18 @@ in that a decimal marker must be |.|.
 \end{LaTeXdemo}
 
 \DescribeOption{retain-explicit-plus}
+\DescribeOption{retain-zero-uncertainty}
 The inclusion of a leading plus sign is usually unnecessary for positive
 numbers, and so they are not retained as-standard when parsing. The
 \opt{retain-explicit-plus} option is available to control this behaviour.
+Similarly, an uncertainty of zero is normally not meaningful, and so is
+ignored by the parser. This can be controlled using the
+\opt{retain-zero-uncertainty} option.
 \begin{LaTeXdemo}
   \num{+345} \\
   \num[retain-explicit-plus]{+345}
+  \num{12.3(0)} \\
+  \num[retain-zero-uncertainty]{12.3(0)}
 \end{LaTeXdemo}
 
 \subsection{Post-processing numbers}

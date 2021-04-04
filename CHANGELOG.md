@@ -81,6 +81,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `number-unit-product`
 - Option `prefixes-as-symbols`
 - Option `retain-unity-mantissa`
+- Option `retain-zero-uncertainty`
 - Option `retain-zero-exponent`
 - Option `scientific-notation`
 - Option `table-align-text-post`

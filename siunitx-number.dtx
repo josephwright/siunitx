@@ -374,6 +374,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{retain-zero-uncertainty}
+%   \begin{syntax}
+%     |retain-zero-uncertainty| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{round-half}
 %   \begin{syntax}
 %     |round-half| = |even|\verb"|"|up|
@@ -553,7 +559,8 @@
 %      \l_@@_input_uncert_open_tl  ,
 %      \l_@@_input_sign_tl         ,
 %      \l_@@_input_uncert_sign_tl  ,
-%      \l_@@_explicit_plus_bool
+%      \l_@@_explicit_plus_bool    ,
+%      \l_@@_zero_uncert_bool
 %   }
 %  \begin{macro}[EXP]{\@@_expression:n}
 %   Options which determine the various valid parts of a parsed number.
@@ -592,7 +599,9 @@
     parse-numbers .bool_set:N =
       \l_siunitx_number_parse_bool ,
     retain-explicit-plus .bool_set:N =
-      \l_@@_explicit_plus_bool
+      \l_@@_explicit_plus_bool ,
+    retain-zero-uncertainty .bool_set:N =
+      \l_@@_zero_uncert_bool
   }
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
@@ -841,7 +850,11 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_parse_combine_uncert_auxv:w #1
   {
-    \quark_if_recursion_tail_stop:N #1
+    \quark_if_recursion_tail_stop_do:Nn #1
+      {
+        \bool_if:NT \l_@@_zero_uncert_bool
+          { { S } { 0 } }
+      }
     \str_if_eq:nnTF {#1} { 0 }
       { \@@_parse_combine_uncert_auxv:w }
       { \@@_parse_combine_uncert_auxvi:w #1 }
@@ -1344,7 +1357,15 @@
               { \@@_parse_loop_break:wN }
               {
                 \tl_if_empty:NTF \l_@@_partial_tl
-                  { \tl_put_right:Nx #1 { { } } }
+                  {
+                    \tl_put_right:Nx #1
+                      {
+                        {
+                          \bool_if:NT \l_@@_zero_uncert_bool
+                            { { S } { 0 } }
+                        }
+                      }
+                  }
                   {
                     \tl_set:Nx \l_@@_partial_tl
                       { { S } { \exp_not:V \l_@@_partial_tl } }
@@ -3021,6 +3042,7 @@
     print-unity-mantissa     = true                                   ,
     print-zero-exponent      = false                                  ,
     retain-explicit-plus     = false                                  ,
+    retain-zero-uncertainty  = false                                  ,
     round-half               = up                                     ,
     round-minimum            = 0                                      ,
     round-mode               = none                                   ,
