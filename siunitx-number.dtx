@@ -2638,7 +2638,8 @@
 % \begin{macro}[rEXP]{\@@_format_bracket:nn}
 % \begin{macro}[rEXP]{\@@_format_bracket:w}
 % \begin{macro}[rEXP]{\@@_format_comparator:nn}
-% \begin{macro}[rEXP]{\@@_format_sign:n}
+% \begin{macro}[rEXP]{\@@_format_sign:nn}
+% \begin{macro}[rEXP]{\@@_format_sign:nN}
 % \begin{macro}[rEXP]{\@@_format_sign:N}
 % \begin{macro}[rEXP]
 %   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
@@ -2683,7 +2684,7 @@
   {
     \@@_format_comparator:nn {#1} {#8}
     \@@_format_bracket:nn {#5} {#7}
-    \@@_format_sign:n {#2}
+    \@@_format_sign:nn {#1} {#2}
     \@@_format_integer:nnn {#3} {#4} {#7}
     \@@_format_decimal:nn {#4} {#8}
     \@@_format_uncertainty:nnn {#5} {#4} {#8}
@@ -2730,26 +2731,34 @@
 %   Formatting signs has to deal with some additional formatting requirements
 %   for negative numbers. Both making such numbers a fixed color and bracketing
 %   them needs some rearrangement of the order of tokens, which is set up in
-%   the main formatting macro by the dedicated do-nothing end function.
+%   the main formatting macro by the dedicated do-nothing end function. We
+%   also have the comparator passed here: if it is present, we need to deal
+%   with tighter spacing.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_sign:n #1
+\cs_new:Npn \@@_format_sign:nn #1#2
   {
-    \tl_if_blank:nTF {#1}
+    \tl_if_blank:nTF {#2}
       {
         \bool_if:NT \l_@@_implicit_plus_bool
-          { \@@_format_sign:N + }
+          { \@@_format_sign:nN {#1} + }
       }
       {
-        \str_if_eq:nnTF {#1} { - }
+        \str_if_eq:nnTF {#2} { - }
           {
             \tl_if_empty:NF \l_@@_negative_color_tl
               { \@@_format_sign_color:w }
             \bool_if:NTF \l_@@_bracket_negative_bool
               { \@@_format_sign_brackets:w }
-              { \@@_format_sign:N #1 }
+              { \@@_format_sign:nN {#1} #2 }
           }
-          { \@@_format_sign:N #1 }
+          { \@@_format_sign:nN {#1} #2 }
       }
+  }
+\cs_new:Npn \@@_format_sign:nN #1#2
+  {
+    \tl_if_blank:nTF {#1}
+      { \@@_format_sign:N #2 }
+      { \exp_not:n { \mathord {#2} } }
   }
 \cs_new:Npn \@@_format_sign:N #1
   {
@@ -3008,6 +3017,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_format_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
