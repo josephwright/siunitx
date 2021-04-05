@@ -1605,6 +1605,9 @@
 %     \@@_exponent_shift_up_aux:fnn ,
 %     \@@_exponent_shift_up_aux:ffn
 %   }
+% \begin{macro}[EXP]{\@@_exponent_shift_uncert:nw}
+% \begin{macro}[EXP]
+%   {\@@_exponent_shift_uncert_S:nnnn, \@@_exponent_shift_uncert_S:fnnn}
 % \begin{macro}[EXP]{\@@_exponent_uncert:n}
 % \begin{macro}[EXP]{\@@_exponent_finalise:n}
 % \begin{macro}[EXP]{\@@_exponent_engineering_aux:nnnnnnn}
@@ -1747,6 +1750,7 @@
           { \int_eval:n { #1 + 1 } }
           { \str_if_eq:nnF {#2} { 0 } {#2} 0 }
           { }
+        \@@_exponent_shift_uncert:nw { 1 }
       }
       {  \@@_exponent_shift_up:nnw {#1} {#2} #3 \q_stop }
   }
@@ -1769,11 +1773,38 @@
               \prg_replicate:nn { \int_abs:n {#1} } { 0 }
             }
             { }
+            \@@_exponent_shift_uncert:nw { \int_abs:n {#1} }
          }
          { \@@_exponent_shift_up:nnn {#1} {#2} {#3} }
       }
   }
 \cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { f , ff }
+%    \end{macrocode}
+%   If the shift has put digits into the integer part, we have to adjust the
+%   uncertainty accordingly. First, we grab the data, then adjust by the
+%   number of places that have been transferred.
+%    \begin{macrocode}
+\cs_new:Npn \@@_exponent_shift_uncert:nw
+  #1#2 \@@_exponent_uncert:n #3
+  {
+    \tl_if_blank:nTF {#3}
+      {
+        #2
+        \@@_exponent_uncert:n { }
+      }
+      {
+        \use:c { @@_exponent_shift_uncert_ \use_i:nn #3 :fnnn }
+          { \prg_replicate:nn {#1} { 0 } }
+          {#2}
+          #3
+      }
+  }
+\cs_new:Npn \@@_exponent_shift_uncert_S:nnnn #1#2#3#4
+  {
+    #2
+    \@@_exponent_uncert:n { { S } { #4#1 } }
+  }
+\cs_generate_variant:Nn \@@_exponent_shift_uncert_S:nnnn { f }
 \cs_new:Npn \@@_exponent_uncert:n #1 { { \exp_not:n {#1} } }
 %    \end{macrocode}
 %   Tidy up the exponent to put the sign in the right place.
@@ -1846,6 +1877,8 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
