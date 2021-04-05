@@ -1605,6 +1605,7 @@
 %     \@@_exponent_shift_up_aux:fnn ,
 %     \@@_exponent_shift_up_aux:ffn
 %   }
+% \begin{macro}[EXP]{\@@_exponent_uncert:n}
 % \begin{macro}[EXP]{\@@_exponent_finalise:n}
 % \begin{macro}[EXP]{\@@_exponent_engineering_aux:nnnnnnn}
 % \begin{macro}[EXP]
@@ -1645,7 +1646,7 @@
   {
     \exp_not:n { {#2} {#3} }
     \@@_exponent_shift:nnn {#1} {#4} {#5}
-    \exp_not:n { {#6} }
+    \@@_exponent_uncert:n {#6}
     \exp_not:n { {#7} } { \int_use:N \l_@@_exponent_fixed_int }
   }
 \cs_new:Npn \@@_exponent_input:nnnnnnn #1#2#3#4#5#6#7
@@ -1676,7 +1677,7 @@
       }
       {
         \@@_exponent_shift:nnn { #1 - 1 } {#4} {#5}
-        \exp_not:n { {#6} }
+        \@@_exponent_uncert:n {#6}
         \@@_exponent_finalise:n { #1 + #7#8 - 1 }
       }
   }
@@ -1773,6 +1774,7 @@
       }
   }
 \cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { f , ff }
+\cs_new:Npn \@@_exponent_uncert:n #1 { { \exp_not:n {#1} } }
 %    \end{macrocode}
 %   Tidy up the exponent to put the sign in the right place.
 %    \begin{macrocode}
@@ -1844,6 +1846,7 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
