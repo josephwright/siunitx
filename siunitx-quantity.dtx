@@ -199,7 +199,9 @@
 % \begin{macro}{\@@_parsed_aux:nnnw}
 % \begin{macro}{\@@_parsed_aux:nnnn}
 %   For quantities, there is bit to do to combine things. The first question is
-%   whether we are parsing at all: if not, things are quite short.
+%   whether we are parsing at all: if not, things are quite short. Notice that
+%   within this group we turn off bracketing in the number formatter: we
+%   have to deal with quantity-based brackets instead.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_quantity:nn #1#2
   {
@@ -227,6 +229,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:nn #1#2
   {
+    \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
     \bool_if:NTF \l_@@_prefix_bool
       {
