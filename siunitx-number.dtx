@@ -1599,7 +1599,12 @@
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nw}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnw}
-% \begin{macro}[EXP]{\@@_exponent_shift_up_aux:nnn, \@@_exponent_shift_up_aux:fnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_exponent_shift_up_aux:nnn ,
+%     \@@_exponent_shift_up_aux:fnn ,
+%     \@@_exponent_shift_up_aux:ffn
+%   }
 % \begin{macro}[EXP]{\@@_exponent_finaliise:n}
 % \begin{macro}[EXP]{\@@_exponent_engineering_aux:nnnnnnn}
 % \begin{macro}[EXP]
@@ -1730,19 +1735,27 @@
 %    \end{macrocode}
 %   For shifting the exponent up, we can run out of decimal digits, at which
 %   point filling is easy. Other than that a simple loop as we are picking
-%   input off the front of the decimal part.
+%   input off the front of the decimal part. We also need to deal with leading
+%   zeros: these cannot accumulate.
 %    \begin{macrocode}
 \cs_new:Npn \@@_exponent_shift_up:nnn #1#2#3
   {
     \tl_if_blank:nTF {#3}
       {
-        \@@_exponent_shift_up_aux:fnn
-          { \int_eval:n { #1 + 1 } } { #2 0 } { }
+        \@@_exponent_shift_up_aux:ffn
+          { \int_eval:n { #1 + 1 } }
+          { \str_if_eq:nnF {#2} { 0 } {#2} 0 }
+          { }
       }
       {  \@@_exponent_shift_up:nnw {#1} {#2} #3 \q_stop }
   }
 \cs_new:Npn \@@_exponent_shift_up:nnw #1#2#3#4 \q_stop
-  { \@@_exponent_shift_up_aux:fnn { \int_eval:n { #1 + 1 } } { #2 #3 } {#4} }
+  {
+    \@@_exponent_shift_up_aux:ffn
+      { \int_eval:n { #1 + 1 } }
+      { \str_if_eq:nnF {#2} { 0 } {#2} #3 }
+      {#4}
+  }
 \cs_new:Npn \@@_exponent_shift_up_aux:nnn #1#2#3
   {
     \int_compare:nNnTF {#1} = 0
@@ -1759,7 +1772,7 @@
          { \@@_exponent_shift_up:nnn {#1} {#2} {#3} }
       }
   }
-\cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { f }
+\cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { f , ff }
 %    \end{macrocode}
 %   Tidy up the exponent to put the sign in the right place.
 %    \begin{macrocode}
