@@ -1617,7 +1617,9 @@
 %     \@@_exponent_engineering_1:nnnn ,
 %     \@@_exponent_engineering_2:nnnn
 %   }
-%  \begin{macro}[EXP]{\@@_exponent_engineering:nNw}
+%  \begin{macro}[EXP]{\@@_exponent_engineering:nnNw}
+%  \begin{macro}[EXP]{\@@_exponent_engineering_uncert:nn}
+%  \begin{macro}[EXP]{\@@_exponent_engineering_uncert_S:nnn}
 %   Manipulating an exponent is done using a single expansion function
 %   \emph{unless} dealing with engineering-style output. The latter is easier
 %   to handle by first converting to scientific output, then post-processing.
@@ -1858,32 +1860,59 @@
 \cs_new:cpn { @@_exponent_engineering_1:nnnn } #1#2#3#4
   {
     \tl_if_blank:nTF {#2}
-      { { \exp_not:n { #1 0 } } { } }
+      {
+        { \exp_not:n { #1 0 } } { }
+        { \@@_exponent_engineering_uncert:nn {#3} { 0 } }
+      }
       {
         { \exp_not:n {#1} \exp_not:o { \tl_head:w #2 \q_stop } }
         { \exp_not:f { \tl_tail:n {#2} } }
+        { \exp_not:n {#3} }
       }
-    \exp_not:n { {#3} }
     \@@_exponent_finalise:n { #4 - 1 }
   }
 \cs_new:cpn { @@_exponent_engineering_2:nnnn } #1#2#3#4
   {
     \tl_if_blank:nTF {#2}
-      { { \exp_not:n { #1 00 } } { } }
-      { \@@_exponent_engineering:nNw {#1} #2 \q_stop }
-    \exp_not:n { {#3} }
+      {
+        { \exp_not:n { #1 00 } } { }
+        { \@@_exponent_engineering_uncert:nn {#3} { 00 } }
+      }
+      {\@@_exponent_engineering:nnNw {#1} {#3} #2 \q_stop }
     \@@_exponent_finalise:n { #4 - 2 }
   }
-\cs_new:Npn \@@_exponent_engineering:nNw #1#2#3 \q_stop
+\cs_new:Npn \@@_exponent_engineering:nnNw #1#2#3#4 \q_stop
   {
-    \tl_if_blank:nTF {#3}
-      { { \exp_not:n { #1#2 0 } } { } }
+    \tl_if_blank:nTF {#4}
       {
-        { \exp_not:n {#1#2} \exp_not:o { \tl_head:w #3 \q_stop } }
-        { \exp_not:f { \tl_tail:n {#3} } }
+        { \exp_not:n { #1#3 0 } } { }
+        { { \@@_exponent_engineering_uncert:nn {#2} { 0 } } }
+      }
+      {
+        { \exp_not:n {#1#3} \exp_not:o { \tl_head:w #4 \q_stop } }
+        { \exp_not:f { \tl_tail:n {#4} } }
+        { \exp_not:n {#2} }
       }
   }
+\cs_new:Npn \@@_exponent_engineering_uncert:nn #1#2
+  {
+    \tl_if_blank:nF {#1}
+      {
+        \use:c { @@_exponent_engineering_uncert_ \use_i:nn #1 :nnn }
+          #1 {#2}
+      }
+  }
+\cs_new:Npn \@@_exponent_engineering_uncert_S:nnn #1#2#3
+  {
+    { S }
+    {
+      \exp_not:n {#2}
+      \str_if_eq:nnF {#2} { 0 } {#3}
+    }
+  }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
