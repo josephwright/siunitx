@@ -1793,10 +1793,17 @@
         \@@_exponent_uncert:n { }
       }
       {
-        \use:c { @@_exponent_shift_uncert_ \use_i:nn #3 :fnnn }
-          { \prg_replicate:nn {#1} { 0 } }
-          {#2}
-          #3
+        \str_if_eq:nnTF {#3} { 0 }
+          {
+            #2
+            \@@_exponent_uncert:n { { S } { 0 } }
+          }
+          {      
+            \use:c { @@_exponent_shift_uncert_ \use_i:nn #3 :fnnn }
+              { \prg_replicate:nn {#1} { 0 } }
+              {#2}
+              #3
+          }
       }
   }
 \cs_new:Npn \@@_exponent_shift_uncert_S:nnnn #1#2#3#4
