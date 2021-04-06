@@ -64,8 +64,7 @@
 %     \cs{siunitx_number_list:n} \Arg{entries}
 %   \end{syntax}
 %   Prints the list of numbers in the \meta{entries}, each of which should
-%   be given as a \meta{balanced text}. Formatting of each number is carried
-%   out as described for \cs{siunitx_number_format:nN}.
+%   be given as a \meta{balanced text}.
 % \end{function}
 %
 % \begin{function}{\siunitx_product:n}
@@ -73,17 +72,14 @@
 %     \cs{siunitx_number_product:n} \Arg{entries}
 %   \end{syntax}
 %   Prints the series of numbers in the \meta{entries}, each of which should
-%   be given as a \meta{balanced text}. Formatting of each number is carried
-%   out as described for \cs{siunitx_number_format:nN}.
+%   be given as a \meta{balanced text}.
 % \end{function}
 %
 % \begin{function}{\siunitx_range:nn}
 %   \begin{syntax}
 %     \cs{siunitx_number_range:nn} \Arg{start} \Arg{end}
 %   \end{syntax}
-%   Prints the range of numbers from the \meta{start} to the \meta{end},
-%   both of which are processed as described for
-%   \cs{siunitx_number_format:nN}.
+%   Prints the range of numbers from the \meta{start} to the \meta{end}.
 % \end{function}
 %
 % \begin{variable}
@@ -224,26 +220,37 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_list:n}
-%   The hard work here can be done using a sequence: just a question of
-%   adding the data there.
+% \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_list:n #1
   {
     \group_begin:
       \seq_clear:N \l_@@_tmp_seq
-      \tl_map_inline:nn {#1}
-        {
-          \siunitx_number_format:nN {##1} \l_@@_tmp_tl
-          \seq_put_right:Nx \l_@@_tmp_seq
-            { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
-        }
+      \bool_if:NTF \l_siunitx_number_parse_bool
+        { \tl_map_function:nN {#1} \@@_parsed:n }
+        { \tl_map_function:nN {#1} \@@_unparsed:n }
       \seq_use:NVVV \l_@@_tmp_seq
         \l_siunitx_list_separator_pair_tl
         \l_siunitx_list_separator_tl
         \l_siunitx_list_separator_final_tl
     \group_end:
   }
+\cs_new_protected:Npn \@@_parsed:n #1
+  {
+    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:N \l_@@_tmp_tl }
+    \seq_put_right:Nx \l_@@_tmp_seq
+      { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
+  }
+\cs_new_protected:Npn \@@_unparsed:n #1
+  {
+    \seq_put_right:Nn \l_@@_tmp_seq
+      { \siunitx_print:nn { number } { \ensuremath {#1} } }
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Products}
@@ -326,23 +333,33 @@
 % \end{macro}
 %
 % \begin{macro}{\siunitx_product:n}
+% \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
 % \begin{macro}{\@@_phrase:, \@@_symbol:}
-%   Much like lists, but with two possible output methods and a simpler
-%   loop.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_product:n #1
   {
     \group_begin:
       \seq_clear:N \l_@@_tmp_seq
-      \tl_map_inline:nn {#1}
-        {
-          \siunitx_number_format:nN {##1} \l_@@_tmp_tl
-          \seq_put_right:Nx \l_@@_tmp_seq
-            { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
-        }
+      \bool_if:NTF \l_siunitx_number_parse_bool
+        { \tl_map_function:nN {#1} \@@_parsed:n }
+        { \tl_map_function:nN {#1} \@@_unparsed:n }
       \seq_use:Nx \l_@@_tmp_seq
         { \exp_not:c { @@_ \l_@@_mode_tl : } }
     \group_end:
+  }
+\cs_new_protected:Npn \@@_parsed:n #1
+  {
+    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:N \l_@@_tmp_tl }
+    \seq_put_right:Nx \l_@@_tmp_seq
+      { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
+  }
+\cs_new_protected:Npn \@@_unparsed:n #1
+  {
+    \seq_put_right:Nn \l_@@_tmp_seq
+      { \siunitx_print:nn { number } { \ensuremath {#1} } }
   }
 \cs_new_protected:Npn \@@_phrase:
   { \tl_use:N \l_@@_phrase_tl }
@@ -353,6 +370,7 @@
     \siunitx_print:nV { number } \l_@@_tmp_tl
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -368,6 +386,13 @@
 %   Scratch space.
 %    \begin{macrocode}
 \tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_start_tl, \l_@@_end_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_start_tl
+\tl_new:N \l_@@_end_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -404,16 +429,34 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_range:nn}
+% \begin{macro}{\@@_number:nN}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_range:nn #1#2
   {
-    \siunitx_number_format:nN {#1} \l_@@_tmp_tl
-    \siunitx_print:nV { number } \l_@@_tmp_tl
-    \tl_use:N \l_siunitx_range_phrase_tl
-    \siunitx_number_format:nN {#2} \l_@@_tmp_tl
-    \siunitx_print:nV { number } \l_@@_tmp_tl
+    \group_begin:
+      \bool_if:NTF \l_siunitx_number_parse_bool
+        {
+          \@@_number:nN {#1} \l_@@_start_tl
+          \@@_number:nN {#2} \l_@@_end_tl
+        }
+        {
+          \tl_set:Nn \l_@@_start_tl { \ensuremath {#1} }
+          \tl_set:Nn \l_@@_end_tl { \ensuremath {#2} }
+        }
+      \siunitx_print:nV { number } \l_@@_start_tl
+      \tl_use:N \l_siunitx_range_phrase_tl
+      \siunitx_print:nV { number } \l_@@_end_tl
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_number:nN #1#2
+  {
+    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx #2
+      { \siunitx_number_format:N \l_@@_tmp_tl }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
