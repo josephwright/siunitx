@@ -253,17 +253,59 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_mode_tl, \l_@@_phrase_tl, \l_@@_symbol_tl}
+% \begin{variable}
+%   {
+%     \l_@@_bracket_bool ,
+%     \l_@@_mode_tl      ,
+%     \l_@@_phrase_tl    ,
+%     \l_@@_power_bool   ,
+%     \l_@@_repeat_bool  ,
+%     \l_@@_symbol_tl
+%   }
 %   Options for products.
 %    \begin{macrocode}
+\bool_new:N \l_@@_bracket_bool
 \tl_new:N \l_@@_mode_tl
+\bool_new:N \l_@@_power_bool
+\bool_new:N \l_@@_repeat_bool
 \keys_define:nn { siunitx }
   {
     product-mode .choices:nn =
       { phrase , symbol }
       { \tl_set_eq:NN \l_@@_mode_tl \l_keys_choice_tl } ,
     product-phrase .tl_set:N = \l_@@_phrase_tl ,
-    product-symbol .tl_set:N = \l_@@_symbol_tl
+    product-symbol .tl_set:N = \l_@@_symbol_tl ,
+    product-units .choice: ,
+    product-units / bracket .code:n =
+      {
+        \bool_set_true:N  \l_@@_bracket_bool
+        \bool_set_false:N \l_@@_power_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      } ,
+    product-units / bracket-power .code:n =
+      {
+        \bool_set_true:N  \l_@@_bracket_bool
+        \bool_set_true:N \l_@@_power_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      } ,
+    product-units / power .code:n =
+      {
+        \bool_set_false:N  \l_@@_bracket_bool
+        \bool_set_true:N \l_@@_power_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      } ,
+    product-units / repeat .code:n =
+      {
+        \bool_set_false:N \l_@@_bracket_bool
+        \bool_set_false:N \l_@@_power_bool
+        \bool_set_true:N  \l_@@_repeat_bool
+      } ,
+    product-units / single .code:n =
+      {
+        \bool_set_false:N \l_@@_bracket_bool
+        \bool_set_false:N \l_@@_power_bool
+        \bool_set_false:N \l_@@_repeat_bool
+      }
   }
 %    \end{macrocode}
 % \end{variable}
@@ -381,6 +423,7 @@
     product-mode         = symbol            ,
     product-phrase       = \text { ~ by ~ }  ,
     product-symbol       = \times            ,
+    product-units        = repeat            ,
     range-phrase         = \text { ~ to ~ }  ,
     range-units          = repeat
   }
