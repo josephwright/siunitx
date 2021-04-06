@@ -21,7 +21,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-arc-seconds`
 - Option `font-command`
 - Option `fraction-command`
-- Option `list-mode`
 - Option `minimum-decimal-digits`
 - Option `minimum-integer-digits`
 - Option `overwrite-commands`
@@ -34,7 +33,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `product-symbol`
 - Option `qualifier-phrase`
 - Option `quantity-product`
-- Option `range-mode`
 - Option `round-pad`
 - Option `number-angle-product`
 - Option `propagate-math-font`
@@ -98,13 +96,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-space-text-post`
 - Option `table-space-text-pre`
 - Option `zero-decimal-to-integer`
-- Option setting `list-mode = brackets`
+- Option setting `list-units = brackets`
 - Option setting `per-mode = reciprocal`
 - Option setting `per-mode = reciprocal-positive-first`
 - Option setting `qualifier-mode = brackets`
 - Option setting `qualifier-mode = space`
 - Option setting `qualifier-mode = text`
-- Option setting `range-mode = brackets`
+- Option setting `range-units = brackets`
 - Option setting `table-number-alignment = center-decimal-marker`
 
 ### Removed
