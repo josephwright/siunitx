@@ -59,6 +59,14 @@
 %
 % \begin{documentation}
 %
+% \begin{function}{\siunitx_compound:nN}
+%   \begin{syntax}
+%     \cs{siunitx_compound:nN} \Arg{entries} \meta{seq}
+%   \end{syntax}
+%   Formats each \meta{entry} in the \meta{entries}, each of which should be
+%   a \meta{balanced text}, and places the result in the \meta{seq}.
+% \end{function}
+%
 % \begin{function}{\siunitx_list:n}
 %   \begin{syntax}
 %     \cs{siunitx_list:n} \Arg{entries}
@@ -160,6 +168,54 @@
 %
 % \section{\pkg{siunitx-compound} implementation}
 %
+% \subsection{General mechanism}
+%
+% Identify the internal prefix (\LaTeX3 \pkg{DocStrip} convention): only
+% internal material in this \emph{submodule} should be used directly.
+%    \begin{macrocode}
+%<@@=siunitx_compound>
+%    \end{macrocode}
+%
+% Typesetting lists, ranges and products of numbers or quantities has shared
+% features which mean they are best handled using a common mechanism. The aim
+% therefore is to abstract out enough of the process such that output-specific
+% aspects can be left to separate processes.
+%
+% \begin{variable}{\l_@@_tmp_tl}
+%   Scratch space.
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_compound:nN}
+% \begin{macro}{\@@_parsed:Nn, \@@_unparsed:Nn}
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_compound:nN #1#2
+  {
+    \seq_clear:N #2
+    \bool_if:NTF \l_siunitx_number_parse_bool
+      { \tl_map_tokens:nn {#1} { \@@_parsed:Nn #2 } }
+      { \tl_map_function:nn {#1} { \@@_unparsed:Nn #2 } }
+  }
+\cs_new_protected:Npn \@@_parsed:Nn #1#2
+  {
+    \siunitx_number_parse:nN {#2} \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_format:N \l_@@_tmp_tl }
+    \seq_put_right:Nx #1
+      { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
+  }
+\cs_new_protected:Npn \@@_unparsed:Nn #1#2
+  {
+    \seq_put_right:Nn #1
+      { \siunitx_print:nn { number } { \ensuremath {#2} } }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Lists}
 %
 % Identify the internal prefix (\LaTeX3 \pkg{DocStrip} convention): only
@@ -220,37 +276,18 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_list:n}
-% \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_list:n #1
   {
     \group_begin:
-      \seq_clear:N \l_@@_tmp_seq
-      \bool_if:NTF \l_siunitx_number_parse_bool
-        { \tl_map_function:nN {#1} \@@_parsed:n }
-        { \tl_map_function:nN {#1} \@@_unparsed:n }
+      \siunitx_compound:nN {#1} \l_@@_tmp_seq
       \seq_use:NVVV \l_@@_tmp_seq
         \l_siunitx_list_separator_pair_tl
         \l_siunitx_list_separator_tl
         \l_siunitx_list_separator_final_tl
     \group_end:
   }
-\cs_new_protected:Npn \@@_parsed:n #1
-  {
-    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-    \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_format:N \l_@@_tmp_tl }
-    \seq_put_right:Nx \l_@@_tmp_seq
-      { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
-  }
-\cs_new_protected:Npn \@@_unparsed:n #1
-  {
-    \seq_put_right:Nn \l_@@_tmp_seq
-      { \siunitx_print:nn { number } { \ensuremath {#1} } }
-  }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \subsection{Products}
@@ -333,33 +370,15 @@
 % \end{macro}
 %
 % \begin{macro}{\siunitx_product:n}
-% \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
 % \begin{macro}{\@@_phrase:, \@@_symbol:}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_product:n #1
   {
     \group_begin:
-      \seq_clear:N \l_@@_tmp_seq
-      \bool_if:NTF \l_siunitx_number_parse_bool
-        { \tl_map_function:nN {#1} \@@_parsed:n }
-        { \tl_map_function:nN {#1} \@@_unparsed:n }
+      \siunitx_compound:nN {#1} \l_@@_tmp_seq
       \seq_use:Nx \l_@@_tmp_seq
         { \exp_not:c { @@_ \l_@@_mode_tl : } }
     \group_end:
-  }
-\cs_new_protected:Npn \@@_parsed:n #1
-  {
-    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-    \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_format:N \l_@@_tmp_tl }
-    \seq_put_right:Nx \l_@@_tmp_seq
-      { \siunitx_print:nn { number } { \exp_not:V \l_@@_tmp_tl } }
-  }
-\cs_new_protected:Npn \@@_unparsed:n #1
-  {
-    \seq_put_right:Nn \l_@@_tmp_seq
-      { \siunitx_print:nn { number } { \ensuremath {#1} } }
   }
 \cs_new_protected:Npn \@@_phrase:
   { \tl_use:N \l_@@_phrase_tl }
@@ -372,7 +391,6 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
-% \end{macro}
 %
 % \subsection{Ranges}
 %
@@ -382,9 +400,10 @@
 %<@@=siunitx_range>
 %    \end{macrocode}
 %
-% \begin{variable}{\l_@@_tmp_tl}
+% \begin{variable}{\l_@@_seq_tl, \l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\tl_new:N \l_@@_seq_tl
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
 % \end{variable}
@@ -429,34 +448,22 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_range:nn}
-% \begin{macro}{\@@_number:nN}
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_range:nn #1#2
   {
     \group_begin:
-      \bool_if:NTF \l_siunitx_number_parse_bool
+      \siunitx_compound:nN { {#1} {#2} } \l_@@_tmp_seq
+      \use:x
         {
-          \@@_number:nN {#1} \l_@@_start_tl
-          \@@_number:nN {#2} \l_@@_end_tl
+          \siunitx_print:nn { number }
+            { \seq_item:Nn \l_@@_tmp_seq { 1 } }
+          \exp_not:V \l_siunitx_range_phrase_tl
+          \siunitx_print:nn { number }
+            { \seq_item:Nn \l_@@_tmp_seq { 2 } }
         }
-        {
-          \tl_set:Nn \l_@@_start_tl { \ensuremath {#1} }
-          \tl_set:Nn \l_@@_end_tl { \ensuremath {#2} }
-        }
-      \siunitx_print:nV { number } \l_@@_start_tl
-      \tl_use:N \l_siunitx_range_phrase_tl
-      \siunitx_print:nV { number } \l_@@_end_tl
     \group_end:
   }
-\cs_new_protected:Npn \@@_number:nN #1#2
-  {
-    \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-    \tl_set:Nx #2
-      { \siunitx_number_format:N \l_@@_tmp_tl }
-  }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
