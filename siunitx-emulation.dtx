@@ -106,72 +106,6 @@
 % \end{macro}
 % \end{macro}
 %
-% \subsection{Preamble commands}
-%
-% \begin{macro}{\DeclareBinaryPrefix}
-%   We simply drop |#3|.
-%    \begin{macrocode}
-\NewDocumentCommand \DeclareBinaryPrefix { +m m m }
-  {
-    \siunitx_declare_prefix:Nn #1 {#2}
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\DeclareSIPrePower, \DeclareSIPostPower}
-%   Simply use a throw-away command for the part we do not need: this can
-%   be followed by some clean-up.
-%    \begin{macrocode}
-\NewDocumentCommand \DeclareSIPrePower { +m m }
-  {
-    \siunitx_declare_power:NNn #1 \@@_tmp:w {#2}
-    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
-  }
-\NewDocumentCommand \DeclareSIPostPower { +m m }
-  {
-    \siunitx_declare_power:NNn \@@_tmp:w #1 {#2}
-    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \subsection{Document commands}
-%
-% \begin{macro}{\si}
-%   A straight copy of \cs{unit}.
-%    \begin{macrocode}
-\NewDocumentCommand \si { O { } m }
-  {
-    \mode_leave_vertical:
-    \group_begin:
-      \keys_set:nn { siunitx } {#1}
-      \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
-      \siunitx_print:nV { unit } \l_@@_tmp_tl
-    \group_end:
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\SI}
-%   Almost the same as \cs{qty}, but with the addition pre-unit.
-%    \begin{macrocode}
-\NewDocumentCommand \SI { O { } m o m }
-  {
-    \mode_leave_vertical:
-    \group_begin:
-      \keys_set:nn { siunitx } {#1}
-      \IfNoValueF {#3}
-        {
-          \siunitx_unit_format:nN {#3} \l_@@_tmp_tl
-          \siunitx_print:nV { unit } \l_@@_tmp_tl
-          \nobreak
-        }
-      \siunitx_quantity:nn {#2} {#4}
-    \group_end:
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % \subsection{Angle options}
 %
 %  All straight-forward emulation.
@@ -805,6 +739,72 @@
     prefixes-as-symbols .default:n = true
   }
 %    \end{macrocode}
+%
+% \subsection{Preamble commands}
+%
+% \begin{macro}{\DeclareBinaryPrefix}
+%   We simply drop |#3|.
+%    \begin{macrocode}
+\NewDocumentCommand \DeclareBinaryPrefix { +m m m }
+  {
+    \siunitx_declare_prefix:Nn #1 {#2}
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DeclareSIPrePower, \DeclareSIPostPower}
+%   Simply use a throw-away command for the part we do not need: this can
+%   be followed by some clean-up.
+%    \begin{macrocode}
+\NewDocumentCommand \DeclareSIPrePower { +m m }
+  {
+    \siunitx_declare_power:NNn #1 \@@_tmp:w {#2}
+    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
+  }
+\NewDocumentCommand \DeclareSIPostPower { +m m }
+  {
+    \siunitx_declare_power:NNn \@@_tmp:w #1 {#2}
+    \seq_remove_all:Nn \l_siunitx_unit_symbolic_seq { \@@_tmp:w }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Document commands}
+%
+% \begin{macro}{\si}
+%   A straight copy of \cs{unit}.
+%    \begin{macrocode}
+\NewDocumentCommand \si { O { } m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
+      \siunitx_print:nV { unit } \l_@@_tmp_tl
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\SI}
+%   Almost the same as \cs{qty}, but with the addition pre-unit.
+%    \begin{macrocode}
+\NewDocumentCommand \SI { O { } m o m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \keys_set:nn { siunitx } {#1}
+      \IfNoValueF {#3}
+        {
+          \siunitx_unit_format:nN {#3} \l_@@_tmp_tl
+          \siunitx_print:nV { unit } \l_@@_tmp_tl
+          \nobreak
+        }
+      \siunitx_quantity:nn {#2} {#4}
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</package>
