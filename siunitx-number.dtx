@@ -107,7 +107,11 @@
 %   with the result stored in \meta{tl~var2}.
 % \end{function}
 %
-% \begin{function}[rEXP]{\siunitx_number_output:N, \siunitx_number_output:NN}
+% \begin{function}[rEXP]
+%   {
+%     \siunitx_number_output:N,  \siunitx_number_output:n,
+%     \siunitx_number_output:NN, \siunitx_number_output:nN
+%   }
 %   \begin{syntax}
 %     \cs{siunitx_number_output:N} \meta{number}
 %     \cs{siunitx_number_output:NN} \meta{number} \meta{marker}
@@ -131,6 +135,9 @@
 %     \item Both sides of the decimal marker for a separated uncertainty
 %     \item Both sides of the multiplication symbol for the exponent part.
 %    \end{itemize}
+%
+%   The \texttt{n} and \texttt{nN} version take a token list, which should
+%   be in the internal \pkg{siunitx} format.
 % \end{function}
 %
 % \begin{function}{\siunitx_number_format:nN}
@@ -2747,8 +2754,11 @@
 % \end{variable}
 %
 % \begin{macro}[rEXP]{\siunitx_number_output:N}
+% \begin{macro}[rEXP]{\siunitx_number_output:n}
 % \begin{macro}[rEXP]{\siunitx_number_output:NN}
+% \begin{macro}[rEXP]{\siunitx_number_output:nN}
 % \begin{macro}[rEXP]{\@@_output:Nn}
+% \begin{macro}[rEXP]{\@@_output:nn}
 % \begin{macro}[rEXP]{\@@_output:nnnnnnn}
 % \begin{macro}[rEXP]{\@@_output_bracket:nn}
 % \begin{macro}[rEXP]{\@@_output_bracket:w}
@@ -2788,12 +2798,21 @@
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_output:N #1
   { \@@_output:Nn #1 { } }
+\cs_new:Npn \siunitx_number_output:n #1
+  { \@@_output:nn #1 { } }
 \cs_new:Npn \siunitx_number_output:NN #1#2
   { \@@_output:Nn #1 {#2} }
+\cs_new:Npn \siunitx_number_output:nN #1#2
+  { \@@_output:nn #1 {#2} }
 \cs_new:Npn \@@_output:Nn #1#2
   {
     \tl_if_empty:NF #1
       { \exp_after:wN \@@_output:nnnnnnn #1 {#2} }
+  }
+\cs_new:Npn \@@_output:nn #1#2
+  {
+    \tl_if_empty:nF {#1}
+      { \@@_output:nnnnnnn #1 {#2} }
   }
 \cs_new:Npn \@@_output:nnnnnnn #1#2#3#4#5#6#7#8
   {
@@ -3132,6 +3151,9 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
