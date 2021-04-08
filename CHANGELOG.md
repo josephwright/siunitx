@@ -21,6 +21,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-arc-seconds`
 - Option `font-command`
 - Option `fraction-command`
+- Option `list-exponents`
 - Option `minimum-decimal-digits`
 - Option `minimum-integer-digits`
 - Option `overwrite-commands`
@@ -28,11 +29,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `print-implicit-plus`
 - Option `print-unity-mantissa`
 - Option `print-zero-exponent`
+- Option `product-exponents`
 - Option `product-mode`
 - Option `product-phrase`
 - Option `product-symbol`
 - Option `qualifier-phrase`
 - Option `quantity-product`
+- Option `range-exponents`
 - Option `round-pad`
 - Option `number-angle-product`
 - Option `propagate-math-font`

@@ -1629,12 +1629,15 @@ options, which apply to these more unusual input forms
       Type &
       \multicolumn{1}{l}{Default} \\
     \midrule
+      list-exponents       & Choice  & individual           \\
       list-final-separator & Literal & \verb*=\text{ and }= \\
       list-pair-separator  & Literal & \verb*=\text{ and }= \\
       list-separator       & Literal & \verb*=\text{, }=    \\
+      product-exponents    & Choice  & individual           \\
       product-mode         & Choice  & symbol               \\
       product-phrase       & Literal & \verb*=\text{ by }=  \\
       product-symbol       & Literal & \cs{times}           \\
+      range-exponents      & Choice  & individual           \\
       range-phrase         & Literal & \verb*=\text{ to }=  \\
     \bottomrule
   \end{tabular}
@@ -1684,6 +1687,40 @@ extra space is added.
 \begin{LaTeXdemo}
   \numrange{5}{100} \\
   \numrange[range-phrase = --]{5}{100}
+\end{LaTeXdemo}
+
+\DescribeOption{list-exponents}
+\DescribeOption{product-exponents}
+\DescribeOption{range-exponents}
+Lists, products and ranges can be \enquote{compressed} by combining the
+exponent parts. This is controlled by the options \opt{list-exponents},
+\opt{product-exponents} and \opt{range-exponents}, all of which take the
+choices \opt{individual}, \opt{combine-bracket} and \opt{combine}. The standard
+setting, \opt{individual}, leaves the exponent with the matching value. Both
+\opt{combine} and \opt{combine-bracket} take the exponent of the first entry
+and apply to to all other entries, with the exponent itself places at the end.
+\begin{LaTeXdemo}
+  \numlist{5e3;7e3;9e3;1e4} \\
+  \numproduct{5e3 x 7e3 x 9e3 x 1e4} \\
+  \numrange{5e3}{7e3} \\
+  \sisetup
+    {
+      list-exponents    = combine-bracket ,
+      product-exponents = combine-bracket ,
+      range-exponents   = combine-bracket
+    }
+  \numlist{5e3;7e3;9e3;1e4} \\
+  \numproduct{5e3 x 7e3 x 9e3 x 1e4} \\
+  \numrange{5e3}{7e3} \\
+  \sisetup
+    {
+      list-exponents    = combine ,
+      product-exponents = combine ,
+      range-exponents   = combine
+    }
+  \numlist{5e3;7e3;9e3;1e4} \\
+  \numproduct{5e3 x 7e3 x 9e3 x 1e4} \\
+  \numrange{5e3}{7e3}
 \end{LaTeXdemo}
 
 \subsection{Angles}
