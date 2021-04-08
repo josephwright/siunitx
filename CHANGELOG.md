@@ -111,7 +111,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option setting `table-number-alignment = center-decimal-marker`
 
 ### Removed
+- Option `abbreviations`
 - Option `add-integer-zero`
+- Option `binary-units`
 - Option `close-bracket`
 - Option `detect-all`
 - Option `detect-display-math`
@@ -144,6 +146,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `unit-text-rm`
 - Option `unit-text-sf`
 - Option `unit-text-tt`
+- Option `version-1-compatibility`
 
 ## [v2.8c] - 2021-03-27
 
