@@ -1,0 +1,208 @@
+\documentclass{article}
+
+\input{regression-test}
+
+\usepackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx}
+
+\begin{document}
+
+\START
+
+\ExplSyntaxOn
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \siunitx_compound:nN {#1} \l_tmpa_seq
+    \seq_show:N \l_tmpa_seq
+    \siunitx_compound_extract_exponents:nNN {#1} \l_tmpa_seq \l_tmpa_tl
+    \seq_show:N \l_tmpa_seq
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
+\TEST { Basics:~compound~numbers }
+  {
+    \test:n { { 1 } }
+    \test:n { { 1 } { 2 } }
+    \test:n { { 1 } { 2 } { 3 } }
+    \test:n { { 1e10 } }
+    \test:n { { 1e10 } { 2 } }
+    \test:n { { 1e10 } { 2e10 } { 3e9 } }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_list:n {#1}
+        \siunitx_product:n {#1}
+      }
+    \box_show:N \l_tmpa_box
+  }
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      { \siunitx_range:nn {#1} {#2} }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Lists~and~products~of~numbers }
+  {
+    \test:n { { 1 } }
+    \test:n { { 1 } { 2 } }
+    \test:n { { 1 } { 2 } { 3 } }
+    \test:n { { 1e10 } }
+    \test:n { { 1e10 } { 2 } }
+    \test:n { { 1e10 } { 2e10 } { 3e9 } }
+  }
+
+\TEST { Ranges~of~numbers }
+  {
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \str_if_eq:nnTF {#1} { list }
+          { \siunitx_list:n {#2} }
+          {
+            \str_if_eq:nnTF {#1} { product }
+              { \siunitx_product:n {#2} }
+              { \siunitx_range:nn {#1} {#2} }
+          }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST
+  {
+    Option~settings~"list-final-separator",~
+    "list-pair-separator"~and~"list-separator"
+  }
+  {
+    \test:nn { list } { { 1 } }
+    \test:nn { list } { { 1 } { 2 } }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { list-final-separator = END }
+    \test:nn { list } { { 1 } }
+    \test:nn { list } { { 1 } { 2 } }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { list-pair-separator = PAIR }
+    \test:nn { list } { { 1 } }
+    \test:nn { list } { { 1 } { 2 } }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { list-separator = SEP }
+    \test:nn { list } { { 1 } }
+    \test:nn { list } { { 1 } { 2 } }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+  }
+
+\TEST { Option~setting~"list-exponents" }
+  {
+    \test:nn { list } { { 1e2 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { list } { { 1e2 } { 2e3 } { 3e1 } }
+    \keys_set:nn { siunitx } { list-exponents = combine }
+    \test:nn { list } { { 1e2 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { list } { { 1e2 } { 2e3 } { 3e1 } }
+    \keys_set:nn { siunitx } { list-exponents = combine-bracket }
+    \test:nn { list } { { 1e2 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { list } { { 1e2 } { 2e3 } { 3e1 } }
+  }
+
+\TEST { Option~setting~"product-exponents" }
+  {
+    \test:nn { product } { { 1e2 } }
+    \test:nn { product } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { product } { { 1e2 } { 2e3 } { 3e1 } }
+    \keys_set:nn { siunitx } { product-exponents = combine }
+    \test:nn { product } { { 1e2 } }
+    \test:nn { product } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { product } { { 1e2 } { 2e3 } { 3e1 } }
+    \keys_set:nn { siunitx } { product-exponents = combine-bracket }
+    \test:nn { product } { { 1e2 } }
+    \test:nn { product } { { 1e2 } { 2e2 } { 3e2 } }
+    \test:nn { product } { { 1e2 } { 2e3 } { 3e1 } }
+  }
+
+\TEST { Option~setting~"product-mode" }
+  {
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { product-mode = phrase }
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+  }
+
+\TEST { Option~setting~"product-symbol" }
+  {
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { product-symbol = X }
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+  }
+
+\TEST { Option~setting~"product-phrase" }
+  {
+    \OMIT
+    \keys_set:nn { siunitx } { product-mode = phrase }
+    \TIMO
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx } { product-phrase = PROD }
+    \test:nn { product } { { 1 } }
+    \test:nn { product } { { 1 } { 2 } }
+    \test:nn { product } { { 1 } { 2 } { 3 } }
+  }
+
+\TEST { Option~setting~"range-exponents" }
+  {
+    \test:nn { 1e2 } { 2e2 }
+    \test:nn { 1e2 } { 2e3 }
+    \test:nn { 1e2 } { 2e1 }
+    \keys_set:nn { siunitx } { range-exponents = combine }
+    \test:nn { 1e2 } { 2e2 }
+    \test:nn { 1e2 } { 2e3 }
+    \test:nn { 1e2 } { 2e1 }
+    \keys_set:nn { siunitx } { range-exponents = combine-bracket }
+    \test:nn { 1e2 } { 2e2 }
+    \test:nn { 1e2 } { 2e3 }
+    \test:nn { 1e2 } { 2e1 }
+  }
+
+\TEST { Option~setting~"range-phrase" }
+  {
+    \test:nn { 1 } { 2 }
+    \keys_set:nn { siunitx } { range-phrase = -- }
+    \test:nn { 1 } { 2 }
+  }
+
+\END
