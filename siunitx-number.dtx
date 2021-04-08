@@ -107,10 +107,10 @@
 %   with the result stored in \meta{tl~var2}.
 % \end{function}
 %
-% \begin{function}[rEXP]{\siunitx_number_format:N, \siunitx_number_format:NN}
+% \begin{function}[rEXP]{\siunitx_number_output:N, \siunitx_number_output:NN}
 %   \begin{syntax}
-%     \cs{siunitx_number_format:N} \meta{number}
-%     \cs{siunitx_number_format:NN} \meta{number} \meta{marker}
+%     \cs{siunitx_number_output:N} \meta{number}
+%     \cs{siunitx_number_output:NN} \meta{number} \meta{marker}
 %   \end{syntax}
 %   Formats the \meta{number} (in the \pkg{siunitx} internal format),
 %   producing the result in a form suitable for typesetting in math mode.
@@ -138,7 +138,7 @@
 %     \cs{siunitx_number_format:nN} \Arg{number} \meta{tl~var}
 %   \end{syntax}
 %    Carries out a combination of \cs{siunitx_number_parse:nN},
-%    \cs{siunitx_number_process:NN} and \cs{siunitx_number_format:N} using
+%    \cs{siunitx_number_process:NN} and \cs{siunitx_number_output:N} using
 %    \texttt{x}-type expansion to place the result in the \meta{tl~var}. If
 %    \cs{l_siunitx_number_parse_bool} if \texttt{false}, the input is simply
 %    stored inside the \meta{tl~var} inside \cs{ensuremath}.
@@ -475,11 +475,11 @@
 %
 % \subsection{Main formatting routine}
 %
-% \begin{variable}{\l_@@_formatted_tl}
+% \begin{variable}{\l_@@_outputted_tl}
 %   A token list for the final formatted result: may or may not be generated
 %   by the parser, depending on settings which are active.
 %    \begin{macrocode}
-\tl_new:N \l_@@_formatted_tl
+\tl_new:N \l_@@_outputted_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -510,12 +510,12 @@
         {
           \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
           \siunitx_number_process:NN \l_@@_parsed_tl \l_@@_parsed_tl
-          \tl_set:Nx \l_@@_formatted_tl
-            { \siunitx_number_format:N \l_@@_parsed_tl }
+          \tl_set:Nx \l_@@_outputted_tl
+            { \siunitx_number_output:N \l_@@_parsed_tl }
         }
-        { \tl_set:Nn \l_@@_formatted_tl { \ensuremath {#1} } }
+        { \tl_set:Nn \l_@@_outputted_tl { \ensuremath {#1} } }
     \exp_args:NNNV \group_end:
-    \tl_set:Nn #2 \l_@@_formatted_tl
+    \tl_set:Nn #2 \l_@@_outputted_tl
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2639,7 +2639,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \subsection{Formatting parsed numbers}
+% \subsection{Outputting parsed numbers}
 %
 % \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
 %   Purely internal for the present.
@@ -2746,72 +2746,72 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[rEXP]{\siunitx_number_format:N}
-% \begin{macro}[rEXP]{\siunitx_number_format:NN}
-% \begin{macro}[rEXP]{\@@_format:Nn}
-% \begin{macro}[rEXP]{\@@_format:nnnnnnn}
-% \begin{macro}[rEXP]{\@@_format_bracket:nn}
-% \begin{macro}[rEXP]{\@@_format_bracket:w}
-% \begin{macro}[rEXP]{\@@_format_comparator:nn}
-% \begin{macro}[rEXP]{\@@_format_sign:nn}
-% \begin{macro}[rEXP]{\@@_format_sign:nN}
-% \begin{macro}[rEXP]{\@@_format_sign:N}
+% \begin{macro}[rEXP]{\siunitx_number_output:N}
+% \begin{macro}[rEXP]{\siunitx_number_output:NN}
+% \begin{macro}[rEXP]{\@@_output:Nn}
+% \begin{macro}[rEXP]{\@@_output:nnnnnnn}
+% \begin{macro}[rEXP]{\@@_output_bracket:nn}
+% \begin{macro}[rEXP]{\@@_output_bracket:w}
+% \begin{macro}[rEXP]{\@@_output_comparator:nn}
+% \begin{macro}[rEXP]{\@@_output_sign:nn}
+% \begin{macro}[rEXP]{\@@_output_sign:nN}
+% \begin{macro}[rEXP]{\@@_output_sign:N}
 % \begin{macro}[rEXP]
-%   {\@@_format_sign_color:w, \@@_format_sign_brackets:w}
-% \begin{macro}[rEXP]{\@@_format_integer:nnn}
-% \begin{macro}[rEXP]{\@@_format_decimal:nn, \@@_format_decimal:fn}
-% \begin{macro}[rEXP]{\@@_format_digits:nn}
-% \begin{macro}[rEXP]{\@@_format_integer_aux:n}
+%   {\@@_output_sign_color:w, \@@_output_sign_brackets:w}
+% \begin{macro}[rEXP]{\@@_output_integer:nnn}
+% \begin{macro}[rEXP]{\@@_output_decimal:nn, \@@_output_decimal:fn}
+% \begin{macro}[rEXP]{\@@_output_digits:nn}
+% \begin{macro}[rEXP]{\@@_output_integer_aux:n}
 % \begin{macro}[rEXP]
 %   {
-%     \@@_format_integer_aux_0:n,
-%     \@@_format_integer_aux_1:n,
-%     \@@_format_integer_aux_2:n
+%     \@@_output_integer_aux_0:n,
+%     \@@_output_integer_aux_1:n,
+%     \@@_output_integer_aux_2:n
 %   }
-% \begin{macro}[rEXP]{\@@_format_decimal_aux:n}
-% \begin{macro}[rEXP]{\@@_format_decimal_loop:NNNN}
-% \begin{macro}[rEXP]{\@@_format_integer_first:nnNN}
-% \begin{macro}[rEXP]{\@@_format_integer_loop:NNNN}
-% \begin{macro}[rEXP]{\@@_format_uncertainty:nnn}
-% \begin{macro}[rEXP]{\@@_format_uncertainty_unaligned:n}
-% \begin{macro}[rEXP]{\@@_format_uncertainty_S:nnnw}
-% \begin{macro}[rEXP]{\@@_format_uncertainty_S_aux:nnn}
+% \begin{macro}[rEXP]{\@@_output_decimal_aux:n}
+% \begin{macro}[rEXP]{\@@_output_decimal_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_output_integer_first:nnNN}
+% \begin{macro}[rEXP]{\@@_output_integer_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_output_uncertainty:nnn}
+% \begin{macro}[rEXP]{\@@_output_uncertainty_unaligned:n}
+% \begin{macro}[rEXP]{\@@_output_uncertainty_S:nnnw}
+% \begin{macro}[rEXP]{\@@_output_uncertainty_S_aux:nnn}
 % \begin{macro}[rEXP]
-%   {\@@_format_uncertainty_S:nnnw, \@@_format_uncertainty_S:fnw}
-% \begin{macro}[rEXP]{\@@_format_uncertainty_S:nnw}
-% \begin{macro}[rEXP]{\@@_format_exponent:nnnn}
-% \begin{macro}[rEXP]{\@@_format_end:}
+%   {\@@_output_uncertainty_S:nnnw, \@@_output_uncertainty_S:fnw}
+% \begin{macro}[rEXP]{\@@_output_uncertainty_S:nnw}
+% \begin{macro}[rEXP]{\@@_output_exponent:nnnn}
+% \begin{macro}[rEXP]{\@@_output_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts. All of the parts are assembled including
 %   inserting tabular alignment markers (which may be empty) for each
 %   separate unit.
 %    \begin{macrocode}
-\cs_new:Npn \siunitx_number_format:N #1
-  { \@@_format:Nn #1 { } }
-\cs_new:Npn \siunitx_number_format:NN #1#2
-  { \@@_format:Nn #1 {#2} }
-\cs_new:Npn \@@_format:Nn #1#2
+\cs_new:Npn \siunitx_number_output:N #1
+  { \@@_output:Nn #1 { } }
+\cs_new:Npn \siunitx_number_output:NN #1#2
+  { \@@_output:Nn #1 {#2} }
+\cs_new:Npn \@@_output:Nn #1#2
   {
     \tl_if_empty:NF #1
-      { \exp_after:wN \@@_format:nnnnnnn #1 {#2} }
+      { \exp_after:wN \@@_output:nnnnnnn #1 {#2} }
   }
-\cs_new:Npn \@@_format:nnnnnnn #1#2#3#4#5#6#7#8
+\cs_new:Npn \@@_output:nnnnnnn #1#2#3#4#5#6#7#8
   {
-    \@@_format_comparator:nn {#1} {#8}
-    \@@_format_bracket:nn {#5} {#7}
-    \@@_format_sign:nn {#1} {#2}
-    \@@_format_integer:nnn {#3} {#4} {#7}
-    \@@_format_decimal:nn {#4} {#8}
-    \@@_format_uncertainty:nnn {#5} {#4} {#8}
-    \@@_format_exponent:nnnn {#6} {#7} { #3 . #4 } {#8}
-    \@@_format_end:
+    \@@_output_comparator:nn {#1} {#8}
+    \@@_output_bracket:nn {#5} {#7}
+    \@@_output_sign:nn {#1} {#2}
+    \@@_output_integer:nnn {#3} {#4} {#7}
+    \@@_output_decimal:nn {#4} {#8}
+    \@@_output_uncertainty:nnn {#5} {#4} {#8}
+    \@@_output_exponent:nnnn {#6} {#7} { #3 . #4 } {#8}
+    \@@_output_end:
   }
 %    \end{macrocode}
 %   Adding brackets for the combination of a separate uncertainty with an
 %   exponent may need brackets. This needs testing up-front, so has to come
 %   before the main formatting routines.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_bracket:nn #1#2
+\cs_new:Npn \@@_output_bracket:nn #1#2
   {
     \bool_lazy_all:nT
       {
@@ -2824,19 +2824,19 @@
             { ! \str_if_eq_p:nn {#2} { 0 } }
         }
       }
-    \@@_format_bracket:w
+    \@@_output_bracket:w
   }
-\cs_new:Npn \@@_format_bracket:w #1 \@@_format_exponent:nnnn
+\cs_new:Npn \@@_output_bracket:w #1 \@@_output_exponent:nnnn
   {
     \exp_not:V \l_@@_bracket_open_tl
     #1
     \exp_not:V \l_@@_bracket_close_tl
-    \@@_format_exponent:nnnn
+    \@@_output_exponent:nnnn
   }
 %    \end{macrocode}
 %   To get the spacing correct this needs to be an ordinary math character.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_comparator:nn #1#2
+\cs_new:Npn \@@_output_comparator:nn #1#2
   {
     \tl_if_blank:nF {#1}
       { \exp_not:n { \mathord {#1} } }
@@ -2850,53 +2850,53 @@
 %   also have the comparator passed here: if it is present, we need to deal
 %   with tighter spacing.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_sign:nn #1#2
+\cs_new:Npn \@@_output_sign:nn #1#2
   {
     \tl_if_blank:nTF {#2}
       {
         \bool_if:NT \l_@@_implicit_plus_bool
-          { \@@_format_sign:nN {#1} + }
+          { \@@_output_sign:nN {#1} + }
       }
       {
         \str_if_eq:nnTF {#2} { - }
           {
             \tl_if_empty:NF \l_@@_negative_color_tl
-              { \@@_format_sign_color:w }
+              { \@@_output_sign_color:w }
             \bool_if:NTF \l_@@_bracket_negative_bool
-              { \@@_format_sign_brackets:w }
-              { \@@_format_sign:nN {#1} #2 }
+              { \@@_output_sign_brackets:w }
+              { \@@_output_sign:nN {#1} #2 }
           }
-          { \@@_format_sign:nN {#1} #2 }
+          { \@@_output_sign:nN {#1} #2 }
       }
   }
-\cs_new:Npn \@@_format_sign:nN #1#2
+\cs_new:Npn \@@_output_sign:nN #1#2
   {
     \tl_if_blank:nTF {#1}
-      { \@@_format_sign:N #2 }
+      { \@@_output_sign:N #2 }
       { \exp_not:n { \mathord {#2} } }
   }
-\cs_new:Npn \@@_format_sign:N #1
+\cs_new:Npn \@@_output_sign:N #1
   {
     \bool_if:NTF \l_@@_tight_bool
       { \exp_not:n { \mathord {#1} } }
       { \exp_not:n {#1} }
   }
 \cs_new:Npn
-  \@@_format_sign_color:w #1 \@@_format_end:
+  \@@_output_sign_color:w #1 \@@_output_end:
   {
     \exp_not:N \textcolor { \exp_not:V \l_@@_negative_color_tl }
       {
         #1
-        \@@_format_end:
+        \@@_output_end:
       }
   }
 \cs_new:Npn
-  \@@_format_sign_brackets:w #1 \@@_format_end:
+  \@@_output_sign_brackets:w #1 \@@_output_end:
   {
     \exp_not:V \l_@@_bracket_open_tl
     #1
     \exp_not:V \l_@@_bracket_close_tl
-    \@@_format_end:
+    \@@_output_end:
   }
 %    \end{macrocode}
 %   Digit formatting leads off with separate functions to allow for a few
@@ -2904,7 +2904,7 @@
 %   cases. The code then splits again as the two types of grouping need
 %   different strategies.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_integer:nnn #1#2#3
+\cs_new:Npn \@@_output_integer:nnn #1#2#3
   {
     \bool_lazy_all:nF
       {
@@ -2913,9 +2913,9 @@
         { ! \str_if_eq_p:nn {#3} { 0 } }
         { ! \l_@@_unity_mantissa_bool }
       }
-      { \@@_format_digits:nn { integer } {#1} }
+      { \@@_output_digits:nn { integer } {#1} }
   }
-\cs_new:Npn \@@_format_decimal:nn #1#2
+\cs_new:Npn \@@_output_decimal:nn #1#2
   {
     \exp_not:n {#2}
     \tl_if_blank:nF {#1}
@@ -2926,17 +2926,17 @@
             { \exp_not:V \l_siunitx_number_output_decimal_tl }
       }
     \exp_not:n {#2}
-    \@@_format_digits:nn { decimal } {#1}
+    \@@_output_digits:nn { decimal } {#1}
   }
-\cs_generate_variant:Nn \@@_format_decimal:nn { f }
-\cs_new:Npn \@@_format_digits:nn #1#2
+\cs_generate_variant:Nn \@@_output_decimal:nn { f }
+\cs_new:Npn \@@_output_digits:nn #1#2
   {
     \bool_if:cTF { l_@@_group_ #1 _ bool }
       {
         \int_compare:nNnTF
           { \tl_count:n {#2} } < \l_@@_group_minimum_int
           { \exp_not:n {#2} }
-          { \use:c { @@_format_ #1 _aux:n } {#2} }
+          { \use:c { @@_output_ #1 _aux:n } {#2} }
       }
       { \exp_not:n {#2} }
   }
@@ -2945,28 +2945,28 @@
 %   correct insertion of separators. That is done using a two-part set up such
 %   that there is no separator on the first pass.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_integer_aux:n #1
+\cs_new:Npn \@@_output_integer_aux:n #1
   {
      \use:c
        {
-         @@_format_integer_aux_
+         @@_output_integer_aux_
          \int_eval:n { \int_mod:nn { \tl_count:n {#1} } { 3 } }
          :n
        } {#1}
   }
-\cs_new:cpn { @@_format_integer_aux_0:n } #1
-  { \@@_format_integer_first:nnNN #1 \q_nil }
-\cs_new:cpn { @@_format_integer_aux_1:n } #1
-  { \@@_format_integer_first:nnNN { } { } #1 \q_nil }
-\cs_new:cpn { @@_format_integer_aux_2:n } #1
-  { \@@_format_integer_first:nnNN { } #1 \q_nil }
-\cs_new:Npn \@@_format_integer_first:nnNN #1#2#3#4
+\cs_new:cpn { @@_output_integer_aux_0:n } #1
+  { \@@_output_integer_first:nnNN #1 \q_nil }
+\cs_new:cpn { @@_output_integer_aux_1:n } #1
+  { \@@_output_integer_first:nnNN { } { } #1 \q_nil }
+\cs_new:cpn { @@_output_integer_aux_2:n } #1
+  { \@@_output_integer_first:nnNN { } #1 \q_nil }
+\cs_new:Npn \@@_output_integer_first:nnNN #1#2#3#4
   {
     \exp_not:n {#1#2#3}
     \quark_if_nil:NF #4
-      { \@@_format_integer_loop:NNNN #4 }
+      { \@@_output_integer_loop:NNNN #4 }
   }
-\cs_new:Npn \@@_format_integer_loop:NNNN #1#2#3#4
+\cs_new:Npn \@@_output_integer_loop:NNNN #1#2#3#4
   {
     \str_if_eq:VnTF \l_@@_group_separator_tl { , }
       { \exp_not:N \mathord }
@@ -2974,7 +2974,7 @@
         { \exp_not:V \l_@@_group_separator_tl }
     \exp_not:n {#1#2#3}
     \quark_if_nil:NF #4
-      { \@@_format_integer_loop:NNNN #4 }
+      { \@@_output_integer_loop:NNNN #4 }
   }
 %    \end{macrocode}
 %   For decimals, no need to do any counting, just loop using enough markers to
@@ -2982,12 +2982,12 @@
 %   to have to use a check on the content of the rest of the number. The
 %   |\use_none:n(n)| mop up the remaining |\q_nil| tokens.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_decimal_aux:n #1
+\cs_new:Npn \@@_output_decimal_aux:n #1
   {
-    \@@_format_decimal_loop:NNNN \c_empty_tl
+    \@@_output_decimal_loop:NNNN \c_empty_tl
       #1 \q_nil \q_nil \q_nil
   }
-\cs_new:Npn \@@_format_decimal_loop:NNNN #1#2#3#4
+\cs_new:Npn \@@_output_decimal_loop:NNNN #1#2#3#4
   {
     \quark_if_nil:NF #2
       {
@@ -3001,7 +3001,7 @@
               { \use_none:nn }
               {
                 \exp_not:n {#4}
-                \@@_format_decimal_loop:NNNN
+                \@@_output_decimal_loop:NNNN
                   \l_@@_group_separator_tl
               }
           }
@@ -3015,25 +3015,25 @@
 %   digit tokens need to be removed from the start of the uncertainty and
 %   the split result sent to the appropriate auxiliaries.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_uncertainty:nnn #1#2#3
+\cs_new:Npn \@@_output_uncertainty:nnn #1#2#3
   {
     \tl_if_blank:nTF {#1}
-      { \@@_format_uncertainty_unaligned:n {#3} }
+      { \@@_output_uncertainty_unaligned:n {#3} }
       {
-        \use:c { @@_format_uncertainty_ \tl_head:n {#1} :nnnw }
+        \use:c { @@_output_uncertainty_ \tl_head:n {#1} :nnnw }
           {#2} {#3} #1
       }
   }
-\cs_new:Npn \@@_format_uncertainty_unaligned:n #1
+\cs_new:Npn \@@_output_uncertainty_unaligned:n #1
   { \exp_not:n { #1 #1 #1 #1 } }
-\cs_new:Npn \@@_format_uncertainty_S:nnnw #1#2#3#4
+\cs_new:Npn \@@_output_uncertainty_S:nnnw #1#2#3#4
   {
     \bool_if:NTF \l_@@_uncert_separate_bool
       {
         \exp_not:n {#2}
-        \@@_format_sign:N \pm
+        \@@_output_sign:N \pm
         \exp_not:n {#2}
-        \exp_args:Nf \@@_format_uncertainty_S_aux:nnn
+        \exp_args:Nf \@@_output_uncertainty_S_aux:nnn
           { \int_eval:n { \tl_count:n {#4} - \tl_count:n {#1} } }
           {#4} {#2}
       }
@@ -3042,14 +3042,14 @@
         \exp_not:V \l_@@_output_uncert_open_tl
         \exp_not:n {#4}
         \exp_not:V \l_@@_output_uncert_close_tl
-        \@@_format_uncertainty_unaligned:n {#2}
+        \@@_output_uncertainty_unaligned:n {#2}
       }
   }
-\cs_new:Npn \@@_format_uncertainty_S_aux:nnn #1#2#3
+\cs_new:Npn \@@_output_uncertainty_S_aux:nnn #1#2#3
   {
     \int_compare:nNnTF {#1} > 0
       {
-        \@@_format_uncertainty_S_aux:fnnw
+        \@@_output_uncertainty_S_aux:fnnw
           { \int_eval:n { #1 - 1 } }
           {#3}
           { }
@@ -3057,7 +3057,7 @@
       }
       {
         0
-        \@@_format_decimal:fn
+        \@@_output_decimal:fn
           {
             \prg_replicate:nn { \int_abs:n {#1} } { 0 }
             #2
@@ -3065,25 +3065,25 @@
           {#3}
       }
   }
-\cs_new:Npn \@@_format_uncertainty_S_aux:nnnw #1#2#3#4
+\cs_new:Npn \@@_output_uncertainty_S_aux:nnnw #1#2#3#4
   {
     \quark_if_nil:NF #4
       {
         \int_compare:nNnTF {#1} = 0
-          { \@@_format_uncertainty_S_aux:nnw {#3#4} {#2} }
+          { \@@_output_uncertainty_S_aux:nnw {#3#4} {#2} }
           {
-            \@@_format_uncertainty_S_aux:fnnw
+            \@@_output_uncertainty_S_aux:fnnw
               { \int_eval:n { #1 - 1 } }
               {#2}
               {#3#4}
           }
       }
   }
-\cs_generate_variant:Nn \@@_format_uncertainty_S_aux:nnnw { f }
-\cs_new:Npn \@@_format_uncertainty_S_aux:nnw #1#2#3 \q_nil
+\cs_generate_variant:Nn \@@_output_uncertainty_S_aux:nnnw { f }
+\cs_new:Npn \@@_output_uncertainty_S_aux:nnw #1#2#3 \q_nil
   {
-    \@@_format_digits:nn { integer } {#1}
-    \@@_format_decimal:nn {#3} {#2}
+    \@@_output_digits:nn { integer } {#1}
+    \@@_output_decimal:nn {#3} {#2}
   }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
@@ -3094,7 +3094,7 @@
 %   For signs, the auxiliary from the main sign routine can be used, but not
 %   the main function: negative exponents don't have special handling.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_exponent:nnnn #1#2#3#4
+\cs_new:Npn \@@_output_exponent:nnnn #1#2#3#4
   {
     \exp_not:n {#4}
     \bool_lazy_or:nnTF
@@ -3118,10 +3118,10 @@
             \tl_if_blank:nTF {#1}
               {
                 \bool_if:NT \l_@@_implicit_plus_bool
-                  { \@@_format_sign:N + }
+                  { \@@_output_sign:N + }
               }
-              { \@@_format_sign:N #1 }
-            \@@_format_digits:nn { integer } {#2}
+              { \@@_output_sign:N #1 }
+            \@@_output_digits:nn { integer } {#2}
           }
       }
       { \exp_not:n {#4} }
@@ -3130,7 +3130,7 @@
 %   A do-nothing marker used to allow shuffling of the output and so expandable
 %   operations for formatting.
 %    \begin{macrocode}
-\cs_new:Npn \@@_format_end: { }
+\cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
