@@ -1555,21 +1555,22 @@
 % \end{macro}
 %
 % \begin{macro}{\siunitx_number_process:NN}
-% \begin{macro}{\@@_process:nnnnnNN}
+% \begin{macro}{\@@_process:nnnnnnnNN}
 %   A top-level interface for the processing tools.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_process:NN #1#2
   {
-    \tl_if_empty:NF #1
+    \tl_if_empty:NTF #1
+      { \tl_clear:N #2 }
       {
         \@@_drop_uncertainty:NN #1 #2
-        \exp_after:wN \@@_process:nnnnnNN #2 #2 #2
+        \exp_after:wN \@@_process:nnnnnnnNN #2 #2 #2
         \@@_drop_exponent:NN #2 #2
         \@@_zero_decimal:NN #2 #2
         \@@_digits:NN #2 #2
       }
   }
-\cs_new_protected:Npn \@@_process:nnnnnNN #1#2#3#4#5#6#7#8#9
+\cs_new_protected:Npn \@@_process:nnnnnnnNN #1#2#3#4#5#6#7#8#9
   {
     \bool_lazy_and:nnF
       { \str_if_eq_p:nn {#3} { 0 } }
@@ -1644,8 +1645,8 @@
       }
     \str_if_eq:VnT \l_@@_exponent_mode_tl { engineering }
       {
-        \tl_set:Nx #1
-         { \exp_after:wN \@@_exponent_engineering_aux:nnnnnnn #1 }
+        \tl_set:Nx #2
+          { \exp_after:wN \@@_exponent_engineering_aux:nnnnnnn #2 }
       }
   }
 \cs_new:Npn \@@_exponent_fixed:nnnnnnn #1#2#3#4#5#6#7
@@ -1999,11 +2000,13 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_drop_uncertainty:NN #1#2
   {
-    \bool_if:NT \l_@@_drop_uncertainty_bool
+    \bool_if:NTF \l_@@_drop_uncertainty_bool
       {
         \tl_set:Nx #2
           { \exp_after:wN \@@_drop_uncertainty:nnnnnnn #1 }
       }
+      { \tl_set_eq:NN #2 #1 }
+
   }
 \cs_new:Npn \@@_drop_uncertainty:nnnnnnn #1#2#3#4#5#6#7
   { \exp_not:n { {#1} {#2} {#3} {#4} { } {#6} {#7} } }
