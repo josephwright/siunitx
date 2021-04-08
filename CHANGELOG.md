@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Added
+- `\qty`
+- `\qtylist`
+- `\qtypower`
+- `\qtylist`
 - Option `allow-quantity-breaks`
 - Option `angle-mode`
 - Option `drop-exponent`
