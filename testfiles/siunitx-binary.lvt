@@ -1,0 +1,42 @@
+\input{regression-test}
+
+\RequirePackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx}
+
+\START
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \siunitx_unit_format:nN {#1} \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+\TIMO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Binary~units }
+  {
+    \clist_map_inline:nn { \bit , \byte }
+      {
+        \test:n {#1}
+      }
+  }
+
+\TEST { Binary~prefixes }
+  {
+    \clist_map_inline:nn
+      { \kibi, \mebi, \gibi, \tebi, \pebi, \exbi, \zebi, \yobi }
+      {
+        \test:n { #1 \byte }
+      }
+  }
+
+\END
