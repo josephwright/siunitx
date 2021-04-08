@@ -76,16 +76,19 @@
 %
 % \subsection{Initial set up}
 %
-% Load only the essential support (\pkg{expl3}) \enquote{up-front}.
+% Load only the essential support (\pkg{expl3}) \enquote{up-front}, and
+% only if required.
 %    \begin{macrocode}
-\RequirePackage{expl3}
+\@ifundefined{ExplFileDate}
+  {\RequirePackage{expl3}}
+  {}
 %    \end{macrocode}
 %
 % Make sure that the version of \pkg{l3kernel} in use is sufficiently new.
-% This will also trap any problems with \pkg{l3packages} (as the two are now
-% tied together, version-wise).
+% We use \cs{ExplFileDate} as \cs{@ifpackagelater} doesn't work for pre-loaded
+% \pkg{expl3} in the absence of the package.
 %    \begin{macrocode}
-\@ifpackagelater{expl3}{2018-06-01}
+\@ifl@t@r\ExplFileDate{2018-06-01}
   {}
   {%
     \PackageError{siunitx}{Support package expl3 too old}
