@@ -715,7 +715,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\SIlist}
+% \begin{macro}{\SIlist, \SIrange}
 %   Straight copies.
 %    \begin{macrocode}
 \NewDocumentCommand \SIlist
@@ -726,6 +726,15 @@
       \siunitx_unit_options_apply:n {#3}
       \keys_set:nn { siunitx } {#1}
       \siunitx_list:nn {#2} {#3}
+    \group_end:
+  }
+\NewDocumentCommand \SIrange { O { } m m > { \TrimSpaces } m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \siunitx_unit_options_apply:n {#4}
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_range:nnn {#2} {#3} {#4}
     \group_end:
   }
 %    \end{macrocode}
