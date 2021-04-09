@@ -618,7 +618,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.4k] - 2012-03-22
 
 ### Fixed
-- Interaction of `^` and `_` with `brenw (issue #191)
+- Interaction of `^` and `_` with `breqn` (issue #191)
 - Adapted `list-pair-separator` for `translator` package (issue #190)
 - Check for `round-minimum` with large values
 
