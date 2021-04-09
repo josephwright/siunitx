@@ -412,6 +412,7 @@
 %     \l_siunitx_list_separator_tl       ,
 %     \l_siunitx_list_separator_final_tl ,
 %     \l_siunitx_list_separator_pair_tl  ,
+%     \l_@@_separator_text_bool          ,
 %     \l_@@_exp_bracket_bool             ,
 %     \l_@@_exp_combine_bool             ,
 %     \l_@@_unit_bracket_bool            ,
@@ -444,8 +445,20 @@
     list-final-separator .tl_set:N = \l_siunitx_list_separator_final_tl ,
     list-pair-separator .tl_set:N = \l_siunitx_list_separator_pair_tl ,
     list-separator .tl_set:N = \l_siunitx_list_separator_tl ,
+    list-separator-text .bool_set:N =
+      \l_@@_separator_text_bool ,
     list-units .choice: ,
     list-units / bracket .code:n =
+      {
+        \bool_set_true:N  \l_@@_unit_bracket_bool
+        \bool_set_false:N \l_@@_unit_repeat_bool
+      } ,
+    list-units / bracket-power .code:n =
+      {
+        \bool_set_true:N  \l_@@_unit_bracket_bool
+        \bool_set_false:N \l_@@_unit_repeat_bool
+      } ,
+    list-units / power .code:n =
       {
         \bool_set_true:N  \l_@@_unit_bracket_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
@@ -583,7 +596,7 @@
                 \exp_not:n {#2}
                 \seq_item:Nn \l_@@_tmp_seq { 1 }
               }
-            \tl_use:N \l_siunitx_list_separator_pair_tl
+            \@@_print_separator:V \l_siunitx_list_separator_pair_tl
             #4
               {
                 \seq_item:Nn \l_@@_tmp_seq { 2 }
@@ -613,12 +626,12 @@
                 \exp_not:V \l_@@_start_tl
                 \exp_not:n {#2}
               }
-            \tl_use:N \l_siunitx_list_separator_tl
+            \@@_print_separator:V \l_siunitx_list_separator_tl
           }
         { \l_@@_count_int - 1 }
           {
             \@@_print_aux:n { \exp_not:n {#2} }
-            \tl_use:N \l_siunitx_list_separator_final_tl
+            \@@_print_separator:V \l_siunitx_list_separator_final_tl
           }
         { \l_@@_count_int }
           {
@@ -631,13 +644,20 @@
       }
       {
         \@@_print_aux:n { \exp_not:n {#2} }
-        \tl_use:N \l_siunitx_list_separator_tl
+        \@@_print_separator:V \l_siunitx_list_separator_tl
       }
   }
 \cs_new_protected:Npn \@@_print_number:n #1
   { \siunitx_print:nx { number } {#1} }
 \cs_new_protected:Npn \@@_print_quantity:n #1
   { \siunitx_quantity_print:nV {#1} \l_@@_unit_tl }
+\cs_new_protected:Npn \@@_print_separator:n #1
+  {
+    \bool_if:NTF \l_@@_separator_text_bool
+      { \text {#1} }
+      { \siunitx_print:nn { number } {#1} }
+  }
+\cs_generate_variant:Nn \@@_print_separator:n { V }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -657,176 +677,82 @@
 %<@@=siunitx_product>
 %    \end{macrocode}
 %
-% \begin{variable}{\l_@@_tmp_seq, \l_@@_tmp_tl}
-%   Scratch space.
 %    \begin{macrocode}
-\seq_new:N \l_@@_tmp_seq
-\tl_new:N \l_@@_tmp_tl
+\cs_generate_variant:Nn \keys_set:nn { nx }
 %    \end{macrocode}
-% \end{variable}
-%
-% \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
-%   Purely internal for the present.
-%    \begin{macrocode}
-\tl_new:N \l_@@_bracket_close_tl
-\tl_new:N \l_@@_bracket_open_tl
-\tl_set:Nn \l_@@_bracket_open_tl { ( }
-\tl_set:Nn \l_@@_bracket_close_tl { ) }
-%    \end{macrocode}
-% \end{variable}
 %
 % \begin{variable}
 %   {
-%     \l_@@_exp_bracket_bool  ,
-%     \l_@@_exp_combine_bool  ,
-%     \l_@@_mode_tl           ,
-%     \l_@@_phrase_tl         ,
-%     \l_@@_power_bool        ,
-%     \l_@@_unit_bracket_bool ,
-%     \l_@@_unit_repeat_bool  ,
-%     \l_@@_symbol_tl
+%     \l_@@_exp_tl      ,
+%     \l_@@_phrase_bool ,
+%     \l_@@_phrase_tl   ,
+%     \l_@@_symbol_tl   ,
+%     \l_@@_units_tl
 %   }
 %   Options for products.
 %    \begin{macrocode}
-\bool_new:N \l_@@_exp_bracket_bool
-\bool_new:N \l_@@_exp_combine_bool
-\tl_new:N \l_@@_mode_tl
-\bool_new:N \l_@@_power_bool
-\bool_new:N \l_@@_unit_bracket_bool
-\bool_new:N \l_@@_unit_repeat_bool
 \keys_define:nn { siunitx }
   {
-    product-exponents .choice: ,
-    product-exponents / combine .code:n =
-      {
-        \bool_set_false:N \l_@@_exp_bracket_bool
-        \bool_set_true:N \l_@@_exp_combine_bool
-      } ,
-    product-exponents / combine-bracket .code:n =
-      {
-        \bool_set_true:N \l_@@_exp_bracket_bool
-        \bool_set_true:N \l_@@_exp_combine_bool
-      } ,
-    product-exponents / individual .code:n =
-      {
-        \bool_set_false:N \l_@@_exp_bracket_bool
-        \bool_set_false:N \l_@@_exp_combine_bool
-      } ,
-    product-mode .choices:nn =
-      { phrase , symbol }
-      { \tl_set_eq:NN \l_@@_mode_tl \l_keys_choice_tl } ,
+    product-exponents .choices:nn =
+      { combine , combine-bracket , individual }
+      { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
+    product-mode .choice: ,
+    product-mode / phrase .code:n =
+      { \bool_set_true:N \l_@@_phrase_bool } ,
+    product-mode / symbol .code:n =
+      { \bool_set_false:N \l_@@_phrase_bool } ,
     product-phrase .tl_set:N = \l_@@_phrase_tl ,
     product-symbol .tl_set:N = \l_@@_symbol_tl ,
-    product-units .choice: ,
-    product-units / bracket .code:n =
-      {
-        \bool_set_true:N  \l_@@_unit_bracket_bool
-        \bool_set_false:N \l_@@_power_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      } ,
-    product-units / bracket-power .code:n =
-      {
-        \bool_set_true:N  \l_@@_unit_bracket_bool
-        \bool_set_true:N \l_@@_power_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      } ,
-    product-units / power .code:n =
-      {
-        \bool_set_false:N  \l_@@_unit_bracket_bool
-        \bool_set_true:N \l_@@_power_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      } ,
-    product-units / repeat .code:n =
-      {
-        \bool_set_false:N \l_@@_unit_bracket_bool
-        \bool_set_false:N \l_@@_power_bool
-        \bool_set_true:N  \l_@@_unit_repeat_bool
-      } ,
-    product-units / single .code:n =
-      {
-        \bool_set_false:N \l_@@_unit_bracket_bool
-        \bool_set_false:N \l_@@_power_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      }
+    product-units .choices:nn =
+      { bracket , bracket-power , power , repeat , single }
+      { \tl_set_eq:NN \l_@@_units_tl \l_keys_choice_tl }
   }
+\bool_new:N \l_@@_phrase_bool
 %    \end{macrocode}
 % \end{variable}
 %
 % \begin{macro}{\siunitx_product:n}
-% \begin{macro}{\@@_print:nn, \@@_print:xx}
-% \begin{macro}[EXP]{\@@_phrase:, \@@_symbol:}
-%   This works much like lists in many ways. First we collect up the data.
+% \begin{macro}{\siunitx_product:nn}
+% \begin{macro}{\@@_aux:}
+% \begin{macro}{\@@_aux:n, \@@_aux:x}
+%   Simply recover the settings and use as a list.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_product:n #1
   {
     \group_begin:
-      \bool_lazy_and:nnTF
-        { \l_@@_exp_combine_bool }
-        { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
-        {
-          \siunitx_compound_extract_exponents:nNN {#1}
-            \l_@@_tmp_seq \l_@@_tmp_tl
-        }
-        {
-          \tl_clear:N \l_@@_tmp_tl
-          \siunitx_compound:nN {#1} \l_@@_tmp_seq
-        }
-      \bool_lazy_and:nnTF
-        { \l_@@_exp_bracket_bool }
-        { ! \tl_if_empty_p:N \l_@@_tmp_tl }
-        {
-          \@@_print:xx
-            { \exp_not:V \l_@@_bracket_open_tl }
-            {
-              \exp_not:V \l_@@_bracket_close_tl
-              \exp_not:V \l_@@_tmp_tl
-            }
-        }
-        { \@@_print:xx { } { \exp_not:V \l_@@_tmp_tl } }
+      \@@_aux:
+      \siunitx_list:n {#1}
     \group_end:
   }
-%    \end{macrocode}
-%   Now we need to print: unlike a list, we don't need different separators
-%   so the only requirement is to extract the first and last entries. That
-%   is conveniently achieved by popping them off and handling them separately.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_print:nn #1#2
+\cs_new_protected:Npn \siunitx_product:nn #1#2
   {
-    \int_compare:nNnTF { \seq_count:N \l_@@_tmp_seq } > 1
+    \group_begin:
+      \@@_aux:
+      \siunitx_list:nn {#1} {#2}
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_aux:
+  {
+    \bool_if:NTF \l_@@_phrase_bool
+      { \@@_aux:x { \exp_not:V \l_@@_phrase_tl } }
+      { \@@_aux:x { { } \exp_not:V \l_@@_symbol_tl { } } }
+  }
+\cs_new_protected:Npn \@@_aux:n #1
+  {
+    \keys_set:nx { siunitx }
       {
-        \seq_pop_left:NN \l_@@_tmp_seq \l_@@_tmp_tl
-        \siunitx_print:nx { number }
-          {
-            \exp_not:n {#1}
-            \exp_not:V \l_@@_tmp_tl
-          }
-        \seq_pop_right:NN \l_@@_tmp_seq \l_@@_tmp_tl
-        \seq_map_inline:Nn \l_@@_tmp_seq 
-          {
-            \siunitx_print:nx { number }
-              {
-                \use:c { @@_ \l_@@_mode_tl : }
-                \exp_not:n {##1}
-              }
-          }
-        \siunitx_print:nx { number }
-          {
-            \use:c { @@_ \l_@@_mode_tl : }
-            \exp_not:V \l_@@_tmp_tl
-            \exp_not:n {#2}
-          }
-      }
-      {
-        \siunitx_print:nx { number }
-          { \seq_item:Nn \l_@@_tmp_seq { 1 } }
+        list-exponents       = \l_@@_exp_tl ,
+        list-final-separator = { \exp_not:n {#1} } ,
+        list-pair-separator  = { \exp_not:n {#1} } ,
+        list-separator       = { \exp_not:n {#1} } ,
+        list-separator-text  =
+          \bool_if:NTF \l_@@_phrase_bool { true } { false } ,
+        list-units           = \l_@@_units_tl
       }
   }
-\cs_generate_variant:Nn \@@_print:nn { xx }
-\cs_new:Npn \@@_phrase:
-  { \exp_not:V \l_@@_phrase_tl }
-\cs_new:Npn \@@_symbol:
-  { { } \exp_not:V \l_@@_symbol_tl { } }
+\cs_generate_variant:Nn \@@_aux:n { x }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -839,143 +765,55 @@
 %<@@=siunitx_range>
 %    \end{macrocode}
 %
-% \begin{variable}{\l_@@_tmp_seq, \l_@@_tmp_tl}
-%   Scratch space.
-%    \begin{macrocode}
-\seq_new:N \l_@@_tmp_seq
-\tl_new:N \l_@@_tmp_tl
-%    \end{macrocode}
-% \end{variable}
-%
-% \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
-%   Purely internal for the present.
-%    \begin{macrocode}
-\tl_new:N \l_@@_bracket_close_tl
-\tl_new:N \l_@@_bracket_open_tl
-\tl_set:Nn \l_@@_bracket_open_tl { ( }
-\tl_set:Nn \l_@@_bracket_close_tl { ) }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{variable}
 %   {
+%     \l_@@_exp_tl               ,
 %     \l_siunitx_range_phrase_tl ,
-%     \l_@@_exp_bracket_bool     ,
-%     \l_@@_exp_combine_bool     ,
-%     \l_@@_unit_bracket_bool    ,
-%     \l_@@_unit_repeat_bool
+%     \l_@@_units_tl
 %   }
+%   Options for products.
 %    \begin{macrocode}
-\bool_new:N \l_@@_exp_bracket_bool
-\bool_new:N \l_@@_exp_combine_bool
-\bool_new:N \l_@@_unit_bracket_bool
-\bool_new:N \l_@@_unit_repeat_bool
 \keys_define:nn { siunitx }
   {
-    range-exponents .choice: ,
-    range-exponents / combine .code:n =
-      {
-        \bool_set_false:N \l_@@_exp_bracket_bool
-        \bool_set_true:N \l_@@_exp_combine_bool
-      } ,
-    range-exponents / combine-bracket .code:n =
-      {
-        \bool_set_true:N \l_@@_exp_bracket_bool
-        \bool_set_true:N \l_@@_exp_combine_bool
-      } ,
-    range-exponents / individual .code:n =
-      {
-        \bool_set_false:N \l_@@_exp_bracket_bool
-        \bool_set_false:N \l_@@_exp_combine_bool
-      } ,
+    range-exponents .choices:nn =
+      { combine , combine-bracket , individual }
+      { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
     range-phrase .tl_set:N = \l_siunitx_range_phrase_tl ,
-    range-units .choice: ,
-    range-units / bracket .code:n =
-      {
-        \bool_set_true:N  \l_@@_unit_bracket_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      } ,
-    range-units / repeat .code:n =
-      {
-        \bool_set_false:N \l_@@_unit_bracket_bool
-        \bool_set_true:N  \l_@@_unit_repeat_bool
-      } ,
-    range-units / single .code:n =
-      {
-        \bool_set_false:N \l_@@_unit_bracket_bool
-        \bool_set_false:N \l_@@_unit_repeat_bool
-      }
+    range-units .choices:nn =
+      { bracket , repeat , single }
+      { \tl_set_eq:NN \l_@@_units_tl \l_keys_choice_tl }
   }
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_range:nn, \@@_aux:nn}
-% \begin{macro}{\@@_print:nn, \@@_print:xx}
-% \begin{macro}{\@@_single:n}
-%   A range is relatively easy to deal with. After dealing with dodgy input,
-%   we simply combine the two entries into a list then use the generic
-%   mechanism. Printing here is reality easy as there is no loop.
+% \begin{macro}{\siunitx_range:nn}
+% \begin{macro}{\siunitx_range:nnn}
+% \begin{macro}{\@@_aux:}
+%   Simply recover the settings and use as a list.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_range:nn #1#2
   {
-    \tl_if_blank:nTF {#1}
-      { \@@_single:n {#2} }
+    \group_begin:
+      \@@_aux:
+      \siunitx_list:n { {#1} {#2} }
+    \group_end:
+  }
+\cs_new_protected:Npn \siunitx_range:nnn #1#2#3
+  {
+    \group_begin:
+      \@@_aux:
+      \siunitx_list:nn { {#1} {#2} } {#3}
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_aux:
+  {
+    \keys_set:nx { siunitx }
       {
-        \tl_if_blank:nTF {#2}
-          { \@@_single:n {#1} }
-          { \@@_aux:nn {#1} {#2} }
+        list-exponents       = \l_@@_exp_tl ,
+        list-pair-separator  = { \exp_not:V \l_siunitx_range_phrase_tl } ,
+        list-separator-text  = true ,
+        list-units           = \l_@@_units_tl
       }
-  }
-\cs_new_protected:Npn \@@_aux:nn #1#2
-  {
-    \group_begin:
-      \bool_if:NTF \l_@@_exp_combine_bool
-        {
-          \siunitx_compound_extract_exponents:nNN { {#1} {#2} }
-            \l_@@_tmp_seq \l_@@_tmp_tl
-        }
-        {
-          \tl_clear:N \l_@@_tmp_tl
-          \siunitx_compound:nN { {#1} {#2} } \l_@@_tmp_seq
-        }
-      \bool_lazy_and:nnTF
-        { \l_@@_exp_bracket_bool }
-        { ! \tl_if_empty_p:N \l_@@_tmp_tl }
-        {
-          \@@_print:xx
-            {
-              \exp_not:V \l_@@_bracket_open_tl
-              \seq_item:Nn \l_@@_tmp_seq { 1 }
-            }
-            {
-              \seq_item:Nn \l_@@_tmp_seq { 2 }
-              \exp_not:V \l_@@_bracket_close_tl
-              \exp_not:V \l_@@_tmp_tl
-            }
-        }
-        {
-          \@@_print:xx
-            { \seq_item:Nn \l_@@_tmp_seq { 1 } }
-            {
-              \seq_item:Nn \l_@@_tmp_seq { 2 }
-              \exp_not:V \l_@@_tmp_tl
-            }
-        }
-    \group_end:
-  }
-\cs_new_protected:Npn \@@_print:nn #1#2
-  {
-    \siunitx_print:nn { number } {#1}
-    \tl_if_blank:nF {#2} { \tl_use:N \l_siunitx_range_phrase_tl }
-    \siunitx_print:nn { number } {#2}
-  }
-\cs_generate_variant:Nn \@@_print:nn { xx }
-\cs_new_protected:Npn \@@_single:n #1
-  {
-    \group_begin:
-      \siunitx_numnber_format:nN {#1} \l_@@_tmp_tl
-      \siunitx_print:nV { number } \l_@@_tmp_tl
-    \group_end:
   }
 %    \end{macrocode}
 % \end{macro}
@@ -990,18 +828,19 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    list-exponents       = individual        ,
-    list-final-separator = \text { ~ and ~ } ,
-    list-pair-separator  = \text { ~ and ~ } ,
-    list-separator       = \text { , ~ }     ,
-    list-units           = repeat            ,
-    product-exponents    = individual        ,
-    product-mode         = symbol            ,
-    product-phrase       = \text { ~ by ~ }  ,
-    product-symbol       = \times            ,
-    product-units        = repeat            ,
-    range-exponents      = individual        ,
-    range-phrase         = \text { ~ to ~ }  ,
+    list-exponents       = individual  ,
+    list-final-separator = { ~ and ~ } ,
+    list-pair-separator  = { ~ and ~ } ,
+    list-separator       = { , ~ }     ,
+    list-separator-text  = true        ,
+    list-units           = repeat      ,
+    product-exponents    = individual  ,
+    product-mode         = symbol      ,
+    product-phrase       = { ~ by ~ }  ,
+    product-symbol       = \times      ,
+    product-units        = repeat      ,
+    range-exponents      = individual  ,
+    range-phrase         = { ~ to ~ }  ,
     range-units          = repeat
   }
 %    \end{macrocode}
