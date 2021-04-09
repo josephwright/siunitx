@@ -15,6 +15,20 @@ typesetfiles = {"*.tex"}
 -- Shorten the tagging list
 tagfiles = {"siunitx.dtx"}
 
+-- Source files cover those for rollback
+sourcefiles =
+  {
+    "*.dtx",
+    "*.ins",
+    "*.tex",
+    "siunitx-abbreviations.cfg",
+    "siunitx-binary.cfg",
+    "siunitx-v2.sty",
+    "siunitx-version-1.cfg",
+  }
+-- Whilst we also need to install .cfg files
+installfiles = {"*.cfg", "*.sty"}
+
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
   return string.gsub(content,
