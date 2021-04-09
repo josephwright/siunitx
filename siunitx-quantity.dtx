@@ -68,6 +68,20 @@
 %   the prints the results using \cs{siunitx_print:nn}.
 % \end{function}
 %
+% \begin{function}
+%   {
+%     \siunitx_quantity_print:nn, \siunitx_quantity_print:nV,
+%     \siunitx_quantity_print:VV, \siunitx_quantity_print:xV
+%   }
+%   \begin{syntax}
+%     \cs{siunitx_quantity_print:nn} \Arg{number} \Arg{unit}
+%   \end{syntax}
+%   A low-level function which prints the quantity directly: there is
+%   no processing applied to either the \meta{number} or \meta{unit}. The
+%   two parts are printed using \cs{siunitx_print:nn} and appropriate
+%   spacing and break-prevention is applied.
+% \end{function}
+%
 % \begin{function}{allow-quantity-breaks}
 %   \begin{syntax}
 %     |allow-quantity-breaks| = |true|\verb"|"|false|
@@ -235,7 +249,8 @@
             {
               \tl_set:Nn \l_@@_number_tl { \ensuremath {#1} }
               \siunitx_unit_format:nN {#2} \l_@@_unit_tl
-              \exp_args:NV \@@_single:n \l_@@_number_tl
+              \siunitx_quantity_print:VV
+                \l_@@_number_tl \l_@@_unit_tl
             }
         }
     \group_end:
@@ -285,11 +300,11 @@
 \cs_new_protected:Npn \@@_parsed_aux:nnnn #1#2#3#4
   {
     \tl_if_blank:nTF {#3}
-      { \@@_single:n {#1#2#4} }
+      { \siunitx_quantity_print:nV {#1#2#4} \l_@@_unit_tl }
       {
         \bool_if:NTF \l_@@_uncert_bracket_bool
           {
-            \exp_args:Nx \@@_single:n
+            \siunitx_quantity_print:xV
               {
                 \exp_not:n {#1}
                 \exp_not:V \l_@@_bracket_open_tl
@@ -297,15 +312,18 @@
                 \exp_not:V \l_@@_bracket_close_tl
                 \exp_not:n {#4}
               }
+            \l_@@_unit_tl
           }
           {
             \bool_if:NTF \l_@@_uncert_repeat_bool
               {
-                \@@_single:n {#1#2}
-                \@@_single:n { { } #3 }
+                \siunitx_quantity_print:nV {#1#2}
+                  \l_@@_unit_tl
+                \siunitx_quantity_print:nV { { } #3 }
+                  \l_@@_unit_tl
                 \siunitx_print:nn { number } { { } #4 }
               }
-              { \@@_single:n {#1#2#3#4} }
+              { \siunitx_quantity_print:nV {#1#2#3#4} \l_@@_unit_tl }
           }
       }
   }
@@ -364,21 +382,26 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_single:n}
-%   When there is a single part to the number, printing is quite
-%   straight-forward. The number is passed explicitly as that makes life
-%   easier combining the routes.
+% \begin{macro}
+%   {
+%     \siunitx_quanity_print:nn, \siunitx_quanity_print:nV,
+%     \siunitx_quanity_print:VV, \siunitx_quanity_print:xV
+%   }
+%   For printing a single part of a quantity. This is needed for compound
+%   quantities and so is public: that's also the reason for passing both
+%   argument explicitly.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_single:n #1
+\cs_new_protected:Npn \siunitx_quantity_print:nn #1#2
   {
     \siunitx_print:nn { number } {#1}
-    \tl_if_empty:NF \l_@@_unit_tl
+    \tl_if_blank:nF {#2}
       {
         \tl_use:N \l_@@_product_tl
         \bool_if:NF \l_@@_break_bool { \nobreak }
-        \siunitx_print:nV { unit } \l_@@_unit_tl
+        \siunitx_print:nn { unit } {#2}
       }
   }
+\cs_generate_variant:Nn \siunitx_quantity_print:nn { nV , VV , xV }
 %    \end{macrocode}
 % \end{macro}
 %
