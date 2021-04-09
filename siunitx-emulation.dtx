@@ -110,26 +110,25 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\@@_option_removed:n, \@@_option_removed:V}
+%   Abstract out a simple wrapper.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_option_removed:n #1
+  {
+    \msg_warning:nnx { siunitx } { option-removed }
+      {#1}
+  }
+\cs_generate_variant:Nn \@@_option_removed:n { V }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Load-time option}
 %
 %    \begin{macrocode}
-\keys_define:nn { siunitx }
+\clist_map_inline:nn { abbreviations , binary-units , version-1-compatibility }
   {
-    abbreviations .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { abbreviations }
-      } ,
-    binary-units .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { binary-units }
-      } ,
-    version-1-compatibility .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { version-1-compatibility }
-      } ,
+    \keys_define:nn { siunitx } { #1 .code:n = \@@_option_removed:n {#1} }
   }
 %    \end{macrocode}
 %
@@ -210,152 +209,49 @@
 %
 % \subsection{Print options}
 %
-% At present, simply remove these.
 %    \begin{macrocode}
-\keys_define:nn { siunitx }
+\clist_map_inline:nn
   {
-    detect-all .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-all }
-      } ,
-    detect-display-math .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-display-math }
-      } ,
-    detect-family .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-family }
-      } ,
-    detect-inline-family .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-inline-family }
-      } ,
-    detect-inline-weight .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-inline-weight }
-      } ,
-    detect-mode .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-mode }
-      } ,
-    detect-none .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-none }
-      } ,
-    detect-shape .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-shape }
-      } ,
-    detect-weight .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { detect-weight }
-      }
+    detect-all           ,
+    detect-display-math  ,
+    detect-family        ,
+    detect-inline-family ,
+    detect-inline-weight ,
+    detect-mode          ,
+    detect-none          ,
+    detect-shape         ,
+    detect-weight
+  }
+  {
+    \keys_define:nn { siunitx } { #1 .code:n = \@@_option_removed:n {#1} }
   }
 %    \end{macrocode}
 %
-% The old font insertion options: all removed.
+% The old font insertion options.
 %    \begin{macrocode}
-\keys_define:nn { siunitx }
+\clist_map_inline:nn
   {
-    math-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { math-rm }
-      } ,
-    math-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { math-sf }
-      } ,
-    math-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { math-tt }
-      } ,
-    number-math-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-math-rm }
-      } ,
-    number-math-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-math-sf }
-      } ,
-    number-math-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-math-tt }
-      } ,
-    number-text-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-text-rm }
-      } ,
-    number-text-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-text-sf }
-      } ,
-    number-text-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { number-text-tt }
-      } ,
-    text-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { text-rm }
-      } ,
-    text-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { text-sf }
-      } ,
-    text-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { text-tt }
-      } ,
-    unit-math-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-math-rm }
-      } ,
-    unit-math-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-math-sf }
-      } ,
-    unit-math-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-math-tt }
-      } ,
-    unit-text-rm .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-text-rm }
-      } ,
-    unit-text-sf .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-text-sf }
-      } ,
-    unit-text-tt .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { unit-text-tt }
-      }
+    math-rm        ,
+    math-sf        ,
+    math-tt        ,
+    number-math-rm ,
+    number-math-sf ,
+    number-math-tt ,
+    number-text-rm ,
+    number-text-sf ,
+    number-text-tt , 
+    text-rm        ,
+    text-sf        ,
+    text-tt        , 
+    unit-math-rm   ,
+    unit-math-sf   ,
+    unit-math-tt   ,
+    unit-text-rm   ,
+    unit-text-sf   ,
+    unit-text-tt 
+  }
+  {
+    \keys_define:nn { siunitx } { #1 .code:n = \@@_option_removed:n {#1} }
   }
 %    \end{macrocode}
 %
@@ -366,10 +262,7 @@
 \keys_define:nn { siunitx }
   {
     input-protect-tokens .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { input-protect-tokens }
-      }
+      { \@@_option_removed:V \l_keys_key_tl }
   }
 %    \end{macrocode}
 %
@@ -392,15 +285,9 @@
       } ,
     add-decimal-zero .default:n = true ,
     add-integer-zero .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { add-integer-zero }
-      } ,
+      { \@@_option_removed:V \l_keys_key_tl } ,
     close-bracket .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { close-bracket }
-      } ,
+      { \@@_option_removed:V \l_keys_key_tl } ,
     bracket-numbers .choice: ,
     bracket-numbers / false .code:n =
       {
@@ -423,10 +310,7 @@
               { explicit-sign }
               { print-implicit-plus~=~true  }
           }
-          {
-            \msg_warning:nnn { siunitx } { option-removed }
-              { explicit-sign }
-          }
+          { \@@_option_removed:V \l_keys_key_tl }
       } ,
     omit-uncertainty .code:n =
       {
@@ -437,10 +321,7 @@
       } ,
     omit-uncertainty .default:n = true ,
     open-bracket .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { open-bracket }
-      } ,
+      { \@@_option_removed:V \l_keys_key_tl } ,
     retain-unity-mantissa .code:n =
       {
         \@@_option_deprecated:nnV
@@ -652,10 +533,7 @@
           \l_keys_value_tl
       } ,
     literal-superscript-as-power .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { literal-superscript-as-power }
-      } ,
+      { \@@_option_removed:V \l_keys_key_tl } ,
     per-mode / reciprocal .code:n =
       {
         \@@_option_deprecated:nn
@@ -669,10 +547,7 @@
           { per-mode~=~power-positive-first }
       } ,
     power-font .code:n =
-      {
-        \msg_warning:nnn { siunitx } { option-removed }
-          { power-font }
-      } ,
+      { \@@_option_removed:V \l_keys_key_tl } ,
     qualifier-mode / brackets .code:n =
       {
         \@@_option_deprecated:nn
