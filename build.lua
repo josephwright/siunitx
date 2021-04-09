@@ -31,10 +31,15 @@ installfiles = {"*.cfg", "*.sty"}
 
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
+  tagname = string.gsub(tagname, "^v", "")
+  content = string.gsub(content,
+    "\\DeclareCurrentRelease%{[^}]+%}%{[^}]+%}",
+    "\\DeclareCurrentRelease{" .. tagname .. "}{" .. tagdate .. "}"
+    )
   return string.gsub(content,
     "\n\\ProvidesExplPackage %{siunitx%} %{[^}]+%} %{[^}]+%}\n",
     "\n\\ProvidesExplPackage {siunitx} {"
-      .. tagdate .. "} {" .. string.gsub(tagname, "^v", "") .. "}\n")
+      .. tagdate .. "} {" .. tagname .. "}\n")
 end
 
 function tag_hook(tagname)
