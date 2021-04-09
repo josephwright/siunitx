@@ -7,7 +7,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v2.8c] - 2021-03-27
+## [v2.8d] - 2021-04-09
 
 ### Changed
 
