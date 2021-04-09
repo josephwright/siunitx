@@ -85,6 +85,14 @@
 %   be given as a \meta{balanced text}.
 % \end{function}
 %
+% \begin{function}{\siunitx_list:nn}
+%   \begin{syntax}
+%     \cs{siunitx_list:n} \Arg{entries} \Arg{unit}
+%   \end{syntax}
+%   Prints the list of quantities in the \meta{entries}, each of which should
+%   be given as a \meta{balanced text}.
+% \end{function}
+%
 % \begin{function}{\siunitx_product:n}
 %   \begin{syntax}
 %     \cs{siunitx_product:n} \Arg{entries}
@@ -368,6 +376,27 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_start_tl, \l_@@_end_tl}
+%   Data on the end-of-list.
+%    \begin{macrocode}
+\tl_new:N \l_@@_start_tl
+\tl_new:N \l_@@_end_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_count_int}
+%   Data on the length-of-list.
+%    \begin{macrocode}
+\int_new:N \l_@@_count_int
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_unit_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_unit_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
 %   Purely internal for the present.
 %    \begin{macrocode}
@@ -436,9 +465,14 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_list:n}
-% \begin{macro}{\@@_print:nn, \@@_print:xx}
-% \begin{macro}{\@@_print:nnn}
+% \begin{macro}{\siunitx_list:nn}
+% \begin{macro}{\@@_format_numbers:n}
+% \begin{macro}{\@@_print:N}
+% \begin{macro}{\@@_print:nnN, \@@_print:xxN}
+% \begin{macro}{\@@_print:nnnN}
+% \begin{macro}{\@@_print_aux:n}
 % \begin{macro}{\@@_print_aux:nn}
+% \begin{macro}{\@@_print_number:n}
 %   Printing a list starts with the question of whether we want to extract
 %   exponents. If we do, then there is the work to do with extraction. Either
 %   way, the printing is handed off to a common function. We do a quick count
@@ -447,65 +481,110 @@
 \cs_new_protected:Npn \siunitx_list:n #1
   {
     \group_begin:
-      \bool_lazy_and:nnTF
-        { \l_@@_exp_combine_bool }
-        { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
-        {
-          \siunitx_compound_extract_exponents:nNN {#1}
-            \l_@@_tmp_seq \l_@@_tmp_tl
-        }
-        {
-          \tl_clear:N \l_@@_tmp_tl
-          \siunitx_compound:nN {#1} \l_@@_tmp_seq
-        }
-      \bool_lazy_and:nnTF
-        { \l_@@_exp_bracket_bool }
-        { ! \tl_if_empty_p:N \l_@@_tmp_tl }
-        {
-          \@@_print:xx
-            { \exp_not:V \l_@@_bracket_open_tl }
-            {
-              \exp_not:V \l_@@_bracket_close_tl
-              \exp_not:V \l_@@_tmp_tl
-            }
-        }
-        { \@@_print:xx { } { \exp_not:V \l_@@_tmp_tl } }
+      \@@_format_numbers:n {#1}
+      \@@_print:N \@@_print_number:n
     \group_end:
+  }
+%    \end{macrocode}
+%   For quantities, life is more complex as there are interactions between the
+%   options for exponents and units.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_list:nn #1#2
+  {
+    \group_begin:
+      \siunitx_unit_options_apply:n {#2}
+      \bool_if:NT \l_@@_unit_bracket_bool
+        { \bool_set_true:N \l_@@_exp_bracket_bool }
+      \bool_if:NT \l_@@_unit_repeat_bool
+        { \bool_set_false:N \l_@@_exp_combine_bool }
+      \bool_lazy_or:nnT
+        { \l_@@_unit_bracket_bool }
+        { ! \l_@@_unit_repeat_bool }
+        { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
+      \@@_format_numbers:n {#1}
+      \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+      \bool_if:NTF \l_@@_unit_repeat_bool
+        { \@@_print:N \@@_print_quantity:n }
+        {
+          \bool_lazy_and:nnT
+            { \l_@@_unit_bracket_bool }
+            { \tl_if_empty_p:N \l_@@_tmp_tl }
+            {
+              \siunitx_print:nV { number } \l_@@_bracket_open_tl
+              \@@_print:N \@@_print_number:n
+              \siunitx_print:nV { number } \l_@@_bracket_close_tl
+            }
+            { \@@_print:N \@@_print_number:n }
+          \@@_print_quantity:n { }
+        }
+    \group_end:
+  }
+\cs_new_protected:Npn \@@_format_numbers:n #1
+  {
+    \bool_lazy_and:nnTF
+      { \l_@@_exp_combine_bool }
+      { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
+      {
+        \siunitx_compound_extract_exponents:nNN {#1}
+          \l_@@_tmp_seq \l_@@_tmp_tl
+      }
+      {
+        \tl_clear:N \l_@@_tmp_tl
+        \siunitx_compound:nN {#1} \l_@@_tmp_seq
+      }
+  }
+\cs_new_protected:Npn \@@_print:N #1
+  {
+    \bool_lazy_and:nnTF
+      { \l_@@_exp_bracket_bool }
+      { ! \tl_if_empty_p:N \l_@@_tmp_tl }
+      {
+        \@@_print:xxN
+          { \exp_not:V \l_@@_bracket_open_tl }
+          {
+            \exp_not:V \l_@@_bracket_close_tl
+            \exp_not:V \l_@@_tmp_tl
+          }
+          #1
+      }
+      { \@@_print:xxN { } { \exp_not:V \l_@@_tmp_tl } #1 }
   }
 %    \end{macrocode}
 %   We now need to know how many entries there are: the reason we don't use
 %   \cs{seq_use:Nnnn} is that we want to be able to insert \cs{siunitx_print:nn}
 %   in a controlled way.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print:nn #1#2
+\cs_new_protected:Npn \@@_print:nnN #1#2#3
   {
-    \exp_args:Nx \@@_print:nnn
-      { \seq_count:N \l_@@_tmp_seq } {#1} {#2}
+    \exp_args:Nx \@@_print:nnnN
+      { \seq_count:N \l_@@_tmp_seq } {#1} {#2} #3
   }
+\cs_generate_variant:Nn \@@_print:nnN { xx }
 %    \end{macrocode}
 %   A rather long auxiliary as we want a way to have the brackets/exponent
 %   available. The actual flow is simple enough: see how many entries there are
-%   and print as required.
+%   and print as required. To keep everything generic, we have some slightly
+%   tricky saving of data to allow everything to go to the mapping.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print:nnn #1#2#3
+\cs_new_protected:Npn \@@_print:nnnN #1#2#3#4
   {
     \int_case:nnF {#1}
       {
         { 0 } { }
         { 1 }
           {
-            \siunitx_print:nx { number }
+            #4
               { \seq_item:Nn \l_@@_tmp_seq { 1 } }
           }
         { 2 }
           {
-            \siunitx_print:nx { number }
+            #4
               {
                 \exp_not:n {#2}
                 \seq_item:Nn \l_@@_tmp_seq { 1 }
               }
             \tl_use:N \l_siunitx_list_separator_pair_tl
-            \siunitx_print:nx { number }
+            #4
               {
                 \seq_item:Nn \l_@@_tmp_seq { 2 }
                 \exp_not:n {#3}
@@ -513,36 +592,57 @@
           }
       }
       {
-        \cs_set_protected:Npn \@@_print_aux:nn ##1##2
-          {
-            \int_case:nnF {##1}
-              {
-                { 1 }
-                  {
-                    \siunitx_print:nn { number } { #2 ##2 }
-                    \tl_use:N \l_siunitx_list_separator_tl
-                  }
-                { #1 - 1 }
-                  {
-                    \siunitx_print:nn { number } {##2}
-                    \tl_use:N \l_siunitx_list_separator_final_tl
-                  }
-                { #1 }
-                  { \siunitx_print:nn { number } { ##2 #3 } }
-              }
-              {
-                \siunitx_print:nn { number } {##2}
-                \tl_use:N \l_siunitx_list_separator_tl
-              }
-          }
+        \int_set:Nn \l_@@_count_int {#1}
+        \tl_set:Nn \l_@@_start_tl {#2}
+        \tl_set:Nn \l_@@_end_tl {#3}
+        \cs_set_eq:NN \@@_print_aux:n #4
         \seq_map_indexed_function:NN
           \l_@@_tmp_seq
           \@@_print_aux:nn
       }
   }
-\cs_generate_variant:Nn \@@_print:nn { xx }
-\cs_new_protected:Npn \@@_print_aux:nn #1#2 { }
+\cs_new_protected:Npn \@@_print_aux:n #1 { }
+\cs_new_protected:Npn \@@_print_aux:nn #1#2
+  {
+    \int_case:nnF {#1}
+      {
+        { 1 }
+          {
+            \@@_print_aux:n
+              {
+                \exp_not:V \l_@@_start_tl
+                \exp_not:n {#2}
+              }
+            \tl_use:N \l_siunitx_list_separator_tl
+          }
+        { \l_@@_count_int - 1 }
+          {
+            \@@_print_aux:n { \exp_not:n {#2} }
+            \tl_use:N \l_siunitx_list_separator_final_tl
+          }
+        { \l_@@_count_int }
+          {
+            \@@_print_aux:n
+              {
+                \exp_not:n {#2}
+                \exp_not:V \l_@@_end_tl
+              }
+          }
+      }
+      {
+        \@@_print_aux:n { \exp_not:n {#2} }
+        \tl_use:N \l_siunitx_list_separator_tl
+      }
+  }
+\cs_new_protected:Npn \@@_print_number:n #1
+  { \siunitx_print:nx { number } {#1} }
+\cs_new_protected:Npn \@@_print_quantity:n #1
+  { \siunitx_quantity_print:nV {#1} \l_@@_unit_tl }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
