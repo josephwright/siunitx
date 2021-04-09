@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v2.8c] - 2021-03-27
+
 ### Changed
 - Updates to follow LaTeX2e kernel revisions
 - No longer apply `\addtocontents` patch
@@ -1044,7 +1046,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8b...stable
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8c...stable
+[v2.8c]: https://github.com/josephwright/siunitx/compare/v2.8b...v2.8c
 [v2.8b]: https://github.com/josephwright/siunitx/compare/v2.8a...v2.8b
 [v2.8a]: https://github.com/josephwright/siunitx/compare/v2.8...v2.8a
 [v2.8]: https://github.com/josephwright/siunitx/compare/v2.7u...v2.8
