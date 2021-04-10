@@ -1677,10 +1677,10 @@ settings print a mantissa of $1$ but omit an exponent of $0$.
   \num[print-zero-exponent = true]{444e0}
 \end{LaTeXdemo}
 
-\subsection{Lists, products and ranges of numbers}
+\subsection{Lists, products and ranges}
 
-Lists, products and ranges of numbers have a small number of specialised
-options, which apply to these more unusual input forms
+Lists, products and ranges of numbers and quantities have a small number of
+specialised options, which apply to these more unusual input forms
 (Table~\ref{tab:opt:num:list}).
 \begin{table}
   \caption{Output options for lists, products ranges of numbers.%
@@ -1695,12 +1695,15 @@ options, which apply to these more unusual input forms
       list-final-separator & Literal & \verb*=\text{ and }= \\
       list-pair-separator  & Literal & \verb*=\text{ and }= \\
       list-separator       & Literal & \verb*=\text{, }=    \\
+      list-units           & Choice  & repeat               \\
       product-exponents    & Choice  & individual           \\
       product-mode         & Choice  & symbol               \\
       product-phrase       & Literal & \verb*=\text{ by }=  \\
       product-symbol       & Literal & \cs{times}           \\
+      product-units        & Choice  & repeat               \\
       range-exponents      & Choice  & individual           \\
       range-phrase         & Literal & \verb*=\text{ to }=  \\
+      range-units          & Choice  & repeat               \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1713,7 +1716,8 @@ stored using the \opt{list-separator} option. The separator before the last
 item of a list may be different, and is therefore set using the
 \opt{list-final-separator} option. The separator used for exactly two items is
 set using the \opt{list-pair-separator} option. Any spaces needed should be
-included in the option settings: none are added within the code.
+included in the option settings: none are added within the code. The separators
+are always printed in text mode.
 \begin{LaTeXdemo}
   \numlist{0.1;0.2;0.3}                              \\
   \numlist[list-separator = {; }]{0.1;0.2;0.3}       \\
@@ -1732,7 +1736,9 @@ included in the option settings: none are added within the code.
 Products of numbers can be output using either a product symbol or phrase:
 this is controlled by the \opt{product-mode} setting. When \opt{symbol} is
 set, the appropriate symbol is stored in \opt{product-symbol}. When using
-\opt{phrase} mode, the information is stored in \opt{product-phrase}.
+\opt{phrase-mode}, the information is stored in \opt{product-phrase}. Phrases
+are always printed in text mode; symbols are printed using the same routine
+as for numbers.
 \begin{LaTeXdemo}
   \numproduct{5 x 100 x 2} \\
   \numproduct[product-symbol = \ensuremath{\cdot}]{5 x 100 x 2} \\
@@ -1745,7 +1751,7 @@ set, the appropriate symbol is stored in \opt{product-symbol}. When using
 Ranges of numbers can be given as input. These will have an appropriate word or
 symbol inserted between the two entries: this is stored using the
 \opt{range-phrase} option. The phrase should include any necessary spaces: no
-extra space is added.
+extra space is added. The phrase is always printed in text mode.
 \begin{LaTeXdemo}
   \numrange{5}{100} \\
   \numrange[range-phrase = --]{5}{100}
@@ -1783,6 +1789,26 @@ and apply to to all other entries, with the exponent itself places at the end.
   \numlist{5e3;7e3;9e3;1e4} \\
   \numproduct{5e3 x 7e3 x 9e3 x 1e4} \\
   \numrange{5e3}{7e3}
+\end{LaTeXdemo}
+
+\DescribeOption{list-units}
+\DescribeOption{product-units}
+\DescribeOption{range-units}
+The \opt{list-units}, \opt{product-units} and \opt{range-units} options
+determine how \cs{qtylist}, \cs{qtyproduct} and \cs{qtyrange} command print
+units, respectively. The standard setting for these is \opt{repeat}, where each
+number will be printed with a unit. Alternatives are \opt{bracket} and
+\opt{single}. If set to \opt{single}, this will override collection of
+exponents.
+\begin{LaTeXdemo}
+  \qtylist{2;4;6;8}{\tesla} \\
+  \qtylist[list-units = bracket]{2;4;6;8}{\tesla} \\
+  \qtylist[list-units = repeat]{2;4;6;8}{\tesla} \\
+  \qtylist[list-units = single]{2;4;6;8}{\tesla} \\
+  \qtyrange{2}{4}{\degreeCelsius} \\
+  \qtyrange[range-units = bracket]{2}{4}{\degreeCelsius} \\
+  \qtyrange[range-units = repeat]{2}{4}{\degreeCelsius} \\
+  \qtyrange[range-units = single]{2}{4}{\degreeCelsius}
 \end{LaTeXdemo}
 
 \subsection{Angles}
