@@ -52,6 +52,40 @@
     \test:nn { 1e2 } { 2e2 }
   }
 
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_list:nn {#1} { \metre }
+        \siunitx_product:nn {#1} { \metre }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      { \siunitx_range:nnn {#1} {#2} { \metre } }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Lists~and~products~of~quantities }
+  {
+    \test:n { { 1 } }
+    \test:n { { 1 } { 2 } }
+    \test:n { { 1 } { 2 } { 3 } }
+    \test:n { { 1e10 } }
+    \test:n { { 1e10 } { 2 } }
+    \test:n { { 1e10 } { 2e10 } { 3e9 } }
+  }
+
+\TEST { Ranges~of~quantities }
+  {
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+  }
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \OMIT
