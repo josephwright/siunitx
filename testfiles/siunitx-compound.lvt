@@ -216,4 +216,74 @@
     \test:nn { 1 } { 2 }
   }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \str_if_eq:nnTF {#1} { list }
+          { \siunitx_list:nn {#2} { \metre } }
+          {
+            \str_if_eq:nnTF {#1} { product }
+              { \siunitx_product:nn {#2} { \metre } }
+              { \siunitx_range:nnn {#1} {#2} { \metre } }
+          }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Option~setting~"list-units" }
+  {
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { list-units = bracket }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { list-units = repeat }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { list-units = single }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+  }
+
+\TEST { Option~setting~"product-units" }
+  {
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { product-units = bracket }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { product-units = bracket-power }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { product-units = power }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { product-units = repeat }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+    \keys_set:nn { siunitx } { product-units = single }
+    \test:nn { list } { { 1 } { 2 } { 3 } }
+    \test:nn { list } { { 1e2 } { 2e2 } { 3e2 } }
+  }
+
+\TEST { Option~setting~"range-units" }
+  {
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+    \keys_set:nn { siunitx } { range-units = bracket }
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+    \keys_set:nn { siunitx } { range-units = repeat }
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+    \keys_set:nn { siunitx } { range-units = single }
+    \test:nn { 1 } { 2 }
+    \test:nn { 1e2 } { 2e2 }
+  }
+
 \END

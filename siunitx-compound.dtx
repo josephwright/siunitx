@@ -334,13 +334,14 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_separator_final_tl           ,
-%     \l_@@_separator_pair_tl            ,
-%     \l_@@_separator_tl                 ,
-%     \l_@@_separator_text_bool          ,
-%     \l_@@_exp_bracket_bool             ,
-%     \l_@@_exp_combine_bool             ,
-%     \l_@@_unit_bracket_bool            ,
+%     \l_@@_separator_final_tl  ,
+%     \l_@@_separator_pair_tl   ,
+%     \l_@@_separator_tl        ,
+%     \l_@@_separator_text_bool ,
+%     \l_@@_exp_bracket_bool    ,
+%     \l_@@_exp_combine_bool    ,
+%     \l_@@_unit_bracket_bool   ,
+%     \l_@@_unit_repeat_bool    ,
 %     \l_@@_unit_repeat_bool
 %   }
 %   List options.
@@ -349,6 +350,7 @@
 \bool_new:N \l_@@_exp_combine_bool
 \bool_new:N \l_@@_separator_text_bool
 \bool_new:N \l_@@_unit_bracket_bool
+\bool_new:N \l_@@_unit_power_bool
 \bool_new:N \l_@@_unit_repeat_bool
 \keys_define:nn { siunitx }
   {
@@ -383,26 +385,31 @@
     compound-units / bracket .code:n =
       {
         \bool_set_true:N  \l_@@_unit_bracket_bool
+        \bool_set_false:N \l_@@_unit_power_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
       } ,
     compound-units / bracket-power .code:n =
       {
         \bool_set_true:N  \l_@@_unit_bracket_bool
+        \bool_set_true:N  \l_@@_unit_power_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
       } ,
     compound-units / power .code:n =
       {
         \bool_set_true:N  \l_@@_unit_bracket_bool
+        \bool_set_true:N  \l_@@_unit_power_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
       } ,
     compound-units / repeat .code:n   =
       {
         \bool_set_false:N \l_@@_unit_bracket_bool
+        \bool_set_false:N \l_@@_unit_power_bool
         \bool_set_true:N  \l_@@_unit_repeat_bool
       } ,
     compound-units / single .code:n   =
       {
         \bool_set_false:N \l_@@_unit_bracket_bool
+        \bool_set_false:N \l_@@_unit_power_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
       }
   }
@@ -447,7 +454,12 @@
         { ! \l_@@_unit_repeat_bool }
         { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
       \@@_format_numbers:n {#1}
-      \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+      \bool_if:NTF \l_@@_unit_power_bool
+        {
+          \siunitx_unit_format_multiply:nnN {#2}
+            { \tl_count:n {#1} } \l_@@_unit_tl
+        }
+        { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
       \bool_if:NTF \l_@@_unit_repeat_bool
         { \@@_print:N \@@_print_quantity:n }
         {

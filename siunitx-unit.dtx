@@ -148,6 +148,34 @@
 %   \end{verbatim}
 % \end{function}
 %
+% \begin{function}
+%   {
+%     \siunitx_unit_format_multiply:nnN ,
+%     \siunitx_unit_format_multiply_extract_prefixes:nnNN ,
+%     \siunitx_unit_format_multiply_combine_exponent:nnnN
+%   }
+%   \begin{syntax}
+%     \cs{siunitx_unit_format_multiply:nnN} \Arg{units} \Arg{factor} \meta{tl~var}
+%     \cs{siunitx_unit_format_multiply_extract_prefixes:nnNN}
+%       \Arg{units} \Arg{factor} \meta{tl~var} \meta{fp~var}
+%     \cs{siunitx_unit_format_multiply_combine_exponent:nnnN}
+%       \Arg{units} \Arg{factor} \Arg{exponent} \meta{tl~var}
+%   \end{syntax}
+%   These function formats the \meta{units} in the same way as described for
+%   \cs{siunitx_unit_format:nN}. The units are multiplied by the \meta{factor},
+%   and further processing takes place as previously described.
+%
+%   For example,
+%   \begin{verbatim}
+%     \siunitx_unit_format_multiply:nnN { \metre \per \second }
+%       { 3 } \l_tmpa_tl
+%   \end{verbatim}
+%   will, with standard settings, result in \cs{l_tmpa_tl} being set to
+%   \begin{verbatim}
+%     \mathrm{km}^{3}\,\mathrm{s}^{-3}
+%   \end{verbatim}
+% \end{function}
+%
 % \section{Defining symbolic units}
 %
 % \begin{function}{\siunitx_declare_prefix:Nnn, \siunitx_declare_prefix:Nnx}
@@ -1044,6 +1072,9 @@
 % \begin{macro}{\siunitx_unit_format:nN}
 % \begin{macro}{\siunitx_unit_format_extract_prefixes:nNN}
 % \begin{macro}{\siunitx_unit_format_combine_exponent:nnN}
+% \begin{macro}{\siunitx_unit_format_multiply:nnN}
+% \begin{macro}{\siunitx_unit_format_multiply_extract_prefixes:nnNN}
+% \begin{macro}{\siunitx_unit_format_multiply_combine_exponent:nnnN}
 % \begin{macro}{\@@_format:nNN}
 % \begin{macro}{\@@_format_aux:}
 %   Formatting parsed units can take place either with the prefixes printed or
@@ -1071,19 +1102,45 @@
   {
     \bool_set_false:N \l_@@_prefix_exp_bool
     \fp_zero:N \l_@@_combine_exp_fp
+    \fp_set:Nn \l_@@_multiple_fp { \c_one_fp }
     \@@_format:nNN {#1} #2 \l_@@_tmp_fp
   }
 \cs_new_protected:Npn \siunitx_unit_format_extract_prefixes:nNN #1#2#3
   {
     \bool_set_true:N \l_@@_prefix_exp_bool
     \fp_zero:N \l_@@_combine_exp_fp
+    \fp_set:Nn \l_@@_multiple_fp { \c_one_fp }
     \@@_format:nNN {#1} #2 #3
   }
 \cs_new_protected:Npn \siunitx_unit_format_combine_exponent:nnN #1#2#3
   {
     \bool_set_false:N \l_@@_prefix_exp_bool
     \fp_set:Nn \l_@@_combine_exp_fp {#2}
+    \fp_set:Nn \l_@@_multiple_fp { \c_one_fp }
     \@@_format:nNN {#1} #3 \l_@@_tmp_fp
+  }
+\cs_new_protected:Npn \siunitx_unit_format_multiply:nnN #1#2#3
+  {
+    \bool_set_false:N \l_@@_prefix_exp_bool
+    \fp_zero:N \l_@@_combine_exp_fp
+    \fp_set:Nn \l_@@_multiple_fp {#2}
+    \@@_format:nNN {#1} #3 \l_@@_tmp_fp
+  }
+\cs_new_protected:Npn \siunitx_unit_format_multiply_extract_prefixes:nnNN
+  #1#2#3#4
+  {
+    \bool_set_true:N \l_@@_prefix_exp_bool
+    \fp_zero:N \l_@@_combine_exp_fp
+    \fp_set:Nn \l_@@_multiple_fp {#2}
+    \@@_format:nNN {#1} #3 #4
+  }
+\cs_new_protected:Npn \siunitx_unit_format_multiply_combine_exponent:nnnN
+  #1#2#3#4
+  {
+    \bool_set_false:N \l_@@_prefix_exp_bool
+    \fp_set:Nn \l_@@_combine_exp_fp {#3}
+    \fp_set:Nn \l_@@_multiple_fp {#2}
+    \@@_format:nNN {#1} #4 \l_@@_tmp_fp
   }
 \cs_new_protected:Npn \@@_format:nNN #1#2#3
   {
@@ -1119,6 +1176,9 @@
   }
 \cs_new_protected:Npn \@@_format_aux: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1772,6 +1832,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_multiple_fp}
+%   For multiplying units.
+%    \begin{macrocode}
+\fp_new:N \l_@@_multiple_fp
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_current_tl, \l_@@_part_tl}
 %   Building up the (partial) formatted unit requires some token list storage.
 %   Each part of the unit combination that is recovered also has to be
@@ -1815,6 +1882,8 @@
     \int_zero:N \l_@@_position_int
     \fp_compare:nNnF \l_@@_combine_exp_fp = \c_zero_fp
       { \@@_format_combine_exp: }
+    \fp_compare:nNnF \l_@@_multiple_fp = \c_one_fp
+      { \@@_format_multiply: }
     \bool_lazy_and:nnT
       { \l_@@_prefix_exp_bool }
       { \l_@@_mass_kilogram_bool }
@@ -1879,6 +1948,28 @@
           {
             \msg_error:nnx { siunitx } { unit / non-convertible-exponent }
               { \l_@@_tmp_tl }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_format_multiply:}
+%   A simple mapping.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_multiply:
+  {
+    \int_step_inline:nn { \prop_count:N \l_@@_parsed_prop  }
+      {
+        \prop_get:NnNF \l_@@_parsed_prop { power- ##1 } \l_@@_tmp_tl
+          { \tl_set:Nn \l_@@_tmp_tl { 1 } }
+        \fp_set:Nn \l_@@_tmp_fp
+          { \l_@@_tmp_tl * \l_@@_multiple_fp }
+        \fp_compare:nNnTF \l_@@_tmp_fp = \c_one_fp
+          { \prop_remove:N \l_@@_parsed_prop { power- ##1 } }
+          {
+            \prop_put:Nnx \l_@@_parsed_prop { power- ##1 }
+              { \fp_use:N \l_@@_tmp_fp }
           }
       }
   }
