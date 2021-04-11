@@ -521,7 +521,7 @@
 %
 % \begin{macro}{\siunitx_print_math:n}
 % \begin{macro}[EXP]{\@@_extract_series:Nw}
-% \begin{macro}[EXP]{\@@_convert_series:n}
+% \begin{macro}[EXP]{\@@_convert_series:n, \@@_convert_series:v}
 % \begin{macro}{\@@_math_version:nn, \@@_math_version:Vn}
 % \begin{macro}
 %   {
@@ -560,15 +560,16 @@
 \cs_new:Npn \@@_extract_series:Nw  #1#2 ? #3 \q_stop
   {
     \cs_if_exist:cTF { c_@@_weight_ #1#2 _tl }
-      { \@@_convert_series:n { m } }
+      { \@@_convert_series:v { c_@@_weight_ #1#2 _tl } }
       {
         \cs_if_exist:cTF { c_@@_weight_ #1 _tl }
-          { \@@_convert_series:n {#1} }
+          { \@@_convert_series:v { c_@@_weight_ #1 _tl } }
           { \@@_convert_series:n {#1#2} }
       }
   }
 \cs_new:Npn \@@_convert_series:n #1
   { \tl_use:c { l_@@_version_ #1 _tl } }
+\cs_generate_variant:Nn \@@_convert_series:n { v }
 \cs_new_protected:Npn \@@_math_auxi:n #1
   {
     \bool_if:NTF \l_@@_math_version_bool
