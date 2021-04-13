@@ -244,12 +244,13 @@
 %    \end{macrocode}
 %   For parsed numbers, we have two major questions to think about: whether we
 %   are combining prefixes, and whether we have a multi-part numbers to handle.
+%   Number processing has to be delayed it needs to come after any extracted
+%   exponent is combined.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:nn #1#2
   {
     \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
-    \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
     \use:c { @@_parsed_ \l_siunitx_quantity_prefix_mode_tl :n } {#2}
     \tl_set:Nx \l_@@_number_tl
       { \siunitx_number_output:NN \l_@@_number_tl \q_nil }
@@ -257,6 +258,7 @@
   }
 \cs_new_protected:cpn { @@_parsed_combine-exponent:n } #1
   {
+    \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
     \exp_args:NV \@@_extract_exp:nNN
       \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
     \siunitx_unit_format_combine_exponent:nnN {#1}
@@ -268,9 +270,13 @@
       \l_@@_unit_tl \l_@@_tmp_fp
     \exp_args:NV \@@_adjust_exp:nNN
       \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
+    \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
   }
 \cs_new_protected:Npn \@@_parsed_input:n #1
-  { \siunitx_unit_format:nN {#1} \l_@@_unit_tl }
+  {
+    \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
+    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
 %    \end{macrocode}
 %   To find out if we need to work harder, we first need to split the formatted
 %   number into the constituent parts. That is done using the table-like
