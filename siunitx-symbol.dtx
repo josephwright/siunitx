@@ -265,7 +265,6 @@
   }
 %    \end{macrocode}
 %
-% \begin{macro}{\@@_texttimes:}
 %   For the times symbol, only \LuaTeX{} allows us to use the math mode symbol
 %   directly. However, that likely won't follow the surrounding font appearance,
 %   so in all cases we use the |TS1| version for text. Otherwise much the
@@ -274,7 +273,6 @@
 %    \begin{macrocode}
 \AtBeginDocument
   {
-    \cs_new_eq:NN \@@_texttimes: \texttimes
     \group_begin:
         \tl_set:Nn \l_@@_tmpa_tl
           { { } { } { 2 } { } { } { } { 1 } }
@@ -287,15 +285,14 @@
             \keys_set:nn { siunitx }
               {
                 exponent-product =
-                  \ifmmode \times \else \@@_texttimes: \fi ,
+                  \ifmmode \times \else \texttimes \fi ,
                 product-symbol =
-                  \ifmmode \times \else \@@_texttimes: \fi
+                  \ifmmode \times \else \texttimes \fi
               }
           }
           { \group_end: }
   }
 %    \end{macrocode}
-% \end{macro}
 %
 % \subsection{Bookmark definitions}
 %
