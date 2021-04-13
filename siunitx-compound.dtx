@@ -418,10 +418,7 @@
 %
 % \begin{macro}{\siunitx_compound:n}
 % \begin{macro}{\@@_format_numbers:n}
-% \begin{macro}{\@@_format_numbers:nN}
-% \begin{macro}{\@@_format_numbers_extract_exponents:nNN}
-% \begin{macro}{\@@_end:}
-% \begin{macro}[EXP]{\@@_end_aux:Nn}
+% \begin{macro}{\@@_extract_exponents:n}
 %   Printing a generic set starts with the question of whether we want to
 %   extract exponents. If we do, then there is the work to do with extraction.
 %   Either way, the printing is handed off to a common function. We do a quick
@@ -436,67 +433,22 @@
   }
 \cs_new_protected:Npn \@@_format_numbers:n #1
   {
-    \bool_lazy_and:nnTF
-      { \l_@@_exp_combine_bool }
-      { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
+    \seq_clear:N \l_@@_tmp_seq
+    \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \@@_format_numbers_extract_exponents:nNN {#1}
-          \l_@@_tmp_seq \l_@@_tmp_tl
+        \bool_lazy_and:nnTF
+          { \l_@@_exp_combine_bool }
+          { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
+          {
+            \exp_args:Nxx \@@_extract_exponents:nn
+              { \tl_head:n {#1} }
+              { \tl_tail:n {#1} }
+           }
+          { \tl_map_function:nN {#1} \@@_parsed:n }
       }
-      {
-        \tl_clear:N \l_@@_tmp_tl
-        \@@_format_numbers:nN {#1} \l_@@_tmp_seq
-      }
+      { \tl_map_function:nN {#1} \@@_unparsed:n }
   }
 %    \end{macrocode}
-%   A single internal route deals with both cases. Most of this is obvious,
-%   other than we have a bit of fun as using a group is best here but
-%   getting a sequence back out is non-trivial.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_numbers:nN #1#2
-  {
-    \bool_set_false:N \l_@@_extract_exp_bool
-    \@@_extract_exponents:nNN {#1} #2 \l_@@_exp_tl
-  }
-\cs_new_protected:Npn \@@_format_numbers_extract_exponents:nNN #1#2#3
-  {
-    \bool_set_true:N \l_@@_extract_exp_bool
-    \@@_extract_exponents:nNN {#1} #2 #3
-  }
-\cs_new_protected:Npn \@@_extract_exponents:nNN #1#2#3
-  {
-    \group_begin:
-      \seq_clear:N \l_@@_tmp_seq
-      \bool_if:NTF \l_siunitx_number_parse_bool
-        {
-          \bool_if:NTF \l_@@_extract_exp_bool
-            {
-              \exp_args:Nxx \@@_extract_exponents:nn
-                { \tl_head:n {#1} }
-                { \tl_tail:n {#1} }
-             }
-            { \tl_map_function:nN {#1} \@@_parsed:n }
-        }
-        { \tl_map_function:nN {#1} \@@_unparsed:n }
-      \cs_set_protected:Npx \@@_end:
-        {
-          \seq_clear:N \exp_not:N #2
-          \seq_map_tokens:Nn \l_@@_tmp_seq
-            { \@@_end_aux:Nn #2 }
-          \tl_set:Nn \exp_not:N #3
-            { \exp_not:V \l_@@_exp_tl }
-        }
-    \exp_after:wN \group_end:
-    \@@_end:
-  }
-\cs_new_protected:Npn \@@_end: { }
-\cs_new:Npn \@@_end_aux:Nn #1#2
-  {
-    \seq_put_right:Nn \exp_not:N #1 { \exp_not:n {#2} }
-  }
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro} 
 % \end{macro}
 % \end{macro}
@@ -589,7 +541,7 @@
         {
           \bool_lazy_and:nnTF
             { \l_@@_unit_bracket_bool }
-            { \tl_if_empty_p:N \l_@@_tmp_tl }
+            { \tl_if_empty_p:N \l_@@_exp_tl }
             {
               \siunitx_print:nV { number } \l_@@_bracket_open_tl
               \@@_print:N \@@_print_number:n
@@ -617,17 +569,17 @@
   {
     \bool_lazy_and:nnTF
       { \l_@@_exp_bracket_bool }
-      { ! \tl_if_empty_p:N \l_@@_tmp_tl }
+      { ! \tl_if_empty_p:N \l_@@_exp_tl }
       {
         \@@_print:xxN
           { \exp_not:V \l_@@_bracket_open_tl }
           {
             \exp_not:V \l_@@_bracket_close_tl
-            \exp_not:V \l_@@_tmp_tl
+            \exp_not:V \l_@@_exp_tl
           }
           #1
       }
-      { \@@_print:xxN { } { \exp_not:V \l_@@_tmp_tl } #1 }
+      { \@@_print:xxN { } { \exp_not:V \l_@@_exp_tl } #1 }
   }
 \cs_new_protected:Npn \@@_print:nnN #1#2#3
   {
