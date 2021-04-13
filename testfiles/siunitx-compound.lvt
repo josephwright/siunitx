@@ -352,4 +352,45 @@
     \test:nn { 1e2 } { 2e2 }
   }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_compound:nn {#1} {#2}
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Option~settings~"prefix-mode"~and~"compound-units" }
+  {
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { compound-units = bracket }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { compound-units = bracket-power }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { compound-units = power }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { compound-units = repeat }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { compound-units = single }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \metre }
+    \keys_set:nn { siunitx } { prefix-mode = extract-exponent }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+    \keys_set:nn { siunitx } { compound-units = bracket }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+    \keys_set:nn { siunitx } { compound-units = bracket-power }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+    \keys_set:nn { siunitx } { compound-units = power }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+    \keys_set:nn { siunitx } { compound-units = repeat }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+    \keys_set:nn { siunitx } { compound-units = single }
+    \test:nn { { 1e2 } { 2e2 } { 3e2 } } { \kilo \metre }
+  }
+
 \END
