@@ -272,9 +272,10 @@
 % therefore is to abstract out enough of the process such that output-specific
 % aspects can be left to separate processes.
 %
-% \begin{variable}{\l_@@_tmp_seq, \l_@@_tmp_tl}
+% \begin{variable}{\l_@@_tmp_fp, \l_@@_tmp_seq, \l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\fp_new:N \l_@@_tmp_fp
 \seq_new:N \l_@@_tmp_seq
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
@@ -410,8 +411,8 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_compound:n}
-% \begin{macro}{\@@_format_numbers:n}
-% \begin{macro}{\@@_format_numbers:nn}
+% \begin{macro}{\@@_format:n}
+% \begin{macro}{\@@_format:nnn}
 %   Printing a generic set starts with the question of whether we want to
 %   extract exponents. If we do, then there is the work to do with extraction.
 %   Either way, the printing is handed off to a common function. We do a quick
@@ -420,25 +421,33 @@
 \cs_new_protected:Npn \siunitx_compound:n #1
   {
     \group_begin:
-      \@@_format_numbers:n {#1}
+      \@@_format:nn {#1} { }
       \@@_print:N \@@_print_number:n
     \group_end:
   }
-\cs_new_protected:Npn \@@_format_numbers:n #1
+\cs_new_protected:Npn \@@_format:nn #1#2
   {
     \seq_clear:N \l_@@_tmp_seq
     \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \exp_args:Nxx \@@_format_numbers:nn
+        \exp_args:Nxx \@@_format:nnn
           { \tl_head:n {#1} }
           { \tl_tail:n {#1} }
+          {#2}
       }
       { \tl_map_function:nN {#1} \@@_unparsed:n }
   }
-\cs_new_protected:Npn \@@_format_numbers:nn #1#2
+%    \end{macrocode}
+%   Formatting at a low level needs to know about units and numbers: we have to
+%   exchange data between the two. Most of the business of handling the units
+%   is left to a dedicated auxiliary.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format:nnn #1#2#3
   {
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
+    \tl_if_blank:nTF {#3}
+      { \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl }
+      { \@@_format_units:nn {#2} {#3} }
     \bool_lazy_and:nnTF
       { \l_@@_exp_combine_bool }
       { \int_compare_p:nNn { \tl_count:n {#2} } > 0 }
@@ -515,6 +524,135 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_format_units:nn}
+% \begin{macro}
+%   {
+%     \@@_format_combine-exponent:n ,
+%     \@@_format_extract-exponent:n ,
+%     \@@_format_input:n
+%   }
+% \begin{macro}
+%   {
+%     \@@_format_combine-exponent:nn ,
+%     \@@_format_extract-exponent:nn
+%   }
+% \begin{macro}
+%   {
+%     \@@_format_combine-exponent_aux:n ,
+%     \@@_format_extract-exponent_aux:n 
+%   }
+% \begin{macro}{\@@_extract_exp:nN}
+% \begin{macro}{\@@_extract_exp:nnnnnnnN}
+% \begin{macro}{\@@_adjust_exp:nNN}
+% \begin{macro}{\@@_adjust_exp:nnnnnnnNN}
+% \begin{macro}[EXP]{\@@_adjust_exp:n}
+% \begin{macro}[EXP]{\@@_adjust_exp:Nw}
+%   Actually formatting the units is much the same as is done in
+%   the quantities module, except that we have to cover the multiplication
+%   cases too: gets a bit repetitive. Notice that when combining exponents,
+%   there is no adjustment to the original exponent: we purely need to
+%   extract it.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_units:nn #1#2
+  {
+    \bool_if:NTF \l_@@_unit_power_bool
+      {
+        \use:c { @@_format_ \l_siunitx_quantity_prefix_mode_tl :nn }
+          {#2} { \tl_count:n {#1} + 1 }
+      }
+      {
+        \use:c { @@_format_ \l_siunitx_quantity_prefix_mode_tl :n } {#2}
+      }
+  }
+\cs_new_protected:cpx { @@_format_combine-exponent:n } #1
+  {
+    \exp_not:c { @@_format_combine-exponent_aux:n }
+      {
+        \exp_not:N \siunitx_unit_format_combine_exponent:nnN
+          {#1}
+      }
+  }
+\cs_new_protected:cpx { @@_format_combine-exponent:nn } #1#2
+  {
+    \exp_not:c { @@_format_combine-exponent_aux:n }
+      {
+        \exp_not:N \siunitx_unit_format_multiply_combine_exponent:nnnN
+          {#1} {#2}
+      }
+  }
+\cs_new_protected:cpn { @@_format_combine-exponent_aux:n } #1
+  {
+    \bool_set_true:N \l_@@_exp_combine_bool
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
+    \exp_args:NV \@@_extract_exp:nN
+      \l_@@_first_tl \l_@@_tmp_fp
+    #1 \l_@@_tmp_fp \l_@@_unit_tl
+  }
+\cs_new_protected:cpx { @@_format_extract-exponent:n } #1
+  {
+    \exp_not:c { @@_format_extract-exponent_aux:n }
+      { \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1} }
+  }
+\cs_new_protected:cpx { @@_format_extract-exponent:nn } #1#2
+  {
+    \exp_not:c { @@_format_extract-exponent_aux:n }
+      {
+        \exp_not:N \siunitx_unit_format_multiply_extract_prefixes:nnNN
+          {#1} {#2}
+      }
+  }
+\cs_new_protected:cpn { @@_format_extract-exponent_aux:n } #1
+  {
+    #1 \l_@@_unit_tl \l_@@_tmp_fp
+    \exp_args:NV \@@_adjust_exp:nNN
+      \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
+    \bool_set_true:N \l_@@_exp_combine_bool
+  }
+\cs_new_protected:Npn \@@_format_input:n #1
+  {
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
+    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
+\cs_new_protected:Npn \@@_format_input:nn #1#2
+  {
+    \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
+    \siunitx_unit_format_multiply:nnN {#1} {#2} \l_@@_unit_tl
+  }
+\cs_new_protected:Npn \@@_extract_exp:nN #1#2
+  { \@@_extract_exp:nnnnnnnN #1 #2 }
+\cs_new_protected:Npn \@@_extract_exp:nnnnnnnN #1#2#3#4#5#6#7#8
+  { \fp_set:Nn #8 {#6#7} }
+\cs_new_protected:Npn \@@_adjust_exp:nNN #1#2#3
+  { \@@_adjust_exp:nnnnnnnNN #1 #2 #3 }
+\cs_new_protected:Npn \@@_adjust_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
+  {
+    \tl_set:Nx #9
+      {
+        {#1} {#2} {#3} {#4} {#5}
+        \exp_args:Ne \@@_adjust_exp:n { \fp_eval:n { #6#7 + #8 } }
+      }
+  }
+\cs_new:Npn \@@_adjust_exp:n #1
+  { \@@_adjust_exp:Nw #1 \q_stop }
+\cs_new:Npn \@@_adjust_exp:Nw #1#2 \q_stop
+  {
+    \token_if_eq_meaning:NNTF #1 -
+      { {#1} {#2} }
+      { { } {#1#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\siunitx_compound:nn}
 %   For quantities, life is more complex as there are interactions between the
 %   options for exponents and units.
@@ -531,13 +669,9 @@
         { \l_@@_unit_bracket_bool }
         { ! \l_@@_unit_repeat_bool }
         { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
-      \@@_format_numbers:n {#1}
-      \bool_if:NTF \l_@@_unit_power_bool
-        {
-          \siunitx_unit_format_multiply:nnN {#2}
-            { \tl_count:n {#1} } \l_@@_unit_tl
-        }
-        { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
+      \@@_format:nn {#1} {#2}
+      \str_if_eq:VnT \l_siunitx_quantity_prefix_mode_tl { combine-exponent }
+        { \tl_clear:N \l_@@_exp_tl }
       \bool_if:NTF \l_@@_unit_repeat_bool
         { \@@_print:N \@@_print_quantity:n }
         {
@@ -555,7 +689,7 @@
     \group_end:
   }
 %    \end{macrocode}
-% \end{macro} 
+% \end{macro}
 %
 % \begin{macro}{\@@_print:N}
 % \begin{macro}{\@@_print:nnN, \@@_print:xxN}
