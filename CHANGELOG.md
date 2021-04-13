@@ -115,6 +115,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option setting `table-number-alignment = center-decimal-marker`
 
 ### Removed
+- `\SIUnitSymbolAngstrom`
+- `\SIUnitSymbolArcminute`
+- `\SIUnitSymbolArcsecond`
+- `\SIUnitSymbolCelsius`
+- `\SIUnitSymbolDegree`
+- `\SIUnitSymbolMicro`
+- `\SIUnitSymbolOhm`
 - Option `abbreviations`
 - Option `add-integer-zero`
 - Option `binary-units`
@@ -131,9 +138,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `input-protect-tokens`
 - Option `literal-superscript-as-power`
 - Option `open-bracket`
+- Option `math-angstrom`
+- Option `math-arcminute`
+- Option `math-arcsecond`
+- Option `math-celsius`
+- Option `math-degree`
+- Option `math-micro`
+- Option `math-ohm`
 - Option `math-rm`
 - Option `math-sf`
 - Option `math-tt`
+- Option `redefine-symbols`
 - Option `number-math-rm`
 - Option `number-math-sf`
 - Option `number-math-tt`
@@ -141,6 +156,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `number-text-sf`
 - Option `number-text-tt`
 - Option `table-unit-alignment`
+- Option `text-angstrom`
+- Option `text-arcminute`
+- Option `text-arcsecond`
+- Option `text-celsius`
+- Option `text-degree`
+- Option `text-micro`
+- Option `text-ohm`
 - Option `text-rm`
 - Option `text-sf`
 - Option `text-tt`
