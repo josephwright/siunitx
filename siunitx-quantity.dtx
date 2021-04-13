@@ -164,38 +164,23 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_break_bool          ,
-%     \l_@@_combine_exp_bool    ,
-%     \l_@@_prefix_bool         ,
-%     \l_@@_product_tl          ,
-%     \l_@@_uncert_bracket_bool ,
+%     \l_siunitx_quantity_prefix_mode_tl ,
+%     \l_@@_break_bool                   ,
+%     \l_@@_product_tl                   ,
+%     \l_@@_uncert_bracket_bool          ,
 %     \l_@@_uncert_repeat_bool
 %   }
 %    \begin{macrocode}
-\bool_new:N \l_@@_combine_exp_bool
-\bool_new:N \l_@@_prefix_bool
+\tl_new:N \l_siunitx_quantity_prefix_mode_tl
 \bool_new:N \l_@@_uncert_bracket_bool
 \bool_new:N \l_@@_uncert_repeat_bool
 \keys_define:nn { siunitx }
   {
     allow-quantity-breaks .bool_set:N =
       \l_@@_break_bool ,
-    prefix-mode .choice:,
-    prefix-mode / combine-exponent .code:n =
-      {
-        \bool_set_true:N \l_@@_combine_exp_bool
-        \bool_set_true:N \l_@@_prefix_bool
-      } ,
-    prefix-mode / extract-exponent .code:n =
-     {
-       \bool_set_false:N \l_@@_combine_exp_bool
-       \bool_set_false:N \l_@@_prefix_bool
-     } ,
-    prefix-mode / input .code:n =
-     {
-       \bool_set_false:N \l_@@_combine_exp_bool
-       \bool_set_true:N \l_@@_prefix_bool
-     } ,
+    prefix-mode .choices:nn =
+      { combine-exponent , extract-exponent , input }
+      { \tl_set_eq:NN \l_siunitx_quantity_prefix_mode_tl \l_keys_choice_tl } ,
     quantity-product .tl_set:N =
       \l_@@_product_tl ,
     separate-uncertainty-units .choice: ,
@@ -226,6 +211,7 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_quantity:nn, \@@_parsed:nn}
+% \begin{macro}{\@@_parsed_combine-exponent:n, \@@_parsed_combine-exponent:n, \@@_parsed_input:n}
 % \begin{macro}{\@@_parsed_aux:w}
 % \begin{macro}{\@@_parsed_aux:nnnw}
 % \begin{macro}{\@@_parsed_aux:nnnn}
@@ -264,27 +250,27 @@
     \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
     \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
-    \bool_if:NTF \l_@@_prefix_bool
-      {
-        \bool_if:NTF \l_@@_combine_exp_bool
-          {
-            \exp_args:NV \@@_extract_exp:nNN
-              \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
-            \siunitx_unit_format_combine_exponent:nnN {#2}
-              \l_@@_tmp_fp \l_@@_unit_tl
-          }
-          { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
-      }
-      {
-        \siunitx_unit_format_extract_prefixes:nNN {#2}
-          \l_@@_unit_tl \l_@@_tmp_fp
-        \exp_args:NV \@@_adjust_exp:nNN
-          \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
-      }
+    \use:c { @@_parsed_ \l_siunitx_quantity_prefix_mode_tl :n } {#2}
     \tl_set:Nx \l_@@_number_tl
       { \siunitx_number_output:NN \l_@@_number_tl \q_nil }
     \exp_after:wN \@@_parsed_aux:w \l_@@_number_tl \q_stop
   }
+\cs_new_protected:cpn { @@_parsed_combine-exponent:n } #1
+  {
+    \exp_args:NV \@@_extract_exp:nNN
+      \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
+    \siunitx_unit_format_combine_exponent:nnN {#1}
+      \l_@@_tmp_fp \l_@@_unit_tl
+  }
+\cs_new_protected:cpn { @@_parsed_extract-exponent:n } #1
+  {
+    \siunitx_unit_format_extract_prefixes:nNN {#1}
+      \l_@@_unit_tl \l_@@_tmp_fp
+    \exp_args:NV \@@_adjust_exp:nNN
+      \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
+  }
+\cs_new_protected:Npn \@@_parsed_input:n #1
+  { \siunitx_unit_format:nN {#1} \l_@@_unit_tl }
 %    \end{macrocode}
 %   To find out if we need to work harder, we first need to split the formatted
 %   number into the constituent parts. That is done using the table-like
@@ -328,6 +314,7 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
