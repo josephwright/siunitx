@@ -3237,9 +3237,9 @@
 % \begin{macro}[pTF, EXP]{\siunitx_if_number_token:N}
 % \begin{macro}[EXP]
 %   {
-%     \@@_if_number_token_auxi:NN   ,
-%     \@@_if_number_token_auxii:NN  ,
-%     \@@_if_number_token_auxiii:NN
+%     \@@_if_token_auxi:NN   ,
+%     \@@_if_token_auxii:NN  ,
+%     \@@_if_token_auxiii:NN
 %   }
 %   A simple conditional to answer the question of whether a specific token is
 %   possibly valid in a number.
@@ -3247,7 +3247,7 @@
 \prg_new_conditional:Npnn \siunitx_if_number_token:N #1
   { p , T , F , TF }
   {
-    \@@_number_token_auxi:NN #1
+    \@@_token_auxi:NN #1
       \l_siunitx_number_input_decimal_tl
       \l_@@_input_uncert_close_tl
       \l_@@_input_comparator_tl
@@ -3260,18 +3260,18 @@
       \q_recursion_tail
       \q_recursion_stop
   }
-\cs_new:Npn \@@_number_token_auxi:NN #1#2
+\cs_new:Npn \@@_token_auxi:NN #1#2
   {
     \quark_if_recursion_tail_stop_do:Nn #2 { \prg_return_false: }
-    \@@_number_token_auxii:NN #1 #2
-    \@@_number_token_auxi:NN #1
+    \@@_token_auxii:NN #1 #2
+    \@@_token_auxi:NN #1
   }
-\cs_new:Npn \@@_number_token_auxii:NN #1#2
+\cs_new:Npn \@@_token_auxii:NN #1#2
   {
-    \exp_after:wN \@@_number_token_auxiii:NN \exp_after:wN #1
+    \exp_after:wN \@@_token_auxiii:NN \exp_after:wN #1
       #2 \q_recursion_tail \q_recursion_stop
   }
-\cs_new:Npn \@@_number_token_auxiii:NN #1#2
+\cs_new:Npn \@@_token_auxiii:NN #1#2
   {
     \quark_if_recursion_tail_stop:N #2
     \str_if_eq:nnT {#1} {#2}
@@ -3282,26 +3282,42 @@
               { \prg_return_true: }
           }
       }
-    \@@_number_token_auxiii:NN #1
+    \@@_token_auxiii:NN #1
   }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}[pTF, EXP]{\siunitx_if_compator_token:N, \siunitx_if_sign_token:N}
+% \begin{macro}[EXP]{\@@_token_generic:NN}
+% \begin{macro}[EXP]{\@@_token_loop:NN}
 %   Same idea but just for comparators and signs.
 %    \begin{macrocode}
 \prg_new_conditional:Npnn \siunitx_if_comparator_token:N #1
   { p , T , F , TF }
   {
-    \@@_number_token_auxi:NN #1
-      \l_@@_input_comparator_tl
+    \@@_token_generic:NN #1 \l_@@_input_comparator_tl
   }
 \prg_new_conditional:Npnn \siunitx_if_sign_token:N #1
   { p , T , F , TF }
   {
-    \@@_number_token_auxi:NN #1
-      \l_@@_input_sign_tl
+    \@@_token_generic:NN #1 \l_@@_input_sign_tl
+  }
+\cs_new:Npn \@@_token_generic:NN #1#2
+  {
+    \exp_after:wN \@@_token_loop:NN \exp_after:wN #1
+      #2 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_token_loop:NN #1#2
+  {
+    \quark_if_recursion_tail_stop_do:Nn #2
+      { \prg_return_false: }
+    \str_if_eq:nnT {#1} {#2}
+      {
+        \use_i_delimit_by_q_recursion_stop:nw
+          { \prg_return_true: }
+      }
+    \@@_token_loop:NN #1
   }
 %    \end{macrocode}
 % \end{macro}
