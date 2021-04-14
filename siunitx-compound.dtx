@@ -59,66 +59,66 @@
 %
 % \begin{documentation}
 %
-% \begin{function}{\siunitx_compound:n}
+% \begin{function}{\siunitx_compound_number:n}
 %   \begin{syntax}
-%     \cs{siunitx_compound:n} \Arg{entries}
+%     \cs{siunitx_compound_number:n} \Arg{entries}
 %   \end{syntax}
 %   Prints a set of numbers in the \meta{entries}, each of which should
-%   be given as a \meta{balanced text}. Unlike \cs{siunitx_list:n}, this
+%   be given as a \meta{balanced text}. Unlike \cs{siunitx_number_list:nn}, this
 %   function may semantically take any form
 % \end{function}
 %
-% \begin{function}{\siunitx_compound:nn}
+% \begin{function}{\siunitx_compound_quantity:nn}
 %   \begin{syntax}
-%     \cs{siunitx_compound:nn} \Arg{entries} \Arg{unit}
+%     \cs{siunitx_compound_quantity:nn} \Arg{entries} \Arg{unit}
 %   \end{syntax}
 %   Prints a set of quantities in the \meta{entries}, each of which should
-%   be given as a \meta{balanced text}. Unlike \cs{siunitx_list:nn}, this
+%   be given as a \meta{balanced text}. Unlike \cs{siunitx_quantity_list:nn}, this
 %   function may semantically take any form
 % \end{function}
 %
-% \begin{function}{\siunitx_list:n}
+% \begin{function}{\siunitx_number_list:nn}
 %   \begin{syntax}
-%     \cs{siunitx_list:n} \Arg{entries}
+%     \cs{siunitx_number_list:nn} \Arg{entries}
 %   \end{syntax}
 %   Prints the list of numbers in the \meta{entries}, each of which should
 %   be given as a \meta{balanced text}.
 % \end{function}
 %
-% \begin{function}{\siunitx_list:nn}
+% \begin{function}{\siunitx_quantity_list:nn}
 %   \begin{syntax}
-%     \cs{siunitx_list:nn} \Arg{entries} \Arg{unit}
+%     \cs{siunitx_quantity_list:nn} \Arg{entries} \Arg{unit}
 %   \end{syntax}
 %   Prints the list of quantities in the \meta{entries}, each of which should
 %   be given as a \meta{balanced text}.
 % \end{function}
 %
-% \begin{function}{\siunitx_product:n}
+% \begin{function}{\siunitx_number_product:n}
 %   \begin{syntax}
-%     \cs{siunitx_product:n} \Arg{entries}
+%     \cs{siunitx_number_product:n} \Arg{entries}
 %   \end{syntax}
 %   Prints the series of numbers in the \meta{entries}, each of which should
 %   be given as a \meta{balanced text}.
 % \end{function}
 %
-% \begin{function}{\siunitx_product:nn}
+% \begin{function}{\siunitx_quantity_product:nn}
 %   \begin{syntax}
-%     \cs{siunitx_product:n} \Arg{entries} \Arg{unit}
+%     \cs{siunitx_number_product:n} \Arg{entries} \Arg{unit}
 %   \end{syntax}
 %   Prints the series of quantities in the \meta{entries}, each of which should
 %   be given as a \meta{balanced text}.
 % \end{function}
 %
-% \begin{function}{\siunitx_range:nn}
+% \begin{function}{\siunitx_number_range:nn}
 %   \begin{syntax}
-%     \cs{siunitx_range:nn} \Arg{start} \Arg{end}
+%     \cs{siunitx_number_range:nn} \Arg{start} \Arg{end}
 %   \end{syntax}
 %   Prints the range of numbers from the \meta{start} to the \meta{end}.
 % \end{function}
 %
-% \begin{function}{\siunitx_range:nnn}
+% \begin{function}{\siunitx_quantity_range:nnn}
 %   \begin{syntax}
-%     \cs{siunitx_range:nn} \Arg{start} \Arg{end} \Arg{unit}
+%     \cs{siunitx_number_range:nn} \Arg{start} \Arg{end} \Arg{unit}
 %   \end{syntax}
 %   Prints the range of quantities from the \meta{start} to the \meta{end}.
 % \end{function}
@@ -410,7 +410,7 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_compound:n}
+% \begin{macro}{\siunitx_compound_number:n}
 % \begin{macro}{\@@_format:n}
 % \begin{macro}{\@@_format:nnn}
 %   Printing a generic set starts with the question of whether we want to
@@ -418,7 +418,7 @@
 %   Either way, the printing is handed off to a common function. We do a quick
 %   count up-front to avoid excess work when there is not actually a list.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_compound:n #1
+\cs_new_protected:Npn \siunitx_compound_number:n #1
   {
     \group_begin:
       \@@_format:nn {#1} { }
@@ -475,7 +475,7 @@
 \cs_new_protected:Npn \@@_extract_exponents:
   {
     \tl_set:Nx \l_@@_tmp_tl
-      { \siunitx_number_output:NN \l_@@_first_tl \q_nil }  
+      { \siunitx_number_output:NN \l_@@_first_tl \q_nil }
     \exp_after:wN \@@_extract_exponents_auxi:w
       \l_@@_tmp_tl \q_stop
   }
@@ -487,7 +487,7 @@
     \@@_extract_exponents_auxii:w #9 \q_stop
   }
 \cs_new_protected:Npn \@@_extract_exponents_auxii:w
-  #1 \q_nil #2 \q_stop 
+  #1 \q_nil #2 \q_stop
   {
     \tl_set:Nn \l_@@_exp_tl { #1#2 }
     \exp_after:wN \@@_extract_exponents_auxiii:nnnnnnn
@@ -539,7 +539,7 @@
 % \begin{macro}
 %   {
 %     \@@_format_combine-exponent_aux:n ,
-%     \@@_format_extract-exponent_aux:n 
+%     \@@_format_extract-exponent_aux:n
 %   }
 % \begin{macro}{\@@_extract_exp:nN}
 % \begin{macro}{\@@_extract_exp:nnnnnnnN}
@@ -653,11 +653,11 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_compound:nn}
+% \begin{macro}{\siunitx_compound_quantity:nn}
 %   For quantities, life is more complex as there are interactions between the
 %   options for exponents and units.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_compound:nn #1#2
+\cs_new_protected:Npn \siunitx_compound_quantity:nn #1#2
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#2}
@@ -851,24 +851,24 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_list:n}
-% \begin{macro}{\siunitx_list:nn}
+% \begin{macro}{\siunitx_number_list:nn}
+% \begin{macro}{\siunitx_quantity_list:nn}
 % \begin{macro}{\@@_aux:}
 %   Simply recover the settings and use as a list.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_list:n #1
+\cs_new_protected:Npn \siunitx_number_list:nn #1
   {
     \group_begin:
       \@@_aux:
-      \siunitx_compound:n {#1}
+      \siunitx_compound_number:n {#1}
     \group_end:
   }
-\cs_new_protected:Npn \siunitx_list:nn #1#2
+\cs_new_protected:Npn \siunitx_quantity_list:nn #1#2
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#2}
       \@@_aux:
-      \siunitx_compound:nn {#1} {#2}
+      \siunitx_compound_quantity:nn {#1} {#2}
     \group_end:
   }
 \cs_new_protected:Npn \@@_aux:
@@ -931,25 +931,25 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_product:n}
-% \begin{macro}{\siunitx_product:nn}
+% \begin{macro}{\siunitx_number_product:n}
+% \begin{macro}{\siunitx_quantity_product:nn}
 % \begin{macro}{\@@_aux:}
 % \begin{macro}{\@@_aux:n, \@@_aux:x}
 %   Simply recover the settings and use as a list.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_product:n #1
+\cs_new_protected:Npn \siunitx_number_product:n #1
   {
     \group_begin:
       \@@_aux:
-      \siunitx_compound:n {#1}
+      \siunitx_compound_number:n {#1}
     \group_end:
   }
-\cs_new_protected:Npn \siunitx_product:nn #1#2
+\cs_new_protected:Npn \siunitx_quantity_product:nn #1#2
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#2}
       \@@_aux:
-      \siunitx_compound:nn {#1} {#2}
+      \siunitx_compound_quantity:nn {#1} {#2}
     \group_end:
   }
 \cs_new_protected:Npn \@@_aux:
@@ -994,7 +994,7 @@
 %   }
 %   Options for products.
 %    \begin{macrocode}
-\tl_new:N \l_@@_exp_tl 
+\tl_new:N \l_@@_exp_tl
 \tl_new:N \l_@@_units_tl
 \keys_define:nn { siunitx }
   {
@@ -1009,24 +1009,24 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_range:nn}
-% \begin{macro}{\siunitx_range:nnn}
+% \begin{macro}{\siunitx_number_range:nn}
+% \begin{macro}{\siunitx_quantity_range:nnn}
 % \begin{macro}{\@@_aux:}
 %   Simply recover the settings and use as a list.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_range:nn #1#2
+\cs_new_protected:Npn \siunitx_number_range:nn #1#2
   {
     \group_begin:
       \@@_aux:
-      \siunitx_compound:n { {#1} {#2} }
+      \siunitx_compound_number:n { {#1} {#2} }
     \group_end:
   }
-\cs_new_protected:Npn \siunitx_range:nnn #1#2#3
+\cs_new_protected:Npn \siunitx_quantity_range:nnn #1#2#3
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#3}
       \@@_aux:
-      \siunitx_compound:nn { {#1} {#2} } {#3}
+      \siunitx_compound_quantity:nn { {#1} {#2} } {#3}
     \group_end:
   }
 \cs_new_protected:Npn \@@_aux:
@@ -1057,7 +1057,7 @@
     compound-pair-separator  = { ~ and ~ } ,
     compound-separator       = { , ~ }     ,
     compound-separator-mode  = text        ,
-    compound-units           = repeat      ,    
+    compound-units           = repeat      ,
     list-exponents           = individual  ,
     list-final-separator     = { ~ and ~ } ,
     list-pair-separator      = { ~ and ~ } ,
