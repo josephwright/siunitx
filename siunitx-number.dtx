@@ -169,6 +169,24 @@
 %   tokens currently set up for detection in a number.
 % \end{function}
 %
+% \begin{function}[TF]{\siunitx_if_comparator_token:N}
+%   \begin{syntax}
+%     \cs{siunitx_if_comparator_token:NTF} \Arg{token}
+%       \Arg{true code} \Arg{false code}
+%   \end{syntax}
+%   Determines if the \meta{token} is valid in a sign based on those
+%   tokens currently set up for detection in a number.
+% \end{function}
+%
+% \begin{function}[TF]{\siunitx_if_sign_token:N}
+%   \begin{syntax}
+%     \cs{siunitx_if_sign_token:NTF} \Arg{token}
+%       \Arg{true code} \Arg{false code}
+%   \end{syntax}
+%   Determines if the \meta{token} is valid in a sign based on those
+%   tokens currently set up for detection in a number.
+% \end{function}
+%
 % \begin{variable}{\l_siunitx_bracket_ambiguous_bool}
 %   A switch to control whether ambiguous numbers are bracketed: this can
 %   also be covered in quantity formatting by a setting there.
@@ -3265,6 +3283,25 @@
           }
       }
     \@@_number_token_auxiii:NN #1
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[pTF, EXP]{\siunitx_if_compator_token:N, \siunitx_if_sign_token:N}
+%   Same idea but just for comparators and signs.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \siunitx_if_comparator_token:N #1
+  { p , T , F , TF }
+  {
+    \@@_number_token_auxi:NN #1
+      \l_@@_input_comparator_tl
+  }
+\prg_new_conditional:Npnn \siunitx_if_sign_token:N #1
+  { p , T , F , TF }
+  {
+    \@@_number_token_auxi:NN #1
+      \l_@@_input_sign_tl
   }
 %    \end{macrocode}
 % \end{macro}
