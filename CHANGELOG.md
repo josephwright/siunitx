@@ -68,6 +68,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Modular re-write to provide code-level API
+- Update unit support to 9th edition of SI Brochure
 
 ### Deprecated
 - `\DeclareSIPrePower`
