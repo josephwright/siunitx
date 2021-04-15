@@ -59,6 +59,37 @@
 %
 % \begin{documentation}
 %
+% \begin{function}{\siunitx_complex_number:n}
+%   \begin{syntax}
+%     \cs{siunitx_complex_number:n} \Arg{number}
+%   \end{syntax}
+%   Parses the \meta{number} and splits into real and complex parts, which are
+%   then formatted as described for \cs{siunitx_number_format:nN}. The results
+%   are combined and printed using the standard functions in the module.
+% \end{function}
+%
+% \begin{function}{complex-root-position}
+%   \begin{syntax}
+%     |complex-root-position| = |after-number|\verb"|"|before-number|
+%   \end{syntax}
+%   Choice which determines where the complex root symbol is printed relative
+%   to the numbers.
+% \end{function}
+%
+% \begin{function}{v}
+%   \begin{syntax}
+%     |input-complex-root| = \meta{tokens}
+%   \end{syntax}
+%   The token(s) considered as complexes roots for number parsing.
+% \end{function}
+%
+% \begin{function}{output-complex-root}
+%   \begin{syntax}
+%     |output-complex-root| = \meta{tokens}
+%   \end{syntax}
+%   The token(s) used to show the complex root in output.
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -76,6 +107,613 @@
 %<@@=siunitx_complex>
 %    \end{macrocode}
 %
+% \subsection{General setup}
+%
+% \begin{variable}{\l_@@_tmp_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_input_tl}
+%   The numerical input exactly as given by the user.
+%    \begin{macrocode}
+\tl_new:N \l_@@_input_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_comparator_tl}
+%   A comparator, if found, is held here.
+%    \begin{macrocode}
+\tl_new:N \l_@@_comparator_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_exp_tl}
+%   The exponent part of a parsed number.
+%    \begin{macrocode}
+\tl_new:N \l_@@_exp_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_real_tl, \l_@@_img_tl}
+%   The real and imaginary parts of the number, respectively.
+%    \begin{macrocode}
+\tl_new:N \l_@@_real_tl
+\tl_new:N \l_@@_img_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_join_tl, \l_@@_sign_tl}
+%   Staging posts for a joining and leading sign, respectively.
+%    \begin{macrocode}
+\tl_new:N \l_@@_join_tl
+\tl_new:N \l_@@_sign_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_input_root_tl, \l_@@_output_root_tl}
+%    \begin{macrocode}
+\bool_new:N \l_@@_root_after_bool
+\keys_define:nn { siunitx }
+  {
+    complex-root-position .choice: ,
+    complex-root-position / after-number .code:n =
+      { \bool_set_true:N \l_@@_root_after_bool } ,
+    complex-root-position / before-number .code:n =
+      { \bool_set_false:N \l_@@_root_after_bool } ,
+    input-complex-root .tl_set:N =
+      \l_@@_input_root_tl ,
+    output-complex-root .tl_set:N =
+      \l_@@_output_root_tl
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \subsection{Parsing}
+%
+% \begin{macro}{\@@_parse:nNN}
+% \begin{macro}{\@@_parse_end:}
+% \begin{macro}{\@@_parse_clear:}
+%   Parsing for complex numbers needs some of the same approaches as the
+%   general parser. However, as the aim here is to do only enough to split
+%   the real and imaginary parts before handing off the the usual code,
+%   it's not a full repeat. Instead, we shortcut where we can. The |clear|
+%   function here is not only there to make this function shorter: it
+%   also allows a single way to zap any stored data if a parse error occurs.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse:nNN #1#2#3
+  {
+    \group_begin:
+      \@@_parse_clear:
+      \protected@edef \l_@@_arg_tl {#1}
+      \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
+      \siunitx_number_normalize_symbols:N \l_@@_arg_tl
+      \tl_if_empty:NF \l_@@_arg_tl
+        { \@@_parse_comparator: }
+      \@@_parse_check:
+      \cs_set_protected:Npx \@@_parse_end:
+        {
+          \tl_set:Nn \exp_not:N #2 { \exp_not:V \l_@@_real_tl }
+          \tl_set:Nn \exp_not:N #3 { \exp_not:V \l_@@_img_tl }
+        }
+    \exp_after:wN \group_end:
+    \@@_parse_end:
+  }
+\cs_new_protected:Npn \@@_parse_end: { }
+\cs_new_protected:Npn \@@_parse_clear:
+  {
+    \tl_clear:N \l_@@_real_tl
+    \tl_clear:N \l_@@_img_tl
+    \tl_clear:N \l_@@_exp_tl
+    \tl_clear:N \l_@@_sign_tl
+    \tl_clear:N \l_@@_join_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_check:, \@@_parse_finalise:}
+% \begin{macro}{\@@_parse_finalise:N}
+%   Now we tidy up and do the main work: passing to the standard formatter for
+%   final parsing.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_check:
+  {
+    \bool_lazy_all:nTF
+      {
+        { \tl_if_empty_p:N \l_@@_real_tl }
+        { \tl_if_empty_p:N \l_@@_img_tl }
+        { \tl_if_empty_p:N \l_@@_exp_tl }
+      }
+      {
+        \msg_error:nnx { siunitx } { invalid-complex-number }
+          { \exp_not:V \l_@@_input_tl }
+      }
+      { \@@_parse_finalise: }
+  }
+\cs_new_protected:Npn \@@_parse_finalise:
+  {
+    \tl_if_empty:NTF \l_@@_img_tl
+      { \@@_parse_finalise:N \l_@@_real_tl }
+      {
+        \tl_if_empty:NTF \l_@@_real_tl
+          { \@@_parse_finalise:N \l_@@_img_tl }
+          {
+            \@@_parse_finalise:N \l_@@_real_tl
+            \tl_set_eq:NN \l_@@_sign_tl \l_@@_join_tl
+            \@@_parse_finalise:N \l_@@_img_tl
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_parse_finalise:N #1
+  {
+    \tl_set:Nx #1
+      {
+        \exp_not:V \l_@@_comparator_tl
+        \exp_not:V \l_@@_sign_tl
+        \exp_not:V #1
+        \exp_not:V \l_@@_exp_tl
+      }
+    \tl_clear:N \l_@@_comparator_tl
+    \tl_clear:N \l_@@_sign_tl
+    \siunitx_number_parse:VN #1 #1
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_comparator:}
+% \begin{macro}{\@@_parse_comparator_aux:Nw}
+%   The first step is to extract any comparator: this is the same as
+%   for a full number parse.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_comparator:
+  {
+    \exp_after:wN \@@_parse_comparator_aux:Nw
+      \l_@@_arg_tl \q_stop
+  }
+\cs_new_protected:Npn \@@_parse_comparator_aux:Nw #1#2 \q_stop
+  {
+    \tl_if_in:NnTF \l_siunitx_number_input_comparator_tl {#1}
+      {
+        \tl_set:Nn \l_@@_comparator_tl {#1}
+        \tl_set:Nn \l_@@_arg_tl {#2}
+      }
+      { \tl_clear:N \l_@@_comparator_tl }
+    \tl_if_empty:NF \l_@@_arg_tl
+      { \@@_parse_sign: }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_exponent:}
+% \begin{macro}{\@@_parse_exponent_auxi:w}
+% \begin{macro}{\@@_parse_exponent_auxii:nn}
+%   An exponent part of a number has to come at the end and can only occur
+%   once. Thus it is relatively easy to parse. The code here is a simplified
+%   version of that in \pkg{siunitx-number}: we only need to find \emph{some}
+%   exponent, not check on the detail. Notice that we need to retain the
+%   exponent marker here: that is done using the short-lived temporary
+%   variable.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_exponent:
+  {
+    \tl_if_empty:NTF \l_siunitx_number_input_exponent_tl
+      { \@@_parse_root: }
+      {
+        \tl_set:Nx \l_@@_tmp_tl
+          { \tl_head:V \l_siunitx_number_input_exponent_tl }
+        \tl_map_inline:Nn \l_siunitx_number_input_exponent_tl
+          {
+            \tl_replace_all:NnV \l_@@_arg_tl
+              {##1} \l_@@_tmp_tl
+          }
+        \use:x
+          {
+            \cs_set_protected:Npn
+              \exp_not:N \@@_parse_exponent_auxi:w
+              ####1 \exp_not:V \l_@@_tmp_tl
+              ####2 \exp_not:V \l_@@_tmp_tl
+              ####3 \exp_not:N \q_stop
+          }
+            { \@@_parse_exponent_auxii:nn {##1} {##2} }
+        \use:x
+          {
+            \@@_parse_exponent_auxi:w
+              \exp_not:V \l_@@_arg_tl
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_nil
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_stop
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_parse_exponent_auxi:w  { }
+\cs_new_protected:Npn \@@_parse_exponent_auxii:nn #1#2
+  {
+    \quark_if_nil:nF {#2}
+      {
+        \tl_set:Nn \l_@@_arg_tl {#1}
+        \tl_set:Nx \l_@@_exp_tl
+          { \exp_not:V \l_@@_tmp_tl \exp_not:n {#2} }
+      }
+    \@@_parse_root:
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_root:}
+% \begin{macro}{\@@_parse_root_auxi:w}
+% \begin{macro}{\@@_parse_root_auxii:nn}
+%   Splitting at the complex root is much like splitting the exponent.
+%   After dealing with the case where there is no complex root allowed,
+%   use the first possible symbol to do the work.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_root:
+  {
+    \tl_if_empty:NTF \l_@@_input_root_tl
+      { \tl_set_eq:NN \l_@@_real_tl \l_@@_arg_tl }
+      {
+        \tl_set:Nx \l_@@_tmp_tl
+          { \tl_head:V \l_@@_input_root_tl }
+        \tl_map_inline:Nn \l_@@_input_root_tl
+          {
+            \tl_replace_all:NnV \l_@@_arg_tl
+              {##1} \l_@@_tmp_tl
+          }
+        \use:x
+          {
+            \cs_set_protected:Npn
+              \exp_not:N \@@_parse_root_auxi:w
+              ####1 \exp_not:V \l_@@_tmp_tl
+              ####2 \exp_not:V \l_@@_tmp_tl
+              ####3 \exp_not:N \q_stop
+          }
+            { \@@_parse_root_auxii:nn {##1} {##2} }
+        \use:x
+          {
+            \@@_parse_root_auxi:w
+              \exp_not:V \l_@@_arg_tl
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_nil
+              \exp_not:V \l_@@_tmp_tl \exp_not:N \q_stop
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_parse_root_auxi:w  { }
+%    \end{macrocode}
+%   This is where the business end lies. We have four possibilities:
+%   \begin{itemize}
+%     \item There was no complex root at all: |#2| will be |\q_nil|
+%     \item All of the number is in the complex part with a leading
+%       root: |#1| will be empty. This includes the case where
+%       the input was \emph{just} a root symbol (plus possibly sign,
+%       exponent): we need to cover that.
+%     \item All of the number was before the complex root: |#2| will
+%       be empty and we need to check |#1| fully to split out the two
+%       parts
+%     \item The input has a a real part with the complex part starting
+%       with the root symbol: just the last token needs to be separated.
+%   \end{itemize}
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_root_auxii:nn #1#2
+  {
+    \quark_if_nil:nTF {#2}
+      { \tl_set:Nn \l_@@_real_tl {#1} }
+      {
+        \tl_set:Nn \l_@@_img_tl {#2}
+        \tl_if_blank:nTF {#1}
+          {
+            \tl_if_blank:nT {#2}
+              { \tl_set:Nn \l_@@_img_tl { 1 } }
+          }
+          {
+            \tl_if_blank:nTF {#2}
+              { \@@_parse_split:n {#1} }
+              { \@@_parse_sign_check:n {#1} }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_sign:}
+% \begin{macro}{\@@_parse_sign_aux:Nw}
+%   The first token of a number after a comparator could be a sign. A quick
+%   check is made and if found stored. There is no need to worry about the
+%   nature of the sign: we keep them regardless.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_sign:
+  {
+    \exp_after:wN \@@_parse_sign_aux:Nw
+      \l_@@_arg_tl \q_stop
+  }
+\cs_new_protected:Npn \@@_parse_sign_aux:Nw #1#2 \q_stop
+  {
+    \tl_if_in:NnT \l_siunitx_number_input_sign_tl {#1}
+      {
+        \tl_set:Nn \l_@@_sign_tl {#1}
+        \tl_set:Nn \l_@@_arg_tl {#2}
+      }
+    \tl_if_empty:NF \l_@@_arg_tl
+      { \@@_parse_exponent: }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_sign_check:n}
+% \begin{macro}{\@@_parse_sign_check:nN}
+% \begin{macro}{\@@_parse_sign_check:nNw}
+%   Here, we want to check that the last token in the input is a sign.
+%   There cannot be anything after the sign, and there has to be at one
+%   token before the sign: we can therefore signal a parsing error if we
+%   need to.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_sign_check:n #1
+  {
+    \@@_parse_sign_check:nN { } #1 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new_protected:Npn \@@_parse_sign_check:nN #1#2
+  {
+    \quark_if_recursion_tail_stop_do:Nn #2
+      { \@@_parse_clear: }
+    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#2}
+      { \@@_parse_sign_check:nNw {#1} #2 }
+      { \@@_parse_sign_check:nN {#1#2} }
+  }
+\cs_new_protected:Npn \@@_parse_sign_check:nNw
+  #1#2 #3 \q_recursion_tail \q_recursion_stop
+  {
+    \tl_if_blank:nTF {#3}
+      {
+        \tl_if_blank:nTF {#1}
+          { \@@_parse_clear: }
+          {
+            \tl_set:Nn \l_@@_real_tl {#1}
+            \tl_set:Nn \l_@@_join_tl {#2}
+          }
+      }
+      { \@@_parse_clear: }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_split:n}
+% \begin{macro}{\@@_parse_split:nN}
+% \begin{macro}{\@@_parse_split:w}
+%   Checking for a sign inside the leading part of the number is a simple loop.
+%   There is the possibility that there is no number in the imaginary part
+%   needs to be allowed for. Notice that we do a check that there is some
+%   real part: this covers for example an original input |++1i|, which
+%   otherwise would not be trapped.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_split:n #1
+  {
+    \@@_parse_split:nN { } #1 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new_protected:Npn \@@_parse_split:nN #1#2
+  {
+    \quark_if_recursion_tail_stop_do:Nn #2
+      { \tl_set:Nn \l_@@_img_tl {#1} }
+    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#2}
+      {
+        \tl_set:Nn \l_@@_real_tl {#1}
+        \tl_set:Nn \l_@@_join_tl {#2}
+        \@@_parse_split:w
+      }
+      { \@@_parse_split:nN {#1#2} }
+  }
+\cs_new_protected:Npn \@@_parse_split:w #1 \q_recursion_tail \q_recursion_stop
+  {
+    \tl_set:Nx \l_@@_img_tl
+      {
+        \tl_if_blank:nTF {#1}
+          { 1 }
+          { \exp_not:n {#1} }
+     }
+    \tl_if_empty:NT \l_@@_real_tl
+      { \@@_parse_clear: }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \section{Formatting}
+%
+% \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
+%   Purely internal for the present.
+%    \begin{macrocode}
+\tl_new:N \l_@@_bracket_close_tl
+\tl_new:N \l_@@_bracket_open_tl
+\tl_set:Nn \l_@@_bracket_open_tl { ( }
+\tl_set:Nn \l_@@_bracket_close_tl { ) }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\siunitx_complex_number:n}
+%   The work here is pretty trivial.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_complex_number:n #1
+  {
+    \group_begin:
+      \bool_if:NTF \l_siunitx_number_parse_bool
+        {
+          \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
+          \@@_format:
+        }
+        {
+          \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+          \siunitx_print:nV { number } \l_@@_tmp_tl
+        }
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_format:}
+% \begin{macro}{\@@_format_auxi:}
+% \begin{macro}{\@@_format_unary:nnnnnnn}
+% \begin{macro}{\@@_format_auxii:}
+% \begin{macro}{\@@_drop_exponent:nnnnnnn}
+% \begin{macro}{\@@_format_sign:nnnnnnn}
+% \begin{macro}{\@@_extract_exponent:nw}
+% \begin{macro}{\@@_extract_exponent_aux:w}
+% \begin{macro}[EXP]{\@@_format_bracket:n}
+%   Formatting the complex number is mainly a paste-up job: take the
+%   parts, do a light amount of processing, print.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format:
+  {
+    \bool_lazy_and:nnF
+      { \tl_if_empty_p:N \l_@@_real_tl }
+      { \tl_if_empty_p:N \l_@@_img_tl }
+      { \@@_format_auxi: }
+  }
+\cs_new_protected:Npn \@@_format_auxi:
+  {
+    \tl_clear:N \l_@@_tmp_tl
+    \tl_if_empty:NTF \l_@@_real_tl
+      {
+        \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+        \exp_after:wN \@@_format_unary:nnnnnnn \l_@@_img_tl
+        \tl_set:Nx \l_@@_tmp_tl
+          {
+            \siunitx_number_output:N \l_@@_img_tl
+            \exp_not:V \l_@@_output_root_tl
+          }
+      }
+      {
+        \tl_if_empty:NTF \l_@@_img_tl
+          {
+            \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+            \tl_set:Nx \l_@@_tmp_tl
+              { \siunitx_number_output:N \l_@@_real_tl }
+          }
+          { \@@_format_auxii: }
+      }
+    \siunitx_print:nV { number } \l_@@_tmp_tl
+  }
+\cs_new_protected:Npn \@@_format_unary:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \tl_set:Nx \l_@@_img_tl
+      {
+        \exp_not:n { {#1} {#2} }
+        \tl_if_blank:nTF {#4}
+          {
+            \str_if_eq:nnTF {#3} { 1 }
+              { { } { } }
+              { \exp_not:n { {#3} {#4} } }
+          }
+          { \exp_not:n { {#3} {#4} } }
+        \exp_not:n { {#5} {#6} {#7} }
+      }
+  }
+\cs_new_protected:Npn \@@_format_auxii:
+  {
+    \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+    \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl
+    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \exp_after:wN \@@_format_sign:nnnnnnn \l_@@_img_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_output:NN \l_@@_img_tl \q_nil }
+    \exp_after:wN \@@_extract_exponent:w \l_@@_tmp_tl \q_stop
+    \tl_set:Nx \l_@@_tmp_tl
+      {
+        \bool_lazy_and:nnTF
+          { \l_siunitx_number_bracket_ambiguous_bool }
+          { ! \tl_if_empty_p:N \l_@@_exp_tl }
+          { \@@_format_bracket:n }
+          { \use:n }
+          {
+            \siunitx_number_output:N \l_@@_real_tl
+            \exp_not:V \l_@@_sign_tl
+            \bool_if:NF \l_@@_root_after_bool
+              { \exp_not:V \l_@@_output_root_tl }
+             \exp_not:V \l_@@_tmp_tl
+            \bool_if:NT \l_@@_root_after_bool
+              { \exp_not:V \l_@@_output_root_tl }
+           }
+         \exp_not:V \l_@@_exp_tl
+      }
+  }
+%    \end{macrocode}
+%   No exponent for the real part. 
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_drop_exponent:nnnnnnn #1#2#3#4#5#6#7
+  { \tl_set:Nn \l_@@_real_tl { {#1} {#2} {#3} {#4} {#5} { } { 0 } } }
+%    \end{macrocode}
+%   Ensure the imaginary part has a sign, and also deal with the case
+%   where there is no mantissa to print (as it is $1$).
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_sign:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \tl_set:Nx \l_@@_img_tl
+      {
+        { }
+        {  \tl_if_blank:nTF {#2} { + } { \exp_not:n {#2} } }
+        \tl_if_blank:nTF {#4}
+          {
+            \str_if_eq:nnTF {#3} { 1 }
+              { { } { } }
+              { \exp_not:n { {#3} {#4} } }
+          }
+          { \exp_not:n { {#3} {#4} } }
+        \exp_not:n { {#5} {#6} {#7} }
+      }
+  }
+%    \end{macrocode}
+%   Pull out the formatted exponent: we also need the sign.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_extract_exponent:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil #8
+  \q_nil #9 \q_stop
+  {
+    \tl_set:Nn \l_@@_sign_tl {#1#2}
+    \@@_extract_exponent_aux:nw {#3#4#5#6#7#8} #9 \q_stop
+  }
+\cs_new:Npn \@@_extract_exponent_aux:nw
+  #1#2 \q_nil #3 \q_nil #4 \q_stop
+  {
+    \tl_set:Nn \l_@@_tmp_tl {#1#2}
+    \tl_set:Nn \l_@@_exp_tl {#3#4}
+  }
+\cs_new_protected:Npn \@@_format_bracket:n #1
+  {
+    \exp_not:V \l_@@_bracket_open_tl
+    #1
+    \exp_not:V \l_@@_bracket_close_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Messages}
+%
+%    \begin{macrocode}
+\msg_new:nnnn { siunitx } { invalid-complex-number }
+  { Invalid~complex-number~'#1'. }
+  {
+    The~input~'#1'~could~not~be~parsed~as~a~complex|number~following~the~
+    format~defined~in~module~documentation.
+  }
+%    \end{macrocode}
+%
 % \subsection{Standard settings for module options}
 %
 % Some of these follow naturally from the point of definition
@@ -84,6 +722,9 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
+    complex-root-position = after-number ,
+    input-complex-root    = ij           ,
+    output-complex-root   = \mathrm { i }
   }
 %    \end{macrocode}
 %

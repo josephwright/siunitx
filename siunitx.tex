@@ -246,6 +246,7 @@ The package provides the user macros:
   \item \cs{qtylist}\oarg{options}\marg{numbers}\marg{unit}
   \item \cs{qtyproduct}\oarg{options}\marg{numbers}\marg{unit}
   \item \cs{qtyrange}\oarg{options}\marg{number1}\marg{number2}\marg{unit}
+  \item \cs{complexnum}\oarg{options}\marg{number}
   \item \cs{sisetup}\marg{options}
   \item \cs{tablenum}\oarg{options}\marg{number}
 \end{itemize}
@@ -253,10 +254,13 @@ plus the \texttt{S} column type for decimal alignments and units in tabular
 environments. These user macros and column types are designed for typesetting
 numbers and units with control of appearance and with intelligent processing.
 
-Numbers are processed with understanding of exponents.
+Numbers are processed with understanding of exponents, or using additional
+commands for products and complex numbers.
 \begin{LaTeXdemo}
-  \num{12345,67890} \\
-  \num{.3e45}       \\
+  \num{12345,67890}  \\
+  \num{.3e45}        \\
+  \complexnum{1+-2i} \\
+  \numproduct{1.654 x 2.34 x 3.430}
 \end{LaTeXdemo}
 
 The unit system can interpret units given as text to be used directly or as
@@ -477,6 +481,17 @@ allows them to be adjusted together. These commands are intended to allow
 consistent formatting of related values: as such, they apply a a single
 unit to all of the values. This is particularly notable when using
 adjustment of the numerical values.
+
+\subsection{Complex numbers and quantities}
+
+\begin{function}{\complexnum}
+  \begin{syntax}
+    \cs{complexnum}\oarg{options}\marg{number}
+  \end{syntax}
+\end{function}
+Typesets the complex number, which must be given in the form $a + b\mathrm{i}$
+or $a + \mathrm{i}b$. Processing of the numerical parts is otherwise identical
+to the standard \cs{num} command.
 
 \subsection{The unit macros}
 
@@ -1801,6 +1816,55 @@ exponents.
   \qtyrange[range-units = single]{2}{4}{\degreeCelsius}
 \end{LaTeXdemo}
 
+\subsection{Complex numbers}
+
+A small number of options apply specifically to the handling of complex
+numbers; these are summarised in Table~\ref{tab:opt:num:complex}.
+\begin{table}
+  \caption{Options for complex numbers.%
+    \label{tab:opt:num:complex}}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule
+      complex-root-position & Choice  & after-number      \\
+      input-complex-root    & Literal & ij                \\
+      output-complex-root   & Literal & \verb=\mathrm{i}= \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{input-complex-root}
+When using complex numbers in input, the complex root $(\mathrm{i} =
+\sqrt{-1}\,)$ is indicated by one of the tokens stored in
+\opt{input-complex-roots}. The parser understands complex root symbols given
+either before or after the associated number (but will detect any invalid
+arrangement):
+\begin{LaTeXdemo}
+  \complexnum{9.99 + 88.8i} \\
+  \complexnum{9.99 + i88.8}
+\end{LaTeXdemo}
+
+\DescribeOption{output-complex-root}
+The output complex root symbol is independent of the input and can be changed
+using the \opt{output-complex-root} setting.
+\begin{LaTeXdemo}
+  \complexnum[output-complex-root = i]{1+2i} \\
+  \complexnum[output-complex-root = j]{1+2i}
+\end{LaTeXdemo}
+
+\DescribeOption{complex-root-position}
+ The position of the complex root can be adjusted to place it
+ either before or after the associated numeral in a complex number
+ using the \opt{complex-root-position} option.
+\begin{LaTeXdemo}
+  \complexnum{67-0.9i} \\
+  \complexnum[complex-root-position = before-number]{67-0.9i} \\
+  \complexnum[complex-root-position = after-number]{67-0.9i}
+\end{LaTeXdemo}
+
 \subsection{Angles}
 
 Angle processing provided by the \cs{ang} function has a set of options which
@@ -2694,7 +2758,9 @@ this means that
 \begin{itemize}
   \item Products of numbers must now be given using the dedicated
     \cs{numproduct} and \cs{qtyproduct} commands;
-  \item Quotients of numbers are only supported as literals.
+  \item Quotients of numbers are only supported as literals;
+  \item Complex values need to be given using the dedicated command
+    \cs{complexnum}.
 \end{itemize}
 
 A new approach has been taken to providing non-Latin symbols for use in

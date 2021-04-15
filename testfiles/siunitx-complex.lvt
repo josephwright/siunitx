@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\input{regression-test}
+
+\usepackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\RequirePackage{siunitx}
+
+\begin{document}
+
+\START
+
+\ExplSyntaxOn
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_complex_number:n {#1}
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Basic~complex~numbers }
+  {
+    \test:n { 1 }
+    \test:n { i }
+    \test:n { +5.2i }
+    \test:n { -i5.2 }
+    \test:n { 1 + i }
+    \test:n { 2 + 2i }
+    \test:n { 2 + i2 }
+    \test:n { 1.2 - 3(4)i }
+    \test:n { 1.2 - i3(4) }
+    \test:n { 1.2 - 3(4)ie3 }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Option~setting~"complex-root-position" }
+  {
+    \test:n { 12.34 + 2i }
+    \keys_set:nn { siunitx } { complex-root-position = before-number }
+    \test:n { 12.34 + 2i }
+  }
+
+\TEST { Option~setting~"input-complex-root" }
+  {
+    \test:n { 12.34 + 2i }
+    \keys_set:nn { siunitx } { input-complex-root = }
+    \test:n { 12.34 + 2i }
+  }
+
+\TEST { Option~setting~"output-complex-root" }
+  {
+    \test:n { 12.34 + 2i }
+    \keys_set:nn { siunitx } { output-complex-root = j }
+    \test:n { 12.34 + 2i }
+  }
+
+\END
