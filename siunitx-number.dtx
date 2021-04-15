@@ -179,6 +179,15 @@
 % \end{variable}
 %
 % \begin{variable}
+%   {
+%     \l_siunitx_number_comparator_tl ,
+%     \l_siunitx_number_exponent_tl   ,
+%     \l_siunitx_number_sign_tl
+%   }
+%   The list of  possible input comparators, exponent markers and signs.
+% \end{variable}
+%
+% \begin{variable}
 %   {\l_siunitx_number_input_decimal_tl, \l_siunitx_number_output_decimal_tl}
 %   The list of  possible input decimal marker(s), and the output marker.
 % \end{variable}
@@ -575,16 +584,16 @@
 %
 % \begin{variable}
 %   {
-%      \l_@@_expression_bool       ,
-%      \l_@@_input_uncert_close_tl ,
-%      \l_@@_input_comparator_tl   ,
-%      \l_@@_input_digit_tl        ,
-%      \l_@@_input_exponent_tl     ,
-%      \l_@@_input_ignore_tl       ,
-%      \l_@@_input_uncert_open_tl  ,
-%      \l_@@_input_sign_tl         ,
-%      \l_@@_input_uncert_sign_tl  ,
-%      \l_@@_explicit_plus_bool    ,
+%      \l_@@_expression_bool                 ,
+%      \l_@@_input_uncert_close_tl           ,
+%      \l_siunitx_number_input_comparator_tl ,
+%      \l_@@_input_digit_tl                  ,
+%      \l_siunitx_number_input_exponent_tl   ,
+%      \l_@@_input_ignore_tl                 ,
+%      \l_@@_input_uncert_open_tl            ,
+%      \l_siunitx_number_input_sign_tl       ,
+%      \l_@@_input_uncert_sign_tl            ,
+%      \l_@@_explicit_plus_bool              ,
 %      \l_@@_zero_uncert_bool
 %   }
 %  \begin{macro}[EXP]{\@@_expression:n}
@@ -599,26 +608,26 @@
     input-close-uncertainty .tl_set:N =
       \l_@@_input_uncert_close_tl ,
     input-comparators .tl_set:N =
-      \l_@@_input_comparator_tl ,
+      \l_siunitx_number_input_comparator_tl ,
     input-decimal-markers .tl_set:N =
       \l_siunitx_number_input_decimal_tl ,
     input-digits .tl_set:N =
       \l_@@_input_digit_tl ,
     input-exponent-markers .tl_set:N =
-      \l_@@_input_exponent_tl ,
+      \l_siunitx_number_input_exponent_tl ,
     input-ignore .tl_set:N =
       \l_@@_input_ignore_tl ,
     input-open-uncertainty .tl_set:N =
       \l_@@_input_uncert_open_tl ,
     input-signs .tl_set:N =
-      \l_@@_input_sign_tl ,
+      \l_siunitx_number_input_sign_tl ,
     input-uncertainty-signs .code:n =
       {
         \tl_set:Nn \l_@@_input_uncert_sign_tl {#1}
         \tl_map_inline:nn {#1}
           {
-            \tl_if_in:NnF \l_@@_input_sign_tl {##1}
-              { \tl_put_right:Nn \l_@@_input_sign_tl {##1} }
+            \tl_if_in:NnF \l_siunitx_number_input_sign_tl {##1}
+              { \tl_put_right:Nn \l_siunitx_number_input_sign_tl {##1} }
           }
       } ,
     parse-numbers .bool_set:N =
@@ -909,7 +918,7 @@
   }
 \cs_new_protected:Npn \@@_parse_comparator_aux:Nw #1#2 \q_stop
   {
-    \tl_if_in:NnTF \l_@@_input_comparator_tl {#1}
+    \tl_if_in:NnTF \l_siunitx_number_input_comparator_tl {#1}
       {
         \tl_set:Nn \l_@@_comparator_tl {#1}
         \tl_set:Nn \l_@@_arg_tl {#2}
@@ -946,7 +955,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_exponent:
   {
-    \tl_if_empty:NTF \l_@@_input_exponent_tl
+    \tl_if_empty:NTF \l_siunitx_number_input_exponent_tl
       {
         \tl_set:Nn \l_@@_exponent_tl { { } 0 }
         \tl_if_empty:NF \l_@@_parsed_tl
@@ -954,8 +963,8 @@
       }
       {
         \tl_set:Nx \l_@@_tmp_tl
-          { \tl_head:V \l_@@_input_exponent_tl }
-        \tl_map_inline:Nn \l_@@_input_exponent_tl
+          { \tl_head:V \l_siunitx_number_input_exponent_tl }
+        \tl_map_inline:Nn \l_siunitx_number_input_exponent_tl
           {
             \tl_replace_all:NnV \l_@@_arg_tl
               {##1} \l_@@_tmp_tl
@@ -994,7 +1003,7 @@
   }
 \cs_new_protected:Npn \@@_parse_exponent_auxiii:Nw #1#2 \q_stop
   {
-    \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
+    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#1}
       { \@@_parse_exponent_auxiv:nn {#1} {#2} }
       { \@@_parse_exponent_auxiv:nn { } {#1#2} }
     \tl_if_empty:NT \l_@@_exponent_tl
@@ -1225,7 +1234,7 @@
               {
                 \bool_if:NTF #4
                   {
-                    \tl_if_in:NnTF \l_@@_input_sign_tl {#5}
+                    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#5}
                       {
                         \@@_parse_loop_main_sign:NNN
                           #1#2 #5
@@ -1452,7 +1461,7 @@
   }
 \cs_new_protected:Npn \@@_parse_sign_aux:Nw #1#2 \q_stop
   {
-    \tl_if_in:NnTF \l_@@_input_sign_tl {#1}
+    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#1}
       {
         \tl_set:Nn \l_@@_arg_tl {#2}
         \bool_lazy_and:nnTF
@@ -3232,12 +3241,12 @@
     \@@_token_auxi:NN #1
       \l_siunitx_number_input_decimal_tl
       \l_@@_input_uncert_close_tl
-      \l_@@_input_comparator_tl
+      \l_siunitx_number_input_comparator_tl
       \l_@@_input_digit_tl
-      \l_@@_input_exponent_tl
+      \l_siunitx_number_input_exponent_tl
       \l_@@_input_ignore_tl
       \l_@@_input_uncert_open_tl
-      \l_@@_input_sign_tl
+      \l_siunitx_number_input_sign_tl
       \l_@@_input_uncert_sign_tl
       \q_recursion_tail
       \q_recursion_stop
