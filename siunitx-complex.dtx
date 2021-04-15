@@ -568,8 +568,7 @@
 % \begin{macro}{\@@_extract_exponent:nw}
 % \begin{macro}{\@@_extract_exponent_aux:w}
 % \begin{macro}[EXP]{\@@_format_bracket:n}
-%   Formatting the complex number is mainly a paste-up job: take the
-%   parts, do a light amount of processing, print.
+%   We start here checking that there is something to do.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format:
   {
@@ -578,6 +577,8 @@
       { \tl_if_empty_p:N \l_@@_img_tl }
       { \@@_format_auxi: }
   }
+%    \end{macrocode}
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_auxi:
   {
     \tl_clear:N \l_@@_tmp_tl
@@ -602,6 +603,10 @@
       }
     \siunitx_print:nV { number } \l_@@_tmp_tl
   }
+%    \end{macrocode}
+%   An imaginary part that is exactly $1$ is omitted, with only the complex
+%   root printed. That means checking and removing a lone $1$ here.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_unary:nnnnnnn #1#2#3#4#5#6#7
   {
     \tl_set:Nx \l_@@_img_tl
@@ -617,6 +622,11 @@
         \exp_not:n { {#5} {#6} {#7} }
       }
   }
+%    \end{macrocode}
+%   If we get to this stage we have both parts to a complex number. We
+%   need to process both and do some massaging, then it's just a question
+%   of reassembly with the right parts in the right places.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_auxii:
   {
     \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
