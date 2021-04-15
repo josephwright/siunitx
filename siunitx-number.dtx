@@ -129,6 +129,7 @@
 %   \begin{itemize}
 %     \item Between the comparator and the integer (\emph{before} any
 %       sign for the integer)
+%     \item Between the sign and the first digit of the integer
 %     \item Both sides of the decimal marker
 %     \item Both sides of the separated uncertainty sign (\foreign{i.e.}~after
 %       the decimal part and before any integer uncertainty part)
@@ -2780,7 +2781,7 @@
 % \begin{macro}[rEXP]{\@@_output_bracket:nn}
 % \begin{macro}[rEXP]{\@@_output_bracket:w}
 % \begin{macro}[rEXP]{\@@_output_comparator:nn}
-% \begin{macro}[rEXP]{\@@_output_sign:nn}
+% \begin{macro}[rEXP]{\@@_output_sign:nnn}
 % \begin{macro}[rEXP]{\@@_output_sign:nN}
 % \begin{macro}[rEXP]{\@@_output_sign:N}
 % \begin{macro}[rEXP]
@@ -2835,7 +2836,7 @@
   {
     \@@_output_comparator:nn {#1} {#8}
     \@@_output_bracket:nn {#5} {#7}
-    \@@_output_sign:nn {#1} {#2}
+    \@@_output_sign:nnn {#1} {#2} {#8}
     \@@_output_integer:nnn {#3} {#4} {#7}
     \@@_output_decimal:nn {#4} {#8}
     \@@_output_uncertainty:nnn {#5} {#4} {#8}
@@ -2886,7 +2887,7 @@
 %   also have the comparator passed here: if it is present, we need to deal
 %   with tighter spacing.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_sign:nn #1#2
+\cs_new:Npn \@@_output_sign:nnn #1#2#3
   {
     \tl_if_blank:nTF {#2}
       {
@@ -2904,6 +2905,7 @@
           }
           { \@@_output_sign:nN {#1} #2 }
       }
+    \exp_not:n {#3}
   }
 \cs_new:Npn \@@_output_sign:nN #1#2
   {

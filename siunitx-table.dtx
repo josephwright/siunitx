@@ -823,14 +823,14 @@
       \l_@@_tmp_tl \q_stop
   }
 \cs_new_protected:Npn \@@_direct_format_aux:w
-  #1 \q_nil #2 \q_nil #3 \q_stop
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_stop
   {
     \hbox_set:Nn \l_@@_tmp_box
-      { \ensuremath { \@@_cleanup_decimal:w #3 } }
+      { \ensuremath { \@@_cleanup_decimal:w #4 } }
     \hbox_set_to_wd:Nnn \l_@@_decimal_box
       { \box_wd:N \l_@@_tmp_box }
       { \@@_fil: }
-    \hbox_set:Nn \l_@@_tmp_box { \ensuremath { #1#2 } }
+    \hbox_set:Nn \l_@@_tmp_box { \ensuremath { #1#2#3 } }
     \hbox_set_to_wd:Nnw \l_@@_integer_box
       { \box_wd:N \l_@@_tmp_box }
       \c_math_toggle_token
@@ -987,12 +987,12 @@
     \box_use_drop:N \l_@@_after_box
   }
 \cs_new_protected:Npn \@@_print_marker:w
-  #1 \q_nil #2 \q_nil #3 \q_stop
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_stop
   {
     \hbox_set:Nn \l_@@_integer_box
-      { \siunitx_print:nn { number } { #1#2 } }
+      { \siunitx_print:nn { number } { #1#2#3 } }
     \hbox_set:Nn \l_@@_decimal_box
-      { \siunitx_print:nn { number } { \@@_cleanup_decimal:w #3 } }
+      { \siunitx_print:nn { number } { \@@_cleanup_decimal:w #4 } }
     \@@_center_marker:
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
@@ -1105,9 +1105,9 @@
 %   (In effect, \cs{l_@@_tmp_dim} is here \enquote{l_@@_comparator_dim}.)
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format_auxii:w
-  #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
+  #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box {#1}
+    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
     \bool_lazy_and:nnTF
       { \l_@@_align_comparator_bool }
       { \dim_compare_p:nNn { \box_wd:N \l_@@_integer_box } > { 0pt } }
@@ -1120,7 +1120,7 @@
           {
             \hbox_unpack:N \l_@@_integer_box
             \@@_fil:
-            \siunitx_print:nn { number } {#3}
+            \siunitx_print:nn { number } {#4#5}
           }
       }
       {
@@ -1134,7 +1134,7 @@
               {
                 \@@_fil:
                 \hbox_unpack:N \l_@@_integer_box
-                \siunitx_print:nn { number } {#3}
+                \siunitx_print:nn { number } {#4#5}
               }
           }
           {
@@ -1143,7 +1143,7 @@
             \hbox_set:Nn \l_@@_integer_box
               {
                 \hbox_unpack:N \l_@@_integer_box
-                \siunitx_print:nn { number } {#3}
+                \siunitx_print:nn { number } {#4#5}
               }
             \hbox_set_to_wd:Nnn \l_@@_before_box
               {
@@ -1158,7 +1158,7 @@
               }
           }
       }
-    \@@_print_format_auxiii:w #2 \q_mark #4 \q_stop
+    \@@_print_format_auxiii:w #3 \q_mark #6 \q_stop
   }
 %    \end{macrocode}
 %   We now deal with the decimal part: there is nothing already in the
