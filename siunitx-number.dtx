@@ -151,6 +151,15 @@
 %    stored inside the \meta{tl~var} inside \cs{ensuremath}.
 % \end{function}
 %
+% \begin{function}{\siunitx_number_normalize_symbols:N}
+%   \begin{syntax}
+%     \cs{siunitx_number_normalize_symbols:N} \meta{tl~var}
+%   \end{syntax}
+%    Replaces all multi-token signs and comparators in the \meta{tl~var}
+%    with their single-token equivalents. Replaces any active hyphen tokens
+%    with non-active versions.
+% \end{function}
+%
 % \begin{function}[pTF, EXP]{\siunitx_if_number:n}
 %   \begin{syntax}
 %     \cs{siunitx_if_number_token:NTF} \Arg{tokens}
@@ -706,6 +715,52 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{macro}{\siunitx_number_normalize_symbols:N}
+% \begin{macro}{\@@_normalize_aux:nN}
+% \begin{macro}{\@@_normalize_sign:N}
+% \begin{variable}{\c_@@_normalize_tl}
+%   There are two parts to the replacement code. First, any active
+%   hyphens signs are normalised: these can come up with some packages and
+%   cause issues. Multi-token signs then are converted to the single token
+%   equivalents so that everything else can work on a one token basis.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_number_normalize_symbols:N #1
+  {
+    \@@_normalize_minus:N #1
+    \exp_after:wN \@@_normalize_aux:NnN \exp_after:wN #1
+      \c_@@_normalize_tl
+      { ? } \q_recursion_tail
+        \q_recursion_stop
+  }
+\cs_set_protected:Npn \@@_normalize_aux:NnN #1#2#3
+  {
+    \quark_if_recursion_tail_stop:N #3
+    \tl_replace_all:Nnn #1 {#2} {#3}
+    \@@_normalize_aux:NnN #1
+  }
+\tl_const:Nn \c_@@_normalize_tl
+  {
+    { -+ } \mp
+    { +- } \pm
+    { << } \ll
+    { <= } \le
+    { >> } \gg
+    { >= } \ge
+  }
+\group_begin:
+  \char_set_catcode_active:N \-
+  \cs_new_protected:Npx \@@_normalize_minus:N #1
+    {
+      \tl_replace_all:Nnn #1
+        { \exp_not:N - }  { \token_to_str:N - }
+    }
+\group_end:
+%    \end{macrocode}
+% \end{variable}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\siunitx_number_parse:nN}
 % \begin{macro}{\@@_parse:nN}
 %   After some initial set up, the parser expands the input and then replaces
@@ -731,7 +786,7 @@
             {#1}
         }
       \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
-      \@@_parse_replace:
+      \siunitx_number_normalize_symbols:N \l_@@_arg_tl
       \tl_if_empty:NF \l_@@_arg_tl
         { \@@_parse_comparator: }
       \@@_parse_check:
@@ -1047,53 +1102,6 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-% \begin{macro}{\@@_parse_replace:}
-% \begin{macro}{\@@_parse_replace_aux:nN}
-% \begin{macro}{\@@_parse_replace_sign:}
-% \begin{variable}{\c_@@_parse_sign_replacement_tl}
-%   There are two parts to the replacement code. First, any active
-%   hyphens signs are normalised: these can come up with some packages and
-%   cause issues. Multi-token signs then are converted to the single token
-%   equivalents so that everything else can work on a one token basis.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_replace:
-  {
-    \@@_parse_replace_minus:
-    \exp_last_unbraced:NV \@@_parse_replace_aux:nN
-      \c_@@_parse_sign_replacement_tl
-      { ? } \q_recursion_tail
-        \q_recursion_stop
-  }
-\cs_set_protected:Npn \@@_parse_replace_aux:nN #1#2
-  {
-    \quark_if_recursion_tail_stop:N #2
-    \tl_replace_all:Nnn \l_@@_arg_tl {#1} {#2}
-    \@@_parse_replace_aux:nN
-  }
-\tl_const:Nn \c_@@_parse_sign_replacement_tl
-  {
-    { -+ } \mp
-    { +- } \pm
-    { << } \ll
-    { <= } \le
-    { >> } \gg
-    { >= } \ge
-  }
-\group_begin:
-  \char_set_catcode_active:N \-
-  \cs_new_protected:Npx \@@_parse_replace_minus:
-    {
-      \tl_replace_all:Nnn \exp_not:N \l_@@_arg_tl
-        { \exp_not:N - }  { \token_to_str:N - }
-    }
-\group_end:
-%    \end{macrocode}
-% \end{variable}
 % \end{macro}
 % \end{macro}
 % \end{macro}
