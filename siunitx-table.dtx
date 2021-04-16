@@ -925,6 +925,7 @@
 % \begin{macro}{\@@_print:nnn, \@@_print:VVV}
 % \begin{macro}{\@@_print_marker:nnn}
 % \begin{macro}{\@@_print_marker:w}
+% \begin{macro}[EXP]{\@@_print_marker_aux:w}
 % \begin{macro}{\@@_print_format:nnn}
 % \begin{macro}
 %   {
@@ -992,10 +993,20 @@
     \hbox_set:Nn \l_@@_integer_box
       { \siunitx_print:nn { number } { #1#2#3 } }
     \hbox_set:Nn \l_@@_decimal_box
-      { \siunitx_print:nn { number } { \@@_cleanup_decimal:w #4 } }
+      {
+        \exp_args:Nnx \siunitx_print:nn { number }
+          { \@@_print_marker_aux:w #4 }
+      }
     \@@_center_marker:
     \box_use_drop:N \l_@@_integer_box
     \box_use_drop:N \l_@@_decimal_box
+  }
+\cs_new:Npn \@@_print_marker_aux:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil
+  {
+    \exp_not:n {#1#2#3#4#5}
+    \tl_if_blank:nT {#1#2#3#4#5} { { } }
+    \exp_not:n {#6#7}
   }
 %    \end{macrocode}
 %   For positioning based on a format, we have to work part-by-part as there
@@ -1293,6 +1304,7 @@
      }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
