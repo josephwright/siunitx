@@ -543,10 +543,6 @@
 %   }
 % \begin{macro}{\@@_extract_exp:nN}
 % \begin{macro}{\@@_extract_exp:nnnnnnnN}
-% \begin{macro}{\@@_adjust_exp:nNN}
-% \begin{macro}{\@@_adjust_exp:nnnnnnnNN}
-% \begin{macro}[EXP]{\@@_adjust_exp:n}
-% \begin{macro}[EXP]{\@@_adjust_exp:Nw}
 %   Actually formatting the units is much the same as is done in
 %   the quantities module, except that we have to cover the multiplication
 %   cases too: gets a bit repetitive. Notice that when combining exponents,
@@ -604,8 +600,8 @@
 \cs_new_protected:cpn { @@_format_extract-exponent_aux:n } #1
   {
     #1 \l_@@_unit_tl \l_@@_tmp_fp
-    \exp_args:NV \@@_adjust_exp:nNN
-      \l_@@_tmp_tl \l_@@_tmp_fp \l_@@_tmp_tl
+    \tl_set:Nx \l_@@_tmp_tl
+      { \siunitx_number_adjust_exponent:Nn \l_@@_tmp_tl \l_@@_tmp_fp }
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
     \bool_set_true:N \l_@@_exp_combine_bool
   }
@@ -623,29 +619,7 @@
   { \@@_extract_exp:nnnnnnnN #1 #2 }
 \cs_new_protected:Npn \@@_extract_exp:nnnnnnnN #1#2#3#4#5#6#7#8
   { \fp_set:Nn #8 {#6#7} }
-\cs_new_protected:Npn \@@_adjust_exp:nNN #1#2#3
-  { \@@_adjust_exp:nnnnnnnNN #1 #2 #3 }
-\cs_new_protected:Npn \@@_adjust_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
-  {
-    \tl_set:Nx #9
-      {
-        {#1} {#2} {#3} {#4} {#5}
-        \exp_args:Ne \@@_adjust_exp:n { \fp_eval:n { #6#7 + #8 } }
-      }
-  }
-\cs_new:Npn \@@_adjust_exp:n #1
-  { \@@_adjust_exp:Nw #1 \q_stop }
-\cs_new:Npn \@@_adjust_exp:Nw #1#2 \q_stop
-  {
-    \token_if_eq_meaning:NNTF #1 -
-      { {#1} {#2} }
-      { { } {#1#2} }
-  }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

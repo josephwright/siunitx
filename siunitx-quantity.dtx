@@ -268,8 +268,11 @@
   {
     \siunitx_unit_format_extract_prefixes:nNN {#1}
       \l_@@_unit_tl \l_@@_tmp_fp
-    \exp_args:NV \@@_adjust_exp:nNN
-      \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
+    \tl_set:Nx \l_@@_number_tl
+      {
+        \siunitx_number_adjust_exponent:Nn
+          \l_@@_number_tl \l_@@_tmp_fp
+      }
     \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
   }
 \cs_new_protected:Npn \@@_parsed_input:n #1
@@ -341,38 +344,6 @@
       { {#1} {#2} {#3} {#4} {#5} { } { 0 } }
   }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-%
-% \begin{macro}{\@@_adjust_exp:nNN}
-% \begin{macro}{\@@_adjust_exp:nnnnnnnNN}
-% \begin{macro}[EXP]{\@@_adjust_exp:n}
-% \begin{macro}[EXP]{\@@_adjust_exp:Nw}
-%   To adjust the exponent part for a combined prefix, we decompose the value,
-%   just changing the exponent part. This allows things to work with an
-%   uncertainty.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_adjust_exp:nNN #1#2#3
-  { \@@_adjust_exp:nnnnnnnNN #1 #2 #3 }
-\cs_new_protected:Npn \@@_adjust_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
-  {
-    \tl_set:Nx #9
-      {
-        {#1} {#2} {#3} {#4} {#5}
-        \exp_args:Ne \@@_adjust_exp:n { \fp_eval:n { #6#7 + #8 } }
-      }
-  }
-\cs_new:Npn \@@_adjust_exp:n #1
-  { \@@_adjust_exp:Nw #1 \q_stop }
-\cs_new:Npn \@@_adjust_exp:Nw #1#2 \q_stop
-  {
-    \token_if_eq_meaning:NNTF #1 -
-      { {#1} {#2} }
-      { { } {#1#2} }
-  }
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
