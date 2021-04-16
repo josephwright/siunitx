@@ -183,6 +183,22 @@
 %<*options>
 %    \end{macrocode}
 %
+% \subsection{Load time options}
+%
+% \begin{variable}{\l_@@_column_type_tl}
+%   \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    table-column-type .tl_set:N =
+      \l_@@_column_type_tl
+  }
+\keys_set:nn { siunitx }
+  {
+    table-column-type = S
+  }
+%    \end{macrocode}
+% \end{variable}
+%
 % \subsection{Option handling}
 %
 %   \begin{macrocode}
@@ -458,12 +474,15 @@
            }
       }
       { }
-    \@@_declare_column:Nnn S
+    \tl_map_inline:Nn \l_@@_column_type_tl
       {
-        \keys_set:nn { siunitx } {#1}
-        \siunitx_cell_begin:w
+        \@@_declare_column:Nnn #1
+          {
+            \keys_set:nn { siunitx } {##1}
+            \siunitx_cell_begin:w
+          }
+          { \siunitx_cell_end: }
       }
-      { \siunitx_cell_end: }
   }
 %    \end{macrocode}
 % \end{macro}

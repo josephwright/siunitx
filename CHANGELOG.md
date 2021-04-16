@@ -51,6 +51,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
+- Option `table-column-type`
 - Option `text-family-to-math`
 - Option `text-weight-to-math`
 - Option `weight-version-mapping`
