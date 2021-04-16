@@ -384,7 +384,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\complexnum}
+% \begin{macro}{\complexnum, \complexqty}
 %   Interfaces for complex numbers.
 %    \begin{macrocode}
 \NewDocumentCommand \complexnum { O { } m }
@@ -393,6 +393,15 @@
     \group_begin:
       \keys_set:nn { siunitx } {#1}
       \siunitx_complex_number:n {#2} \l_@@_tmp_tl
+    \group_end:
+  }
+\NewDocumentCommand \complexqty { O { } m  m }
+  {
+    \mode_leave_vertical:
+    \group_begin:
+      \siunitx_unit_options_apply:n {#3}
+      \keys_set:nn { siunitx } {#1}
+      \siunitx_complex_quantity:nn {#2} {#3}
     \group_end:
   }
 %    \end{macrocode}

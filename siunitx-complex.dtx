@@ -68,6 +68,15 @@
 %   are combined and printed using the standard functions in the module.
 % \end{function}
 %
+% \begin{function}{\siunitx_complex_quantity:nn}
+%   \begin{syntax}
+%     \cs{siunitx_complex_quantity:n} \Arg{number} \Arg{units}
+%   \end{syntax}
+%   Parses the \meta{number} and splits into real and complex parts, which are
+%   then formatted as described for \cs{siunitx_quantity:nn}. The results
+%   are combined and printed using the standard functions in the module.
+% \end{function}
+%
 % \begin{function}{complex-root-position}
 %   \begin{syntax}
 %     |complex-root-position| = |after-number|\verb"|"|before-number|
@@ -539,7 +548,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_unit_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_unit_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_complex_number:n}
+% \begin{macro}{\siunitx_complex_quantity:nn}
 %   The work here is pretty trivial.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_complex_number:n #1
@@ -548,7 +564,7 @@
       \bool_if:NTF \l_siunitx_number_parse_bool
         {
           \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
-          \@@_format:
+          \@@_format:n { }
         }
         {
           \siunitx_number_format:nN {#1} \l_@@_tmp_tl
@@ -556,11 +572,23 @@
         }
     \group_end:
   }
+\cs_new_protected:Npn \siunitx_complex_quantity:nn #1#2
+  {
+    \group_begin:
+      \bool_if:NTF \l_siunitx_number_parse_bool
+        {
+          \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
+          \@@_format:n {#2}
+        }
+        { \siunitx_quantity:nn {#1} {#2} }
+    \group_end:
+  }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\@@_format:}
-% \begin{macro}{\@@_format_auxi:}
+% \begin{macro}{\@@_format:n}
+% \begin{macro}{\@@_format_auxi:n}
 % \begin{macro}{\@@_format_unary:nnnnnnn}
 % \begin{macro}{\@@_format_auxii:}
 % \begin{macro}{\@@_drop_exponent:nnnnnnn}
@@ -570,16 +598,16 @@
 % \begin{macro}[EXP]{\@@_format_bracket:n}
 %   We start here checking that there is something to do.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format:
+\cs_new_protected:Npn \@@_format:n #1
   {
     \bool_lazy_and:nnF
       { \tl_if_empty_p:N \l_@@_real_tl }
       { \tl_if_empty_p:N \l_@@_img_tl }
-      { \@@_format_auxi: }
+      { \@@_format_auxi:n {#1} }
   }
 %    \end{macrocode}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_auxi:
+\cs_new_protected:Npn \@@_format_auxi:n #1
   {
     \tl_clear:N \l_@@_tmp_tl
     \tl_if_empty:NTF \l_@@_real_tl
@@ -601,7 +629,12 @@
           }
           { \@@_format_auxii: }
       }
-    \siunitx_print:nV { number } \l_@@_tmp_tl
+    \tl_if_blank:nTF {#1}
+      { \siunitx_print:nV { number } \l_@@_tmp_tl }
+      {
+        \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+        \siunitx_quantity_print:VV \l_@@_tmp_tl \l_@@_unit_tl
+      }
   }
 %    \end{macrocode}
 %   An imaginary part that is exactly $1$ is omitted, with only the complex
