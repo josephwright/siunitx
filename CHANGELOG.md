@@ -138,8 +138,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `detect-shape`
 - Option `detect-weight`
 - Option `input-protect-tokens`
+- Option `input-quotient`
 - Option `literal-superscript-as-power`
 - Option `open-bracket`
+- Option `quotient-mode`
 - Option `math-angstrom`
 - Option `math-arcminute`
 - Option `math-arcsecond`
