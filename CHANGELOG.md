@@ -53,6 +53,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-alignment-mode`
 - Option `text-family-to-math`
 - Option `text-weight-to-math`
+- Option `weight-version-mapping`
 - Option setting `list-mode = bracket`
 - Option setting `mode = match`
 - Option setting `number-mode = match`
@@ -64,7 +65,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option setting `range-mode = bracket`
 - Option setting `text-mode = match`
 - Option setting `unit-mode = match`
-- Option tree `weight-version-mapping`
 
 ### Changed
 - Modular re-write to provide code-level API
