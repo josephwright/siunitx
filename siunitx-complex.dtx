@@ -590,7 +590,7 @@
 % \begin{macro}{\@@_format:n}
 % \begin{macro}{\@@_format_auxi:n}
 % \begin{macro}{\@@_format_unary:nnnnnnn}
-% \begin{macro}{\@@_format_auxii:}
+% \begin{macro}{\@@_format_auxii:n}
 % \begin{macro}{\@@_drop_exponent:nnnnnnn}
 % \begin{macro}{\@@_format_sign:nnnnnnn}
 % \begin{macro}{\@@_extract_exponent:nw}
@@ -612,7 +612,7 @@
     \tl_clear:N \l_@@_tmp_tl
     \tl_if_empty:NTF \l_@@_real_tl
       {
-        \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+        \@@_format_units:n {#1}
         \exp_after:wN \@@_format_unary:nnnnnnn \l_@@_img_tl
         \tl_set:Nx \l_@@_tmp_tl
           {
@@ -627,14 +627,11 @@
             \tl_set:Nx \l_@@_tmp_tl
               { \siunitx_number_output:N \l_@@_real_tl }
           }
-          { \@@_format_auxii: }
+          { \@@_format_auxii:n {#1} }
       }
     \tl_if_blank:nTF {#1}
       { \siunitx_print:nV { number } \l_@@_tmp_tl }
-      {
-        \siunitx_unit_format:nN {#1} \l_@@_unit_tl
-        \siunitx_quantity_print:VV \l_@@_tmp_tl \l_@@_unit_tl
-      }
+      { \siunitx_quantity_print:VV \l_@@_tmp_tl \l_@@_unit_tl }
   }
 %    \end{macrocode}
 %   An imaginary part that is exactly $1$ is omitted, with only the complex
@@ -660,11 +657,10 @@
 %   need to process both and do some massaging, then it's just a question
 %   of reassembly with the right parts in the right places.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_auxii:
+\cs_new_protected:Npn \@@_format_auxii:n #1
   {
-    \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+    \@@_format_units:n {#1}
     \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl
-    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
     \exp_after:wN \@@_format_sign:nnnnnnn \l_@@_img_tl
     \tl_set:Nx \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_img_tl \q_nil }
@@ -741,6 +737,71 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_format_units:n}
+% \begin{macro}
+%   {
+%     \@@_format_combine-exponent:n ,
+%     \@@_format_extract-exponent:n ,
+%     \@@_format_input:n
+%   }
+% \begin{macro}{\@@_format_extract-exponent:N}
+% \begin{macro}[EXP]{\@@_extract_exp:nnnnnnn}
+%   Formatting units needs to know the settings from the main module, and
+%   the flow is then much the same as in \pkg{siunitx-compound}. We only
+%   have to watch the fact there are two numbers to format.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_units:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      {
+        \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+        \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+      }
+      {
+        \use:c { @@_format_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
+      }
+  }
+\cs_new_protected:cpn { @@_format_combine-exponent:n } #1
+  {
+    \tl_if_empty:NF \l_@@_real_tl
+      { \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl }
+    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \fp_set:Nn \l_@@_tmp_fp
+     { \exp_after:wN \@@_extract_exp:nnnnnnn \l_@@_img_tl }
+    \siunitx_unit_format_combine_exponent:nnN {#1}
+      \l_@@_tmp_fp \l_@@_unit_tl
+  }
+\cs_new_protected:cpx { @@_format_extract-exponent:n } #1
+  {
+    \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1}
+      \exp_not:N \l_@@_unit_tl \exp_not:N \l_@@_tmp_fp
+    \exp_not:c { @@_format_extract-exponent:N }
+      \exp_not:N \l_@@_img_tl
+    \exp_not:N \tl_if_empty:NF \exp_not:N \l_@@_real_tl
+      {
+        \exp_not:c { @@_format_extract-exponent:N }
+          \exp_not:N \l_@@_real_tl
+      }
+  }
+\cs_new_protected:cpn { @@_format_extract-exponent:N } #1
+  {
+    \tl_set:Nx #1
+      { \siunitx_number_adjust_exponent:Nn #1 \l_@@_tmp_fp }
+    \siunitx_number_process:NN #1 #1
+  }
+\cs_new_protected:Npn \@@_format_input:n #1
+  {
+    \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
+\cs_new:Npn \@@_extract_exp:nnnnnnn #1#2#3#4#5#6#7 { #6#7 }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
