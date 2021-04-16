@@ -50,6 +50,7 @@ tlmgr install   \
   cancel        \
   caption       \
   carlisle      \
+  cellspace     \
   collcell      \
   colortbl      \
   csquotes      \

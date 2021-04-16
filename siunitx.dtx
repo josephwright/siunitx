@@ -468,6 +468,11 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_declare_column:Nnn #1#2#3
   {
+    \cs_if_exist:cT { NC@rewrite@ #1 }
+      {
+        \cs_undefine:c { NC@rewrite@ #1 }
+        \msg_warning:nnn { siunitx } { column-overwritten } {#1}
+      }
     \newcolumntype {#1} { }
     \cs_set_protected:Npn \@@_tmp:w \NC@do ##1##2 \NC@do #1
       { \NC@list { \NC@do ##1 \NC@do #1 ##2 } }
@@ -482,6 +487,8 @@
         \NC@find
       }
   }
+\msg_new:nnn { siunitx } { column-overwritten }
+  { Tabular~column~type~"#1"~overwritten~with~siunitx~definition. }
 %    \end{macrocode}
 %   When \pkg{mdwtab} is loaded the syntax required is slightly different.
 %    \begin{macrocode}
@@ -491,6 +498,11 @@
       {
         \cs_set_protected:Npn \@@_declare_column:Nnn #1#2#3
           {
+            \cs_if_exist:cT { NC@rewrite@ #1 }
+               {
+                 \cs_undefine:c { NC@rewrite@ #1 }
+                 \msg_warning:nnn { siunitx } { column-overwritten } {#1}
+               }
             \newcolumntype {#1} [ 1 ] [ ]
               { > {#2} c < {#3} }
            }
