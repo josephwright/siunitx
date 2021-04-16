@@ -266,6 +266,17 @@
 %
 % \begin{macro}{\qty}
 %    \begin{macrocode}
+\@ifpackageloaded { physics }
+  {
+    \msg_new:nnn { siunitx } { physics-pkg }
+      {
+        Detected~the~"physics"~package: \\
+        Omitting~definition~of~\token_to_str:N \qty.
+      }
+    \msg_warning:nn { siunitx } { physics-pkg }
+    \use_none:nnnn
+  }
+  { }
 \NewDocumentCommand \qty { O { } m > { \TrimSpaces } m }
   {
     \mode_leave_vertical:
