@@ -26,6 +26,10 @@
 %
 %<*driver>
 \documentclass{l3doc}
+\ExplSyntaxOn
+\cs_gset_eq:NN \LowerCaseText \tl_lower_case:n
+\ExplSyntaxOff
+\ProvideDocumentCommand\acro{m}{\textsc{\LowerCaseText{#1}}}
 \ProvideDocumentCommand\foreign{m}{\textit{#1}}
 % The next line is needed so that \GetFileInfo will be able to pick up
 % version data
@@ -307,12 +311,12 @@
 % \enquote{generic} symbolic parts.
 %
 % Broadly, the pre-defined units are those defined by the \textsc{bipm} in the
-% documentation for the \emph{International System of Units} (SI)~\cite{BIPM}.
-% As far as possible, the names given to the command names for units are those
-% used by the \textsc{bipm}, omitting spaces and using only \textsc{ascii}
-% characters. The standard symbols are also taken from the same documentation.
-% In the following documentation, the order of the description of units
-% broadly follows the SI~Brochure.
+% documentation for the \emph{International System of Units}
+% (\acro{SI})~\cite{BIPM}. As far as possible, the names given to the command
+% names for units are those used by the \acro{bipm}, omitting spaces and using
+% only \acro{ASCII} characters. The standard symbols are also taken from the
+% same documentation. In the following documentation, the order of the
+% description of units broadly follows the \acro{SI}~Brochure.
 %
 % \begin{function}
 %   {
@@ -325,14 +329,14 @@
 %     \second   ,
 %     \ampere
 %   }
-%   The base units as defined in the SI Brochure~\cite{base-units}.
+%   The base units as defined in the \acro{SI} Brochure~\cite{base-units}.
 %   Notice that \cs{meter} is defined as an alias for \cs{metre} as the former
 %   spelling is common in the US (although the latter is the official spelling).
 % \end{function}
 %
 % \begin{function}{\gram}
-%   The base unit \cs{kilogram} is defined using an SI prefix: as such the
-%   (derived) unit \cs{gram} is required by the module to correctly produce
+%   The base unit \cs{kilogram} is defined using an \acro{SI} prefix: as such
+%   the (derived) unit \cs{gram} is required by the module to correctly produce
 %   output for the \cs{kilogram}.
 % \end{function}
 %
@@ -363,7 +367,7 @@
 %   Prefixes, all of which are integer powers of $10$: the powers are stored
 %   internally by the module and can be used for conversion from prefixes to
 %   their numerical equivalent. These prefixes are documented in Section~3.1
-%   of the SI~Brochure.
+%   of the \acro{SI}~Brochure.
 %
 %   Note that the \cs{kilo} prefix is required to
 %   define the base \cs{kilogram} unit. Also note the two spellings available
@@ -395,8 +399,8 @@
 %     \watt          ,
 %     \weber
 %   }
-%   The defined SI~units with defined names and symbols, as given in
-%   Table~4 of the SI~Brochure. Notice that the names
+%   The defined \acro{SI}~units with defined names and symbols, as given in
+%   Table~4 of the \acro{SI}~Brochure. Notice that the names
 %   of the units are lower case with the exception of \cs{degreeCelsius}, and
 %   that this unit name includes \enquote{degree}.
 % \end{function}
@@ -417,9 +421,9 @@
 %     \minute           ,
 %     \tonne
 %   }
-%   Units accepted for use with the SI: here \cs{minute} is a unit of time
-%   not of plane angle. These units are taken from Table~8 of the
-%   SI~Brochure.
+%   Units accepted for use with the \acro{SI}: here \cs{minute} is a unit of
+%   time not of plane angle. These units are taken from Table~8 of the
+%   \acro{SI}~Brochure.
 %
 %   For the unit \cs{litre}, both |l| and |L| are listed
 %   as acceptable symbols: the latter is the standard setting of the module.
@@ -433,15 +437,15 @@
 %     \arcsecond ,
 %     \degree
 %   }
-%   Units for plane angles accepted for use with the SI: to avoid a clash
-%   with units for time, here \cs{arcminute} and \cs{arcsecond} are used in
-%   place of \cs{minute} and \cs{second}. These units are taken from Table~8
-%   of the SI~Brochure.
+%   Units for plane angles accepted for use with the \acro{SI}: to avoid a
+%   clash with units for time, here \cs{arcminute} and \cs{arcsecond} are
+%   used in place of \cs{minute} and \cs{second}. These units are taken from
+%   Table~8 of the \acro{SI}~Brochure.
 % \end{function}
 %
 % \begin{function}{\percent}
-%   The mathematical concept of percent, usable with the SI as detailed in
-%   Section~5.4.7 of the SI~Brochure.
+%   The mathematical concept of percent, usable with the \acro{SI} as detailed
+%   in Section~5.4.7 of the \acro{SI}~Brochure.
 % \end{function}
 %
 % \begin{function}{\square, \cubic}
@@ -2494,8 +2498,8 @@
 %     \second   ,
 %     \ampere
 %   }
-%   The basic SI units: technically the correct spelling is \cs{metre} but
-%   US users tend to use \cs{meter}.
+%   The basic \acro{SI} units: technically the correct spelling is \cs{metre}
+%   but US users tend to use \cs{meter}.
 %    \begin{macrocode}
 \siunitx_declare_unit:Nn \kilogram { \kilo \gram }
 \siunitx_declare_unit:Nn \metre    { m }
@@ -2528,7 +2532,7 @@
 %     \centi ,
 %     \deci
 %  }
-%   The various SI multiple prefixes are defined here: first the small
+%   The various \acro{SI} multiple prefixes are defined here: first the small
 %   ones.
 %    \begin{macrocode}
 \siunitx_declare_prefix:Nnn \yocto { -24 } { y }
@@ -2648,7 +2652,7 @@
 %     \neper            ,
 %     \tonne
 %  }
-%   Non-SI, but accepted for general use. Once again there are two
+%   Non-\acro{SI}, but accepted for general use. Once again there are two
 %   spellings, here for litre and with different output in this case.
 %    \begin{macrocode}
 \siunitx_declare_unit:Nn \astronomicalunit { au }
@@ -2672,7 +2676,7 @@
 %     \arcsecond ,
 %     \degree
 %  }
-%   Arc units: again, non-SI, but accepted for general use.
+%   Arc units: again, non-\acro{SI}, but accepted for general use.
 %    \begin{macrocode}
 \siunitx_declare_unit:Nx \arcminute { \@@_non_latin:n { "02B9 } }
 \siunitx_declare_unit:Nx \arcsecond { \@@_non_latin:n { "02BA } }
@@ -2773,7 +2777,7 @@
 %
 % \begin{thebibliography}{1}
 %   \bibitem{BIPM}
-%     \emph{The International System of Units (SI)},
+%     \emph{The International System of Units (\acro{SI})},
 %     \url{https://www.bipm.org/en/measurement-units/}.
 %   \bibitem{base-units}
 %     \emph{SI base units},
