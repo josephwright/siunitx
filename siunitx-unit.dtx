@@ -27,9 +27,19 @@
 %<*driver>
 \documentclass{l3doc}
 \ExplSyntaxOn
-\cs_gset_eq:NN \LowerCaseText \tl_lower_case:n
+\makeatletter
+\NewDocumentCommand \acro { m }
+  {
+    \textsc
+      {
+        \exp_args:NV \tl_if_head_eq_charcode:nNTF \f@series { m }
+          { \tl_lower_case:n }
+          { \use:n }
+            {#1}
+      }
+  }
+\makeatother
 \ExplSyntaxOff
-\ProvideDocumentCommand\acro{m}{\textsc{\LowerCaseText{#1}}}
 \ProvideDocumentCommand\foreign{m}{\textit{#1}}
 % The next line is needed so that \GetFileInfo will be able to pick up
 % version data

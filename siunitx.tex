@@ -40,9 +40,19 @@ for those people who are interested.
 
 % Commands for this document
 \ExplSyntaxOn
-\cs_new_eq:NN \LowerCaseText \tl_lower_case:n
+\makeatletter
+\NewDocumentCommand \acro { m }
+  {
+    \textsc
+      {
+        \exp_args:NV \tl_if_head_eq_charcode:nNTF \f@series { m }
+          { \tl_lower_case:n }
+          { \use:n }
+            {#1}
+      }
+  }
+\makeatother
 \ExplSyntaxOff
-\NewDocumentCommand\acro{m}{\textsc{\LowerCaseText{#1}}}
 \NewDocumentCommand\email{m}{\href{mailto:#1}{\nolinkurl{#1}}}
 \NewDocumentCommand\ext{m}{\texttt{.#1}}
 \NewDocumentCommand\foreign{m}{\textit{#1}}
