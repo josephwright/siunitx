@@ -178,6 +178,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `unit-text-tt`
 - Option `version-1-compatibility`
 
+## [v2.8e] - 2021-04-17
+
+### Fixed
+
+- Correct file dates for configuration files
+
 ## [v2.8d] - 2021-04-09
 
 ### Changed
@@ -1223,7 +1229,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8d...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8e...HEAD
+[v2.8e]: https://github.com/josephwright/siunitx/compare/v2.8d...v2.8e
 [v2.8d]: https://github.com/josephwright/siunitx/compare/v2.8c...v2.8d
 [v2.8c]: https://github.com/josephwright/siunitx/compare/v2.8b...v2.8c
 [v2.8b]: https://github.com/josephwright/siunitx/compare/v2.8a...v2.8b
