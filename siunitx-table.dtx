@@ -236,25 +236,27 @@
 %   \cs{cr} is used to allow collection of any tokens
 %   inserted after the main content when dealing with the last cell of a row:
 %   the \enquote{group} around it is needed to avoid issues with the underlying
-%   |\halign|. (The approach is based on that in \pkg{collcell}.) Notice that
-%   as each cell forms a group there is no need to reset the definition of
-%   \cs{cr}. We use an auxiliary to fish out the |\ignorespaces| from the
-%   template: that has to go to avoid issues with the peek-ahead code
-%   (everything before the |#| needs to be read \emph{before} the Appendix~D
-%   trick gets applied). Some packages add additional tokens before the
-%   |\ignorespaces|, which are dealt with by the delimited argument.
+%   |\halign|. (The approach is based on that in \pkg{collcell}.) Whilst the
+%   group formed by a cell will normally tidy up |\cr|, we add an extra one as
+%   the collected material could be a tabular in itself. We use an auxiliary to
+%   fish out the |\ignorespaces| from the template: that has to go to avoid
+%   issues with the peek-ahead code (everything before the |#| needs to be
+%   read \emph{before} the Appendix~D trick gets applied). Some packages
+%   add additional tokens before the |\ignorespaces|, which are dealt with by
+%   the delimited argument.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_begin:
   {
-    \tl_clear:N \l_@@_collect_tl
-    \if_false: { \fi:
-    \cs_set_protected:Npn \cr
-      {
-        \@@_collect_loop:
-        \tex_cr:D
-      }
-    \if_false: } \fi:
-    \@@_collect_begin:w
+    \group_begin:
+      \tl_clear:N \l_@@_collect_tl
+      \if_false: { \fi:
+      \cs_set_protected:Npn \cr
+        {
+          \@@_collect_loop:
+          \tex_cr:D
+        }
+      \if_false: } \fi:
+      \@@_collect_begin:w
   }
 \cs_new_protected:Npn \@@_collect_begin:w #1 \ignorespaces
   { \@@_collect_loop: #1 }
@@ -361,13 +363,17 @@
 % \end{variable}
 %
 % \begin{macro}{\@@_collect_end:}
-%   At the end of the cell, expand all of the content as far as possible then
-%   split it up into numerical and non-numerical parts.
+% \begin{macro}{\@@_collect_end:n}
+% \begin{macro}[EXP]{\@@_collect_end_aux:n}
+% \begin{macro}[EXP]{\@@_collect_end:w}
+%   At the end of the cell, escape the group and check for expansion. We
+%   only do that if the entire content is not a brace group: there is more
+%   likely to be problematic content in the case of a header.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_end:
   {
-    \protected@edef \l_@@_collect_tl
-      { \l_@@_collect_tl }
+    \exp_args:NNV \group_end:
+    \@@_collect_end:n \l_@@_collect_tl
     \exp_args:NV \@@_split:nNNN
       \l_@@_collect_tl
       \l_@@_before_tl
@@ -382,7 +388,22 @@
           \l_@@_after_tl
       }
   }
+\cs_new_protected:Npn \@@_collect_end:n #1
+  {
+    \str_if_eq:eeTF { \exp_not:n {#1} }
+      { { \@@_collect_end_aux:n {#1} } }
+      { \tl_set:Nn }
+      { \protected@edef }
+        \l_@@_collect_tl {#1}
+  }
+\cs_new:Npn \@@_collect_end_aux:n #1
+  { \exp_after:wN \@@_collect_end:w #1 \q_stop }
+\cs_new:Npn \@@_collect_end:w #1 \q_stop
+  { \exp_not:n {#1} }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_split:nNNN}
