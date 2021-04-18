@@ -229,7 +229,6 @@
 %
 % \begin{macro}{\@@_collect_begin:}
 % \begin{macro}{\@@_collect_begin:w}
-% \begin{macro}{\@@_collect_cr:, \@@_collect_saved_cr:}
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
@@ -249,21 +248,17 @@
   {
     \tl_clear:N \l_@@_collect_tl
     \if_false: { \fi:
-    \cs_set_eq:NN \@@_collect_saved_cr: \cr
-    \cs_set_eq:NN \cr \@@_collect_cr:
+    \cs_set_protected:Npn \cr
+      {
+        \@@_collect_loop:
+        \tex_cr:D
+      }
     \if_false: } \fi:
     \@@_collect_begin:w
   }
 \cs_new_protected:Npn \@@_collect_begin:w #1 \ignorespaces
   { \@@_collect_loop: #1 }
-\cs_new_protected:Npn \@@_collect_cr:
-  {
-    \@@_collect_loop:
-    \tex_cr:D
-  }
-\cs_new_protected:Npn \@@_collect_saved_cr: { }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -371,8 +366,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_end:
   {
-    \@@_collect_end_expand:N \l_@@_collect_tl
-
+    \protected@edef \l_@@_collect_tl
+      { \l_@@_collect_tl }
     \exp_args:NV \@@_split:nNNN
       \l_@@_collect_tl
       \l_@@_before_tl
@@ -386,10 +381,6 @@
           \l_@@_number_tl
           \l_@@_after_tl
       }
-  }
-\cs_new_protected:Npn \@@_collect_end_expand:N #1
-  {
-    \protected@edef #1 { #1 }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -581,15 +572,12 @@
 %
 % \begin{macro}{\@@_print_text:n, \@@_print_text:V}
 %   Printing escaped text is easy: just place it in correctly in the
-%   column. We need to restore the definition of \cs{cr} and to reset
-%   it as we might have a tabular inside the text.
+%   column.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_text:n #1
   {
-    \cs_set_eq:NN \cr \@@_collect_saved_cr:
     \bool_set_true:N \l_@@_text_bool
     \use:c { @@_align_ \l_@@_align_text_tl :n } {#1}
-    \cs_set_eq:NN \cr \@@_collect_cr:
   }
 \cs_generate_variant:Nn \@@_print_text:n { V }
 %    \end{macrocode}
