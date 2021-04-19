@@ -10,13 +10,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.8e] - 2021-04-17
 
 ### Fixed
-
 - Missing setting in emulation of v1 option `repeatunits`
 
 ## [v2.8d] - 2021-04-09
 
 ### Changed
-
 - Correct file dates for configuration files
 
 ## [v2.8c] - 2021-03-27
@@ -326,7 +324,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option name wrong in v1 table (issue #240)
 - Use `\textpm` in text mode if `textcomp` package is loaded (issue #249)
 - Ignore hard spaces in `\num` (issue #256)
-- Use `\mathord for tight spacing on 'in line' exponent (issue #257)
+- Use `\mathord` for tight spacing on 'in line' exponent (issue #257)
 
 ## [v2.5s] - 2013-07-31
 
@@ -479,7 +477,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.4k] - 2012-03-22
 
 ### Fixed
-- Interaction of `^` and `_` with `brenw (issue #191)
+- Interaction of `^` and `_` with `breqn` (issue #191)
 - Adapted `list-pair-separator` for `translator` package (issue #190)
 - Check for `round-minimum` with large values
 
@@ -1058,7 +1056,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8d...stable
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v2.8e...HEAD
+[v2.8e]: https://github.com/josephwright/siunitx/compare/v2.8d...v2.8e
 [v2.8d]: https://github.com/josephwright/siunitx/compare/v2.8c...v2.8d
 [v2.8c]: https://github.com/josephwright/siunitx/compare/v2.8b...v2.8c
 [v2.8b]: https://github.com/josephwright/siunitx/compare/v2.8a...v2.8b
