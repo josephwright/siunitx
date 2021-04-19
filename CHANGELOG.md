@@ -181,13 +181,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2.8e] - 2021-04-17
 
 ### Fixed
-
-- Correct file dates for configuration files
+- Missing setting in emulation of v1 option `repeatunits`
 
 ## [v2.8d] - 2021-04-09
 
 ### Changed
-
 - Correct file dates for configuration files
 
 ## [v2.8c] - 2021-03-27
