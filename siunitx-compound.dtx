@@ -777,7 +777,7 @@
 \cs_new_protected:Npn \@@_print_separator:n #1
   {
     \bool_if:NTF \l_@@_separator_text_bool
-      { \text {#1} }
+      { #1 }
       { \siunitx_print:nn { number } {#1} }
   }
 \cs_generate_variant:Nn \@@_print_separator:n { V }
@@ -1023,23 +1023,55 @@
 \keys_set:nn { siunitx }
   {
     compound-exponents       = individual  ,
-    compound-final-separator = { ~ and ~ } ,
-    compound-pair-separator  = { ~ and ~ } ,
-    compound-separator       = { , ~ }     ,
+    compound-final-separator =
+      {
+        \ifmmode \  \else \space \fi
+        \text { and }
+        \ifmmode \  \else \space \fi
+      } ,
+    compound-pair-separator  =
+      {
+        \ifmmode \  \else \space \fi
+        \text { and }
+        \ifmmode \  \else \space \fi
+      } ,
+    compound-separator       =
+      { , \ifmmode \  \else \space \fi } ,
     compound-separator-mode  = text        ,
     compound-units           = repeat      ,
     list-exponents           = individual  ,
-    list-final-separator     = { ~ and ~ } ,
-    list-pair-separator      = { ~ and ~ } ,
-    list-separator           = { , ~ }     ,
+    list-final-separator     =
+      {
+        \ifmmode \  \else \space \fi
+        \text { and }
+        \ifmmode \  \else \space \fi
+      } ,
+    list-pair-separator      =
+      {
+        \ifmmode \  \else \space \fi
+        \text { and }
+        \ifmmode \  \else \space \fi
+      } ,
+    list-separator           =
+      { , \ifmmode \  \else \space \fi } ,
     list-units               = repeat      ,
     product-exponents        = individual  ,
     product-mode             = symbol      ,
-    product-phrase           = { ~ by ~ }  ,
+    product-phrase           =
+      {
+        \ifmmode \  \else \space \fi
+        \text { by }
+        \ifmmode \  \else \space \fi
+      } ,
     product-symbol           = \times      ,
     product-units            = repeat      ,
     range-exponents          = individual  ,
-    range-phrase             = { ~ to ~ }  ,
+    range-phrase             =
+      {
+        \ifmmode \  \else \space \fi
+        \text { to }
+        \ifmmode \  \else \space \fi
+      } ,
     range-units              = repeat
   }
 %    \end{macrocode}
