@@ -18,13 +18,28 @@ tagfiles = {"siunitx.dtx"}
 -- Source files cover those for rollback
 sourcefiles =
   {
-    "*.dtx",
-    "*.ins",
-    "*.tex",
-    "siunitx-abbreviations.cfg",
+    "siunitx.dtx",
+    "siunitx.ins",
+    "siunitx.tex",
+    "siunitx-abbreviation.cfg",
+    "siunitx-abbreviation.dtx",
+    "siunitx-angle.dtx",
     "siunitx-binary.cfg",
+    "siunitx-binary.dtx",
+    "siunitx-code.tex",
+    "siunitx-command.dtx",
+    "siunitx-complex.dtx",
+    "siunitx-compound.dtx",
+    "siunitx-emulation.dtx",
+    "siunitx-locale.dtx",
+    "siunitx-number.dtx",
+    "siunitx-print.dtx",
+    "siunitx-quantity.dtx",
+    "siunitx-symbol.dtx",
+    "siunitx-table.dtx",
+    "siunitx-unit.dtx",
     "siunitx-v2.sty",
-    "siunitx-version-1.cfg",
+    "siunitx-version-1.cfg"
   }
 -- Whilst we also need to install .cfg files
 installfiles = {"*.cfg", "*.sty"}
