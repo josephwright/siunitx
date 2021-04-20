@@ -33,8 +33,8 @@ installfiles = {"*.cfg", "*.sty"}
 function update_tag(file,content,tagname,tagdate)
   tagname = string.gsub(tagname, "^v", "")
   content = string.gsub(content,
-    "\\DeclareCurrentRelease%{[^}]+%}%{[^}]+%}",
-    "\\DeclareCurrentRelease{" .. tagname .. "}{" .. tagdate .. "}"
+    "\\DeclareCurrentRelease%{%}%{[^}]+%}",
+    "\\DeclareCurrentRelease{}{" .. tagdate .. "}"
     )
   return string.gsub(content,
     "\n\\ProvidesExplPackage %{siunitx%} %{[^}]+%} %{[^}]+%}\n",
