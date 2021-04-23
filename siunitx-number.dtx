@@ -1159,7 +1159,7 @@
 % \begin{macro}{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
 % \begin{macro}{\@@_parse_loop_after_decimal:NNN}
-% \begin{macro}{\@@_parse_loop_uncert:NNNNN}
+% \begin{macro}{\@@_parse_loop_uncert:NNNN}
 % \begin{macro}{\@@_parse_loop_after_uncert:N}
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
 % \begin{macro}{\@@_parse_loop_break:wN}
@@ -1324,8 +1324,8 @@
 \cs_new_protected:Npn \@@_parse_loop_main_uncert:NNN #1#2#3
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
-    \@@_parse_loop_uncert:NNNNN
-      #1 \c_true_bool \c_false_bool #3
+    \@@_parse_loop_uncert:NNN
+      #1 \c_true_bool \c_false_bool
   }
 %    \end{macrocode}
 %   If a sign is found, terminate the current number, store the sign as the
@@ -1389,26 +1389,26 @@
 %   latter is not valid for the very first token, which is handled using a
 %   switch (it's a simple enough difference).
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_uncert:NNNNN #1#2#3#4#5
+\cs_new_protected:Npn \@@_parse_loop_uncert:NNNN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #5
+    \quark_if_recursion_tail_stop_do:Nn #4
       { \@@_parse_loop_break:wN \q_recursion_stop }
-    \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#4}
       {
         \bool_lazy_or:nnTF
-          {#3} { ! \str_if_eq_p:nn {#5} { 0 } }
+          {#3} { ! \str_if_eq_p:nn {#4} { 0 } }
           {
-            \tl_put_right:Nn \l_@@_partial_tl {#5}
-            \@@_parse_loop_uncert:NNNNN
-              #1 \c_false_bool \c_true_bool #4
+            \tl_put_right:Nn \l_@@_partial_tl {#4}
+            \@@_parse_loop_uncert:NNNN
+              #1 \c_false_bool \c_true_bool
           }
           {
-            \@@_parse_loop_uncert:NNNNN
-              #1 \c_false_bool \c_false_bool #4
+            \@@_parse_loop_uncert:NNNN
+              #1 \c_false_bool \c_false_bool
           }
       }
       {
-        \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#5}
+        \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#4}
           {
             \bool_if:NTF #2
               { \@@_parse_loop_break:wN }
