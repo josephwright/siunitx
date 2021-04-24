@@ -771,6 +771,120 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Symbol commands}
+%
+%    \begin{macrocode}
+%<@@=siunitx_emulation>
+%    \end{macrocode}
+%
+% \begin{macro}{\@@_non_latin:n}
+% \begin{macro}{\@@_non_latin:nnnn}
+%   As in \pkg{siunitx-unit}, but internal in both cases as it's rather
+%   specialised.
+%    \begin{macrocode}
+\bool_lazy_or:nnTF
+  { \sys_if_engine_luatex_p: }
+  { \sys_if_engine_xetex_p: }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      { \char_generate:nn {#1} { \char_value_catcode:n {#1} } }
+  }
+  {
+    \cs_new:Npn \@@_non_latin:n #1
+      {
+        \exp_last_unbraced:Nf \@@_non_latin:nnnn
+          { \char_to_utfviii_bytes:n {#1} }
+      }
+    \cs_new:Npn \@@_non_latin:nnnn #1#2#3#4
+      {
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#1} { 13 }
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#2} { 13 }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \SIUnitSymbolAngstrom  ,
+%     \SIUnitSymbolArcminute ,
+%     \SIUnitSymbolArcsecond ,
+%     \SIUnitSymbolCelsius   ,
+%     \SIUnitSymbolDegree    ,
+%     \SIUnitSymbolMicro     ,
+%     \SIUnitSymbolOhm
+%   }
+%     The same setup as elsewhere but localised to the emulation module
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \cs_new_protected:Npn \SIUnitSymbolArcminute
+       { \ensuremath { { } ' } }
+    \cs_new_protected:Npn \SIUnitSymbolArcsecond
+       { \ensuremath { { } '' } }
+    \@ifpackageloaded { fontspec }
+      {
+        \cs_new_protected:Npx \SIUnitSymbolAngstrom
+           { \@@_non_latin:n { "00C5 } }
+        \cs_new_protected:Npx \SIUnitSymbolDegree
+           { \@@_non_latin:n { "00B0 } }
+        \cs_new_protected:Npx \SIUnitSymbolCelsius
+           { \@@_non_latin:n { "00B0 } C }
+        \cs_new_protected:Npx \SIUnitSymbolDegree
+           { \@@_non_latin:n { "00B0 } }
+      }
+      {
+        \cs_new_protected:Npx \SIUnitSymbolAngstrom
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00C5 } }
+          }
+        \cs_new_protected:Npx \SIUnitSymbolCelsius
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00B0 } } C
+          }
+        \cs_new_protected:Npx \SIUnitSymbolDegree
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00B0 } }
+          }
+      }
+    \cs_new_protected:Npx \SIUnitSymbolMicro
+       {
+          \siunitx_print_text:n
+            {
+              \bool_lazy_or:nnTF
+                { \sys_if_engine_luatex_p: }
+                { \sys_if_engine_xetex_p: }
+                { \@@_non_latin:n { "00B5 } }
+                { \exp_not:N \textmu }
+            }
+       }
+    \cs_new_protected:Npx \SIUnitSymbolOhm
+       {
+          \exp_not:N \ifmmode
+            \cs_if_exist:NTF \upOmega
+              { \exp_not:N \upOmega }
+              { \exp_not:N \Omega }
+          \exp_not:N \else
+            \siunitx_print_text:n
+              {
+                \bool_lazy_or:nnTF
+                  { \sys_if_engine_luatex_p: }
+                  { \sys_if_engine_xetex_p: }
+                  { \@@_non_latin:n { "03A9 } }
+                  { \exp_not:N \textohm }
+              }
+          \exp_not:N \fi
+       }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %    \begin{macrocode}
 %</interfaces>
 %    \end{macrocode}
@@ -781,4 +895,4 @@
 %
 % \end{implementation}
 %
-% \PrintIndex
+% \PrintInex
