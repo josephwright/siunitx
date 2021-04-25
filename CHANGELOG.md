@@ -74,6 +74,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Deprecated
 - `\DeclareSIPrePower`
 - `\DeclareSIPostPower`
+- `\SIUnitSymbolAngstrom`
+- `\SIUnitSymbolArcminute`
+- `\SIUnitSymbolArcsecond`
+- `\SIUnitSymbolCelsius`
+- `\SIUnitSymbolDegree`
+- `\SIUnitSymbolMicro`
+- `\SIUnitSymbolOhm`
 - Option `add-decimal-zero`
 - Option `allow-number-unit-break`
 - Option `add-arc-degree-zero`
@@ -117,13 +124,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option setting `table-number-alignment = center-decimal-marker`
 
 ### Removed
-- `\SIUnitSymbolAngstrom`
-- `\SIUnitSymbolArcminute`
-- `\SIUnitSymbolArcsecond`
-- `\SIUnitSymbolCelsius`
-- `\SIUnitSymbolDegree`
-- `\SIUnitSymbolMicro`
-- `\SIUnitSymbolOhm`
 - Option `abbreviations`
 - Option `add-integer-zero`
 - Option `binary-units`
