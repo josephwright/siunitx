@@ -21,15 +21,16 @@
 \OMIT
 \cs_set_protected:Npn \test:nn #1#2
   {
-    \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+    \cs_set_eq:Nc \test:n { siunitx_print_ #1 :n }
+    \hbox_set:Nn \l_tmpa_box { \test:n {#2} }
     \box_show:N \l_tmpa_box
-    \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
+    \hbox_set:Nn \l_tmpa_box { $ \test:n {#2} $ }
     \box_show:N \l_tmpa_box
     \group_begin:
       \keys_set:nn { siunitx } { mode = text }
-      \hbox_set:Nn \l_tmpa_box { \siunitx_print:nn {#1} {#2} }
+      \hbox_set:Nn \l_tmpa_box { \test:n {#2} }
       \box_show:N \l_tmpa_box
-      \hbox_set:Nn \l_tmpa_box { $ \siunitx_print:nn {#1} {#2} $ }
+      \hbox_set:Nn \l_tmpa_box { $ \test:n {#2} $ }
       \box_show:N \l_tmpa_box
     \group_end:
   }

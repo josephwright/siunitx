@@ -422,7 +422,7 @@
   {
     \group_begin:
       \@@_format:nn {#1} { }
-      \@@_print:N \@@_print_number:n
+      \@@_print:N \siunitx_print_number:x
     \group_end:
   }
 \cs_new_protected:Npn \@@_format:nn #1#2
@@ -652,11 +652,11 @@
             { \l_@@_unit_bracket_bool }
             { \tl_if_empty_p:N \l_@@_exp_tl }
             {
-              \siunitx_print:nV { number } \l_@@_bracket_open_tl
-              \@@_print:N \@@_print_number:n
-              \siunitx_print:nV { number } \l_@@_bracket_close_tl
+              \siunitx_print_number:V \l_@@_bracket_open_tl
+              \@@_print:N \siunitx_print_number:x
+              \siunitx_print_number:V \l_@@_bracket_close_tl
             }
-            { \@@_print:N \@@_print_number:n }
+            { \@@_print:N \siunitx_print_number:x }
           \@@_print_quantity:n { }
         }
     \group_end:
@@ -669,10 +669,9 @@
 % \begin{macro}{\@@_print:nnnN}
 % \begin{macro}{\@@_print_aux:n}
 % \begin{macro}{\@@_print_aux:nn}
-% \begin{macro}{\@@_print_number:n}
 %   We now need to know how many entries there are: the reason we don't use
-%   \cs{seq_use:Nnnn} is that we want to be able to insert \cs{siunitx_print:nn}
-%   in a controlled way.
+%   \cs{seq_use:Nnnn} is that we want to be able to insert
+%   \cs{siunitx_print_\dots:n} in a controlled way.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:N #1
   {
@@ -770,19 +769,16 @@
         \@@_print_separator:V \l_@@_separator_tl
       }
   }
-\cs_new_protected:Npn \@@_print_number:n #1
-  { \siunitx_print:nx { number } {#1} }
 \cs_new_protected:Npn \@@_print_quantity:n #1
   { \siunitx_quantity_print:nV {#1} \l_@@_unit_tl }
 \cs_new_protected:Npn \@@_print_separator:n #1
   {
     \bool_if:NTF \l_@@_separator_text_bool
       { #1 }
-      { \siunitx_print:nn { number } {#1} }
+      { \siunitx_print_number:n {#1} }
   }
 \cs_generate_variant:Nn \@@_print_separator:n { V }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

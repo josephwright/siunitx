@@ -83,13 +83,20 @@
 %   \item \pkg{amstext}: the \cs{text} command for printing in text mode
 % \end{itemize}
 %
-% \begin{function}{\siunitx_print:nn, \siunitx_print:nV, \siunitx_print:nx}
+% \begin{function}
+%   {
+%     \siunitx_print_number:n, \siunitx_print_number:V,
+%       \siunitx_print_number:x,
+%     \siunitx_print_unit:n, \siunitx_print_unit:V,
+%       \siunitx_print_unit:x
+%   }
 %   \begin{syntax}
-%     \cs{siunitx_print:nn} \Arg{type} \Arg{material}
+%     \cs{siunitx_print_number:n} \Arg{material}
+%     \cs{siunitx_print_unit:n} \Arg{material}
 %   \end{syntax}
 %   Prints the \meta{material} according the the prevailing settings for the
-%   submodule as applicable to the \meta{type} of content: the latter should be
-%   either |number| or |unit|. The \meta{material} should comprise normal
+%   submodule as applicable to the \meta{type} of content (|number| or |unit|).
+%   The \meta{material} should comprise normal
 %   \LaTeX{} mark-up for numbers or units. In particular, units will typically
 %   use |\mathrm| to indicate material to be printed in the current upright
 %   roman font, and |^| and |_| will typically be used to indicate super- and
@@ -105,7 +112,7 @@
 %     \cs{siunitx_print_math:n} \Arg{material}
 %     \cs{siunitx_print_text:n} \Arg{material}
 %   \end{syntax}
-%   Prints the \meta{material} as described for \cs{siunitx_print:nn} but
+%   Prints the \meta{material} as described for \cs{siunitx_print_\dots:n} but
 %   with a fixed text or math mode output. The printing does \emph{not} set
 %   color (which is managed on a |unit|/|number| basis), but otherwise sets
 %   the font as described above. The |match| function uses either the prevailing
@@ -132,7 +139,7 @@
 %   \end{syntax}
 %   Selects which mode (math or text) the output is printed in: a choice
 %   from the options |match|, |math| or |text|. The option |match| matches
-%   the mode prevailing at the point \cs{siunitx_print:nn} is called. The
+%   the mode prevailing at the point \cs{siunitx_print_\dots:n} is called. The
 %   |math| and |text| options choose the relevant \TeX{} mode for printing.
 %   The standard setting is |math|.
 % \end{function}
@@ -152,7 +159,7 @@
 %   \end{syntax}
 %   Selects which mode (math or text) the numbers are printed in: a choice
 %   from the options |match|, |math| or |text|. The option |match| matches
-%   the mode prevailing at the point \cs{siunitx_print:nn} is called. The
+%   the mode prevailing at the point \cs{siunitx_prin_number:n} is called. The
 %   |math| and |text| options choose the relevant \TeX{} mode for printing.
 %   The standard setting is |math|.
 % \end{function}
@@ -162,7 +169,7 @@
 %     |propagate-math-font| = |true|\verb"|"|false|
 %   \end{syntax}
 %   Switch to determine if the currently-active math font is applied within
-%   printed output. This is relevant only when \cs{siunitx_print:nn} is
+%   printed output. This is relevant only when \cs{siunitx_print_\dots:n} is
 %   called from within math mode: in text mode there is not active math
 %   font. When not active, math mode material will be typeset using
 %   standard math mode fonts without any changes being made to the
@@ -238,7 +245,7 @@
 %   \end{syntax}
 %   Selects which mode (math or text) units are printed in: a choice
 %   from the options |match|, |math| or |text|. The option |match| matches
-%   the mode prevailing at the point \cs{siunitx_print:nn} is called. The
+%   the mode prevailing at the point \cs{siunitx_print_\dots:n} is called. The
 %   |math| and |text| options choose the relevant \TeX{} mode for printing.
 %   The standard setting is |math|.
 % \end{function}
@@ -438,11 +445,24 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_print:nn, \siunitx_print:nV, \siunitx_print:nx}
+% \begin{macro}
+%   {
+%     \siunitx_print_number:n, \siunitx_print_number:V,
+%       \siunitx_print_number:x,
+%     \siunitx_print_unit:n, \siunitx_print_unit:V,
+%       \siunitx_print_unit:x
+%   }
+% \begin{macro}{\@@_aux:nn}
 %   The main printing function doesn't actually need to do very much: just set
 %   the color and select the correct sub-function.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_print:nn #1#2
+\cs_new_protected:Npn \siunitx_print_number:n #1
+  { \@@_aux:nn { number } {#1} }
+\cs_generate_variant:Nn \siunitx_print_number:n { V , x }
+\cs_new_protected:Npn \siunitx_print_unit:n #1
+  { \@@_aux:nn { unit } {#1} }
+\cs_generate_variant:Nn \siunitx_print_unit:n { V , x }
+\cs_new_protected:Npn \@@_aux:nn #1#2
   {
     \tl_if_empty:cTF { l_@@_ #1 _color_tl }
       { \use:n }
@@ -456,8 +476,8 @@
               {#2}
         }
   }
-\cs_generate_variant:Nn \siunitx_print:nn { nV , nx }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\siunitx_print_match:n}

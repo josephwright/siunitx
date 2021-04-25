@@ -65,7 +65,7 @@
 %   \end{syntax}
 %   Parses the \meta{number} and the \meta{unit} as detailed for
 %   \cs{siunitx_number_parse:nN} and \cs{siunitx_unit_format:nN},
-%   the prints the results using \cs{siunitx_print:nn}.
+%   the prints the results using \cs{siunitx_print_unit:n}.
 % \end{function}
 %
 % \begin{function}
@@ -78,7 +78,7 @@
 %   \end{syntax}
 %   A low-level function which prints the quantity directly: there is
 %   no processing applied to either the \meta{number} or \meta{unit}. The
-%   two parts are printed using \cs{siunitx_print:nn} and appropriate
+%   two parts are printed using \cs{siunitx_print_unit:n} and appropriate
 %   spacing and break-prevention is applied.
 % \end{function}
 %
@@ -227,7 +227,7 @@
       \tl_if_blank:nTF {#1}
         {
           \siunitx_unit_format:nN {#2} \l_@@_unit_tl
-          \siunitx_print:nV { unit } \l_@@_unit_tl
+          \siunitx_print_unit:V \l_@@_unit_tl
         }
         {
           \bool_if:NTF \l_siunitx_number_parse_bool
@@ -317,7 +317,7 @@
                   \l_@@_unit_tl
                 \siunitx_quantity_print:nV { { } #3 }
                   \l_@@_unit_tl
-                \siunitx_print:nn { number } { { } #4 }
+                \siunitx_print_number:n { { } #4 }
               }
               { \siunitx_quantity_print:nV {#1#2#3#4} \l_@@_unit_tl }
           }
@@ -358,12 +358,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_quantity_print:nn #1#2
   {
-    \siunitx_print:nn { number } {#1}
+    \siunitx_print_number:n {#1}
     \tl_if_blank:nF {#2}
       {
         \tl_use:N \l_@@_product_tl
         \bool_if:NF \l_@@_break_bool { \nobreak }
-        \siunitx_print:nn { unit } {#2}
+        \siunitx_print_unit:n {#2}
       }
   }
 \cs_generate_variant:Nn \siunitx_quantity_print:nn { nV , VV , xV }
