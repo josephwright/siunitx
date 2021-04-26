@@ -1437,9 +1437,14 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_uncert:NN}
-% \begin{macro}{\@@_parse_uncert:NNN}
-% \begin{macro}{\@@_parse_uncert_aux:NN}
-% \begin{macro}{\@@_parse_uncert_after:N}
+% \begin{macro}{\@@_parse_uncert:NNNN}
+% \begin{macro}{\@@_parse_uncert_auxi:NN, \@@_parse_uncert_auxii:NN}
+% \begin{macro}
+%   {
+%     \@@_parse_uncert_auxii:N  ,
+%     \@@_parse_uncert_marker:N ,
+%     \@@_parse_uncert_after:N
+%   }
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
 %   so we filter that out explicitly. After that, we check for digits,
@@ -1452,47 +1457,109 @@
       { \@@_parse_loop_break:wN \q_recursion_stop }
     \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
       { \@@_parse_loop_break:wN }
-      { \@@_parse_uncert:NNN #1 \c_false_bool #2 }
+      {
+        \@@_parse_uncert:NNNN
+          #1 \c_false_bool \@@_parse_uncert_auxi:NN #2
+      }
   }
-\cs_new_protected:Npn \@@_parse_uncert:NNN #1#2#3
+%    \end{macrocode}
+%   Deal with digits: a simple question of whether they are significant.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert:NNNN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #3
+    \quark_if_recursion_tail_stop_do:Nn #4
       { \@@_parse_loop_break:wN \q_recursion_stop }
-    \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#4}
       {
         \bool_lazy_or:nnTF
-          {#2} { ! \str_if_eq_p:nn {#3} { 0 } }
+          {#2} { ! \str_if_eq_p:nn {#4} { 0 } }
           {
-            \tl_put_right:Nn \l_@@_partial_tl {#3}
-            \@@_parse_uncert:NNN #1 \c_true_bool
+            \tl_put_right:Nn \l_@@_partial_tl {#4}
+            \@@_parse_uncert:NNNN #1 \c_true_bool #3
           }
-          { \@@_parse_uncert:NNN #1 \c_false_bool }
+          { \@@_parse_uncert:NNNN #1 \c_false_bool #3 }
       }
-      { \@@_parse_uncert_aux:NN #1#3 }
+      { #3 #1#4 }
   }
-\cs_new_protected:Npn \@@_parse_uncert_aux:NN #1#2
+%    \end{macrocode}
+%   For the two auxiliaries, the difference is the handling of a
+%   decimal marker: one may be present, but only exactly one.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_auxi:NN #1#2
   {
     \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
       {
-        \tl_if_empty:NTF \l_@@_partial_tl
-          {
-            \tl_put_right:Nx #1
-              {
-                {
-                  \bool_if:NT \l_@@_zero_uncert_bool
-                    { { S } { 0 } }
-                }
-             }
-          }
-          {
-            \tl_set:Nx \l_@@_partial_tl
-              { { S } { \exp_not:V \l_@@_partial_tl } }
-             \@@_parse_loop_main_store:NNN #1
-               \c_false_bool \c_false_bool
-          }
+        \@@_parse_uncert_auxiii:N #1
+        \@@_parse_uncert_after:N
+      }
+      {
+        \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#2}
+          { \@@_parse_uncert_marker:N #1 }
+          { \@@_parse_loop_break:wN }
+      }
+  }
+\cs_new_protected:Npn \@@_parse_uncert_auxii:NN #1#2
+  {
+    \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
+      {
+        \@@_parse_uncert_auxiii:N #1
         \@@_parse_uncert_after:N
       }
       { \@@_parse_loop_break:wN }
+  }
+%    \end{macrocode}
+%   Deal with the closing bracket, which might leave us with nothing if there
+%   were no significant digits.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_auxiii:N #1
+  {
+    \tl_if_empty:NTF \l_@@_partial_tl
+      {
+        \tl_put_right:Nx #1
+          {
+            {
+              \bool_if:NT \l_@@_zero_uncert_bool
+                { { S } { 0 } }
+            }
+         }
+      }
+      {
+        \tl_set:Nx \l_@@_partial_tl
+          { { S } { \exp_not:V \l_@@_partial_tl } }
+         \@@_parse_loop_main_store:NNN #1
+           \c_false_bool \c_false_bool
+      }
+  }
+%    \end{macrocode}
+%   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
+%   sure it's valid. First, we need to be sure that the integer part of the captured
+%   uncertainty is not too long. Then we need to check that the decimal part is
+%   not too long. Both of these require data from the collected partial number,
+%   so we extract that first. Checking the decimal part needs the length of the
+%   not-yet-collected uncertainty. Handily, we know that it should be a set of
+%   digits then a closing marker. So we can use that as a length: if it's
+%   too long we can stop.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_marker:N #1
+  { \exp_after:wN \@@_parse_uncert_marker:nnnN #1 #1 }
+\cs_new_protected:Npn \@@_parse_uncert_marker:nnnN #1#2#3#4
+  {
+    \int_compare:nNnTF
+      { \tl_count:N \l_@@_partial_tl } > { \tl_count:n {#2} }
+      { \@@_parse_loop_break:wN }
+      { \@@_parse_uncert_marker:nNw {#3} #4 }
+  }
+\cs_new_protected:Npn \@@_parse_uncert_marker:nNw
+  #1#2#3 \q_recursion_tail \q_recursion_stop
+  {
+    \int_compare:nNnTF
+      { \tl_count:n {#3} - 1 } = { \tl_count:n {#1} }
+      {
+        \@@_parse_uncert:NNNN
+          #2 \c_false_bool \@@_parse_uncert_auxii:NN
+      }
+      { \@@_parse_loop_break:wN }
+    #3 \q_recursion_tail \q_recursion_stop
   }
 %    \end{macrocode}
 %   No further tokens are allowed after an uncertainty in parenthesis.
