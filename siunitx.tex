@@ -1561,6 +1561,7 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       print-unity-mantissa     & Switch  & true              \\
       print-zero-exponent      & Switch  & false             \\
       tight-spacing            & Switch  & false             \\
+      uncertainty-mode         & Choice  & compact           \\
       uncertainty-separator    & Literal & \meta{none}       \\
     \bottomrule
   \end{tabular}
@@ -1650,6 +1651,26 @@ decimal marker position whether these are separated out or not.
 \begin{LaTeXdemo}
   \num{8.2(13)} \\
   \num[separate-uncertainty]{8.2(13)}
+\end{LaTeXdemo}
+
+\DescribeOption{uncertainty-mode}
+When the uncertainty is given in brackets, the exact appearance can be set
+using the \opt{uncertainty-mode} option, which takes values \opt{compact},
+\opt{full} and \opt{mixed}. The standard setting of \opt{compact} prints digits
+of uncertainty in the least-significant digits. It does \emph{not} print a
+decimal marker if the uncertainty crosses the decimal. The setting \opt{full}
+prints the full value of the uncertainty. Finally, \opt{mixed} is available to
+print in the \opt{compact} style except where the uncertainty crosses the
+decimal, in which case the \opt{full} style is used.
+\begin{LaTeXdemo}
+  \num{123.45(120)} \\
+  \num{0.035(14)}   \\
+  \sisetup{uncertainty-mode = full}
+  \num{123.45(120)} \\
+  \num{0.035(14)}   \\
+  \sisetup{uncertainty-mode = mixed}
+  \num{123.45(120)} \\
+  \num{0.035(14)}   \\
 \end{LaTeXdemo}
 
 \DescribeOption{bracket-ambiguous-numbers}

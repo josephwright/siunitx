@@ -471,6 +471,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{uncertainty-mode}
+%   \begin{syntax}
+%     |uncertainty-mode| = |compact|\verb"|"|full|\verb"|"|mixed|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{uncertainty-separator}
 %   \begin{syntax}
 %     |uncertainty-separator| = \meta{separator}
@@ -2850,6 +2856,7 @@
 %      \l_@@_output_uncert_close_tl ,
 %      \l_@@_output_uncert_open_tl  ,
 %      \l_@@_uncert_separate_bool   ,
+%      \l_@@_uncert_mode_tl         ,
 %      \l_@@_uncert_separator_tl    ,
 %      \l_@@_tight_bool             ,
 %      \l_@@_unity_mantissa_bool    ,
@@ -2911,11 +2918,15 @@
       \l_@@_uncert_separate_bool ,
     tight-spacing .bool_set:N =
       \l_@@_tight_bool ,
+    uncertainty-mode .choices:nn =
+      { compact , full , mixed }
+      { \tl_set_eq:NN \l_@@_uncert_mode_tl \l_keys_choice_tl } ,
     uncertainty-separator .tl_set:N =
       \l_@@_uncert_separator_tl
   }
 \bool_new:N \l_@@_group_decimal_bool
 \bool_new:N \l_@@_group_integer_bool
+\tl_new:N \l_@@_uncert_mode_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -2951,10 +2962,17 @@
 % \begin{macro}[rEXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[rEXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[rEXP]{\@@_output_uncert_S:nnnw}
-% \begin{macro}[rEXP]{\@@_output_uncert_S_aux:nnn}
+% \begin{macro}[rEXP]
+%   {\@@_output_uncert_S_aux:nnn, \@@_output_uncert_S_aux:fnn}
 % \begin{macro}[rEXP]
 %   {\@@_output_uncert_S:nnnw, \@@_output_uncert_S:fnw}
 % \begin{macro}[rEXP]{\@@_output_uncert_S:nnw}
+% \begin{macro}[rEXP]
+%   {
+%     \@@_output_uncert_S_compact:nn ,
+%     \@@_output_uncert_S_full:nn    ,
+%     \@@_output_uncert_S_mixed:nn
+%   }
 % \begin{macro}[rEXP]{\@@_output_exponent:nnnn}
 % \begin{macro}[rEXP]{\@@_output_end:}
 %   The approach to formatting a single number is to split into
@@ -3219,14 +3237,14 @@
         \exp_not:n {#2}
         \@@_output_sign:N \pm
         \exp_not:n {#2}
-        \exp_args:Nf \@@_output_uncert_S_aux:nnn
+        \@@_output_uncert_S_aux:nnn
           { \int_eval:n { \tl_count:n {#4} - \tl_count:n {#1} } }
           {#4} {#2}
       }
       {
         \exp_not:V \l_@@_uncert_separator_tl
         \exp_not:V \l_@@_output_uncert_open_tl
-        \exp_not:n {#4}
+        \use:c { @@_output_uncert_S_ \l_@@_uncert_mode_tl :nn } {#1} {#4}
         \exp_not:V \l_@@_output_uncert_close_tl
         \@@_output_uncertainty_unaligned:n {#2}
       }
@@ -3251,6 +3269,7 @@
           {#3}
       }
   }
+\cs_generate_variant:Nn \@@_output_uncert_S_aux:nnn { f }
 \cs_new:Npn \@@_output_uncert_S_aux:nnnw #1#2#3#4
   {
     \quark_if_nil:NF #4
@@ -3270,6 +3289,27 @@
   {
     \@@_output_digits:nn { integer } {#1}
     \@@_output_decimal:nn {#3} {#2}
+  }
+%    \end{macrocode}
+%   Handle the content of brackets: the only complex case is the
+%   mixed situation.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncert_S_compact:nn #1#2
+  { \exp_not:n {#2} }
+\cs_new:Npn \@@_output_uncert_S_full:nn #1#2
+  {
+    \@@_output_uncert_S_aux:fnn
+      { \int_eval:n { \tl_count:n {#2} - \tl_count:n {#1} } }
+      {#2} { }
+  }
+\cs_new:Npn \@@_output_uncert_S_mixed:nn #1#2
+  {
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#1} }
+      { ! \int_compare_p:nNn { \tl_count:n {#2} } > { \tl_count:n {#1} } }
+      { \@@_output_uncert_S_compact:nn }
+      { \@@_output_uncert_S_full:nn }
+        {#1} {#2}
   }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
@@ -3318,6 +3358,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -3498,6 +3539,7 @@
     round-precision           = 2                                      ,
     separate-uncertainty      = false                                  ,
     tight-spacing             = false                                  ,
+    uncertainty-mode          = compact                                ,
     uncertainty-separator     =
   }
 %    \end{macrocode}
