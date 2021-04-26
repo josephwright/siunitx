@@ -1555,8 +1555,18 @@
     \int_compare:nNnTF
       { \tl_count:n {#3} - 1 } = { \tl_count:n {#1} }
       {
-        \@@_parse_uncert:NNNN
-          #2 \c_false_bool \@@_parse_uncert_auxii:NN
+        \str_if_eq:eeTF
+          { \exp_not:V \l_@@_partial_tl }
+          { \prg_replicate:nn { \tl_count:N \l_@@_partial_tl } { 0 } }
+          {
+            \@@_parse_uncert:NNNN
+              #2 \c_false_bool
+          }
+          {
+            \@@_parse_uncert:NNNN
+              #2 \c_true_bool
+          }
+            \@@_parse_uncert_auxii:NN
       }
       { \@@_parse_loop_break:wN }
     #3 \q_recursion_tail \q_recursion_stop
