@@ -1159,10 +1159,6 @@
 % \begin{macro}{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
 % \begin{macro}{\@@_parse_loop_after_decimal:NNN}
-% \begin{macro}{\@@_parse_loop_uncert:NN}
-% \begin{macro}{\@@_parse_loop_uncert:NNN}
-% \begin{macro}{\@@_parse_loop_uncert_aux:NN}
-% \begin{macro}{\@@_parse_loop_after_uncert:N}
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
 % \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
@@ -1326,7 +1322,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_uncert:NNN #1#2#3
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
-    \@@_parse_loop_uncert:NN #1
+    \@@_parse_uncert:NN #1
   }
 %    \end{macrocode}
 %   If a sign is found, terminate the current number, store the sign as the
@@ -1384,69 +1380,6 @@
       }
   }
 %    \end{macrocode}
-%   Parsing a combined uncertainty has a very restricted range of allowed
-%   tokens. A closing uncertainty token in the first place is an error,
-%   so we filter that out explicitly. After that, we check for digits,
-%   which require checking for significant digits. The non-digit function
-%   is separate to make the flow clearer.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_uncert:NN #1#2
-  {
-    \quark_if_recursion_tail_stop_do:Nn #2
-      { \@@_parse_loop_break:wN \q_recursion_stop }
-    \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
-      { \@@_parse_loop_break:wN }
-      { \@@_parse_loop_uncert:NNN #1 \c_false_bool #2 }
-  }
-\cs_new_protected:Npn \@@_parse_loop_uncert:NNN #1#2#3
-  {
-    \quark_if_recursion_tail_stop_do:Nn #3
-      { \@@_parse_loop_break:wN \q_recursion_stop }
-    \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
-      {
-        \bool_lazy_or:nnTF
-          {#2} { ! \str_if_eq_p:nn {#3} { 0 } }
-          {
-            \tl_put_right:Nn \l_@@_partial_tl {#3}
-            \@@_parse_loop_uncert:NNN #1 \c_true_bool
-          }
-          { \@@_parse_loop_uncert:NNN #1 \c_false_bool }
-      }
-      { \@@_parse_loop_uncert_aux:NN #1#3 }
-  }
-\cs_new_protected:Npn \@@_parse_loop_uncert_aux:NN #1#2
-  {
-    \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
-      {
-        \tl_if_empty:NTF \l_@@_partial_tl
-          {
-            \tl_put_right:Nx #1
-              {
-                {
-                  \bool_if:NT \l_@@_zero_uncert_bool
-                    { { S } { 0 } }
-                }
-             }
-          }
-          {
-            \tl_set:Nx \l_@@_partial_tl
-              { { S } { \exp_not:V \l_@@_partial_tl } }
-             \@@_parse_loop_main_store:NNN #1
-               \c_false_bool \c_false_bool
-          }
-        \@@_parse_loop_after_uncert:N
-      }
-      { \@@_parse_loop_break:wN }
-  }
-%    \end{macrocode}
-%   No further tokens are allowed after an uncertainty in parenthesis.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_after_uncert:N #1
-  {
-    \quark_if_recursion_tail_stop:N #1
-    \@@_parse_loop_break:wN
-  }
-%    \end{macrocode}
 %   Something is not right: remove all of the remaining tokens from the
 %   number and clear the storage areas as a signal for the next part of the
 %   code.
@@ -1458,10 +1391,6 @@
     \tl_clear:N \l_@@_parsed_tl
   }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1504,6 +1433,78 @@
       { \@@_parse_exponent: }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse_uncert:NN}
+% \begin{macro}{\@@_parse_uncert:NNN}
+% \begin{macro}{\@@_parse_uncert_aux:NN}
+% \begin{macro}{\@@_parse_uncert_after:N}
+%   Parsing a combined uncertainty has a very restricted range of allowed
+%   tokens. A closing uncertainty token in the first place is an error,
+%   so we filter that out explicitly. After that, we check for digits,
+%   which require checking for significant digits. The non-digit function
+%   is separate to make the flow clearer.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert:NN #1#2
+  {
+    \quark_if_recursion_tail_stop_do:Nn #2
+      { \@@_parse_loop_break:wN \q_recursion_stop }
+    \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
+      { \@@_parse_loop_break:wN }
+      { \@@_parse_uncert:NNN #1 \c_false_bool #2 }
+  }
+\cs_new_protected:Npn \@@_parse_uncert:NNN #1#2#3
+  {
+    \quark_if_recursion_tail_stop_do:Nn #3
+      { \@@_parse_loop_break:wN \q_recursion_stop }
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
+      {
+        \bool_lazy_or:nnTF
+          {#2} { ! \str_if_eq_p:nn {#3} { 0 } }
+          {
+            \tl_put_right:Nn \l_@@_partial_tl {#3}
+            \@@_parse_uncert:NNN #1 \c_true_bool
+          }
+          { \@@_parse_uncert:NNN #1 \c_false_bool }
+      }
+      { \@@_parse_uncert_aux:NN #1#3 }
+  }
+\cs_new_protected:Npn \@@_parse_uncert_aux:NN #1#2
+  {
+    \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#2}
+      {
+        \tl_if_empty:NTF \l_@@_partial_tl
+          {
+            \tl_put_right:Nx #1
+              {
+                {
+                  \bool_if:NT \l_@@_zero_uncert_bool
+                    { { S } { 0 } }
+                }
+             }
+          }
+          {
+            \tl_set:Nx \l_@@_partial_tl
+              { { S } { \exp_not:V \l_@@_partial_tl } }
+             \@@_parse_loop_main_store:NNN #1
+               \c_false_bool \c_false_bool
+          }
+        \@@_parse_uncert_after:N
+      }
+      { \@@_parse_loop_break:wN }
+  }
+%    \end{macrocode}
+%   No further tokens are allowed after an uncertainty in parenthesis.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_after:N #1
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \@@_parse_loop_break:wN
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
