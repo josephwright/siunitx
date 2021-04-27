@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `\qtylist`
 - Option `allow-quantity-breaks`
 - Option `angle-mode`
+- Option `angle-separator`
 - Option `angle-symbol-degree`
 - Option `angle-symbol-minute`
 - Option `angle-symbol-second`
@@ -25,9 +26,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `evaluate-expression`
 - Option `exponent-mode`
 - Option `expression`
-- Option `fill-arc-degrees`
-- Option `fill-arc-minutes`
-- Option `fill-arc-seconds`
+- Option `fill-angle-degrees`
+- Option `fill-angle-minutes`
+- Option `fill-angle-seconds`
 - Option `font-command`
 - Option `fraction-command`
 - Option `list-exponents`
@@ -92,6 +93,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `add-arc-degree-zero`
 - Option `add-arc-minute-zero`
 - Option `add-arc-second-zero`
+- Option `arc-separator`
 - Option `explicit-sign`
 - Option `extract-mass-in-kilograms`
 - Option `fraction-function`
