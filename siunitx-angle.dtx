@@ -100,6 +100,18 @@
 %   The standard setting is |\,|.
 % \end{function}
 %
+% \begin{function}
+%   {
+%     arc-symbol-degree ,
+%     arc-symbol-minute ,
+%     arc-symbol-second
+%   }
+%   \begin{syntax}
+%     |arc-symbol-degree| = \meta{symbol}
+%   \end{syntax}
+%   Sets the symbol used for arc degrees, minutes or seconds, respectively.
+% \end{function}
+%
 % \begin{function}{arc-symbol-over-decimal}
 %   \begin{syntax}
 %     |arc-symbol-over-decimal| = |true|\verb"|"|false|
@@ -168,6 +180,9 @@
 %
 %  \begin{variable}
 %    {
+%      \l_@@_symbol_degree_tl    ,
+%      \l_@@_symbol_minute_tl    ,
+%      \l_@@_symbol_second_tl    ,
 %      \l_@@_force_arc_bool      ,
 %      \l_@@_force_decimal_bool  ,
 %      \l_@@_astronomy_bool      ,
@@ -196,6 +211,12 @@
         \bool_set_false:N \l_@@_force_arc_bool
         \bool_set_false:N \l_@@_force_decimal_bool
       } ,
+    angle-symbol-degree .tl_set:N =
+      \l_@@_symbol_degree_tl ,
+    angle-symbol-minute .tl_set:N =
+      \l_@@_symbol_minute_tl ,
+    angle-symbol-second .tl_set:N =
+      \l_@@_symbol_second_tl ,
     angle-symbol-over-decimal .bool_set:N =
       \l_@@_astronomy_bool ,
     arc-separator .tl_set:N =
@@ -385,7 +406,11 @@
 %    \end{macrocode}
 %  \end{variable}
 %
-% \begin{macro}{\@@_arc_print:nnn, \@@_arc_print:VVV, \@@_arc_print_auxi:nnn}
+% \begin{macro}
+%   {
+%     \@@_arc_print:nnn, \@@_arc_print:VVV,
+%     \@@_arc_print_auxi:nnn, \@@_arc_print_auxi:nVn
+%   }
 % \begin{macro}{\@@_arc_print_auxii:w}
 % \begin{macro}{\@@_arc_print_auxiii:n}
 % \begin{macro}{\@@_arc_print_auxiv:NN}
@@ -398,9 +423,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_print:nnn #1#2#3
   {
-    \@@_arc_print_auxi:nnn {#1} { \degree } {#2#3}
-    \@@_arc_print_auxi:nnn {#2} { \arcminute } {#3}
-    \@@_arc_print_auxi:nnn {#3} { \arcsecond } { }
+    \@@_arc_print_auxi:nVn {#1}
+      \l_@@_symbol_degree_tl {#2#3}
+    \@@_arc_print_auxi:nVn {#2}
+      \l_@@_symbol_minute_tl {#3}
+    \@@_arc_print_auxi:nVn {#3}
+      \l_@@_symbol_second_tl { }
   }
 \cs_generate_variant:Nn \@@_arc_print:nnn { VVV }
 \cs_new_protected:Npn \@@_arc_print_auxi:nnn #1#2#3
@@ -420,6 +448,7 @@
           }
       }
   }
+\cs_generate_variant:Nn \@@_arc_print_auxi:nnn { nV }
 %     \end{macrocode}
 %    To align the two parts of the astronomy-style marker, we need to allow
 %    for the |\scriptspace|.
@@ -513,12 +542,15 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    angle-mode                = input ,
-    angle-symbol-over-decimal = false ,
-    arc-separator             =       ,
-    fill-arc-degrees          = false ,
-    fill-arc-minutes          = false ,
-    fill-arc-seconds          = false ,
+    angle-mode                = input      ,
+    angle-symbol-degree       = \degree    ,
+    angle-symbol-minute       = \arcminute ,
+    angle-symbol-over-decimal = false      ,
+    angle-symbol-second       = \arcsecond ,
+    arc-separator             =            ,
+    fill-arc-degrees          = false      ,
+    fill-arc-minutes          = false      ,
+    fill-arc-seconds          = false      ,
     number-angle-product      =
   }
 %    \end{macrocode}

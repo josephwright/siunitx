@@ -16,6 +16,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `\qtylist`
 - Option `allow-quantity-breaks`
 - Option `angle-mode`
+- Option `angle-symbol-degree`
+- Option `angle-symbol-minute`
+- Option `angle-symbol-second`
 - Option `drop-exponent`
 - Option `drop-uncertainty`
 - Option `drop-zero-decimal`
