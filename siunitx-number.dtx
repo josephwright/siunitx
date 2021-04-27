@@ -473,7 +473,7 @@
 %
 % \begin{function}{uncertainty-mode}
 %   \begin{syntax}
-%     |uncertainty-mode| = |compact|\verb"|"|full|\verb"|"|mixed|
+%     |uncertainty-mode| = |compact|\verb"|"|compact-marker|\verb"|"|full|\verb"|"|separate|
 %   \end{syntax}
 % \end{function}
 %
@@ -2855,7 +2855,6 @@
 %      \l_@@_negative_color_tl      ,
 %      \l_@@_output_uncert_close_tl ,
 %      \l_@@_output_uncert_open_tl  ,
-%      \l_@@_uncert_separate_bool   ,
 %      \l_@@_uncert_mode_tl         ,
 %      \l_@@_uncert_separator_tl    ,
 %      \l_@@_tight_bool             ,
@@ -2914,12 +2913,10 @@
       \l_@@_unity_mantissa_bool ,
     print-zero-exponent .bool_set:N =
       \l_@@_zero_exponent_bool ,
-    separate-uncertainty .bool_set:N =
-      \l_@@_uncert_separate_bool ,
     tight-spacing .bool_set:N =
       \l_@@_tight_bool ,
     uncertainty-mode .choices:nn =
-      { compact , full , mixed }
+      { compact , compact-marker , full , separate }
       { \tl_set_eq:NN \l_@@_uncert_mode_tl \l_keys_choice_tl } ,
     uncertainty-separator .tl_set:N =
       \l_@@_uncert_separator_tl
@@ -2969,9 +2966,9 @@
 % \begin{macro}[rEXP]{\@@_output_uncert_S:nnw}
 % \begin{macro}[rEXP]
 %   {
-%     \@@_output_uncert_S_compact:nn ,
-%     \@@_output_uncert_S_full:nn    ,
-%     \@@_output_uncert_S_mixed:nn
+%     \@@_output_uncert_S_compact:nn        ,
+%     \@@_output_uncert_S_compact-marker:nn ,
+%     \@@_output_uncert_S_full:nn
 %   }
 % \begin{macro}[rEXP]{\@@_output_exponent:nnnn}
 % \begin{macro}[rEXP]{\@@_output_end:}
@@ -3018,7 +3015,7 @@
   {
     \bool_lazy_all:nT
       {
-        { \l_@@_uncert_separate_bool }
+        { \str_if_eq_p:Vn \l_@@_uncert_mode_tl { separate } }
         { \l_siunitx_number_bracket_ambiguous_bool }
         { ! \tl_if_blank_p:n {#1} }
         {
@@ -3232,7 +3229,7 @@
   { \exp_not:n { #1 #1 #1 #1 } }
 \cs_new:Npn \@@_output_uncert_S:nnnw #1#2#3#4
   {
-    \bool_if:NTF \l_@@_uncert_separate_bool
+    \str_if_eq:VnTF \l_@@_uncert_mode_tl { separate }
       {
         \exp_not:n {#2}
         \@@_output_sign:N \pm
@@ -3296,13 +3293,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_uncert_S_compact:nn #1#2
   { \exp_not:n {#2} }
-\cs_new:Npn \@@_output_uncert_S_full:nn #1#2
-  {
-    \@@_output_uncert_S_aux:fnn
-      { \int_eval:n { \tl_count:n {#2} - \tl_count:n {#1} } }
-      {#2} { }
-  }
-\cs_new:Npn \@@_output_uncert_S_mixed:nn #1#2
+\cs_new:cpn { @@_output_uncert_S_compact-marker:nn } #1#2
   {
     \bool_lazy_or:nnTF
       { \tl_if_blank_p:n {#1} }
@@ -3310,6 +3301,12 @@
       { \@@_output_uncert_S_compact:nn }
       { \@@_output_uncert_S_full:nn }
         {#1} {#2}
+  }
+\cs_new:Npn \@@_output_uncert_S_full:nn #1#2
+  {
+    \@@_output_uncert_S_aux:fnn
+      { \int_eval:n { \tl_count:n {#2} - \tl_count:n {#1} } }
+      {#2} { }
   }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
@@ -3537,7 +3534,6 @@
     round-mode                = none                                   ,
     round-pad                 = true                                   ,
     round-precision           = 2                                      ,
-    separate-uncertainty      = false                                  ,
     tight-spacing             = false                                  ,
     uncertainty-mode          = compact                                ,
     uncertainty-separator     =

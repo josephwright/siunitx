@@ -107,6 +107,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `retain-zero-uncertainty`
 - Option `retain-zero-exponent`
 - Option `scientific-notation`
+- Option `separate-uncertainty`
 - Option `table-align-text-post`
 - Option `table-align-text-pre`
 - Option `table-comparator`

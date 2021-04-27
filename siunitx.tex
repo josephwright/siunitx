@@ -1554,7 +1554,6 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       output-close-uncertainty & Literal & )                 \\
       output-decimal-marker    & Literal & .                 \\
       output-open-uncertainty  & Literal & (                 \\ ^^A )
-      separate-uncertainty     & Switch  & false             \\
       print-implicit-plus      & Switch  & false             \\
       print-unity-mantissa     & Switch  & true              \\
       print-zero-exponent      & Switch  & false             \\
@@ -1623,52 +1622,43 @@ When exponents are present in the input, the \opt{exponent-base} and
   \num[exponent-base = 2]{1e2}
 \end{LaTeXdemo}
 
-\DescribeOption{separate-uncertainty}
 \DescribeOption{uncertainty-separator}
 \DescribeOption{output-open-uncertainty}
 \DescribeOption{output-close-uncertainty}
+\DescribeOption{uncertainty-separator}
 When input is given including an uncertainty in a number, it can be printed
 either with the uncertainty in brackets or as a separate number. This behaviour
-is controlled by the \opt{separate-uncertainty} choice. If the uncertainty is
-given in brackets, a space may be added between the main number and the
-uncertainty: this is stored using the \opt{uncertainty-separator} option. The
-opening and closing brackets used are stored in \opt{output-open-uncertainty}
-and \opt{output-close-uncertainty}, respectively.
-\begin{LaTeXdemo}
-  \num{1.234(5)} \\
-  \num[separate-uncertainty = true]{1.234(5)} \\
-  \sisetup{
-    output-open-uncertainty  = [,
-    output-close-uncertainty = ],
-    uncertainty-separator    = \,
-  }%
-  \num{1.234(5)}
-\end{LaTeXdemo}
-Notice that \pkg{siunitx} correctly interprets uncertainties which cross the
-decimal marker position whether these are separated out or not.
-\begin{LaTeXdemo}
-  \num{8.2(13)} \\
-  \num[separate-uncertainty]{8.2(13)}
-\end{LaTeXdemo}
-
-\DescribeOption{uncertainty-mode}
-When the uncertainty is given in brackets, the exact appearance can be set
-using the \opt{uncertainty-mode} option, which takes values \opt{compact},
-\opt{full} and \opt{mixed}. The standard setting of \opt{compact} prints digits
-of uncertainty in the least-significant digits. It does \emph{not} print a
-decimal marker if the uncertainty crosses the decimal. The setting \opt{full}
-prints the full value of the uncertainty. Finally, \opt{mixed} is available to
-print in the \opt{compact} style except where the uncertainty crosses the
-decimal, in which case the \opt{full} style is used.
+is controlled by the \opt{uncertainty-mode} choice.When this is set to
+\opt{separate}, the uncertainty is printed as an entirely separate number
+preceded by \cs{pm}. Other settings all place the uncertainty in brackets
+directly attached to the main value. The standard setting of \opt{compact}
+prints digits of uncertainty in the least-significant digits. It does
+\emph{not} print a decimal marker if the uncertainty crosses the decimal. The
+setting \opt{full} prints the full value of the uncertainty. Finally,
+\opt{compact-marker} is available to print in the \opt{compact} style except
+where the uncertainty crosses the decimal, in which case the \opt{full} style
+is used. When the uncertainty is given in brackets, a space may be added
+between the main number and the uncertainty: this is stored using the
+\opt{uncertainty-separator} option. The opening and closing brackets used are
+stored in \opt{output-open-uncertainty} and \opt{output-close-uncertainty},
+respectively. Tokens may be inserted before the opening bracket using
+\opt{uncertainty-separator}.
 \begin{LaTeXdemo}
   \num{123.45(120)} \\
   \num{0.035(14)}   \\
   \sisetup{uncertainty-mode = full}
   \num{123.45(120)} \\
   \num{0.035(14)}   \\
-  \sisetup{uncertainty-mode = mixed}
+  \sisetup{uncertainty-mode = compact-marker}
   \num{123.45(120)} \\
   \num{0.035(14)}   \\
+  \sisetup{uncertainty-mode = separate}
+  \sisetup{
+    output-open-uncertainty  = [,
+    output-close-uncertainty = ],
+    uncertainty-separator    = \,
+  }%
+  \num{1.234(5)}
 \end{LaTeXdemo}
 
 \DescribeOption{bracket-ambiguous-numbers}

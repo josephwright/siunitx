@@ -132,7 +132,7 @@
     \test:n { 123.456 }
     \test:n { 123.456(789) }
     \group_begin:
-      \keys_set:nn { siunitx } { separate-uncertainty = true }
+      \keys_set:nn { siunitx } { uncertainty-mode = separate }
       \test:n { 123.456 \pm 0.789 }
     \group_end:
     \test:n { 123e10 }
@@ -153,7 +153,7 @@
 
 \TEST { Option~setting~"bracket-ambiguous-numbers" }
   {
-    \keys_set:nn { siunitx } { separate-uncertainty }
+    \keys_set:nn { siunitx } { uncertainty-mode = separate }
     \test:n { 1+-2e3 }
     \test:n { -1+-2e3 }
     \test:n { >1+-2e3 }
@@ -646,7 +646,7 @@
     \keys_set:nn { siunitx } { retain-zero-uncertainty = true }
     \test:n { 12(0) }
     \test:n { 12 \pm 0 }
-    \keys_set:nn { siunitx } { separate-uncertainty = true }
+    \keys_set:nn { siunitx } { uncertainty-mode = separate }
     \test:n { 12(0) }
     \test:n { 12 \pm 0 }
   }
@@ -787,23 +787,6 @@
     \test:n { 0.5678 }
   }
 
-\TEST { Option~setting~"separate-uncertainty" }
-  {
-    \test:n { 1234(5) }
-    \test:n { 12.34(5) }
-    \test:n { 12.3456(12345) }
-    \test:n { 12.34567(12345) }
-    \test:n { 1234567(12345) }
-    \test:n { 1234(5)e6 }
-    \keys_set:nn { siunitx } { separate-uncertainty = true }
-    \test:n { 1234(5) }
-    \test:n { 12.34(5) }
-    \test:n { 12.3456(12345) }
-    \test:n { 12.34567(12345) }
-    \test:n { 1234567(12345) }
-    \test:n { 1234(5)e6 }
-  }
-
 \TEST { Option~setting~"tight-spacing" }
   {
     \test:n { -1234 }
@@ -824,14 +807,41 @@
 
 \TEST { Option~setting~"uncertainty-mode" }
   {
-  \test:n { 123.45(120) }
-  \test:n { 0.035(14) }
-  \keys_set:nn { siunitx } { uncertainty-mode = full }
-  \test:n { 123.45(120) }
-  \test:n { 0.035(14) }
-  \keys_set:nn { siunitx } { uncertainty-mode = mixed }
-  \test:n { 123.45(120) }
-  \test:n { 0.035(14) }
+    \test:n { 1234(5) }
+    \test:n { 12.34(5) }
+    \test:n { 12.3456(12345) }
+    \test:n { 12.34567(12345) }
+    \test:n { 1234567(12345) }
+    \test:n { 1234(5)e6 }
+    \test:n { 123.45(120) }
+    \test:n { 0.035(14) }
+    \keys_set:nn { siunitx } { uncertainty-mode = compact-marker }
+    \test:n { 1234(5) }
+    \test:n { 12.34(5) }
+    \test:n { 12.3456(12345) }
+    \test:n { 12.34567(12345) }
+    \test:n { 1234567(12345) }
+    \test:n { 1234(5)e6 }
+    \test:n { 123.45(120) }
+    \test:n { 0.035(14) }
+    \keys_set:nn { siunitx } { uncertainty-mode = full }
+    \test:n { 1234(5) }
+    \test:n { 12.34(5) }
+    \test:n { 12.3456(12345) }
+    \test:n { 12.34567(12345) }
+    \test:n { 1234567(12345) }
+    \test:n { 1234(5)e6 }
+    \test:n { 123.45(120) }
+    \test:n { 0.035(14) }
+    \keys_set:nn { siunitx } { uncertainty-mode = separate }
+    \test:n { 1234(5) }
+    \test:n { 12.34(5) }
+    \test:n { 12.3456(12345) }
+    \test:n { 12.34567(12345) }
+    \test:n { 1234567(12345) }
+    \test:n { 1234(5)e6 }
+    \test:n { 123.45(120) }
+    \test:n { 0.035(14) }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
