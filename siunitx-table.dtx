@@ -61,6 +61,12 @@
 %
 % \section{Numbers in tables}
 %
+% This submodule is concerned with formatting numbers in table cells or
+% similar fixed-width contexts. The main function, \cs{siunitx_cell_begin:w},
+% is designed to work with the normal \LaTeXe{} tablular cell construct
+% featuring \cs{ignorespaces}. Therefore, if used outside of a \LaTeXe{}
+% tabular, it is necessary to provide this token.
+%
 % \begin{function}{\siunitx_cell_begin:w, \siunitx_cell_end:}
 %   \begin{syntax}
 %     \cs{siunitx_cell_begin:w} \meta{preamble} \cs{ignorespaces}
@@ -84,78 +90,121 @@
 %   \begin{syntax}
 %     |table-align-comparator| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether alignment of comparators is attempted
+%   within table cells. The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{table-align-exponent}
 %   \begin{syntax}
 %     |table-align-exponent| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether alignment of exponents is attempted
+%   within table cells. The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{table-align-text-after}
 %   \begin{syntax}
 %     |table-align-text-after| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether alignment of text falling after a number
+%   is attempted within table cells. The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{table-align-text-before}
 %   \begin{syntax}
 %     |table-align-text-before| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether alignment of text falling before a number
+%   is attempted within table cells. The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{table-align-uncertainty}
 %   \begin{syntax}
 %     |table-align-uncertainty| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether alignment of separated uncertainty values
+%   is attempted within table cells. The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{table-alignment}
 %   \begin{syntax}
 %     |table-alignment| = |center|\verb"|"|left|\verb"|"|right|
 %   \end{syntax}
+%   Selects the alignment of all tabular content with the margins of the table
+%   cell (or other boundary). See also |table-number-alignment| and
+%   |table-text-alignment|. The standard setting is |center|.
 % \end{function}
 %
 % \begin{function}{table-alignment-mode}
 %   \begin{syntax}
 %     |table-alignment-mode| = |format|\verb"|"|marker|\verb"|"|none|
 %   \end{syntax}
+%   Selects the method used to align numbers with the desired position in the
+%   cell (set by |table-alignment|). When set to |format|, a dedicated
+%   amount of space is calculated from the |table-format|. When |marker|
+%   is selected, alignment is carried out symmetrically around the decimal
+%   marker. Finally, |none| switches off all alignment: numbers are parsed
+%   and formatted but with no attempt at placement within the cell. The
+%   standard setting is |marker|.
 % \end{function}
 %
 % \begin{function}{table-auto-round}
 %   \begin{syntax}
 %     |table-auto-round| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether numbers are rounded to fit within
+%   the |table-format| specification (if possible). The standard
+%   setting is |false|.
 % \end{function}
 %
 % \begin{function}{table-column-width}
 %   \begin{syntax}
 %     |table-column-width| = \meta{width}
 %   \end{syntax}
+%   Sets the width of the table column used for numbers. This is only used
+%   when |table-fixed-width| is |true|.
 % \end{function}
 %
 % \begin{function}{table-fixed-width}
 %   \begin{syntax}
 %     |table-fixed-width| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Switch which determines whether a fixed-width column is used for numbers
+%   in tables. When |true|, the width is taken from |table-column-width|. The
+%   standard setting is |false|.
 % \end{function}
 %
 % \begin{function}{table-format}
 %   \begin{syntax}
 %     |table-format| = \meta{format}
 %   \end{syntax}
+%   Describes the amount of space that should be reserved when
+%   |table-alignment-mode| is set to |format|. The \meta{format} takes the
+%   same general form as input for a table cell, with the numerical parts
+%   describing how many digits to reserve space for. For example, |1.2e3|
+%   would allow space for one digit in the integer part, two in the decimal
+%   part and three in the exponent part. Signs can be allowed for using any
+%   valid input sign, so for example |+1.2 \pm 1.2| would allow for a sign,
+%   a number with one integer and two decimal digits and a uncertainty of
+%   the same size.
 % \end{function}
 %
 % \begin{function}{table-number-alignment}
 %   \begin{syntax}
 %     |table-number-alignment| = |center|\verb"|"|left|\verb"|"|right|
 %   \end{syntax}
+%   Selects the alignment of numerical content with the margins of the table
+%   cell (or other boundary). See also |table-alignment| and
+%   |table-text-alignment|. The standard setting is |center|.
 % \end{function}
 %
 % \begin{function}{table-text-alignment}
 %   \begin{syntax}
 %     |table-text-alignment| = |center|\verb"|"|left|\verb"|"|right|
 %   \end{syntax}
+%   Selects the alignment of non-numerical content with the margins of the
+%   table cell (or other boundary). See also |table-alignment| and
+%   |table-number-alignment|. The standard setting is |center|.
 % \end{function}
 %
 % \end{documentation}
