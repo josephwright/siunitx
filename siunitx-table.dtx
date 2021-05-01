@@ -752,11 +752,14 @@
 %
 % \begin{macro}{\@@_generate_model:n}
 % \begin{macro}{\@@_generate_model:nnnnnnn}
-% \begin{macro}{\@@_generate_model_S:nw}
+% \begin{macro}[EXP]{\@@_generate_model_S:nnw}
+% \begin{macro}[EXP]{\@@_generate_model_S:nnn}
 %   Creating a model for a table at this stage means parsing the format and
 %   converting that to an appropriate model. Things are quite straight-forward
 %   other than the uncertainty part. At this stage there is no point in
-%   formatting the model: that has to happen at point-of-use.
+%   formatting the model: that has to happen at point-of-use. Notice that
+%   the uncertainty part needs to allow for the case where we cross the
+%   decimal.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_generate_model:n #1
   {
@@ -782,8 +785,8 @@
         {
           \tl_if_blank:nF {#5}
             {
-              \use:c { @@_generate_model_ \tl_head:n {#5} :nw }
-                #5
+              \use:c { @@_generate_model_ \tl_head:n {#5} :nnw }
+                {#4} #5
             }
         }
         \exp_not:n { {#6} }
@@ -794,9 +797,31 @@
         }
       }
   }
-\cs_new:Npn \@@_generate_model_S:nw #1#2
-  { { S } { \prg_replicate:nn {#2} { 8 } } }
+\cs_new:Npn \@@_generate_model_S:nnw #1#2#3
+  {
+    { S }
+    {
+      \exp_args:Nff \@@_generate_model_S:nnn
+        { \tl_count:n {#1} } { \tl_count:n {#3} }
+        {#3}
+    }
+  }
+\cs_new:Npn \@@_generate_model_S:nnn #1#2#3
+  {
+    \prg_replicate:nn
+      {
+        \int_compare:nNnTF {#2} > {#1}
+          {
+            \str_range:nnn {#3} { 1 } {#1}
+            +
+            \str_range:nnn {#3} { 1 + #1 } {#2}
+          }
+          {#3}
+      }
+      { 8 }
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
