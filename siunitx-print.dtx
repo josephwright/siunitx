@@ -219,6 +219,15 @@
 %   |false|.
 % \end{function}
 %
+% \begin{function}{text-font-command}
+%   \begin{syntax}
+%     |text-font-command| = \meta{cmd}
+%   \end{syntax}
+%   Command applied to text during output, inserted after any reset of
+%   font set-up. This can therefore be used to apply non-standard font
+%   set up when printing in text mode. The standard setting is empty.
+% \end{function}
+%
 % \begin{function}{text-weight-to-math}
 %   \begin{syntax}
 %     |text-weight-to-math| = |true|\verb"|"|false|
@@ -366,6 +375,7 @@
 %     \l_@@_math_font_bool    ,
 %     \l_@@_math_version_bool ,
 %     \l_@@_math_family_bool  ,
+%     \l_@@_text_font_tl      ,
 %     \l_@@_math_weight_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
@@ -399,6 +409,8 @@
       \l_@@_text_shape_bool ,
     text-family-to-math .bool_set:N =
       \l_@@_math_family_bool ,
+    text-font-command .tl_set:N =
+      \l_@@_text_font_tl ,
     text-weight-to-math .bool_set:N =
       \l_@@_math_weight_bool ,
     unit-color .tl_set:N =
@@ -765,6 +777,7 @@
             { \l_@@_text_shape_bool }
           }
           { \selectfont }
+        \tl_use:N \l_@@_text_font_tl
         \@@_text_replace:n {#1}
       }
   }
@@ -931,6 +944,7 @@
     reset-text-series   = true  ,
     reset-text-family   = true  ,
     text-family-to-math = false ,
+    text-font-command   =       ,
     text-weight-to-math = false ,
     unit-color          =       ,
     unit-mode           = math

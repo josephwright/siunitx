@@ -121,6 +121,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-sign-mantissa`
 - Option `table-space-text-post`
 - Option `table-space-text-pre`
+- Option `text-font-command`
 - Option `zero-decimal-to-integer`
 - Option setting `list-units = brackets`
 - Option setting `per-mode = reciprocal`
