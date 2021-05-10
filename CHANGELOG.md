@@ -29,7 +29,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `fill-angle-degrees`
 - Option `fill-angle-minutes`
 - Option `fill-angle-seconds`
-- Option `font-command`
 - Option `fraction-command`
 - Option `list-exponents`
 - Option `minimum-decimal-digits`
@@ -61,6 +60,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `text-family-to-math`
 - Option `text-weight-to-math`
 - Option `uncertainty-mode`
+- Option `unit-font-command`
 - Option `weight-version-mapping`
 - Option setting `list-mode = bracket`
 - Option setting `mode = match`

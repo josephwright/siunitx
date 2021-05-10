@@ -567,16 +567,6 @@
 %   active; does not apply when |parse-units| is |false|.
 % \end{function}
 %
-% \begin{function}{font-command}
-%   \begin{syntax}
-%     |font-command| = \meta{command}
-%   \end{syntax}
-%   Command applied to text during output of units: should be command usable
-%   in math mode for font selection. Notice that in a typical unit this does
-%   not (necessarily) apply to all output, for example powers or brackets.
-%   The standard setting is |\mathrm|.
-% \end{function}
-%
 % \begin{function}{fraction-command}
 %   \begin{syntax}
 %     |fraction-command| = \meta{command}
@@ -657,6 +647,16 @@
 %   basis (when |false|) or should apply to all following units
 %   (when |true|). The latter mode is somewhat akin conceptually to the
 %   \TeX{} \cs{over} primitive. The standard setting is |false|.
+% \end{function}
+%
+% \begin{function}{unit-font-command}
+%   \begin{syntax}
+%     |unit-font-command| = \meta{command}
+%   \end{syntax}
+%   Command applied to text during output of units: should be command usable
+%   in math mode for font selection. Notice that in a typical unit this does
+%   not (necessarily) apply to all output, for example powers or brackets.
+%   The standard setting is |\mathrm|.
 % \end{function}
 %
 % \end{documentation}
@@ -1009,10 +1009,10 @@
   {
     extract-mass-in-kilograms .bool_set:N =
       \l_@@_mass_kilogram_bool ,
-    font-command .tl_set:N =
-      \l_siunitx_unit_font_tl ,
     inter-unit-product .tl_set:N =
-      \l_@@_product_tl
+      \l_@@_product_tl ,
+    unit-font-command .tl_set:N =
+      \l_siunitx_unit_font_tl
   }
 %    \end{macrocode}
 % \end{variable}
@@ -2762,7 +2762,6 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    font-command              = \mathrm   ,
     bracket-unit-denominator  = true      ,
     forbid-literal-units      = false     ,
     fraction-command          = \frac     ,
@@ -2773,7 +2772,8 @@
     per-symbol                = /         ,
     qualifier-mode            = subscript ,
     qualifier-phrase          =           ,
-    sticky-per                = false
+    sticky-per                = false     ,
+    unit-font-command         = \mathrm
   }
 %    \end{macrocode}
 %
