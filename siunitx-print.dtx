@@ -756,20 +756,18 @@
     \text
       {
         \bool_if:NT \l_@@_text_family_bool
-          {
-            \fontfamily { \familydefault }
-            \selectfont
-          }
+          { \fontfamily { \familydefault } }
         \bool_if:NT \l_@@_text_series_bool
-          {
-            \fontseries { \seriesdefault }
-            \selectfont
-          }
+          { \fontseries { \seriesdefault } }
         \bool_if:NT \l_@@_text_shape_bool
+          { \fontshape { \shapedefault } }
+        \bool_lazy_any:nT
           {
-            \fontshape { \shapedefault }
-            \selectfont
+            { \l_@@_text_family_bool }
+            { \l_@@_text_series_bool }
+            { \l_@@_text_shape_bool }
           }
+          { \selectfont }
         \@@_text_replace:n {#1}
       }
   }
