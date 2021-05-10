@@ -62,6 +62,6 @@ end
 
 function tag_hook(tagname)
   os.execute('git commit -a -m "Step tag"')
---  os.execute('git tag -a -m "" ' .. tagname)
+  os.execute('git tag -a -m "" ' .. tagname)
 end
 
