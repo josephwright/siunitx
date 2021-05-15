@@ -59,7 +59,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-alignment-mode`
 - Option `table-column-type`
 - Option `text-family-to-math`
-- Option `text-weight-to-math`
+- Option `text-series-to-math`
 - Option `uncertainty-mode`
 - Option `unit-font-command`
 - Option setting `list-mode = bracket`
