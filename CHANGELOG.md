@@ -53,6 +53,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `reset-text-series`
 - Option `reset-text-shape`
 - Option `separate-uncertainty-units`
+- Option `series-version-mapping`
 - Option `table-align-text-after`
 - Option `table-align-text-before`
 - Option `table-alignment-mode`
@@ -61,7 +62,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `text-weight-to-math`
 - Option `uncertainty-mode`
 - Option `unit-font-command`
-- Option `weight-version-mapping`
 - Option setting `list-mode = bracket`
 - Option setting `mode = match`
 - Option setting `number-mode = match`
