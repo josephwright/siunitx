@@ -13,7 +13,7 @@ packtdszip = true
 typesetfiles = {"*.tex"}
 
 -- Shorten the tagging list
-tagfiles = {"siunitx.dtx"}
+tagfiles = {"CHANGELOG.md", "siunitx.dtx"}
 
 -- Source files cover those for rollback
 sourcefiles =
@@ -50,10 +50,27 @@ asciiengines = { }
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
   tagname = string.gsub(tagname, "^v", "")
-  return string.gsub(content,
-    "\n\\ProvidesExplPackage %{siunitx%} %{[^}]+%} %{[^}]+%}\n",
-    "\n\\ProvidesExplPackage {siunitx} {"
-      .. tagdate .. "} {" .. tagname .. "}\n")
+
+  if string.match(file,"CHANGELOG.md") then
+    -- CHANGELOG
+    local pattern = "v%d%.%d%.?%d?[a-z]?"
+    local url = "https://github.com/josephwright/siunitx/compare/"
+    local previous = string.match(content,"compare/(" .. pattern .. ")%.%.%.HEAD") 
+    if tagname == previous then return content end
+    content = string.gsub(content,
+      "## %[Unreleased%]",
+      "## [Unreleased]\n\n## [v" .. tagname .."]")
+    return string.gsub(content,
+      pattern .. "%.%.%.HEAD",
+      tagname .. "...HEAD\n[v" .. tagname .. "]: " .. url .. previous
+        .. "..." .. tagname)
+  else
+    -- siunitx.dtx
+    return string.gsub(content,
+      "\n\\ProvidesExplPackage %{siunitx%} %{[^}]+%} %{[^}]+%}\n",
+      "\n\\ProvidesExplPackage {siunitx} {"
+        .. tagdate .. "} {" .. tagname .. "}\n")
+  end
 end
 
 function tag_hook(tagname)
