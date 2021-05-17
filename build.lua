@@ -74,7 +74,7 @@ function update_tag(file,content,tagname,tagdate)
 end
 
 function tag_hook(tagname)
-  os.execute('git commit -a -m "Step tag"')
+  os.execute('git commit -a -m "Step release tag"')
   os.execute('git tag -a -m "" ' .. tagname)
 end
 
