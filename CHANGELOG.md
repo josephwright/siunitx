@@ -1239,8 +1239,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/3.0.0...HEAD
-[v3.0.0]: https://github.com/josephwright/siunitx/compare/v2.8e...3.0.0
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.0...HEAD
+[v3.0.0]: https://github.com/josephwright/siunitx/compare/v2.8e...v3.0.0
 [v2.8e]: https://github.com/josephwright/siunitx/compare/v2.8d...v2.8e
 [v2.8d]: https://github.com/josephwright/siunitx/compare/v2.8c...v2.8d
 [v2.8c]: https://github.com/josephwright/siunitx/compare/v2.8b...v2.8c

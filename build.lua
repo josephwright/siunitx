@@ -62,8 +62,8 @@ function update_tag(file,content,tagname,tagdate)
       "## [Unreleased]\n\n## [v" .. tagname .."]")
     return string.gsub(content,
       pattern .. "%.%.%.HEAD",
-      tagname .. "...HEAD\n[v" .. tagname .. "]: " .. url .. previous
-        .. "..." .. tagname)
+      "v" .. tagname .. "...HEAD\n[v" .. tagname .. "]: " .. url .. previous
+        .. "...v" .. tagname)
   else
     -- siunitx.dtx
     return string.gsub(content,
