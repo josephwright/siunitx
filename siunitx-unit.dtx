@@ -270,6 +270,11 @@
 %    formatted units: set by |font-command|.
 % \end{variable}
 %
+% \begin{variable}{\l_siunitx_unit_fraction_tl}
+%    The fraction function which is applied whne constructing fractional units:
+%    set by |fraction-command|.
+% \end{variable}
+%
 % \begin{variable}{\l_siunitx_unit_symbolic_seq}
 %   This sequence contains all of the symbolic names defined:
 %   these will be in the form of control sequences such as |\kilogram|.
@@ -1631,9 +1636,9 @@
 %
 % \begin{variable}
 %   {
+%     \l_siunitx_unit_fraction_tl    ,
 %     \l_@@_denominator_bracket_bool ,
 %     \l_@@_forbid_literal_bool      ,
-%     \l_@@_fraction_function_tl     ,
 %     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
 %     \l_@@_qualifier_mode_tl        ,
@@ -1648,7 +1653,7 @@
     forbid-literal-units .bool_set:N =
       \l_@@_forbid_literal_bool ,
     fraction-command .tl_set:N =
-      \l_@@_fraction_function_tl ,
+      \l_siunitx_unit_fraction_tl ,
     parse-units .bool_set:N =
       \l_@@_parse_bool ,
     per-mode .choice: ,
@@ -2416,7 +2421,7 @@
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
-        \exp_not:V \l_@@_fraction_function_tl
+        \exp_not:V \l_siunitx_unit_fraction_tl
           { \exp_not:V \l_@@_formatted_tl }
           { \exp_not:V \l_@@_denominator_tl }
       }
