@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Public `\l_siunitx_unit_fraction_tl` variable
+
 ### Changed
 - Documentation improvements
 
