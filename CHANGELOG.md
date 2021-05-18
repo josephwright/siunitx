@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Documentation improvements
+
 ## [v3.0.0]
 
 ### Added
