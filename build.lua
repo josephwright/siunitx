@@ -21,7 +21,7 @@ sourcefiles =
     "siunitx.dtx",
     "siunitx.ins",
     "siunitx.tex",
-    "siunitx-abbreviation.cfg",
+    "siunitx-abbreviations.cfg",
     "siunitx-abbreviation.dtx",
     "siunitx-angle.dtx",
     "siunitx-binary.cfg",
