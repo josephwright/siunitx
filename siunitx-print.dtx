@@ -73,7 +73,7 @@
 % \cs{fontfamily}, \cs{fontseries} and \cs{fontshape}, \cs{familydefault},
 % \cs{seriesdefault}, \cs{shapedefault} and \cs{selectfont}.
 % It also requires the standard
-% \LaTeXe{} kernel commands \cs{ensuremath}, \cs{textsubscript} and
+% \LaTeXe{} kernel commands \cs{ensuremath}, \cs{mbox}, \cs{textsubscript} and
 % \cs{textsuperscript} for printing in text mode. The following packages are
 % also required to provide the functionality detailed.
 % \begin{itemize}
@@ -756,6 +756,7 @@
 % \begin{macro}{\@@_text_scripts_two:NnNn}
 % \begin{macro}{\@@_text_scripts_two:nn}
 % \begin{macro}{\@@_text_scripts_two:n}
+% \begin{macro}{\@@_text_fraction:Nnn}
 %   Typesetting in text mode is easy in font control terms but more tricky
 %   in the manipulation of the input. The easy part comes first.
 %    \begin{macrocode}
@@ -777,7 +778,9 @@
           }
           { \selectfont }
         \tl_use:N \l_@@_text_font_tl
-        \@@_text_replace:n {#1}
+        \exp_args:NnV \tl_if_head_eq_meaning:nNTF {#1} \l_siunitx_unit_fraction_tl
+          { \@@_text_fraction:Nnn #1 }
+          { \@@_text_replace:n {#1} }
       }
   }
 %    \end{macrocode}
@@ -913,6 +916,20 @@
       }
   }
 %    \end{macrocode}
+%   Fraction commands are always math mode, so we have to go back and forth:
+%   this is done after general font setting for performance reasons.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_text_fraction:Nnn #1#2#3
+  {
+    \ensuremath
+      { 
+        #1
+          { \mbox { \@@_text_replace:n {#2} } }
+          { \mbox { \@@_text_replace:n {#3} } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
