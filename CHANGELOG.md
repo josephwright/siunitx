@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Include `siunitx-abbreviations.cfg` in fallback v2 files
   (issue #419)
+- French translation of 'to' for ranges (issue #421)
 
 ## [v3.0.0]
 
