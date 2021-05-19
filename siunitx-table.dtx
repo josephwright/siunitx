@@ -316,6 +316,7 @@
 % \begin{macro}{\@@_collect_loop:}
 % \begin{macro}{\@@_collect_group:n}
 % \begin{macro}{\@@_collect_token:N}
+% \begin{macro}{\@@_collect_relax:N}
 % \begin{macro}{\@@_collect_search:NnF}
 % \begin{macro}{\@@_collect_search_aux:NNn}
 %   Collecting up the cell content needs a loop: this is done using
@@ -325,7 +326,8 @@
 %   (\foreign{cf.}~the approach in \pkg{collcell}): the special cases are
 %   pulled out for manual handling. The flexible lookup approach is more-or-less
 %   the same idea as in the kernel |case| functions. The |\relax| special case
-%   covers the case where |\\| has been expanded in an empty cell.
+%   covers the case where |\\| has been expanded in an empty cell. This has to
+%   be an explicit token as we can get the same meaning from |\protect|.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_loop:
   {
@@ -344,10 +346,19 @@
       {
         \unskip            { \@@_collect_loop: }
         \end               { \tabularnewline \end }
-        \relax             { \relax }
+        \relax             { \@@_collect_relax:N #1 }
         \tabularnewline    { \tabularnewline }
         \siunitx_cell_end: { \siunitx_cell_end: }
       }
+      {
+        \tl_put_right:Nn \l_@@_collect_tl {#1}
+        \@@_collect_loop:
+      }
+  }
+\cs_new_protected:Npn \@@_collect_relax:N #1
+  {
+    \str_if_eq:nnTF {#1} { \relax }
+      { \relax }
       {
         \tl_put_right:Nn \l_@@_collect_tl {#1}
         \@@_collect_loop:
@@ -391,6 +402,7 @@
       { \@@_collect_search_aux:NNn #1 }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
