@@ -15,6 +15,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option settings `group-digits = true` and `group-digits = false` (issue #422)
 - Correct position of decimal marker in some tables (issue #423)
 - Coloring of negative numbers in tables (issue #424)
+- Alignment of numbers when printing without a `table-format` (issue #424)
 - Emulation of `\celsius` (issue #426)
 - Allow `\cdot` to work in text mode (issue #430)
 
