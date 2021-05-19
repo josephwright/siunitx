@@ -278,7 +278,33 @@
                   \ifmmode \times \else \texttimes \fi
               }
           }
-          { \group_end: }
+          {
+            \tl_set:Nn \l_@@_tmpb_tl { 2 \cdot 10 ^ { 1 } }
+            \tl_if_eq:NNTF \l_@@_tmpa_tl \l_@@_tmpb_tl
+              {
+                \group_end:
+                \keys_set:nn { siunitx }
+                  {
+                    exponent-product =
+                      \ifmmode \cdot \else \textperiodcentered \fi
+                  }
+              }
+              { \group_end: }
+          }
+    \group_begin:
+      \tl_set:Nn \l_@@_tmpa_tl { \mathrm { m } \cdot \mathrm { s } }
+      \tl_set:Nn \l_siunitx_unit_font_tl { \mathrm }
+      \siunitx_unit_format:nN { m . s } \l_@@_tmpb_tl
+      \tl_if_eq:NNTF \l_@@_tmpa_tl \l_@@_tmpb_tl
+        {
+          \group_end:
+          \keys_set:nn { siunitx }
+            {
+              inter-unit-product =
+                \ifmmode \cdot \else \textperiodcentered \fi
+            }
+        }
+        { \group_end: }
   }
 %    \end{macrocode}
 %
