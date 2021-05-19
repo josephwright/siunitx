@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Documentation improvements
+- Better default for `product-symbol`
 
 ### Fixed
 - Option settings `group-digits = true` and `group-digits = false` (issue #422)
