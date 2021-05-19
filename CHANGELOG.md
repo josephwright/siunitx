@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Option settings `group-digits = true` and `group-digits = false` (issue #422)
+
 ## [v3.0.1]
 
 ### Added
