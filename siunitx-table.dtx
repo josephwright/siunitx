@@ -690,16 +690,26 @@
 % \begin{macro}{\@@_center_marker:}
 %   When centering on the decimal marker, the easiest approach is to simply
 %   re-box the two parts. That is needed whether or not we are parsing numbers,
-%   so is best as a short auxiliary.
+%   so is best as a short auxiliary. Notice that we need to allow for the width
+%   of the decimal marker itself.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_center_marker:
   {
+    \hbox_set:Nn \l_@@_tmp_box
+      { \ensuremath { \mathord { \l_siunitx_number_output_decimal_tl } } }
     \dim_compare:nNnTF
       { \box_wd:N \l_@@_integer_box }
-        > { \box_wd:N \l_@@_decimal_box }
+        >
+          {
+              \box_wd:N \l_@@_decimal_box
+            - \box_wd:N \l_@@_tmp_box
+          }
       {
         \hbox_set_to_wd:Nnn \l_@@_decimal_box
-          { \box_wd:N \l_@@_integer_box }
+          {
+              \box_wd:N \l_@@_integer_box
+            + \box_wd:N \l_@@_tmp_box
+          }
           {
             \hbox_unpack:N \l_@@_decimal_box
             \@@_fil:
@@ -707,7 +717,10 @@
       }
       {
         \hbox_set_to_wd:Nnn \l_@@_integer_box
-          { \box_wd:N \l_@@_decimal_box }
+          {
+              \box_wd:N \l_@@_decimal_box
+            - \box_wd:N \l_@@_tmp_box
+          }
           {
             \@@_fil:
             \hbox_unpack:N \l_@@_integer_box
