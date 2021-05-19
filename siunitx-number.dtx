@@ -65,7 +65,10 @@
 % \cs{gg} and \cs{ge} are used to replace two-character input; \cs{pm}
 % is also required for the output of uncertainties. The standard settings
 % require \cs{times}. For the display of colored negative numbers, the command
-% \cs{textcolor} is assumed to be available.
+% \cs{color} is assumed to be available. Where the latter may apply, numbers
+% should be printed inside a group: note that \TeX{} grouping is not added
+% \emph{within} formatted numbers as they may need to be decomposed into parts
+% (see \cs{siunitx_number_output:NN}).
 %
 % \section{Formatting numbers}
 %
@@ -3093,11 +3096,9 @@
 \cs_new:Npn
   \@@_output_sign_color:w #1 \@@_output_end:
   {
-    \exp_not:N \textcolor { \exp_not:V \l_@@_negative_color_tl }
-      {
-        #1
-        \@@_output_end:
-      }
+    \exp_not:N \color { \exp_not:V \l_@@_negative_color_tl }
+    #1
+    \@@_output_end:
   }
 \cs_new:Npn
   \@@_output_sign_brackets:w #1 \@@_output_end:
