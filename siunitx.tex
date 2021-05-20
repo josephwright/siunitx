@@ -2882,6 +2882,8 @@ notably
   \item prefixes can only be interconverted with numbers as part
     of a quantity, not as stand-alone units.
 \end{itemize}
+See Section~\ref{sec:hint:prefixes} for how to work with the new approach
+if you want to print prefix information.
 
 The font control system has been completely re-written for version~$3$. The
 method used is entirely different from version~$2$. Emulation is therefore not
@@ -3325,6 +3327,32 @@ rounding.
 Each extra entry should be a single token, and should either have a definition
 which is safe in both math and text mode, or should only be used when the
 output mode is known.
+
+\subsection{Demonstrating prefixes
+  \label{sec:hint:prefixes}}
+
+As \pkg{siunitx} contains data about the numerical values of unit prefixes,
+you may wish to print this in an automated way. Prefixes cannot be given
+on their own, but it is possible to create a \enquote{do nothing} unit.
+\begin{LaTeXdemo}[code only]
+  \DeclareSIUnit\noop{\relax}
+\end{LaTeXdemo}
+which can then be used to show just the prefix symbol.
+\begin{LaTeXdemo}
+  \unit{\yotta\noop}
+\end{LaTeXdemo}
+To show just the numerical value of a prefix, you will need to use \cs{qty}
+and appropriate settings.
+\begin{LaTeXdemo}
+  \qty[prefix-mode = extract-exponent, print-unity-mantissa = false]%
+    {1}{\yotta\noop}
+\end{LaTeXdemo}
+This may be conveniently wrapped up inside a document command, for example
+\begin{LaTeXdemo}[code only]
+  \NewDocumentCommand\prefixvalue{m}{%
+    \qty[prefix-mode=extract-exponent,print-unity-mantissa=false]{1}{#1\noop}
+  }
+\end{LaTeXdemo}
 
 \section{Using (\acro{SI}) units}
 
