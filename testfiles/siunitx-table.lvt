@@ -210,16 +210,17 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set_to_wd:Nnn \l_tmpa_box { 5cm }
+      { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
 \TEST { Option~setting~"parse-numbers"~in~tables }
   {
-    \OMIT
-    \cs_set_protected:Npn \test:n #1
-      {
-        \hbox_set_to_wd:Nnn \l_tmpa_box { 5cm }
-          { \siunitx_cell_begin:w \ignorespaces #1 \siunitx_cell_end: }
-        \box_show:N \l_tmpa_box
-      }
-    \TIMO
     \keys_set:nn { siunitx } { parse-numbers = false }
     \test:n { 12.34 }
     \test:n { 12.3 }
@@ -236,6 +237,15 @@
     \test:n { 12.34 }
     \test:n { 12.3 }
     \test:n {  2.34 }
+  }
+
+\TEST { Option~setting~"negative-color"~in~tables }
+  {
+    \test:n { 12.34 }
+    \test:n { -1.23 }
+    \keys_set:nn { siunitx } { negative-color = red }
+    \test:n { 12.34 }
+    \test:n { -1.23 }
   }
 
 \END

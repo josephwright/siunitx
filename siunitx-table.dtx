@@ -687,6 +687,26 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_color_check:N}
+% \begin{macro}{\@@_color_check:w}
+% \begin{macro}{\@@_color_check:Nnw}
+%   Handle the fact that splitting a number can leave a negative color
+%   dangling.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_color_check:N #1
+  { \exp_after:wN \@@_color_check:w #1 \q_stop }
+\cs_new_protected:Npn \@@_color_check:w #1 \q_nil #2 \q_nil #3 \q_stop
+  {
+    \tl_if_head_eq_meaning:nNT {#2} \color
+      { \@@_color_check:Nnw #2 \q_stop }
+  }
+\cs_new_protected:Npn \@@_color_check:Nnw #1#2#3 \q_stop
+  { \keys_set:nn { siunitx } { number-color = #2 } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\@@_center_marker:}
 %   When centering on the decimal marker, the easiest approach is to simply
 %   re-box the two parts. That is needed whether or not we are parsing numbers,
@@ -938,6 +958,7 @@
   {
     \tl_set:Nx \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_model_tl \q_nil }
+    \@@_color_check:N \l_@@_tmp_tl
     \exp_after:wN \@@_direct_format_aux:w
       \l_@@_tmp_tl \q_stop
   }
@@ -1102,6 +1123,7 @@
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
     \tl_set:Nx \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_tmp_tl \q_nil }
+    \@@_color_check:N \l_@@_tmp_tl
     \exp_after:wN \@@_print_marker:w
       \l_@@_tmp_tl \q_stop
     \box_use_drop:N \l_@@_after_box
@@ -1174,6 +1196,7 @@
         \exp_not:N \q_mark
         \siunitx_number_output:NN \l_@@_tmp_tl \q_nil
       }
+    \@@_color_check:N \l_@@_tmp_tl
     \exp_after:wN \@@_print_format_auxi:w
       \l_@@_tmp_tl \q_stop
     \hbox_set:Nn \l_@@_tmp_box { \l_@@_after_model_tl }
