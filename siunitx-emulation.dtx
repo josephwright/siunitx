@@ -990,6 +990,31 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% Units that have been removed.
+%    \begin{macrocode}
+\msg_new:nnnn { siunitx } { unit-removed }
+  { Unit~macro~#1~has~been~removed~in~this~release. }
+  {
+    The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
+    You~will~need~to~define~it~yourself~using~\token_to_str:N \DeclareSIUnit.
+  }
+\clist_map_inline:nn
+  {
+    \angstrom         ,
+    \atomicmassunit   ,
+    \bohr             ,
+    \clight           ,
+    \electronmass     ,
+    \elementarycharge ,
+    \hartree          ,
+    \plackbar
+  }
+  {
+    \siunitx_declare_unit:Nx #1
+      { \msg_error:nnn { siunitx } { unit-removed } { \token_to_str:N #1 } }
+  }
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</interfaces>
 %    \end{macrocode}
