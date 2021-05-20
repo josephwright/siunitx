@@ -11,7 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Emulation of `input-symbols (fixes #431)
+- Emulation of `input-symbols` (fixes #431)
 - Standard setting for `group-minimum-digits` (issue #436)
 - Application of negative color in table cells (issue #439)
 
