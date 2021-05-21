@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.4]
+
 ### Changed
 - Standardise and document the position of `\color` in negative values
   within the code-level API
@@ -1287,7 +1289,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.3...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.4...HEAD
+[v3.0.4]: https://github.com/josephwright/siunitx/compare/v3.0.3...v3.0.4
 [v3.0.3]: https://github.com/josephwright/siunitx/compare/v3.0.2...v3.0.3
 [v3.0.2]: https://github.com/josephwright/siunitx/compare/v3.0.1...v3.0.2
 [v3.0.1]: https://github.com/josephwright/siunitx/compare/v3.0.0...v3.0.1
