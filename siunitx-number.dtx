@@ -68,7 +68,9 @@
 % \cs{color} is assumed to be available. Where the latter may apply, numbers
 % should be printed inside a group: note that \TeX{} grouping is not added
 % \emph{within} formatted numbers as they may need to be decomposed into parts
-% (see \cs{siunitx_number_output:NN}).
+% (see \cs{siunitx_number_output:NN}). Such a color will be the \emph{first}
+% part of the result, meaning that a test for an initial |\color| and following
+% brace group may be used to detect/remove/adjust this part.
 %
 % \section{Formatting numbers}
 %
@@ -3008,6 +3010,7 @@
   }
 \cs_new:Npn \@@_output:nnnnnnn #1#2#3#4#5#6#7#8
   {
+    \@@_output_color:n {#2}
     \@@_output_comparator:nn {#1} {#8}
     \@@_output_bracket:nn {#5} {#7}
     \@@_output_sign:nnn {#1} {#2} {#8}
@@ -3045,6 +3048,17 @@
     \@@_output_exponent:nnnn
   }
 %    \end{macrocode}
+%   As color for negative values applies to the \emph{whole} output, we have
+%   to deal with it before anything else. 
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_color:n #1
+  {
+    \bool_lazy_and:nnT
+      { \str_if_eq_p:nn {#1} { - } }
+      { ! \tl_if_empty_p:N \l_@@_negative_color_tl }
+      { \exp_not:N \color { \exp_not:V \l_@@_negative_color_tl } }
+  }
+%    \end{macrocode}
 %   To get the spacing correct this needs to be an ordinary math character.
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_comparator:nn #1#2
@@ -3055,11 +3069,11 @@
   }
 %    \end{macrocode}
 %   Formatting signs has to deal with some additional formatting requirements
-%   for negative numbers. Both making such numbers a fixed color and bracketing
-%   them needs some rearrangement of the order of tokens, which is set up in
-%   the main formatting macro by the dedicated do-nothing end function. We
-%   also have the comparator passed here: if it is present, we need to deal
-%   with tighter spacing.
+%   for negative numbers. Making such numbers by bracketing them needs some
+%   rearrangement of the order of tokens, which is set up in the main
+%   formatting macro by the dedicated do-nothing end function. We also have
+%   the comparator passed here: if it is present, we need to deal with
+%   tighter spacing.
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_sign:nnn #1#2#3
   {
@@ -3071,8 +3085,6 @@
       {
         \str_if_eq:nnTF {#2} { - }
           {
-            \tl_if_empty:NF \l_@@_negative_color_tl
-              { \@@_output_sign_color:w }
             \bool_if:NTF \l_@@_bracket_negative_bool
               { \@@_output_sign_brackets:w }
               { \@@_output_sign:nN {#1} #2 }
@@ -3092,13 +3104,6 @@
     \bool_if:NTF \l_@@_tight_bool
       { \exp_not:n { \mathord {#1} } }
       { \exp_not:n {#1} }
-  }
-\cs_new:Npn
-  \@@_output_sign_color:w #1 \@@_output_end:
-  {
-    \exp_not:N \color { \exp_not:V \l_@@_negative_color_tl }
-    #1
-    \@@_output_end:
   }
 \cs_new:Npn
   \@@_output_sign_brackets:w #1 \@@_output_end:
