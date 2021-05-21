@@ -11,6 +11,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Standardise and document the position of `\color` in negative values
   within the code-level API
 
+### Fixed
+- Alignment of integers in tables when `parse-numbers = tables` (issue #442)
+
 ## [v3.0.3]
 
 ### Changed
