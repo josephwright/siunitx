@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.5]
+
 ### Changed
 - Documentation improvements
 
@@ -1299,7 +1301,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.5...HEAD
+[v3.0.5]: https://github.com/josephwright/siunitx/compare/v3.0.4...v3.0.5
 [v3.0.4]: https://github.com/josephwright/siunitx/compare/v3.0.3...v3.0.4
 [v3.0.3]: https://github.com/josephwright/siunitx/compare/v3.0.2...v3.0.3
 [v3.0.2]: https://github.com/josephwright/siunitx/compare/v3.0.1...v3.0.2
