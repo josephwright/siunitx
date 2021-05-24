@@ -310,8 +310,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_unit_tl}
+% \begin{variable}{\l_@@_unit_bool, \l_@@_unit_tl}
 %    \begin{macrocode}
+\bool_new:N \l_@@_unit_bool
 \tl_new:N \l_@@_unit_tl
 %    \end{macrocode}
 % \end{variable}
@@ -412,6 +413,7 @@
 %
 % \begin{macro}{\siunitx_compound_number:n}
 % \begin{macro}{\@@_format:n}
+% \begin{macro}{\@@_format:nn}
 % \begin{macro}{\@@_format:nnn}
 %   Printing a generic set starts with the question of whether we want to
 %   extract exponents. If we do, then there is the work to do with extraction.
@@ -421,6 +423,7 @@
 \cs_new_protected:Npn \siunitx_compound_number:n #1
   {
     \group_begin:
+      \bool_set_false:N \l_@@_unit_bool
       \@@_format:nn {#1} { }
       \@@_print:N \siunitx_print_number:x
     \group_end:
@@ -445,16 +448,25 @@
 \cs_new_protected:Npn \@@_format:nnn #1#2#3
   {
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-    \tl_if_blank:nTF {#3}
-      { \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl }
+    \bool_if:NTF \l_@@_unit_bool
       { \@@_format_units:nn {#2} {#3} }
+      { \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl }
     \bool_lazy_and:nnTF
       { \l_@@_exp_combine_bool }
       { \int_compare_p:nNn { \tl_count:n {#2} } > 0 }
       { \@@_extract_exponents: }
       {
-        \tl_set:Nx \l_@@_tmp_tl
-          { \siunitx_number_output:N \l_@@_first_tl }
+        \bool_if:NTF \l_@@_unit_bool
+          {
+            \tl_set:Nx \l_@@_tmp_tl
+              { \siunitx_number_output:NN \l_@@_first_tl \q_nil }
+            \tl_set:Nx \l_@@_tmp_tl
+              { \@@_uncert_bracket:N \l_@@_tmp_tl }
+          }
+          {
+            \tl_set:Nx \l_@@_tmp_tl
+              { \siunitx_number_output:N \l_@@_first_tl }
+          }
         \seq_put_right:NV \l_@@_tmp_seq \l_@@_tmp_tl
       }
     \tl_map_function:nN {#2} \@@_parsed:n
@@ -508,13 +520,23 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
 %   The simple cases for parsing (or not) all entries.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:n #1
   {
-    \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+    \bool_if:NTF \l_@@_unit_bool
+      {
+        \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
+        \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
+        \tl_set:Nx \l_@@_tmp_tl
+          { \siunitx_number_output:NN \l_@@_tmp_tl \q_nil }
+        \tl_set:Nx \l_@@_tmp_tl
+          { \@@_uncert_bracket:N \l_@@_tmp_tl }
+      }
+      { \siunitx_number_format:nN {#1} \l_@@_tmp_tl }
     \seq_put_right:NV \l_@@_tmp_seq \l_@@_tmp_tl
   }
 \cs_new_protected:Npn \@@_unparsed:n #1
@@ -642,6 +664,7 @@
         { \l_@@_unit_bracket_bool }
         { ! \l_@@_unit_repeat_bool }
         { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
+      \bool_set_true:N \l_@@_unit_bool
       \@@_format:nn {#1} {#2}
       \str_if_eq:VnT \l_siunitx_quantity_prefix_mode_tl { combine-exponent }
         { \tl_clear:N \l_@@_exp_tl }
@@ -781,6 +804,36 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[EXP]{\@@_uncert_bracket:N}
+% \begin{macro}[EXP]{\@@_uncert_bracket:w}
+% \begin{macro}[EXP]{\@@_uncert_bracket:nnw}
+%   Check for the case where there is a separate uncertainty but not exponent,
+%   when we are handling units.
+%    \begin{macrocode}
+\cs_new:Npn \@@_uncert_bracket:N #1
+  { \exp_after:wN \@@_uncert_bracket:w #1 \q_stop }
+\cs_new:Npn \@@_uncert_bracket:w
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil
+  #8 \q_nil #9 \q_stop
+  { \@@_uncert_bracket:nnw {#1#2#3#4#5#6} {#7#8} #9 \q_stop }
+\cs_new:Npn \@@_uncert_bracket:nnw #1#2 #3 \q_nil #4 \q_nil #5 \q_stop
+  {
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#2#3} }
+      { ! \tl_if_blank_p:n {#5} }
+      { \exp_not:n {#1#2#3#4#5} }
+      {
+        \exp_not:V \l_@@_bracket_open_tl
+        \exp_not:n {#1#2#3}
+        \exp_not:V \l_@@_bracket_close_tl
+        \exp_not:n {#4#5}
+      }
+  }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}

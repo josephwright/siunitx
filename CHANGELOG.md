@@ -11,6 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
+- Bracket separate uncertainties in compound quantities
+  (issue #441)
 - Color negative values in table cells correctly (issue #444)
 - Avoid consumption of any math alphabets (issue #445)
 - Mark `\bar` as removed (issue #448)
