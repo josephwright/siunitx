@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
+- Avoid consumption of any math alphabets (issue #445)
 - Mark `\bar` as removed (issue #448)
 
 ## [v3.0.4]

@@ -82,6 +82,9 @@
 %     in text mode
 %   \item \pkg{amstext}: the \cs{text} command for printing in text mode
 % \end{itemize}
+% For detection of math mode fonts, as well as \cs{mathrm}, the existence of
+% \cs{symoperators} is assumed; other math font commands are not
+% \emph{required} to exist.
 %
 % \begin{function}
 %   {
@@ -317,51 +320,12 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{variable}{\l_@@_tmp_box, \l_@@_tmp_tl}
+% \begin{variable}{\l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
-\box_new:N \l_@@_tmp_box
 \tl_new:N \l_@@_tmp_tl
 %    \end{macrocode}
 % \end{variable}
-%
-% \begin{macro}{\document}
-% \begin{macro}{\@@_store_fam:n}
-% \begin{variable}{\c_@@_mathrm_int, \c_@@_mathsf_int, \c_@@_mathtt_int}
-%   In order to test math fonts, we need information about the \cs{fam} used
-%   by the various options. As we are doing typesetting (if only in a box), we
-%   need to be right at the start of the document: this also avoids any issue
-%   with \pkg{fontspec}. With a sufficiently recent \LaTeXe{} this is easy;
-%   for older kernels, we have to do things manually.
-%    \begin{macrocode}
-\IfFormatAtLeastTF { 2020-10-01 }
-  { \hook_gput_code:nnn { begindocument/end } { siunitx } }
-  { \tl_put_right:Nn \document }
-    {
-      \@@_store_fam:n { rm }
-      \@@_store_fam:n { sf }
-      \@@_store_fam:n { tt }
-    }
-\IfFormatAtLeastTF { 2020-10-01 }
-  { }
-  { \tl_put_right:Nn \document { \ignorespaces } }
-\cs_new_protected:Npn \@@_store_fam:n #1
-  {
-    \group_begin:
-      \hbox_set:Nn \l_@@_tmp_box
-        {
-          \ensuremath
-            {
-              \use:c { math #1 }
-                { \int_const:cn { c_@@_math #1 _int } { \fam } }
-            }
-        }
-    \group_end:
-  }
-%    \end{macrocode}
-% \end{variable}
-% \end{macro}
-% \end{macro}
 %
 % \subsection{Printing routines}
 %
@@ -559,6 +523,8 @@
 %     \@@_math_auxiv:n,
 %     \@@_math_auxv:n
 %   }
+% \begin{macro}{\@@_math_aux:N}
+% \begin{macro}{\@@_math_aux:w}
 % \begin{macro}{\@@_math_aux:Nn, \@@_math_aux:cn}
 % \begin{macro}{\@@_math_sub:n, \@@_math_super:n, \@@_math_script:n}
 % \begin{macro}{\@@_math_text:n}
@@ -661,14 +627,7 @@
 \cs_new_protected:Npn \@@_math_auxiv:n #1
   {
     \bool_if:NTF \l_@@_math_font_bool
-      {
-        \int_case:nnF \fam
-          {
-            \c_@@_mathsf_int { \@@_math_aux:Nn \mathsf }
-            \c_@@_mathtt_int { \@@_math_aux:Nn \mathtt }
-          }
-          { \use:n }
-      }
+      { \@@_math_aux:N \mathsf \mathtt \q_recursion_tail \q_recursion_stop }
       { \@@_math_auxv:n }
         {#1}
   }
@@ -676,10 +635,23 @@
   {
     \bool_lazy_or:nnTF
       { \int_compare_p:nNn \fam = { -1 } }
-      { \int_compare_p:nNn \fam = \c_@@_mathrm_int }
+      { \int_compare_p:nNn \fam = \symoperators }
       { \use:n }
       { \mathrm }
         {#1}
+  }
+\cs_new_protected:Npn \@@_math_aux:N #1
+  {
+    \quark_if_recursion_tail_stop_do:Nn #1 { \use:n }
+    \exp_after:wN \exp_after:wN \exp_after:wN \@@_math_aux:w
+      \cs:w \cs_to_str:N #1 \c_space_tl \cs_end:
+        \use@mathgroup ? { -2 } \q_stop #1
+  }
+\cs_new_protected:Npn \@@_math_aux:w #1 \use@mathgroup #2#3 #4 \q_stop #5
+  {
+    \int_compare:nNnTF \fam = {#3}
+      { \use_i_delimit_by_q_recursion_stop:nw { \@@_math_aux:Nn #5 } }
+      { \@@_math_aux:N }
   }
 %    \end{macrocode}
 %   Search-and-replace fun: deal with any font commands  in the argument and
@@ -735,6 +707,8 @@
       { }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
