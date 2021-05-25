@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Avoid error if `forbid-literal-units` is set in the preamble
+  (issue #452)
+
 ## [v3.0.5]
 
 ### Changed
