@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Avoid error if `forbid-literal-units` is set in the preamble
   (issue #452)
+- Format separate uncertainty correctly where it falls purely
+  in the integer part (issue #454)
 
 ## [v3.0.5]
 
