@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Issue a warning for removed option `load-configurations`
+  (issue #455)
+
 ## [v3.0.6]
 
 ### Changed
