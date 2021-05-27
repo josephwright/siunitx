@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Issue a warning for removed option `load-configurations`
   (issue #455)
+- Printing of `\times` and `\cdot` in text mode when using a
+  locale (issue #457)
 
 ## [v3.0.6]
 
