@@ -8,6 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Formating of some literal units (issue #449)
 - Issue a warning for removed option `load-configurations`
   (issue #455)
 - Printing of `\times` and `\cdot` in text mode when using a
