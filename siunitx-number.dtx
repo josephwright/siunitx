@@ -2860,6 +2860,7 @@
 %      \l_@@_group_minimum_int      ,
 %      \l_@@_group_separator_tl     ,
 %      \l_@@_negative_color_tl      ,
+%      \l_@@_output_exp_marker_tl   ,
 %      \l_@@_output_uncert_close_tl ,
 %      \l_@@_output_uncert_open_tl  ,
 %      \l_@@_uncert_mode_tl         ,
@@ -2912,6 +2913,8 @@
       \l_@@_output_uncert_close_tl ,
     output-decimal-marker .tl_set:N =
       \l_siunitx_number_output_decimal_tl ,
+    output-exponent-marker .tl_set:N =
+      \l_@@_output_exp_marker_tl ,
     output-open-uncertainty .tl_set:N =
       \l_@@_output_uncert_open_tl ,
     print-implicit-plus .bool_set:N =
@@ -2980,7 +2983,13 @@
 %     \@@_output_uncert_S_compact-marker:nn ,
 %     \@@_output_uncert_S_full:nn
 %   }
-% \begin{macro}[rEXP]{\@@_output_exponent:nnnn}
+% \begin{macro}[rEXP]
+%   {
+%     \@@_output_exponent:nnnn       ,
+%     \@@_output_exponent_auxi:nnnn  ,
+%     \@@_output_exponent_auxii:nnnn
+%   }
+% \begin{macro}[rEXP]{\@@_output_exponent_auxiii:nn}
 % \begin{macro}[rEXP]{\@@_output_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts. All of the parts are assembled including
@@ -3371,30 +3380,45 @@
       { \l_@@_zero_exponent_bool }
       { ! \str_if_eq_p:nn {#2} { 0 } }
       {
-        \bool_lazy_and:nnTF
-          { \str_if_eq_p:nn {#3} { 1. } }
-          { ! \l_@@_unity_mantissa_bool }
-          { \exp_not:n {#4} }
-          {
-            \bool_if:NTF \l_@@_tight_bool
-              { \exp_not:N \mathord }
-              { \use:n }
-                { \exp_not:V \l_@@_exponent_product_tl }
-            \exp_not:n {#4}
-          }
-        \exp_not:V \l_@@_exponent_base_tl
-        ^
-          {
-            \tl_if_blank:nTF {#1}
-              {
-                \bool_if:NT \l_@@_implicit_plus_bool
-                  { \@@_output_sign:N + }
-              }
-              { \@@_output_sign:N #1 }
-            \@@_output_digits:nn { integer } {#2}
-          }
+        \tl_if_empty:NTF \l_@@_output_exp_marker_tl
+          { \@@_output_exponent_auxi:nnnn }
+          { \@@_output_exponent_auxii:nnnn }
+            {#1} {#2} {#3} {#4}
       }
       { \exp_not:n {#4} }
+  }
+\cs_new:Npn \@@_output_exponent_auxi:nnnn #1#2#3#4
+  {
+    \bool_lazy_and:nnTF
+      { \str_if_eq_p:nn {#3} { 1. } }
+      { ! \l_@@_unity_mantissa_bool }
+      { \exp_not:n {#4} }
+      {
+        \bool_if:NTF \l_@@_tight_bool
+          { \exp_not:N \mathord }
+          { \use:n }
+            { \exp_not:V \l_@@_exponent_product_tl }
+        \exp_not:n {#4}
+      }
+    \exp_not:V \l_@@_exponent_base_tl
+    ^
+      { \@@_output_exponent_auxiii:nn {#1} {#2} }
+  }
+\cs_new:Npn \@@_output_exponent_auxii:nnnn #1#2#3#4
+  {
+    \exp_not:n {#4}
+    \exp_not:V \l_@@_output_exp_marker_tl
+    \@@_output_exponent_auxiii:nn {#1} {#2}
+  }
+\cs_new:Npn \@@_output_exponent_auxiii:nn #1#2
+  {
+    \tl_if_blank:nTF {#1}
+      {
+        \bool_if:NT \l_@@_implicit_plus_bool
+          { \@@_output_sign:N + }
+      }
+      { \@@_output_sign:N #1 }
+    \@@_output_digits:nn { integer } {#2}
   }
 %    \end{macrocode}
 %   A do-nothing marker used to allow shuffling of the output and so expandable
@@ -3402,6 +3426,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
