@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Emulation of `group-four-digits` (issue #460)
+
 ## [v3.0.7]
 
 ### Fixed
