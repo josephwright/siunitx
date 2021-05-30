@@ -3127,12 +3127,9 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_integer:nnn #1#2#3
   {
-    \bool_lazy_any:nT
-      {
-        { \l_@@_unity_mantissa_bool }
-        { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
-        { ! \str_if_eq_p:nn {#3} { 0 } }
-      }
+    \bool_lazy_or:nnT
+      { \l_@@_unity_mantissa_bool }
+      { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
       { \@@_output_digits:nn { integer } {#1} }
   }
 \cs_new:Npn \@@_output_decimal:nn #1#2
@@ -3388,10 +3385,9 @@
   }
 \cs_new:Npn \@@_output_exponent_auxi:nnnn #1#2#3#4
   {
-    \bool_lazy_and:nnTF
-      { \str_if_eq_p:nn {#3} { 1. } }
-      { ! \l_@@_unity_mantissa_bool }
-      { \exp_not:n {#4} }
+    \bool_lazy_or:nnTF
+      { \l_@@_unity_mantissa_bool }
+      { ! \str_if_eq_p:nn {#3} { 1. } }
       {
         \bool_if:NTF \l_@@_tight_bool
           { \exp_not:N \mathord }
@@ -3399,6 +3395,7 @@
             { \exp_not:V \l_@@_exponent_product_tl }
         \exp_not:n {#4}
       }
+      { \exp_not:n {#4} }
     \exp_not:V \l_@@_exponent_base_tl
     ^
       { \@@_output_exponent_auxiii:nn {#1} {#2} }
