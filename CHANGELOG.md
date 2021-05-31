@@ -8,6 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Changed
+- Documentation improvements
 - Add `\barn`, `\knot`, `\mmHg`, `\nauticalmile` to list of
   deprecated units
 - Provide a fallback route for deprecated units

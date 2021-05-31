@@ -2848,18 +2848,13 @@ letters may be used: these must be single tokens. For example, provided the
 \pkg{numprint} package has not been loaded, the letter |n| could be used as
 this would suggest a numerical column.
 
-\section{Upgrading from version~\texorpdfstring{$2$}{2}}
+\section{Upgrading from version~\texorpdfstring{$2$}{2}%
+  \label{sec:upgrading}}
 
 The package has been largely re-written internally between versions $2$ and
 $3$. A significant number of key--value settings have new, more descriptive,
 names. Where possible, older names are mapped to newer ones internally: you
 will be warned in the log if this is the case.
-
-Updating to the latest edition of the \acro{SI} Brochure means that a small
-number of unit macros have been removed: of those accepted for use,
-\cs{angstrom} is no longer present, whilst the units determined experimentally
-are all no longer listed (\cs{atomicmassunit}, \cs{bohr}, \cs{clight},
-\cs{electronmass}, \cs{elementarycharge}, \cs{hartree}, \cs{planckbar}).
 
 It is possible to use the \LaTeXe{} kernel mechanism to load the last
 version~$2$ release for documents that cannot be successfully processed using
@@ -2934,6 +2929,48 @@ or
 
 If you are using \opt{table-column-width} to have fixed-width columns, you
 also now need \opt{table-fixed-width} to set this option active.
+
+\section{Unit changes made by \acro{BIPM}}
+
+In addition to the changes in the \pkg{siunitx} package described in
+Section~\ref{sec:upgrading}, there are changes in the units defined by the
+\acro{BIPM} in the 9th Edition of the \acro{SI} Brochure which are reflected
+here. There are two major areas of change.
+
+The first is in respect of units accepted for use with \acro{SI} units. In the
+8th Edition of the \acro{SI} Brochure, the following units were listed as
+accepted for use in specialist fields
+\begin{itemize}
+  \item ångström (\cs{angstrom})
+  \item bar (\cs{bar})
+  \item barn (\cs{barn})
+  \item knot (\cs{knot})
+  \item millimetre of mercury (\cs{mmHg})
+  \item nautical mile (\cs{nauticalmile})
+\end{itemize}
+These are no longer listed in the 9th Edition, and so are deprecated as
+pre-defined units by \pkg{siunitx}. These units will issue a warning on first
+use, and users should add their own definitions to the start of their sources
+to avoid this.
+
+Secondly, the move to a new definition of base units means that the table of
+units determined experimentally has been removed from the \acro{SI} Brochure.
+This covers the following units defined by \pkg{siunitx} in previous releases
+\begin{itemize}
+  \item \cs{bohr}
+  \item \cs{clight}
+  \item \cs{electronmass}
+  \item \cs{elementarycharge}
+  \item 	\cs{hartree}
+  \item \cs{planckbar}
+\end{itemize}
+These are also deprecated in \pkg{siunitx} and users should provide their own
+definitions.
+
+In addition to these two major blocks, the unit \cs{atomicmassunit} has similar
+deprecated status: this was listed as with experimentally-determined units in
+the 8th Edition of the \acro{SI} Brochure but is equivalent to the dalton, a
+unit which remains accepted.
 
 \section{Localisation}
 
