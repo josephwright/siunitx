@@ -2930,7 +2930,8 @@ or
 If you are using \opt{table-column-width} to have fixed-width columns, you
 also now need \opt{table-fixed-width} to set this option active.
 
-\section{Unit changes made by \acro{BIPM}}
+\section{Unit changes made by \acro{BIPM}%
+  \label{sec:BIPM8}}
 
 In addition to the changes in the \pkg{siunitx} package described in
 Section~\ref{sec:upgrading}, there are changes in the units defined by the
@@ -3406,6 +3407,28 @@ This may be conveniently wrapped up inside a document command, for example
   \NewDocumentCommand\prefixvalue{m}{%
     \qty[prefix-mode=extract-exponent,print-unity-mantissa=false]{1}{#1\noop}
   }
+\end{LaTeXdemo}
+
+\subsection{Creating a set of pre-defined units%
+  \label{sec:hint:config}}
+
+There are many units which sit outside of those defined in the (current)
+\acro{SI} Brochure which are of use to many people. Most obvious are those
+which have been detailed in previous editions of the Brochure, as described
+in Section~\ref{sec:BIPM8}, but there are many others.
+
+It is often convenient to have a pre-defined set of useful units available
+without needing to copy the full set of definitions into each source file. At
+the same time, it is important that such sources do show that they are using
+units not defined by the core part of \pkg{siunitx}. The most straight-forward
+way to acheive this is to create a separate file, for example
+\texttt{siunitx-local-units.tex}, and place it in your local \TeX{} tree
+(usually \verb|~/texmf/tex/latex/| on Linux, \verb|~/Library/texmf/tex/latex/|
+on macOS or \verb|C:\Users\<name>\texmf\tex\latex| on Windows). This can then
+be loaded in the preamble using
+\begin{LaTeXdemo}[code only]
+  % Load useful 'local' units
+  \input{siunitx-local-units}
 \end{LaTeXdemo}
 
 \section{Using (\acro{SI}) units}
