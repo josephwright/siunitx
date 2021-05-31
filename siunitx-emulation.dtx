@@ -1010,33 +1010,68 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% Units that have been removed.
+% Units that have been removed: to avoid issues, we mark them as deprecated.
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx } { unit-removed }
-  { Unit~macro~#1~has~been~removed~in~this~release. }
+\msg_new:nnnn { siunitx } { unit-deprecated }
+  { Unit~macro~#1~has~been~deprecated~in~this~release. }
   {
     The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
-    You~will~need~to~define~it~yourself~using~\token_to_str:N \DeclareSIUnit.
+    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit
+    in~your~source.
   }
-\clist_map_inline:nn
+\cs_gset_protected:Npn \@@_tmp:w #1#2
   {
-    \angstrom         ,
-    \atomicmassunit   ,
-    \bar              ,
-    \barn             ,
-    \bohr             ,
-    \clight           ,
-    \electronmass     ,
-    \elementarycharge ,
-    \hartree          ,
-    \mmHg             ,
-    \nauticalmile     ,
-    \planckbar
-  }
-  {
+    \quark_if_recursion_tail_stop:N #1
+    \bool_new:c { g_@@_unit_warning_ \token_to_str:N #1 _bool }
     \siunitx_declare_unit:Nx #1
-      { \msg_error:nnn { siunitx } { unit-removed } { \token_to_str:N #1 } }
+      {
+        \exp_not:N \bool_if:NF
+          \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
+          {
+            \exp_not:N \bool_gset_true:N 
+              \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
+            \msg_warning:nnn { siunitx } { unit-deprecated }
+              { \token_to_str:N #1 }
+          }
+        #2
+      }
+    \@@_tmp:w
   }
+\@@_tmp:w
+  \atomicmassunit   { u }
+  \bar              { bar }
+  \barn             { b }
+  \bohr
+    { \text { \ensuremath { a } } \char_generate:nn { `\_ } { 8 } { 0 } }
+  \clight
+    { \text { \ensuremath { c } } \char_generate:nn { `\_ } { 8 } { 0 } }
+  \electronmass
+    {
+      \text { \ensuremath { m } }
+      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { e } }
+    }
+  \elementarycharge { \text { \ensuremath { e } } }
+  \hartree
+    {
+      \text { \ensuremath { E } }
+      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { h } }
+    }
+  \mmHg             { mmHg }
+  \nauticalmile     { M }
+  \planckbar
+    { \text { \ensuremath { \exp_not:N \hbar } } }
+  \q_recursion_tail { }
+  \q_recursion_stop
+\@ifpackageloaded { fontspec }
+  {
+    \@@_tmp:w \angstrom { \@@_non_latin:n { "00C5 } }
+  }
+  {
+    \@@_tmp:w \angstrom
+      { \exp_not:N \text { \@@_non_latin:n { "00C5 } } }
+  }
+  \q_recursion_tail { }
+  \q_recursion_stop
 %    \end{macrocode}
 %
 %    \begin{macrocode}
