@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.8]
+
 ### Changed
 - Documentation improvements
 - Add `\barn`, `\knot`, `\mmHg`, `\nauticalmile` to list of
@@ -1332,7 +1334,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.7...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.8...HEAD
+[v3.0.8]: https://github.com/josephwright/siunitx/compare/v3.0.7...v3.0.8
 [v3.0.7]: https://github.com/josephwright/siunitx/compare/v3.0.6...v3.0.7
 [v3.0.6]: https://github.com/josephwright/siunitx/compare/v3.0.5...v3.0.6
 [v3.0.5]: https://github.com/josephwright/siunitx/compare/v3.0.4...v3.0.5
