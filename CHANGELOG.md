@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Add `\barn`, `\mmHg`, `\nauticalmile` to list of deprected
+  units
+
 ### Fixed
 - Correct printing of `10^{0}` (issue #459)
 - Emulation of `group-four-digits` (issue #461)
