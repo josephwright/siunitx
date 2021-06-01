@@ -15,6 +15,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Suppress some spurious overfull box warnings 
 - Printing in text mode for compound quantities (issue #463)
 - Correctly handle `\protect` in literal units (issue #464)
+- Interpretation of uncertainties in integers (issue #465)
 
 ## [v3.0.8]
 
