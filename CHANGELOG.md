@@ -14,14 +14,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Suppress some spurious overfull box warnings 
 - Printing in text mode for compound quantities (issue #463)
-- Correcly handle `\protect` in literal units (issue #464)
+- Correctly handle `\protect` in literal units (issue #464)
 
 ## [v3.0.8]
 
 ### Changed
 - Documentation improvements
-- Add `\barn`, `\knot`, `\mmHg`, `\nauticalmile` to list of
-  deprecated units
+- Add `\barn`, `\knot`, `\mmHg`, `\nauticalmile` to list of deprecated units
 - Provide a fallback route for deprecated units
 
 ### Fixed
@@ -32,10 +31,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Formatting of some literal units (issue #449)
-- Issue a warning for removed option `load-configurations`
-  (issue #455)
-- Printing of `\times` and `\cdot` in text mode when using a
-  locale (issue #457)
+- Issue a warning for removed option `load-configurations` (issue #455)
+- Printing of `\times` and `\cdot` in text mode when using a locale
+  (issue #457)
 - Implement missing `output-exponent-marker` (issue #458)
 
 ## [v3.0.6]
@@ -44,10 +42,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Avoid error if `forbid-literal-units` is set in the preamble
-  (issue #452)
-- Format separate uncertainty correctly where it falls purely
-  in the integer part (issue #454)
+- Avoid error if `forbid-literal-units` is set in the preamble (issue #452)
+- Format separate uncertainty correctly where it falls purely in the integer
+  part (issue #454)
 
 ## [v3.0.5]
 
@@ -55,8 +52,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Bracket separate uncertainties in compound quantities
-  (issue #441)
+- Bracket separate uncertainties in compound quantities (issue #441)
 - Color negative values in table cells correctly (issue #444)
 - Avoid consumption of any math alphabets (issue #445)
 - Mark `\bar` as removed (issue #448)
@@ -107,8 +103,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Printing of fractional units in text mode (issue #418)
-- Include `siunitx-abbreviations.cfg` in fallback v2 files
-  (issue #419)
+- Include `siunitx-abbreviations.cfg` in fallback v2 files (issue #419)
 - French translation of 'to' for ranges (issue #421)
 
 ## [v3.0.0]
