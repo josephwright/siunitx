@@ -1181,7 +1181,12 @@
 % \begin{macro}{\@@_format_literal_auxiii:w}
 % \begin{macro}{\@@_format_literal_auxiv:n}
 % \begin{macro}{\@@_format_literal_auxv:nw}
-% \begin{macro}{\@@_format_literal_auxvi:nN}
+% \begin{macro}
+%   {
+%     \@@_format_literal_auxvi:nN   ,
+%     \@@_format_literal_auxvii:nN  ,
+%     \@@_format_literal_auxviii:nN
+%   }
 % \begin{macro}{\@@_format_literal_super:nn, \@@_format_literal_sub:nn}
 % \begin{macro}{\@@_format_literal_add:n}
 % \begin{macro}{\@@_format_literal_auxvii:nn}
@@ -1293,9 +1298,20 @@
         \exp_not:N \token_if_eq_meaning:NNTF
           #2 \c_@@_math_subscript_tl
           { \exp_not:N \@@_format_literal_sub:nn {#1} }
-          { \exp_not:N \@@_format_literal_auxvi:nN {#1#2} }
+          { \exp_not:N \@@_format_literal_auxvii:nN {#1} #2 }
       }
   }
+%    \end{macrocode}
+%   We need to make sure |\protect| sticks with the next token.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_literal_auxvii:nN #1#2
+  {
+    \str_if_eq:nnTF {#2} { \protect }
+      { \@@_format_literal_auxviii:nN {#1} }
+      { \@@_format_literal_auxvi:nN {#1#2} }
+  }
+\cs_new_protected:Npn \@@_format_literal_auxviii:nN #1#2
+  { \@@_format_literal_auxvii:nN { #1 \protect #2 } }
 \cs_new_protected:Npn \@@_format_literal_super:nn #1#2
   {
     \quark_if_recursion_tail_stop:n {#2}
