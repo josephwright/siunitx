@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Documenation improvements
+- Add a hint for formatting regression tables
 
 ### Fixed
 - Suppress some spurious overfull box warnings 
