@@ -2709,6 +2709,7 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn,  \@@_round_uncertainty_aux:nnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_aux:nnnnnn}
 %   Rounding to an uncertainty can only happen where the result will have some
 %   uncertainty left: otherwise we simply drop the uncertainty entirely. Only
 %   |S|-type uncertainties can be used for rounding.
@@ -2754,23 +2755,37 @@
       { \int_eval:n { \tl_count:n {#5} - \tl_count:n {#2} } }
       {#1} {#2} {#3} {#4}
   }
+%    \end{macrocode}
+%   The first argument here deals with the case where we've lost digits
+%   in the uncertainty and it's purely located in the integer part.
+%    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_aux:nnnnn #1#2#3#4#5
   {
-    \tl_if_blank:nTF {#2}
+    \exp_args:Nf \@@_round_uncertainty_aux:nnnnnn
+      {
+        \tl_if_blank:nT {#5}
+          { \prg_replicate:nn {#1} { 0 } }
+      }
+      {#1} {#2} {#3} {#4} {#5}
+  }
+\cs_new:Npn \@@_round_uncertainty_aux:nnnnnn #1#2#3#4#5#6
+  {
+    \tl_if_blank:nTF {#3}
       {
         \@@_round:nnn
-          {#1}
-          {#4} {#5}
-        { { S } {#3} }
+          {#2}
+          {#5} {#6}
+        { { S } { #4 #1 } }
       }
       {
         \@@_round:fnn
-          { \int_eval:n { #1 + 1 } }
-          {#4} {#5}
-        { { S } { #2 \@@_round_truncate_direct:n {#3} } }
+          { \int_eval:n { #2 + 1 } }
+          {#5} {#6}
+        { { S } { #3 \@@_round_truncate_direct:n {#4} #1 } }
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
