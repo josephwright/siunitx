@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Suppress some spurious overfull box warnings 
+
 ## [v3.0.8]
 
 ### Changed
