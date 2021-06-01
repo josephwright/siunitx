@@ -13,6 +13,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Suppress some spurious overfull box warnings 
+- Printing in text mode for compound quantities (issue #463)
 - Correcly handle `\protect` in literal units (issue #464)
 
 ## [v3.0.8]
