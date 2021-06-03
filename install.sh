@@ -6,7 +6,7 @@
 # A minimal current TL is installed adding only the packages that are
 # required
 
-# See if there is a cached verson of TL available
+# See if there is a cached version of TL available
 export PATH=/tmp/texlive/bin/x86_64-linux:$PATH
 if ! command -v texlua > /dev/null; then
   # Obtain TeX Live
