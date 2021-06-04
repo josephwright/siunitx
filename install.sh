@@ -75,6 +75,7 @@ tlmgr install    \
   mathpazo       \
   mptopdf        \
   multirow       \
+  natbib         \
   opensans       \
   pdftexcmds     \
   pgfplots       \
@@ -84,6 +85,7 @@ tlmgr install    \
   soulpos        \
   soulutf8       \
   stringenc      \
+  textcase       \
   threeparttable \
   translations   \
   underscore     \
