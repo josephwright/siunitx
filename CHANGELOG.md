@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.0.10]
 
 ### Changed
-- Documenation improvements
+- Documentation improvements
 
 ### Fixed
 - Incompatibility with REVTeX (issue #469)
