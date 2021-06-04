@@ -1013,12 +1013,13 @@
 %
 % Units that have been removed: to avoid issues, we mark them as deprecated.
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx } { unit-deprecated }
-  { Unit~macro~#1~has~been~deprecated~in~this~release. }
+\msg_new:nnn { siunitx } { unit-deprecated }
   {
+    Unit~macro~#1~has~been~deprecated~in~this~release. \\ \\
     The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
-    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit
-    in~your~source.
+    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit\ %
+    in~your~source. The~current~definition~is\\ \\
+    \token_to_str:N \DeclareSIUnit \{ #2 \}
   }
 \cs_gset_protected:Npn \@@_tmp:w #1#2
   {
@@ -1031,8 +1032,8 @@
           {
             \exp_not:N \bool_gset_true:N 
               \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
-            \msg_warning:nnn { siunitx } { unit-deprecated }
-              { \token_to_str:N #1 }
+            \msg_warning:nnnn { siunitx } { unit-deprecated }
+              { \token_to_str:N #1 } {#2}
           }
         #2
       }
