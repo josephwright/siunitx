@@ -445,12 +445,22 @@
           \l_@@_after_tl
       }
   }
+%    \end{macrocode}
+%   To cover the use of REV\TeX{}, we need to allow for the insertion of
+%   \cs{array@row@rst} into cell content: that explodes inside
+%   \cs{protected@edef}. We use the classical solution of making locally
+%   equal to \cs{scan_stop:}.   
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_end:n #1
   {
     \str_if_eq:eeTF { \exp_not:n {#1} }
       { { \@@_collect_end_aux:n {#1} } }
       { \tl_set:Nn }
-      { \protected@edef }
+      {
+        \cs_if_exist:NT \array@row@rst
+          { \cs_set_eq:NN \array@row@rst \scan_stop: }
+        \protected@edef
+      }
         \l_@@_collect_tl {#1}
   }
 \cs_new:Npn \@@_collect_end_aux:n #1
