@@ -20,6 +20,9 @@ if ! command -v texlua > /dev/null; then
   cd ..
 fi
 
+# Keep no backups (not required, simply makes cache bigger)
+tlmgr option -- autobackup 0
+
 # Update tlmgr itself then all installed packages
 tlmgr update --self --all --no-auto-install
 
@@ -88,6 +91,3 @@ tlmgr install    \
   xcolor         \
   xtab           \
   zref
-
-# Keep no backups (not required, simply makes cache bigger)
-tlmgr option -- autobackup 0
