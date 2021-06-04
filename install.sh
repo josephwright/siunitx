@@ -79,6 +79,7 @@ tlmgr install    \
   pdftexcmds     \
   pgfplots       \
   psnfss         \
+  revtex         \
   sansmath       \
   soulpos        \
   soulutf8       \
