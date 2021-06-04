@@ -75,10 +75,10 @@ tlmgr install    \
   mathpazo       \
   mptopdf        \
   multirow       \
+  opensans       \
   pdftexcmds     \
   pgfplots       \
   psnfss         \
-  opensans       \
   sansmath       \
   soulpos        \
   soulutf8       \
