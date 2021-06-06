@@ -12,6 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Argument order for `\DeclareSIPrefix` (issue #471)
+- Emulation of `number-unit-separator` (issue #473)
 
 ## [v3.0.10]
 
