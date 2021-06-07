@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Improve some fallback unit definitions
 
 ### Fixed
+- Printing of symbols with encodings other than UTF-8 (issue #470)
 - Argument order for `\DeclareSIPrefix` (issue #471)
 - Emulation of `number-unit-separator` (issue #473)
 
