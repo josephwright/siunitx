@@ -53,7 +53,7 @@ function update_tag(file,content,tagname,tagdate)
 
   if string.match(file,"CHANGELOG.md") then
     -- CHANGELOG
-    local pattern = "v%d%.%d%.?%d?[a-z]?"
+    local pattern = "v%d%.%d%.%d%d?"
     local url = "https://github.com/josephwright/siunitx/compare/"
     local previous = string.match(content,"compare/(" .. pattern .. ")%.%.%.HEAD") 
     if tagname == previous then return content end
