@@ -1691,7 +1691,8 @@
 %
 % \begin{macro}{\siunitx_number_process:NN}
 % \begin{macro}{\@@_process:nnnnnnnNN}
-%   A top-level interface for the processing tools.
+%   A top-level interface for the processing tools. Rounding happens in all
+%   cases, but exponents are only processed if the value is not $0$.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_process:NN #1#2
   {
@@ -1707,12 +1708,13 @@
   }
 \cs_new_protected:Npn \@@_process:nnnnnnnNN #1#2#3#4#5#6#7#8#9
   {
-    \bool_lazy_and:nnF
+    \bool_lazy_and:nnTF
       { \str_if_eq_p:nn {#3} { 0 } }
       {
         \str_if_eq_p:ee
           { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
       }
+      { \@@_round:NN #8 #9 }
       {
         \@@_exponent:NN #8 #9
         \@@_round:NN #9 #9
@@ -2547,14 +2549,26 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[EXP]{\@@_round_figures:nnnnnnn}
+% \begin{macro}[EXP]{\@@_round_figures:nnnnnnn, \@@_round_figures_aux:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnN}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnnN}
-%   Rounding to a fixed number of significant figures starts by checking that
+%   Rounding to figures only makes sense if the number is not $0$, so we start
+%   by filtering out that case. We then check that
 %   there is no uncertainty, and that the number of figures requested is
 %   positive: if not, the result is always fixed at zero.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_figures:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \bool_lazy_and:nnTF
+      { \str_if_eq_p:nn {#3} { 0 } }
+      {
+        \str_if_eq_p:ee
+          { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      }
+      { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
+      { \@@_round_figures_aux:nnnnnnn {#1} {#2} {#3} {#4} {#5} {#6} {#7} }
+  }
+\cs_new:Npn \@@_round_figures_aux:nnnnnnn #1#2#3#4#5#6#7
   {
     \tl_if_blank:nTF {#5}
       {

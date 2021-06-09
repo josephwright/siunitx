@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Modify warning message (fixes #476)
+- Rounding zero values to a fixed number of places (issue #477)
 
 ## [v3.0.11]
 
