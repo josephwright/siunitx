@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.12]
+
 ### Fixed
 - Modify warning message (fixes #476)
 - Rounding zero values to a fixed number of places (issue #477)
@@ -1366,7 +1368,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.11...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.12...HEAD
+[v3.0.12]: https://github.com/josephwright/siunitx/compare/v3.0.11...v3.0.12
 [v3.0.11]: https://github.com/josephwright/siunitx/compare/v3.0.10...v3.0.11
 [v3.0.10]: https://github.com/josephwright/siunitx/compare/v3.0.9...v3.0.10
 [v3.0.9]: https://github.com/josephwright/siunitx/compare/v3.0.8...v3.0.9
