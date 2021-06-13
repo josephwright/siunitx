@@ -9,6 +9,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Position of complex root when no real part is present (issue #481)
+- Printing units in compound quantities when `parse-numbers is
+  false (issue #484)
 
 ## [v3.0.12]
 
