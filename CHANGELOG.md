@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Position of complex root when no real part is present (issue #481)
+- Skip defining `\unit` if the `units` package is loaded (issue #482)
 - Printing units in compound quantities when `parse-numbers is
   false (issue #484)
 
