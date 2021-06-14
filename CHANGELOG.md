@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Catalan translations for lists and ranges
+
 ### Fixed
 - Position of complex root when no real part is present (issue #481)
 - Skip defining `\unit` if the `units` package is loaded (issue #482)

@@ -44,6 +44,7 @@ tlmgr install    \
   alphalph       \
   amsfonts       \
   atveryend      \
+  babel-catalan  \
   babel-english  \
   babel-french   \
   babel-german   \
