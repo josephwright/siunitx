@@ -17,6 +17,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   false (issue #484)
 - Printing of `1` when both `print-zero-exponent` and
   `print-unity-mantissa` are false (issue #485)
+- Printing of ohm symbol in text mode with `fourier` package (issue #486)
 
 ## [v3.0.12]
 

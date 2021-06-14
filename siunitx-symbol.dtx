@@ -225,26 +225,38 @@
         { \group_end: }
 %    \end{macrocode}
 %   For |\ohm|, there is a math mode symbol we can use, so there has to be
-%   a mode-dependent definition.
+%   a mode-dependent definition. This doesn't work if the text mode symbol is
+%   bust: the \pkg{fourier} package puts us in that position.
 %    \begin{macrocode}
     \@@_if_replace:NnT \ohm { "03A9 }
       {
         \siunitx_declare_unit:Nx \ohm
           {
-            \exp_not:N \ifmmode
-              \cs_if_exist:NTF \upOmega
-                { \exp_not:N \upOmega }
-                { \exp_not:N \Omega }
-            \exp_not:N \else
-              \exp_not:N \text
-                {
-                  \bool_lazy_or:nnTF
-                    { \sys_if_engine_luatex_p: }
-                    { \sys_if_engine_xetex_p: }
-                    { \@@_non_latin:n { "03A9 } }
-                    { \exp_not:N \textohm }
-                }
-            \exp_not:N \fi
+            \@ifpackageloaded { fourier }
+              {
+                \exp_not:N \ensuremath
+                  {
+                    \cs_if_exist:NTF \upOmega
+                      { \exp_not:N \upOmega }
+                      { \exp_not:N \Omega }
+                  }
+              }
+              {
+                \exp_not:N \ifmmode
+                  \cs_if_exist:NTF \upOmega
+                    { \exp_not:N \upOmega }
+                    { \exp_not:N \Omega }
+                \exp_not:N \else
+                  \exp_not:N \text
+                    {
+                      \bool_lazy_or:nnTF
+                        { \sys_if_engine_luatex_p: }
+                        { \sys_if_engine_xetex_p: }
+                        { \@@_non_latin:n { "03A9 } }
+                        { \exp_not:N \textohm }
+                    }
+                \exp_not:N \fi
+              }
           }
       }
 %    \end{macrocode}

@@ -64,6 +64,7 @@ tlmgr install    \
   enumitem       \
   epstopdf-pkg   \
   fancyvrb       \
+  fourier        \
   hologo         \
   hycolor        \
   hyperref       \
