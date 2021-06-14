@@ -3165,9 +3165,16 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_integer:nnn #1#2#3
   {
-    \bool_lazy_or:nnT
-      { \l_@@_unity_mantissa_bool }
-      { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
+    \bool_lazy_any:nTF
+      {
+        { \l_@@_unity_mantissa_bool }
+        { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
+        {
+          \bool_lazy_and_p:nn
+            { \str_if_eq_p:nn {#3} { 0 } }
+            { ! \l_@@_zero_exponent_bool }
+        }
+      }
       { \@@_output_digits:nn { integer } {#1} }
   }
 \cs_new:Npn \@@_output_decimal:nn #1#2

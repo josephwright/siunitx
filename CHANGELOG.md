@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Skip defining `\unit` if the `units` package is loaded (issue #482)
 - Printing units in compound quantities when `parse-numbers is
   false (issue #484)
+- Printing of `1` when both `print-zero-exponent` and
+  `print-unity-mantissa` are false (issue #485)
 
 ## [v3.0.12]
 
