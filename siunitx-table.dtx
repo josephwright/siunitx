@@ -584,10 +584,15 @@
 % \begin{variable}{\l_@@_column_width_dim, \l_@@_fixed_width_bool}
 %   Settings which apply to aligned columns in general.
 %    \begin{macrocode}
+\dim_new:N \l_@@_column_width_dim
 \keys_define:nn { siunitx }
   {
-    table-column-width .dim_set:N =
-      \l_@@_column_width_dim ,
+    table-column-width .code:n =
+      {
+        \dim_set:Nn \l_@@_column_width_dim {#1}
+        \dim_compare:nNnT \l_@@_column_width_dim > \c_zero_dim
+          { \bool_set_true:N \l_@@_fixed_width_bool }
+      } ,
     table-fixed-width .bool_set:N =
       \l_@@_fixed_width_bool
   }

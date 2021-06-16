@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Auto-enable `table-fixed-width` when setting `table-column-width`
+  to a positive value
+
 ### Fixed
 - Incorrect handling of `{}` in literal units (issue #487)
 
