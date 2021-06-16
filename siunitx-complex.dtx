@@ -597,12 +597,12 @@
 %
 % \begin{macro}{\@@_format:n}
 % \begin{macro}{\@@_format_auxi:n}
-% \begin{macro}{\@@_format_unary:nnnnnnn}
 % \begin{macro}{\@@_format_auxii:n}
 % \begin{macro}{\@@_drop_exponent:nnnnnnn}
 % \begin{macro}{\@@_format_sign:nnnnnnn}
 % \begin{macro}{\@@_extract_exponent:nw}
 % \begin{macro}{\@@_extract_exponent_aux:w}
+% \begin{macro}{\@@_format_unary:nnnnnnn}
 % \begin{macro}[EXP]{\@@_format_bracket:n}
 %   We start here checking that there is something to do.
 %    \begin{macrocode}
@@ -614,54 +614,22 @@
       { \@@_format_auxi:n {#1} }
   }
 %    \end{macrocode}
+%  We split based on whether the number has a complex part at all,
+%  then print the result.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_auxi:n #1
   {
     \tl_clear:N \l_@@_tmp_tl
-    \tl_if_empty:NTF \l_@@_real_tl
+    \tl_if_empty:NTF \l_@@_img_tl
       {
-        \@@_format_units:n {#1}
-        \exp_after:wN \@@_format_unary:nnnnnnn \l_@@_img_tl
+        \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
         \tl_set:Nx \l_@@_tmp_tl
-          {
-            \bool_if:NF \l_@@_root_after_bool
-              { \exp_not:V \l_@@_output_root_tl }
-            \siunitx_number_output:N \l_@@_img_tl
-            \bool_if:NT \l_@@_root_after_bool
-              { \exp_not:V \l_@@_output_root_tl }
-          }
+          { \siunitx_number_output:N \l_@@_real_tl }
       }
-      {
-        \tl_if_empty:NTF \l_@@_img_tl
-          {
-            \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
-            \tl_set:Nx \l_@@_tmp_tl
-              { \siunitx_number_output:N \l_@@_real_tl }
-          }
-          { \@@_format_auxii:n {#1} }
-      }
+      { \@@_format_auxii:n {#1} }
     \tl_if_blank:nTF {#1}
       { \siunitx_print_number:V \l_@@_tmp_tl }
       { \siunitx_quantity_print:VV \l_@@_tmp_tl \l_@@_unit_tl }
-  }
-%    \end{macrocode}
-%   An imaginary part that is exactly $1$ is omitted, with only the complex
-%   root printed. That means checking and removing a lone $1$ here.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_unary:nnnnnnn #1#2#3#4#5#6#7
-  {
-    \tl_set:Nx \l_@@_img_tl
-      {
-        \exp_not:n { {#1} {#2} }
-        \tl_if_blank:nTF {#4}
-          {
-            \str_if_eq:nnTF {#3} { 1 }
-              { { } { } }
-              { \exp_not:n { {#3} {#4} } }
-          }
-          { \exp_not:n { {#3} {#4} } }
-        \exp_not:n { {#5} {#6} {#7} }
-      }
   }
 %    \end{macrocode}
 %   If we get to this stage we have both parts to a complex number. We
@@ -671,8 +639,10 @@
 \cs_new_protected:Npn \@@_format_auxii:n #1
   {
     \@@_format_units:n {#1}
-    \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl
+    \tl_if_empty:NF \l_@@_real_tl
+      { \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl }
     \exp_after:wN \@@_format_sign:nnnnnnn \l_@@_img_tl
+    \exp_after:wN \@@_format_unary:nnnnnnn \l_@@_img_tl
     \tl_set:Nx \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_img_tl \q_nil }
     \exp_after:wN \@@_extract_exponent:w \l_@@_tmp_tl \q_stop
@@ -709,7 +679,11 @@
     \tl_set:Nx \l_@@_img_tl
       {
         { }
-        {  \tl_if_blank:nTF {#2} { + } { \exp_not:n {#2} } }
+        {
+          \tl_if_blank:nTF {#2}
+            { \tl_if_empty:NF \l_@@_real_tl { + } }
+            { \exp_not:n {#2} }
+        }
         \tl_if_blank:nTF {#4}
           {
             \str_if_eq:nnTF {#3} { 1 }
@@ -735,6 +709,25 @@
   {
     \tl_set:Nn \l_@@_tmp_tl {#1#2}
     \tl_set:Nn \l_@@_exp_tl {#3#4}
+  }
+%    \end{macrocode}
+%   An imaginary part that is exactly $1$ is omitted, with only the complex
+%   root printed. That means checking and removing a lone $1$ here.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_unary:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \tl_set:Nx \l_@@_img_tl
+      {
+        \exp_not:n { {#1} {#2} }
+        \tl_if_blank:nTF {#4}
+          {
+            \str_if_eq:nnTF {#3} { 1 }
+              { { } { } }
+              { \exp_not:n { {#3} {#4} } }
+          }
+          { \exp_not:n { {#3} {#4} } }
+        \exp_not:n { {#5} {#6} {#7} }
+      }
   }
 \cs_new_protected:Npn \@@_format_bracket:n #1
   {

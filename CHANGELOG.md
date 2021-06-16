@@ -14,6 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Incorrect handling of `{}` in literal units (issue #487)
+- Placement of sign in some complex numbers (issue #488)
 
 ## [v3.0.13]
 
