@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Auto-enable `table-fixed-width` when setting `table-column-width`
   to a positive value
+- Expand `table-format` input before splitting
 
 ### Fixed
 - Incorrect handling of `{}` in literal units (issue #487)
