@@ -221,6 +221,7 @@
 % \begin{macro}{\@@_parsed_aux:w}
 % \begin{macro}{\@@_parsed_aux:nnnw}
 % \begin{macro}{\@@_parsed_aux:nnnn}
+% \begin{macro}{\@@_parsed_aux:nnn}
 %   For quantities, there is bit to do to combine things. The first question is
 %   whether we are parsing at all: if not, things are quite short. Notice that
 %   within this group we turn off bracketing in the number formatter: we
@@ -319,17 +320,28 @@
           {
             \bool_if:NTF \l_@@_uncert_repeat_bool
               {
-                \siunitx_quantity_print:nV {#1#2}
-                  \l_@@_unit_tl
-                \siunitx_quantity_print:nV { { } #3 }
-                  \l_@@_unit_tl
-                \siunitx_print_number:n { { } #4 }
+                \tl_if_blank:nTF {#4}
+                  { \@@_parsed_aux:nnn {#1#2} {#3} { } }
+                  { \@@_parsed_aux:nnn {#1#2} {#3} { { } #4 } }
               }
               { \siunitx_quantity_print:nV {#1#2#3#4} \l_@@_unit_tl }
           }
       }
   }
 %    \end{macrocode}
+%   For the case of a separated uncertainty with repeated units, we print the
+%   two parts independently. The third argument here is the exponent if there
+%   is one, with the spacing correct in either case as we only pass the empty
+%   group if one is required.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parsed_aux:nnn #1#2#3
+  {
+    \siunitx_quantity_print:nV {#1#3} \l_@@_unit_tl
+    \tl_if_blank:nF {#2}
+      { \siunitx_quantity_print:nV { { } #2#3 } \l_@@_unit_tl }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
