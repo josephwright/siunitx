@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.14]
+
 ### Changed
 - Auto-enable `table-fixed-width` when setting `table-column-width`
   to a positive value
@@ -1393,7 +1395,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.13...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.14...HEAD
+[v3.0.14]: https://github.com/josephwright/siunitx/compare/v3.0.13...v3.0.14
 [v3.0.13]: https://github.com/josephwright/siunitx/compare/v3.0.12...v3.0.13
 [v3.0.12]: https://github.com/josephwright/siunitx/compare/v3.0.11...v3.0.12
 [v3.0.11]: https://github.com/josephwright/siunitx/compare/v3.0.10...v3.0.11
