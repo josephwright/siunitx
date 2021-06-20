@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Bracketting of complex quantities (issue #491)
+
 ## [v3.0.14]
 
 ### Changed

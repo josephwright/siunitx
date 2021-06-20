@@ -648,9 +648,20 @@
     \exp_after:wN \@@_extract_exponent:w \l_@@_tmp_tl \q_stop
     \tl_set:Nx \l_@@_tmp_tl
       {
-        \bool_lazy_and:nnTF
-          { \l_siunitx_number_bracket_ambiguous_bool }
-          { ! \tl_if_empty_p:N \l_@@_exp_tl }
+        \bool_lazy_or:nnTF
+          {
+            \bool_lazy_and_p:nn
+              { \l_siunitx_number_bracket_ambiguous_bool }
+              { ! \tl_if_empty_p:N \l_@@_exp_tl }
+          }
+          {
+            ! \bool_lazy_any_p:n
+              {
+                { \tl_if_blank_p:n {#1} }
+                { \tl_if_empty_p:N \l_@@_real_tl }
+                { \tl_if_empty_p:N \l_@@_img_tl }
+              }
+          }
           { \@@_format_bracket:n }
           { \use:n }
           {
