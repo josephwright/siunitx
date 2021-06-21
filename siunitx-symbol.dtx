@@ -230,22 +230,30 @@
 %    \begin{macrocode}
     \@@_if_replace:NnT \ohm { "03A9 }
       {
+        \tl_set:Nx \l_@@_tmp_tl
+          {
+            \cs_if_exist:NTF \upOmega
+              { \exp_not:N \upOmega }
+              { \exp_not:N \Omega }
+          }
         \siunitx_declare_unit:Nx \ohm
           {
             \@ifpackageloaded { fourier }
               {
                 \exp_not:N \ensuremath
-                  {
-                    \cs_if_exist:NTF \upOmega
-                      { \exp_not:N \upOmega }
-                      { \exp_not:N \Omega }
-                  }
+                  { \exp_not:V \l_@@_tmp_tl }
               }
               {
                 \exp_not:N \ifmmode
-                  \cs_if_exist:NTF \upOmega
-                    { \exp_not:N \upOmega }
-                    { \exp_not:N \Omega }
+                  \@ifpackageloaded { fontspec }
+                    {
+                      \exp_not:N \text
+                        {
+                          \exp_not:N \ensuremath
+                            { \exp_not:V \l_@@_tmp_tl }
+                        }
+                    }
+                    { \exp_not:V \l_@@_tmp_tl }
                 \exp_not:N \else
                   \exp_not:N \text
                     {

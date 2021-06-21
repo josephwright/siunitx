@@ -9,6 +9,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Bracketting of complex quantities (issue #491)
+- Printing of `\ohm` with `fontspec` (issue #492)
 
 ## [v3.0.14]
 
