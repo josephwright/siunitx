@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.0.15]
 
 ### Fixed
-- Bracketting of complex quantities (issue #491)
+- Bracketing of complex quantities (issue #491)
 - Printing of `\ohm` with `fontspec` (issue #492)
 - Suppress printing implicit plus for zero exponents (issue #493)
 - Engineering exponents with some exponent values (issue #494)
