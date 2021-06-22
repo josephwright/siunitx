@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.15]
+
 ### Fixed
 - Bracketting of complex quantities (issue #491)
 - Printing of `\ohm` with `fontspec` (issue #492)
@@ -1401,7 +1403,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.14...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.15...HEAD
+[v3.0.15]: https://github.com/josephwright/siunitx/compare/v3.0.14...v3.0.15
 [v3.0.14]: https://github.com/josephwright/siunitx/compare/v3.0.13...v3.0.14
 [v3.0.13]: https://github.com/josephwright/siunitx/compare/v3.0.12...v3.0.13
 [v3.0.12]: https://github.com/josephwright/siunitx/compare/v3.0.11...v3.0.12
