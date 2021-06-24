@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Treatment of spaces before `/` in literal units (issue #495)
+
 ## [v3.0.15]
 
 ### Fixed

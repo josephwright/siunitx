@@ -1190,6 +1190,7 @@
 % \begin{macro}{\@@_format_literal_super:nn, \@@_format_literal_sub:nn}
 % \begin{macro}{\@@_format_literal_add:n}
 % \begin{macro}{\@@_format_literal_auxix:nn}
+% \begin{macro}{\@@_format_literal_auxx:nw}
 % \begin{variable}{\l_@@_separator_tl}
 %   To format literal units, there are two tasks to do. The input is
 %   \texttt{x}-type expanded to force any symbolic units to be converted into
@@ -1285,7 +1286,11 @@
   {
     \tl_if_head_is_N_type:nTF {#2}
       { \@@_format_literal_auxvi:nN }
-      { \@@_format_literal_auxix:nn }
+      {
+        \tl_if_head_is_group:nTF {#2}
+          { \@@_format_literal_auxix:nn }
+          { \@@_format_literal_auxx:nw }
+      }
         {#1} #2 \q_recursion_stop
   }
 \cs_new_protected:Npx \@@_format_literal_auxvi:nN #1#2
@@ -1347,9 +1352,16 @@
   }
 \cs_new_protected:Npn \@@_format_literal_auxix:nn #1#2
   { \@@_format_literal_auxvi:nN { #1 {#2} } }
+\use:x
+  {
+    \cs_new_protected:Npn \exp_not:N \@@_format_literal_auxx:nw
+      ##1 \c_space_tl
+  }
+  { \@@_format_literal_auxv:nw {#1} }
 \tl_new:N \l_@@_separator_tl
 %    \end{macrocode}
 % \end{variable}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
