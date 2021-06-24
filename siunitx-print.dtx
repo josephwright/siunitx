@@ -722,6 +722,8 @@
 % \begin{macro}{\@@_text_replace:n}
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
+% \begin{macro}{\@@_text_replace:Nnnn}
+% \begin{macro}{\@@_text_replace_frac:n}
 % \begin{macro}{\@@_text_sub:n, \@@_text_super:n}
 % \begin{macro}{\@@_text_scripts:NnN}
 % \begin{macro}{\@@_text_scripts:}
@@ -763,9 +765,13 @@
 \cs_new_protected:Npn \@@_text_replace:n #1
   {
     \group_begin:
-      \tl_set:Nn \l_@@_tmp_tl {#1}
-      \@@_text_replace:N \l_@@_tmp_tl
-      \tl_use:N \l_@@_tmp_tl
+    \tl_if_head_eq_meaning:nNTF {#1} \mathchoice
+      { \@@_text_replace:Nnnnn #1 }
+      {
+        \tl_set:Nn \l_@@_tmp_tl {#1}
+        \@@_text_replace:N \l_@@_tmp_tl
+        \tl_use:N \l_@@_tmp_tl
+      }
     \group_end:
   }
 \cs_new_protected:Npx \@@_text_replace:N #1
@@ -796,6 +802,27 @@
     \quark_if_recursion_tail_stop:N #2
     \tl_replace_all:Nnn #1 {#2} {#3}
     \@@_text_replace:NNn #1
+  }
+\cs_new_protected:Npn \@@_text_replace:Nnnnn #1#2#3#4#5
+  {
+    \ensuremath
+      {
+        \mathchoice
+          { \@@_print_replace_frac:n {#2} }
+          { \@@_print_replace_frac:n {#3} }
+          { \@@_print_replace_frac:n {#4} }
+          { \@@_print_replace_frac:n {#5} }
+      }
+  }
+%    \end{macrocode}
+%   Almost the same as the lead-off but here we need to deal with re-inserting
+%   a text mode shift.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_replace_frac:n #1
+  {
+    \exp_args:NnV \tl_if_head_eq_meaning:nNTF {#1} \l_siunitx_unit_fraction_tl
+      { \@@_text_fraction:Nnn #1 }
+      { \mbox { \@@_text_replace:n {#1} } }
   }
 %    \end{macrocode}
 %   When the \pkg{bidi} package is loaded, we need to make sure
@@ -906,6 +933,8 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
