@@ -204,27 +204,11 @@
 %   Creating document commands is all done by a single function which is
 %   set up using expansion: that way the tests are only run once. Other than
 %   that, this is all just a question of picking up all the various routes.
-%   Where the \pkg{soulpos} package is loaded \emph{after} \pkg{siunitx}, the
-%   commands \cs{hl} and \cs{ul} will be created only after the hook is used.
-%   The \pkg{soul} package creates those using \tn{newcommand}, so we have to
-%   avoid an issue.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_command_create:
   {
     \bool_if:NT \l_@@_create_bool
-      {
-        \@@_create:
-        \@ifpackageloaded { soulpos }
-          {
-            \@ifpackageloaded { soul }
-              { }
-              {
-                \cs_undefine:N \hl
-                \cs_undefine:N \ul
-              }
-          }
-          { }
-      }
+      { \@@_create: }
 %    \end{macrocode}
 %   At the beginning of table cells and inside \texttt{x}-type expansion,
 %   all symbolic units need to have \emph{some} definition. 
@@ -234,6 +218,22 @@
         \cs_if_free:NT ##1
           { \cs_set_protected:Npn ##1 { \ERROR } }
       }
+%    \end{macrocode}
+%   Where the \pkg{soulpos} package is loaded \emph{after} \pkg{siunitx}, the
+%   commands \cs{hl} and \cs{ul} will be created only after the hook is used.
+%   The \pkg{soul} package creates those using \tn{newcommand}, so we have to
+%   avoid an issue.
+%    \begin{macrocode}
+    \@ifpackageloaded { soulpos }
+      {
+        \@ifpackageloaded { soul }
+          { }
+          {
+            \cs_undefine:N \hl
+            \cs_undefine:N \ul
+          }
+      }
+      { }
   }
 \AtBeginDocument { \siunitx_command_create: }
 \cs_new_protected:Npn \@@_create:
