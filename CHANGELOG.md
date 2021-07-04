@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Printing of reciprocal units when `per-mode = symbol` is active
+  (issue #500)
+
 ## [v3.0.17]
 
 ### Fixed
