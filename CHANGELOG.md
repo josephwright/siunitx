@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.18]
+
 ### Fixed
 - Printing of reciprocal units when `per-mode = symbol` is active
   (issue #500)
@@ -1418,7 +1420,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.17...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.18...HEAD
+[v3.0.18]: https://github.com/josephwright/siunitx/compare/v3.0.17...v3.0.18
 [v3.0.17]: https://github.com/josephwright/siunitx/compare/v3.0.16...v3.0.17
 [v3.0.16]: https://github.com/josephwright/siunitx/compare/v3.0.15...v3.0.16
 [v3.0.15]: https://github.com/josephwright/siunitx/compare/v3.0.14...v3.0.15
