@@ -1011,6 +1011,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Unit commands}
+%
 % \begin{macro}{\celsius}
 %   Deprecated but should work.
 %    \begin{macrocode}
@@ -1089,6 +1091,52 @@
   \q_recursion_tail { }
   \q_recursion_stop
 %    \end{macrocode}
+%
+% \subsection{Communication with \pkg{pgf}}
+%
+%    \begin{macrocode}
+%<@@=siunitx_number>
+%    \end{macrocode}
+%
+% \begin{macro}{\SendSettingsToPgf}
+%    \begin{macrocode}
+\NewDocumentCommand \SendSettingsToPgf { }
+  {
+    \use:x
+      {
+        \exp_not:N \pgfqkeys { /pgf/number~format }
+          {
+            \str_if_eq:VnT \l_@@_round_mode_tl { figures }
+              {
+                fixed ,
+                fixed~zerofill = true ,
+              }
+            precision = \int_use:N \l_@@_round_precision_int ,
+            set~decimal~separator =
+              \str_if_eq:VnTF \l_siunitx_number_output_decimal_tl { , }
+                { \exp_not:N \mathord }
+                { \use:n }
+                  { \exp_not:V \l_siunitx_number_output_decimal_tl } ,
+            set~thousands~separator =
+            set~decimal~separator =
+              \str_if_eq:VnTF \l_@@_group_separator_tl { , }
+                { \exp_not:N \mathord }
+                { \use:n }
+                  { \exp_not:V \l_@@_group_separator_tl } ,
+            min~exponent~for~1000~sep =
+              \int_eval:n { \l_@@_group_minimum_int - 1 } ,
+            \bool_lazy_or:nnF
+              { \l_@@_group_decimal_bool }
+              { \l_@@_group_integer_bool }
+              { min~exponent~for~1000~sep = 999 , }
+            showpos = 
+              \bool_if:NTF \l_@@_implicit_plus_bool
+                { true }
+                { false }
+          }
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</interfaces>

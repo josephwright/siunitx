@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Emulation for `\SendSettingsToPgf` (issue #501)
+
 ## [v3.0.18]
 
 ### Fixed
