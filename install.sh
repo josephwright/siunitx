@@ -55,6 +55,7 @@ tlmgr install    \
   caption        \
   carlisle       \
   cellspace      \
+  cjk            \
   cjk-ko         \
   collcell       \
   colortbl       \
