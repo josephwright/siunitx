@@ -8,6 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Interaction with `kotex` (issue #502)
 - Handling of groups in literal units (issue #503)
 
 ## [v3.0.19]

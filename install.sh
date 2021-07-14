@@ -68,8 +68,9 @@ tlmgr install    \
   hologo         \
   hycolor        \
   hyperref       \
-  kvoptions      \
+  kotex          \
   koma-script    \
+  kvoptions      \
   libertine      \
   listings       \
   lualatex-math  \

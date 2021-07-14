@@ -2511,7 +2511,8 @@
 % \begin{macro}{\@@_non_latin:nnnn}
 %   A small amount of code to make it convenient to include non-Latin
 %   characters in units without having to directly include them in the
-%   sources directly.
+%   sources directly. We only make the first token active as some packages
+%   (\foreign{e.g.}~\pkg{kotex}) do this.
 %    \begin{macrocode}
 \bool_lazy_or:nnTF
   { \sys_if_engine_luatex_p: }
@@ -2530,8 +2531,7 @@
       {
         \exp_after:wN \exp_after:wN \exp_after:wN
           \exp_not:N \char_generate:nn {#1} { 13 }
-        \exp_after:wN \exp_after:wN \exp_after:wN
-          \exp_not:N \char_generate:nn {#2} { 13 }
+        \char_generate:nn {#2} { 12 }
       }
   }
 %    \end{macrocode}
