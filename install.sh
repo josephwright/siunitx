@@ -75,6 +75,7 @@ tlmgr install    \
   libertine      \
   listings       \
   lualatex-math  \
+  luatexbase     \
   luatexko       \
   makeindex      \
   mathpazo       \
@@ -97,5 +98,6 @@ tlmgr install    \
   unicode-math   \
   was            \
   xcolor         \
+  xetexko        \
   xtab           \
   zref
