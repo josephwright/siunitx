@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.20]
+
 ### Fixed
 - Interaction with `kotex` (issue #502)
 - Handling of groups in literal units (issue #503)
@@ -1429,7 +1431,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.19...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.20...HEAD
+[v3.0.20]: https://github.com/josephwright/siunitx/compare/v3.0.19...v3.0.20
 [v3.0.19]: https://github.com/josephwright/siunitx/compare/v3.0.18...v3.0.19
 [v3.0.18]: https://github.com/josephwright/siunitx/compare/v3.0.17...v3.0.18
 [v3.0.17]: https://github.com/josephwright/siunitx/compare/v3.0.16...v3.0.17
