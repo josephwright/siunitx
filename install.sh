@@ -74,6 +74,7 @@ tlmgr install    \
   libertine      \
   listings       \
   lualatex-math  \
+  luatexko       \
   makeindex      \
   mathpazo       \
   mptopdf        \
