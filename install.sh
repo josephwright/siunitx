@@ -69,7 +69,6 @@ tlmgr install    \
   hologo         \
   hycolor        \
   hyperref       \
-  kotex          \
   koma-script    \
   kvoptions      \
   libertine      \
