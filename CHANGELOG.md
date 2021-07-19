@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Print degree symbol if `fontspec` package is loaded with
   `no-math` option (issue #505)
+- Symbol for arcs in text mode (issue #507)
 
 ## [v3.0.20]
 
