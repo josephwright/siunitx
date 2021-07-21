@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Interaction with `cellspace` package (issue #512)
+
 ## [v3.0.21]
 
 ### Fixed
