@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Support `table-text-alignment = none` for interoperation with
+  `tabularray` (issue #510)
+
 ### Fixed
 - Support for `input-remove` (issue #511)
 - Interaction with `cellspace` package (issue #512)

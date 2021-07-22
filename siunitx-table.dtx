@@ -200,11 +200,12 @@
 %
 % \begin{function}{table-text-alignment}
 %   \begin{syntax}
-%     |table-text-alignment| = |center|\verb"|"|left|\verb"|"|right|
+%     |table-text-alignment| = |center|\verb"|"|left|\verb"|"|none|\verb"|"|right|
 %   \end{syntax}
 %   Selects the alignment of non-numerical content with the margins of the
 %   table cell (or other boundary). See also |table-alignment| and
-%   |table-number-alignment|. The standard setting is |center|.
+%   |table-number-alignment|. Notice the additional support for |none| here.
+%   The standard setting is |center|.
 % \end{function}
 %
 % \end{documentation}
@@ -599,7 +600,8 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_align_center:n, \@@_align_left:n, \@@_align_right:n}
+% \begin{macro}
+%   {\@@_align_center:n, \@@_align_left:n, \@@_align_right:n, \@@_align_none:n}
 % \begin{macro}{\@@_align_auxi:nn, \@@_align_auxii:nn}
 %   The beginning and end of each table cell have to adjust the position of
 %   the content using glue. When \pkg{colortbl} is loaded the glue is done in
@@ -613,6 +615,13 @@
   { \@@_align_auxi:nn {#1} { 0pt } }
 \cs_new_protected:Npn \@@_align_right:n #1
   { \@@_align_auxi:nn {#1} { 0pt~plus~1fill } }
+\cs_new_protected:Npn \@@_align_none:n #1
+  {
+    \bool_if:NTF \l_@@_fixed_width_bool
+      { \hbox_to_wd:nn \l_@@_column_width_dim }
+      { \use:n }
+        {#1}
+  }
 \cs_new_protected:Npn \@@_align_auxi:nn #1#2
   {
     \bool_if:NTF \l_@@_fixed_width_bool
@@ -656,7 +665,7 @@
 \keys_define:nn { siunitx }
   {
     table-text-alignment .choices:nn =
-      { center , left , right }
+      { center , left , right , none }
       { \tl_set:Nn \l_@@_align_text_tl {#1} } ,
   }
 \tl_new:N \l_@@_align_text_tl
