@@ -8,6 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Support for `input-remove` (issue #511)
 - Interaction with `cellspace` package (issue #512)
 
 ## [v3.0.21]
