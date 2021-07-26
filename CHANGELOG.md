@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Load order of `xparse` (issue #518)
+
 ## [v3.0.22]
 
 ### Changed
