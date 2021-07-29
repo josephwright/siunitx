@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Option setting `round-half = even` (issue #519)
+
 ## [v3.0.23]
 
 ### Fixed
