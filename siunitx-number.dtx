@@ -1449,12 +1449,9 @@
 % \begin{macro}{\@@_parse_uncert:NN}
 % \begin{macro}{\@@_parse_uncert:NNNN}
 % \begin{macro}{\@@_parse_uncert_auxi:NN, \@@_parse_uncert_auxii:NN}
-% \begin{macro}
-%   {
-%     \@@_parse_uncert_auxii:N  ,
-%     \@@_parse_uncert_marker:N ,
-%     \@@_parse_uncert_after:N
-%   }
+% \begin{macro} {\@@_parse_uncert_auxii:N, \@@_parse_uncert_marker:N}
+%  \begin{macro}{\@@_parse_uncert_extend:nnnN}
+%  \begin{macro}{\@@_parse_uncert_after:N}
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
 %   so we filter that out explicitly. After that, we check for digits,
@@ -1544,7 +1541,8 @@
 %   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
 %   sure it's valid. First, we need to be sure that the integer part of the captured
 %   uncertainty is not too long. Then we need to check that the decimal part is
-%   not too long. Both of these require data from the collected partial number,
+%   not too long, and extend the decimal if it is.
+%   Both of these require data from the collected partial number,
 %   so we extract that first. Checking the decimal part needs the length of the
 %   not-yet-collected uncertainty. Handily, we know that it should be a set of
 %   digits then a closing marker. So we can use that as a length: if it's
@@ -1578,8 +1576,14 @@
           }
             \@@_parse_uncert_auxii:NN
       }
-      { \@@_parse_loop_break:wN }
+      { \exp_after:wN \@@_parse_uncert_extend:nnnN #2 #2 }
     #3 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new_protected:Npn \@@_parse_uncert_extend:nnnN #1#2#3#4
+  {
+    \tl_set:Nn #4 { {#1} {#2} { #3 0 } }
+    \@@_parse_uncert:NNNN #4 \c_true_bool
+      \@@_parse_uncert_auxii:NN
   }
 %    \end{macrocode}
 %   No further tokens are allowed after an uncertainty in parenthesis.
@@ -1590,6 +1594,8 @@
     \@@_parse_loop_break:wN
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
