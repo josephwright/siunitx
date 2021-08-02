@@ -9,6 +9,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Option setting `round-half = even` (issue [#519](https://github.com/josephwright/siunitx/issues/519))
+- Handling of standard deviation-like uncertainties
+  where decimal is longer than main part (issue [#522](https://github.com/josephwright/siunitx/issues/522))
 
 ## [v3.0.23]
 
