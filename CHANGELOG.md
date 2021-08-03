@@ -8,44 +8,56 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
-- Option setting `round-half = even` (issue [#519](https://github.com/josephwright/siunitx/issues/519))
-- Handling of standard deviation-like uncertainties
-  where decimal is longer than main part (issue [#522](https://github.com/josephwright/siunitx/issues/522))
-- Rounding to uncertainty in the integer part (issue [#523](https://github.com/josephwright/siunitx/issues/523))
+- Option setting `round-half = even` (issue
+  [#519](https://github.com/josephwright/siunitx/issues/519))
+- Handling of standard deviation-like uncertainties where decimal is longer than
+  main part (issue [#522](https://github.com/josephwright/siunitx/issues/522))
+- Rounding to uncertainty in the integer part (issue
+  [#523](https://github.com/josephwright/siunitx/issues/523))
 
 ## [v3.0.23]
 
 ### Fixed
-- Load order of `xparse` (issue [#518](https://github.com/josephwright/siunitx/issues/518))
+- Load order of `xparse` (issue
+  [#518](https://github.com/josephwright/siunitx/issues/518))
 
 ## [v3.0.22]
 
 ### Changed
 - Support `table-text-alignment = none` for interoperation with
-  `tabularray` (issue [#510](https://github.com/josephwright/siunitx/issues/510))
+  `tabularray` (issue
+  [#510](https://github.com/josephwright/siunitx/issues/510))
 
 ### Fixed
-- Support for `input-remove` (issue [#511](https://github.com/josephwright/siunitx/issues/511))
-- Interaction with `cellspace` package (issue [#512](https://github.com/josephwright/siunitx/issues/512))
+- Support for `input-remove` (issue
+  [#511](https://github.com/josephwright/siunitx/issues/511))
+- Interaction with `cellspace` package (issue
+  [#512](https://github.com/josephwright/siunitx/issues/512))
 
 ## [v3.0.21]
 
 ### Fixed
 - Print degree symbol if `fontspec` package is loaded with
-  `no-math` option (issue [#505](https://github.com/josephwright/siunitx/issues/505))
-- Handling of 'over-long' separated uncertainties (issue [#506](https://github.com/josephwright/siunitx/issues/506))
-- Symbol for arcs in text mode (issue [#507](https://github.com/josephwright/siunitx/issues/507))
+  `no-math` option (issue
+  [#505](https://github.com/josephwright/siunitx/issues/505))
+- Handling of 'over-long' separated uncertainties (issue
+  [#506](https://github.com/josephwright/siunitx/issues/506))
+- Symbol for arcs in text mode (issue
+  [#507](https://github.com/josephwright/siunitx/issues/507))
 
 ## [v3.0.20]
 
 ### Fixed
-- Interaction with `kotex` (issue [#502](https://github.com/josephwright/siunitx/issues/502))
-- Handling of groups in literal units (issue [#503](https://github.com/josephwright/siunitx/issues/503))
+- Interaction with `kotex` (issue
+  [#502](https://github.com/josephwright/siunitx/issues/502))
+- Handling of groups in literal units (issue
+  [#503](https://github.com/josephwright/siunitx/issues/503))
 
 ## [v3.0.19]
 
 ### Fixed
-- Emulation for `\SendSettingsToPgf` (issue [#501](https://github.com/josephwright/siunitx/issues/501))
+- Emulation for `\SendSettingsToPgf` (issue
+  [#501](https://github.com/josephwright/siunitx/issues/501))
 
 ## [v3.0.18]
 
@@ -56,21 +68,28 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.0.17]
 
 ### Fixed
-- Load order issue with `soulpos` (issue [#498](https://github.com/josephwright/siunitx/issues/498))
+- Load order issue with `soulpos` (issue
+  [#498](https://github.com/josephwright/siunitx/issues/498))
 
 ## [v3.0.16]
 
 ### Fixed
-- Treatment of spaces before `/` in literal units (issue [#495](https://github.com/josephwright/siunitx/issues/495))
-- Printing of `\mathchoice` entries in text mode (issue [#497](https://github.com/josephwright/siunitx/issues/497))
+- Treatment of spaces before `/` in literal units (issue
+  [#495](https://github.com/josephwright/siunitx/issues/495))
+- Printing of `\mathchoice` entries in text mode (issue
+  [#497](https://github.com/josephwright/siunitx/issues/497))
 
 ## [v3.0.15]
 
 ### Fixed
-- Bracketing of complex quantities (issue [#491](https://github.com/josephwright/siunitx/issues/491))
-- Printing of `\ohm` with `fontspec` (issue [#492](https://github.com/josephwright/siunitx/issues/492))
-- Suppress printing implicit plus for zero exponents (issue [#493](https://github.com/josephwright/siunitx/issues/493))
-- Engineering exponents with some exponent values (issue [#494](https://github.com/josephwright/siunitx/issues/494))
+- Bracketing of complex quantities (issue
+  [#491](https://github.com/josephwright/siunitx/issues/491))
+- Printing of `\ohm` with `fontspec` (issue
+  [#492](https://github.com/josephwright/siunitx/issues/492))
+- Suppress printing implicit plus for zero exponents (issue
+  [#493](https://github.com/josephwright/siunitx/issues/493))
+- Engineering exponents with some exponent values (issue
+  [#494](https://github.com/josephwright/siunitx/issues/494))
 
 ## [v3.0.14]
 
@@ -80,10 +99,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Expand `table-format` input before splitting
 
 ### Fixed
-- Incorrect handling of `{}` in literal units (issue [#487](https://github.com/josephwright/siunitx/issues/487))
-- Placement of sign in some complex numbers (issue [#488](https://github.com/josephwright/siunitx/issues/488))
+- Incorrect handling of `{}` in literal units (issue
+  [#487](https://github.com/josephwright/siunitx/issues/487))
+- Placement of sign in some complex numbers (issue
+  [#488](https://github.com/josephwright/siunitx/issues/488))
 - Printing of units in quantities when `uncertainty-mode` is
-  `separate` and an exponent is present (issue [#490](https://github.com/josephwright/siunitx/issues/490))
+  `separate` and an exponent is present (issue
+    [#490](https://github.com/josephwright/siunitx/issues/490))
 
 ## [v3.0.13]
 
@@ -91,20 +113,27 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Catalan translations for lists and ranges
 
 ### Fixed
-- Position of complex root when no real part is present (issue [#481](https://github.com/josephwright/siunitx/issues/481))
-- Skip defining `\unit` if the `units` package is loaded (issue [#482](https://github.com/josephwright/siunitx/issues/482))
+- Position of complex root when no real part is present (issue
+  [#481](https://github.com/josephwright/siunitx/issues/481))
+- Skip defining `\unit` if the `units` package is loaded (issue
+  [#482](https://github.com/josephwright/siunitx/issues/482))
 - Printing units in compound quantities when `parse-numbers` is
   false (issue [#484](https://github.com/josephwright/siunitx/issues/484))
 - Printing of `1` when both `print-zero-exponent` and
-  `print-unity-mantissa` are false (issue [#485](https://github.com/josephwright/siunitx/issues/485))
-- Printing of ohm symbol in text mode with `fourier` package (issue [#486](https://github.com/josephwright/siunitx/issues/486))
+  `print-unity-mantissa` are false (issue
+    [#485](https://github.com/josephwright/siunitx/issues/485))
+- Printing of ohm symbol in text mode with `fourier` package (issue
+  [#486](https://github.com/josephwright/siunitx/issues/486))
 
 ## [v3.0.12]
 
 ### Fixed
-- Modify warning message (fixes #476)
-- Rounding zero values to a fixed number of places (issue [#477](https://github.com/josephwright/siunitx/issues/477))
-- Remove stray debug code in symbol allocation (issue [#478](https://github.com/josephwright/siunitx/issues/478))
+- Modify warning message (fixes
+  [#476](https://github.com/josephwright/siunitx/issues/476))
+- Rounding zero values to a fixed number of places (issue
+  [#477](https://github.com/josephwright/siunitx/issues/477))
+- Remove stray debug code in symbol allocation (issue
+  [#478](https://github.com/josephwright/siunitx/issues/478))
 
 ## [v3.0.11]
 
@@ -112,9 +141,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Improve some fallback unit definitions
 
 ### Fixed
-- Printing of symbols with encodings other than UTF-8 (issue [#470](https://github.com/josephwright/siunitx/issues/470))
-- Argument order for `\DeclareSIPrefix` (issue [#471](https://github.com/josephwright/siunitx/issues/471))
-- Emulation of `number-unit-separator` (issue [#473](https://github.com/josephwright/siunitx/issues/473))
+- Printing of symbols with encodings other than UTF-8 (issue
+  [#470](https://github.com/josephwright/siunitx/issues/470))
+- Argument order for `\DeclareSIPrefix` (issue
+  [#471](https://github.com/josephwright/siunitx/issues/471))
+- Emulation of `number-unit-separator` (issue
+  [#473](https://github.com/josephwright/siunitx/issues/473))
 
 ## [v3.0.10]
 
@@ -122,7 +154,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Incompatibility with REVTeX (issue [#469](https://github.com/josephwright/siunitx/issues/469))
+- Incompatibility with REVTeX (issue
+  [#469](https://github.com/josephwright/siunitx/issues/469))
 
 ## [v3.0.9]
 
@@ -131,12 +164,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Add a hint for formatting regression tables
 
 ### Fixed
-- Suppress some spurious overfull box warnings 
+- Suppress some spurious overfull box warnings
 - Issue an error with `output-product`
-- Rounding of uncertainties falling in the integer part (issue [#454](https://github.com/josephwright/siunitx/issues/454))
-- Printing in text mode for compound quantities (issue [#463](https://github.com/josephwright/siunitx/issues/463))
-- Correctly handle `\protect` in literal units (issue [#464](https://github.com/josephwright/siunitx/issues/464))
-- Interpretation of uncertainties in integers (issue [#465](https://github.com/josephwright/siunitx/issues/465))
+- Rounding of uncertainties falling in the integer part (issue
+  [#454](https://github.com/josephwright/siunitx/issues/454))
+- Printing in text mode for compound quantities (issue
+  [#463](https://github.com/josephwright/siunitx/issues/463))
+- Correctly handle `\protect` in literal units (issue
+  [#464](https://github.com/josephwright/siunitx/issues/464))
+- Interpretation of uncertainties in integers (issue
+  [#465](https://github.com/josephwright/siunitx/issues/465))
 
 ## [v3.0.8]
 
@@ -146,17 +183,22 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Provide a fallback route for deprecated units
 
 ### Fixed
-- Correct printing of `10^{0}` (issue [#459](https://github.com/josephwright/siunitx/issues/459))
-- Emulation of `group-four-digits` (issue [#461](https://github.com/josephwright/siunitx/issues/461))
+- Correct printing of `10^{0}` (issue
+  [#459](https://github.com/josephwright/siunitx/issues/459))
+- Emulation of `group-four-digits` (issue
+  [#461](https://github.com/josephwright/siunitx/issues/461))
 
 ## [v3.0.7]
 
 ### Fixed
-- Formatting of some literal units (issue [#449](https://github.com/josephwright/siunitx/issues/449))
-- Issue a warning for removed option `load-configurations` (issue [#455](https://github.com/josephwright/siunitx/issues/455))
+- Formatting of some literal units (issue
+  [#449](https://github.com/josephwright/siunitx/issues/449))
+- Issue a warning for removed option `load-configurations` (issue
+  [#455](https://github.com/josephwright/siunitx/issues/455))
 - Printing of `\times` and `\cdot` in text mode when using a locale
   (issue [#457](https://github.com/josephwright/siunitx/issues/457))
-- Implement missing `output-exponent-marker` (issue [#458](https://github.com/josephwright/siunitx/issues/458))
+- Implement missing `output-exponent-marker` (issue
+  [#458](https://github.com/josephwright/siunitx/issues/458))
 
 ## [v3.0.6]
 
@@ -164,7 +206,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Avoid error if `forbid-literal-units` is set in the preamble (issue [#452](https://github.com/josephwright/siunitx/issues/452))
+- Avoid error if `forbid-literal-units` is set in the preamble (issue
+  [#452](https://github.com/josephwright/siunitx/issues/452))
 - Format separate uncertainty correctly where it falls purely in the integer
   part (issue [#454](https://github.com/josephwright/siunitx/issues/454))
 
@@ -174,10 +217,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Bracket separate uncertainties in compound quantities (issue [#441](https://github.com/josephwright/siunitx/issues/441))
-- Color negative values in table cells correctly (issue [#444](https://github.com/josephwright/siunitx/issues/444))
-- Avoid consumption of any math alphabets (issue [#445](https://github.com/josephwright/siunitx/issues/445))
-- Mark `\bar` as removed (issue [#448](https://github.com/josephwright/siunitx/issues/448))
+- Bracket separate uncertainties in compound quantities (issue
+  [#441](https://github.com/josephwright/siunitx/issues/441))
+- Color negative values in table cells correctly (issue
+  [#444](https://github.com/josephwright/siunitx/issues/444))
+- Avoid consumption of any math alphabets (issue
+  [#445](https://github.com/josephwright/siunitx/issues/445))
+- Mark `\bar` as removed (issue
+  [#448](https://github.com/josephwright/siunitx/issues/448))
 
 ## [v3.0.4]
 
@@ -186,7 +233,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   within the code-level API
 
 ### Fixed
-- Alignment of integers in tables when `parse-numbers = tables` (issue [#442](https://github.com/josephwright/siunitx/issues/442))
+- Alignment of integers in tables when `parse-numbers = tables` (issue
+  [#442](https://github.com/josephwright/siunitx/issues/442))
 
 ## [v3.0.3]
 
@@ -195,8 +243,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Emulation of `input-symbols` (fixes #431)
-- Standard setting for `group-minimum-digits` (issue [#436](https://github.com/josephwright/siunitx/issues/436))
-- Application of negative color in table cells (issue [#439](https://github.com/josephwright/siunitx/issues/439))
+- Standard setting for `group-minimum-digits` (issue
+  [#436](https://github.com/josephwright/siunitx/issues/436))
+- Application of negative color in table cells (issue
+  [#439](https://github.com/josephwright/siunitx/issues/439))
 
 ## [v3.0.2]
 
@@ -205,12 +255,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Better default for `product-symbol`
 
 ### Fixed
-- Option settings `group-digits = true` and `group-digits = false` (issue [#422](https://github.com/josephwright/siunitx/issues/422))
-- Correct position of decimal marker in some tables (issue [#423](https://github.com/josephwright/siunitx/issues/423))
-- Coloring of negative numbers in tables (issue [#424](https://github.com/josephwright/siunitx/issues/424))
-- Alignment of numbers when printing without a `table-format` (issue [#424](https://github.com/josephwright/siunitx/issues/424))
-- Emulation of `\celsius` (issue [#426](https://github.com/josephwright/siunitx/issues/426))
-- Allow `\cdot` to work in text mode (issue [#430](https://github.com/josephwright/siunitx/issues/430))
+- Option settings `group-digits = true` and `group-digits = false` (issue
+  [#422](https://github.com/josephwright/siunitx/issues/422))
+- Correct position of decimal marker in some tables (issue
+  [#423](https://github.com/josephwright/siunitx/issues/423))
+- Coloring of negative numbers in tables (issue
+  [#424](https://github.com/josephwright/siunitx/issues/424))
+- Alignment of numbers when printing without a `table-format` (issue
+  [#424](https://github.com/josephwright/siunitx/issues/424))
+- Emulation of `\celsius` (issue
+  [#426](https://github.com/josephwright/siunitx/issues/426))
+- Allow `\cdot` to work in text mode (issue
+  [#430](https://github.com/josephwright/siunitx/issues/430))
 
 ### Deprecated
 - Unit macro `\celsius`
@@ -224,9 +280,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Documentation improvements
 
 ### Fixed
-- Printing of fractional units in text mode (issue [#418](https://github.com/josephwright/siunitx/issues/418))
-- Include `siunitx-abbreviations.cfg` in fallback v2 files (issue [#419](https://github.com/josephwright/siunitx/issues/419))
-- French translation of 'to' for ranges (issue [#421](https://github.com/josephwright/siunitx/issues/421))
+- Printing of fractional units in text mode (issue
+  [#418](https://github.com/josephwright/siunitx/issues/418))
+- Include `siunitx-abbreviations.cfg` in fallback v2 files (issue
+  [#419](https://github.com/josephwright/siunitx/issues/419))
+- French translation of 'to' for ranges (issue
+  [#421](https://github.com/josephwright/siunitx/issues/421))
 
 ## [v3.0.0]
 
