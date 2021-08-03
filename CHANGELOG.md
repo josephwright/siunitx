@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option setting `round-half = even` (issue #519)
 - Handling of standard deviation-like uncertainties
   where decimal is longer than main part (issue #522)
+- Rounding to uncertainty in the integer part (issue #523)
 
 ## [v3.0.23]
 

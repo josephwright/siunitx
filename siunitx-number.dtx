@@ -2768,7 +2768,7 @@
   }
 \cs_new:Npn \@@_round_uncertainty:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nf \@@_round_uncertainty_aux:nnnnn 
+    \exp_args:Nff \@@_round_uncertainty_aux:nnnnn 
       { \int_eval:n { \tl_count:n {#5} - \tl_count:n {#2} } }
       {#1} {#2} {#3} {#4}
   }
@@ -2780,8 +2780,9 @@
   {
     \exp_args:Nf \@@_round_uncertainty_aux:nnnnnn
       {
-        \tl_if_blank:nT {#5}
-          { \prg_replicate:nn {#1} { 0 } }
+        \prg_replicate:nn
+          { \int_max:nn { #1 - \tl_count:n {#5} } { 0 } }
+          { 0 }
       }
       {#1} {#2} {#3} {#4} {#5}
   }
