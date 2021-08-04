@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.24]
+
 ### Fixed
 - Option setting `round-half = even` (issue
   [#519](https://github.com/josephwright/siunitx/issues/519))
@@ -1519,7 +1521,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.23...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.24...HEAD
+[v3.0.24]: https://github.com/josephwright/siunitx/compare/v3.0.23...v3.0.24
 [v3.0.23]: https://github.com/josephwright/siunitx/compare/v3.0.22...v3.0.23
 [v3.0.22]: https://github.com/josephwright/siunitx/compare/v3.0.21...v3.0.22
 [v3.0.21]: https://github.com/josephwright/siunitx/compare/v3.0.20...v3.0.21
