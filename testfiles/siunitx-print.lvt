@@ -128,16 +128,18 @@
           \box_show:N \l_tmpa_box
         }
       \cs_generate_variant:Nn \test:Nn { NV }
+      \cs_set_protected:Npn \test:N #1
+        {
+          \test:Nn #1 { \mathrm{kg} }
+          \test:Nn #1 { \mathrm{kg}^{2} }
+          \test:Nn #1 \l_tmpa_tl
+        }
     \TIMO
-    \test:Nn \mathsf { \mathrm{kg} }
-    \test:Nn \mathsf { \mathrm{kg}^{2} }
-    \test:NV \mathsf \l_tmpa_tl
-    \test:Nn \mathtt { \mathrm{kg} }
-    \keys_set:nn { siunitx } { propagate-math-font = true } 
-    \test:Nn \mathsf { \mathrm{kg} }
-    \test:Nn \mathsf { \mathrm{kg}^{2} }
-    \test:NV \mathsf \l_tmpa_tl
-    \test:Nn \mathtt { \mathrm{kg} }
+    \tl_map_function:nN { \mathbf \mathit \mathsf \mathtt }
+      \test:N
+    \keys_set:nn { siunitx } { propagate-math-font = true }
+    \tl_map_function:nN { \mathbf \mathit \mathsf \mathtt }
+      \test:N
   }
 
 \TEST { Option~setting~"reset-math-version" }

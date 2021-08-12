@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Extend `propogate-math-font` to cover `\mathbf` and `\mathit`
+  (issue [#525](https://github.com/josephwright/siunitx/issues/525))
+
 ## [v3.0.24]
 
 ### Fixed
