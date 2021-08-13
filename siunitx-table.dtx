@@ -736,7 +736,8 @@
 %   When centering on the decimal marker, the easiest approach is to simply
 %   re-box the two parts. That is needed whether or not we are parsing numbers,
 %   so is best as a short auxiliary. Notice that we need to allow for the width
-%   of the decimal marker itself.
+%   of the decimal marker itself. When not aligning non-numerical material, we
+%   put the extra space into the boxes around the number.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_center_marker:
   {
@@ -750,26 +751,53 @@
             - \box_wd:N \l_@@_tmp_box
           }
       {
-        \hbox_set_to_wd:Nnn \l_@@_decimal_box
+        \bool_if:NTF \l_@@_align_after_bool
           {
-              \box_wd:N \l_@@_integer_box
-            + \box_wd:N \l_@@_tmp_box
-          }
-          {
-            \hbox_unpack:N \l_@@_decimal_box
-            \@@_fil:
-          }
+            \@@_center_marker_aux:Nnnn \l_@@_decimal_box
+              {
+                  \box_wd:N \l_@@_integer_box
+                + \box_wd:N \l_@@_tmp_box
+              }
+           }
+           {
+             \@@_center_marker_aux:Nnnn \l_@@_after_box
+               {
+                   \box_wd:N \l_@@_after_box
+                 + \box_wd:N \l_@@_integer_box
+                 - \box_wd:N \l_@@_decimal_box
+                 + \box_wd:N \l_@@_tmp_box
+               }
+           }
+               { } { \@@_fil: }
       }
       {
-        \hbox_set_to_wd:Nnn \l_@@_integer_box
+        \bool_if:NTF \l_@@_align_before_bool
           {
-              \box_wd:N \l_@@_decimal_box
-            - \box_wd:N \l_@@_tmp_box
+            \@@_center_marker_aux:Nnnn \l_@@_integer_box
+              {
+                  \box_wd:N \l_@@_decimal_box
+                - \box_wd:N \l_@@_tmp_box
+              }
           }
           {
-            \@@_fil:
-            \hbox_unpack:N \l_@@_integer_box
+            \@@_center_marker_aux:Nnnn \l_@@_before_box
+               {
+                   \box_wd:N \l_@@_before_box
+                 + \box_wd:N \l_@@_decimal_box
+                 - \box_wd:N \l_@@_integer_box
+                 - \box_wd:N \l_@@_tmp_box
+               }
           }
+              { \@@_fil: } { }
+      }
+  }
+\cs_new_protected:Npn \@@_center_marker_aux:Nnnn #1#2#3#4
+  {
+    \hbox_set_to_wd:Nnn #1 {#2}
+      {
+        #3
+        \hbox_unpack:N #1
+        #4
       }
   }
 %    \end{macrocode}
@@ -967,10 +995,17 @@
       \c_math_toggle_token
       \l_siunitx_number_output_decimal_tl
   }
+%    \end{macrocode}
+%   We set the two alignment booleans here so that a single auxiliary can
+%   cover this case as well as the one for centering the marker when also
+%   parsing.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_direct_marker_end:
   {
       \c_math_toggle_token
     \hbox_set_end:
+    \bool_set_true:N \l_@@_align_before_bool
+    \bool_set_true:N \l_@@_align_after_bool
     \@@_center_marker:
     \use:c { @@_align_ \l_@@_align_text_tl :n }
       {

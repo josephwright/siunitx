@@ -10,6 +10,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Extend `propogate-math-font` to cover `\mathbf` and `\mathit`
   (issue [#525](https://github.com/josephwright/siunitx/issues/525))
+- Position of non-aligned non-numeric material in table cells when
+  centering decimal marker (issue
+  [#526](https://github.com/josephwright/siunitx/issues/526))
 
 ## [v3.0.24]
 
