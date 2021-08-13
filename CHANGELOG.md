@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Default to sanserif units if `\familydefault` is `\sfdefault`
+  (issue [#516](https://github.com/josephwright/siunitx/issues/516))
+
 ### Fixed
 - Extend `propogate-math-font` to cover `\mathbf` and `\mathit`
   (issue [#525](https://github.com/josephwright/siunitx/issues/525))
