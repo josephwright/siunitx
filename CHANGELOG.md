@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Position of non-aligned non-numeric material in table cells when
   centering decimal marker (issue
   [#526](https://github.com/josephwright/siunitx/issues/526))
+- Treatment of multiple tokens for `input-ignore` (issue
+  [#531](https://github.com/josephwright/siunitx/issues/531))
 
 ## [v3.0.24]
 
