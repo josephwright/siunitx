@@ -2205,6 +2205,9 @@
 %  \begin{macro}[EXP]{\@@_round_auxvi:nN}
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnN, \@@_round_auxviii:nnN}
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
+%  \begin{macro}[EXP]{\@@_round_final_signicant:n}
+%  \begin{macro}[EXP]{\@@_round_final_signicant:N}
+%  \begin{macro}[EXP]{\@@_round_final_signicant:w}
 %  \begin{macro}[EXP]{\@@_round_final_output:nn, \@@_round_final_output:ff}
 %  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:fn}
 %  \begin{macro}[EXP]{\@@_round_final_shift:nn, \@@_round_final_shift:ff}
@@ -2263,7 +2266,10 @@
 %   one of which deals with the integer. In the latter, we should never hit
 %   the end before we've dropped all the digits: the fixed-zero is a
 %   fall-back in case something weird happens. For the integer case, we need
-%   to collect up zeros to pad the length back out correctly later.
+%   to collect up zeros to pad the length back out correctly later. We also
+%   have to cover the case where we round to exactly place above the length
+%   of the integer: that may product a value of $1\dots$: we tidy up the
+%   case where it comes out as $0$ later.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_auxiii:nnnN #1#2#3#4
   {
@@ -2282,7 +2288,14 @@
 \cs_new:Npn \@@_round_auxiv:nnnN #1#2#3#4
   {
     \quark_if_recursion_tail_stop_do:Nn #4
-      { { 0 } { } }
+      {
+        \int_compare:nNnTF {#1} = 0
+          {
+            \@@_round_auxvi:nnN {#3} {#2}
+              0 \q_recursion_tail \q_recursion_stop
+          }
+          { { 0 } { } }
+      }
     \int_compare:nNnTF {#1} > 0
       {
         \exp_args:Nf \@@_round_auxiv:nnnN
@@ -2413,9 +2426,27 @@
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
     \@@_round_final_output:ff
-      { \tl_reverse:n {#3} #2 }
+      { \exp_args:Ne \@@_round_final_significant:n { \tl_reverse:n {#3} #2 } }
       {#1}
   }
+\cs_new:Npn \@@_round_final_significant:n #1
+  {
+     \@@_round_final_significant:N #1
+       \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_final_significant:N #1
+  {
+    \quark_if_recursion_tail_stop_do:Nn #1 { 0 }
+    \int_compare:nNnTF {#1} = 0
+      { \@@_round_final_significant:N }
+      {
+        #1
+        \@@_round_final_significant:w
+      }
+  }
+\cs_new:Npn \@@_round_final_significant:w
+  #1 \q_recursion_tail \q_recursion_stop
+  {#1}
 \cs_new:Npn \@@_round_final_output:nn #1#2 { {#1} {#2} }
 \cs_generate_variant:Nn \@@_round_final_output:nn { ff }
 \cs_new:Npn \@@_round_final:nn #1#2
@@ -2498,6 +2529,9 @@
     \@@_round_truncate:nnN {#1#2} {#3}
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
