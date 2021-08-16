@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.25]
+
 ### Changed
 - Default to sanserif units if `\familydefault` is `\sfdefault`
   (issue [#516](https://github.com/josephwright/siunitx/issues/516))
@@ -1537,7 +1539,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.24...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.25...HEAD
+[v3.0.25]: https://github.com/josephwright/siunitx/compare/v3.0.24...v3.0.25
 [v3.0.24]: https://github.com/josephwright/siunitx/compare/v3.0.23...v3.0.24
 [v3.0.23]: https://github.com/josephwright/siunitx/compare/v3.0.22...v3.0.23
 [v3.0.22]: https://github.com/josephwright/siunitx/compare/v3.0.21...v3.0.22
