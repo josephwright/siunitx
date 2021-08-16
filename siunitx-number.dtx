@@ -2763,9 +2763,26 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_end:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn,  \@@_round_uncertainty_aux:nnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_aux:nnnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnw}
+% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_uncertainty_engineering:nnn ,
+%     \@@_round_uncertainty_fixed:nnn       ,
+%     \@@_round_uncertainty_input:nnn       ,
+%     \@@_round_uncertainty_scientific:nnn
+%   }
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_uncertainty_engineering_2:n ,
+%     \@@_round_uncertainty_engineering_3:n ,
+%     \@@_round_uncertainty_engineering_4:n
+%   }
 %   Rounding to an uncertainty can only happen where the result will have some
 %   uncertainty left: otherwise we simply drop the uncertainty entirely. Only
 %   |S|-type uncertainties can be used for rounding.
@@ -2782,11 +2799,13 @@
             \exp_not:n { {#1} {#2} }
             \exp_args:Nnno \@@_round_uncertainty:nnn
               {#3} {#4} { \use_ii:nn #5 }
-            \exp_not:n { {#6} {#7} }
+            \@@_round_uncertainty_end:nn {#6} {#7}
           }
           { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
       }
   }
+\cs_new:Npn \@@_round_uncertainty_end:nn #1#2
+  { \exp_not:n { {#1} {#2} } }
 %    \end{macrocode}
 %   Round the uncertainty first: this is needed to get the number of places
 %   correct (for the case where the uncertainty rounds up to |1...|). Once that
@@ -2835,13 +2854,97 @@
         { { S } { #4 #1 } }
       }
       {
-        \@@_round:fnn
-          { \int_eval:n { #2 + 1 } }
-          {#5} {#6}
-        { { S } { #3 #1 } }
+       \exp_args:Ne \@@_round_uncertainty_shift:nn
+         {
+            \@@_round:fnn
+              { \int_eval:n { #2 + 1 } }
+              {#5} {#6}
+          }
+          { { S } { #3 #1 } }
       }
   }
 %    \end{macrocode}
+%   We now have to clear up the exponent, plus deal with the case where
+%   rounding has resulted in the entire value being uncertain (|1(1)| with
+%   some exponent). The latter shows up if the uncertainty is too long or if
+%   we match a specific pattern.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_uncertainty_shift:nn #1#2
+  { \@@_round_uncertainty_shift:nnnw #1 {#2} }
+\cs_new:Npn \@@_round_uncertainty_shift:nnnw
+  #1#2#3 #4 \@@_round_uncertainty_end:nn #5#6
+  {
+    #4
+    \bool_lazy_and:nnTF
+      {
+        \int_compare_p:nNn
+          { \tl_count:o { \use_ii:nn #3 } } = \l_@@_round_precision_int
+      }
+      {
+        ! \str_if_eq_p:nn { {#1} {#2} {#3} } { { 10 } { } { { S } { 1 } } }
+      }
+      {
+        \use:c
+          { @@_round_ \l_@@_exponent_mode_tl :nn }
+            {#1} {#2}
+        \@@_round_places_end:nnn {#3} {#5} {#6}
+      }
+      {
+        \use:c
+          { @@_round_uncertainty_ \l_@@_exponent_mode_tl :nnn }
+            {#1} {#5} {#6}
+      }
+  }
+%    \end{macrocode}
+%   With the data available, adjust the output such that the uncertainty
+%   is of the right length.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_uncertainty_engineering:nnn #1#2#3
+  {
+    \use:c
+      {
+         @@_round_uncertainty_
+         \l_@@_exponent_mode_tl _
+	     \tl_count:n {#1}
+         :n
+      }
+        {#2#3}
+  }
+\cs_new:cpn { @@_round_uncertainty_engineering_2:n } #1
+  {
+    { 10 } { } { { S } { 10 } }
+    \@@_exponent_finalise:n {#1}
+  }
+\cs_new:cpn { @@_round_uncertainty_engineering_3:n } #1
+  {
+    { 100 } { } { { S } { 100 } }
+    \@@_exponent_finalise:n {#1}
+  }
+\cs_new:cpn { @@_round_uncertainty_engineering_4:n } #1
+  {
+    { 1 } { } { { S } { 1 } }
+    \@@_exponent_finalise:n { #1 + 3 }
+  }
+\cs_new:Npn \@@_round_uncertainty_fixed:nnn #1#2#3
+  {
+    {#1} { }
+    { { S } { 1 \prg_replicate:nn { \tl_count:n {#1} - 1 } { 0 } } }
+    {#2} {#3}
+  }
+\cs_new_eq:NN \@@_round_uncertainty_input:nnn
+   \@@_round_uncertainty_fixed:nnn
+\cs_new:Npn \@@_round_uncertainty_scientific:nnn #1#2#3
+  {
+    { 1 } { } { { S } { 1 } }
+    \@@_exponent_finalise:n { #2#3 + \tl_count:n {#1} - 1 }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
