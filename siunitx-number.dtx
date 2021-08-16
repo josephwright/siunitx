@@ -2477,7 +2477,6 @@
     \int_compare:nNnTF { \tl_count:n {#1} } = 4
       {
         \@@_round_engineering:NNNNn #1 {#2}
-        { }
         \@@_round_final_shift:Nw 3
       }
       { {#1} {#2} }
@@ -2502,11 +2501,13 @@
   {
     \@@_exponent_shift:nnf
       { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
-    { }
     \@@_round_final_shift:Nw 1
   }
-\cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_places_end:nn #3#4
-  { \@@_exponent_finalise:n { #3#4 + #1 } }
+\cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_places_end:nnn #3#4#5
+  {
+    \exp_not:n { {#3} }
+    \@@_exponent_finalise:n { #4#5 + #1 }
+  }
 %    \end{macrocode}
 %   When we have rounded up to the next power of ten, we need to go back and
 %   remove one more digit. That only happens when rounding to a number of
@@ -2660,7 +2661,7 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_places:nnnnnnn}
-% \begin{macro}[EXP]{\@@_round_places_end:nn}
+% \begin{macro}[EXP]{\@@_round_places_end:nnn}
 % \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
 % \begin{macro}[EXP]{\@@_round_places_finalise:n}
 % \begin{macro}[EXP]{\@@_round_places_finalise:nnnnnnn}
@@ -2682,12 +2683,12 @@
               { \@@_round_places_decimal:nn }
               { \@@_round_places_integer:nn }
                 {#3} {#4}
-            \@@_round_places_end:nn {#6} {#7}
+            \@@_round_places_end:nnn { } {#6} {#7}
           }
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
-\cs_new:Npn \@@_round_places_end:nn #1#2 { { } \exp_not:n { {#1} {#2} } }
+\cs_new:Npn \@@_round_places_end:nnn #1#2#3 { \exp_not:n { {#1} {#2} {#3} } }
 \cs_new:Npn \@@_round_places_decimal:nn #1#2
   {
     \int_compare:nNnTF
