@@ -361,6 +361,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-alignment-mode`
 - Option `table-column-type`
 - Option `text-family-to-math`
+- Option `text-font-command`
 - Option `text-series-to-math`
 - Option `uncertainty-mode`
 - Option `unit-font-command`
@@ -423,7 +424,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `table-sign-mantissa`
 - Option `table-space-text-post`
 - Option `table-space-text-pre`
-- Option `text-font-command`
 - Option `zero-decimal-to-integer`
 - Option setting `list-units = brackets`
 - Option setting `per-mode = reciprocal`
