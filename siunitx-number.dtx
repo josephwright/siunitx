@@ -2765,8 +2765,9 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_end:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn,  \@@_round_uncertainty_aux:nnnnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty_aux:nnnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty:nnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_shift:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnw}
 % \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnn}
@@ -2808,59 +2809,58 @@
   { \exp_not:n { {#1} {#2} } }
 %    \end{macrocode}
 %   Round the uncertainty first: this is needed to get the number of places
-%   correct (for the case where the uncertainty rounds up to |1...|). Once that
-%   is done, it's just a question of working out the digits in the main part.
+%   correct. Once that is done, it's just a question of working out the digits
+%   in the main part.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nnn #1#2#3
   {
-    \exp_last_unbraced:Nf \@@_round_uncertainty:nnnnn
+    \exp_args:Nf \@@_round_uncertainty:nnnn
       {
-        \@@_round:fnn
-          {
-            \int_eval:n
-              { \tl_count:n {#3} - \l_@@_round_precision_int }
-          }
-          { } {#3}
+        \int_eval:n
+          { \tl_count:n {#3} - \l_@@_round_precision_int }
       }
       {#1} {#2} {#3}
   }
-\cs_new:Npn \@@_round_uncertainty:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty:nnnn #1#2#3#4
   {
-    \exp_args:Nff \@@_round_uncertainty_aux:nnnnn 
-      { \int_eval:n { \tl_count:n {#5} - \tl_count:n {#2} } }
-      {#1} {#2} {#3} {#4}
+    \exp_last_unbraced:Nf \@@_round_uncertainty:nnnnn
+      { \@@_round:nnn {#1} { } {#4} }
+      {#2} {#3} {#1}
   }
 %    \end{macrocode}
-%   The first argument here deals with the case where we've lost digits
-%   in the uncertainty and it's purely located in the integer part.
+%   Here, we need to work out how many digits to zero-fill the uncertainty, for
+%   the case where it crosses into the integer part.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty_aux:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nf \@@_round_uncertainty_aux:nnnnnn
+    \exp_args:Nf \@@_round_uncertainty:nnnnnn
       {
         \prg_replicate:nn
-          { \int_max:nn { #1 - \tl_count:n {#5} } { 0 } }
+          {
+            \int_max:nn
+              { 0 - ( \tl_count:n {#4} - \tl_count:n {#2} - #5 +  1 ) } { 0 }
+          } 
           { 0 }
       }
-      {#1} {#2} {#3} {#4} {#5}
+      {#3} {#4} {#1} {#2} {#5}
   }
-\cs_new:Npn \@@_round_uncertainty_aux:nnnnnn #1#2#3#4#5#6
+\cs_new:Npn \@@_round_uncertainty:nnnnnn #1#2#3#4#5#6
   {
-    \tl_if_blank:nTF {#3}
+    \tl_if_blank:nTF {#4}
       {
         \@@_round:nnn
-          {#2}
-          {#5} {#6}
-        { { S } { #4 #1 } }
+          {#6}
+          {#2} {#3}
+        { { S } { #5 #1 } }
       }
       {
        \exp_args:Ne \@@_round_uncertainty_shift:nn
          {
             \@@_round:fnn
-              { \int_eval:n { #2 + 1 } }
-              {#5} {#6}
+              { \int_eval:n { #6 + 1 } }
+              {#2} {#3}
           }
-          { { S } { #3 #1 } }
+          { { S } { #4 #1 } }
       }
   }
 %    \end{macrocode}
@@ -2939,6 +2939,7 @@
     \@@_exponent_finalise:n { #2#3 + \tl_count:n {#1} - 1 }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
