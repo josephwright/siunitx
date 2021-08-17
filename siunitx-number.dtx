@@ -2767,10 +2767,14 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_uncertainty_simple:nnnnnn ,
+%     \@@_round_uncertainty_shift:nnnnnn
+%   }
 % \begin{macro}[EXP]{\@@_round_uncertainty_shift:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnw}
-% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_shift_aux:nnnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_uncertainty_engineering:nnn ,
@@ -2829,45 +2833,53 @@
   }
 %    \end{macrocode}
 %   Here, we need to work out how many digits to zero-fill the uncertainty, for
-%   the case where it crosses into the integer part.
+%   the case where it crosses into the integer part. This depends on whether
+%   the uncertainty rounded up, which also links to additional treatment. We
+%   therefore split paths here.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nf \@@_round_uncertainty:nnnnnn
+    \tl_if_blank:nTF {#1}
       {
-        \prg_replicate:nn
+        \exp_args:Nf \@@_round_uncertainty_simple:nnnnn
           {
-            \int_max:nn
-              { 0 - ( \tl_count:n {#4} - \tl_count:n {#2} - #5 +  1 ) } { 0 }
-          } 
-          { 0 }
-      }
-      {#3} {#4} {#1} {#2} {#5}
-  }
-\cs_new:Npn \@@_round_uncertainty:nnnnnn #1#2#3#4#5#6
-  {
-    \tl_if_blank:nTF {#4}
-      {
-        \@@_round:nnn
-          {#6}
-          {#2} {#3}
-        { { S } { #5 #1 } }
-      }
-      {
-       \exp_args:Ne \@@_round_uncertainty_shift:nn
-         {
-            \@@_round:fnn
-              { \int_eval:n { #6 + 1 } }
-              {#2} {#3}
+            \prg_replicate:nn
+              { 
+                \int_max:nn
+                  { 0 - ( \tl_count:n {#4} - \tl_count:n {#2} - #5 +  1 ) }
+                  { 0 }
+              }
+              { 0 }
           }
-          { { S } { #4 #1 } }
+          {#3} {#4} {#2} {#5}
       }
+      { \@@_round_uncertainty_shift:nnnnn {#3} {#4} {#1} {#2} {#5} }
+        
   }
 %    \end{macrocode}
-%   We now have to clear up the exponent, plus deal with the case where
-%   rounding has resulted in the entire value being uncertain (|1(1)| with
-%   some exponent). The latter shows up if the uncertainty is too long or if
-%   we match a specific pattern.
+%   The simple case: round and pad out the uncertainty as required.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_uncertainty_simple:nnnnn #1#2#3#4#5
+  {
+    \@@_round:nnn
+      {#5}
+      {#2} {#3}
+    { { S } { #4 #1 } }
+  }
+%    \end{macrocode}
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_uncertainty_shift:nnnnn #1#2#3#4#5
+  {
+    \exp_args:Ne \@@_round_uncertainty_shift:nn
+      { \@@_round:fnn { \int_eval:n { #5 + 1 } } {#1} {#2} }
+      {#5}
+  }
+%    \end{macrocode}
+%   If the padding length is the same as the number of integer digits, then
+%   we have a pathological case and need to filter out. They show up as they
+%   have the either the precision greater than the length of the integer
+%   part, or have a value of exactly $10$ when the exponent mode is
+%   scientific.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_shift:nn #1#2
   { \@@_round_uncertainty_shift:nnnw #1 {#2} }
@@ -2876,24 +2888,38 @@
   {
     #4
     \bool_lazy_and:nnTF
+      { \int_compare_p:nNn {#3} > { \tl_count:n {#1} } }
       {
-        \int_compare_p:nNn
-          { \tl_count:o { \use_ii:nn #3 } } = \l_@@_round_precision_int
+        ! \bool_lazy_or_p:nn
+          { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { scientific } }
+          { \str_if_eq_p:nn { #1.#2 } { 10. } }
       }
       {
-        ! \str_if_eq_p:nn { {#1} {#2} {#3} } { { 10 } { } { { S } { 1 } } }
-      }
-      {
-        \use:c
-          { @@_round_ \l_@@_exponent_mode_tl :nn }
-            {#1} {#2}
-        \@@_round_places_end:nnn {#3} {#5} {#6}
+        \exp_args:Nf \@@_round_uncertainty_shift_aux:nnnnn
+          {
+            \prg_replicate:nn
+              {
+                \tl_if_blank:nTF {#2}
+                  { \int_min:nn {#3} { \tl_count:n {#1} - 1 } }
+                  { 0 }
+              }
+              { 0 }
+          }
+          {#1} {#2}
       }
       {
         \use:c
           { @@_round_uncertainty_ \l_@@_exponent_mode_tl :nnn }
-            {#1} {#5} {#6}
+            {#1}
       }
+         {#5} {#6}
+  }
+\cs_new:Npn \@@_round_uncertainty_shift_aux:nnnnn #1#2#3#4#5
+  {
+    \use:c
+      { @@_round_ \l_@@_exponent_mode_tl :nn }
+        {#2} {#3}
+    \@@_round_places_end:nnn { { S } { 1 #1 } } {#4} {#5}
   }
 %    \end{macrocode}
 %   With the data available, adjust the output such that the uncertainty
