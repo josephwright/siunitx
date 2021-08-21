@@ -7,8 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-### Changed
-- Internal improvements in rounding to uncertainty
+### Fixed
+- Accidental printing of `T@TS1` with `beamer` (issue
+  [#534](https://github.com/josephwright/siunitx/issues/534))
 
 ## [v3.0.25]
 
