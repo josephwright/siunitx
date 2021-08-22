@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.27]
+
 ### Fixed
 - Detection of unchanged symbols when font is sanserif (issue
   [#535](https://github.com/josephwright/siunitx/issues/535))
@@ -1549,7 +1551,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.26...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.27...HEAD
+[v3.0.27]: https://github.com/josephwright/siunitx/compare/v3.0.26...v3.0.27
 [v3.0.26]: https://github.com/josephwright/siunitx/compare/v3.0.25...v3.0.26
 [v3.0.25]: https://github.com/josephwright/siunitx/compare/v3.0.24...v3.0.25
 [v3.0.24]: https://github.com/josephwright/siunitx/compare/v3.0.23...v3.0.24
