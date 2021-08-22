@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Detection of unchanged symbols when font is sanserif (issue
+  [#535](https://github.com/josephwright/siunitx/issues/535))
+
 ## [v3.0.26]
 
 ### Fixed
