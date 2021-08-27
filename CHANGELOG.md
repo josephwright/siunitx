@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Pre-spacing for free-standing units (issue
+  [#538](https://github.com/josephwright/siunitx/issues/538))
+
 ## [v3.0.27]
 
 ### Fixed
