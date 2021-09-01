@@ -339,7 +339,7 @@
 %     \l_@@_math_version_bool ,
 %     \l_@@_math_family_bool  ,
 %     \l_@@_text_font_tl      ,
-%     \l_@@_math_weight_bool
+%     \l_@@_math_series_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
@@ -375,7 +375,7 @@
     text-font-command .tl_set:N =
       \l_@@_text_font_tl ,
     text-series-to-math .bool_set:N =
-      \l_@@_math_weight_bool ,
+      \l_@@_math_series_bool ,
     unit-color .tl_set:N =
       \l_@@_unit_color_tl ,
     unit-mode .choices:nn =
@@ -482,32 +482,32 @@
 %
 % \begin{variable}
 %   {
-%      \c_@@_weight_uc_tl ,
-%      \c_@@_weight_ecl_tl ,
-%      \c_@@_weight_c_tl ,
-%      \c_@@_weight_sc_tl ,
-%      \c_@@_weight_sx_tl ,
-%      \c_@@_weight_x_tl ,
-%      \c_@@_weight_ex_tl ,
-%      \c_@@_weight_ux_tl
+%      \c_@@_series_uc_tl ,
+%      \c_@@_series_ecl_tl ,
+%      \c_@@_series_c_tl ,
+%      \c_@@_series_sc_tl ,
+%      \c_@@_series_sx_tl ,
+%      \c_@@_series_x_tl ,
+%      \c_@@_series_ex_tl ,
+%      \c_@@_series_ux_tl
 %   }
 %  Font widths where the |m| for weight is omitted.
 %    \begin{macrocode}
 \clist_map_inline:nn { uc , ec , c , sc , sx , x , ex , ux }
-  { \tl_const:cn { c_@@_weight_ #1 _tl } { m } }
+  { \tl_const:cn { c_@@_series_ #1 _tl } { m } }
 %    \end{macrocode}
 % \end{variable}
 %
 % \begin{variable}
 %   {
-%      \c_@@_weight_l_tl ,
-%      \c_@@_weight_m_tl ,
-%      \c_@@_weight_b_tl
+%      \c_@@_series_l_tl ,
+%      \c_@@_series_m_tl ,
+%      \c_@@_series_b_tl
 %   }
 %  Font widths with one letter.
 %    \begin{macrocode}
 \clist_map_inline:nn { l , m , b }
-  { \tl_const:cn { c_@@_weight_ #1 _tl } { #1 } }
+  { \tl_const:cn { c_@@_series_ #1 _tl } { #1 } }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -535,7 +535,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print_math:n #1
   {
-    \bool_if:NTF \l_@@_math_weight_bool
+    \bool_if:NTF \l_@@_math_series_bool
       {
         \tl_set:Nx \l_@@_tmp_tl
           { \exp_after:wN \@@_extract_series:Nw \f@series ? \q_stop }
@@ -553,11 +553,11 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_extract_series:Nw  #1#2 ? #3 \q_stop
   {
-    \cs_if_exist:cTF { c_@@_weight_ #1#2 _tl }
-      { \@@_convert_series:v { c_@@_weight_ #1#2 _tl } }
+    \cs_if_exist:cTF { c_@@_series_ #1#2 _tl }
+      { \@@_convert_series:v { c_@@_series_ #1#2 _tl } }
       {
-        \cs_if_exist:cTF { c_@@_weight_ #1 _tl }
-          { \@@_convert_series:v { c_@@_weight_ #1 _tl } }
+        \cs_if_exist:cTF { c_@@_series_ #1 _tl }
+          { \@@_convert_series:v { c_@@_series_ #1 _tl } }
           { \@@_convert_series:n {#1#2} }
       }
   }
