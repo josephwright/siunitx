@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Only apply `text-series-to-math` when the math version is
+  `normal` (issue
+  [#541](https://github.com/josephwright/siunitx/issues/541))
+
 ## [v3.0.28]
 
 ### Fixed

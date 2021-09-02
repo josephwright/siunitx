@@ -535,7 +535,9 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print_math:n #1
   {
-    \bool_if:NTF \l_@@_math_series_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_math_series_bool }
+      { \str_if_eq_p:Vn \math@version { normal } }
       {
         \tl_set:Nx \l_@@_tmp_tl
           { \exp_after:wN \@@_extract_series:Nw \f@series ? \q_stop }
