@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.29]
+
 ### Fixed
 - Only apply `text-series-to-math` when the math version is
   `normal` (issue
@@ -1562,7 +1564,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.28...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.29...HEAD
+[v3.0.29]: https://github.com/josephwright/siunitx/compare/v3.0.28...v3.0.29
 [v3.0.28]: https://github.com/josephwright/siunitx/compare/v3.0.27...v3.0.28
 [v3.0.27]: https://github.com/josephwright/siunitx/compare/v3.0.26...v3.0.27
 [v3.0.26]: https://github.com/josephwright/siunitx/compare/v3.0.25...v3.0.26
