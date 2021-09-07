@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Ensure that units contain `\text` are correctly formatted when printing
+   in math mode (issue
+  [#542](https://github.com/josephwright/siunitx/issues/542))
+
 ## [v3.0.29]
 
 ### Fixed

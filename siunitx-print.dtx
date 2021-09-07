@@ -303,10 +303,15 @@
 %
 % \subsection{Initial set up}
 %
-% The printing routines depend on \pkg{amstext} for text mode working.
+% \begin{macro}{\@@_ams_text:n}
+%   The printing routines depend on \pkg{amstext} for text mode working.
+%   We also save the definition of \cs{text} here to use it internally, as the
+%   nature of the \emph{document} command may need to vary.
 %    \begin{macrocode}
 \RequirePackage { amstext }
+\cs_new_eq:NN \@@_ams_text:n \text
 %    \end{macrocode}
+% \end{macro}
 %
 % Color support is always required.
 %    \begin{macrocode}
@@ -603,7 +608,16 @@
 %   commands have different |\long| status.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_math_auxii:n #1
-  { \ensuremath { \@@_math_auxiii:n {#1} } }
+  {
+    \group_begin:
+      \cs_set_protected:Npn \text ##1
+        {
+          \cs_set_eq:NN \text \@@_ams_text:n
+          \siunitx_print_text:n {##1}
+        }
+      \ensuremath { \@@_math_auxiii:n {#1} }
+     \group_end:
+  }
 \cs_new_protected:Npn \@@_math_auxiii:n #1
   {
     \bool_if:NTF \l_@@_math_family_bool
