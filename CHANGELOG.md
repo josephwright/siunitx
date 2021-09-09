@@ -9,8 +9,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Ensure that units contain `\text` are correctly formatted when printing
-   in math mode (issue
+  in math mode (issue
   [#542](https://github.com/josephwright/siunitx/issues/542))
+- Use `\ExplLoaderFileDate` to test for `expl3` version (issue
+  [#544](https://github.com/josephwright/siunitx/issues/544))
 
 ## [v3.0.29]
 
