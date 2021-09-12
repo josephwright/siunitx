@@ -248,6 +248,7 @@
       { \exp_args:Ne \@@_arc_convert:n { \fp_eval:n {#1} } }
       {
         \siunitx_number_parse:nN {#1} \l_@@_degrees_tl
+        \siunitx_number_process:NN \l_@@_degrees_tl \l_@@_degrees_tl
         \tl_set:Nx \l_@@_degrees_tl
           { \siunitx_number_output:NN \l_@@_degrees_tl \q_nil }
         \@@_arc_print:VVV
@@ -349,6 +350,8 @@
         {
           \tl_if_empty:cF { l_@@_ ##1 _tl }
             {
+              \exp_args:Ncc \siunitx_number_process:NN
+                { l_@@_ ##1 _tl } { l_@@_ ##1 _tl }
               \tl_set:cx { l_@@_ ##1 _tl }
                 {
                   \exp_args:Nc \siunitx_number_output:NN

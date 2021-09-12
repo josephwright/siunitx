@@ -13,6 +13,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [#542](https://github.com/josephwright/siunitx/issues/542))
 - Use `\ExplLoaderFileDate` to test for `expl3` version (issue
   [#544](https://github.com/josephwright/siunitx/issues/544))
+- Apply number processing options to angles (issue
+  [#546](https://github.com/josephwright/siunitx/issues/546))
 
 ## [v3.0.29]
 
