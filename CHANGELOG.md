@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Delay selection of math mode to better support `tex4ht` (issue
+  [#530](https://github.com/josephwright/siunitx/issues/530))
+
 ### Fixed
 - Ensure that units contain `\text` are correctly formatted when printing
   in math mode (issue

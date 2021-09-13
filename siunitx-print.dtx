@@ -516,6 +516,12 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_math_html_tl}
+%    \begin{macrocode}
+\tl_new:N \l_@@_math_html_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_print_math:n}
 % \begin{macro}[EXP]{\@@_extract_series:Nw}
 % \begin{macro}[EXP]{\@@_convert_series:n, \@@_convert_series:v}
@@ -524,15 +530,20 @@
 %   {
 %     \@@_math_auxi:n,
 %     \@@_math_auxii:n,
+%   }
+% \begin{macro}{\@@_math_replace:Nn}
+% \begin{macro}
+%   {
 %     \@@_math_auxiii:n,
 %     \@@_math_auxiv:n,
 %     \@@_math_auxv:n
 %   }
-% \begin{macro}{\@@_math_aux:N}
-% \begin{macro}{\@@_math_aux:w}
-% \begin{macro}{\@@_math_aux:Nn, \@@_math_aux:cn}
+% \begin{macro}{\@@_math_auxvi:Nn}
+% \begin{macro}{\@@_math_auxvii:N}
+% \begin{macro}{\@@_math_auxviii:w}
+% \begin{macro}{\@@_math_auxix:Nn}
 % \begin{macro}{\@@_math_sub:n, \@@_math_super:n, \@@_math_script:n}
-% \begin{macro}{\@@_math_text:n}
+% \begin{macro}{\@@_math_ensure:n}
 %   The first step in setting in math mode is to check on the math version.
 %   The starting point is the question of whether text series needs to
 %   propagate to math mode: if so, check on the mapping, otherwise check on
@@ -615,8 +626,17 @@
           \cs_set_eq:NN \text \@@_ams_text:n
           \siunitx_print_text:n {##1}
         }
-      \ensuremath { \@@_math_auxiii:n {#1} }
+      \tl_set:Nn \l_@@_tmp_tl {#1}
+      \exp_after:wN \@@_math_replace:Nn
+        \l_@@_math_html_tl
+        \q_recursion_tail { } \q_recursion_stop
+      \exp_args:NV \@@_math_auxiii:n \l_@@_tmp_tl
      \group_end:
+  }
+\cs_new_protected:Npn \@@_math_replace:Nn #1#2
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \tl_replace_all:Nnn \l_@@_tmp_tl {#1} {#2}
   }
 \cs_new_protected:Npn \@@_math_auxiii:n #1
   {
@@ -625,8 +645,8 @@
         \str_case_e:nnF { \f@family }
           {
             { \rmdefault } { \@@_math_auxv:n }
-            { \sfdefault } { \@@_math_aux:Nn \mathsf }
-            { \ttdefault } { \@@_math_aux:Nn \mathtt }
+            { \sfdefault } { \@@_math_auxix:Nn \mathsf }
+            { \ttdefault } { \@@_math_auxix:Nn \mathtt }
           }
           { \@@_math_auxiv:n }
       }
@@ -644,7 +664,7 @@
   {
     \bool_if:NTF \l_@@_math_font_bool
       {
-        \@@_math_aux:N
+        \@@_math_auxvii:N
           \mathbf \mathit \mathsf \mathtt
           \q_recursion_tail \q_recursion_stop
       }
@@ -656,28 +676,30 @@
     \bool_lazy_or:nnTF
       { \int_compare_p:nNn \fam = { -1 } }
       { \int_compare_p:nNn \fam = \symoperators }
-      { \use:n }
-      { \mathrm }
+      { \@@_math_ensure:n }
+      { \@@_math_auxvi:Nn \mathrm }
         {#1}
   }
-\cs_new_protected:Npn \@@_math_aux:N #1
+\cs_new_protected:Npn \@@_math_auxvi:Nn #1#2
+  { \@@_math_ensure:n { #1 {#2} } }
+\cs_new_protected:Npn \@@_math_auxvii:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1 { \@@_math_auxv:n }
-    \exp_after:wN \exp_after:wN \exp_after:wN \@@_math_aux:w
+    \exp_after:wN \exp_after:wN \exp_after:wN \@@_math_auxviii:w
       \cs:w \cs_to_str:N #1 \c_space_tl \cs_end:
         \use@mathgroup ? { -2 } \q_stop #1
   }
-\cs_new_protected:Npn \@@_math_aux:w #1 \use@mathgroup #2#3 #4 \q_stop #5
+\cs_new_protected:Npn \@@_math_auxviii:w #1 \use@mathgroup #2#3 #4 \q_stop #5
   {
     \int_compare:nNnTF \fam = {#3}
-      { \use_i_delimit_by_q_recursion_stop:nw { \@@_math_aux:Nn #5 } }
-      { \@@_math_aux:N }
+      { \use_i_delimit_by_q_recursion_stop:nw { \@@_math_auxix:Nn #5 } }
+      { \@@_math_auxvii:N }
   }
 %    \end{macrocode}
 %   Search-and-replace fun: deal with any font commands  in the argument and
 %   also inside sub/superscripts.
 %    \begin{macrocode}
-\cs_new_protected:Npx \@@_math_aux:Nn #1#2
+\cs_new_protected:Npx \@@_math_auxix:Nn #1#2
   {
     \group_begin:
       \tl_set:Nn \exp_not:N \l_@@_tmp_tl {#2}
@@ -688,10 +710,10 @@
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
         { ^ }
         { \exp_not:N \@@_math_super:n }
-      #1 { \exp_not:N \tl_use:N \exp_not:N \l_@@_tmp_tl }
+      \exp_not:N \exp_args:NNV \@@_math_auxvi:Nn
+        #1 \exp_not:N \l_@@_tmp_tl
     \group_end:
   }
-\cs_generate_variant:Nn \@@_math_aux:Nn { c }
 \cs_new_protected:Npx \@@_math_sub:n #1
   {
     \char_generate:nn { `\_ } { 8 }
@@ -707,26 +729,26 @@
       \tl_use:N \l_@@_tmp_tl
     \group_end:
   }
+\cs_new_protected:Npn \@@_math_ensure:n #1
+  {
+    \mode_if_math:TF
+      {#1}
+      { $ #1 $ }
+  }
 %    \end{macrocode}
 %   For \pkg{tex4ht}, we need to have category code $12$ |^| tokens in math
-%   mode. We handle that by intercepting at the first auxiliary that makes
-%   sense.
+%   mode.
 %    \begin{macrocode}
 \AtBeginDocument
   {
     \@ifpackageloaded { tex4ht }
-      {
-        \cs_set_protected:Npn \@@_math_auxii:n #1
-          {
-            \tl_set:Nn \l_@@_tmp_tl {#1}
-            \exp_args:NNnx \tl_replace_all:Nnn \l_@@_tmp_tl
-              { ^ } { \token_to_str:N ^ }
-            \ensuremath { \exp_args:NV \@@_math_auxiii:n \l_@@_tmp_tl }
-          }
-      }
+      { \tl_set:Nx \l_@@_math_html_tl { ^ { \token_to_str:N ^ } } }
       { }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
