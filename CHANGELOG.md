@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Avoid infinite loop with `tex4ht` (issue
+  [#549](https://github.com/josephwright/siunitx/issues/549))
+
 ## [v3.0.30]
 
 ### Changed
