@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.31]
+
 ### Changed
 - Avoid infinite loop with `tex4ht` (issue
   [#549](https://github.com/josephwright/siunitx/issues/549))
@@ -1583,7 +1585,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.30...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.31...HEAD
+[v3.0.31]: https://github.com/josephwright/siunitx/compare/v3.0.30...v3.0.31
 [v3.0.30]: https://github.com/josephwright/siunitx/compare/v3.0.29...v3.0.30
 [v3.0.29]: https://github.com/josephwright/siunitx/compare/v3.0.28...v3.0.29
 [v3.0.28]: https://github.com/josephwright/siunitx/compare/v3.0.27...v3.0.28
