@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Use math mode symbol for degree where possible (see issue
+  [#550](https://github.com/josephwright/siunitx/issues/550))
+
 ## [v3.0.31]
 
 ### Fixed

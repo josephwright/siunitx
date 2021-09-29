@@ -179,12 +179,16 @@
       {
         \siunitx_declare_unit:Nxn \degree
           {
-            \exp_not:N \text
-              {
-                \@ifpackageloaded { inputenc }
-                  { \exp_not:N \textdegree }
-                  { \@@_non_latin:n { "00B0 } }
-              }
+            \exp_not:N \ifmmode
+              { } ^ { \exp_not:N \circ }
+            \exp_not:N \else
+              \exp_not:N \text
+                {
+                  \@ifpackageloaded { inputenc }
+                    { \exp_not:N \textdegree }
+                    { \@@_non_latin:n { "00B0 } }
+                }
+            \exp_not:N \fi
           }
           { quantity-product = { } }
       }
@@ -203,12 +207,16 @@
           \group_end:
           \siunitx_declare_unit:Nx \degreeCelsius
             {
-              \exp_not:N \text
-                {
-                  \@ifpackageloaded { inputenc }
-                    { \exp_not:N \textdegree }
-                    { \@@_non_latin:n { "00B0 } }
-                }
+              \exp_not:N \ifmmode
+                { } ^ { \exp_not:N \circ }
+              \exp_not:N \else
+                \exp_not:N \text
+                  {
+                    \@ifpackageloaded { inputenc }
+                      { \exp_not:N \textdegree }
+                      { \@@_non_latin:n { "00B0 } }
+                  }
+              \exp_not:N \fi
                   C
             }
         }
