@@ -3063,6 +3063,22 @@ When the \pkg{units} package is loaded before \pkg{siunitx}, the command
 
 \section{Hints for using \pkg{siunitx}}
 
+\subsection{Problematic font encodings%
+  \label{sec:hint:encoding}}
+
+The standard settings in \pkg{siunitx} assume that \enquote{sensible} input and
+font encoding values prevail. The input encoding is assumed to be \acro{UTF-8}
+in all cases. With pdf\LaTeX{}, the font encoding should be \texttt{T1},
+whereas for Xe\LaTeX{} and Lua\LaTeX{}, \texttt{TU} (Unicode font encoding) is
+expected.
+
+Some packages, for example \pkg{newtxtext} or \pkg{stix2}, either force
+\texttt{T1} or do not anticipate \texttt{TU} correctly with Xe\LaTeX{} and
+Lua\LaTeX{}. In these cases, the symbols used by \pkg{siunitx} may be
+incorrect. If correcting the font encoding is not possible, you will need to
+re-declare the relevant units using symbol definitions which account for this
+non-standard setup.
+
 \subsection{Adjusting \cs{litre} and \cs{liter}%
   \label{sec:hint:litre}}
 
