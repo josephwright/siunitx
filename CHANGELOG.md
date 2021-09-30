@@ -11,7 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 - Hint concerning non-standard font encodings (see issues
-  [#547](https://github.com/josephwright/siunitx/issues/550) and
+  [#547](https://github.com/josephwright/siunitx/issues/547) and
   [#550](https://github.com/josephwright/siunitx/issues/550))
 
 ### Changed
