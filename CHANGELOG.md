@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Futher improvements to degree symbol in math mode
+
 ## [v3.0.32]
 
 ### Added
