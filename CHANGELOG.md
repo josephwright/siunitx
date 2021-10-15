@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.33]
+
 ### Changed
 - Further improvements to degree symbol in math mode
 
@@ -1605,7 +1607,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.32...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.33...HEAD
+[v3.0.33]: https://github.com/josephwright/siunitx/compare/v3.0.32...v3.0.33
 [v3.0.32]: https://github.com/josephwright/siunitx/compare/v3.0.31...v3.0.32
 [v3.0.31]: https://github.com/josephwright/siunitx/compare/v3.0.30...v3.0.31
 [v3.0.30]: https://github.com/josephwright/siunitx/compare/v3.0.29...v3.0.30
