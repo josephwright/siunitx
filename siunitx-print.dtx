@@ -819,7 +819,9 @@
           \@@_replace_font:N \l_@@_tmp_tl
           \cs_set:Npn \mathord ##1 {##1}
           \cs_set:Npn \pm { \exp_not:N \textpm }
-          \cs_set:Npn \mp { \exp_not:n { \ensuremath { \mp } } }
+          \tl_map_inline:nn
+            { \mp \ge \le \gg \ll }
+            { \cs_set:Npn ##1 { \exp_not:N \ensuremath { \exp_not:N ##1 } } }
           \cs_set:Npn \cdot { \exp_not:N \textperiodcentered }
           \cs_set:Npn \times { \exp_not:N \texttimes }
           \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }

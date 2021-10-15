@@ -11,6 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Further improvements to degree symbol in math mode
 
 ### Fixed
+- Handling of comparators when `mode = text` (see issue
+  [#551](https://github.com/josephwright/siunitx/issues/551)
 - Handling of combination of `mode = text` with `tight-spacing` (see issue
   [#553](https://github.com/josephwright/siunitx/issues/553)
 
