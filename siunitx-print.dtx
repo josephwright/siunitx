@@ -806,35 +806,33 @@
   }
 %    \end{macrocode}
 %   To get math mode material to print in text mode, various search-and-replace
-%   steps are needed.
+%   steps are needed. We use \tn{protected@edef} to deal with commands, partly
+%   for speed and partly as it deals with anything nested inside \cs{mathord}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_replace:n #1
   {
     \group_begin:
-    \tl_if_head_eq_meaning:nNTF {#1} \mathchoice
-      { \@@_text_replace:Nnnnn #1 }
-      {
-        \tl_set:Nn \l_@@_tmp_tl {#1}
-        \@@_text_replace:N \l_@@_tmp_tl
-        \tl_use:N \l_@@_tmp_tl
-      }
+      \tl_if_head_eq_meaning:nNTF {#1} \mathchoice
+        { \@@_text_replace:Nnnnn #1 }
+        {
+          \tl_set:Nn \l_@@_tmp_tl {#1}
+          \@@_replace_font:N \l_@@_tmp_tl
+          \cs_set:Npn \mathord ##1 {##1}
+          \cs_set:Npn \pm { \exp_not:N \textpm }
+          \cs_set:Npn \mp { \exp_not:n { \ensuremath { \mp } } }
+          \cs_set:Npn \cdot { \exp_not:N \textperiodcentered }
+          \cs_set:Npn \times { \exp_not:N \texttimes }
+          \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
+          \@@_text_replace:N \l_@@_tmp_tl
+          \tl_use:N \l_@@_tmp_tl
+        }
     \group_end:
   }
 \cs_new_protected:Npx \@@_text_replace:N #1
   {
-    \@@_replace_font:N #1
     \exp_not:N \@@_text_replace:NNn #1
-      \exp_not:N \mathord { }
-      \exp_not:N \pm
-        { \exp_not:N \textpm }
-      \exp_not:N \mp
-        { \exp_not:n { \ensuremath { \mp } } }
       -
         { \exp_not:N \textminus }
-      \exp_not:N \times
-        { \exp_not:N \texttimes }
-      \exp_not:N \cdot
-        { \exp_not:N \textperiodcentered }
       \char_generate:nn { `\_ } { 8 }
         { \exp_not:N \@@_text_sub:n }
       ^

@@ -10,6 +10,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Further improvements to degree symbol in math mode
 
+### Fixed
+- Handling of combination of `mode = text` with `tight-spacing` (see issue
+  [#553](https://github.com/josephwright/siunitx/issues/553)
+
 ## [v3.0.32]
 
 ### Added
