@@ -765,7 +765,7 @@
 % \end{macro}
 %
 % \begin{macro}{\siunitx_print_text:n}
-% \begin{macro}{\@@_text_replace:n}
+% \begin{macro}{\@@_text_replace:n, \@@_text_replace_aux:n}
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
 % \begin{macro}{\@@_text_replace:Nnnn}
@@ -824,10 +824,11 @@
           \cs_set:Npn \times { \exp_not:N \texttimes }
           \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
           \@@_text_replace:N \l_@@_tmp_tl
-          \tl_use:N \l_@@_tmp_tl
+          \@@_text_replace_aux:n { \tl_use:N \l_@@_tmp_tl }
         }
     \group_end:
   }
+\cs_new_protected:Npn \@@_text_replace_aux:n #1 {#1}
 \cs_new_protected:Npx \@@_text_replace:N #1
   {
     \exp_not:N \@@_text_replace:NNn #1
@@ -878,14 +879,7 @@
       {
          \@ifpackageloaded { bidi }
            {
-             \cs_set_protected:Npn \@@_text_replace:n #1
-               {
-                 \group_begin:
-                   \tl_set:Nn \l_@@_tmp_tl {#1}
-                   \@@_text_replace:N \l_@@_tmp_tl
-                   \LRE { \tl_use:N \l_@@_tmp_tl }
-                 \group_end:
-               }
+             \cs_set_protected:Npn \@@_text_replace_aux:n #1 { \LRE {#1} }
            }
        { }
       }
