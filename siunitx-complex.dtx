@@ -766,6 +766,8 @@
 %   }
 % \begin{macro}{\@@_format_extract-exponent:N}
 % \begin{macro}[EXP]{\@@_extract_exp:nnnnnnn}
+% \begin{macro}{\@@_drop_exp:N}
+% \begin{macro}[EXP]{\@@_drop_exp:nnnnnnnN}
 %   Formatting units needs to know the settings from the main module, and
 %   the flow is then much the same as in \pkg{siunitx-compound}. We only
 %   have to watch the fact there are two numbers to format.
@@ -788,6 +790,8 @@
     \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
     \fp_set:Nn \l_@@_tmp_fp
      { \exp_after:wN \@@_extract_exp:nnnnnnn \l_@@_img_tl }
+    \@@_drop_exp:N \l_@@_real_tl
+    \@@_drop_exp:N \l_@@_img_tl
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
   }
@@ -816,7 +820,13 @@
     \siunitx_unit_format:nN {#1} \l_@@_unit_tl
   }
 \cs_new:Npn \@@_extract_exp:nnnnnnn #1#2#3#4#5#6#7 { #6#7 }
+\cs_new_protected:Npn \@@_drop_exp:N #1
+  { \exp_after:wN \@@_drop_exp:nnnnnnnN #1 #1 }
+\cs_new_protected:Npn \@@_drop_exp:nnnnnnnN #1#2#3#4#5#6#7#8
+  { \tl_set:Nn #8 { {#1} {#2} {#3} {#4} {#5} { } { 0 } } }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

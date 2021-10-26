@@ -111,4 +111,22 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_complex_quantity:nn {#1} { \metre }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Option~settings~"exponent-mode"~and~"prefix-mode" }
+  {
+    \test:n { 0,00540 + j0,01717 }
+    \keys_set:nn { siunitx }
+      { exponent-mode = engineering, prefix-mode = combine-exponent }
+    \test:n { 0,00540 + j0,01717 }
+  }
+
 \END

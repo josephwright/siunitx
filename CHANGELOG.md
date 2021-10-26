@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Printing of exponent for complex values when converting to a prefix (see
+  issue [#555](https://github.com/josephwright/siunitx/issues/555))
+
 ## [v3.0.33]
 
 ### Changed
