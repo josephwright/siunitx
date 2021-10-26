@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.34]
+
 ### Fixed
 - Printing of exponent for complex values when converting to a prefix (see
   issue [#555](https://github.com/josephwright/siunitx/issues/555))
@@ -1611,7 +1613,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.33...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.34...HEAD
+[v3.0.34]: https://github.com/josephwright/siunitx/compare/v3.0.33...v3.0.34
 [v3.0.33]: https://github.com/josephwright/siunitx/compare/v3.0.32...v3.0.33
 [v3.0.32]: https://github.com/josephwright/siunitx/compare/v3.0.31...v3.0.32
 [v3.0.31]: https://github.com/josephwright/siunitx/compare/v3.0.30...v3.0.31
