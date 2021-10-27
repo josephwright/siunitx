@@ -816,7 +816,8 @@
         { \@@_text_replace:Nnnnn #1 }
         {
           \tl_set:Nn \l_@@_tmp_tl {#1}
-          \@@_replace_font:N \l_@@_tmp_tl
+          \tl_if_empty:NF \l_siunitx_unit_font_tl
+            { \exp_after:wN \cs_set_eq:NN \l_siunitx_unit_font_tl \use:n }
           \cs_set:Npn \mathord ##1 {##1}
           \cs_set:Npn \pm { \exp_not:N \textpm }
           \tl_map_inline:nn

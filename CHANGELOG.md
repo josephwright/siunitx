@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Text mode replacement of `\mathrm` in super/subscripts (see issue
+  [#556](https://github.com/josephwright/siunitx/issues/556))
+
 ## [v3.0.34]
 
 ### Fixed
