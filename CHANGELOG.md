@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.35]
+
 ### Fixed
 - Text mode replacement of `\mathrm` in super/subscripts (see issue
   [#556](https://github.com/josephwright/siunitx/issues/556))
@@ -1617,7 +1619,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.34...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.35...HEAD
+[v3.0.35]: https://github.com/josephwright/siunitx/compare/v3.0.34...v3.0.35
 [v3.0.34]: https://github.com/josephwright/siunitx/compare/v3.0.33...v3.0.34
 [v3.0.33]: https://github.com/josephwright/siunitx/compare/v3.0.32...v3.0.33
 [v3.0.32]: https://github.com/josephwright/siunitx/compare/v3.0.31...v3.0.32
