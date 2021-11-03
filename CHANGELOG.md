@@ -9,6 +9,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v3.0.35]
 
+### Changed
+- Delay loading of `color` package to `begindocument` hook
+
 ### Fixed
 - Text mode replacement of `\mathrm` in super/subscripts (see issue
   [#556](https://github.com/josephwright/siunitx/issues/556))
