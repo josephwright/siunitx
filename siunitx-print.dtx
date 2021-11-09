@@ -532,6 +532,7 @@
 %     \@@_math_auxi:n,
 %     \@@_math_auxii:n,
 %   }
+% \begin{macro}{\@@_math_text_setup:}
 % \begin{macro}{\@@_math_replace:Nn}
 % \begin{macro}
 %   {
@@ -622,17 +623,39 @@
 \cs_new_protected:Npn \@@_math_auxii:n #1
   {
     \group_begin:
-      \cs_set_protected:Npn \text ##1
+      \tl_if_head_eq_meaning:nNTF {#1} \sfrac
         {
-          \cs_set_eq:NN \text \@@_ams_text:n
-          \siunitx_print_text:n {##1}
+          \cs_set_protected:Npn \text ##1
+            {
+              \cs_set_eq:NN \text \@@_ams_text:n
+              \@@_math_text_setup:
+              ##1
+            }
         }
+        { \@@_math_text_setup: }
       \tl_set:Nn \l_@@_tmp_tl {#1}
       \exp_after:wN \@@_math_replace:Nn
         \l_@@_math_html_tl
         \q_recursion_tail { } \q_recursion_stop
       \exp_args:NV \@@_math_auxiii:n \l_@@_tmp_tl
      \group_end:
+  }
+%    \end{macrocode}
+%   Within the math mode argument, there might be a nested \cs{text}, at which
+%   point we need to apply the text-mode support. Within \emph{that}, we need
+%   to reset \cs{text} to normal. There is one wrinkle, which is covered in the
+%   function above: the \cs{sfrac} command from \pkg{xfrac}. In the latter,
+%   there is a \cs{text} applied to the two arguments, and the material that is
+%   passed contains a lot of code: we cannot apply search-and-replace there.
+%   Instead, we delay things by one expansion.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_math_text_setup:
+  {
+    \cs_set_protected:Npn \text ##1
+      {
+        \cs_set_eq:NN \text \@@_ams_text:n
+        \siunitx_print_text:n {##1}
+      }
   }
 \cs_new_protected:Npn \@@_math_replace:Nn #1#2
   {
@@ -751,6 +774,7 @@
       { }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
