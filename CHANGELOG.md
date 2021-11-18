@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Internal changes to tabular code to improve visual output when integer part
+  is overfull (in preparation for _The LaTeX Companion_, 3rd Edition)
+
 ### Fixed
 - Printing fractional units using `\sfrac` (see issue
   [#558](https://github.com/josephwright/siunitx/issues/558))
