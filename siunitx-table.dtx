@@ -1321,10 +1321,15 @@
 %    \end{macrocode}
 %   The integer part follows much the same pattern, except now it is control
 %   of the comparator alignment that determines where the white space goes.
+%   We want to make sure that \emph{if} the integer is too long, it pokes out
+%   to the left, and at the same time we want to issue exactly one overfull
+%   box warning. That is achieved using an explicit test, such that if there
+%   is an issue we force the size of the content appropriately. That process
+%   will lead to a hit but only for \enquote{defective} input.
+%
 %   As we already have content in the |integer| box, we need to measure how
-%   much \emph{extra} material has been added. To avoid using more boxes
-%   or re-setting, we do that by recording sizes before and after the change.
-%   (In effect, \cs{l_@@_tmp_dim} is here \enquote{l_@@_comparator_dim}.)
+%   much \emph{extra} material has been added.
+%
 %   As the integer part is completed here, we are able to finalise the width
 %   of the pre-numeral part, reboxing it to have the correct width and possibly
 %   to force a single overfull warning if appropriate.
@@ -1333,6 +1338,18 @@
   #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
     \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+    \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
+    \@@_print_format_box:Nn \l_@@_tmp_box {#4#5}
+    \dim_compare:nNnT { \box_wd:N \l_@@_tmp_box } > \l_@@_tmp_dim
+      {
+        \hbox_set_to_wd:Nnn \l_@@_tmp_box \l_@@_tmp_dim
+          { \hbox_unpack:N \l_@@_tmp_box }
+        \hbox_set_to_wd:Nnn \l_@@_tmp_box \l_@@_tmp_dim
+          {
+            \tex_hss:D
+            \hbox_unpack:N \l_@@_tmp_box
+          }
+      }
     \bool_lazy_and:nnTF
       { \l_@@_align_comparator_bool }
       { \dim_compare_p:nNn { \box_wd:N \l_@@_integer_box } > { 0pt } }
@@ -1340,12 +1357,12 @@
         \hbox_set_to_wd:Nnn \l_@@_integer_box
           {
               \box_wd:N \l_@@_integer_box
-            + \box_wd:N \l_@@_tmp_box
+            + \l_@@_tmp_dim
           }
           {
             \hbox_unpack:N \l_@@_integer_box
             \@@_fil:
-            \siunitx_print_number:n {#4#5}
+            \hbox_unpack:N \l_@@_tmp_box
           }
       }
       {
@@ -1354,27 +1371,24 @@
             \hbox_set_to_wd:Nnn \l_@@_integer_box
               {
                   \box_wd:N \l_@@_integer_box
-                + \box_wd:N \l_@@_tmp_box
+                + \l_@@_tmp_dim
               }
               {
                 \@@_fil:
                 \hbox_unpack:N \l_@@_integer_box
-                \siunitx_print_number:n {#4#5}
+                \hbox_unpack:N \l_@@_tmp_box
               }
           }
           {
-            \dim_set:Nn \l_@@_tmp_dim
-              { \box_wd:N \l_@@_integer_box }
             \hbox_set:Nn \l_@@_integer_box
               {
                 \hbox_unpack:N \l_@@_integer_box
-                \siunitx_print_number:n {#4#5}
+                \hbox_unpack:N \l_@@_tmp_box
               }
             \dim_add:Nn \l_@@_before_dim
               {
-                + \box_wd:N \l_@@_tmp_box
-                + \l_@@_tmp_dim
-                - \box_wd:N \l_@@_integer_box
+                  \l_@@_tmp_dim
+                - \box_wd:N \l_@@_tmp_box
               }
           }
       }
