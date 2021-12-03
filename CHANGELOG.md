@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Documentation and warning improvements for "drop-exponent" option
+
 ## [v3.0.36]
 
 ### Changed
