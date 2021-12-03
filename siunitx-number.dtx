@@ -2143,6 +2143,10 @@
   {
     \bool_if:NT \l_@@_drop_exponent_bool
       {
+        \bool_lazy_or:nnF
+          { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { engineering } }
+          { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { scientific } }
+          { \msg_warning:nn { siunitx } { ambiguous-dropped-exponent } }
         \tl_set:Nx #2
           { \exp_after:wN \@@_drop_exponent:nnnnnnn #1 }
       }
@@ -3735,6 +3739,12 @@
   {
     The~input~'#1'~could~not~be~parsed~as~a~number~following~the~
     format~defined~in~module~documentation.
+  }
+\msg_new:nnn { siunitx } { ambiguous-dropped-exponent }
+  { Potentially~ambiguous~dropping~of~exponent. }
+  {
+    The~option~"drop-exponent"~is~active~but~values~do~not~have~an~
+    exponent~fixed~by~"exponent-mode".~The~result~could~be~misleading.
   }
 %    \end{macrocode}
 %
