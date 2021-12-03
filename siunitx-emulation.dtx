@@ -559,10 +559,19 @@
       } ,
     table-omit-exponent .code:n =
       {
-        \@@_option_deprecated:nnV
-          { table-omit-exponent }
-          { drop-exponent }
-          \l_keys_value_tl
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { table-omit-exponent } { drop-exponent }
+        \str_if_eq:VnTF \l_keys_value_tl { true }
+          {
+            \keys_set:nn
+              { siunitx }
+              { drop-exponent = true , exponent-mode = fixed }
+          }
+          {
+            \keys_set:nn
+              { siunitx }
+              { drop-exponent = false }
+          }
       } ,
     table-omit-exponent .default:n = true ,
     table-parse-only .code:n =
