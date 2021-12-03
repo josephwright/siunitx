@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.37]
+
 ### Changed
 - Documentation and warning improvements for "drop-exponent" option
 
@@ -1635,7 +1637,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.36...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.37...HEAD
+[v3.0.37]: https://github.com/josephwright/siunitx/compare/v3.0.36...v3.0.37
 [v3.0.36]: https://github.com/josephwright/siunitx/compare/v3.0.35...v3.0.36
 [v3.0.35]: https://github.com/josephwright/siunitx/compare/v3.0.34...v3.0.35
 [v3.0.34]: https://github.com/josephwright/siunitx/compare/v3.0.33...v3.0.34
