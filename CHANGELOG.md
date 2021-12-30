@@ -7,12 +7,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v3.0.37]
+## [v3.0.37]: 2021-12-04
 
 ### Changed
 - Documentation and warning improvements for "drop-exponent" option
 
-## [v3.0.36]
+## [v3.0.36]: 2021-11-18
 
 ### Changed
 - Internal changes to tabular code to improve visual output when integer part
@@ -22,7 +22,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Printing fractional units using `\sfrac` (see issue
   [#558](https://github.com/josephwright/siunitx/issues/558))
 
-## [v3.0.35]
+## [v3.0.35]: 2021-11-03
 
 ### Changed
 - Delay loading of `color` package to `begindocument` hook
@@ -31,13 +31,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Text mode replacement of `\mathrm` in super/subscripts (see issue
   [#556](https://github.com/josephwright/siunitx/issues/556))
 
-## [v3.0.34]
+## [v3.0.34]: 2021-10-26
 
 ### Fixed
 - Printing of exponent for complex values when converting to a prefix (see
   issue [#555](https://github.com/josephwright/siunitx/issues/555))
 
-## [v3.0.33]
+## [v3.0.33]: 2021-10-15
 
 ### Changed
 - Further improvements to degree symbol in math mode
@@ -48,7 +48,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Handling of combination of `mode = text` with `tight-spacing` (see issue
   [#553](https://github.com/josephwright/siunitx/issues/553)
 
-## [v3.0.32]
+## [v3.0.32]: 2021-09-29
 
 ### Added
 - Hint concerning non-standard font encodings (see issues
@@ -59,13 +59,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Use math mode symbol for degree where possible (see issue
   [#550](https://github.com/josephwright/siunitx/issues/550))
 
-## [v3.0.31]
+## [v3.0.31]: 2021-09-22
 
 ### Fixed
 - Avoid infinite loop with `tex4ht` (issue
   [#549](https://github.com/josephwright/siunitx/issues/549))
 
-## [v3.0.30]
+## [v3.0.30]: 2021-09-14
 
 ### Changed
 - Delay selection of math mode to better support `tex4ht` (issue
@@ -80,32 +80,32 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Apply number processing options to angles (issue
   [#546](https://github.com/josephwright/siunitx/issues/546))
 
-## [v3.0.29]
+## [v3.0.29]: 2021-09-06
 
 ### Fixed
 - Only apply `text-series-to-math` when the math version is
   `normal` (issue
   [#541](https://github.com/josephwright/siunitx/issues/541))
 
-## [v3.0.28]
+## [v3.0.28]: 2021-08-27
 
 ### Fixed
 - Pre-spacing for free-standing units (issue
   [#538](https://github.com/josephwright/siunitx/issues/538))
 
-## [v3.0.27]
+## [v3.0.27]: 2021-08-22
 
 ### Fixed
 - Detection of unchanged symbols when font is sanserif (issue
   [#535](https://github.com/josephwright/siunitx/issues/535))
 
-## [v3.0.26]
+## [v3.0.26]: 2021-08-21
 
 ### Fixed
 - Accidental printing of `T@TS1` with `beamer` (issue
   [#534](https://github.com/josephwright/siunitx/issues/534))
 
-## [v3.0.25]
+## [v3.0.25]: 2021-08-16
 
 ### Changed
 - Default to sanserif units if `\familydefault` is `\sfdefault`
@@ -123,7 +123,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Treatment of multiple tokens for `input-ignore` (issue
   [#531](https://github.com/josephwright/siunitx/issues/531))
 
-## [v3.0.24]
+## [v3.0.24]: 2021-08-04
 
 ### Fixed
 - Option setting `round-half = even` (issue
@@ -133,13 +133,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Rounding to uncertainty in the integer part (issue
   [#523](https://github.com/josephwright/siunitx/issues/523))
 
-## [v3.0.23]
+## [v3.0.23]: 2021-07-26
 
 ### Fixed
 - Load order of `xparse` (issue
   [#518](https://github.com/josephwright/siunitx/issues/518))
 
-## [v3.0.22]
+## [v3.0.22]: 2021-07-22
 
 ### Changed
 - Support `table-text-alignment = none` for interoperation with
@@ -152,7 +152,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Interaction with `cellspace` package (issue
   [#512](https://github.com/josephwright/siunitx/issues/512))
 
-## [v3.0.21]
+## [v3.0.21]: 2021-07-20
 
 ### Fixed
 - Print degree symbol if `fontspec` package is loaded with
@@ -163,7 +163,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Symbol for arcs in text mode (issue
   [#507](https://github.com/josephwright/siunitx/issues/507))
 
-## [v3.0.20]
+## [v3.0.20]: 2021-07-14
 
 ### Fixed
 - Interaction with `kotex` (issue
@@ -171,25 +171,25 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Handling of groups in literal units (issue
   [#503](https://github.com/josephwright/siunitx/issues/503))
 
-## [v3.0.19]
+## [v3.0.19]: 2021-07-06
 
 ### Fixed
 - Emulation for `\SendSettingsToPgf` (issue
   [#501](https://github.com/josephwright/siunitx/issues/501))
 
-## [v3.0.18]
+## [v3.0.18]: 2021-07-04
 
 ### Fixed
 - Printing of reciprocal units when `per-mode = symbol` is active
   (issue [#500](https://github.com/josephwright/siunitx/issues/500))
 
-## [v3.0.17]
+## [v3.0.17]: 2021-06-29
 
 ### Fixed
 - Load order issue with `soulpos` (issue
   [#498](https://github.com/josephwright/siunitx/issues/498))
 
-## [v3.0.16]
+## [v3.0.16]: 2021-06-24
 
 ### Fixed
 - Treatment of spaces before `/` in literal units (issue
@@ -197,7 +197,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Printing of `\mathchoice` entries in text mode (issue
   [#497](https://github.com/josephwright/siunitx/issues/497))
 
-## [v3.0.15]
+## [v3.0.15]: 2021-06-22
 
 ### Fixed
 - Bracketing of complex quantities (issue
@@ -209,7 +209,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Engineering exponents with some exponent values (issue
   [#494](https://github.com/josephwright/siunitx/issues/494))
 
-## [v3.0.14]
+## [v3.0.14]: 2021-06-17
 
 ### Changed
 - Auto-enable `table-fixed-width` when setting `table-column-width`
@@ -225,7 +225,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   `separate` and an exponent is present (issue
     [#490](https://github.com/josephwright/siunitx/issues/490))
 
-## [v3.0.13]
+## [v3.0.13]: 2021-06-14
 
 ### Added
 - Catalan translations for lists and ranges
@@ -243,7 +243,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Printing of ohm symbol in text mode with `fourier` package (issue
   [#486](https://github.com/josephwright/siunitx/issues/486))
 
-## [v3.0.12]
+## [v3.0.12]: 2021-06-09
 
 ### Fixed
 - Modify warning message (fixes
@@ -253,7 +253,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Remove stray debug code in symbol allocation (issue
   [#478](https://github.com/josephwright/siunitx/issues/478))
 
-## [v3.0.11]
+## [v3.0.11]: 2021-06-07
 
 ### Changed
 - Improve some fallback unit definitions
@@ -266,7 +266,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Emulation of `number-unit-separator` (issue
   [#473](https://github.com/josephwright/siunitx/issues/473))
 
-## [v3.0.10]
+## [v3.0.10]: 2021-06-04
 
 ### Changed
 - Documentation improvements
@@ -275,7 +275,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Incompatibility with REVTeX (issue
   [#469](https://github.com/josephwright/siunitx/issues/469))
 
-## [v3.0.9]
+## [v3.0.9]: 2021-06-01
 
 ### Changed
 - Documentation improvements
@@ -293,7 +293,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Interpretation of uncertainties in integers (issue
   [#465](https://github.com/josephwright/siunitx/issues/465))
 
-## [v3.0.8]
+## [v3.0.8]: 2021-05-31
 
 ### Changed
 - Documentation improvements
@@ -306,7 +306,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Emulation of `group-four-digits` (issue
   [#461](https://github.com/josephwright/siunitx/issues/461))
 
-## [v3.0.7]
+## [v3.0.7]: 2021-05-28
 
 ### Fixed
 - Formatting of some literal units (issue
@@ -318,7 +318,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Implement missing `output-exponent-marker` (issue
   [#458](https://github.com/josephwright/siunitx/issues/458))
 
-## [v3.0.6]
+## [v3.0.6]: 2021-05-25
 
 ### Changed
 - Documentation improvements
@@ -329,7 +329,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Format separate uncertainty correctly where it falls purely in the integer
   part (issue [#454](https://github.com/josephwright/siunitx/issues/454))
 
-## [v3.0.5]
+## [v3.0.5]: 2021-05-24
 
 ### Changed
 - Documentation improvements
@@ -344,7 +344,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Mark `\bar` as removed (issue
   [#448](https://github.com/josephwright/siunitx/issues/448))
 
-## [v3.0.4]
+## [v3.0.4]: 2021-05-21
 
 ### Changed
 - Standardise and document the position of `\color` in negative values
@@ -354,7 +354,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Alignment of integers in tables when `parse-numbers = tables` (issue
   [#442](https://github.com/josephwright/siunitx/issues/442))
 
-## [v3.0.3]
+## [v3.0.3]: 2021-05-20
 
 ### Changed
 - Documentation improvements
@@ -366,7 +366,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Application of negative color in table cells (issue
   [#439](https://github.com/josephwright/siunitx/issues/439))
 
-## [v3.0.2]
+## [v3.0.2]: 2021-05-19
 
 ### Changed
 - Documentation improvements
@@ -389,7 +389,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Deprecated
 - Unit macro `\celsius`
 
-## [v3.0.1]
+## [v3.0.1]: 2021-05-18
 
 ### Added
 - Public `\l_siunitx_unit_fraction_tl` variable
@@ -405,7 +405,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - French translation of 'to' for ranges (issue
   [#421](https://github.com/josephwright/siunitx/issues/421))
 
-## [v3.0.0]
+## [v3.0.0]: 2021-05-17
 
 ### Added
 - `\complexnum`
