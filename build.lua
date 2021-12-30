@@ -53,7 +53,7 @@ function update_tag(file,content,tagname,tagdate)
     -- CHANGELOG
     local pattern = "v%d%.%d%.%d%d?"
     local url = "https://github.com/josephwright/siunitx/compare/"
-    local previous = string.match(content,"compare/(" .. pattern .. ")%.%.%.HEAD") 
+    local previous = string.match(content,"compare/(" .. pattern .. ")%.%.%.HEAD")
     if tagname == previous then return content end
     content = string.gsub(content,
       "## %[Unreleased%]",
