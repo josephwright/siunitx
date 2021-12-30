@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Allow for empty values in lists and ranges (see issue
+  [#566](https://github.com/josephwright/siunitx/issues/566))
+
 ## [v3.0.37]: 2021-12-04
 
 ### Changed

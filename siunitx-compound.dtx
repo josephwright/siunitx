@@ -447,6 +447,15 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format:nnn #1#2#3
   {
+    \tl_if_blank:nTF {#1}
+      {
+        \tl_if_blank:nF {#2}
+          { \@@_format:nn {#2} {#3} }
+      }
+      { \@@_format_aux:nnn {#1} {#2} {#3} }
+  }
+\cs_new_protected:Npn \@@_format_aux:nnn #1#2#3
+  {
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
     \bool_if:NTF \l_@@_unit_bool
       { \@@_format_units:nn {#2} {#3} }
@@ -522,10 +531,15 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_parsed:n, \@@_unparsed:n}
+% \begin{macro}{\@@_parsed:n, \@@_parsed_aux:n, \@@_unparsed:n}
 %   The simple cases for parsing (or not) all entries.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:n #1
+  {
+    \tl_if_blank:nF {#1}
+      { \@@_parsed_aux:n {#1} }
+  }
+\cs_new_protected:Npn \@@_parsed_aux:n #1
   {
     \bool_if:NTF \l_@@_unit_bool
       {
@@ -541,7 +555,8 @@
   }
 \cs_new_protected:Npn \@@_unparsed:n #1
   {
-    \seq_put_right:Nn \l_@@_tmp_seq { \ensuremath {#1} }
+    \tl_if_blank:nF {#1}
+      { \seq_put_right:Nn \l_@@_tmp_seq { \ensuremath {#1} } }
   }
 %    \end{macrocode}
 % \end{macro}
