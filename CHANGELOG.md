@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.39]: 2022-01-05
+
 ### Fixed
 - Differentiate unity- and missing mantissa values (see issue
   [#565](https://github.com/josephwright/siunitx/issues/565))
@@ -1647,7 +1649,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.38...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.39...HEAD
+[v3.0.39]: https://github.com/josephwright/siunitx/compare/v3.0.38...v3.0.39
 [v3.0.38]: https://github.com/josephwright/siunitx/compare/v3.0.37...v3.0.38
 [v3.0.37]: https://github.com/josephwright/siunitx/compare/v3.0.36...v3.0.37
 [v3.0.36]: https://github.com/josephwright/siunitx/compare/v3.0.35...v3.0.36
