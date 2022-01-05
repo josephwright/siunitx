@@ -1210,7 +1210,7 @@
     \quark_if_recursion_tail_stop_do:Nn #3
       {
         \bool_if:NTF #2
-          { \tl_put_right:Nn #1 { { 1 } { } { } } }
+          { \tl_put_right:Nn #1 { { } { } { } } }
           { \@@_parse_loop_break:wN \q_recursion_stop }
       }
     \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
@@ -3198,9 +3198,9 @@
 %   }
 % \begin{macro}[rEXP]
 %   {
-%     \@@_output_exponent:nnnn       ,
-%     \@@_output_exponent_auxi:nnnn  ,
-%     \@@_output_exponent_auxii:nnnn
+%     \@@_output_exponent:nnnnn       ,
+%     \@@_output_exponent_auxi:nnnnn  ,
+%     \@@_output_exponent_auxii:nnnnn
 %   }
 % \begin{macro}[rEXP]{\@@_output_exponent_auxiii:nn}
 % \begin{macro}[rEXP]{\@@_output_end:}
@@ -3236,7 +3236,7 @@
     \@@_output_integer:nnn {#3} {#4} {#7}
     \@@_output_decimal:nn {#4} {#8}
     \@@_output_uncertainty:nnn {#5} {#4} {#8}
-    \@@_output_exponent:nnnn {#6} {#7} { #3 . #4 } {#8}
+    \@@_output_exponent:nnnnn {#6} {#7} {#3} {#4} {#8}
     \@@_output_end:
   }
 %    \end{macrocode}
@@ -3259,12 +3259,12 @@
       }
     \@@_output_bracket:w
   }
-\cs_new:Npn \@@_output_bracket:w #1 \@@_output_exponent:nnnn
+\cs_new:Npn \@@_output_bracket:w #1 \@@_output_exponent:nnnnn
   {
     \exp_not:V \l_@@_bracket_open_tl
     #1
     \exp_not:V \l_@@_bracket_close_tl
-    \@@_output_exponent:nnnn
+    \@@_output_exponent:nnnnn
   }
 %    \end{macrocode}
 %   As color for negative values applies to the \emph{whole} output, we have
@@ -3340,17 +3340,26 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_integer:nnn #1#2#3
   {
-    \bool_lazy_any:nT
+    \tl_if_blank:nTF {#1}
       {
-        { \l_@@_unity_mantissa_bool }
-        { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
-        {
-          \bool_lazy_and_p:nn
-            { \str_if_eq_p:nn {#3} { 0 } }
-            { ! \l_@@_zero_exponent_bool }
-        }
+        \bool_lazy_and:nnT
+          { \str_if_eq_p:nn {#3} { 0 } }
+          { ! \l_@@_zero_exponent_bool }
+          { \@@_output_digits:nn { integer } { 1 } }
       }
-      { \@@_output_digits:nn { integer } {#1} }
+      {
+        \bool_lazy_any:nT
+           {
+            { \l_@@_unity_mantissa_bool }
+            { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
+            {
+              \bool_lazy_and_p:nn
+                { \str_if_eq_p:nn {#3} { 0 } }
+                { ! \l_@@_zero_exponent_bool }
+            }
+          }
+          { \@@_output_digits:nn { integer } {#1} }
+      }
   }
 \cs_new:Npn \@@_output_decimal:nn #1#2
   {
@@ -3553,39 +3562,47 @@
 %   For signs, the auxiliary from the main sign routine can be used, but not
 %   the main function: negative exponents don't have special handling.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_exponent:nnnn #1#2#3#4
+\cs_new:Npn \@@_output_exponent:nnnnn #1#2#3#4#5
   {
-    \exp_not:n {#4}
+    \exp_not:n {#5}
     \bool_lazy_or:nnTF
       { \l_@@_zero_exponent_bool }
       { ! \str_if_eq_p:nn {#2} { 0 } }
       {
         \tl_if_empty:NTF \l_@@_output_exp_marker_tl
-          { \@@_output_exponent_auxi:nnnn }
-          { \@@_output_exponent_auxii:nnnn }
-            {#1} {#2} {#3} {#4}
+          { \@@_output_exponent_auxi:nnnnn }
+          { \@@_output_exponent_auxii:nnnnn }
+            {#1} {#2} {#3} {#4} {#5}
       }
-      { \exp_not:n {#4} }
+      { \exp_not:n {#5} }
   }
-\cs_new:Npn \@@_output_exponent_auxi:nnnn #1#2#3#4
+\cs_new:Npn \@@_output_exponent_auxi:nnnnn #1#2#3#4#5
   {
     \bool_lazy_or:nnT
-      { \l_@@_unity_mantissa_bool }
-      { ! \str_if_eq_p:nn {#3} { 1. } }
+      {
+        \bool_lazy_and_p:nn
+          { \l_@@_unity_mantissa_bool }
+          { \str_if_eq_p:nn { #3 . #4 } { 1. } }
+      }
+      {
+        ! \bool_lazy_or_p:nn
+          { \str_if_eq_p:nn { #3 . #4 } { 1. } }
+          { \tl_if_blank_p:n {#3} }
+      }
       {
         \bool_if:NTF \l_@@_tight_bool
           { \exp_not:N \mathord }
           { \use:n }
             { \exp_not:V \l_@@_exponent_product_tl }
       }
-    \exp_not:n {#4}
+    \exp_not:n {#5}
     \exp_not:V \l_@@_exponent_base_tl
     ^
       { \@@_output_exponent_auxiii:nn {#1} {#2} }
   }
-\cs_new:Npn \@@_output_exponent_auxii:nnnn #1#2#3#4
+\cs_new:Npn \@@_output_exponent_auxii:nnnnn #1#2#3#4#5
   {
-    \exp_not:n {#4}
+    \exp_not:n {#5}
     \exp_not:V \l_@@_output_exp_marker_tl
     \@@_output_exponent_auxiii:nn {#1} {#2}
   }

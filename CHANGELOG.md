@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Differentiate unity- and missing mantissa values (see issue
+  [#565](https://github.com/josephwright/siunitx/issues/565))
+
 ## [v3.0.38]: 2022-01-04
 
 ### Changed
