@@ -332,9 +332,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_collect_loop:
   {
-    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
-      { \@@_collect_group:n }
-      { \@@_collect_token:N }
+    \peek_remove_spaces:n
+      {
+        \peek_catcode:NTF \c_group_begin_token
+          { \@@_collect_group:n }
+          { \@@_collect_token:N }
+      }
   }
 \cs_new_protected:Npn \@@_collect_group:n #1
   {
@@ -493,9 +496,12 @@
   }
 \cs_new_protected:Npn \@@_split_loop:NNN #1#2#3
   {
-    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
-      { \@@_split_group:NNNn #1#2#3 }
-      { \@@_split_token:NNNN #1#2#3 }
+    \peek_remove_spaces:n
+      {
+        \peek_catcode:NTF \c_group_begin_token
+          { \@@_split_group:NNNn #1#2#3 }
+          { \@@_split_token:NNNN #1#2#3 }
+      }
   }
 \cs_new_protected:Npn \@@_split_group:NNNn #1#2#3#4
   {
@@ -956,11 +962,14 @@
 \cs_new_protected:Npn \@@_direct_begin:w #1 \ignorespaces
   {
     #1
-    \peek_catcode_ignore_spaces:NTF \c_group_begin_token
-      { \@@_print_text:n }
+    \peek_remove_spaces:n
       {
-        \m@th
-        \use:c { @@_direct_ \l_@@_align_mode_tl : }
+        \peek_catcode:NTF \c_group_begin_token
+          { \@@_print_text:n }
+          {
+            \m@th
+            \use:c { @@_direct_ \l_@@_align_mode_tl : }
+          }
       }
   }
 \cs_new_protected:Npn \@@_direct_end:
