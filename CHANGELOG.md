@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.40]: 2022-01-12
+
 ### Changed
 - Remove a deprecated `expl3` function
 
@@ -1652,7 +1654,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.39...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.40...HEAD
+[v3.0.40]: https://github.com/josephwright/siunitx/compare/v3.0.39...v3.0.40
 [v3.0.39]: https://github.com/josephwright/siunitx/compare/v3.0.38...v3.0.39
 [v3.0.38]: https://github.com/josephwright/siunitx/compare/v3.0.37...v3.0.38
 [v3.0.37]: https://github.com/josephwright/siunitx/compare/v3.0.36...v3.0.37
