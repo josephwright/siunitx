@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Remove a deprecated `expl3` function
+
 ## [v3.0.39] - 2022-01-05
 
 ### Fixed
