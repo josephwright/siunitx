@@ -965,9 +965,26 @@
     \keys_set:nn { siunitx }
       { round-mode = uncertainty , round-precision = 1 }
     \test:
-    \keys_set:nn { siunitx } { exponent-mode = engineering }
+    \group_begin:
+      \keys_set:nn { siunitx } { exponent-mode = engineering }
+      \test:
+      \keys_set:nn { siunitx } { exponent-mode = scientific }
+      \test:
+    \group_end:
+    \OMIT
+       \cs_set_protected:Npn \test:
+        {
+          \test:n { 1677(9) }
+          \test:n { 1677(90) }
+          \test:n { 1677(900) }
+          \test:n { 1677(9000) }
+        }
+    \TIMO
+    \keys_set:nn { siunitx } { round-precision = 2 }
     \test:
-    \keys_set:nn { siunitx } { exponent-mode = scientific }
+    \keys_set:nn { siunitx } { round-precision = 3 }
+    \test:
+    \keys_set:nn { siunitx } { round-precision = 4 }
     \test:
   }
 

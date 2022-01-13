@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding to an uncertainty purely in the integer part (see issue
+  [\#568](https://github.com/josephwright/siunitx/issues/568))
+
 ## [v3.0.40] - 2022-01-12
 
 ### Changed
