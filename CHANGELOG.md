@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Enable new LaTeX option handling if available
+
 ## [v3.0.41] - 2022-01-13
 
 ### Fixed
