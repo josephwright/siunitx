@@ -118,6 +118,8 @@
         \exp_after:wN \exp_after:wN \exp_after:wN
           \exp_not:N \char_generate:nn {#1} { 13 }
         \char_generate:nn {#2} { 12 }
+        \tl_if_blank:nF {#3}
+          { \char_generate:nn {#3} { 12 } }
       }
   }
 \cs_new:Npn \@@_deal_with_utf: { }
@@ -230,7 +232,7 @@
 %   a mode-dependent definition. This doesn't work if the text mode symbol is
 %   bust: the \pkg{fourier} package puts us in that position.
 %    \begin{macrocode}
-    \@@_if_replace:NnT \ohm { "03A9 }
+    \@@_if_replace:NnT \ohm { "2126 }
       {
         \tl_set:Nx \l_@@_tmpa_tl
           {
@@ -262,7 +264,7 @@
                       \bool_lazy_or:nnTF
                         { \sys_if_engine_luatex_p: }
                         { \sys_if_engine_xetex_p: }
-                        { \@@_non_latin:n { "03A9 } }
+                        { \@@_non_latin:n { "2126 } }
                         { \exp_not:N \textohm }
                     }
                 \exp_not:N \fi
