@@ -7,12 +7,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Slovene translations (see pull request
+  [\#570](https://github.com/josephwright/siunitx/pull/570))
+
 ### Changed
 - Enable new LaTeX option handling if available
 - Use U+2126 rather than U+03A9 for `\ohm` in text mode with Unicode
   engines
-- Added Slovene translations (see pull request
-  [\#570](https://github.com/josephwright/siunitx/pull/570))
 
 ## [v3.0.41] - 2022-01-13
 
