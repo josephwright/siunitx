@@ -9,6 +9,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Enable new LaTeX option handling if available
+- Added Slovene translations (see pull request
+  [\#570](https://github.com/josephwright/siunitx/pull/570))
 
 ## [v3.0.41] - 2022-01-13
 
