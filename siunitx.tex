@@ -3111,6 +3111,23 @@ mathematics font without affecting the rest of the output. In some cases,
 simply forcing \cs{mathnormal} will suffice, but this is less reliable with
 non-Latin characters.
 
+\subsection{Including a literal hyphen inside \cs{text}%
+  \label{sec:hint:text-minus}}
+
+In most cases, a "-" character inside \cs{text} will represent a minus. The
+package will therefore replace it with \cs{textminus}. However, this may be
+problematic if you want a hyphen, or if you are using "-" in a piece of \TeX{}
+syntax. You can prevent this by using a second set of braces
+\begin{LaTeXdemo}[code only]
+  \DeclareSIUnit\electronvolt{\text{{e\kern -0.1em V}}}
+\end{LaTeXdemo}
+or by defining a protected command that will yield a hyphen on typesetting
+\begin{LaTeXdemo}[code only]
+  \usepackage{etoolbox}
+  \newrobustcmd*\hyphenminus{-}
+  \DeclareSIUnit\electronvolt{\text{e\kern \hyphenminus0.1em V}}
+\end{LaTeXdemo}
+
 \subsection{Expanding content in tables%
   \label{sec:hint:expanding}}
 
