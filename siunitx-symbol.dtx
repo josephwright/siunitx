@@ -240,6 +240,11 @@
               { \exp_not:N \upOmega }
               { \exp_not:N \Omega }
           }
+        \tl_set:Nx \l_@@_tmpb_tl
+          {
+            \exp_not:N \text
+              { \exp_not:N \ensuremath { \exp_not:V \l_@@_tmpa_tl } }
+          }
         \siunitx_declare_unit:Nx \ohm
           {
             \@ifpackageloaded { fourier }
@@ -250,14 +255,12 @@
               {
                 \exp_not:N \ifmmode
                   \@ifpackageloaded { fontspec }
+                    { \exp_not:V \l_@@_tmpb_tl }
                     {
-                      \exp_not:N \text
-                        {
-                          \exp_not:N \ensuremath
-                            { \exp_not:V \l_@@_tmpa_tl }
-                        }
+                      \@ifclassloaded { beamer }
+                        { \exp_not:V \l_@@_tmpb_tl }
+                        { \exp_not:V \l_@@_tmpa_tl }
                     }
-                    { \exp_not:V \l_@@_tmpa_tl }
                 \exp_not:N \else
                   \exp_not:N \text
                     {
