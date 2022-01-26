@@ -17,7 +17,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.0.43] - 2022-01-20
 
 ### Fixed
-- Printing `\ohm` with `bemear` class (see issue
+- Printing `\ohm` with `beamer` class (see issue
   [\#572](https://github.com/josephwright/siunitx/issues/572))
 
 ## [v3.0.42] - 2022-01-18
