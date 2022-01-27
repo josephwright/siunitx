@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Include `reset-text-shape = false` in emulation of `detect-all` (see issue
+  [\#579](https://github.com/josephwright/siunitx/issues/579))
+
 ## [v3.0.44] - 2022-01-26
 
 ### Added
