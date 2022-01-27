@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.45] - 2022-01-27
+
 ### Fixed
 - Include `reset-text-shape = false` in emulation of `detect-all` (see issue
   [\#579](https://github.com/josephwright/siunitx/issues/579))
@@ -1690,7 +1692,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.44...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.45...HEAD
+[v3.0.45]: https://github.com/josephwright/siunitx/compare/v3.0.44...v3.0.45
 [v3.0.44]: https://github.com/josephwright/siunitx/compare/v3.0.43...v3.0.44
 [v3.0.43]: https://github.com/josephwright/siunitx/compare/v3.0.42...v3.0.43
 [v3.0.42]: https://github.com/josephwright/siunitx/compare/v3.0.41...v3.0.42
