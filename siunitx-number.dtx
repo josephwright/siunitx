@@ -3169,7 +3169,6 @@
 % \begin{macro}[rEXP]{\@@_output_comparator:nn}
 % \begin{macro}[rEXP]{\@@_output_sign:nnn}
 % \begin{macro}[rEXP]{\@@_output_sign:nN}
-% \begin{macro}[rEXP]{\@@_output_sign:N}
 % \begin{macro}[rEXP]
 %   {\@@_output_sign_color:w, \@@_output_sign_brackets:w}
 % \begin{macro}[rEXP]{\@@_output_integer:nnn}
@@ -3319,14 +3318,9 @@
 \cs_new:Npn \@@_output_sign:nN #1#2
   {
     \tl_if_blank:nTF {#1}
-      { \@@_output_sign:N #2 }
-      { \exp_not:n { \mathord {#2} } }
-  }
-\cs_new:Npn \@@_output_sign:N #1
-  {
-    \bool_if:NTF \l_@@_tight_bool
-      { \exp_not:n { \mathord {#1} } }
-      { \exp_not:n {#1} }
+      { \use:n }
+      { \mathord }
+        { \exp_not:n {#2} }
   }
 \cs_new:Npn
   \@@_output_sign_brackets:w #1 \@@_output_end:
@@ -3631,7 +3625,6 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
