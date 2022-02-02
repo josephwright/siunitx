@@ -843,13 +843,22 @@
           \tl_set:Nn \l_@@_tmp_tl {#1}
           \tl_if_empty:NF \l_siunitx_unit_font_tl
             { \exp_after:wN \cs_set_eq:NN \l_siunitx_unit_font_tl \use:n }
-          \cs_set:Npn \mathord ##1 {##1}
-          \cs_set:Npn \pm { \exp_not:N \textpm }
+          \cs_set:Npn \mathord ##1
+            {
+              \str_case:nnF {##1}
+                {
+                  { \cdot }  { \exp_not:N \textperiodcentered }
+                  { \pm }    { \exp_not:N \textpm }
+                  { \times } { \exp_not:N \texttimes }
+                }
+                {##1}
+            }
+          \cs_set:Npn \pm { \: \exp_not:N \textpm \: }
           \tl_map_inline:nn
             { \mp \ge \le \gg \ll }
             { \cs_set:Npn ##1 { \exp_not:N \ensuremath { \exp_not:N ##1 } } }
-          \cs_set:Npn \cdot { \exp_not:N \textperiodcentered }
-          \cs_set:Npn \times { \exp_not:N \texttimes }
+          \cs_set:Npn \cdot { \: \exp_not:N \textperiodcentered \: }
+          \cs_set:Npn \times { \: \exp_not:N \texttimes \: }
           \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
           \@@_text_replace:N \l_@@_tmp_tl
           \@@_text_replace_aux:n { \tl_use:N \l_@@_tmp_tl }
@@ -992,7 +1001,7 @@
 \cs_new_protected:Npn \@@_text_fraction:Nnn #1#2#3
   {
     \ensuremath
-      { 
+      {
         #1
           { \mbox { \@@_text_replace:n {#2} } }
           { \mbox { \@@_text_replace:n {#3} } }

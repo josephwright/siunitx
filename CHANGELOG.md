@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Spacing around math symbols in text mode (see issue
+  [\#583](https://github.com/josephwright/siunitx/issues/583))
+
 ## [v3.0.45] - 2022-01-27
 
 ### Fixed
