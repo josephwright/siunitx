@@ -3167,9 +3167,8 @@
 % \begin{macro}[rEXP]{\@@_output_bracket:nn}
 % \begin{macro}[rEXP]{\@@_output_bracket:w}
 % \begin{macro}[rEXP]{\@@_output_comparator:nn}
-% \begin{macro}[rEXP]{\@@_output_sign:nnn}
+% \begin{macro}[rEXP]{\@@_output_sign:nn}
 % \begin{macro}[rEXP]{\@@_output_sign:nN}
-% \begin{macro}[rEXP]{\@@_output_sign:N}
 % \begin{macro}[rEXP]
 %   {\@@_output_sign_color:w, \@@_output_sign_brackets:w}
 % \begin{macro}[rEXP]{\@@_output_integer:nnn}
@@ -3236,7 +3235,7 @@
     \@@_output_color:n {#2}
     \@@_output_comparator:nn {#1} {#8}
     \@@_output_bracket:nn {#5} {#7}
-    \@@_output_sign:nnn {#1} {#2} {#8}
+    \@@_output_sign:nn {#2} {#8}
     \@@_output_integer:nnn {#3} {#4} {#7}
     \@@_output_decimal:nn {#4} {#8}
     \@@_output_uncertainty:nnn {#5} {#4} {#8}
@@ -3294,39 +3293,25 @@
 %   Formatting signs has to deal with some additional formatting requirements
 %   for negative numbers. Making such numbers by bracketing them needs some
 %   rearrangement of the order of tokens, which is set up in the main
-%   formatting macro by the dedicated do-nothing end function. We also have
-%   the comparator passed here: if it is present, we need to deal with
-%   tighter spacing.
+%   formatting macro by the dedicated do-nothing end function.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_sign:nnn #1#2#3
+\cs_new:Npn \@@_output_sign:nn #1#2
   {
-    \tl_if_blank:nTF {#2}
+    \tl_if_blank:nTF {#1}
       {
         \bool_if:NT \l_@@_implicit_plus_bool
-          { \@@_output_sign:nN {#1} + }
+          { \mathord { + }  }
       }
       {
-        \str_if_eq:nnTF {#2} { - }
+        \str_if_eq:nnTF {#1} { - }
           {
             \bool_if:NTF \l_@@_bracket_negative_bool
               { \@@_output_sign_brackets:w }
-              { \@@_output_sign:nN {#1} #2 }
+              { \mathord { - } }
           }
-          { \@@_output_sign:nN {#1} #2 }
+          { \mathord { \exp_not:n {#1} } }
       }
-    \exp_not:n {#3}
-  }
-\cs_new:Npn \@@_output_sign:nN #1#2
-  {
-    \tl_if_blank:nTF {#1}
-      { \@@_output_sign:N #2 }
-      { \exp_not:n { \mathord {#2} } }
-  }
-\cs_new:Npn \@@_output_sign:N #1
-  {
-    \bool_if:NTF \l_@@_tight_bool
-      { \exp_not:n { \mathord {#1} } }
-      { \exp_not:n {#1} }
+    \exp_not:n {#2}
   }
 \cs_new:Npn
   \@@_output_sign_brackets:w #1 \@@_output_end:
@@ -3481,7 +3466,9 @@
     \str_if_eq:VnTF \l_@@_uncert_mode_tl { separate }
       {
         \exp_not:n {#2}
-        \@@_output_sign:N \pm
+        \bool_if:NTF \l_@@_tight_bool
+          { \exp_not:n { \mathord { \pm } } }
+          { \exp_not:n { \pm } }
         \exp_not:n {#2}
         \@@_output_uncert_S_aux:nnn
           { \int_eval:n { \tl_count:n {#4} - \tl_count:n {#1} } }
@@ -3617,9 +3604,9 @@
         \bool_lazy_and:nnT
           { \l_@@_implicit_plus_bool }
           { ! \str_if_eq_p:nn {#2} { 0 } }
-          { \@@_output_sign:N + }
+          { + }
       }
-      { \@@_output_sign:N #1 }
+      { \exp_not:n {#1} }
     \@@_output_digits:nn { integer } {#2}
   }
 %    \end{macrocode}
@@ -3628,8 +3615,6 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
