@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.47] - 2022-02-03
+
 ### Changed
 - Better handling of `\mathord` in text mode
 
@@ -1701,7 +1703,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.46...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.47...HEAD
+[v3.0.47]: https://github.com/josephwright/siunitx/compare/v3.0.46...v3.0.47
 [v3.0.46]: https://github.com/josephwright/siunitx/compare/v3.0.45...v3.0.46
 [v3.0.45]: https://github.com/josephwright/siunitx/compare/v3.0.44...v3.0.45
 [v3.0.44]: https://github.com/josephwright/siunitx/compare/v3.0.43...v3.0.44
