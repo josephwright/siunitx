@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Better handling of `\mathord` in text mode
+
 ## [v3.0.46] - 2022-02-02
 
 ### Fixed
