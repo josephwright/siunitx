@@ -10,6 +10,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - Polish locale
 
+### Fixed
+- Printing blank entries in text mode (see issue
+  [\#5853](https://github.com/josephwright/siunitx/issues/585))
+
 ## [v3.0.47] - 2022-02-03
 
 ### Changed
