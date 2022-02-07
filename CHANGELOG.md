@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.48] - 2022-02-07
+
 ### Added
 - Polish locale
 
@@ -1710,7 +1712,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.47...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.48...HEAD
+[v3.0.48]: https://github.com/josephwright/siunitx/compare/v3.0.47...v3.0.48
 [v3.0.47]: https://github.com/josephwright/siunitx/compare/v3.0.46...v3.0.47
 [v3.0.46]: https://github.com/josephwright/siunitx/compare/v3.0.45...v3.0.46
 [v3.0.45]: https://github.com/josephwright/siunitx/compare/v3.0.44...v3.0.45
