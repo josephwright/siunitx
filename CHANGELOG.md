@@ -7,10 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v3.0.47] - 2022-02-03
-
 ### Added
 - Polish locale
+
+## [v3.0.47] - 2022-02-03
 
 ### Changed
 - Better handling of `\mathord` in text mode
