@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Option `print-zero-integer` to replace older `add-integer-zero` option
+  (see issue [\#587](https://github.com/josephwright/siunitx/issues/587))
+
 ## [v3.0.48] - 2022-02-07
 
 ### Added

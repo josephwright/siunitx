@@ -3087,7 +3087,8 @@
 %      \l_@@_uncert_separator_tl    ,
 %      \l_@@_tight_bool             ,
 %      \l_@@_unity_mantissa_bool    ,
-%      \l_@@_zero_exponent_bool
+%      \l_@@_zero_exponent_bool     ,
+%      \l_@@_zero_integer_bool
 %   }
 %   Keys producing tokens in the output.
 %    \begin{macrocode}
@@ -3143,6 +3144,8 @@
       \l_@@_unity_mantissa_bool ,
     print-zero-exponent .bool_set:N =
       \l_@@_zero_exponent_bool ,
+    print-zero-integer .bool_set:N =
+      \l_@@_zero_integer_bool ,
     tight-spacing .bool_set:N =
       \l_@@_tight_bool ,
     uncertainty-mode .choices:nn =
@@ -3346,17 +3349,27 @@
           { \@@_output_digits:nn { integer } { 1 } }
       }
       {
-        \bool_lazy_any:nT
-           {
-            { \l_@@_unity_mantissa_bool }
-            { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
-            {
-              \bool_lazy_and_p:nn
-                { \str_if_eq_p:nn {#3} { 0 } }
-                { ! \l_@@_zero_exponent_bool }
-            }
+        \bool_lazy_or:nnT
+          { \l_@@_zero_integer_bool }
+          { ! \str_if_eq_p:nn {#1} { 0 } }
+          {
+            \bool_lazy_any:nT
+              {
+                { \l_@@_unity_mantissa_bool }
+                { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
+                {
+                  \bool_lazy_and_p:nn
+                    { \str_if_eq_p:nn {#3} { 0 } }
+                    { ! \l_@@_zero_exponent_bool }
+                }
+                {
+                  \bool_lazy_and_p:nn
+                    { \str_if_eq_p:nn {#1} { 0 } }
+                    { \l_@@_zero_integer_bool }
+                }
+              }
+              { \@@_output_digits:nn { integer } {#1} }
           }
-          { \@@_output_digits:nn { integer } {#1} }
       }
   }
 \cs_new:Npn \@@_output_decimal:nn #1#2
@@ -3803,6 +3816,7 @@
     print-implicit-plus       = false                                  ,
     print-unity-mantissa      = true                                   ,
     print-zero-exponent       = false                                  ,
+    print-zero-integer        = true                                   ,
     retain-explicit-plus      = false                                  ,
     retain-zero-uncertainty   = false                                  ,
     round-half                = up                                     ,
