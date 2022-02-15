@@ -97,11 +97,14 @@
 %   \meta{integer} and \meta{exponent} parts: these are required. The
 %   \meta{uncertainty} part should either be blank or contain an
 %   \meta{identifier} (as a brace group), followed by one or more data entries.
-%   Valid \meta{identifiers} currently are
+%   Valid uncertainty \meta{identifiers} currently are
 %   \begin{itemize}
 %     \item[\texttt{S}] A single symmetrical uncertainty (\foreign{e.g.}~a
 %       statistical standard uncertainty)
 %   \end{itemize}
+%   If a decimal marker should be explicitly recorded as present for a value
+%   with no decimal digits, the \meta{decimal} part should contain
+%   \cs{empty}.
 % \end{function}
 %
 % \begin{function}{\siunitx_number_process:NN}
@@ -442,6 +445,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{retain-explicit-decimal-marker}
+%   \begin{syntax}
+%     |retain-explicit-decimal-marker| = |true|\verb"|"|false|
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{retain-zero-uncertainty}
 %   \begin{syntax}
 %     |retain-zero-uncertainty| = |true|\verb"|"|false|
@@ -635,6 +644,7 @@
 %      \l_@@_input_uncert_open_tl            ,
 %      \l_siunitx_number_input_sign_tl       ,
 %      \l_@@_input_uncert_sign_tl            ,
+%      \l_@@_explicit_decimal_bool           ,
 %      \l_@@_explicit_plus_bool              ,
 %      \l_@@_zero_uncert_bool
 %   }
@@ -674,6 +684,8 @@
       } ,
     parse-numbers .bool_set:N =
       \l_siunitx_number_parse_bool ,
+    retain-explicit-decimal-marker .bool_set:N =
+      \l_@@_explicit_decimal_bool ,
     retain-explicit-plus .bool_set:N =
       \l_@@_explicit_plus_bool ,
     retain-zero-uncertainty .bool_set:N =
@@ -1293,13 +1305,21 @@
 %   depending on the setting for the indicator switch. For the integer
 %   part, if no number has been collected then one or more non-significant
 %   zeros have been dropped. Exactly one zero is therefore needed to make
-%   sure the parsed result is correct.
+%   sure the parsed result is correct. On the other hand, if the decimal
+%   is empty \emph{and} we are asked to track the presence of a marker,
+%   we store the indicator value \cs{empty}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main_end:NN #1#2
   {
-    \bool_lazy_and:nnT
-      {#2} { \tl_if_empty_p:N \l_@@_partial_tl }
-      { \tl_set:Nn \l_@@_partial_tl { 0 } }
+    \tl_if_empty:NT \l_@@_partial_tl
+      {
+        \bool_if:NTF #2
+          { \tl_set:Nn \l_@@_partial_tl { 0 } }
+          {
+            \bool_if:NT \l_@@_explicit_decimal_bool
+              { \tl_set:Nn \l_@@_partial_tl { \empty } }
+          }
+      }
     \tl_put_right:Nx #1
       {
         { \exp_not:V \l_@@_partial_tl }
@@ -2182,7 +2202,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_round:NN}
-% \begin{macro}[EXP]{\@@_round_none:nnnnnnn}
+% \begin{macro}[EXP]{\@@_round:nnnnnnn}
 %   Rounding is at the top level simple enough: fire off the expandable
 %   set up which does the work.
 %    \begin{macrocode}
@@ -2190,14 +2210,18 @@
   {
     \tl_set:Nx #2
       {
-        \cs:w
-          @@_round_ \l_@@_round_mode_tl :nnnnnnn
-          \exp_after:wN
-        \cs_end: #1
-      }
+        \str_if_eq:VnTF \l_@@_round_mode_tl { none }
+          { \exp_not:V #1 }
+          { \exp_after:wN \@@_round:nnnnnnn #1 }
+       }
   }
-\cs_new:Npn \@@_round_none:nnnnnnn #1#2#3#4#5#6#7
-  { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
+\cs_new:Npn \@@_round:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \str_if_eq:nnTF {#4} { \empty }
+      { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} { } }
+      { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} {#4} }
+        {#5} {#6} {#7}
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -3389,7 +3413,8 @@
             { \exp_not:V \l_siunitx_number_output_decimal_tl }
       }
     \exp_not:n {#2}
-    \@@_output_digits:nn { decimal } {#1}
+    \str_if_eq:nnF {#1} { \empty }
+      { \@@_output_digits:nn { decimal } {#1} }
   }
 \cs_generate_variant:Nn \@@_output_decimal:nn { f }
 \cs_new:Npn \@@_output_digits:nn #1#2
@@ -3789,50 +3814,51 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    bracket-ambiguous-numbers = true                                   ,
-    bracket-negative-numbers  = false                                  ,
-    drop-exponent             = false                                  ,
-    drop-uncertainty          = false                                  ,
-    drop-zero-decimal         = false                                  ,
-    evaluate-expression       = false                                  ,
-    exponent-base             = 10                                     ,
-    exponent-mode             = input                                  ,
-    exponent-product          = \times                                 ,
-    expression                = #1                                     ,
-    fixed-exponent            = 0                                      ,
-    group-digits              = all                                    ,
-    group-minimum-digits      = 5                                      ,
-    group-separator           = \,                                     , % (
-    input-close-uncertainty   = )                                      ,
-    input-comparators         = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
-    input-decimal-markers     = { ., }                                 ,
-    input-digits              = 0123456789                             ,
-    input-exponent-markers    = dDeE                                   ,
-    input-ignore              = \,                                     ,
-    input-open-uncertainty    = (                                      , % )
-    input-signs               = +-\mp\pm                               ,
-    input-uncertainty-signs   = \pm                                    ,
-    minimum-decimal-digits    = 0                                      ,
-    minimum-integer-digits    = 0                                      ,
-    negative-color            =                                        , % (
-    output-close-uncertainty  = )                                      ,
-    output-decimal-marker     = .                                      ,
-    output-open-uncertainty   = (                                      , % )
-    parse-numbers             = true                                   ,
-    print-implicit-plus       = false                                  ,
-    print-unity-mantissa      = true                                   ,
-    print-zero-exponent       = false                                  ,
-    print-zero-integer        = true                                   ,
-    retain-explicit-plus      = false                                  ,
-    retain-zero-uncertainty   = false                                  ,
-    round-half                = up                                     ,
-    round-minimum             = 0                                      ,
-    round-mode                = none                                   ,
-    round-pad                 = true                                   ,
-    round-precision           = 2                                      ,
-    tight-spacing             = false                                  ,
-    uncertainty-mode          = compact                                ,
-    uncertainty-separator     =
+    bracket-ambiguous-numbers      = true                                   ,
+    bracket-negative-numbers       = false                                  ,
+    drop-exponent                  = false                                  ,
+    drop-uncertainty               = false                                  ,
+    drop-zero-decimal              = false                                  ,
+    evaluate-expression            = false                                  ,
+    exponent-base                  = 10                                     ,
+    exponent-mode                  = input                                  ,
+    exponent-product               = \times                                 ,
+    expression                     = #1                                     ,
+    fixed-exponent                 = 0                                      ,
+    group-digits                   = all                                    ,
+    group-minimum-digits           = 5                                      ,
+    group-separator                = \,                                     , % (
+    input-close-uncertainty        = )                                      ,
+    input-comparators              = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
+    input-decimal-markers          = { ., }                                 ,
+    input-digits                   = 0123456789                             ,
+    input-exponent-markers         = dDeE                                   ,
+    input-ignore                   = \,                                     ,
+    input-open-uncertainty         = (                                      , % )
+    input-signs                    = +-\mp\pm                               ,
+    input-uncertainty-signs        = \pm                                    ,
+    minimum-decimal-digits         = 0                                      ,
+    minimum-integer-digits         = 0                                      ,
+    negative-color                 =                                        , % (
+    output-close-uncertainty       = )                                      ,
+    output-decimal-marker          = .                                      ,
+    output-open-uncertainty        = (                                      , % )
+    parse-numbers                  = true                                   ,
+    print-implicit-plus            = false                                  ,
+    print-unity-mantissa           = true                                   ,
+    print-zero-exponent            = false                                  ,
+    print-zero-integer             = true                                   ,
+    retain-explicit-decimal-marker = false                                  ,
+    retain-explicit-plus           = false                                  ,
+    retain-zero-uncertainty        = false                                  ,
+    round-half                     = up                                     ,
+    round-minimum                  = 0                                      ,
+    round-mode                     = none                                   ,
+    round-pad                      = true                                   ,
+    round-precision                = 2                                      ,
+    tight-spacing                  = false                                  ,
+    uncertainty-mode               = compact                                ,
+    uncertainty-separator          =
   }
 %    \end{macrocode}
 %

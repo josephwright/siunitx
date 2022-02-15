@@ -8,6 +8,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Added
+- Option `retain-explicit-decimal-marker` to allow printing of
+  significant decimal markers (see issue
+  [\#590](https://github.com/josephwright/siunitx/issues/590))
 - Option `print-zero-integer` to replace older `add-integer-zero` option
   (see issue [\#587](https://github.com/josephwright/siunitx/issues/587))
 

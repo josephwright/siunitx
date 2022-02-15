@@ -1256,22 +1256,23 @@ Table~\ref{tab:opt:num:in}.
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      evaluate-expression     & Switch  & false            \\
-      expression              & Literal & |#1|             \\^^A (
-      input-close-uncertainty & Literal & )                \\
-      input-comparators       & Literal &
+      evaluate-expression            & Switch  & false            \\
+      expression                     & Literal & |#1|             \\^^A (
+      input-close-uncertainty        & Literal & )                \\
+      input-comparators              & Literal &
         <=>\cs{approx}\cs{ge}\cs{geq} \\
         & & \cs{gg}\cs{le}\cs{leq}\cs{ll} \cs{sim} \\
-      input-decimal-markers   & Literal & .,               \\
-      input-digits            & Literal & 0123456789       \\
-      input-exponent-markers  & Literal & dDeE             \\
-      input-ignore            & Literal & \meta{none}      \\
-      input-open-uncertainty  & Literal & (                \\ ^^A )
-      input-signs             & Literal & +-\cs{pm}\cs{mp} \\
-      input-uncertainty-signs & Literal & \cs{pm}          \\
-      parse-numbers           & Switch  & true             \\
-      retain-explicit-plus    & Switch  & false            \\
-      retain-zero-uncertainty & Switch  & false            \\
+      input-decimal-markers          & Literal & .,               \\
+      input-digits                   & Literal & 0123456789       \\
+      input-exponent-markers         & Literal & dDeE             \\
+      input-ignore                   & Literal & \meta{none}      \\
+      input-open-uncertainty         & Literal & (                \\ ^^A )
+      input-signs                    & Literal & +-\cs{pm}\cs{mp} \\
+      input-uncertainty-signs        & Literal & \cs{pm}          \\
+      parse-numbers                  & Switch  & true             \\
+      retain-explicit-decimal-marker & Switch  & false            \\
+      retain-explicit-plus           & Switch  & false            \\
+      retain-zero-uncertainty        & Switch  & false            \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1361,15 +1362,21 @@ most notably in that a decimal marker must be |.|.
   \qty[expression = 10 * (#1)]{2 + 4 * 3}{\joule}
 \end{LaTeXdemo}
 
+\DescribeOption{retain-explicit-decimal-marker}
 \DescribeOption{retain-explicit-plus}
 \DescribeOption{retain-zero-uncertainty}
-The inclusion of a leading plus sign is usually unnecessary for positive
-numbers, and so they are not retained as-standard when parsing. The
-\opt{retain-explicit-plus} option is available to control this behaviour.
-Similarly, an uncertainty of zero is normally not meaningful, and so is
-ignored by the parser. This can be controlled using the
+In some areas, a trailing decimal marker with no decimal part present is used
+to show that zeros in the integer part are significant. This can be enabled
+using the \opt{retain-explicit-decimal-marker} option. The inclusion of a
+leading plus sign is usually unnecessary for positive numbers, and so they are
+not retained as-standard when parsing. The \opt{retain-explicit-plus} option is
+available to control this behaviour. Similarly, an uncertainty of zero is
+normally not meaningful, and so is ignored by the parser. This can be
+controlled using the
 \opt{retain-zero-uncertainty} option.
 \begin{LaTeXdemo}
+  \num{10.} \\
+  \num[retain-explicit-decimal-marker]{10.} \\
   \num{+345} \\
   \num[retain-explicit-plus]{+345} \\
   \num{12.3(0)} \\
