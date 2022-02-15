@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.0.49] - 2022-02-15
+
 ### Added
 - Option `retain-explicit-decimal-marker` to allow printing of
   significant decimal markers (see issue
@@ -1719,7 +1721,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.48...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.49...HEAD
+[v3.0.49]: https://github.com/josephwright/siunitx/compare/v3.0.48...v3.0.49
 [v3.0.48]: https://github.com/josephwright/siunitx/compare/v3.0.47...v3.0.48
 [v3.0.47]: https://github.com/josephwright/siunitx/compare/v3.0.46...v3.0.47
 [v3.0.46]: https://github.com/josephwright/siunitx/compare/v3.0.45...v3.0.46
