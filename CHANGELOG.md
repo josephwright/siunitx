@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Added
+- Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
+  [\#575](https://github.com/josephwright/siunitx/issues/575))
 - Unit abbreviations `\fH` and `\pH` (see issue
   [\#596](https://github.com/josephwright/siunitx/issues/596))
 - Unit abbreviation `\nW` (see issue
