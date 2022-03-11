@@ -1127,20 +1127,22 @@ Table~\ref{tab:opt:print}.
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      color               & Literal & \meta{none} \\
-      mode                & Choice  & math        \\
-      number-color        & Literal & \meta{none} \\
-      number-mode         & Choice  & math        \\
-      propagate-math-font & Switch  & false       \\
-      reset-math-version  & Switch  & true        \\
-      reset-text-family   & Switch  & true        \\
-      reset-text-series   & Switch  & true        \\
-      reset-text-shape    & Switch  & true        \\
-      text-family-to-math & Switch  & false       \\
-      text-font-command   & Literal & \meta{none} \\
-      text-series-to-math & Switch  & false       \\
-      unit-color          & Literal & \meta{none} \\
-      unit-mode           & Choice  & math        \\
+      color                    & Literal & \meta{none}          \\
+      mode                     & Choice  & math                 \\
+      number-color             & Literal & \meta{none}          \\
+      number-mode              & Choice  & math                 \\
+      propagate-math-font      & Switch  & false                \\
+      reset-math-version       & Switch  & true                 \\
+      reset-text-family        & Switch  & true                 \\
+      reset-text-series        & Switch  & true                 \\
+      reset-text-shape         & Switch  & true                 \\
+      text-family-to-math      & Switch  & false                \\
+      text-font-command        & Literal & \meta{none}          \\
+      text-subscript-command   & Literal & \cs{textsubscript}   \\
+      text-superscript-command & Literal & \cs{textsuperscript} \\
+      text-series-to-math      & Switch  & false                \\
+      unit-color               & Literal & \meta{none}          \\
+      unit-mode                & Choice  & math                 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1233,6 +1235,24 @@ font variant which does not feature them.
   \qty{123456789}{\kilo\volt\per\centi\metre} \\
   \sisetup{text-font-command = \fontfamily{pplx}\selectfont}
   \qty{123456789}{\kilo\volt\per\centi\metre}
+\end{LaTeXdemo}
+
+\DescribeOption{text-subscript-command}
+\DescribeOption{text-superscript-command}
+In most cases, the commands \cs{textsubscript} and \cs{textsuperscript} are
+appropriagte for creating sub- and superscript material in text mode. However,
+when the \pkg{realscripts} package is loaded, it is possible that the output is
+not as desired. These two commands are therefore available to allow tuning of
+the results. They can also be used for non-standard effects, for example as
+here adding color to subscripts.
+\begin{LaTeXdemo}
+  \sisetup{unit-mode = text}
+  \unit{\kg\of{polymer}} \\
+  \newcommand*\mysubscript[1]{%
+    \textsubscript{\textcolor{blue}{#1}}%
+  }
+  \sisetup{text-subscript-command = \mysubscript}
+  \unit{\kg\of{polymer}}
 \end{LaTeXdemo}
 
 \DescribeOption{color}

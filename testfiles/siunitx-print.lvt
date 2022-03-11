@@ -225,6 +225,29 @@
     \test:nn { number } { 123 }
   }
 
+\tl_set:Nx \l_tmpa_tl
+  {
+    \exp_not:N \mathrm { kg }
+    \char_generate:nn { `\_ } { 8 }
+    { \exp_not:N \mathrm { polymer } }
+  }
+
+\TEST { Option~setting~"text-subscript-command" }
+  {
+    \keys_set:nn { siunitx } { mode = text }
+    \exp_args:NnV \test:nn { unit } \l_tmpa_tl
+    \keys_set:nn { siunitx } { text-subscript-command = X }
+    \exp_args:NnV \test:nn { unit } \l_tmpa_tl
+  }
+
+\TEST { Option~setting~"text-superscript-command" }
+  {
+    \keys_set:nn { siunitx } { mode = text }
+    \test:nn { unit } { abc ^ { def } }
+    \keys_set:nn { siunitx } { text-superscript-command = X }
+    \test:nn { unit } { abc ^ { def } }
+  }
+
 \TEST { Option~setting~"text-series-to-math" }
   {
     \group_begin:

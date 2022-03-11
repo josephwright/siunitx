@@ -8,6 +8,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Added
+- Options `text-subscript-command` and `text-superscript-command` to allow
+  customisation of script printing in text mode (see issue
+    [\#595](https://github.com/josephwright/siunitx/issues/595))
 - Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
   [\#575](https://github.com/josephwright/siunitx/issues/575))
 - Unit abbreviations `\fH` and `\pH` (see issue

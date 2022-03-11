@@ -241,6 +241,16 @@
 %   The mappings between text and math weight are set . The standard setting is |false|.
 % \end{function}
 %
+% \begin{function}{text-subscript-command, text-superscript-command}
+%   \begin{syntax}
+%     |text-subscript-command| = \meta{cmd}
+%     |text-superscript-command| = \meta{cmd}
+%   \end{syntax}
+%   Sets the command used when printing material in sub- or superscript
+%   positions in text mode. The standard settings are \cs{textsubscript}
+%   and \cs{textsuperscript}, respectively.
+% \end{function}
+%
 % \begin{function}{unit-color}
 %   \begin{syntax}
 %     |unit-color| = \meta{color}
@@ -345,6 +355,8 @@
 %     \l_@@_math_version_bool ,
 %     \l_@@_math_family_bool  ,
 %     \l_@@_text_font_tl      ,
+%     \l_@@_text_sub_tl       ,
+%     \l_@@_text_super_tl     ,
 %     \l_@@_math_series_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
@@ -380,6 +392,10 @@
       \l_@@_math_family_bool ,
     text-font-command .tl_set:N =
       \l_@@_text_font_tl ,
+    text-subscript-command .tl_set:N =
+      \l_@@_text_sub_tl ,
+    text-superscript-command .tl_set:N =
+      \l_@@_text_super_tl ,
     text-series-to-math .bool_set:N =
       \l_@@_math_series_bool ,
     unit-color .tl_set:N =
@@ -797,7 +813,7 @@
 % \begin{macro}{\@@_text_replace:Nnnn}
 % \begin{macro}{\@@_text_replace_frac:n}
 % \begin{macro}{\@@_text_sub:n, \@@_text_super:n}
-% \begin{macro}{\@@_text_scripts:NnN}
+% \begin{macro}{\@@_text_scripts:nnN}
 % \begin{macro}{\@@_text_scripts:}
 % \begin{macro}{\@@_text_scripts_one:NnN}
 % \begin{macro}{\@@_text_scripts_two:NnNn}
@@ -935,15 +951,15 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_sub:n #1
   {
-    \@@_text_scripts:NnN
-      \textsubscript {#1} \@@_text_super:n
+    \@@_text_scripts:VnN
+      \l_@@_text_sub_tl {#1} \@@_text_super:n
   }
 \cs_new_protected:Npn \@@_text_super:n #1
   {
-    \@@_text_scripts:NnN
-      \textsuperscript {#1} \@@_text_sub:n
+    \@@_text_scripts:VnN
+      \l_@@_text_super_tl {#1} \@@_text_sub:n
   }
-\cs_new_protected:Npn \@@_text_scripts:NnN #1#2#3
+\cs_new_protected:Npn \@@_text_scripts:nnN #1#2#3
   {
     \cs_set_protected:Npn \@@_text_scripts:
       {
@@ -956,6 +972,7 @@
       }
     \peek_after:Nw \@@_text_scripts:
   }
+\cs_generate_variant:Nn \@@_text_scripts:nnN { V }
 \cs_new_protected:Npn \@@_text_scripts: { }
 %    \end{macrocode}
 %   In the simple case of one script item, we have to do a search-and-replace
@@ -1039,20 +1056,22 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    color               =       ,
-    mode                = math  ,
-    number-color        =       ,
-    number-mode         = math  ,
-    propagate-math-font = false ,
-    reset-math-version  = true  ,
-    reset-text-shape    = true  ,
-    reset-text-series   = true  ,
-    reset-text-family   = true  ,
-    text-family-to-math = false ,
-    text-font-command   =       ,
-    text-series-to-math = false ,
-    unit-color          =       ,
-    unit-mode           = math
+    color                    =                  ,
+    mode                     = math             ,
+    number-color             =                  ,
+    number-mode              = math             ,
+    propagate-math-font      = false            ,
+    reset-math-version       = true             ,
+    reset-text-shape         = true             ,
+    reset-text-series        = true             ,
+    reset-text-family        = true             ,
+    text-family-to-math      = false            ,
+    text-font-command        =                  ,
+    text-subscript-command   = \textsubscript   ,
+    text-superscript-command = \textsuperscript ,
+    text-series-to-math      = false            ,
+    unit-color               =                  ,
+    unit-mode                = math
   }
 %    \end{macrocode}
 %
