@@ -71,16 +71,59 @@
 %   \end{syntax}
 %   Parses the \meta{number} and splits into real and complex parts, which are
 %   then formatted as described for \cs{siunitx_number_format:nN}. The results
-%   are combined and printed using the standard functions in the module.
+%   are combined and printed using the standard functions in the module. If
+%   the setting \opt{complex-mode} is set to \meta{polar}, the input is
+%   parsed, converted to polar form and then passed to
+%   \cs{siunitx_complex_number:nn}. This parsing requires that the complex root
+%   is given as \texttt{i} at the \emph{end} of the value.
 % \end{function}
 %
-% \begin{function}{\siunitx_complex_quantity:nn}
+% \begin{function}{\siunitx_complex_number:nn}
 %   \begin{syntax}
-%     \cs{siunitx_complex_quantity:n} \Arg{number} \Arg{units}
+%     \cs{siunitx_complex_number:nn} \Arg{magnitude} \Arg{angle}
 %   \end{syntax}
-%   Parses the \meta{number} and splits into real and complex parts, which are
-%   then formatted as described for \cs{siunitx_quantity:nn}. The results
-%   are combined and printed using the standard functions in the module.
+%   Parses the \meta{magnitude} and \meta{angle} and then formats each as
+%   described for \cs{siunitx_number_format:nN}. The two are separated by the
+%   angle symbol, which is treated as a numerical part. If
+%   \opt{complex-angle-unit} is set to \opt{degrees} then the unit symbol is
+%   added: this is printed as a unit in the usual way. If
+%   the setting \opt{complex-mode} is set to \meta{cartesian}, the input is
+%   parsed, converted to Cartesian form and then passed to
+%   \cs{siunitx_complex_number:n}.
+% \end{function}
+%
+% \begin{function}{\siunitx_complex_quantity:nn, \siunitx_complex_quantity:nnn}
+%   \begin{syntax}
+%     \cs{siunitx_complex_quantity:nn} \Arg{number} \Arg{units}
+%     \cs{siunitx_complex_quantity:nnn} \Arg{magnitude} \Arg{angle} \Arg{units}
+%   \end{syntax}
+%   These functions treat their numerical argument(s) as described
+%   for the corresponding \texttt{number} functions. They then typeset the
+%   entire numerical part and the unit as described for \cs{siunitx_quantity:nn}.
+% \end{function}
+%
+% \begin{function}{complex-angle-unit}
+%   \begin{syntax}
+%     |complex-angle-unit| = |degrees|\verb"|"|radians|
+%   \end{syntax}
+%   Sets how the unit for polar complex numbers is treated. This setting
+%   is used to determine how polar \emph{input} is interpreted, how
+%   conversion to polar form works and how output in polar form is typeset.
+%   The standard setting is |degrees|.
+% \end{function}
+%
+% \begin{function}{complex-mode}
+%   \begin{syntax}
+%     |complex-mode| = |cartesian|\verb"|"|input|\verb"|"|polar|
+%   \end{syntax}
+%   Selects how complex values are formatted: a choice from the options
+%   |cartesian|, |input| and |polar|. The option |cartesian| means that
+%   complex values will always be typeset in cartesian ($x + y\mathrm{i}$)
+%   format, whilst |polar| means that complex are typeset as a magnitude
+%   and angle. Finally, |input| setting means that the input format
+%   (\foreign{i.e.}~difference between \cs{siunitx_complex_number:n} and
+%   \cs{siunitx_complex_number:nn}) is maintained. The standard setting is
+%   |input|.
 % \end{function}
 %
 % \begin{function}{complex-root-position}
@@ -89,6 +132,20 @@
 %   \end{syntax}
 %   Choice which determines where the complex root symbol is printed relative
 %   to the numbers. The standard setting is |after-number|.
+% \end{function}
+%
+% \begin{function}{complex-symbol-angle}
+%   \begin{syntax}
+%     |complex-symbol-angle| = \meta{symbol}
+%   \end{syntax}
+%   Sets the symbol used before the polar angle.
+% \end{function}
+%
+% \begin{function}{complex-symbol-degree}
+%   \begin{syntax}
+%     |complex-symbol-degree| = \meta{symbol}
+%   \end{syntax}
+%   Sets the symbol used for polar degrees.
 % \end{function}
 %
 % \begin{function}{input-complex-root}
@@ -155,10 +212,18 @@
 % \end{variable}
 %
 % \begin{variable}{\l_@@_real_tl, \l_@@_img_tl}
-%   The real and imaginary parts of the number, respectively.
+%   The real and imaginary parts of cartesian form, respectively.
 %    \begin{macrocode}
 \tl_new:N \l_@@_real_tl
 \tl_new:N \l_@@_img_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_mag_tl, \l_@@_angle_tl}
+%   The magnitude and angle of polar form, respectively.
+%    \begin{macrocode}
+\tl_new:N \l_@@_mag_tl
+\tl_new:N \l_@@_angle_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -170,16 +235,54 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_input_root_tl, \l_@@_output_root_tl}
+% \begin{variable}
+%   {
+%     \l_@@_root_after_bool      ,
+%     \l_@@_force_cartesian_bool ,
+%     \l_@@_force_polar_bool     ,
+%     \l_@@_polar_degree_bool    ,
+%     \l_@@_symbol_angle_tl      ,
+%     \l_@@_symbol_degree_tl     ,
+%     \l_@@_input_root_tl        ,
+%     \l_@@_output_root_tl
+%   }
 %    \begin{macrocode}
 \bool_new:N \l_@@_root_after_bool
+\bool_new:N \l_@@_force_cartesian_bool
+\bool_new:N \l_@@_force_polar_bool
+\bool_new:N \l_@@_polar_degree_bool
 \keys_define:nn { siunitx }
   {
+    complex-mode .choice: ,
+    complex-mode / cartesian .code:n =
+      {
+        \bool_set_true:N \l_@@_force_cartesian_bool
+        \bool_set_false:N \l_@@_force_polar_bool
+      } ,
+    complex-mode / polar .code:n =
+      {
+        \bool_set_false:N \l_@@_force_cartesian_bool
+        \bool_set_true:N \l_@@_force_polar_bool
+      } ,
+    complex-mode / input .code:n =
+      {
+        \bool_set_false:N \l_@@_force_cartesian_bool
+        \bool_set_false:N \l_@@_force_polar_bool
+      } ,
+    complex-angle-unit .choice: ,
+    complex-angle-unit / degrees .code:n =
+      { \bool_set_true:N \l_@@_polar_degree_bool } ,
+    complex-angle-unit / radians .code:n =
+      { \bool_set_false:N \l_@@_polar_degree_bool } ,
     complex-root-position .choice: ,
     complex-root-position / after-number .code:n =
       { \bool_set_true:N \l_@@_root_after_bool } ,
     complex-root-position / before-number .code:n =
       { \bool_set_false:N \l_@@_root_after_bool } ,
+    complex-symbol-angle .tl_set:N =
+      \l_@@_symbol_angle_tl ,
+    complex-symbol-degree .tl_set:N =
+      \l_@@_symbol_degree_tl ,
     input-complex-root .tl_set:N =
       \l_@@_input_root_tl ,
     output-complex-root .tl_set:N =
@@ -232,40 +335,26 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_parse_check:, \@@_parse_finalise:}
-% \begin{macro}{\@@_parse_finalise:N}
+% \begin{macro}{\@@_parse_check:}
+% \begin{macro}{\@@_parse_check:N}
 %   Now we tidy up and do the main work: passing to the standard formatter for
 %   final parsing.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_check:
   {
-    \bool_lazy_all:nTF
-      {
-        { \tl_if_empty_p:N \l_@@_real_tl }
-        { \tl_if_empty_p:N \l_@@_img_tl }
-        { \tl_if_empty_p:N \l_@@_exp_tl }
-      }
-      {
-        \msg_error:nnx { siunitx } { invalid-complex-number }
-          { \exp_not:V \l_@@_input_tl }
-      }
-      { \@@_parse_finalise: }
-  }
-\cs_new_protected:Npn \@@_parse_finalise:
-  {
     \tl_if_empty:NTF \l_@@_img_tl
-      { \@@_parse_finalise:N \l_@@_real_tl }
+      { \@@_parse_check:N \l_@@_real_tl }
       {
         \tl_if_empty:NTF \l_@@_real_tl
-          { \@@_parse_finalise:N \l_@@_img_tl }
+          { \@@_parse_check:N \l_@@_img_tl }
           {
-            \@@_parse_finalise:N \l_@@_real_tl
+            \@@_parse_check:N \l_@@_real_tl
             \tl_set_eq:NN \l_@@_sign_tl \l_@@_join_tl
-            \@@_parse_finalise:N \l_@@_img_tl
+            \@@_parse_check:N \l_@@_img_tl
           }
       }
   }
-\cs_new_protected:Npn \@@_parse_finalise:N #1
+\cs_new_protected:Npn \@@_parse_check:N #1
   {
     \tl_set:Nx #1
       {
@@ -545,6 +634,27 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\@@_parse_polar:nn}
+%   Almost trivial but repeated in a couple of places so worth an auxiliary.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_polar:nn #1#2
+  {
+    \siunitx_number_parse:nN {#1} \l_@@_mag_tl
+    \group_begin:
+      \keys_set:nn { siunitx }
+        {
+          input-comparators       = ,
+          input-exponent-markers  = ,
+          input-open-uncertainty  = ,
+          input-close-uncertainty =
+        }
+      \siunitx_number_format:nN {#2} \l_@@_angle_tl
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn \l_@@_angle_tl \l_@@_angle_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \section{Formatting}
 %
 % \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
@@ -564,41 +674,110 @@
 % \end{variable}
 %
 % \begin{macro}{\siunitx_complex_number:n}
+% \begin{macro}{\siunitx_complex_number:nn, \@@_number:nn}
 % \begin{macro}{\siunitx_complex_quantity:nn}
-%   The work here is pretty trivial.
+% \begin{macro}{\siunitx_complex_quantity:nnn, \@@_quantity:nnn}
+%   The work here is pretty trivial: only conversion between forms makes
+%   things a bit more intricate.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_complex_number:n #1
   {
-    \group_begin:
-      \bool_if:NTF \l_siunitx_number_parse_bool
-        {
-          \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
-          \@@_format:n { }
-        }
-        {
-          \siunitx_number_format:nN {#1} \l_@@_tmp_tl
-          \siunitx_print_number:V \l_@@_tmp_tl
-        }
-    \group_end:
+    \bool_if:NTF \l_@@_force_polar_bool
+      {
+        \use:e
+          {
+            \siunitx_complex_number:nn
+               \@@_convert_polar:n {#1}
+          }
+      }
+      {
+        \bool_if:NTF \l_siunitx_number_parse_bool
+          {
+            \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
+            \@@_format_cartesian:n { }
+          }
+          {
+            \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+            \siunitx_print_number:V \l_@@_tmp_tl
+          }
+      }
+  }
+\cs_new_protected:Npn \siunitx_complex_number:nn #1#2
+  {
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#1} }
+      { \tl_if_blank_p:n {#2} }
+      {
+        \msg_error:nnnn { siunitx } { invalid-polar-form }
+          {#1} {#2}
+      }
+      { \@@_number:nn {#1} {#2} }
+  }
+\cs_new_protected:Npn \@@_number:nn #1#2
+  {
+    \bool_if:NTF \l_@@_force_cartesian_bool
+      {
+        \exp_args:Ne \siunitx_complex_number:n
+          { \@@_convert_cartesian:nn {#1} {#2} }
+      }
+      {
+        \@@_parse_polar:nn {#1} {#2}
+        \@@_format_polar:n { }
+      }
   }
 \cs_new_protected:Npn \siunitx_complex_quantity:nn #1#2
   {
-    \group_begin:
-      \bool_if:NTF \l_siunitx_number_parse_bool
-        {
-          \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
-          \@@_format:n {#2}
-        }
-        { \siunitx_quantity:nn {#1} {#2} }
-    \group_end:
+    \bool_if:NTF \l_@@_force_polar_bool
+      {
+        \use:e
+          {
+            \siunitx_complex_quantity:nnn
+               \@@_convert_polar:n {#1}
+          }
+            {#2}
+      }
+      {
+        \bool_if:NTF \l_siunitx_number_parse_bool
+          {
+            \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
+            \@@_format_cartesian:n {#2}
+          }
+          { \siunitx_quantity:nn {#1} {#2} }
+      }
+  }
+\cs_new_protected:Npn \siunitx_complex_quantity:nnn #1#2#3
+  {
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#1} }
+      { \tl_if_blank_p:n {#2} }
+      {
+        \msg_error:nnnn { siunitx } { invalid-polar-form }
+          {#1} {#2}
+      }
+      { \@@_quantity:nnn {#1} {#2} {#3} }
+  }
+\cs_new_protected:Npn \@@_quantity:nnn #1#2#3
+  {
+    \bool_if:NTF \l_@@_force_cartesian_bool
+      {
+        \exp_args:Ne \siunitx_complex_quantity:nn
+          { \@@_convert_cartesian:nn {#1} {#2} }
+          {#3}
+      }
+      {
+        \@@_parse_polar:nn {#1} {#2}
+        \@@_format_polar:n {#3}
+      }
   }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\@@_format:n}
-% \begin{macro}{\@@_format_auxi:n}
-% \begin{macro}{\@@_format_auxii:n}
+% \begin{macro}{\@@_format_cartesian:n}
+% \begin{macro}{\@@_format_cartesian_auxi:n}
+% \begin{macro}{\@@_format_cartesian_auxii:n}
 % \begin{macro}{\@@_drop_exponent:nnnnnnn}
 % \begin{macro}{\@@_format_sign:nnnnnnn}
 % \begin{macro}{\@@_extract_exponent:nw}
@@ -606,18 +785,18 @@
 % \begin{macro}[EXP]{\@@_format_bracket:n}
 %   We start here checking that there is something to do.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format:n #1
+\cs_new_protected:Npn \@@_format_cartesian:n #1
   {
     \bool_lazy_and:nnF
       { \tl_if_empty_p:N \l_@@_real_tl }
       { \tl_if_empty_p:N \l_@@_img_tl }
-      { \@@_format_auxi:n {#1} }
+      { \@@_format_cartesian_auxi:n {#1} }
   }
 %    \end{macrocode}
 %  We split based on whether the number has a complex part at all,
 %  then print the result.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_auxi:n #1
+\cs_new_protected:Npn \@@_format_cartesian_auxi:n #1
   {
     \tl_clear:N \l_@@_tmp_tl
     \tl_if_empty:NTF \l_@@_img_tl
@@ -626,7 +805,7 @@
         \tl_set:Nx \l_@@_tmp_tl
           { \siunitx_number_output:N \l_@@_real_tl }
       }
-      { \@@_format_auxii:n {#1} }
+      { \@@_format_cartesian_auxii:n {#1} }
     \tl_if_blank:nTF {#1}
       { \siunitx_print_number:V \l_@@_tmp_tl }
       { \siunitx_quantity_print:VV \l_@@_tmp_tl \l_@@_unit_tl }
@@ -636,9 +815,9 @@
 %   need to process both and do some massaging, then it's just a question
 %   of reassembly with the right parts in the right places.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_auxii:n #1
+\cs_new_protected:Npn \@@_format_cartesian_auxii:n #1
   {
-    \@@_format_units:n {#1}
+    \@@_format_cartesian_units:n {#1}
     \tl_if_empty:NF \l_@@_real_tl
       { \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl }
     \exp_after:wN \@@_format_sign:nnnnnnn \l_@@_img_tl
@@ -744,12 +923,12 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_format_units:n}
+% \begin{macro}{\@@_format_cartesian_units:n}
 % \begin{macro}
 %   {
-%     \@@_format_combine-exponent:n ,
-%     \@@_format_extract-exponent:n ,
-%     \@@_format_input:n
+%     \@@_format_cartesian_combine-exponent:n ,
+%     \@@_format_cartesian_extract-exponent:n ,
+%     \@@_format_cartesian_input:n
 %   }
 % \begin{macro}{\@@_format_extract-exponent:N}
 % \begin{macro}[EXP]{\@@_extract_exp:nnnnnnn}
@@ -759,7 +938,7 @@
 %   the flow is then much the same as in \pkg{siunitx-compound}. We only
 %   have to watch the fact there are two numbers to format.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_units:n #1
+\cs_new_protected:Npn \@@_format_cartesian_units:n #1
   {
     \tl_if_blank:nTF {#1}
       {
@@ -767,10 +946,11 @@
         \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
       }
       {
-        \use:c { @@_format_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
+        \use:c
+          { @@_format_cartesian_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
       }
   }
-\cs_new_protected:cpn { @@_format_combine-exponent:n } #1
+\cs_new_protected:cpn { @@_format_cartesian_combine-exponent:n } #1
   {
     \tl_if_empty:NF \l_@@_real_tl
       { \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl }
@@ -782,7 +962,7 @@
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
   }
-\cs_new_protected:cpx { @@_format_extract-exponent:n } #1
+\cs_new_protected:cpx { @@_format_cartesian_extract-exponent:n } #1
   {
     \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1}
       \exp_not:N \l_@@_unit_tl \exp_not:N \l_@@_tmp_fp
@@ -794,17 +974,17 @@
           \exp_not:N \l_@@_real_tl
       }
   }
+\cs_new_protected:Npn \@@_format_cartesian_input:n #1
+  {
+    \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
+    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
 \cs_new_protected:cpn { @@_format_extract-exponent:N } #1
   {
     \tl_set:Nx #1
       { \siunitx_number_adjust_exponent:Nn #1 \l_@@_tmp_fp }
     \siunitx_number_process:NN #1 #1
-  }
-\cs_new_protected:Npn \@@_format_input:n #1
-  {
-    \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
-    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
-    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
   }
 \cs_new:Npn \@@_extract_exp:nnnnnnn #1#2#3#4#5#6#7 { #6#7 }
 \cs_new_protected:Npn \@@_drop_exp:N #1
@@ -819,14 +999,196 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}
+%   {
+%     \@@_format_polar:n            ,
+%     \@@_format_combine-exponent:n ,
+%     \@@_format_extract-exponent:n ,
+%     \@@_format_polar_input:n
+%   }
+%     We see similar ideas here to the Cartesian versions, but with only
+%     the magnitude to adjust, things are rather simpler in the exponent
+%     manipulations.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_polar:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      { \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl }
+      {
+        \use:c
+          { @@_format_polar_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
+      }
+    \tl_set:Nx \l_@@_tmp_tl
+      {
+        \siunitx_number_output:N \l_@@_mag_tl
+        \exp_not:V \l_@@_symbol_angle_tl
+        \mathord % TEMP
+        \exp_not:V \l_@@_angle_tl
+      }
+    \siunitx_print_number:V \l_@@_tmp_tl
+    \bool_if:NT \l_@@_polar_degree_bool
+      {
+        \exp_args:NV \siunitx_unit_format:nN \l_@@_symbol_degree_tl \l_@@_tmp_tl
+        \nobreak
+        \siunitx_print_unit:V \l_@@_tmp_tl
+      }
+    \siunitx_quantity_print:nV { } \l_@@_unit_tl
+  }
+\cs_new_protected:cpn { @@_format_polar_combine-exponent:n } #1
+  {
+    \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl
+    \fp_set:Nn \l_@@_tmp_fp
+     { \exp_after:wN \@@_extract_exp:nnnnnnn \l_@@_mag_tl }
+    \@@_drop_exp:N \l_@@_mag_tl
+    \siunitx_unit_format_combine_exponent:nnN {#1}
+      \l_@@_tmp_fp \l_@@_unit_tl
+  }
+\cs_new_protected:cpx { @@_format_polar_extract-exponent:n } #1
+  {
+    \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1}
+      \exp_not:N \l_@@_unit_tl \exp_not:N \l_@@_tmp_fp
+    \exp_not:c { @@_format_extract-exponent:N }
+      \exp_not:N \l_@@_mag_tl
+  }
+\cs_new_protected:Npn \@@_format_polar_input:n #1
+  {
+    \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl
+    \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Conversion}
+%
+% \begin{macro}[EXP]
+%   {\@@_convert_cartesian:nn, \@@_convert_cartesian_aux:nn}
+% \begin{macro}[EXP]{\@@_convert_cartesian_aux:w}
+%   Conversion to Cartesian form is easy as we have two inputs and need to
+%   do no parsing here at all.
+%    \begin{macrocode}
+\cs_new:Npn \@@_convert_cartesian:nn #1#2
+  {
+    \exp_args:Nee \@@_convert_cartesian_aux:nn
+      {
+        \fp_to_tl:n
+          { (#1) * cos \bool_if:NT \l_@@_polar_degree_bool { d } (#2) }
+      }
+      {
+        \fp_to_tl:n
+          { (#1) * sin \bool_if:NT \l_@@_polar_degree_bool { d } (#2) }
+      }
+  }
+\cs_new:Npn \@@_convert_cartesian_aux:nn #1#2
+  {
+    \@@_convert_cartesian_aux:w #1 e e \q_mark #2 e e \q_stop
+  }
+\cs_new:Npn \@@_convert_cartesian_aux:w
+  #1 e #2 e #3 \q_mark #4 e #5 e #6 \q_stop
+  {
+    \fp_compare:nNnF {#1} = \c_zero_fp
+      {#1}
+    \fp_compare:nNnF {#4} = \c_zero_fp
+      {
+        \fp_compare:nNnF {#4} < \c_zero_fp { + }
+        #4 i
+      }
+    \tl_if_blank:nF {#2}
+      { e #2 }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[EXP]{\@@_convert_polar:n}
+% \begin{macro}[EXP]{\@@_convert_polar_auxi:w}
+% \begin{macro}[EXP]{\@@_convert_polar_auxii:nw}
+% \begin{macro}[EXP]{\@@_convert_polar_auxiii:nnw}
+% \begin{macro}[EXP]{\@@_convert_polar_auxiv:nnw}
+% \begin{macro}[EXP]{\@@_convert_polar_auxv:nnw}
+% \begin{macro}[EXP]{\@@_convert_polar_auxvi:nnn}
+% \begin{macro}[EXP]{\@@_convert_polar_auxvii:nnn}
+% \begin{macro}[EXP]{\@@_convert_polar_auxviii:nn}
+%    A simplified parser for complex numbers which works by expansion,
+%    then converts to polar form.
+%    \begin{macrocode}
+\cs_new:Npn \@@_convert_polar:n #1
+  { \@@_convert_polar_auxi:w #1 e e \q_stop }
+\cs_new:Npn \@@_convert_polar_auxi:w #1 e #2 e #3 \q_stop
+  { \@@_convert_polar_auxii:nw {#2} #1 \q_stop }
+\cs_new:Npn \@@_convert_polar_auxii:nw #1#2#3 \q_stop
+  {
+    \bool_lazy_or:nnTF
+      { \str_if_eq_p:nn {#2} { i } }
+      { \str_if_eq_p:nn {#2#3} { +i } }
+      { \@@_convert_polar_auxvi:nnn { } { 1 } {#1} }
+      {
+        \str_if_eq:nnTF {#2#3} { -i }
+          { \@@_convert_polar_auxvi:nnn { } { -1 } {#1} }
+          { \@@_convert_polar_auxiii:nnw {#1} {#2} #3 + + \q_stop }
+      }
+  }
+\cs_new:Npn \@@_convert_polar_auxiii:nnw #1#2#3 + #4 + #5 \q_stop
+  {
+    \tl_if_blank:nTF {#4}
+      { \@@_convert_polar_auxiv:nnw {#1} {#2} #3 - - \q_stop }
+      {
+        \str_if_eq:nnTF {#4} { i }
+          { \@@_convert_polar_auxvi:nnn {#2#3} { 1 } {#1} }
+          { \@@_convert_polar_auxv:nnw {#2#3} {#1} #4 i \q_nil i \q_stop }
+      }
+  }
+\cs_new:Npn \@@_convert_polar_auxiv:nnw #1#2#3 - #4 - #5 \q_stop
+  {
+    \tl_if_blank:nTF {#4}
+      { \@@_convert_polar_auxv:nnw { } {#1} #2#3 i \q_nil i \q_stop }
+      {
+        \str_if_eq:nnTF {#4} { i }
+          { \@@_convert_polar_auxvi:nnn { } { -1 } {#1} }
+          { \@@_convert_polar_auxv:nnw {#2#3} {#1} -#4 i \q_nil i \q_stop }
+      }
+  }
+\cs_new:Npn \@@_convert_polar_auxv:nnw #1#2#3 i #4 i #5 \q_stop
+  {
+    \quark_if_nil:nTF {#4}
+      { { #3 \tl_if_blank:nF {#2} { e#2 } } { 0 } }
+      { \@@_convert_polar_auxvi:nnn {#1} {#3} {#2} }
+  }
+\cs_new:Npn \@@_convert_polar_auxvi:nnn #1#2#3
+  {
+    \exp_args:Neee \@@_convert_polar_auxvii:nnn
+      { \tl_if_blank:nTF {#1} { 0 } {#1} }
+      { \tl_if_blank:nTF {#2} { 0 } {#2} }
+      { \tl_if_blank:nF {#3} { e#3 } }
+  }
+\cs_new:Npn \@@_convert_polar_auxvii:nnn #1#2#3
+  {
+    \exp_args:Nee \@@_format_polar_auxviii:nn
+      { \fp_eval:n { sqrt ( (#1#3)^2 + (#2#3)^2 ) } }
+      {
+        \fp_eval:n
+          { atan \bool_if:NT \l_@@_polar_degree_bool { d } (#2 , #1) }
+      }
+  }
+\cs_new:Npn \@@_format_polar_auxviii:nn #1#2 { {#1} {#2} }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Messages}
 %
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx } { invalid-complex-number }
-  { Invalid~complex-number~'#1'. }
+\msg_new:nnnn { siunitx } { invalid-polar-form }
+  { Invalid~polar~form~"#1:#2". }
   {
-    The~input~'#1'~could~not~be~parsed~as~a~complex|number~following~the~
-    format~defined~in~module~documentation.
+    Complex~numbers~in~polar~form~must~have~both~a~magnitude~and~and~
+    angle.
   }
 %    \end{macrocode}
 %
@@ -838,7 +1200,11 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
+    complex-angle-unit    = degrees      ,
+    complex-mode          = input        ,
     complex-root-position = after-number ,
+    complex-symbol-angle  = \angle       ,
+    complex-symbol-degree = \degree      ,
     input-complex-root    = ij           ,
     output-complex-root   = \mathrm { i }
   }

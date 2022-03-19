@@ -398,21 +398,29 @@
 % \begin{macro}{\complexnum, \complexqty}
 %   Interfaces for complex numbers.
 %    \begin{macrocode}
-\NewDocumentCommand \complexnum { O { } m }
+\use:e
+  {
+    \NewDocumentCommand \exp_not:N \complexnum
+      { O { } > { \SplitArgument { 1 } { \c_colon_str } } m }
+  }
   {
     \mode_leave_vertical:
     \group_begin:
       \keys_set:nn { siunitx } {#1}
-      \siunitx_complex_number:n {#2} \l_@@_tmp_tl
+      \@@_complex_number_aux:nn #2
     \group_end:
   }
-\NewDocumentCommand \complexqty { O { } m  m }
+\use:e
+  {
+    \NewDocumentCommand \exp_not:N \complexqty
+      { O { } > { \SplitArgument { 1 } { \c_colon_str } } m  m }
+  }
   {
     \mode_leave_vertical:
     \group_begin:
       \siunitx_unit_options_apply:n {#3}
       \keys_set:nn { siunitx } {#1}
-      \siunitx_complex_quantity:nn {#2} {#3}
+      \@@_complex_quantity_aux:nnn #2 {#3}
     \group_end:
   }
 %    \end{macrocode}
@@ -459,6 +467,26 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_complex_number_aux:nn}
+% \begin{macro}{\@@_complex_quantity_aux:nnn}
+%   The same idea for complex values.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_complex_number_aux:nn #1#2
+  {
+    \tl_if_novalue:nTF {#2}
+      { \siunitx_complex_number:n {#1} }
+      { \siunitx_complex_number:nn {#1} {#2} }
+  }
+\cs_new_protected:Npn \@@_complex_quantity_aux:nnn #1#2#3
+  {
+    \tl_if_novalue:nTF {#2}
+      { \siunitx_complex_quantity:nn {#1} {#3} }
+      { \siunitx_complex_quantity:nnn {#1} {#2} {#3} }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Table column}

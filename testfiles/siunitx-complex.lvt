@@ -31,6 +31,14 @@
       }
     \box_show:N \l_tmpa_box
   }
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_complex_number:nn {#1} {#2}
+      }
+    \box_show:N \l_tmpa_box
+  }
 \TIMO
 
 \TEST { Basic~complex~numbers }
@@ -45,13 +53,28 @@
     \test:n { 1.2 - 3(4)i }
     \test:n { 1.2 - i3(4) }
     \test:n { 1.2 - 3(4)ie3 }
+    \test:nn { 1 } { 10 }
+    \test:nn { -1 } { -10 }
+    \test:nn { 1.2e3 } { 4 }
+    \test:nn { 1.2(3) } { 4 }
+    \test:nn { } { 1 }
+    \test:nn { 2 } { }
   }
 
+\OMIT
 \cs_set_protected:Npn \test:n #1
   {
     \hbox_set:Nn \l_tmpa_box
       {
         \siunitx_complex_quantity:nn {#1} { \metre }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_complex_quantity:nnn {#1} {#2} { \metre }
       }
     \box_show:N \l_tmpa_box
   }
@@ -70,10 +93,17 @@
     \test:n { 1.2 - 3(4)i }
     \test:n { 1.2 - i3(4) }
     \test:n { 1.2 - 3(4)ie3 }
+    \test:nn { 1 } { 10 }
+    \test:nn { -1 } { -10 }
+    \test:nn { 1.2e3 } { 4 }
+    \test:nn { 1.2(3) } { 4 }
+    \test:nn { } { 1 }
+    \test:nn { 2 } { }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\OMIT
 \cs_set_protected:Npn \test:n #1
   {
     \hbox_set:Nn \l_tmpa_box
@@ -82,7 +112,49 @@
       }
     \box_show:N \l_tmpa_box
   }
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \siunitx_complex_number:nn {#1} {#2}
+      }
+    \box_show:N \l_tmpa_box
+  }
 \TIMO
+
+\TEST { Option~setting~"complex-angle-unit" }
+  {
+    \keys_set:nn { siunitx } { complex-mode = polar }
+    \test:nn { 10 } { 45 }
+    \test:n { 1 + i }
+    \keys_set:nn { siunitx } { complex-angle-unit = radians }
+    \test:nn { 10 } { 45 }
+    \test:n { 1 + i }
+  }
+
+\TEST { Option~setting~"complex-mode" }
+  {
+    \test:n { 12.34 }
+    \test:n { i }
+    \test:n { -i }
+    \test:n { -2i }
+    \test:n { 12.34 + 2i }
+    \test:nn { 1 } { 30 }
+    \keys_set:nn { siunitx } { complex-mode = cartesian }
+    \test:n { 12.34 }
+    \test:n { i }
+    \test:n { -i }
+    \test:n { -2i }
+    \test:n { 12.34 + 2i }
+    \test:nn { 1 } { 30 }
+    \keys_set:nn { siunitx } { complex-mode = polar }
+    \test:n { 12.34 }
+    \test:n { i }
+    \test:n { -i }
+    \test:n { -2i }
+    \test:n { 12.34 + 2i }
+    \test:nn { 1 } { 30 }
+  }
 
 \TEST { Option~setting~"complex-root-position" }
   {
@@ -93,6 +165,20 @@
     \test:n { 12.34 + 2i }
     \test:n { 2i }
     \test:n { -2i }
+  }
+
+\TEST { Option~setting~"complex-symbol-angle" }
+  {
+    \test:nn { 12 } { 30 }
+    \keys_set:nn { siunitx } { complex-symbol-angle = A }
+    \test:nn { 12 } { 30 }
+  }
+
+\TEST { Option~setting~"complex-symbol-degree" }
+  {
+    \test:nn { 12 } { 30 }
+    \keys_set:nn { siunitx } { complex-symbol-degree = D }
+    \test:nn { 12 } { 30 }
   }
 
 \TEST { Option~setting~"input-complex-root" }
@@ -111,6 +197,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\OMIT
 \cs_set_protected:Npn \test:n #1
   {
     \hbox_set:Nn \l_tmpa_box

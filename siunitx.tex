@@ -508,18 +508,20 @@ adjustment of the numerical values.
     \cs{complexnum}\oarg{options}\marg{number}
   \end{syntax}
 \end{function}
-Typesets the complex number, which must be given in the form $a + b\mathrm{i}$
-or $a + \mathrm{i}b$. Processing of the numerical parts is otherwise identical
-to the standard \cs{num} command.
+Typesets the complex number, which can be given in the Cartesian form $a +
+b\mathrm{i}$ or $a + \mathrm{i}b$, or in the polar form $r$\texttt{:}$\theta$.
+Processing of the numerical parts is otherwise identical to the standard
+\cs{num} command.
 
 \begin{function}{\complexqty}
   \begin{syntax}
     \cs{complexqty}\oarg{options}\marg{number}\marg{unit}
   \end{syntax}
 \end{function}
-Typesets the complex quantity, which must be given in the form $a + b\mathrm{i}$
-or $a + \mathrm{i}b$. Processing of the numerical parts is otherwise identical
-to the standard \cs{qty} command.
+Typesets the complex number, which can be given in the Cartesian form $a +
+b\mathrm{i}$ or $a + \mathrm{i}b$, or in the polar form $r$\texttt{:}$\theta$.
+Processing of the numerical parts is otherwise identical to the standard
+\cs{qty} command.
 
 \subsection{The unit macros}
 
@@ -1969,12 +1971,34 @@ numbers; these are summarised in Table~\ref{tab:opt:num:complex}.
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
+      complex-angle-unit    & Choice  & degrees           \\
+      complex-mode          & Choice  & input             \\
       complex-root-position & Choice  & after-number      \\
+      complex-symbol-angle  & Literal & \cs{angle}        \\
+      complex-symbol-degree & Literal & \cs{degree}       \\
       input-complex-root    & Literal & ij                \\
       output-complex-root   & Literal & \verb=\mathrm{i}= \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\DescribeOption{complex-mode}
+The format in which complex values are printed can be set using the
+\opt{complex-mode} option. With the standard setting (\opt{input}), the complex
+value is printed as-given. By setting the option to \opt{cartesian} or
+\opt{polar}, the output format can be set to an Cartesian or polar form.
+Conversion uses the \LaTeX3 floating-point unit, so is limited to $16$ decimal
+places. When converting from Cartesian to polar form, the complex root symbol
+must come at the \emph{end} of the imaginary part. It must also be specified
+using \texttt{i}.
+\begin{LaTeXdemo}
+  \complexnum{1 + i} \\
+  \complexnum{1:45}  \\
+  \complexnum[complex-mode = cartesian]{1 + i} \\
+  \complexnum[complex-mode = cartesian, round-mode = places]{1:45}  \\
+  \complexnum[complex-mode = polar]{1 + i} \\
+  \complexnum[complex-mode = polar]{1:45}
+\end{LaTeXdemo}
 
 \DescribeOption{input-complex-root}
 When using complex numbers in input, the complex root $(\mathrm{i} =
@@ -2003,6 +2027,21 @@ using the \opt{output-complex-root} setting.
   \complexnum{67-0.9i} \\
   \complexnum[complex-root-position = before-number]{67-0.9i} \\
   \complexnum[complex-root-position = after-number]{67-0.9i}
+\end{LaTeXdemo}
+
+\DescribeOption{complex-angle-unit}
+\DescribeOption{complex-symbol-angle}
+\DescribeOption{complex-symbol-degree}
+When printing or converting to polar form, the angle may be interpreted in
+units set by \opt{complex-angle-unit}: one of \opt{degrees} or \opt{radians}.
+The symbol used to denote the angle, and that used for units of degrees,
+are controlled by the options \opt{complex-symbol-angle} and
+\opt{complex-symbol-degree}, respectively.
+\begin{LaTeXdemo}
+  \complexqty{1:1}{\ohm} \\
+  \complexqty[complex-angle-unit = radians]{1:1}{\ohm} \\
+  \complexqty[complex-symbol-angle = \mathrm{A}]{1:1}{\ohm} \\
+  \complexqty[complex-symbol-degree = d]{1:1}{\ohm}
 \end{LaTeXdemo}
 
 \subsection{Angles}
