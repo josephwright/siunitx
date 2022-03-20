@@ -505,6 +505,21 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{zero-decimal-as-symbol}
+%   \begin{syntax}
+%     |zero-decimal-as-symbol| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to determine if an entirely zero decimal part is replaced by a
+%   symbol. Does not apply if the decimal part is marked as entirely absent.
+% \end{function}
+%
+% \begin{function}{zero-symbol}
+%   \begin{syntax}
+%     |zero-symbol| = \meta{symbol}
+%   \end{syntax}
+%   Material printed when a zero numerical component is replaced by a symbol.
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -3182,7 +3197,10 @@
       { compact , compact-marker , full , separate }
       { \tl_set_eq:NN \l_@@_uncert_mode_tl \l_keys_choice_tl } ,
     uncertainty-separator .tl_set:N =
-      \l_@@_uncert_separator_tl
+      \l_@@_uncert_separator_tl ,
+    zero-decimal-as-symbol .bool_set:N =
+      \l_@@_zero_symbol_bool ,
+    zero-symbol .tl_set:N = \l_@@_zero_symbol_tl
   }
 \bool_new:N \l_@@_group_decimal_bool
 \bool_new:N \l_@@_group_integer_bool
@@ -3414,7 +3432,17 @@
       }
     \exp_not:n {#2}
     \str_if_eq:nnF {#1} { \empty }
-      { \@@_output_digits:nn { decimal } {#1} }
+      {
+        \bool_lazy_and:nnTF
+          { \l_@@_zero_symbol_bool }
+          {
+            \str_if_eq_p:ee
+            {#1}
+            { \prg_replicate:nn { \tl_count:n {#1} } { 0 } }
+          }
+          { \exp_not:V \l_@@_zero_symbol_tl }
+          { \@@_output_digits:nn { decimal } {#1} }
+      }
   }
 \cs_generate_variant:Nn \@@_output_decimal:nn { f }
 \cs_new:Npn \@@_output_digits:nn #1#2
@@ -3858,7 +3886,9 @@
     round-precision                = 2                                      ,
     tight-spacing                  = false                                  ,
     uncertainty-mode               = compact                                ,
-    uncertainty-separator          =
+    uncertainty-separator          =                                        ,
+    zero-decimal-as-symbol         = false                                  ,
+    zero-symbol                    = \mbox { --- }
   }
 %    \end{macrocode}
 %

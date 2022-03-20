@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     [\#595](https://github.com/josephwright/siunitx/issues/595))
 - Options `complex-angle-unit`, `complex-mode`, `complex-symbol-angle`,
   and `complex-symbol-degree` to support complex numbers in polar form
+- Options `zero-decimal-as-symbol` and `zero-symbol` to support conversion of
+  a zero deicmal part to a dash or other symbol
 - Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
   [\#575](https://github.com/josephwright/siunitx/issues/575))
 - Unit abbreviations `\fH` and `\pH` (see issue
