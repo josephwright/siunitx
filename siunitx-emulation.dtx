@@ -856,10 +856,11 @@
 % \begin{macro}{\si}
 %   A straight copy of \cs{unit}.
 %    \begin{macrocode}
-\NewDocumentCommand \si { O { } m }
+\NewDocumentCommand \si { O { } > { \TrimSpaces } m }
   {
     \mode_leave_vertical:
     \group_begin:
+      \siunitx_unit_options_apply:n {#2}
       \keys_set:nn { siunitx } {#1}
       \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
       \siunitx_print_unit:V \l_@@_tmp_tl
@@ -871,10 +872,11 @@
 % \begin{macro}{\SI}
 %   Almost the same as \cs{qty}, but with the addition pre-unit.
 %    \begin{macrocode}
-\NewDocumentCommand \SI { O { } m o m }
+\NewDocumentCommand \SI { O { } m o > { \TrimSpaces } m }
   {
     \mode_leave_vertical:
     \group_begin:
+      \siunitx_unit_options_apply:n {#4}
       \keys_set:nn { siunitx } {#1}
       \IfNoValueF {#3}
         {
