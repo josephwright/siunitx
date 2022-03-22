@@ -1616,10 +1616,13 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       \multicolumn{1}{l}{Default} \\
     \midrule
       bracket-negative-numbers & Switch  & false             \\
+      digit-group-size         & Integer & 3                 \\
+      digit-group-first-size   & Integer & 3                 \\
+      digit-group-other-size   & Integer & 3                 \\
       exponent-base            & Literal & 10                \\
       exponent-product         & Math    & \verb=\times=     \\
       group-digits             & Choice  & all               \\
-      group-minimum-digits     & integer & 5                 \\
+      group-minimum-digits     & Integer & 5                 \\
       group-separator          & Literal & \cs{,}            \\
       negative-color           & Literal & \meta{none}       \\ ^^A (
       output-close-uncertainty & Literal & )                 \\
@@ -1676,6 +1679,21 @@ separately for the integer and decimal parts of the number: grouping does not
   \num{12345.67890} \\
   \num[group-minimum-digits = 5]{1234.5678} \\
   \num[group-minimum-digits = 5]{12345.67890}
+\end{LaTeXdemo}
+
+\DescribeOption{digit-group-size}
+\DescribeOption{digit-group-first-size}
+\DescribeOption{digit-group-other-size}
+The number of digits in each group can be controlled by the setting
+\opt{digit-group-size}, which has standard value $3$. Finer control can be
+achieved using \opt{digit-group-first-size} and \opt{digit-group-other-size}:
+the first group is that immediately by the decimal point, the other value
+applies to the second and subsequent groupings. These can be used for
+example to achieve the grouping typically used in India (lakh).
+\begin{LaTeXdemo}
+  \num{1234567890} \\
+  \num[digit-group-size = 5]{1234567890} \\
+  \num[digit-group-other-size = 2]{1234567890}
 \end{LaTeXdemo}
 
 \DescribeOption{output-decimal-marker}

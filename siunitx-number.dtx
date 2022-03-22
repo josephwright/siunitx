@@ -301,6 +301,18 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}
+%   {digit-group-size, digit-group-first-size, digit-group-other-size}
+%   \begin{syntax}
+%     |digit-group-number| = \meta{integer}
+%   \end{syntax}
+%   Sets the size of the block (the number of digits) used when grouping
+%   digits. The option |digit-group-first-size| applies to the first grouping,
+%   \foreign{i.e.}~immediately next to the decimal marker, while
+%   |digit-group-other-size| applies to all other groups. Both can be set
+%   using |digit-group-size|. The standard setting for both options is $3$.
+% \end{function}
+%
 % \begin{function}{group-digits}
 %   \begin{syntax}
 %     |group-digits| = |all|\verb"|"|decimal|\verb"|"|integer|\verb"|"|none|
@@ -3128,6 +3140,8 @@
 %      \l_@@_implicit_plus_bool     ,
 %      \l_@@_exponent_base_tl       ,
 %      \l_@@_exponent_product_tl    ,
+%      \l_@@_group_size_int         ,
+%      \l_@@_group_first_int        ,
 %      \l_@@_group_decimal_bool     ,
 %      \l_@@_group_integer_bool     ,
 %      \l_@@_group_minimum_int      ,
@@ -3155,6 +3169,15 @@
       \l_@@_exponent_base_tl ,
     exponent-product .tl_set:N =
       \l_@@_exponent_product_tl ,
+    digit-group-size .meta:n =
+      {
+        digit-group-first-size = {#1} ,
+        digit-group-other-size = {#1}
+      } ,
+    digit-group-first-size .int_set:N =
+      \l_@@_group_first_int ,
+    digit-group-other-size .int_set:N =
+      \l_@@_group_size_int ,
     group-digits .choice: ,
     group-digits / all .code:n =
       {
@@ -3233,17 +3256,26 @@
 % \begin{macro}[rEXP]{\@@_output_integer:nnn}
 % \begin{macro}[rEXP]{\@@_output_decimal:nn, \@@_output_decimal:fn}
 % \begin{macro}[rEXP]{\@@_output_digits:nn}
-% \begin{macro}[rEXP]{\@@_output_integer_aux:n}
+% \begin{macro}[rEXP]{\@@_output_digit_separator:N}
+% \begin{macro}[rEXP]{\@@_output_integer_3_3:n}
 % \begin{macro}[rEXP]
 %   {
 %     \@@_output_integer_aux_0:n,
 %     \@@_output_integer_aux_1:n,
 %     \@@_output_integer_aux_2:n
 %   }
-% \begin{macro}[rEXP]{\@@_output_decimal_aux:n}
-% \begin{macro}[rEXP]{\@@_output_decimal_loop:NNNN}
 % \begin{macro}[rEXP]{\@@_output_integer_first:nnNN}
 % \begin{macro}[rEXP]{\@@_output_integer_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_output_integer_first:n}
+% \begin{macro}[rEXP]{\@@_output_integer_aux:n}
+% \begin{macro}[rEXP]{\@@_output_integer_loop:NnnN}
+% \begin{macro}[rEXP]{\@@_output_decimal_3_3:n}
+% \begin{macro}[rEXP]{\@@_output_decimal_loop:NNNN}
+% \begin{macro}[rEXP]{\@@_output_decimal_3_2:n}
+% \begin{macro}[rEXP]{\@@_output_decimal:NNNw}
+% \begin{macro}[rEXP]{\@@_output_decimal_loop:NN}
+% \begin{macro}[rEXP]{\@@_output_decimal_first:n}
+% \begin{macro}[rEXP]{\@@_output_decimal_loop:NnnN}
 % \begin{macro}[rEXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[rEXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[rEXP]{\@@_output_uncert_S:nnnw}
@@ -3460,16 +3492,37 @@
         \int_compare:nNnTF
           { \tl_count:n {#2} } < \l_@@_group_minimum_int
           { \exp_not:n {#2} }
-          { \use:c { @@_output_ #1 _aux:n } {#2} }
+          {
+            \cs_if_exist_use:cF
+              {
+                @@_output_ #1 _
+                \int_use:N \l_@@_group_first_int
+                _
+                \int_use:N \l_@@_group_size_int
+                :n
+              }
+              { \use:c { @@_output_ #1 _first:n } }
+                {#2}
+          }
       }
       { \exp_not:n {#2} }
   }
 %    \end{macrocode}
-%   For integers, we need to know how many digits there are to allow for the
-%   correct insertion of separators. That is done using a two-part set up such
-%   that there is no separator on the first pass.
+%   An auxiliary to ensure spacing is correct.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_integer_aux:n #1
+\cs_new:Npn \@@_output_digit_separator:N #1
+  {
+    \str_if_eq:VnTF #1 { , }
+      { \exp_not:N \mathord }
+      { \use:n }
+        { \exp_not:V #1 }
+  }
+%    \end{macrocode}
+%   For standard grouping of integers, we need to know how many digits there
+%   are to allow for the correct insertion of separators. That is done using
+%   a two-part set up such that there is no separator on the first pass.
+%    \begin{macrocode}
+\cs_new:cpn { @@_output_integer_3_3:n } #1
   {
      \use:c
        {
@@ -3492,21 +3545,51 @@
   }
 \cs_new:Npn \@@_output_integer_loop:NNNN #1#2#3#4
   {
-    \str_if_eq:VnTF \l_@@_group_separator_tl { , }
-      { \exp_not:N \mathord }
-      { \use:n }
-        { \exp_not:V \l_@@_group_separator_tl }
+    \@@_output_digit_separator:N \l_@@_group_separator_tl
     \exp_not:n {#1#2#3}
     \quark_if_nil:NF #4
       { \@@_output_integer_loop:NNNN #4 }
   }
 %    \end{macrocode}
-%   For decimals, no need to do any counting, just loop using enough markers to
-%   find the end of the list. By passing the decimal marker, it is possible not
-%   to have to use a check on the content of the rest of the number. The
-%   |\use_none:n(n)| mop up the remaining |\q_nil| tokens.
+%   There is no clever way of doing an uneven integer grouping, so just provide
+%   a slow generic approach. This is more-or-less the same as the generic
+%   decimal code, but with the output reversed. The only wrinkle is we need to
+%   reverse the entire input again, so it has to be carried as an argument.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_decimal_aux:n #1
+\cs_new:Npn \@@_output_integer_first:n #1
+  {
+    \exp_args:Ne \@@_output_integer_aux:n { \tl_reverse:n {#1} }
+  }
+\cs_new:Npn \@@_output_integer_aux:n #1
+  {
+    \@@_output_integer_loop:NnnN \l_@@_group_first_int { 0 } { }
+      #1 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_output_integer_loop:NnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4 {#3}
+    \int_compare:nNnTF { #2 + 1 } > #1
+      {
+        \@@_output_integer_loop:NnnN
+          \l_@@_group_size_int { 1 }
+            {
+              \exp_not:n {#4}
+              \@@_output_digit_separator:N \l_@@_group_separator_tl
+              #3
+            }
+      }
+      {
+        \@@_output_integer_loop:NnnN #1 { #2 + 1 }
+          { \exp_not:n {#4} #3 }
+      }
+  }
+%    \end{macrocode}
+%   For standard decimal grouping, no need to do any counting, just loop using
+%   enough markers to find the end of the list. By passing the decimal marker,
+%   it is possible not to have to use a check on the content of the rest of
+%   the number. The |\use_none:n(n)| mop up the remaining |\q_nil| tokens.
+%    \begin{macrocode}
+\cs_new:cpn { @@_output_decimal_3_3:n } #1
   {
     \@@_output_decimal_loop:NNNN \c_empty_tl
       #1 \q_nil \q_nil \q_nil
@@ -3515,7 +3598,7 @@
   {
     \quark_if_nil:NF #2
       {
-        \exp_not:V #1
+        \@@_output_digit_separator:N #1
         \exp_not:n {#2}
         \quark_if_nil:NTF #3
           { \use_none:n }
@@ -3530,6 +3613,56 @@
               }
           }
       }
+  }
+%    \end{macrocode}
+%   The same trick for the group-of-two case, but as the first pass is already
+%   done, there is not need to worry about the separator.
+%    \begin{macrocode}
+\cs_new:cpn { @@_output_decimal_3_2:n } #1
+  {
+    \int_compare:nNnTF { \tl_count:n {#1} } > 2
+      { \@@_output_decimal:NNNw #1 \q_stop }
+      { \exp_not:n {#1} }
+  }
+\cs_new:Npn \@@_output_decimal:NNNw #1#2#3#4 \q_stop
+  {
+    \exp_not:n {#1#2#3}
+    \@@_output_decimal_loop:NN #4 \q_nil \q_nil
+  }
+\cs_new:Npn \@@_output_decimal_loop:NN #1#2
+  {
+    \quark_if_nil:NF #1
+      {
+        \@@_output_digit_separator:N
+          \l_@@_group_separator_tl
+        \exp_not:n {#1}
+        \quark_if_nil:NTF #2
+          { \use_none:n }
+          {
+            \exp_not:n {#2}
+            \@@_output_decimal_loop:NN
+          }
+      }
+  }
+%    \end{macrocode}
+%   The generic decimal separator: simply count the digits.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_decimal_first:n #1
+  {
+    \@@_output_decimal_loop:NnnN \l_@@_group_first_int { 0 } { }
+      #1 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_output_decimal_loop:NnnN #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4 { \exp_not:n {#3} }
+    \int_compare:nNnTF { #2 + 1 } > #1
+      {
+        \exp_not:n {#3}
+        \@@_output_digit_separator:N
+          \l_@@_group_separator_tl
+        \@@_output_decimal_loop:NnnN \l_@@_group_size_int { 1 } {#4}
+      }
+      { \@@_output_decimal_loop:NnnN #1 { #2 + 1 } { #3 #4 } }
   }
 %    \end{macrocode}
 %   Uncertainties which are directly attached are easy to deal with. For those
@@ -3737,6 +3870,15 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Miscellaneous tools}
 %
@@ -3861,6 +4003,9 @@
     exponent-product               = \times                                 ,
     expression                     = #1                                     ,
     fixed-exponent                 = 0                                      ,
+    digit-group-size               = 3                                      ,
+    digit-group-first-size         = 3                                      ,
+    digit-group-other-size         = 3                                      ,
     group-digits                   = all                                    ,
     group-minimum-digits           = 5                                      ,
     group-separator                = \,                                     , % (
