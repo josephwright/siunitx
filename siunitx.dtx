@@ -266,16 +266,34 @@
 %
 % \begin{macro}{\qty}
 %    \begin{macrocode}
-\@ifpackageloaded { physics }
+\AtBeginDocument
   {
-    \msg_new:nnn { siunitx } { physics-pkg }
+    \@ifpackageloaded { physics }
       {
-        Detected~the~"physics"~package: \\
-        Omitting~definition~of~\token_to_str:N \qty.
+        \msg_new:nnn { siunitx } { physics-pkg }
+          {
+            Detected~the~"physics"~package: \\
+            omitting~definition~of~\token_to_str:N \qty.
+            \\ \\
+            If~you~want~to~use~\qty with~the~siunitx~definition,~add~
+            \\ \\
+            \iow_indent:n
+              {
+                \token_to_str:N \AtBeginDocument
+                  { 
+                    \token_to_str:N \RenewCommandCopy
+                      \token_to_str:N \qty \token_to_str:N \SI
+                  }
+              }
+            \\ \\
+            to~your~preamble.
+          }
+        \msg_warning:nn { siunitx } { physics-pkg }
       }
-    \msg_warning:nn { siunitx } { physics-pkg }
-    \use_none:nnnn
+      { }
   }
+\@ifpackageloaded { physics }
+  { \use_none:nnnn }
   { }
 \NewDocumentCommand \qty { O { } m > { \TrimSpaces } m }
   {
