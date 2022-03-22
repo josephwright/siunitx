@@ -25,6 +25,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Unit abbreviation `\nW` (see issue
   [\#596](https://github.com/josephwright/siunitx/issues/596))
 
+### Changed
+- Issue an error if the `units` package is loaded
+
 ## [v3.0.49] - 2022-02-15
 
 ### Added

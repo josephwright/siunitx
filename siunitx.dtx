@@ -144,11 +144,11 @@
       { }
   }
 \clist_map_function:nN
-  { SIunits , sistyle , unitsdef , fancyunits }
+  { SIunits , sistyle , units , unitsdef , fancyunits }
   \@@_load_check:n
 \AtBeginDocument
   {
-    \clist_map_function:nN { SIunits , sistyle }
+    \clist_map_function:nN { SIunits , sistyle , units }
       \@@_load_check:n
   }
 %    \end{macrocode}
@@ -310,17 +310,6 @@
       \siunitx_print_number:V \l_@@_tmp_tl
     \group_end:
   }
-\@ifpackageloaded { units }
-  {
-    \msg_new:nnn { siunitx } { units-pkg }
-      {
-        Detected~the~"units"~package: \\
-        Omitting~definition~of~\token_to_str:N \unit.
-      }
-    \msg_warning:nn { siunitx } { units-pkg }
-    \use_none:nnnn
-  }
-  { }
 \NewDocumentCommand \unit { O { } > { \TrimSpaces } m }
   {
     \mode_leave_vertical:
