@@ -524,6 +524,14 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{round-zero-positive}
+%   \begin{syntax}
+%     |round-zero-positive| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to control whether a value rounded to zero is regarded as a positive
+%   number if the input was negative. The standard setting is |true|.
+% \end{function}
+%
 % \begin{function}{tight-spacing}
 %   \begin{syntax}
 %     |tight-spacing| = |true|\verb"|"|false|
@@ -1718,7 +1726,8 @@
 %     \l_@@_round_half_even_bool   ,
 %     \l_@@_round_mode_tl          ,
 %     \l_@@_round_pad_bool         ,
-%     \l_@@_round_precision_int
+%     \l_@@_round_precision_int    ,
+%     \l_@@_round_positive_bool
 %   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -1752,6 +1761,8 @@
       \l_@@_round_pad_bool ,
     round-precision .int_set:N =
       \l_@@_round_precision_int ,
+    round-zero-positive .bool_set:N =
+      \l_@@_round_positive_bool
   }
 \bool_new:N \l_@@_round_half_even_bool
 \tl_new:N \l_@@_exponent_mode_tl
@@ -2837,7 +2848,12 @@
         \tl_if_empty:NTF \l_@@_round_min_tl
           {
             \exp_not:n { {#1} }
-            { \str_if_eq:nnF {#2} { - } { \exp_not:n {#2} } }
+            {
+              \bool_lazy_and:nnF
+                { \l_@@_round_positive_bool }
+                { \str_if_eq_p:nn {#2} { - } }
+                { \exp_not:n {#2} }
+            }
             \exp_not:n { {#3} {#4} {#5} {#6} {#7} }
           }
           {
@@ -4073,6 +4089,7 @@
     round-mode                     = none                                   ,
     round-pad                      = true                                   ,
     round-precision                = 2                                      ,
+    round-zero-positive            = true                                   ,
     tight-spacing                  = false                                  ,
     uncertainty-mode               = compact                                ,
     uncertainty-separator          =                                        ,

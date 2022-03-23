@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Options `digit-group-size`, `digit-group-first-size` and
   `digit-group-other-size` to control digit grouping
 - Option `retain-negative-zero`
+- Option `round-zero-positive` to control the outcome of rounding
+  negative values to zero
 - Options `zero-decimal-as-symbol` and `zero-symbol` to support conversion of
   a zero deicmal part to a dash or other symbol
 - Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
