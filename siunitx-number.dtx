@@ -477,6 +477,14 @@
 %   setting is |false|.
 % \end{function}
 %
+% \begin{function}{retain-negative-zero}
+%   \begin{syntax}
+%     |retain-negative-zero| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines if a negative sign is retained where the value of
+%   a parsed number is exactly zero. The standard setting is |false|.
+% \end{function}
+%
 % \begin{function}{retain-zero-uncertainty}
 %   \begin{syntax}
 %     |retain-zero-uncertainty| = |true|\verb"|"|false|
@@ -690,6 +698,7 @@
 %      \l_@@_input_uncert_sign_tl            ,
 %      \l_@@_explicit_decimal_bool           ,
 %      \l_@@_explicit_plus_bool              ,
+%      \l_@@_negative_zero_bool              ,
 %      \l_@@_zero_uncert_bool
 %   }
 %  \begin{macro}[EXP]{\@@_expression:n}
@@ -732,6 +741,8 @@
       \l_@@_explicit_decimal_bool ,
     retain-explicit-plus .bool_set:N =
       \l_@@_explicit_plus_bool ,
+    retain-negative-zero .bool_set:N =
+      \l_@@_negative_zero_bool ,
     retain-zero-uncertainty .bool_set:N =
       \l_@@_zero_uncert_bool
   }
@@ -1199,9 +1210,10 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_finalise:}
-% \begin{macro}{\@@_parse_finalise:nw}
-%   Combine all of the bits of a number together: both the real and
-%   imaginary parts contain all of the data.
+% \begin{macro}[EXP]{\@@_parse_finalise:nnnn}
+% \begin{macro}[EXP]{\@@_parse_finalise:nw}
+%   Combine all of the bits of a number together, dealing with negative zero
+%   if required.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_finalise:
   {
@@ -1210,11 +1222,27 @@
         \tl_set:Nx \l_@@_parsed_tl
           {
             { \exp_not:V \l_@@_comparator_tl }
-            \exp_not:V \l_@@_parsed_tl
+            \exp_after:wN \@@_parse_finalise:nnnn \l_@@_parsed_tl
             \exp_after:wN \@@_parse_finalise:nw
               \l_@@_exponent_tl \q_stop
           }
       }
+  }
+\cs_new:Npn \@@_parse_finalise:nnnn #1#2#3#4
+  {
+    \bool_lazy_all:nTF
+      {
+        { ! \l_@@_negative_zero_bool }
+        { \str_if_eq_p:nn {#1} { - } }
+        { ! \tl_if_blank_p:n {#2#3} }
+        {
+          \str_if_eq_p:ee
+            { \exp_not:n {#2#3} }
+            { \prg_replicate:nn { \tl_count:n {#2#3} } { 0 } }
+        }
+      }
+      { \exp_not:n { { } {#2} {#3} {#4} } }
+      { \exp_not:n { {#1} {#2} {#3} {#4} } }
   }
 \cs_new:Npn \@@_parse_finalise:nw #1#2 \q_stop
   {
@@ -1222,6 +1250,7 @@
     { \exp_not:n {#2} }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -4040,6 +4069,7 @@
     print-zero-integer             = true                                   ,
     retain-explicit-decimal-marker = false                                  ,
     retain-explicit-plus           = false                                  ,
+    retain-negative-zero           = false                                  ,
     retain-zero-uncertainty        = false                                  ,
     round-half                     = up                                     ,
     round-minimum                  = 0                                      ,

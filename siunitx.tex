@@ -1305,6 +1305,7 @@ Table~\ref{tab:opt:num:in}.
       parse-numbers                  & Switch  & true             \\
       retain-explicit-decimal-marker & Switch  & false            \\
       retain-explicit-plus           & Switch  & false            \\
+      retain-negative-zero           & Switch  & false            \\
       retain-zero-uncertainty        & Switch  & false            \\
     \bottomrule
   \end{tabular}
@@ -1397,6 +1398,7 @@ most notably in that a decimal marker must be |.|.
 
 \DescribeOption{retain-explicit-decimal-marker}
 \DescribeOption{retain-explicit-plus}
+\DescribeOption{retain-negative-zero}
 \DescribeOption{retain-zero-uncertainty}
 In some areas, a trailing decimal marker with no decimal part present is used
 to show that zeros in the integer part are significant. This can be enabled
@@ -1405,13 +1407,16 @@ leading plus sign is usually unnecessary for positive numbers, and so they are
 not retained as-standard when parsing. The \opt{retain-explicit-plus} option is
 available to control this behaviour. Similarly, an uncertainty of zero is
 normally not meaningful, and so is ignored by the parser. This can be
-controlled using the
-\opt{retain-zero-uncertainty} option.
+controlled using the \opt{retain-zero-uncertainty} option. Finally, a negative
+sign for an entirely zero value may or may not have significance: this is
+controlled by the \opt{retain-negative-zero} option.
 \begin{LaTeXdemo}
   \num{10.} \\
   \num[retain-explicit-decimal-marker]{10.} \\
   \num{+345} \\
   \num[retain-explicit-plus]{+345} \\
+  \num{-0} \\
+  \num[retain-negative-zero]{-0} \\ 
   \num{12.3(0)} \\
   \num[retain-zero-uncertainty]{12.3(0)}
 \end{LaTeXdemo}

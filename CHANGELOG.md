@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   and `complex-symbol-degree` to support complex numbers in polar form
 - Options `digit-group-size`, `digit-group-first-size` and
   `digit-group-other-size` to control digit grouping
+- Option `retain-negative-zero`
 - Options `zero-decimal-as-symbol` and `zero-symbol` to support conversion of
   a zero deicmal part to a dash or other symbol
 - Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
