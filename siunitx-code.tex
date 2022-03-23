@@ -1,6 +1,6 @@
 \iffalse meta-comment
 
-File: siunitx-code.tex Copyright (C) 2016-2021 Joseph Wright
+File: siunitx-code.tex Copyright (C) 2016-2022 Joseph Wright
 
 It may be distributed and/or modified under the conditions of the
 LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -34,9 +34,19 @@ for those people who are interested.
 
 % Commands for this document
 \ExplSyntaxOn
-\cs_new_eq:NN \LowerCaseText \tl_lower_case:n
+\makeatletter
+\NewDocumentCommand \acro { m }
+  {
+    \textsc
+      {
+        \exp_args:NV \tl_if_head_eq_charcode:nNTF \f@series { m }
+          { \text_lowercase:n }
+          { \use:n }
+            {#1}
+      }
+  }
+\makeatother
 \ExplSyntaxOff
-\NewDocumentCommand\acro{m}{\textsc{\LowerCaseText{#1}}}
 \NewDocumentCommand\foreign{m}{\textit{#1}}
 
 % Standard settings
