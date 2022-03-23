@@ -2830,12 +2830,9 @@
   { \@@_round_places_finalise:nnnnnnn #1 }
 \cs_new:Npn \@@_round_places_finalise:nnnnnnn #1#2#3#4#5#6#7
   {
-    \bool_lazy_and:nnTF
-      { \str_if_eq_p:nn {#3} { 0 } }
-      {
-        \str_if_eq_p:ee
-          { \exp_not:n {#4} } { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
-      }
+    \str_if_eq:eeTF
+      { \exp_not:n {#3#4} }
+      { \prg_replicate:nn { \tl_count:n {#3#4} } { 0 } }
       {
         \tl_if_empty:NTF \l_@@_round_min_tl
           {
