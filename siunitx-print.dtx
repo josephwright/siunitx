@@ -860,18 +860,24 @@
           \tl_set:Nn \l_@@_tmp_tl {#1}
           \tl_if_empty:NF \l_@@_tmp_tl
             {
-              \tl_if_empty:NF \l_siunitx_unit_font_tl
-                { \exp_after:wN \cs_set_eq:NN \l_siunitx_unit_font_tl \use:n }
-              \cs_set:Npn \mathord ##1
-                { \@@_text_replace_first:N ##1 }
-              \cs_set:Npn \pm { \: \exp_not:N \textpm \: }
-              \tl_map_inline:nn
-                { \mp \ge \le \gg \ll \angle }
-                { \cs_set:Npn ##1 { \exp_not:N \ensuremath { \exp_not:N ##1 } } }
-              \cs_set:Npn \cdot { \: \exp_not:N \textperiodcentered \: }
-              \cs_set:Npn \times { \: \exp_not:N \texttimes \: }
-              \protected@edef \l_@@_tmp_tl
-                { \exp_after:wN \@@_text_replace_first:N \l_@@_tmp_tl }
+                \tl_if_empty:NF \l_siunitx_unit_font_tl
+                  { \exp_after:wN \cs_set_eq:NN \l_siunitx_unit_font_tl \use:n }
+                \cs_set:Npn \mathord ##1
+                  { \@@_text_replace_first:N ##1 }
+              \group_begin:
+                \cs_set:Npn \pm { \: \exp_not:N \textpm \: }
+                \tl_map_inline:nn
+                  { \mp \ge \le \gg \ll \angle }
+                  {
+                    \cs_set:Npn ##1
+                      { \exp_not:N \ensuremath { \exp_not:N ##1 } }
+                  }
+                \cs_set:Npn \cdot { \: \exp_not:N \textperiodcentered \: }
+                \cs_set:Npn \times { \: \exp_not:N \texttimes \: }
+                \protected@edef \l_@@_tmp_tl
+                  { \exp_after:wN \@@_text_replace_first:N \l_@@_tmp_tl }
+              \exp_args:NNNV \group_end:
+              \tl_set:Nn \l_@@_tmp_tl \l_@@_tmp_tl
               \@@_text_replace:N \l_@@_tmp_tl
               \@@_text_replace_aux:n { \tl_use:N \l_@@_tmp_tl }
             }
