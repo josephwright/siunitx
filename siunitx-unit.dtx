@@ -625,6 +625,14 @@
 %   The standard setting is |/|.
 % \end{function}
 %
+% \begin{function}{power-half-as-sqrt}
+%   \begin{syntax}
+%     |power-half-as-sqrt| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Used to determine whether a power of exactly half is converted to
+%   \cs{sqrt} in the output. The standard setting is |false|
+% \end{function}
+%
 % \begin{function}{qualifier-mode}
 %   \begin{syntax}
 %     |qualifier-mode| = |bracket|\verb"|"|combine|\verb"|"|phrase|\verb"|"|subscript|
@@ -1745,6 +1753,8 @@
       } ,
     per-symbol .tl_set:N =
       \l_@@_per_symbol_tl ,
+    power-half-as-sqrt .bool_set:N =
+      \l_@@_half_sqrt_bool ,
     qualifier-mode .choices:nn =
       { bracket , combine , phrase , subscript }
       { \tl_set_eq:NN \l_@@_qualifier_mode_tl \l_keys_choice_tl } ,
@@ -2093,8 +2103,20 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_power_superscript:
   {
-    \exp_after:wN \@@_format_power_superscipt:w
-      \l_@@_part_tl . . \q_stop
+    \bool_lazy_and:nnTF
+      { \l_@@_half_sqrt_bool }
+      { \str_if_eq_p:Vn \l_@@_part_tl { 0.5 } }
+      {
+        \tl_set:Nx \l_@@_current_tl
+          {
+            \exp_not:N \sqrt
+              { \exp_not:V \l_@@_current_tl }
+          }
+      }
+      {
+        \exp_after:wN \@@_format_power_superscipt:w
+          \l_@@_part_tl . . \q_stop
+      }
   }
 \cs_new_protected:Npn \@@_format_power_superscipt:w #1 . #2 . #3 \q_stop
   {
@@ -2820,6 +2842,7 @@
     parse-units               = true      ,
     per-mode                  = power     ,
     per-symbol                = /         ,
+    power-half-as-sqrt        = false     ,
     qualifier-mode            = subscript ,
     qualifier-phrase          =           ,
     sticky-per                = false     ,
