@@ -100,7 +100,14 @@
 %   Valid uncertainty \meta{identifiers} currently are
 %   \begin{itemize}
 %     \item[\texttt{S}] A single symmetrical uncertainty (\foreign{e.g.}~a
-%       statistical standard uncertainty)
+%       statistical standard uncertainty). The data item here is a single
+%       value representing the uncertainty in the least-significant digits
+%     \item[\texttt{A}] A single unsymmetrical uncertainty. The data item here
+%       contains two brace groups, each using the same least-significant digit
+%       approach as the \texttt{S} type. The positive component is given first
+%       and the negative second, and neither has a sign.
+%     \item A combination of \texttt{S} and \texttt{A} entries, with one data
+%       item per entry. These are then iterated over to be output in order.
 %   \end{itemize}
 %   If a decimal marker should be explicitly recorded as present for a value
 %   with no decimal digits, the \meta{decimal} part should contain
@@ -559,6 +566,15 @@
 %   \begin{syntax}
 %     |tight-spacing| = |true|\verb"|"|false|
 %   \end{syntax}
+% \end{function}
+%
+% \begin{function}{uncertainty-descriptors}
+%   \begin{syntax}
+%     |uncertainty-descriptors| = \meta{clist}
+%   \end{syntax}
+%   Stores the list of descriptors used when there are multiple uncertainty
+%   components given. This is not used when there is only a single uncertainty
+%   component present. The standard setting is |empty|.
 % \end{function}
 %
 % \begin{function}{uncertainty-mode}
@@ -3236,6 +3252,7 @@
 %      \l_@@_output_exp_marker_tl   ,
 %      \l_@@_output_uncert_close_tl ,
 %      \l_@@_output_uncert_open_tl  ,
+%      \l_@@_uncert_desc_clist      ,
 %      \l_@@_uncert_mode_tl         ,
 %      \l_@@_uncert_separator_tl    ,
 %      \l_@@_tight_bool             ,
@@ -3310,6 +3327,8 @@
       \l_@@_zero_integer_bool ,
     tight-spacing .bool_set:N =
       \l_@@_tight_bool ,
+    uncertainty-descriptors .clist_set:N =
+      \l_@@_uncert_desc_clist ,
     uncertainty-mode .choices:nn =
       { compact , compact-marker , full , separate }
       { \tl_set_eq:NN \l_@@_uncert_mode_tl \l_keys_choice_tl } ,
@@ -3364,18 +3383,31 @@
 % \begin{macro}[rEXP]{\@@_output_decimal_loop:NnnN}
 % \begin{macro}[rEXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[rEXP]{\@@_output_uncertainty_unaligned:n}
-% \begin{macro}[rEXP]{\@@_output_uncert_S:nnnw}
+% \begin{macro}[rEXP]{\@@_output_uncert:nnn}
+% \begin{macro}[rEXP]{\@@_output_uncert:nnnn}
+% \begin{macro}[rEXP]{\@@_output_uncert_loop:nN}
+% \begin{macro}[rEXP]{\@@_output_uncert_loop:nNw}
+% \begin{macro}[rEXP]{\@@_output_uncert_A:nnnn, \@@_output_uncert_A_multi:nnnn}
+% \begin{macro}[rEXP]{\@@_output_uncert_A:nnnnn}
 % \begin{macro}[rEXP]
-%   {\@@_output_uncert_S_aux:nnn, \@@_output_uncert_S_aux:fnn}
-% \begin{macro}[rEXP]
-%   {\@@_output_uncert_S:nnnw, \@@_output_uncert_S:fnw}
-% \begin{macro}[rEXP]{\@@_output_uncert_S:nnw}
+%   {
+%     \@@_output_uncert_S:nnnn       ,
+%     \@@_output_uncert_S_sep:nnnn   ,
+%     \@@_output_uncert_S_multi:nnnn
+%   }
 % \begin{macro}[rEXP]
 %   {
 %     \@@_output_uncert_S_compact:nn        ,
 %     \@@_output_uncert_S_compact-marker:nn ,
 %     \@@_output_uncert_S_full:nn
 %   }
+% \begin{macro}[rEXP]
+%   {\@@_output_uncert_augment:nnnn}
+% \begin{macro}[rEXP]
+%   {\@@_output_uncert_augment:nnn}
+% \begin{macro}[rEXP]
+%   {\@@_output_uncert_augment:nnnw, \@@_output_uncert_augment:fnnw}
+% \begin{macro}[rEXP]{\@@_output_uncert_augment:nnw}
 % \begin{macro}[rEXP]
 %   {
 %     \@@_output_exponent:nnnnn       ,
@@ -3751,6 +3783,82 @@
       { \@@_output_decimal_loop:NnnN #1 { #2 + 1 } { #3 #4 } }
   }
 %    \end{macrocode}
+%   The lead-off here is to deal with the common cases: no uncertainty at all
+%   or a single uncertainty. Otherwise we have to move to a mapping.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncertainty:nnn #1#2#3
+  {
+    \tl_if_blank:nTF {#1}
+      { \@@_output_uncertainty_unaligned:n {#3} }
+      {
+        \cs_if_exist:cTF
+          { @@_output_uncert_ \tl_head:n {#1} :nnnn }
+          {
+            \use:c { @@_output_uncert_ \tl_head:n {#1} :nnnn }
+              {#2} {#3} #1
+          }
+          {
+            \@@_output_uncert:nnn {#3} #1
+            \@@_output_uncertainty_unaligned:n {#3}
+          }
+      }
+  }
+\cs_new:Npn \@@_output_uncertainty_unaligned:n #1
+  { \exp_not:n { #1 #1 #1 #1 } }
+%    \end{macrocode}
+%   For handling a list of uncertainties, we also need the descriptors. There
+%   is no way to reasonably deal with alignment of an open-ended list, so
+%   the treatment is as-for no uncertainty at all.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncert:nnn #1#2#3
+  {
+    \exp_args:NV \@@_output_uncert:nnnn \l_@@_uncert_desc_clist
+      {#1} {#2} {#3}
+  }
+\cs_new:Npn \@@_output_uncert:nnnn #1#2#3#4
+  {
+    \@@_output_uncert_loop:nN {#2}
+      #3 \q_recursion_tail #1 , \q_recursion_stop {#4}
+  }
+\cs_new:Npn \@@_output_uncert_loop:nN #1#2
+  {
+    \quark_if_recursion_tail_stop:N #2
+    \@@_output_uncert_loop:nNw {#1} #2
+  }
+\cs_new:Npn \@@_output_uncert_loop:nNw
+  #1#2#3 \q_recursion_tail #4 , #5 \q_recursion_stop #6
+  {
+    \use:c { @@_output_uncert_ #2 _multi:nnnn } {#1} { } {#2} {#6}
+    \tl_if_blank:nF {#4}
+      { \exp_not:N \, ( \exp_not:N \mathrm { \exp_not:n {#4} } ) }
+   \@@_output_uncert_loop:nN {#1} #3
+     \q_recursion_tail #5 , \q_recursion_stop
+  }
+%    \end{macrocode}
+%   Printing an asymmetrical uncertainty is more straight-forward as they are
+%   always given in a single format. The only issue is handling the catcode.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncert_A:nnnn #1#2#3#4
+  { \@@_output_uncert_A:nnnnn {#1} {#2} {#3} #4 }
+\cs_new_eq:NN \@@_output_uncert_A_multi:nnnn
+  \@@_output_uncert_A:nnnn
+\cs_new:Npx \@@_output_uncert_A:nnnnn #1#2#3#4#5
+  {
+    ^
+      { 
+        +
+        \exp_not:N \@@_output_uncert_augment:nnnn
+          {#4} {#1} {#4} {#2}
+      }
+    \char_generate:nn { `\_ } { 8 }
+      {
+        -
+        \exp_not:N \@@_output_uncert_augment:nnnn
+          {#5} {#1} {#5} {#2}
+      }
+    \exp_not:N \@@_output_uncertainty_unaligned:n {#2}
+  }
+%    \end{macrocode}
 %   Uncertainties which are directly attached are easy to deal with. For those
 %   that are separated, the first step is to find if they are entirely
 %   contained within the decimal part, and to pad if they are. For the case
@@ -3758,31 +3866,10 @@
 %   digit tokens need to be removed from the start of the uncertainty and
 %   the split result sent to the appropriate auxiliaries.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_uncertainty:nnn #1#2#3
-  {
-    \tl_if_blank:nTF {#1}
-      { \@@_output_uncertainty_unaligned:n {#3} }
-      {
-        \use:c { @@_output_uncert_ \tl_head:n {#1} :nnnw }
-          {#2} {#3} #1
-      }
-  }
-\cs_new:Npn \@@_output_uncertainty_unaligned:n #1
-  { \exp_not:n { #1 #1 #1 #1 } }
-\cs_new:Npn \@@_output_uncert_S:nnnw #1#2#3#4
+\cs_new:Npn \@@_output_uncert_S:nnnn #1#2#3#4
   {
     \str_if_eq:VnTF \l_@@_uncert_mode_tl { separate }
-      {
-        \exp_not:n {#2}
-        \bool_if:NTF \l_@@_tight_bool
-          { \mathord }
-          { \use:n }
-            { \exp_not:n { \pm } }
-        \exp_not:n {#2}
-        \@@_output_uncert_S_aux:nnn
-          { \int_eval:n { \tl_count:n {#4} - \tl_count:n {#1} } }
-          {#4} {#2}
-      }
+      { \@@_output_uncert_S_sep:nnnn {#1} {#2} {#3} {#4} }
       {
         \exp_not:V \l_@@_uncert_separator_tl
         \exp_not:V \l_@@_output_uncert_open_tl
@@ -3791,47 +3878,18 @@
         \@@_output_uncertainty_unaligned:n {#2}
       }
   }
-\cs_new:Npn \@@_output_uncert_S_aux:nnn #1#2#3
+\cs_new:Npn \@@_output_uncert_S_sep:nnnn #1#2#3#4
   {
-    \int_compare:nNnTF {#1} > 0
-      {
-        \@@_output_uncert_S_aux:fnnw
-          { \int_eval:n { #1 - 1 } }
-          {#3}
-          { }
-          #2 \q_nil
-      }
-      {
-        0
-        \@@_output_decimal:fn
-          {
-            \prg_replicate:nn { \int_abs:n {#1} } { 0 }
-            #2
-          }
-          {#3}
-      }
+    \exp_not:n {#2}
+    \bool_if:NTF \l_@@_tight_bool
+      { \mathord }
+      { \use:n }
+        { \exp_not:n { \pm } }
+    \exp_not:n {#2}
+    \@@_output_uncert_augment:nnnn {#4} {#1} {#4} {#2}
   }
-\cs_generate_variant:Nn \@@_output_uncert_S_aux:nnn { f }
-\cs_new:Npn \@@_output_uncert_S_aux:nnnw #1#2#3#4
-  {
-    \quark_if_nil:NF #4
-      {
-        \int_compare:nNnTF {#1} = 0
-          { \@@_output_uncert_S_aux:nnw {#3#4} {#2} }
-          {
-            \@@_output_uncert_S_aux:fnnw
-              { \int_eval:n { #1 - 1 } }
-              {#2}
-              {#3#4}
-          }
-      }
-  }
-\cs_generate_variant:Nn \@@_output_uncert_S_aux:nnnw { f }
-\cs_new:Npn \@@_output_uncert_S_aux:nnw #1#2#3 \q_nil
-  {
-    \@@_output_digits:nn { integer } {#1}
-    \@@_output_decimal:nn {#3} {#2}
-  }
+\cs_new_eq:NN \@@_output_uncert_S_multi:nnnn
+  \@@_output_uncert_S_sep:nnnn
 %    \end{macrocode}
 %   Handle the content of brackets: the only complex case is the
 %   mixed situation.
@@ -3849,9 +3907,56 @@
   }
 \cs_new:Npn \@@_output_uncert_S_full:nn #1#2
   {
-    \@@_output_uncert_S_aux:fnn
-      { \int_eval:n { \tl_count:n {#2} - \tl_count:n {#1} } }
-      {#2} { }
+    \@@_output_uncert_augment:nnnn {#2} {#1} {#2} { }
+  }
+%    \end{macrocode}
+%   Convert the internal (short) form of an uncertainty to the longer form.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncert_augment:nnnn #1#2#3#4
+  {
+    \exp_args:Nf \@@_output_uncert_augment:nnn
+      { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#2} } }
+      {#3} {#4}
+  }
+\cs_new:Npn \@@_output_uncert_augment:nnn #1#2#3
+  {
+    \int_compare:nNnTF {#1} > 0
+      {
+        \@@_output_uncert_augment:fnnw
+          { \int_eval:n { #1 - 1 } }
+          {#3}
+          { }
+          #2 \q_nil
+      }
+      {
+        0
+        \@@_output_decimal:fn
+          {
+            \prg_replicate:nn { \int_abs:n {#1} } { 0 }
+            #2
+          }
+          {#3}
+      }
+  }
+\cs_new:Npn \@@_output_uncert_augment:nnnw #1#2#3#4
+  {
+    \quark_if_nil:NF #4
+      {
+        \int_compare:nNnTF {#1} = 0
+          { \@@_output_uncert_augment:nnw {#3#4} {#2} }
+          {
+            \@@_output_uncert_augment:fnnw
+              { \int_eval:n { #1 - 1 } }
+              {#2}
+              {#3#4}
+          }
+      }
+  }
+\cs_generate_variant:Nn \@@_output_uncert_augment:nnnw { f }
+\cs_new:Npn \@@_output_uncert_augment:nnw #1#2#3 \q_nil
+  {
+    \@@_output_digits:nn { integer } {#1}
+    \@@_output_decimal:nn {#3} {#2}
   }
 %    \end{macrocode}
 %   Setting the exponent part requires some information about the mantissa:
@@ -3924,6 +4029,12 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -4126,6 +4237,7 @@
     round-precision                = 2                                      ,
     round-zero-positive            = true                                   ,
     tight-spacing                  = false                                  ,
+    uncertainty-descriptors        =                                        ,
     uncertainty-mode               = compact                                ,
     uncertainty-separator          =                                        ,
     zero-decimal-as-symbol         = false                                  ,
