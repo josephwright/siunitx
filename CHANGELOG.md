@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   and `complex-symbol-degree` to support complex numbers in polar form
 - Options `digit-group-size`, `digit-group-first-size` and
   `digit-group-other-size` to control digit grouping
+- Option `per-symbol-script-correction`
 - Option `power-half-as-sqrt`
 - Option `retain-negative-zero`
 - Option `round-zero-positive` to control the outcome of rounding

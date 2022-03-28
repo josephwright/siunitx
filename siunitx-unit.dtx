@@ -625,6 +625,15 @@
 %   The standard setting is |/|.
 % \end{function}
 %
+% \begin{function}{per-symbol-script-correction}
+%   \begin{syntax}
+%     |per-symbol-script-correction| = \meta{insert}
+%   \end{syntax}
+%   Specifies the tokens used to correct spacing when the symbol set by
+%   |per-symbol| is immediately preceded by a superscript power. The
+%   standard setting is |\!|.
+% \end{function}
+%
 % \begin{function}{power-half-as-sqrt}
 %   \begin{syntax}
 %     |power-half-as-sqrt| = |true|\verb"|"|false|
@@ -1693,6 +1702,7 @@
 %     \l_@@_forbid_literal_bool      ,
 %     \l_@@_parse_bool               ,
 %     \l_@@_per_symbol_tl            ,
+%     \l_@@_per_script_tl            ,
 %     \l_@@_qualifier_mode_tl        ,
 %     \l_@@_qualifier_phrase_tl
 %   }
@@ -1753,6 +1763,8 @@
       } ,
     per-symbol .tl_set:N =
       \l_@@_per_symbol_tl ,
+    per-symbol-script-correction .tl_set:N =
+      \l_@@_per_script_tl ,
     power-half-as-sqrt .bool_set:N =
       \l_@@_half_sqrt_bool ,
     qualifier-mode .choices:nn =
@@ -1854,6 +1866,17 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_current_script_bool, \l_@@_script_bool}
+%   A pair of flags to track whether the last entry in the numerator has a
+%   superscript. This is tracked to deal with spacing immediately before
+%   a slash (symbol), if required. Two flags are needed as otherwise the
+%   denominator interferes.
+%    \begin{macrocode}
+\bool_new:N \l_@@_current_script_bool
+\bool_new:N \l_@@_script_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_current_tl, \l_@@_part_tl}
 %   Building up the (partial) formatted unit requires some token list storage.
 %   Each part of the unit combination that is recovered also has to be
@@ -1907,6 +1930,7 @@
       \l_@@_position_int < \l_@@_total_int
       {
         \bool_set_false:N \l_@@_bracket_bool
+        \bool_set_false:N \l_@@_current_script_bool
         \tl_clear:N \l_@@_current_tl
         \bool_set_false:N \l_@@_font_bool
         \bool_set_true:N \l_@@_numerator_bool
@@ -2146,6 +2170,7 @@
             ^ { \siunitx_number_output:N \l_@@_tmp_tl }
           }
       }
+    \bool_set_true:N \l_@@_current_script_bool
     \bool_set_false:N \l_@@_bracket_bool
   }
 %    \end{macrocode}
@@ -2231,6 +2256,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_qualifier:
   {
+    \bool_set_false:N \l_@@_current_script_bool
     \use:c
       {
         @@_format_qualifier_
@@ -2339,6 +2365,8 @@
   }
 \cs_new_protected:Npn \@@_format_output_aux:
   {
+    \bool_set_eq:NN \l_@@_script_bool
+      \l_@@_current_script_bool
     \@@_format_output_aux:nV { formatted }
       \l_@@_product_tl
   }
@@ -2491,11 +2519,17 @@
           { \exp_not:V \l_@@_denominator_tl }
       }
   }
+%    \end{macrocode}
+%   Add the correction if required: no \cs{relax} needed as we know there is a
+%   non-expandable token following.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_finalise_symbol:
   {
     \tl_set:Nx \l_@@_formatted_tl
       {
         \exp_not:V \l_@@_formatted_tl
+        \bool_if:NT \l_@@_script_bool
+          { \exp_not:V \l_@@_per_script_tl }
         \exp_not:V \l_@@_per_symbol_tl
         \@@_format_bracket:N \l_@@_denominator_tl
       }
@@ -2834,19 +2868,20 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    bracket-unit-denominator  = true      ,
-    forbid-literal-units      = false     ,
-    fraction-command          = \frac     ,
-    inter-unit-product        = \,        ,
-    extract-mass-in-kilograms = true      ,
-    parse-units               = true      ,
-    per-mode                  = power     ,
-    per-symbol                = /         ,
-    power-half-as-sqrt        = false     ,
-    qualifier-mode            = subscript ,
-    qualifier-phrase          =           ,
-    sticky-per                = false     ,
-    unit-font-command         = \mathrm
+    bracket-unit-denominator     = true      ,
+    forbid-literal-units         = false     ,
+    fraction-command             = \frac     ,
+    inter-unit-product           = \,        ,
+    extract-mass-in-kilograms    = true      ,
+    parse-units                  = true      ,
+    per-mode                     = power     ,
+    per-symbol                   = /         ,
+    per-symbol-script-correction = \!        ,
+    power-half-as-sqrt           = false     ,
+    qualifier-mode               = subscript ,
+    qualifier-phrase             =           ,
+    sticky-per                   = false     ,
+    unit-font-command            = \mathrm
   }
 %    \end{macrocode}
 %
