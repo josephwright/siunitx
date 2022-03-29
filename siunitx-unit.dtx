@@ -598,12 +598,12 @@
 %
 % \begin{function}{per-mode}
 %   \begin{syntax}
-%     |per-mode| = |fraction|\verb"|"|power|\verb"|"|power-positive-first|\verb"|"|repeated-symbol|\verb"|"|symbol|\verb"|"|symbol-or-fraction|
+%     |per-mode| = |fraction|\verb"|"|power|\verb"|"|power-positive-first|\verb"|"|repeated-symbol|\verb"|"|single-symbol|\verb"|"|symbol|\verb"|"|symbol-or-fraction|
 %   \end{syntax}
 %   Selects how the negative powers (\cs{per}) are formatted: a choice from
 %   the options |fraction|, |power|, |power-positive-first|, |repeated-symbol|,
-%   |symbol| and |symbol-or-fraction|. The option |fraction| generates
-%   fractional output when appropriate using the command specified by
+%   |single-symbol|, |symbol| and |symbol-or-fraction|. The option |fraction|
+%   generates fractional output when appropriate using the command specified by
 %   the |fraction-command| option. The setting |power| uses reciprocal powers
 %   leaving the units in the order of input, while |power-positive-first| uses
 %   the same display format but sorts units such that the positive powers
@@ -611,7 +611,9 @@
 %   by |per-symbol|) between positive and negative powers, while
 %   |repeated-symbol| uses the same symbol but places it before \emph{every}
 %   unit with a negative power (this is mathematically \enquote{wrong} but
-%   often seen in real work). Finally, |symbol-or-fraction| acts like
+%   often seen in real work). The option |single-symbol| will use a symbol if
+%   exactly one is required (\foreign{i.e.}~with a single negative power), and
+%   will otherwise use powers. Finally, |symbol-or-fraction| acts like
 %   |symbol| for inline output and like |fraction| when the output is used
 %   in a display math environment. The standard setting is |power|.
 % \end{function}
@@ -709,15 +711,18 @@
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
 %
+% \begin{variable}{\l_@@_tmp_bool}
 % \begin{variable}{\l_@@_tmp_fp}
 % \begin{variable}{\l_@@_tmp_int}
 % \begin{variable}{\l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
+\bool_new:N \l_@@_tmp_bool
 \fp_new:N \l_@@_tmp_fp
 \int_new:N \l_@@_tmp_int
 \tl_new:N  \l_@@_tmp_tl
 %    \end{macrocode}
+% \end{variable}
 % \end{variable}
 % \end{variable}
 % \end{variable}
@@ -1723,6 +1728,7 @@
     per-mode / fraction .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_false:N \l_@@_per_symbol_bool
         \bool_set_true:N  \l_@@_powers_positive_bool
         \bool_set_true:N  \l_@@_two_part_bool
@@ -1730,6 +1736,7 @@
     per-mode / power .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_false:N \l_@@_per_symbol_bool
         \bool_set_false:N \l_@@_powers_positive_bool
         \bool_set_false:N \l_@@_two_part_bool
@@ -1737,6 +1744,7 @@
     per-mode / power-positive-first .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_false:N \l_@@_per_symbol_bool
         \bool_set_false:N \l_@@_powers_positive_bool
         \bool_set_true:N  \l_@@_two_part_bool
@@ -1744,6 +1752,7 @@
     per-mode / repeated-symbol .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_true:N  \l_@@_per_symbol_bool
         \bool_set_true:N  \l_@@_powers_positive_bool
         \bool_set_false:N \l_@@_two_part_bool
@@ -1751,6 +1760,7 @@
     per-mode / symbol .code:n =
       {
         \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_true:N  \l_@@_per_symbol_bool
         \bool_set_true:N  \l_@@_powers_positive_bool
         \bool_set_true:N  \l_@@_two_part_bool
@@ -1758,9 +1768,18 @@
     per-mode / symbol-or-fraction .code:n =
       {
         \bool_set_true:N \l_@@_autofrac_bool
+        \bool_set_false:N \l_@@_autosymb_bool
         \bool_set_true:N \l_@@_per_symbol_bool
         \bool_set_true:N \l_@@_powers_positive_bool
         \bool_set_true:N \l_@@_two_part_bool
+      } ,
+    per-mode / single-symbol .code:n =
+      {
+        \bool_set_false:N \l_@@_autofrac_bool
+        \bool_set_true:N \l_@@_autosymb_bool
+        \bool_set_false:N \l_@@_per_symbol_bool
+        \bool_set_false:N \l_@@_powers_positive_bool
+        \bool_set_false:N \l_@@_two_part_bool
       } ,
     per-symbol .tl_set:N =
       \l_@@_per_symbol_tl ,
@@ -1805,6 +1824,7 @@
 % \begin{variable}
 %   {
 %     \l_@@_autofrac_bool        ,
+%     \l_@@_autosymb_bool        ,
 %     \l_@@_powers_positive_bool ,
 %     \l_@@_per_symbol_bool      ,
 %     \l_@@_two_part_bool
@@ -1813,6 +1833,7 @@
 %   requires a few different switches.
 %    \begin{macrocode}
 \bool_new:N \l_@@_autofrac_bool
+\bool_new:N \l_@@_autosymb_bool
 \bool_new:N \l_@@_per_symbol_bool
 \bool_new:N \l_@@_powers_positive_bool
 \bool_new:N \l_@@_two_part_bool
@@ -1927,6 +1948,8 @@
       { \l_@@_prefix_exp_bool }
       { \l_@@_mass_kilogram_bool }
       { \@@_format_mass_to_kilogram: }
+    \bool_if:NT \l_@@_autosymb_bool
+      { \@@_format_symbol_or_power: }
     \int_do_while:nNnn
       \l_@@_position_int < \l_@@_total_int
       {
@@ -2045,6 +2068,36 @@
                   { \l_@@_prefix_fp - 3 * \l_@@_tmp_tl }
               }
           }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_format_symbol_or_power:}
+%   Check if there is exactly one negative power align with at least one
+%   positive one. Assuming there is, flip from (effectively) |power| to
+%   |symbol|.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_symbol_or_power:
+  {
+    \int_compare:nNnT \l_@@_total_int > 1
+      {
+        \bool_set_false:N \l_@@_tmp_bool
+        \int_step_inline:nn \l_@@_total_int
+          {
+            \prop_get:NnNT \l_@@_parsed_prop { power- ##1 }
+              \l_@@_tmp_tl
+              {
+                \int_compare:nNnT \l_@@_tmp_tl < 0
+                  {
+                    \bool_if:NTF \l_@@_tmp_bool
+                      { \bool_set_false:N \l_@@_tmp_bool }
+                      { \bool_set_true:N \l_@@_tmp_bool }
+                  }
+              }
+          }
+        \bool_if:NT \l_@@_tmp_bool
+          { \keys_set:nn { siunitx } { per-mode = symbol } }
       }
   }
 %    \end{macrocode}
