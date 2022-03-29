@@ -22,7 +22,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `round-zero-positive` to control the outcome of rounding
   negative values to zero
 - Options `zero-decimal-as-symbol` and `zero-symbol` to support conversion of
-  a zero deicmal part to a dash or other symbol
+  a zero decimal part to a dash or other symbol
 - Option setting `per-mode = single-symbol` to allow exactly one symbol to be
   present
 - Unit abbreviations `\C`, `\nC`, `\uC`, `\mC` (see issue
