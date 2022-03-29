@@ -31,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#596](https://github.com/josephwright/siunitx/issues/596))
 - Unit abbreviation `\nW` (see issue
   [\#596](https://github.com/josephwright/siunitx/issues/596))
+- Brazilian and Portuguese translations for lists and ranges (see issue
+  [\#514](https://github.com/josephwright/siunitx/issues/514))
 
 ### Changed
 - Issue an error if the `units` package is loaded
