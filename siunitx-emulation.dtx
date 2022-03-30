@@ -97,8 +97,12 @@
   }
 \cs_new_protected:Npn \@@_option_deprecated:nnn #1#2#3
   {
-    \@@_deprecated_info:nn {#1} {#2}
-    \keys_set:nn { siunitx } { #2 = #3 }
+    \str_if_eq:nnTF {#3} { true }
+      { \@@_option_deprecated:nn {#1} {#2} }
+      {
+        \@@_deprecated_info:nn {#1} { #2 ~=~ #3 }
+        \keys_set:nn { siunitx } { #2 = #3 }
+       }
   }
 \cs_generate_variant:Nn \@@_option_deprecated:nnn { nnV }
 %    \end{macrocode}
