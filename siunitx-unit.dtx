@@ -1144,7 +1144,7 @@
             }
             {
               \bool_if:NTF \l_@@_forbid_literal_bool
-                { \msg_error:nnn { siunitx } { unit / literal } {#1} }
+                { \msg_error:nnn { siunitx } { literal-unit } {#1} }
                 { \@@_format_literal:n {#1} }
             }
         }
@@ -1506,7 +1506,7 @@
     \prop_if_in:NVTF \l_@@_parsed_prop
       \l_@@_tmp_tl
       {
-        \msg_error:nnxx { siunitx } { unit / duplicate-part }
+        \msg_error:nnxx { siunitx } { duplicate-part }
           { \exp_not:n {#1} } { \token_to_str:N #3 }
       }
       {
@@ -1554,7 +1554,7 @@
       }
       {
         \msg_error:nnxx { siunitx }
-          { unit / part-before-unit } { power } { \token_to_str:N #1 }
+          { part-before-unit } { power } { \token_to_str:N #1 }
       }
   }
 \cs_new_protected:Npn \@@_parse_qualifier:nn #1#2
@@ -1568,7 +1568,7 @@
       }
       {
         \msg_error:nnnn { siunitx }
-          { unit / part-before-unit } { qualifier } { \token_to_str:N #1 }
+          { part-before-unit } { qualifier } { \token_to_str:N #1 }
       }
   }
 %    \end{macrocode}
@@ -1630,7 +1630,7 @@
       {
         \bool_set_true:N \l_@@_per_bool
         \cs_set_protected:Npn \per
-          { \msg_error:nn { siunitx } { unit / duplicate-sticky-per } }
+          { \msg_error:nn { siunitx } { duplicate-sticky-per } }
       }
       {
         \@@_parse_add:nnnn
@@ -1694,7 +1694,7 @@
         \tl_set:Nx \l_@@_tmp_tl
           { ##1 - \int_eval:n { \l_@@_position_int + 1 } }
         \prop_if_in:NVT \l_@@_parsed_prop \l_@@_tmp_tl
-          { \msg_error:nnn { siunitx } { unit / dangling-part } { ##1 } }
+          { \msg_error:nnn { siunitx } { dangling-part } { ##1 } }
       }
   }
 %    \end{macrocode}
@@ -2041,7 +2041,7 @@
           \l_@@_tmp_tl \l_@@_tmp_tl
           {
             \prop_get:NnN \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl
-            \msg_error:nnx { siunitx } { unit / non-numeric-exponent }
+            \msg_error:nnx { siunitx } { non-numeric-exponent }
               { \l_@@_tmp_tl }
             \tl_set:Nn \l_@@_tmp_tl { 0 }
           }
@@ -2056,7 +2056,7 @@
           \l_@@_tmp_tl \l_@@_tmp_tl
           { \prop_put:NnV \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl }
           {
-            \msg_error:nnx { siunitx } { unit / non-convertible-exponent }
+            \msg_error:nnx { siunitx } { non-convertible-exponent }
               { \l_@@_tmp_tl }
           }
       }
@@ -2890,43 +2890,43 @@
 % \subsection{Messages}
 %
 %    \begin{macrocode}
-\msg_new:nnnn { siunitx } { unit / dangling-part }
+\msg_new:nnnn { siunitx } { dangling-part }
   { Found~#1~part~with~no~unit. }
   {
     Each~#1~part~must~be~associated~with~a~unit:~a~#1~part~was~found~
     but~no~following~unit~was~given.
   }
-\msg_new:nnnn { siunitx } { unit / duplicate-part }
+\msg_new:nnnn { siunitx } { duplicate-part }
   { Duplicate~#1~part:~#2. }
   {
     Each~unit~may~have~only~one~#1:\\
     the~additional~#1~part~'#2'~will~be~ignored.
   }
-\msg_new:nnnn { siunitx } { unit / duplicate-sticky-per }
+\msg_new:nnnn { siunitx } { duplicate-sticky-per }
   { Duplicate~\token_to_str:N \per. }
   {
     When~the~'sticky-per'~option~is~active,~only~one~
     \token_to_str:N \per \  may~appear~in~a~unit.
   }
-\msg_new:nnnn { siunitx } { unit / literal }
+\msg_new:nnnn { siunitx } { literal-unit }
   { Literal~units~disabled. }
   {
     You~gave~the~literal~input~'#1'~
     but~literal~unit~output~is~disabled.
   }
-\msg_new:nnnn { siunitx } { unit / non-convertible-exponent }
+\msg_new:nnnn { siunitx } { non-convertible-exponent }
   { Exponent~'#1'~cannot~be~converted~into~a~symbolic~prefix. }
   {
     The~exponent~'#1'~does~not~match~with~any~of~the~symbolic~prefixes~
     set~up.
   }
-\msg_new:nnnn { siunitx } { unit / non-numeric-exponent }
+\msg_new:nnnn { siunitx } { non-numeric-exponent }
   { Prefix~'#1'~does~not~have~a~numerical~value. }
   {
     The~prefix~'#1'~needs~to~be~combined~with~a~number,~but~it~has~no
     numerical~value.
   }
-\msg_new:nnnn { siunitx } { unit / part-before-unit }
+\msg_new:nnnn { siunitx } { part-before-unit }
   { Found~#1~part~before~first~unit:~#2. }
   {
     The~#1~part~'#2'~must~follow~after~a~unit:~
