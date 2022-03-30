@@ -391,6 +391,28 @@
     \test:n { \kilo \gram \metre \per \second \per \kelvin }
   }
 
+\TEST { Option~setting~"display-per-mode" }
+  {
+    \clist_map_inline:nn
+      {
+        fraction             ,
+        power                ,
+        power-positive-first ,
+        repeated-symbol      ,
+        symbol               ,
+        single-symbol
+      }
+      {
+        \keys_set:nn { siunitx } { display-per-mode = #1 }
+        \test:n { \per \metre }
+        \test:n { \per \metre \per \candela }
+        \test:n { \metre \per \second }
+        \test:n { \joule \per \mole \per \kelvin }
+        \test:n { \newton \metre \per \second }
+        \test:n { \per \metre \second \per \mole \ampere }
+      }
+  }
+
 \TEST { Option~setting~"extract-mass-in-kilograms" }
   {
     \cs_set_protected:Npn \test:n #1
@@ -432,6 +454,28 @@
     \test:n { \kilo \gram \metre \per \second \per \kelvin }
   }
 
+\TEST { Option~setting~"inline-per-mode" }
+  {
+    \clist_map_inline:nn
+      {
+        fraction             ,
+        power                ,
+        power-positive-first ,
+        repeated-symbol      ,
+        symbol               ,
+        single-symbol
+      }
+      {
+        \keys_set:nn { siunitx } { inline-per-mode = #1 }
+        \test:n { \per \metre }
+        \test:n { \per \metre \per \candela }
+        \test:n { \metre \per \second }
+        \test:n { \joule \per \mole \per \kelvin }
+        \test:n { \newton \metre \per \second }
+        \test:n { \per \metre \second \per \mole \ampere }
+      }
+  }
+
 \TEST { Option~setting~"inter-unit-product" }
   {
     \test:n { \joule \per \mole \per \kelvin }
@@ -463,7 +507,6 @@
         power-positive-first ,
         repeated-symbol      ,
         symbol               ,
-        symbol-or-fraction   ,
         single-symbol
       }
       {
@@ -613,4 +656,18 @@
     \TIMO
     \siunitx_unit_format_combine_exponent:nnN { \XXX \metre } { 3 } \l_tmpa_tl
   }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Deprected~option~setting~"per-mode~=~symbol-or-fraction" }
+  {
+    \keys_set:nn { siunitx } { per-mode = symbol-or-fraction }
+    \test:n { \per \metre }
+    \test:n { \per \metre \per \candela }
+    \test:n { \metre \per \second }
+    \test:n { \joule \per \mole \per \kelvin }
+    \test:n { \newton \metre \per \second }
+    \test:n { \per \metre \second \per \mole \ampere }
+  }
+
 \END

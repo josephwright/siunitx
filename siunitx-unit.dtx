@@ -84,8 +84,8 @@
 %
 % A small number of \LaTeXe{} math mode commands are assumed to be available
 % as part of the formatted output. The \cs{mathchoice} command
-% (normally the \TeX{} primitive) is needed when using
-% |per-mode = symbol-or-fraction|. The commands \cs{frac}, \cs{mathrm},
+% (normally the \TeX{} primitive) is needed when using different settings
+% for inline and siplay |per-mode|. The commands \cs{frac}, \cs{mathrm},
 % \cs{mbox}, \verb*|\ | and \cs{,} are used by the standard module settings.
 % For the display of colored (highlighted) and cancelled units, the commands
 % \cs{textcolor} and \cs{cancel} are assumed to be available.
@@ -552,8 +552,7 @@
 %   \end{syntax}
 %   Switch to determine whether brackets are added to the denominator part of
 %   a unit when printed using inline fractional form (with |per-mode| as
-%   |repeated-symbol|, |symbol| or |symbol-or-fraction|). The standard setting
-%   is |true|.
+%   |repeated-symbol| or |symbol|). The standard setting is |true|.
 % \end{function}
 %
 % \begin{function}{extract-mass-in-kilograms}
@@ -596,13 +595,13 @@
 %   mode is used directly. The standard setting is |true|.
 % \end{function}
 %
-% \begin{function}{per-mode}
+% \begin{function}{per-mode, inline-per-mode, display-per-mode}
 %   \begin{syntax}
-%     |per-mode| = |fraction|\verb"|"|power|\verb"|"|power-positive-first|\verb"|"|repeated-symbol|\verb"|"|single-symbol|\verb"|"|symbol|\verb"|"|symbol-or-fraction|
+%     |per-mode| = |fraction|\verb"|"|power|\verb"|"|power-positive-first|\verb"|"|repeated-symbol|\verb"|"|single-symbol|\verb"|"|symbol|
 %   \end{syntax}
 %   Selects how the negative powers (\cs{per}) are formatted: a choice from
 %   the options |fraction|, |power|, |power-positive-first|, |repeated-symbol|,
-%   |single-symbol|, |symbol| and |symbol-or-fraction|. The option |fraction|
+%   |single-symbol| and |symbol|. The option |fraction|
 %   generates fractional output when appropriate using the command specified by
 %   the |fraction-command| option. The setting |power| uses reciprocal powers
 %   leaving the units in the order of input, while |power-positive-first| uses
@@ -613,9 +612,12 @@
 %   unit with a negative power (this is mathematically \enquote{wrong} but
 %   often seen in real work). The option |single-symbol| will use a symbol if
 %   exactly one is required (\foreign{i.e.}~with a single negative power), and
-%   will otherwise use powers. Finally, |symbol-or-fraction| acts like
-%   |symbol| for inline output and like |fraction| when the output is used
-%   in a display math environment. The standard setting is |power|.
+%   will otherwise use powers. The standard setting is |power|.
+%
+%  The |inline-...| and |display-...| settings take the same options and work
+%  in exactly the same way, but are restricted in where they apply. The
+%  |display| version only applies in display math contexts, and the |inline|
+%  version applies in all others.
 % \end{function}
 %
 % \begin{function}{per-symbol}
@@ -623,8 +625,8 @@
 %     |per-symbol| = \meta{symbol}
 %   \end{syntax}
 %   Specifies the symbol to be used to denote negative powers when the option
-%   |per-mode| is set to |repeated-symbol|, |symbol| or |symbol-or-fraction|.
-%   The standard setting is |/|.
+%   |per-mode| is set to |repeated-symbol| or |symbol|. The standard setting
+%   is |/|.
 % \end{function}
 %
 % \begin{function}{per-symbol-script-correction}
@@ -1718,69 +1720,34 @@
   {
     bracket-unit-denominator .bool_set:N =
       \l_@@_denominator_bracket_bool ,
+    display-per-mode .choices:nn =
+      {
+        fraction             ,
+        power                ,
+        power-positive-first , 
+        repeated-symbol      ,
+        symbol               ,
+        single-symbol
+      }
+      { \str_set:Nn \l_@@_per_display_str {#1} } ,
     forbid-literal-units .bool_set:N =
       \l_@@_forbid_literal_bool ,
     fraction-command .tl_set:N =
       \l_siunitx_unit_fraction_tl ,
     parse-units .bool_set:N =
       \l_@@_parse_bool ,
-    per-mode .choice: ,
-    per-mode / fraction .code:n =
+    inline-per-mode .choices:nn =
       {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_false:N \l_@@_per_symbol_bool
-        \bool_set_true:N  \l_@@_powers_positive_bool
-        \bool_set_true:N  \l_@@_two_part_bool
-      } ,
-    per-mode / power .code:n =
-      {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_false:N \l_@@_per_symbol_bool
-        \bool_set_false:N \l_@@_powers_positive_bool
-        \bool_set_false:N \l_@@_two_part_bool
-      } ,
-    per-mode / power-positive-first .code:n =
-      {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_false:N \l_@@_per_symbol_bool
-        \bool_set_false:N \l_@@_powers_positive_bool
-        \bool_set_true:N  \l_@@_two_part_bool
-      } ,
-    per-mode / repeated-symbol .code:n =
-      {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_true:N  \l_@@_per_symbol_bool
-        \bool_set_true:N  \l_@@_powers_positive_bool
-        \bool_set_false:N \l_@@_two_part_bool
-      } ,
-    per-mode / symbol .code:n =
-      {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_true:N  \l_@@_per_symbol_bool
-        \bool_set_true:N  \l_@@_powers_positive_bool
-        \bool_set_true:N  \l_@@_two_part_bool
-      } ,
-    per-mode / symbol-or-fraction .code:n =
-      {
-        \bool_set_true:N \l_@@_autofrac_bool
-        \bool_set_false:N \l_@@_autosymb_bool
-        \bool_set_true:N \l_@@_per_symbol_bool
-        \bool_set_true:N \l_@@_powers_positive_bool
-        \bool_set_true:N \l_@@_two_part_bool
-      } ,
-    per-mode / single-symbol .code:n =
-      {
-        \bool_set_false:N \l_@@_autofrac_bool
-        \bool_set_true:N \l_@@_autosymb_bool
-        \bool_set_false:N \l_@@_per_symbol_bool
-        \bool_set_false:N \l_@@_powers_positive_bool
-        \bool_set_false:N \l_@@_two_part_bool
-      } ,
+        fraction             ,
+        power                ,
+        power-positive-first , 
+        repeated-symbol      ,
+        symbol               ,
+        single-symbol
+      }
+      { \str_set:Nn \l_@@_per_inline_str {#1} } ,
+    per-mode .meta:n =
+      { display-per-mode = {#1} , inline-per-mode  = {#1} } ,
     per-symbol .tl_set:N =
       \l_@@_per_symbol_tl ,
     per-symbol-script-correction .tl_set:N =
@@ -1821,10 +1788,16 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_per_display_str, \l_@@_per_inline_str}
+%   The data storage for |per-mode| settings.
+%    \begin{macrocode}
+\str_new:N \l_@@_per_display_str
+\str_new:N \l_@@_per_inline_str
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
-%     \l_@@_autofrac_bool        ,
-%     \l_@@_autosymb_bool        ,
 %     \l_@@_powers_positive_bool ,
 %     \l_@@_per_symbol_bool      ,
 %     \l_@@_two_part_bool
@@ -1832,8 +1805,6 @@
 %   Dealing with the various ways that reciprocal (\cs{per}) can be handled
 %   requires a few different switches.
 %    \begin{macrocode}
-\bool_new:N \l_@@_autofrac_bool
-\bool_new:N \l_@@_autosymb_bool
 \bool_new:N \l_@@_per_symbol_bool
 \bool_new:N \l_@@_powers_positive_bool
 \bool_new:N \l_@@_two_part_bool
@@ -1928,14 +1899,42 @@
 % \end{variable}
 %
 % \begin{macro}{\@@_format_parsed:}
-% \begin{macro}{\@@_format_parsed_aux:n}
+% \begin{macro}
+%   {\@@_format_parsed:n, \@@_format_parsed:V, \@@_format_parsed_aux:n}
 %   The main formatting routine is essentially a loop over each position,
 %   reading the various parts of the unit to build up complete unit
-%   combination.
+%   combination. When the two types of output need to be different, the
+%   formatter has to be run twice.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_parsed:
   {
+    \str_if_eq:NNTF
+      \l_@@_per_inline_str
+      \l_@@_per_display_str
+      { \@@_format_parsed:V \l_@@_per_inline_str }
+      {
+        \group_begin:
+          \@@_format_parsed:V \l_@@_per_inline_str
+        \exp_args:NNNV \group_end:
+        \tl_set:Nn \l_@@_tmp_tl \l_@@_formatted_tl
+        \group_begin:
+          \@@_format_parsed:V \l_@@_per_display_str
+        \exp_args:NNNV \group_end:
+        \tl_set:Nn \l_@@_formatted_tl \l_@@_formatted_tl
+        \tl_set:Nx \l_@@_formatted_tl
+          {
+            \mathchoice
+              { \exp_not:V \l_@@_formatted_tl }
+              { \exp_not:V \l_@@_tmp_tl }
+              { \exp_not:V \l_@@_tmp_tl }
+              { \exp_not:V \l_@@_tmp_tl }
+          }
+       }
+  }
+\cs_new_protected:Npn \@@_format_parsed:n #1
+  {
     \int_set_eq:NN \l_@@_total_int \l_@@_position_int
+    \use:c { @@_format_init_ #1 : }
     \tl_clear:N \l_@@_denominator_tl
     \tl_clear:N \l_@@_formatted_tl
     \fp_zero:N \l_@@_prefix_fp
@@ -1948,8 +1947,6 @@
       { \l_@@_prefix_exp_bool }
       { \l_@@_mass_kilogram_bool }
       { \@@_format_mass_to_kilogram: }
-    \bool_if:NT \l_@@_autosymb_bool
-      { \@@_format_symbol_or_power: }
     \int_do_while:nNnn
       \l_@@_position_int < \l_@@_total_int
       {
@@ -1965,6 +1962,7 @@
       }
     \@@_format_finalise:
   }
+\cs_generate_variant:Nn \@@_format_parsed:n { V }
 \cs_new_protected:Npn \@@_format_parsed_aux:n #1
   {
     \tl_set:Nx \l_@@_tmp_tl
@@ -1975,6 +1973,55 @@
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}
+%   {
+%     \@@_format_init_fracton:              ,
+%     \@@_format_init_power:                ,
+%     \@@_format_init_power-positive-first: ,
+%     \@@_format_init_repeated-symbol:      ,
+%     \@@_format_init_symbol:               ,
+%     \@@_format_init_single-symbol:        ,
+%   }
+%   To set up the various versions of |per-mode|.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_init_fraction:
+  {
+    \bool_set_false:N \l_@@_per_symbol_bool
+    \bool_set_true:N \l_@@_powers_positive_bool
+    \bool_set_true:N \l_@@_two_part_bool
+  }
+\cs_new_protected:Npn \@@_format_init_power:
+  {
+    \bool_set_false:N \l_@@_per_symbol_bool
+    \bool_set_false:N \l_@@_powers_positive_bool
+    \bool_set_false:N \l_@@_two_part_bool
+  }
+\cs_new_protected:cpn { @@_format_init_power-positive-first: }
+  {
+    \bool_set_false:N \l_@@_per_symbol_bool
+    \bool_set_false:N \l_@@_powers_positive_bool
+    \bool_set_true:N \l_@@_two_part_bool
+  }
+\cs_new_protected:cpn { @@_format_init_repeated-symbol: }
+  {
+    \bool_set_true:N \l_@@_per_symbol_bool
+    \bool_set_true:N \l_@@_powers_positive_bool
+    \bool_set_false:N \l_@@_two_part_bool
+  }
+\cs_new_protected:Npn \@@_format_init_symbol:
+  {
+    \bool_set_true:N \l_@@_per_symbol_bool
+    \bool_set_true:N \l_@@_powers_positive_bool
+    \bool_set_true:N \l_@@_two_part_bool
+  }
+\cs_new_protected:cpn { @@_format_init_single-symbol: }
+  {
+    \@@_format_init_power:
+    \@@_format_symbol_or_power:
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\@@_format_combine_exp:}
@@ -2097,7 +2144,7 @@
               }
           }
         \bool_if:NT \l_@@_tmp_bool
-          { \keys_set:nn { siunitx } { per-mode = symbol } }
+          { \@@_format_init_symbol: }
       }
   }
 %    \end{macrocode}
@@ -2530,36 +2577,9 @@
   {
     \tl_if_empty:NT \l_@@_formatted_tl
       { \tl_set:Nn \l_@@_formatted_tl { 1 } }
-    \bool_if:NTF \l_@@_autofrac_bool
-      { \@@_format_finalise_autofrac: }
-      {
-        \bool_if:NTF \l_@@_per_symbol_bool
-          { \@@_format_finalise_symbol: }
-          { \@@_format_finalise_fraction: }
-      }
-  }
-%    \end{macrocode}
-%   For the \enquote{auto-selected} fraction method, the two other auxiliary
-%   functions are used to do both forms of formatting. So that everything
-%   required is available, this needs one group so that the second auxiliary
-%   receives the correct input. After that it is just a case of applying
-%   \cs{mathchoice} to the formatted output.
-%    \begin{macrocode}
-\cs_new_protected:Npn \@@_format_finalise_autofrac:
-  {
-    \group_begin:
-      \@@_format_finalise_fraction:
-    \exp_args:NNNV \group_end:
-    \tl_set:Nn \l_@@_tmp_tl \l_@@_formatted_tl
-    \@@_format_finalise_symbol:
-    \tl_set:Nx \l_@@_formatted_tl
-      {
-        \mathchoice
-          { \exp_not:V \l_@@_tmp_tl }
-          { \exp_not:V \l_@@_formatted_tl }
-          { \exp_not:V \l_@@_formatted_tl }
-          { \exp_not:V \l_@@_formatted_tl }
-      }
+    \bool_if:NTF \l_@@_per_symbol_bool
+      { \@@_format_finalise_symbol: }
+      { \@@_format_finalise_fraction: }
   }
 %    \end{macrocode}
 %   When using a fraction function the two parts are now assembled.
@@ -2911,6 +2931,31 @@
   {
     The~#1~part~'#2'~must~follow~after~a~unit:~
     it~cannot~appear~before~any~units~and~will~therefore~be~ignored.
+  }
+%    \end{macrocode}
+%
+% \subsection{Deprecated options}
+%
+% To handle |per-mode = symbol-or-fraction|, there needs to be allowance for
+% the fact that it is set up as a meta-option. That is done with appropriate
+% code here for the two newer options.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    display-per-mode / symbol-or-fraction .code:n =
+      {
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { per-mode~=~symbol-or-fraction }
+          { display-per-mode~=~fraction,~inline-per-mode~=~symbol }
+        \str_set:Nn \l_@@_per_display_str { fraction }
+      } ,
+    inline-per-mode / symbol-or-fraction .code:n =
+      {
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { per-mode~=~symbol-or-fraction }
+          { display-per-mode~=~fraction,~inline-per-mode~=~symbol }
+        \str_set:Nn \l_@@_per_inline_str { symbol }
+      }
   }
 %    \end{macrocode}
 %

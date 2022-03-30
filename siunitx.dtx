@@ -199,6 +199,35 @@
 %
 % \subsection{Option handling}
 %
+% Some messages.
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { option-deprecated }
+  {
+    Option~"#1"~has~been~deprecated~in~this~release.\\ \\
+    Use~"#2"~as~a~replacement.
+  }
+%    \end{macrocode}
+%
+% \begin{variable}{\g_@@_deprecated_seq}
+%   Used to avoid repeatedly warning about deprecated options: needed at the
+%   top level.
+%    \begin{macrocode}
+\seq_new:N \g_@@_deprecated_seq
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_deprecated_info:nn}
+%   To avoid repeated messages.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_deprecated_info:nn #1#2
+  {
+    \seq_if_in:NnF \g_@@_deprecated_seq {#1}
+      { \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2} }
+    \seq_gput_right:Nn \g_@@_deprecated_seq {#1}
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %    \begin{macrocode}
 \IfFormatAtLeastTF { 2022-06-01 }
   { \ProcessKeyOptions [ siunitx ] }

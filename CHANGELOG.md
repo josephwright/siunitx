@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   and `complex-symbol-degree` to support complex numbers in polar form
 - Options `digit-group-size`, `digit-group-first-size` and
   `digit-group-other-size` to control digit grouping
+- Options `display-per-mode` and `inline-per-mode` to offer additional
+  flexiblity in `per-mode` control
 - Option `per-symbol-script-correction`
 - Option `power-half-as-sqrt`
 - Option `retain-negative-zero`
@@ -36,6 +38,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Issue an error if the `units` package is loaded
+
+### Deprecated
+- Option setting `per-mode = symbol-or-fraction`
 
 ## [v3.0.49] - 2022-02-15
 

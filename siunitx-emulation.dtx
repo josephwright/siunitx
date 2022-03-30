@@ -82,21 +82,9 @@
 %
 % Some messages.
 %    \begin{macrocode}
-\msg_new:nnn { siunitx } { option-deprecated }
-  {
-    Option~"#1"~has~been~deprecated~in~this~release.\\ \\
-    Use~"#2"~as~a~replacement.
-  }
 \msg_new:nnn { siunitx } { option-removed }
   { Option~"#1"~has~been~removed~in~this~release. }
 %    \end{macrocode}
-%
-% \begin{variable}{\g_@@_deprecated_seq}
-%   Used to avoid repeatedly warning about deprecated options.
-%    \begin{macrocode}
-\seq_new:N \g_@@_deprecated_seq
-%    \end{macrocode}
-% \end{variable}
 %
 % \begin{macro}{\@@_option_deprecated:nn}
 % \begin{macro}{\@@_option_deprecated:nnn, \@@_option_deprecated:nnV}
@@ -104,16 +92,12 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_option_deprecated:nn #1#2
   {
-    \seq_if_in:NnF \g_@@_deprecated_seq {#1}
-      { \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2} }
-    \seq_gput_right:Nn \g_@@_deprecated_seq {#1}
+    \@@_deprecated_info:nn {#1} {#2}
     \keys_set:nn { siunitx } {#2}
   }
 \cs_new_protected:Npn \@@_option_deprecated:nnn #1#2#3
   {
-    \seq_if_in:NnF \g_@@_deprecated_seq {#1}
-      { \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2} }
-    \seq_gput_right:Nn \g_@@_deprecated_seq {#1}
+    \@@_deprecated_info:nn {#1} {#2}
     \keys_set:nn { siunitx } { #2 = #3 }
   }
 \cs_generate_variant:Nn \@@_option_deprecated:nnn { nnV }
@@ -710,18 +694,6 @@
       } ,
     literal-superscript-as-power .code:n =
       { \@@_option_removed:V \l_keys_key_tl } ,
-    per-mode / reciprocal .code:n =
-      {
-        \@@_option_deprecated:nn
-          { per-mode~=~reciprocal }
-          { per-mode~=~power }
-      } ,
-    per-mode / reciprocal-positive-first .code:n =
-      {
-        \@@_option_deprecated:nn
-          { per-mode~=~reciprocal-positive-first }
-          { per-mode~=~power-positive-first }
-      } ,
     power-font .code:n =
       { \@@_option_removed:V \l_keys_key_tl } ,
     qualifier-mode / brackets .code:n =
@@ -744,6 +716,38 @@
         \@@_option_deprecated:nn
           { qualifier-mode~=~text }
           { qualifier-mode~=~combine }
+      }
+  }
+%    \end{macrocode}
+%
+% The deprecated settings for |per-mode| have to be handled manually as
+% |per-mode| is no longer a choice.
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    display-per-mode / reciprocal .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal }
+          { per-mode~=~power }
+      } ,
+    inline-per-mode / reciprocal .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal }
+          { per-mode~=~power }
+      } ,
+    display-per-mode / reciprocal-positive-first .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal-positive-first }
+          { per-mode~=~power-positive-first }
+      } ,
+    inline-per-mode / reciprocal-positive-first .code:n =
+      {
+        \@@_option_deprecated:nn
+          { per-mode~=~reciprocal-positive-first }
+          { per-mode~=~power-positive-first }
       }
   }
 %    \end{macrocode}

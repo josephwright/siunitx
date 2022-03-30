@@ -2329,6 +2329,8 @@ centred dot. To get the correct spacing it is necessary to use
 \end{LaTeXdemo}
 
 \DescribeOption{per-mode}
+\DescribeOption{display-per-mode}
+\DescribeOption{inline-per-mode}
 \DescribeOption{per-symbol}
 \DescribeOption{fraction-command}
 \DescribeOption{bracket-unit-denominator}
@@ -2355,7 +2357,7 @@ unit by setting \opt{per-mode} to \opt{symbol}; the symbol used is stored using
 the setting \opt{per-symbol}. This method for displaying units can be
 ambiguous, and so brackets are added unless \opt{bracket-unit-denominator} is
 set to \opt{false}. Notice that \opt{bracket-unit-denominator} only applies
-when \opt{per-mode} is set to \opt{symbol} or \opt{symbol-or-fraction}.
+when \opt{per-mode} is set to \opt{symbol}.
 \begin{LaTeXdemo}
   \sisetup{per-mode = symbol}%
   \unit{\joule\per\mole\per\kelvin} \\
@@ -2378,12 +2380,16 @@ In other cases, powers are used.
   \qty{20}{\metre\per\second} \\
   \qty{30}{\joule\per\mole\per\kelvin}
 \end{LaTeXdemo}
-Finally, it is possible for the behaviour of the \cs{per} function to depend on
-the prevailing math style. Setting \opt{per-mode} to \opt{symbol-or-fraction}
-will use the \opt{symbol} setting for in line math, and the \opt{fraction}
-setting when used in display math.
+It is possible for the behaviour of the \cs{per} function to depend on the
+prevailing math style. Setting either \opt{display-per-mode} or
+\opt{inline-per-mode} independently can be used to achieve this. For example,
+the following example will will use the \opt{symbol} setting for in line math,
+and the \opt{fraction} setting when used in display math.
 \begin{LaTeXdemo}
-  \sisetup{per-mode = symbol-or-fraction}%
+  \sisetup{
+    display-per-mode = fraction ,
+    inline-per-mode = symbol
+  }%
   $ \unit{\joule\per\mole\per\kelvin} $
   \[ \unit{\joule\per\mole\per\kelvin} \]
      \unit{\joule\per\mole\per\kelvin} \\
