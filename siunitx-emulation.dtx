@@ -91,18 +91,29 @@
   { Option~"#1"~has~been~removed~in~this~release. }
 %    \end{macrocode}
 %
+% \begin{variable}{\g_@@_deprecated_seq}
+%   Used to avoid repeatedly warning about deprecated options.
+%    \begin{macrocode}
+\seq_new:N \g_@@_deprecated_seq
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_option_deprecated:nn}
 % \begin{macro}{\@@_option_deprecated:nnn, \@@_option_deprecated:nnV}
 %   Abstract out a simple wrapper.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_option_deprecated:nn #1#2
   {
-    \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2}
+    \seq_if_in:NnF \g_@@_deprecated_seq {#1}
+      { \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2} }
+    \seq_gput_right:Nn \g_@@_deprecated_seq {#1}
     \keys_set:nn { siunitx } {#2}
   }
 \cs_new_protected:Npn \@@_option_deprecated:nnn #1#2#3
   {
-    \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2}
+    \seq_if_in:NnF \g_@@_deprecated_seq {#1}
+      { \msg_info:nnnn { siunitx } { option-deprecated } {#1} {#2} }
+    \seq_gput_right:Nn \g_@@_deprecated_seq {#1}
     \keys_set:nn { siunitx } { #2 = #3 }
   }
 \cs_generate_variant:Nn \@@_option_deprecated:nnn { nnV }
