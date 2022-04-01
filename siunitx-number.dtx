@@ -1682,22 +1682,24 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_auxiii:
   {
-    \tl_if_empty:NTF \l_@@_partial_tl
+    \tl_set:Nx \l_@@_parsed_tl
       {
-        \tl_put_right:Nx \l_@@_parsed_tl
-          {
+        \exp_not:V \l_@@_parsed_tl
+        {
+          \bool_lazy_and:nnF
+            { \tl_if_empty_p:N \l_@@_partial_tl }
+            { ! \l_@@_zero_uncert_bool }
             {
-              \bool_if:NT \l_@@_zero_uncert_bool
-                { { S } { 0 } }
+              { S }
+              {
+                \tl_if_empty:NTF \l_@@_partial_tl
+                  { 0 }
+                  { \exp_not:V \l_@@_partial_tl }   
+              }
             }
-         }
+        }
       }
-      {
-        \tl_set:Nx \l_@@_partial_tl
-          { { S } { \exp_not:V \l_@@_partial_tl } }
-         \@@_parse_loop_main_store:NNN \l_@@_parsed_tl
-           \c_false_bool \c_false_bool
-      }
+    \tl_clear:N \l_@@_partial_tl
   }
 %    \end{macrocode}
 %   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
