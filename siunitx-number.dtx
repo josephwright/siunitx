@@ -2248,8 +2248,12 @@
 % \begin{macro}{\@@_digits:NN}
 % \begin{macro}[EXP]{\@@_digits:nnnnnnn}
 % \begin{macro}[EXP]{\@@_digits:nn}
-% \begin{macro}[EXP]{\@@_digits_uncert:nnn}
-% \begin{macro}[EXP]{\@@_digits_uncert_S:nn}
+% \begin{macro}[EXP]{\@@_digits_uncert:nnw}
+% \begin{macro}[EXP]
+%   {\@@_digits_uncert_A:nn, \@@_digits_uncert_S:nn, \@@_digits_uncert_aux:nn}
+% \begin{macro}[EXP]{\@@_digits_uncert_A:nnn}
+% \begin{macro}[EXP]{\@@_digits_uncert:nN}
+% \begin{macro}[EXP]{\@@_digits_uncert:nNw}
 %   Forcing a minimum number of digits in each part is quite easy. As
 %   the common case is that we don't do anything here, there is no real need
 %   to optimise the calculation (normally also numbers have only a few digits).
@@ -2270,7 +2274,10 @@
       \exp_not:n {#4}
       \@@_digits:nn \l_@@_min_decimal_int {#4}
     }
-    { \tl_if_blank:nF {#5} { \@@_digits_uncert:nnn {#4} #5 } }
+    {
+      \tl_if_blank:nF {#5}
+        { \@@_digits_uncert:nnw {#4} #5 \q_stop }
+    }
     \exp_not:n { {#6} {#7} }
   }
 \cs_new:Npn \@@_digits:nn #1#2
@@ -2279,12 +2286,26 @@
       { #1 - \tl_count:n {#2} } > 0
       { \prg_replicate:nn { #1 - \tl_count:n {#2} } { 0 } }
   }
-\cs_new:Npn \@@_digits_uncert:nnn #1#2#3
+\cs_new:Npn \@@_digits_uncert:nnw #1#2#3 \q_stop
   {
     { #2 }
-    { \use:c { @@_digits_uncert_ #2 :nn } {#1} {#3} }
+    \cs_if_exist:cTF { @@_digits_uncert_ #2 :nn }
+      { { \use:c { @@_digits_uncert_ #2 :nn } {#1} {#3} } }
+      {
+        \@@_digits_uncert:nN {#1} #2 \q_recursion_tail
+          #3 \q_recursion_stop
+      }
+  }
+\cs_new:Npn \@@_digits_uncert_A:nn #1#2
+  { \@@_digits_uncert_A:nnn {#1} #2 }
+\cs_new:Npn \@@_digits_uncert_A:nnn #1#2#3
+  {
+     { \@@_digits_uncert_aux:nn {#1} {#2} }
+     { \@@_digits_uncert_aux:nn {#1} {#3} }
   }
 \cs_new:Npn \@@_digits_uncert_S:nn #1#2
+  { \@@_digits_uncert_aux:nn {#1} {#2} }
+\cs_new:Npn \@@_digits_uncert_aux:nn #1#2
   {
     \exp_not:n {#2}
     \@@_digits:nn 
@@ -2295,7 +2316,20 @@
       }
       {#2}
   }
+\cs_new:Npn \@@_digits_uncert:nN #1#2
+  {
+    \quark_if_recursion_tail_stop:N #2
+    \@@_digits_uncert:nNw {#1} #2
+  }
+\cs_new:Npn \@@_digits_uncert:nNw #1#2#3 \q_recursion_tail #4
+  {
+    { \use:c { @@_digits_uncert_ #2 :nn } {#1} {#4} }
+    \@@_digits_uncert:nN {#1} #3 \q_recursion_tail
+  }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
