@@ -2247,9 +2247,9 @@
 %
 % \begin{macro}{\@@_digits:NN}
 % \begin{macro}[EXP]{\@@_digits:nnnnnnn}
-% \begin{macro}[EXP]{\@@_digits:Nn}
 % \begin{macro}[EXP]{\@@_digits:nn}
-% \begin{macro}[EXP]{\@@_digits_S:n}
+% \begin{macro}[EXP]{\@@_digits_uncert:nnn}
+% \begin{macro}[EXP]{\@@_digits_uncert_S:nn}
 %   Forcing a minimum number of digits in each part is quite easy. As
 %   the common case is that we don't do anything here, there is no real need
 %   to optimise the calculation (normally also numbers have only a few digits).
@@ -2263,31 +2263,37 @@
   {
     \exp_not:n { {#1} {#2} }
     {
-      \@@_digits:Nn \l_@@_min_integer_int {#3}
+      \@@_digits:nn \l_@@_min_integer_int {#3}
       \exp_not:n {#3}
     }
     {
       \exp_not:n {#4}
-      \@@_digits:Nn \l_@@_min_decimal_int {#4}
+      \@@_digits:nn \l_@@_min_decimal_int {#4}
     }
-    { \tl_if_blank:nF {#5} { \@@_digits_uncert:nn #5 } }
+    { \tl_if_blank:nF {#5} { \@@_digits_uncert:nnn {#4} #5 } }
     \exp_not:n { {#6} {#7} }
   }
-\cs_new:Npn \@@_digits:Nn #1#2
+\cs_new:Npn \@@_digits:nn #1#2
   {
     \int_compare:nNnT
       { #1 - \tl_count:n {#2} } > 0
-      { \prg_replicate:nn { #1 - \tl_count:n {#2}  } { 0 } }
+      { \prg_replicate:nn { #1 - \tl_count:n {#2} } { 0 } }
   }
-\cs_new:Npn \@@_digits_uncert:nn #1#2
+\cs_new:Npn \@@_digits_uncert:nnn #1#2#3
   {
-    { #1 }
-    { \use:c { @@_digits_uncert_ #1 :n } {#2} }
+    { #2 }
+    { \use:c { @@_digits_uncert_ #2 :nn } {#1} {#3} }
   }
-\cs_new:Npn \@@_digits_uncert_S:n #1
+\cs_new:Npn \@@_digits_uncert_S:nn #1#2
   {
-    \exp_not:n {#1}
-    \@@_digits:Nn \l_@@_min_decimal_int {#1}
+    \exp_not:n {#2}
+    \@@_digits:nn 
+      {
+        \int_max:nn
+           { 0 }
+           { \l_@@_min_decimal_int - \tl_count:n {#1} + 1 }
+      }
+      {#2}
   }
 %    \end{macrocode}
 % \end{macro}

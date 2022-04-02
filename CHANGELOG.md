@@ -38,6 +38,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Issue an error if the `units` package is loaded
+- Tweak handling of `minimum-decimal-digits` and uncertainties
 
 ### Deprecated
 - Option setting `per-mode = symbol-or-fraction`
