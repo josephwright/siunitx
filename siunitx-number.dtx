@@ -1322,17 +1322,16 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_loop:}
-% \begin{macro}{\@@_parse_loop_first:N}
+% \begin{macro}{\@@_parse_loop_first:NNN}
 % \begin{macro}{\@@_parse_loop_main:NNNN}
 % \begin{macro}{\@@_parse_loop_main_end:NN}
-% \begin{macro}{\@@_parse_loop_main_digit:NNNNN}
+% \begin{macro}{\@@_parse_loop_main_digit:NNNN}
 % \begin{macro}{\@@_parse_loop_main_decimal:N}
 % \begin{macro}{\@@_parse_loop_main_uncert:NN}
 % \begin{macro}{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
 % \begin{macro}{\@@_parse_loop_after_decimal:NN}
-% \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
-% \begin{macro}{\@@_parse_loop_break:wN}
+% \begin{macro}{\@@_parse_loop_break:w}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
 %   mantissa, which may contain one or more uncertainties. Parsing this
 %   and allowing for all of the different formats possible is best done using
@@ -1369,7 +1368,7 @@
       {
         \bool_if:NTF #2
           { \tl_put_right:Nn #1 { { } { } { } } }
-          { \@@_parse_loop_break:wN \q_recursion_stop }
+          { \@@_parse_loop_break:w \q_recursion_stop }
       }
     \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
       {
@@ -1382,7 +1381,7 @@
             \tl_put_right:Nn #1 { { 0 } }
             \@@_parse_loop_after_decimal:NN #1
           }
-          { \@@_parse_loop_break:wN }
+          { \@@_parse_loop_break:w }
       }
   }
 %    \end{macrocode}
@@ -1419,7 +1418,7 @@
           {
             \bool_if:NTF #2
               { \@@_parse_loop_main_decimal:N #1 }
-              { \@@_parse_loop_break:wN }
+              { \@@_parse_loop_break:w }
           }
           {
             \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#4}
@@ -1430,7 +1429,7 @@
                     \@@_parse_loop_main_sign:NNN
                       #1 #2 #4
                   }
-                  { \@@_parse_loop_break:wN }
+                  { \@@_parse_loop_break:w }
               }
           }
       }
@@ -1544,14 +1543,14 @@
     \tl_if_blank:fTF { \exp_after:wN \use_none:n #1 }
       {
         \quark_if_recursion_tail_stop_do:Nn #2
-          { \@@_parse_loop_break:wN \q_recursion_stop }
+          { \@@_parse_loop_break:w \q_recursion_stop }
         \tl_if_in:NnTF \l_@@_input_digit_tl {#1}
           {
             \tl_put_right:Nn \l_@@_partial_tl {#2}
             \@@_parse_loop_main:NNNN
               #1 \c_false_bool \c_true_bool
           }
-          { \@@_parse_loop_break:wN }
+          { \@@_parse_loop_break:w }
       }
       {
         \@@_parse_loop_main:NNNN
@@ -1563,14 +1562,13 @@
 %   number and clear the storage areas as a signal for the next part of the
 %   code.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_break:wN
+\cs_new_protected:Npn \@@_parse_loop_break:w
   #1 \q_recursion_stop
   {
     \tl_clear:N \l_@@_flex_tl
     \tl_clear:N \l_@@_parsed_tl
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1630,9 +1628,9 @@
 \cs_new_protected:Npn \@@_parse_uncert:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1
-      { \@@_parse_loop_break:wN \q_recursion_stop }
+      { \@@_parse_loop_break:w \q_recursion_stop }
     \tl_if_in:NnTF \l_@@_input_uncert_close_tl {#1}
-      { \@@_parse_loop_break:wN }
+      { \@@_parse_loop_break:w }
       {
         \@@_parse_uncert:NNN
           \c_false_bool \@@_parse_uncert_auxi:N #1
@@ -1644,7 +1642,7 @@
 \cs_new_protected:Npn \@@_parse_uncert:NNN #1#2#3
   {
     \quark_if_recursion_tail_stop_do:Nn #3
-      { \@@_parse_loop_break:wN \q_recursion_stop }
+      { \@@_parse_loop_break:w \q_recursion_stop }
     \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
       {
         \bool_lazy_or:nnTF
@@ -1671,7 +1669,7 @@
       {
         \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#1}
           { \@@_parse_uncert_marker: }
-          { \@@_parse_loop_break:wN }
+          { \@@_parse_loop_break:w }
       }
   }
 \cs_new_protected:Npn \@@_parse_uncert_auxii:N #1
@@ -1681,7 +1679,7 @@
         \@@_parse_uncert_auxiii:
         \@@_parse_uncert_after:N
       }
-      { \@@_parse_loop_break:wN }
+      { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
 %   Deal with the closing bracket, which might leave us with nothing if there
@@ -1714,7 +1712,7 @@
   {
     \int_compare:nNnTF
       { \tl_count:N \l_@@_partial_tl } > { \tl_count:n {#2} }
-      { \@@_parse_loop_break:wN }
+      { \@@_parse_loop_break:w }
       { \@@_parse_uncert_marker:nw {#3} }
   }
 \cs_new_protected:Npn \@@_parse_uncert_marker:nw
@@ -1773,7 +1771,7 @@
       }
     \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#1}
       { \@@_parse_uncert:N }
-      { \@@_parse_loop_break:wN }
+      { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
 % \end{macro}
