@@ -1323,18 +1323,18 @@
 %
 % \begin{macro}{\@@_parse_loop:}
 % \begin{macro}{\@@_parse_loop_first:N}
-% \begin{macro}{\@@_parse_loop_main:NNNNN}
+% \begin{macro}{\@@_parse_loop_main:NNNN}
 % \begin{macro}{\@@_parse_loop_main_end:NN}
 % \begin{macro}{\@@_parse_loop_main_digit:NNNNN}
-% \begin{macro}{\@@_parse_loop_main_decimal:NN}
-% \begin{macro}{\@@_parse_loop_main_uncert:NNN}
+% \begin{macro}{\@@_parse_loop_main_decimal:N}
+% \begin{macro}{\@@_parse_loop_main_uncert:NN}
 % \begin{macro}{\@@_parse_loop_main_sign:NNN}
 % \begin{macro}{\@@_parse_loop_main_store:NNN}
-% \begin{macro}{\@@_parse_loop_after_decimal:NNN}
+% \begin{macro}{\@@_parse_loop_after_decimal:NN}
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
 % \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
-%   mantissa, which may contain one or more complex parts. Parsing this
+%   mantissa, which may contain one or more uncertainties. Parsing this
 %   and allowing for all of the different formats possible is best done using
 %   a token-by-token approach. However, as at each stage only a subset of
 %   tokens are valid, the approach take is to use a set of semi-dedicated
@@ -1373,21 +1373,21 @@
       }
     \tl_if_in:NnTF \l_@@_input_digit_tl {#3}
       {
-        \@@_parse_loop_main:NNNNN
-          #1 \c_true_bool \c_false_bool #2 #3
+        \@@_parse_loop_main:NNNN
+          #1 \c_true_bool \c_false_bool #3
       }
       {
         \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#3}
           {
             \tl_put_right:Nn #1 { { 0 } }
-            \@@_parse_loop_after_decimal:NNN #1 #2
+            \@@_parse_loop_after_decimal:NN #1
           }
           { \@@_parse_loop_break:wN }
       }
   }
 %    \end{macrocode}
 %   A single function is used to cover the \enquote{main} part of numbers:
-%   finding real, complex or separated uncertainty parts and covering both
+%   finding the main or separated uncertainty parts and covering both
 %   the integer and decimal components. This works because these elements
 %   share a lot of concepts: a small number of switches can be used to
 %   differentiate between them. To keep the code at least somewhat readable,
@@ -1404,35 +1404,31 @@
 %       there leading to a store-and-switch situation.
 %     \item An open-uncertainty token: switch to the dedicated collector
 %       for uncertainties.
-%     \item A sign token (if allowed): stop collecting this number and
+%     \item A sign token: stop collecting this number and
 %       restart collection for the next part.
 %   \end{itemize}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main:NNNNN #1#2#3#4#5
+\cs_new_protected:Npn \@@_parse_loop_main:NNNN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #5
+    \quark_if_recursion_tail_stop_do:Nn #4
       { \@@_parse_loop_main_end:NN #1#2 }
-    \tl_if_in:NnTF \l_@@_input_digit_tl {#5}
-      { \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5 }
+    \tl_if_in:NnTF \l_@@_input_digit_tl {#4}
+      { \@@_parse_loop_main_digit:NNNN #1#2#3#4 }
       {
-        \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#5}
+        \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#4}
           {
             \bool_if:NTF #2
-              { \@@_parse_loop_main_decimal:NN #1 #4 }
+              { \@@_parse_loop_main_decimal:N #1 }
               { \@@_parse_loop_break:wN }
           }
           {
-            \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#5}
-              { \@@_parse_loop_main_uncert:NNN #1#2 #4 }
+            \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#4}
+              { \@@_parse_loop_main_uncert:NN #1 #2 }
               {
-                \bool_if:NTF #4
+                \tl_if_in:NnTF \l_@@_input_uncert_sign_tl {#4}
                   {
-                    \tl_if_in:NnTF \l_siunitx_number_input_sign_tl {#5}
-                      {
-                        \@@_parse_loop_main_sign:NNN
-                          #1#2 #5
-                      }
-                      { \@@_parse_loop_break:wN }
+                    \@@_parse_loop_main_sign:NNN
+                      #1 #2 #4
                   }
                   { \@@_parse_loop_break:wN }
               }
@@ -1473,25 +1469,25 @@
 %   that is handled using a combination of a switch and a string test. Other
 %   than that, the situation here is simple: store the input and loop.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main_digit:NNNNN #1#2#3#4#5
+\cs_new_protected:Npn \@@_parse_loop_main_digit:NNNN #1#2#3#4
   {
     \bool_lazy_or:nnTF
-      {#3} { ! \str_if_eq_p:nn {#5} { 0 } }
+      {#3} { ! \str_if_eq_p:nn {#4} { 0 } }
       {
-        \tl_put_right:Nn \l_@@_partial_tl {#5}
-        \@@_parse_loop_main:NNNNN #1 #2 \c_true_bool #4
+        \tl_put_right:Nn \l_@@_partial_tl {#4}
+        \@@_parse_loop_main:NNNN #1 #2 \c_true_bool
       }
-      { \@@_parse_loop_main:NNNNN #1 #2 \c_false_bool #4 }
+      { \@@_parse_loop_main:NNNN #1 #2 \c_false_bool }
   }
 %    \end{macrocode}
 %   When a decimal marker was found, move the integer part to the
 %   store and then go back to the loop with the flags set correctly.
 %   There is the case of non-significant zeros to cover before that, of course.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main_decimal:NN #1#2
+\cs_new_protected:Npn \@@_parse_loop_main_decimal:N #1
   {
     \@@_parse_loop_main_store:NNN #1 \c_false_bool \c_false_bool
-    \@@_parse_loop_after_decimal:NNN #1 #2
+    \@@_parse_loop_after_decimal:NN #1
   }
 %    \end{macrocode}
 %   Starting an uncertainty part means storing the number to date as in other
@@ -1499,7 +1495,7 @@
 %   uncertainty itself is collected by a dedicated function as it is extremely
 %   restricted.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_main_uncert:NNN #1#2#3
+\cs_new_protected:Npn \@@_parse_loop_main_uncert:NN #1#2
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
     \tl_clear:N \l_@@_uncert_tl
@@ -1543,23 +1539,23 @@
 %   an empty integer part first then either simply hands off or looks for
 %   a digit.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_loop_after_decimal:NNN #1#2#3
+\cs_new_protected:Npn \@@_parse_loop_after_decimal:NN #1#2
   {
     \tl_if_blank:fTF { \exp_after:wN \use_none:n #1 }
       {
-        \quark_if_recursion_tail_stop_do:Nn #3
+        \quark_if_recursion_tail_stop_do:Nn #2
           { \@@_parse_loop_break:wN \q_recursion_stop }
         \tl_if_in:NnTF \l_@@_input_digit_tl {#1}
           {
-            \tl_put_right:Nn \l_@@_partial_tl {#3}
-            \@@_parse_loop_main:NNNNN
-              #1 \c_false_bool \c_true_bool #2
+            \tl_put_right:Nn \l_@@_partial_tl {#2}
+            \@@_parse_loop_main:NNNN
+              #1 \c_false_bool \c_true_bool
           }
           { \@@_parse_loop_break:wN }
       }
       {
-        \@@_parse_loop_main:NNNNN
-          #1 \c_false_bool \c_true_bool #2 #3
+        \@@_parse_loop_main:NNNN
+          #1 \c_false_bool \c_true_bool #2
       }
   }
 %    \end{macrocode}
