@@ -1525,11 +1525,13 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main_store:NNN #1#2#3
   {
-    \tl_if_empty:NT \l_@@_partial_tl
-      { \tl_set:Nn \l_@@_partial_tl { 0 } }
     \tl_put_right:Nx #1
       {
-        { \exp_not:V \l_@@_partial_tl }
+        {
+          \tl_if_empty:NTF \l_@@_partial_tl
+            { 0 }
+            { \exp_not:V \l_@@_partial_tl }
+        }
         \bool_if:NT #2 { { } }
         \bool_if:NT #3 { { } }
       }
