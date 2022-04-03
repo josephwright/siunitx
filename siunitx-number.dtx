@@ -867,6 +867,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_uncert_tl}
+%   To allow multiple uncertainties, we want to build this up as possibly
+%   multiple entries.
+%    \begin{macrocode}
+\tl_new:N \l_@@_uncert_tl
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_validate_bool}
 %   Used to set up for validation with no error production.
 %    \begin{macrocode}
@@ -1326,7 +1334,7 @@
 % \begin{macro}{\@@_parse_loop_root_swap:NNwNN}
 % \begin{macro}{\@@_parse_loop_break:wN}
 %   At this stage, the partial input \cs{l_@@_arg_tl} will contain any
-%   mantissa, which may contain an uncertainty or complex part. Parsing this
+%   mantissa, which may contain one or more complex parts. Parsing this
 %   and allowing for all of the different formats possible is best done using
 %   a token-by-token approach. However, as at each stage only a subset of
 %   tokens are valid, the approach take is to use a set of semi-dedicated
@@ -1397,7 +1405,7 @@
 %     \item An open-uncertainty token: switch to the dedicated collector
 %       for uncertainties.
 %     \item A sign token (if allowed): stop collecting this number and
-%       restart collection for the second part.
+%       restart collection for the next part.
 %   \end{itemize}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main:NNNNN #1#2#3#4#5
@@ -1494,6 +1502,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_uncert:NNN #1#2#3
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
+    \tl_clear:N \l_@@_uncert_tl
     \@@_parse_uncert:N
   }
 %    \end{macrocode}
@@ -1682,24 +1691,10 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_auxiii:
   {
-    \tl_set:Nx \l_@@_parsed_tl
-      {
-        \exp_not:V \l_@@_parsed_tl
-        {
-          \bool_lazy_and:nnF
-            { \tl_if_empty_p:N \l_@@_partial_tl }
-            { ! \l_@@_zero_uncert_bool }
-            {
-              { S }
-              {
-                \tl_if_empty:NTF \l_@@_partial_tl
-                  { 0 }
-                  { \exp_not:V \l_@@_partial_tl }   
-              }
-            }
-        }
-      }
-    \tl_clear:N \l_@@_partial_tl
+    \bool_lazy_and:nnT
+      { \l_@@_zero_uncert_bool }
+      { \tl_if_empty_p:N \l_@@_partial_tl }
+      { \tl_set:Nn \l_@@_partial_tl { 0 } }
   }
 %    \end{macrocode}
 %   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
@@ -1731,7 +1726,7 @@
       { \tl_count:n {#2} - 1 } = { \tl_count:n {#1} }
       {
         \str_if_eq:eeTF
-          { \exp_not:V \l_@@_partial_tl }
+          { \exp_not:V \l_@@_uncert_tl }
           { \prg_replicate:nn { \tl_count:N \l_@@_partial_tl } { 0 } }
           { \@@_parse_uncert:NNN \c_false_bool }
           { \@@_parse_uncert:NNN \c_true_bool }
@@ -1747,12 +1742,39 @@
       \@@_parse_uncert_auxii:N
   }
 %    \end{macrocode}
+%   At the end of collection, we can either start another one or be done:
+%   either way we move the data around.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_after:N #1
   {
-    \quark_if_recursion_tail_stop:N #1
+    \tl_set:Nx \l_@@_uncert_tl
+      {
+        \exp_not:V \l_@@_uncert_tl
+        \tl_if_empty:NF \l_@@_partial_tl
+          { { \exp_not:V \l_@@_partial_tl } }
+      }
+    \tl_clear:N \l_@@_partial_tl
+    \quark_if_recursion_tail_stop_do:Nn #1
+      {
+        \tl_set:Nx \l_@@_parsed_tl
+          {
+            \exp_not:V \l_@@_parsed_tl
+            {
+              \tl_if_empty:NF \l_@@_uncert_tl
+                {
+                  {
+                    \prg_replicate:nn
+                      { \tl_count:N \l_@@_uncert_tl }
+                     { S }
+                  }
+                  \exp_not:V \l_@@_uncert_tl
+                }
+            }
+          }
+        \tl_clear:N \l_@@_partial_tl
+      }
     \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#1}
-      { \@@_parse_uncert:N #1 }
+      { \@@_parse_uncert:N }
       { \@@_parse_loop_break:wN }
   }
 %    \end{macrocode}
