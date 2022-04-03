@@ -1652,6 +1652,7 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       print-zero-exponent      & Switch  & false             \\
       print-zero-integer       & Switch  & false             \\
       tight-spacing            & Switch  & false             \\
+      uncertainty-descriptors  & Literal & \meta{none}       \\
       uncertainty-mode         & Choice  & compact           \\
       uncertainty-separator    & Literal & \meta{none}       \\
       zero-decimal-as-symbol   & Switch  & false             \\
@@ -1743,9 +1744,9 @@ stored will be used in place of the normal product and base combination.
 \DescribeOption{output-open-uncertainty}
 \DescribeOption{output-close-uncertainty}
 \DescribeOption{uncertainty-separator}
-When input is given including an uncertainty in a number, it can be printed
-either with the uncertainty in brackets or as a separate number. This behaviour
-is controlled by the \opt{uncertainty-mode} choice. When this is set to
+When input is given including a single uncertainty, it can be printed either
+with the uncertainty in brackets or as a separate number. This behaviour is
+controlled by the \opt{uncertainty-mode} choice. When this is set to
 \opt{separate}, the uncertainty is printed as an entirely separate number
 preceded by \cs{pm}. Other settings all place the uncertainty in brackets
 directly attached to the main value. The standard setting of \opt{compact}
@@ -1776,6 +1777,17 @@ respectively. Tokens may be inserted before the opening bracket using
     uncertainty-separator    = \,
   }%
   \num{1.234(5)}
+\end{LaTeXdemo}
+
+\DescribeOption{uncertainty-descriptors}
+Multiple uncertainties can be given for a number. These are always printed
+in a separated form. When there is more than one uncertainty part, it may be
+useful to describe the nature of this value. This can be achieved using the
+\opt{uncertainty-descriptors} option, which take a comma-separated list of
+descriptions.
+\begin{LaTeXdemo}
+  \num{1.2(3)(4)} \\
+  \num[uncertainty-descriptors = {sys, stat}]{1.2(3)(4)}
 \end{LaTeXdemo}
 
 \DescribeOption{bracket-ambiguous-numbers}
