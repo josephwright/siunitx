@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Behavior of "minimum-decimal-digits" with uncertainties  (see issue
+  [\#601](https://github.com/josephwright/siunitx/issues/601))
+
 ## [v3.0.49] - 2022-02-15
 
 ### Added
