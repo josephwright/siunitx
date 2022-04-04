@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Spacing of sign when using "output-exponent-marker"  (see issue
+  [\#600](https://github.com/josephwright/siunitx/issues/600))
 - Behavior of "minimum-decimal-digits" with uncertainties  (see issue
   [\#601](https://github.com/josephwright/siunitx/issues/601))
 

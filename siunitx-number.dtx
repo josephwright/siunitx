@@ -3649,25 +3649,25 @@
     \exp_not:n {#5}
     \exp_not:V \l_@@_exponent_base_tl
     ^
-      { \@@_output_exponent_auxiii:nn {#1} {#2} }
+      { \@@_output_exponent_auxiii:nnn { } {#1} {#2} }
   }
 \cs_new:Npn \@@_output_exponent_auxii:nnnnn #1#2#3#4#5
   {
     \exp_not:n {#5}
     \exp_not:V \l_@@_output_exp_marker_tl
-    \@@_output_exponent_auxiii:nn {#1} {#2}
+    \@@_output_exponent_auxiii:nnn { \mathord } {#1} {#2}
   }
-\cs_new:Npn \@@_output_exponent_auxiii:nn #1#2
+\cs_new:Npn \@@_output_exponent_auxiii:nnn #1#2#3
   {
-    \tl_if_blank:nTF {#1}
+    \tl_if_blank:nTF {#2}
       {
         \bool_lazy_and:nnT
           { \l_@@_implicit_plus_bool }
-          { ! \str_if_eq_p:nn {#2} { 0 } }
-          { + }
+          { ! \str_if_eq_p:nn {#3} { 0 } }
+          { #1 + }
       }
-      { \exp_not:n {#1} }
-    \@@_output_digits:nn { integer } {#2}
+      { \exp_not:n {#1#2} }
+    \@@_output_digits:nn { integer } {#3}
   }
 %    \end{macrocode}
 %   A do-nothing marker used to allow shuffling of the output and so expandable
