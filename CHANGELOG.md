@@ -39,10 +39,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 - Issue an error if the `units` package is loaded
-- Tweak handling of `minimum-decimal-digits` and uncertainties
 
 ### Deprecated
 - Option setting `per-mode = symbol-or-fraction`
+
+## [v3.0.50] - 2022-04-04
+
+### Fixed
+- Spacing of sign when using "output-exponent-marker"  (see issue
+  [\#600](https://github.com/josephwright/siunitx/issues/600))
+- Behavior of "minimum-decimal-digits" with uncertainties  (see issue
+  [\#601](https://github.com/josephwright/siunitx/issues/601))
 
 ## [v3.0.49] - 2022-02-15
 
@@ -1758,7 +1765,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.49...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.50...HEAD
+[v3.0.50]: https://github.com/josephwright/siunitx/compare/v3.0.49...v3.0.50
 [v3.0.49]: https://github.com/josephwright/siunitx/compare/v3.0.48...v3.0.49
 [v3.0.48]: https://github.com/josephwright/siunitx/compare/v3.0.47...v3.0.48
 [v3.0.47]: https://github.com/josephwright/siunitx/compare/v3.0.46...v3.0.47
