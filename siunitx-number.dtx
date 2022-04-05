@@ -947,6 +947,7 @@
   {
     \group_begin:
       \tl_clear:N \l_@@_parsed_tl
+      \tl_clear:N \l_@@_uncert_tl
       \tl_map_inline:Nn \l_@@_input_ignore_tl
         {
           \token_if_macro:NT ##1
@@ -980,25 +981,11 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_check:
   {
-    \tl_if_empty:NF \l_@@_flex_tl
+    \tl_put_right:NV \l_@@_uncert_tl \l_@@_flex_tl
+    \tl_if_empty:NF \l_@@_uncert_tl
       {
-        \bool_lazy_and:nnTF
-          {
-            \tl_if_blank_p:f
-              { \exp_after:wN \use_iv:nnnn \l_@@_parsed_tl }
-          }
-          {
-            \tl_if_blank_p:f
-              { \exp_after:wN \use_iv:nnnn \l_@@_flex_tl }
-          }
-          {
-            \tl_set:Nx \l_@@_tmp_tl
-              { \exp_after:wN \use_i:nnnn \l_@@_flex_tl }
-            \tl_if_in:NVTF \l_@@_input_uncert_sign_tl
-              \l_@@_tmp_tl
-              { \@@_parse_combine_uncert: }
-              { \tl_clear:N \l_@@_parsed_tl }
-          }
+        \tl_if_blank:fTF { \exp_after:wN \use_iv:nnnn \l_@@_parsed_tl }
+          { \@@_parse_combine_uncert: }
           { \tl_clear:N \l_@@_parsed_tl }
       }
     \tl_if_empty:NTF \l_@@_parsed_tl
@@ -1015,111 +1002,159 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_parse_combine_uncert:}
-% \begin{macro}{\@@_parse_combine_uncert_auxi:nnnnnnnn}
-% \begin{macro}
-%   {
-%     \@@_parse_combine_uncert_auxii:nnnnn,
-%     \@@_parse_combine_uncert_auxii:fnnnn
-%   }
-% \begin{macro}
-%   {
-%     \@@_parse_combine_uncert_auxiii:nnnnnn,
-%     \@@_parse_combine_uncert_auxiii:fnnnnn
-%   }
-% \begin{macro}{\@@_parse_combine_uncert_auxiv:nnnn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert_auxv:w}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert_auxvi:w}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:nn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_loop:nnnnnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_aux:nnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:N}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert:w}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_end:nnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_end:nnnn}
 %   Conversion of a second numerical part to an uncertainty needs a bit of
 %   work. The first step is to extract the useful information from the two
-%   stores: the sign, integer and decimal parts from the real number and the
-%   integer and decimal parts from the second number. That is done using the
-%   input stack to avoid lots of assignments.
+%   stores: the sign, integer and decimal parts from the real number. Then
+%   set up a loop to deal with each uncertainty to combine. Everything is done
+%   by expansion to avoid repeated assignments. To allow for the case where
+%   there is an error, the setup doesn't insert any tokens until the end of
+%   the loop, which means a bit of work on the stack.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_combine_uncert:
   {
-    \exp_after:wN \exp_after:wN \exp_after:wN
-    \@@_parse_combine_uncert_auxi:nnnnnnnn
-      \exp_after:wN \l_@@_parsed_tl \l_@@_flex_tl
+    \tl_set:Nx \l_@@_parsed_tl
+      {
+        \exp_after:wN \@@_parse_combine_uncert:nnnn
+          \l_@@_parsed_tl
+     }
   }
 %    \end{macrocode}
-%   Here, |#4|, |#5| and |#8| are all junk arguments simply there to mop up
-%   tokens, while |#1| will be recovered later from \cs{l_@@_parsed_tl} so does
-%   not need to be passed about. The difference in places between the two
-%   decimal parts is now found: this is done just once to avoid having to
-%   parse token lists twice. The value is then used to generate a number of
-%   filler |0| tokens, and these are added to the appropriate part of the
-%   number. Finally, everything is recombined: the integer part only needs
-%   a test to avoid an empty main number.
+%   Here, |#1| and |#2| are not required at this stage, while |#4| is junk.
+%   Thus |#3| is the only item needed for the rest of the process. After a
+%   little argument shuffling, the main loop can begin.
 %    \begin{macrocode}
-\cs_new_protected:Npn
-  \@@_parse_combine_uncert_auxi:nnnnnnnn #1#2#3#4#5#6#7#8
+\cs_new:Npn \@@_parse_combine_uncert:nnnn #1#2#3#4
   {
-     \@@_parse_combine_uncert_auxii:fnnnn
-        { \int_eval:n { \tl_count:n {#3} - \tl_count:n {#7} } }
-        {#2} {#3} {#6} {#7}
+    \exp_after:wN \@@_parse_combine_uncert:nn
+      \exp_after:wN { \l_@@_uncert_tl } {#3}
   }
-\cs_new_protected:Npn
-  \@@_parse_combine_uncert_auxii:nnnnn #1
+\cs_new:Npn \@@_parse_combine_uncert:nn #1#2
   {
-    \@@_parse_combine_uncert_auxiii:fnnnnn
+    \@@_parse_combine_uncert_loop:nnnnnnn {#2} { } { }
+      #1
+      { \q_recursion_tail } { } { } { } \q_recursion_stop
+  }
+%    \end{macrocode}
+%   Here, |#4| and |#7| are junk arguments simply there to mop up
+%   tokens, with the exception that |#4| is also used for the end-of-loop
+%   test.
+%    \begin{macrocode}
+\cs_new:Npn \@@_parse_combine_uncert_loop:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \quark_if_recursion_tail_stop_do:nn {#4}
+      { \@@_parse_combine_uncert_end:nnn {#1} {#2} {#3} }
+    \exp_args:Nf \@@_parse_combine_uncert:nnnnnn
+      { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#6} } }
+      {#1} {#2} {#3} {#5} {#6}
+  }
+%    \end{macrocode}
+%   The difference in places between the two decimal parts is now found: this
+%   is done just once to avoid having to parse token lists twice. The value
+%   is then used to generate a number of filler |0| tokens, and these are added
+%   to the appropriate part of the number.
+%    \begin{macrocode}
+\cs_new:Npn \@@_parse_combine_uncert:nnnnnn #1
+  {
+    \exp_args:Nf \@@_parse_combine_uncert:nnnnnnn
       { \prg_replicate:nn { \int_abs:n {#1} } { 0 } }
       {#1}
   }
-\cs_generate_variant:Nn \@@_parse_combine_uncert_auxii:nnnnn { f }
-\cs_new_protected:Npn
-  \@@_parse_combine_uncert_auxiii:nnnnnn #1#2#3#4#5#6
+\cs_new:Npn \@@_parse_combine_uncert:nnnnnnn #1#2#3#4#5#6#7
   {
     \int_compare:nNnTF {#2} > 0
       {
-        \@@_parse_combine_uncert_auxiv:nnnn
-          {#3} {#4} {#5} { #6 #1 }
+        \@@_parse_combine_uncert:nnnnn
+          {#3} {#4} {#5} {#6} { #7 #1 }
       }
       {
-        \@@_parse_combine_uncert_auxiv:nnnn
-          {#3} { #4 #1 } {#5} {#6}
+        \@@_parse_combine_uncert:nnnnn
+          { #3 #1 } {#4} {#5} {#6} {#7}
       }
   }
-\cs_generate_variant:Nn
-  \@@_parse_combine_uncert_auxiii:nnnnnn { f }
-\cs_new_protected:Npn
-  \@@_parse_combine_uncert_auxiv:nnnn #1#2#3#4
+%    \end{macrocode}
+%   We now ensure that the decimal part is never entirely blank \emph{if} there
+%   are decimal-part uncertainty digits. There is also a need to handle the
+%   possibly of an entirely empty uncertainty, where the value is zero and that
+%   is not being retained.
+%    \begin{macrocode}
+\cs_new:Npn \@@_parse_combine_uncert:nnnnn #1#2#3#4#5
   {
-    \tl_set:Nx \l_@@_parsed_tl
+    \exp_args:Nee \@@_parse_combine_uncert_aux:nnnn
       {
-        { \tl_head:V \l_@@_parsed_tl }
-        { \exp_not:n {#1} }
-        {
-          \bool_lazy_and:nnTF
-            { \tl_if_blank_p:n {#2} }
-            { ! \tl_if_blank_p:n {#4} }
-            { 0 }
-            { \exp_not:n {#2} }
-        }
-        {
-          \@@_parse_combine_uncert_auxv:w #3#4
-            \q_recursion_tail \q_recursion_stop
-        }
+        \bool_lazy_and:nnTF
+          { \tl_if_blank_p:n {#1} }
+          { ! \tl_if_blank_p:n {#5} }
+          { 0 }
+          { \exp_not:n {#1} }
+       }
+       {
+         \@@_parse_combine_uncert:N #4#5
+           \q_recursion_tail \q_recursion_stop
+       }
+       {#2}
+       {#3}
+  }
+\cs_new:Npn \@@_parse_combine_uncert_aux:nnnn #1#2#3#4
+  {
+    \exp_args:Neee \@@_parse_combine_uncert_loop:nnnnnnn
+      { \exp_not:n {#1} }
+      {
+        \exp_not:n {#3}
+        \tl_if_blank:nF {#2} { S } 
+      }
+      {
+        \exp_not:n {#4}
+        \tl_if_blank:nF {#2} { { \exp_not:n {#2} } }
       }
   }
 %    \end{macrocode}
 %   A short routine to remove any leading zeros in the uncertainty part,
 %   which are not needed for the compact representation used by the module.
 %    \begin{macrocode}
-\cs_new:Npn \@@_parse_combine_uncert_auxv:w #1
+\cs_new:Npn \@@_parse_combine_uncert:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1
-      {
-        \bool_if:NT \l_@@_zero_uncert_bool
-          { { S } { 0 } }
-      }
+      { \bool_if:NT \l_@@_zero_uncert_bool { 0 } }
     \str_if_eq:nnTF {#1} { 0 }
-      { \@@_parse_combine_uncert_auxv:w }
-      { \@@_parse_combine_uncert_auxvi:w #1 }
+      { \@@_parse_combine_uncert:N }
+      { \@@_parse_combine_uncert:w #1 }
   }
-\cs_new:Npn \@@_parse_combine_uncert_auxvi:w
+\cs_new:Npn \@@_parse_combine_uncert:w
   #1 \q_recursion_tail \q_recursion_stop
-  { { S } { \exp_not:n {#1} } }
+  { \exp_not:n {#1} }
 %    \end{macrocode}
+%   Recover the sign and integer part, then add in the new decimal and the
+%   uncertainties.
+%    \begin{macrocode}
+\cs_new:Npn \@@_parse_combine_uncert_end:nnn #1#2#3
+  {
+    \exp_after:wN \@@_parse_combine_uncert_end:nnnn
+      \l_@@_parsed_tl
+    { \exp_not:n {#1} }
+    {
+      \tl_if_blank:nF {#2}
+        { \exp_not:n { {#2} #3 } }
+    }
+  }
+\cs_new:Npn \@@_parse_combine_uncert_end:nnnn #1#2#3#4
+  { \exp_not:n { {#1} {#2} } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1508,6 +1543,7 @@
 \cs_new_protected:Npn \@@_parse_loop_main_sign:NNN #1#2#3
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_true_bool
+    \tl_put_right:NV \l_@@_uncert_tl \l_@@_flex_tl
     \tl_set:Nn \l_@@_flex_tl { {#3} }
     \@@_parse_loop_first:NNN
       \l_@@_flex_tl \c_false_bool
@@ -1768,6 +1804,7 @@
             }
           }
         \tl_clear:N \l_@@_partial_tl
+        \tl_clear:N \l_@@_uncert_tl
       }
     \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#1}
       { \@@_parse_uncert:N }

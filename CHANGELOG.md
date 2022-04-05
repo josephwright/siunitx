@@ -9,6 +9,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 - Support for complex numbers in polar form both as input and output
+- Support for multiple uncertainty values in both short and long form
+  in input, and supporting option `uncertainty-descriptors`
 - Options `text-subscript-command` and `text-superscript-command` to allow
   customisation of script printing in text mode (see issue
     [\#595](https://github.com/josephwright/siunitx/issues/595))
@@ -23,7 +25,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `retain-negative-zero`
 - Option `round-zero-positive` to control the outcome of rounding
   negative values to zero
-- Option `uncertainty-descriptors` to work with multiple uncertainties
 - Options `zero-decimal-as-symbol` and `zero-symbol` to support conversion of
   a zero decimal part to a dash or other symbol
 - Option setting `per-mode = single-symbol` to allow exactly one symbol to be
