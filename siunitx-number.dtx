@@ -3478,10 +3478,12 @@
 % \begin{macro}[rEXP]{\@@_output_decimal_loop:NnnN}
 % \begin{macro}[rEXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[rEXP]{\@@_output_uncertainty_unaligned:n}
-% \begin{macro}[rEXP]{\@@_output_uncert:nnn}
 % \begin{macro}[rEXP]{\@@_output_uncert:nnnn}
-% \begin{macro}[rEXP]{\@@_output_uncert_loop:nN}
-% \begin{macro}[rEXP]{\@@_output_uncert_loop:nNw}
+% \begin{macro}[rEXP]{\@@_output_uncert:nnnnn}
+% \begin{macro}[rEXP]{\@@_output_uncert_loop:nnN}
+% \begin{macro}[rEXP]{\@@_output_uncert_loop:nnNw}
+% \begin{macro}[rEXP]{\@@_output_uncert_A_loop:nnn, \@@_output_uncert_S_loop:nnn}
+% \begin{macro}[rEXP]{\@@_output_uncert_S_loop:w}
 % \begin{macro}[rEXP]{\@@_output_uncert_A:nnnn, \@@_output_uncert_A_multi:nnnn}
 % \begin{macro}[rEXP]{\@@_output_uncert_A:nnnnn}
 % \begin{macro}[rEXP]
@@ -3892,10 +3894,7 @@
             \use:c { @@_output_uncert_ \tl_head:n {#1} :nnnn }
               {#2} {#3} #1
           }
-          {
-            \@@_output_uncert:nnn {#2} #1
-            \@@_output_uncertainty_unaligned:n {#3}
-          }
+          { \@@_output_uncert:nnnn {#2} {#3} #1 }
       }
   }
 \cs_new:Npn \@@_output_uncertainty_unaligned:n #1
@@ -3905,29 +3904,45 @@
 %   is no way to reasonably deal with alignment of an open-ended list, so
 %   the treatment is as-for no uncertainty at all.
 %    \begin{macrocode}
-\cs_new:Npn \@@_output_uncert:nnn #1#2#3
-  {
-    \exp_args:NV \@@_output_uncert:nnnn \l_@@_uncert_desc_clist
-      {#1} {#2} {#3}
-  }
 \cs_new:Npn \@@_output_uncert:nnnn #1#2#3#4
   {
-    \@@_output_uncert_loop:nN {#2}
-      #3 \q_recursion_tail #1 , \q_recursion_stop {#4}
+    \exp_args:NV \@@_output_uncert:nnnnn \l_@@_uncert_desc_clist
+      {#1} {#2} {#3} {#4}
   }
-\cs_new:Npn \@@_output_uncert_loop:nN #1#2
+\cs_new:Npn \@@_output_uncert:nnnnn #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop:N #2
-    \@@_output_uncert_loop:nNw {#1} #2
+    \@@_output_uncert_loop:nnN {#2} {#3}
+      #4 \q_recursion_tail #1 , \q_recursion_stop {#5}
   }
-\cs_new:Npn \@@_output_uncert_loop:nNw
-  #1#2#3 \q_recursion_tail #4 , #5 \q_recursion_stop #6
+\cs_new:Npn \@@_output_uncert_loop:nnN #1#2#3
   {
-    \use:c { @@_output_uncert_ #2 _multi:nnnn } {#1} { } {#2} {#6}
-    \tl_if_blank:nF {#4}
-      { \exp_not:N \, ( \exp_not:N \mathrm { \exp_not:n {#4} } ) }
-   \@@_output_uncert_loop:nN {#1} #3
-     \q_recursion_tail #5 , \q_recursion_stop
+    \quark_if_recursion_tail_stop:N #3
+    \@@_output_uncert_loop:nnNw {#1} {#2} #3
+  }
+\cs_new:Npn \@@_output_uncert_loop:nnNw
+  #1#2#3#4 \q_recursion_tail #5 , #6 \q_recursion_stop #7
+  {
+    \use:c { @@_output_uncert_ #3 _loop:nnn } {#1} {#2} {#7}
+    \tl_if_blank:nF {#5}
+      { \exp_not:N \, ( \exp_not:N \mathrm { \exp_not:n {#5} } ) }
+   \@@_output_uncert_loop:nnN {#1} {#2} #4
+     \q_recursion_tail #6 , \q_recursion_stop
+  }
+%    \end{macrocode}
+%   Here, we have to tidy up so the alignment point only applies to the first
+%   |S|-type uncertainty.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_uncert_A_loop:nnn #1#2#3
+   { \@@_output_uncert_A_multi:nnnn {#1} {#2} { A } {#3} }
+\cs_new:Npn \@@_output_uncert_S_loop:nnn #1#2#3
+   {
+     \@@_output_uncert_S_multi:nnnn {#1} {#2} { S } {#3}
+     \@@_output_uncert_S_loop:w
+   }
+\cs_new:Npn \@@_output_uncert_S_loop:w #1 \@@_output_uncert_loop:nnN #2#3
+  {
+     #1
+     \@@_output_uncert_loop:nnN {#2} { }
   }
 %    \end{macrocode}
 %   Printing an asymmetrical uncertainty is more straight-forward as they are
@@ -4124,6 +4139,8 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_end: { }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
