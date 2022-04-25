@@ -1639,30 +1639,32 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       Type &
       \multicolumn{1}{l}{Default} \\
     \midrule
-      bracket-negative-numbers & Switch  & false             \\
-      digit-group-size         & Integer & 3                 \\
-      digit-group-first-size   & Integer & 3                 \\
-      digit-group-other-size   & Integer & 3                 \\
-      exponent-base            & Literal & 10                \\
-      exponent-product         & Math    & \verb=\times=     \\
-      group-digits             & Choice  & all               \\
-      group-minimum-digits     & Integer & 5                 \\
-      group-separator          & Literal & \cs{,}            \\
-      negative-color           & Literal & \meta{none}       \\ ^^A (
-      output-close-uncertainty & Literal & )                 \\
-      output-decimal-marker    & Literal & .                 \\
-      output-exponent-marker   & Literal & \meta{none}       \\
-      output-open-uncertainty  & Literal & (                 \\ ^^A )
-      print-implicit-plus      & Switch  & false             \\
-      print-unity-mantissa     & Switch  & true              \\
-      print-zero-exponent      & Switch  & false             \\
-      print-zero-integer       & Switch  & false             \\
-      tight-spacing            & Switch  & false             \\
-      uncertainty-descriptors  & Literal & \meta{none}       \\
-      uncertainty-mode         & Choice  & compact           \\
-      uncertainty-separator    & Literal & \meta{none}       \\
-      zero-decimal-as-symbol   & Switch  & false             \\
-      zero-symbol              & Literal & \verb=\mbox{---}= \\
+      bracket-negative-numbers         & Switch  & false             \\
+      digit-group-size                 & Integer & 3                 \\
+      digit-group-first-size           & Integer & 3                 \\
+      digit-group-other-size           & Integer & 3                 \\
+      exponent-base                    & Literal & 10                \\
+      exponent-product                 & Math    & \verb=\times=     \\
+      group-digits                     & Choice  & all               \\
+      group-minimum-digits             & Integer & 5                 \\
+      group-separator                  & Literal & \cs{,}            \\
+      negative-color                   & Literal & \meta{none}       \\ ^^A (
+      output-close-uncertainty         & Literal & )                 \\
+      output-decimal-marker            & Literal & .                 \\
+      output-exponent-marker           & Literal & \meta{none}       \\
+      output-open-uncertainty          & Literal & (                 \\ ^^A )
+      print-implicit-plus              & Switch  & false             \\
+      print-unity-mantissa             & Switch  & true              \\
+      print-zero-exponent              & Switch  & false             \\
+      print-zero-integer               & Switch  & false             \\
+      tight-spacing                    & Switch  & false             \\
+      uncertainty-descriptor-mode      & Choice  & bracket-separator \\
+      uncertainty-descriptor-separator & Literal & \cs{ }            \\
+      uncertainty-descriptors          & Literal & \meta{none}       \\
+      uncertainty-mode                 & Choice  & compact           \\
+      uncertainty-separator            & Literal & \meta{none}       \\
+      zero-decimal-as-symbol           & Switch  & false             \\
+      zero-symbol                      & Literal & \verb=\mbox{---}= \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1786,14 +1788,21 @@ respectively. Tokens may be inserted before the opening bracket using
 \end{LaTeXdemo}
 
 \DescribeOption{uncertainty-descriptors}
-Multiple uncertainties can be given for a number. These are always printed
-in a separated form. When there is more than one uncertainty part, it may be
-useful to describe the nature of this value. This can be achieved using the
+\DescribeOption{uncertainty-descriptor-mode}
+\DescribeOption{uncertainty-descriptor-separator}
+Multiple uncertainties can be given for a number. These are always printed in a
+separated form. When there is more than one uncertainty part, it may be useful
+to describe the nature of this value. This can be achieved using the
 \opt{uncertainty-descriptors} option, which take a comma-separated list of
-descriptions.
+descriptions. The formatting of the descriptors can be adjusted using the
+settings \opt{uncertainty-descriptor-mode} and
+\opt{uncertainty-descriptor-separator}. The choices for the \opt{mode} are
+\opt{bracket}, \opt{bracket-separator}, \opt{separator} and \opt{subscript}.
 \begin{LaTeXdemo}
   \num{1.2(3)(4)} \\
-  \num[uncertainty-descriptors = {sys, stat}]{1.2(3)(4)}
+  \sisetup{uncertainty-descriptors = {sys, stat}}
+  \num{1.2(3)(4)} \\
+  \num[uncertainty-descriptor-mode = subscript]{1.2(3)(4)}
 \end{LaTeXdemo}
 
 \DescribeOption{bracket-ambiguous-numbers}

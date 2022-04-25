@@ -10,7 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - Support for complex numbers in polar form both as input and output
 - Support for multiple uncertainty values in both short and long form
-  in input, and supporting option `uncertainty-descriptors`
+  in input, and supporting options `uncertainty-descriptors`,
+  `uncertainty-descriptor-mode` and `uncertainty-descriptor-separator`
 - Options `text-subscript-command` and `text-superscript-command` to allow
   customisation of script printing in text mode (see issue
     [\#595](https://github.com/josephwright/siunitx/issues/595))
