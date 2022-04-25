@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.0] - 2022-04-25
+
 ### Added
 - Support for complex numbers in polar form both as input and output
 - Support for multiple uncertainty values in both short and long form
@@ -1767,7 +1769,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.0.50...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.0...HEAD
+[v3.1.0]: https://github.com/josephwright/siunitx/compare/v3.0.50...v3.1.0
 [v3.0.50]: https://github.com/josephwright/siunitx/compare/v3.0.49...v3.0.50
 [v3.0.49]: https://github.com/josephwright/siunitx/compare/v3.0.48...v3.0.49
 [v3.0.48]: https://github.com/josephwright/siunitx/compare/v3.0.47...v3.0.48
