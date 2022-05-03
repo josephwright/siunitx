@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.1] - 2022-05-03
+
 ### Changed
 - Allow for _e.g._ `\clist_item:Nn` usage inside `\unit` argument
 
@@ -1772,7 +1774,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.1...HEAD
+[v3.1.1]: https://github.com/josephwright/siunitx/compare/v3.1.0...v3.1.1
 [v3.1.0]: https://github.com/josephwright/siunitx/compare/v3.0.50...v3.1.0
 [v3.0.50]: https://github.com/josephwright/siunitx/compare/v3.0.49...v3.0.50
 [v3.0.49]: https://github.com/josephwright/siunitx/compare/v3.0.48...v3.0.49
