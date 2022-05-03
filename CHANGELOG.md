@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Allow for _e.g._ `\clist_item:Nn` usage inside `\unit` argument
+
 ## [v3.1.0] - 2022-04-25
 
 ### Added

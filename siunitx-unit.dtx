@@ -763,13 +763,16 @@
 %   when parsing there is a need to check if the current unit is built up
 %   from others (symbolic) or is defined in terms of some literals. To do this,
 %   the approach used is to set all of the symbolic unit commands expandable
-%   and to do nothing, with the few special cases handled manually.
+%   and to do nothing, with the few special cases handled manually. We expand
+%   the input here twice: this handles the case where there is a mapping or
+%   similar in |#1| which returns its result in \cs{exp_not:n}.
 %    \begin{macrocode}
 \prg_new_protected_conditional:Npnn \@@_if_symbolic:n #1 { TF }
   {
     \group_begin:
       \bool_set_true:N \l_@@_test_bool
       \protected@edef \l_@@_tmp_tl {#1}
+      \protected@edef \l_@@_tmp_tl { \l_@@_tmp_tl }
     \exp_args:NNV \group_end:
     \tl_if_blank:nTF \l_@@_tmp_tl
       { \prg_return_true: }
