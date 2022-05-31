@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Correct sign when fixing a negative exponent  (see issue
+  [\#602](https://github.com/josephwright/siunitx/issues/602))
+
 ## [v3.1.1] - 2022-05-03
 
 ### Changed
