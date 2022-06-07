@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Behavior of `print-integer-zero` in tables (see issue
+  [\#604](https://github.com/josephwright/siunitx/issues/604))
+
 ## [v3.1.2] - 2022-05-31
 
 ### Fixed

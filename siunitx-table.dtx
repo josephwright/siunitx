@@ -883,7 +883,11 @@
     \tl_set:Nx \l_@@_model_tl
       {
         \exp_not:n { {#1} {#2} }
-        { \prg_replicate:nn {#3} { 8 } }
+        {
+          \int_compare:nNnTF {#3} = 0
+            { 0 }
+            { \prg_replicate:nn {#3} { 8 } }
+        }
         { \prg_replicate:nn { 0 #4 } { 8 } }
         {
           \tl_if_blank:nF {#5}
