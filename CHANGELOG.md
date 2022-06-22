@@ -9,7 +9,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v3.1.4] - 2022-06-22
 
-
 ### Fixed
 - Spacing of `\arcminute` and `\arcsecond` in quantities (see issue
   [\#6048(https://github.com/josephwright/siunitx/issues/608))
