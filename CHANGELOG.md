@@ -7,7 +7,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-### Fixed
 
 ### Fixed
 - Spacing of `\arcminute` and `\arcsecond` in quantities (see issue
