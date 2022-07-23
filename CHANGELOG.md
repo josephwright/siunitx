@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding to figures with a trailing zero and non-zero integer part (see issue
+  [\#615](https://github.com/josephwright/siunitx/issues/615))
 ## [v3.1.4] - 2022-06-22
 
 ### Fixed

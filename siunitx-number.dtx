@@ -2660,8 +2660,17 @@
       {
         \int_compare:nNnTF {#3} = 0
           {
-            \@@_round_final_decimal:nnw
-              {#1} { 1 \@@_round_truncate:n {#2} }
+            \bool_lazy_or:nnTF
+              { \tl_if_blank_p:n {#1} }
+              { \int_compare_p:nNn {#1} = { 0 } }
+              {
+                \@@_round_final_decimal:nnw
+                  {#1} { 1 \@@_round_truncate:n {#2} }
+              }
+              {
+                \@@_round_final_decimal:nnw
+                  {#1} { 1 #2 }
+              }
           }
           {
             \@@_round_final:fn
