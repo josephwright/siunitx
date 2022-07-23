@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.5] - 2022-07-23
+
 ### Fixed
 - Rounding to figures with a trailing zero and non-zero integer part (see issue
   [\#615](https://github.com/josephwright/siunitx/issues/615))
@@ -1796,7 +1798,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.5...HEAD
+[v3.1.5]: https://github.com/josephwright/siunitx/compare/v3.1.4...v3.1.5
 [v3.1.4]: https://github.com/josephwright/siunitx/compare/v3.1.3...v3.1.4
 [v3.1.3]: https://github.com/josephwright/siunitx/compare/v3.1.2...v3.1.3
 [v3.1.2]: https://github.com/josephwright/siunitx/compare/v3.1.1...v3.1.2
