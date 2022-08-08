@@ -3061,6 +3061,9 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_end:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_check:nnnw}
+% \begin{macro}[EXP]{\@@_round_uncertainty_check:Nnnnw}
+% \begin{macro}[EXP]{\@@_round_uncertainty_aux:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnn}
 % \begin{macro}[EXP]
@@ -3108,11 +3111,35 @@
 \cs_new:Npn \@@_round_uncertainty_end:nn #1#2
   { \exp_not:n { {#1} {#2} } }
 %    \end{macrocode}
+%   Before doing any rounding, we need to be sure that the main value has
+%   enough significant digits. If not, the result is zero.
+%    \begin{macrocode}
+\cs_new:Npn \__siunitx_number_round_uncertainty:nnn #1#2#3
+  {
+     \@@_round_uncertainty_check:nnnw {#1} {#2} {#3}
+       #1#2 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_uncertainty_check:nnnw #1#2#3#4
+  {
+    \quark_if_recursion_tail_stop_do:Nn #4 { { 0 } { } { } }
+    \int_compare:nNnTF {#4} = 0
+      { \@@_round_uncertainty_check:nnnw }
+      { \@@_round_uncertainty_check:Nnnnw #4 }
+        {#1} {#2} {#3}
+  }
+\cs_new:Npn \@@_round_uncertainty_check:Nnnnw #1#2#3#4#5
+  \q_recursion_tail \q_recursion_stop
+  {
+    \int_compare:nNnTF { \tl_count:n {#1#5} } < { \tl_count:n {#4} }
+      { { 0 } { } { } }
+      { \@@_round_uncertainty_aux:nnn {#2} {#3} {#4} }
+  }
+%    \end{macrocode}
 %   Round the uncertainty first: this is needed to get the number of places
 %   correct. Once that is done, it's just a question of working out the digits
 %   in the main part.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty:nnn #1#2#3
+\cs_new:Npn \@@_round_uncertainty_aux:nnn #1#2#3
   {
     \exp_args:Nf \@@_round_uncertainty:nnnn
       {
@@ -3268,6 +3295,9 @@
     \@@_exponent_finalise:n { #2#3 + \tl_count:n {#1} - 1 }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Rounding to uncertainty where the last uncertainty digit is zero (see issue
   [\#616](https://github.com/josephwright/siunitx/issues/616))
+- Rounding to uncertainty which is bigger than the value (see issue
+  [\#617](https://github.com/josephwright/siunitx/issues/617))
 
 ## [v3.1.5] - 2022-07-23
 
