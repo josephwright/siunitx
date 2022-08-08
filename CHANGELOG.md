@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.6] - 2022-08-08
+
 ### Fixed
 - Rounding to uncertainty where the last uncertainty digit is zero (see issue
   [\#616](https://github.com/josephwright/siunitx/issues/616))
@@ -1804,7 +1806,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.6...HEAD
+[v3.1.6]: https://github.com/josephwright/siunitx/compare/v3.1.5...v3.1.6
 [v3.1.5]: https://github.com/josephwright/siunitx/compare/v3.1.4...v3.1.5
 [v3.1.4]: https://github.com/josephwright/siunitx/compare/v3.1.3...v3.1.4
 [v3.1.3]: https://github.com/josephwright/siunitx/compare/v3.1.2...v3.1.3
