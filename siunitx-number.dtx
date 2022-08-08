@@ -3123,9 +3123,12 @@
   }
 \cs_new:Npn \@@_round_uncertainty:nnnn #1#2#3#4
   {
-    \exp_last_unbraced:Nf \@@_round_uncertainty:nnnnn
-      { \@@_round:nnn {#1} { } {#4} }
-      {#2} {#3} {#1}
+    \use:e
+      {
+        \exp_not:N \@@_round_uncertainty:nnnnn
+          \@@_round:nnn {#1} { } {#4}
+          {#2} {#3} {#1}
+      }
   }
 %    \end{macrocode}
 %   Here, we need to work out how many digits to zero-fill the uncertainty, for

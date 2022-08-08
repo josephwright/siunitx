@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding to uncertainty where the last uncertainty digit is zero (see issue
+  [\#616](https://github.com/josephwright/siunitx/issues/616))
+
 ## [v3.1.5] - 2022-07-23
 
 ### Fixed
