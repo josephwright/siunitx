@@ -286,8 +286,18 @@
 %
 % \begin{function}{exponent-mode}
 %   \begin{syntax}
-%     |exponent-mode| = |engineering|\verb"|"|fixed|\verb"|"|input|\verb"|"|scientific|
+%     |exponent-mode| = |engineering|\verb"|"|fixed|\verb"|"|input|\verb"|"|scientific|\verb"|"|threshold|
 %   \end{syntax}
+%   Choice which determines whether numbers are converted to exponent form. The
+%   option |engineering| forces exponent form with an exponent which is the
+%   smallest power of three which gives a mantissa with an integer part. The
+%   option |fixed| uses a fixed exponent (set in |fixed-exponent|). The
+%   option |input| leaves the input unchanged (which will therefore produce an
+%   exponent only if the input contained one). The choice |scientific| gives
+%   an exponent with the mantissa~$m$ in the range $1 \le m < 10$. Finally,
+%   the option |threshold| will apply |scientific| if the exponent of input
+%   is outside of the range stored in |exponent-threshold-range|. The standard
+%   setting is |input|.
 % \end{function}
 %
 % \begin{function}{exponent-product}
@@ -1867,8 +1877,10 @@
     drop-zero-decimal .bool_set:N =
       \l_@@_drop_zero_decimal_bool ,
     exponent-mode .choices:nn =
-      { engineering , fixed , input , scientific }
+      { engineering , fixed , input , scientific , threshold }
       { \tl_set_eq:NN \l_@@_exponent_mode_tl \l_keys_choice_tl } ,
+    exponent-threshold-range .code:n =
+      { \@@_set_thresholds:n {#1} } ,
     fixed-exponent .int_set:N =
       \l_@@_exponent_fixed_int ,
     minimum-decimal-digits .int_set:N =
@@ -1931,6 +1943,40 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{variable}{\l_@@_lower_threshold_int, \l_@@_upper_threshold_int}
+%   For storing the range for exponents.
+%    \begin{macrocode}
+\int_new:N \l_@@_lower_threshold_int
+\int_new:N \l_@@_upper_threshold_int
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_set_round_thresholds:n}
+% \begin{macro}{\@@_set_round_thresholds:w}
+% \begin{macro}{\@@_set_round_threshold:nn}
+%  Split the range, parse each part, set the data structures.
+%    \begin{macrocode}
+\cs_new_protected:Npx \@@_set_thresholds:n #1
+  {
+    \exp_not:N \@@_set_thresholds:w
+      #1 \token_to_str:N : \token_to_str:N : \exp_not:N \q_stop
+  }
+\use:x
+  {
+    \cs_new_protected:Npn \exp_not:N \@@_set_thresholds:w
+      ##1 \token_to_str:N : ##2 \token_to_str:N : ##3 \exp_not:N \q_stop
+  }
+  {
+    \@@_set_threshold:nn { lower } {#1}
+    \@@_set_threshold:nn { upper } {#2}
+  }
+\cs_new_protected:Npn \@@_set_threshold:nn #1#2
+  { \int_set:cn { l__@@_ #1 _threshold_int } { 0 #2 } }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -2010,6 +2056,9 @@
 %  \begin{macro}[EXP]{\@@_exponent_engineering:nnNw}
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert:nn}
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert_S:nnn}
+%  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnn}
+%  \begin{macro}[EXP]{\@@_exponent_threshold:nn}
+%  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnnn}
 %   Manipulating an exponent is done using a single expansion function
 %   \emph{unless} dealing with engineering-style output. The latter is easier
 %   to handle by first converting to scientific output, then post-processing.
@@ -2302,6 +2351,32 @@
     }
   }
 %    \end{macrocode}
+%   To branch here we need to work out the scientific notation form.
+%    \begin{macrocode}
+\cs_new:Npn \@@_exponent_threshold:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \exp_args:Ne \@@_exponent_threshold:nn
+      {
+        \@@_exponent_scientific:nnnnnnn
+          {#1} {#2} {#3} {#4} {#5} {#6} {#7}
+      }
+      { {#1} {#2} {#3} {#4} {#5} {#6} {#7} }
+  }
+\cs_new:Npn  \@@_exponent_threshold:nn #1#2
+  { \@@_exponent_threshold:nnnnnnnn #1 {#2} }
+\cs_new:Npn  \@@_exponent_threshold:nnnnnnnn #1#2#3#4#5#6#7#8
+  {
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn {#6#7} > \l_@@_lower_threshold_int }
+      { \int_compare_p:nNn {#6#7} < \l_@@_upper_threshold_int }
+      { \exp_not:n {#8} }
+      { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
+  }
+
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -3079,7 +3154,8 @@
 %     \@@_round_uncertainty_engineering:nnn ,
 %     \@@_round_uncertainty_fixed:nnn       ,
 %     \@@_round_uncertainty_input:nnn       ,
-%     \@@_round_uncertainty_scientific:nnn
+%     \@@_round_uncertainty_scientific:nnn  ,
+%     \@@_round_uncertainty_threshold:nnn
 %   }
 % \begin{macro}[EXP]
 %   {
@@ -3209,7 +3285,9 @@
 %   we have a pathological case and need to filter out. They show up as they
 %   have the either the precision greater than the length of the integer
 %   part, or have a value of exactly $10$ when the exponent mode is
-%   scientific.
+%   scientific. The latter test has to deal with an exponent threshold too:
+%   there we are looking for cases where the threshold will have forced
+%   scientific presentation.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_shift:nn #1#2
   { \@@_round_uncertainty_shift:nnnw #1 {#2} }
@@ -3221,7 +3299,25 @@
       { \int_compare_p:nNn {#3} > { \tl_count:n {#1} } }
       {
         ! \bool_lazy_and_p:nn
-          { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { scientific } }
+          {
+            \bool_lazy_or_p:nn
+              { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { scientific } }
+              {
+                \bool_lazy_and_p:nn
+                  { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { threshold } }
+                  {
+                    ! \bool_lazy_or_p:nn
+                      {
+                        \int_compare_p:nNn {#5#6} >
+                          \l_@@_lower_threshold_int
+                      }
+                      {
+                        \int_compare_p:nNn {#5#6} <
+                          \l_@@_upper_threshold_int
+                      }
+                  }
+              }
+          }
           { \str_if_eq_p:nn { #1.#2 } { 10. } }
       }
       {
@@ -3293,6 +3389,18 @@
   {
     { 1 } { } { { S } { 1 } }
     \@@_exponent_finalise:n { #2#3 + \tl_count:n {#1} - 1 }
+  }
+%    \end{macrocode}
+%   We need to branch here based on the order of magnitude.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_uncertainty_threshold:nnn #1#2#3
+  {
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn {#2#3} > \l_@@_lower_threshold_int }
+      { \int_compare_p:nNn {#2#3} < \l_@@_upper_threshold_int }
+      { \@@_round_uncertainty_input:nnn }
+      { \@@_round_uncertainty_scientific:nnn }
+        {#1} {#2} {#3}
   }
 %    \end{macrocode}
 % \end{macro}
@@ -4467,6 +4575,11 @@
     zero-decimal-as-symbol           = false                                  ,
     zero-symbol                      = \mbox { --- }
   }
+%    \end{macrocode}
+%   One awkward setting.
+%    \begin{macrocode}
+\keys_set:nx { siunitx }
+   { exponent-threshold-range = -3 \c_colon_str 3 }
 %    \end{macrocode}
 %
 %    \begin{macrocode}

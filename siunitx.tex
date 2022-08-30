@@ -1441,19 +1441,20 @@ way; the options are summarised in Table~\ref{tab:opt:num:post}.
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      drop-exponent          & Switch  & false       \\
-      drop-uncertainty       & Switch  & false       \\
-      drop-zero-decimal      & Switch  & false       \\
-      exponent-mode          & Switch  & input       \\
-      fixed-exponent         & Integer & 0           \\
-      minimum-integer-digits & Integer & 0           \\
-      minimum-decimal-digits & Integer & 0           \\
-      round-half             & Choice  & up          \\
-      round-minimum          & Literal & 0           \\
-      round-mode             & Choice  & none        \\
-      round-pad              & Switch  & true        \\
-      round-precision        & Integer & 2           \\
-      round-zero-positive    & Switch  & true        \\
+      drop-exponent            & Switch  & false       \\
+      drop-uncertainty         & Switch  & false       \\
+      drop-zero-decimal        & Switch  & false       \\
+      exponent-mode            & Switch  & input       \\
+      exponent-threshold-range & Literal & -3:3        \\
+      fixed-exponent           & Integer & 0           \\
+      minimum-integer-digits   & Integer & 0           \\
+      minimum-decimal-digits   & Integer & 0           \\
+      round-half               & Choice  & up          \\
+      round-minimum            & Literal & 0           \\
+      round-mode               & Choice  & none        \\
+      round-pad                & Switch  & true        \\
+      round-precision          & Integer & 2           \\
+      round-zero-positive      & Switch  & true        \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1462,9 +1463,9 @@ way; the options are summarised in Table~\ref{tab:opt:num:post}.
 \DescribeOption{fixed-exponent}
 Numbers can be converted to scientific notation by the package. This is
 controlled by the \opt{exponent-mode} option, which takes choices \opt{input},
-\opt{fixed}, \opt{engineering} and \opt{scientific}. The \opt{fixed} setting
-will use the exponent value by the \opt{fixed-exponent} option. When
-\opt{engineering} is set, the exponent is always a power of three.
+\opt{fixed}, \opt{engineering}, \opt{scientific} and \opt{threshold}. The
+\opt{fixed} setting will use the exponent value by the \opt{fixed-exponent}
+option. When \opt{engineering} is set, the exponent is always a power of three.
 \begin{LaTeXdemo}
   \num{0.001}  \\
   \num{0.0100} \\
@@ -1491,6 +1492,40 @@ scientific notation from the input
   \num{1.23e4} \\
   \num[exponent-mode = fixed, fixed-exponent = 0]{1.23e4}
 \end{LaTeXdemo}
+\DescribeOption{exponent-threshold-range}
+When the \opt{exponent-mode} is set to \meta{threshold}, values outside of a
+threshold range for the exponent are always printed in scientific form. Within
+the threshold, they are printed as-given in the input: typically this would be
+without an exponent. The threshold range itself is controlled by
+\opt{exponent-threshold-range}, which is given as
+\texttt{\meta{min}:\meta{max}} (Table~\ref{tab:threshold}).
+\begin{LaTeXdemo}[code and float]
+  \begin{table}
+    \caption{Thresholds for exponents.%
+      \label{tab:threshold}}
+    \begin{tabular}
+      {
+        @{}
+        S
+        S[exponent-mode = threshold]
+        S[exponent-mode = threshold, exponent-threshold-range = -2:2]
+        @{}
+      }
+    \toprule
+      {Input} & {Threshold $-3:3$} &  {Threshold $-2:2$} \\
+    \midrule
+      0.001 & 0.001 & 0.001 \\
+      0.012 & 0.012 & 0.012 \\
+      0.123 & 0.123 & 0.123 \\
+      1     & 1     & 1     \\
+      12    & 12    & 12    \\
+      123   & 123   & 123   \\
+      1234  & 1234  & 1234  \\ 
+    \bottomrule
+    \end{tabular}
+  \end{table}
+\end{LaTeXdemo}
+
 Exponent mode applies \emph{after} rounding, such that the number of decimal
 places for rounding is those which appear in the output.
 
