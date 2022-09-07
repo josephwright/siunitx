@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.7] - 2022-09-07
+
 ### Changed
 - Defensive step against active symbol characters in Unicode engines
 
@@ -1809,7 +1811,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.6...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.7...HEAD
+[v3.1.7]: https://github.com/josephwright/siunitx/compare/v3.1.6...v3.1.7
 [v3.1.6]: https://github.com/josephwright/siunitx/compare/v3.1.5...v3.1.6
 [v3.1.5]: https://github.com/josephwright/siunitx/compare/v3.1.4...v3.1.5
 [v3.1.4]: https://github.com/josephwright/siunitx/compare/v3.1.3...v3.1.4
