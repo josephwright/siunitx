@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Defensive step against active symbol characters in Unicode engines
+
 ## [v3.1.6] - 2022-08-08
 
 ### Fixed

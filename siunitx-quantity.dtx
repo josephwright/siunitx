@@ -428,7 +428,10 @@
   { \sys_if_engine_xetex_p: }
   {
     \cs_new:Npn \@@_non_latin:n #1
-      { \char_generate:nn {#1} { \char_value_catcode:n {#1} } }
+      {
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#1} { \char_value_catcode:n {#1} }
+      }
   }
   {
     \cs_new:Npn \@@_non_latin:n #1
