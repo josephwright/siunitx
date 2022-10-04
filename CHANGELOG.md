@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding to order of magnitude (see issue
+  [\#622](https://github.com/josephwright/siunitx/issues/622))
+
 ## [v3.1.7] - 2022-09-07
 
 ### Changed

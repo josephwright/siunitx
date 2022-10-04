@@ -2757,7 +2757,9 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_final_shift:nn #1#2
   {
-    \str_if_eq:VnTF \l_@@_round_mode_tl { places }
+    \bool_lazy_or:nnTF
+      { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
+      { \str_if_eq_p:Vn \l_@@_round_mode_tl { places } }
       {
         \use:c
           { @@_round_ \l_@@_exponent_mode_tl :nn }
@@ -2770,7 +2772,11 @@
   {
     \int_compare:nNnTF { \tl_count:n {#1} } = 4
       {
-        \@@_round_engineering:NNNNn #1 {#2}
+        \bool_lazy_and:nnTF
+          { \int_compare_p:nNn \l_@@_round_precision_int = 1 }
+          { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
+          { { 1 } { } }
+          { \@@_round_engineering:NNNNn #1 {#2} }
         \@@_round_final_shift:Nw 3
       }
       { {#1} {#2} }
@@ -2779,7 +2785,7 @@
   {
     {#1}
     \exp_args:NV \@@_round_engineering:nnN
-      { \l_@@_round_precision_int } { }
+      \l_@@_round_precision_int { }
       #2#3#4#5 \q_recursion_tail \q_recursion_stop
   }
 \cs_new:Npn \@@_round_engineering:nnN #1#2#3
@@ -2793,11 +2799,17 @@
 \cs_new:Npn \@@_round_input:nn #1#2 { {#1} {#2} }
 \cs_new:Npn \@@_round_scientific:nn #1#2
   {
-    \@@_exponent_shift:nnf
-      { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn \l_@@_round_precision_int = 1 }
+      { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
+      { { 1 } { } }
+      {
+        \@@_exponent_shift:nnf
+          { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
+      }
     \@@_round_final_shift:Nw 1
   }
-\cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_places_end:nnn #3#4#5
+\cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_end:nnn #3#4#5
   {
     \exp_not:n { {#3} }
     \@@_exponent_finalise:n { #4#5 + #1 }
@@ -2885,6 +2897,13 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[EXP]{\@@_round_end:nnn}
+%   Used as a marker to allow adjustment when we pass a power of ten.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_end:nnn #1#2#3 { \exp_not:n { {#1} {#2} {#3} } }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[EXP]{\@@_round_figures:nnnnnnn, \@@_round_figures_aux:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnN}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnnN}
@@ -2913,7 +2932,7 @@
             \exp_not:n { {#1} {#2} }
             \@@_round_figures_count:nnN {#3} {#4} #3#4
               \q_recursion_tail \q_recursion_stop
-            \exp_not:n { { } {#6} {#7} }
+            \@@_round_end:nnn { } {#6} {#7}
           }
           { { } { } { 0 } { } { } { } { 0 } }
       }
@@ -2955,7 +2974,6 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_places:nnnnnnn}
-% \begin{macro}[EXP]{\@@_round_places_end:nnn}
 % \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
 % \begin{macro}[EXP]{\@@_round_places_finalise:n}
 % \begin{macro}[EXP]{\@@_round_places_finalise:nnnnnnn}
@@ -2977,12 +2995,11 @@
               { \@@_round_places_decimal:nn }
               { \@@_round_places_integer:nn }
                 {#3} {#4}
-            \@@_round_places_end:nnn { } {#6} {#7}
+            \@@_round_end:nnn { } {#6} {#7}
           }
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
-\cs_new:Npn \@@_round_places_end:nnn #1#2#3 { \exp_not:n { {#1} {#2} {#3} } }
 \cs_new:Npn \@@_round_places_decimal:nn #1#2
   {
     \int_compare:nNnTF
@@ -3051,7 +3068,6 @@
     \exp_not:n { {#3} {#1} {#2} { } {#4} {#5} }
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -3249,7 +3265,7 @@
     \use:c
       { @@_round_ \l_@@_exponent_mode_tl :nn }
         {#2} {#3}
-    \@@_round_places_end:nnn { { S } { 1 #1 } } {#4} {#5}
+    \@@_round_end:nnn { { S } { 1 #1 } } {#4} {#5}
   }
 %    \end{macrocode}
 %   With the data available, adjust the output such that the uncertainty
