@@ -860,8 +860,7 @@
 \cs_new_protected:Npn \@@_drop_exponent:nnnnnnn #1#2#3#4#5#6#7
   { \tl_set:Nn \l_@@_real_tl { {#1} {#2} {#3} {#4} {#5} { } { 0 } } }
 %    \end{macrocode}
-%   Ensure the imaginary part has a sign, and also deal with the case
-%   where there is no mantissa to print (as it is $1$).
+%   Ensure the imaginary part has a sign.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_sign:nnnnnnn #1#2#3#4#5#6#7
   {
@@ -873,14 +872,7 @@
             { \tl_if_empty:NF \l_@@_real_tl { + } }
             { \exp_not:n {#2} }
         }
-        \tl_if_blank:nTF {#4}
-          {
-            \str_if_eq:nnTF {#3} { 1 }
-              { { } { } }
-              { \exp_not:n { {#3} {#4} } }
-          }
-          { \exp_not:n { {#3} {#4} } }
-        \exp_not:n { {#5} {#6} {#7} }
+        \exp_not:n { {#3} {#4} {#5} {#6} {#7} }
       }
   }
 %    \end{macrocode}
