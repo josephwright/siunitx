@@ -7,6 +7,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Option `print-complex-unity`
+
+## Fixed
+- Printing of complex values of exactly one (see issue
+  [\#625](https://github.com/josephwright/siunitx/issues/625))
+
 ## [v3.1.8] - 2022-10-04
 
 ### Fixed
