@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.10] - 2022-11-16
+
 ### Fixed
 - Rounding to uncertainty in some cases (see issue
   [\#627](https://github.com/josephwright/siunitx/issues/627))
@@ -1829,7 +1831,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.9...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.10...HEAD
+[v3.1.10]: https://github.com/josephwright/siunitx/compare/v3.1.9...v3.1.10
 [v3.1.9]: https://github.com/josephwright/siunitx/compare/v3.1.8...v3.1.9
 [v3.1.8]: https://github.com/josephwright/siunitx/compare/v3.1.7...v3.1.8
 [v3.1.7]: https://github.com/josephwright/siunitx/compare/v3.1.6...v3.1.7
