@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding to uncertainty in some cases (see issue
+  [\#627](https://github.com/josephwright/siunitx/issues/627))
 ## [v3.1.9] - 2022-10-23
 
 ### Added

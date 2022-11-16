@@ -3168,9 +3168,9 @@
   {
     \use:e
       {
-        \exp_not:N \@@_round_uncertainty:nnnnn
+        \exp_not:N \@@_round_uncertainty:nnnnnn
           \@@_round:nnn {#1} { } {#4}
-          {#2} {#3} {#1}
+          {#2} {#3} {#1} {#4}
       }
   }
 %    \end{macrocode}
@@ -3179,7 +3179,7 @@
 %   the uncertainty rounded up, which also links to additional treatment. We
 %   therefore split paths here.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty:nnnnnn #1#2#3#4#5#6
   {
     \tl_if_blank:nTF {#1}
       {
@@ -3191,7 +3191,7 @@
                   {
                     \tl_if_blank:nTF {#4}
                       { #5 }
-                      { 0 - ( \tl_count:n {#4} - \tl_count:n {#2} - #5 +  1 ) }
+                      { ( \tl_count:n {#6} - \tl_count:n {#4} ) - \tl_count:n {#2} }
                   }
                   { 0 }
               }
