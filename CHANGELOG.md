@@ -8,7 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ## Added
-- Option `exponent-threshold-range` and option setting `exponent-mode = threshold`
+- Option `exponent-thresholds` and option setting `exponent-mode = threshold`
   to allow selective use of exponent mode output (see issue
   [\#204](https://github.com/josephwright/siunitx/issues/204))
 
