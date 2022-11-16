@@ -2644,14 +2644,20 @@
 %   A small amount of code to make it convenient to include non-Latin
 %   characters in units without having to directly include them in the
 %   sources directly. We only make the first token active as some packages
-%   (\foreign{e.g.}~\pkg{kotex}) do this.
+%   (\foreign{e.g.}~\pkg{kotex}) do this. For Unicode engines, we
+%   might run into some odd situations where active characters are in
+%   use (\foreign{e.g.}~\pkg{luainputenc}), so take precautions here
+%   too,
 %    \begin{macrocode}
 \bool_lazy_or:nnTF
   { \sys_if_engine_luatex_p: }
   { \sys_if_engine_xetex_p: }
   {
     \cs_new:Npn \@@_non_latin:n #1
-      { \char_generate:nn {#1} { \char_value_catcode:n {#1} } }
+      {
+        \exp_after:wN \exp_after:wN \exp_after:wN
+          \exp_not:N \char_generate:nn {#1} { \char_value_catcode:n {#1} }
+      }
   }
   {
     \cs_new:Npn \@@_non_latin:n #1

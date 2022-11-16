@@ -164,6 +164,14 @@
 %   is |\mathrm{i}|.
 % \end{function}
 %
+% \begin{function}{print-complex-unity}
+%   \begin{syntax}
+%     |print-complex-unity| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to determine if the number \num{1} is printed for a complex
+%   part which is exactly unity.
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -286,7 +294,9 @@
     input-complex-root .tl_set:N =
       \l_@@_input_root_tl ,
     output-complex-root .tl_set:N =
-      \l_@@_output_root_tl
+      \l_@@_output_root_tl ,
+    print-complex-unity .bool_set:N =
+      \l_@@_print_unity_bool
   }
 %    \end{macrocode}
 % \end{variable}
@@ -860,8 +870,7 @@
 \cs_new_protected:Npn \@@_drop_exponent:nnnnnnn #1#2#3#4#5#6#7
   { \tl_set:Nn \l_@@_real_tl { {#1} {#2} {#3} {#4} {#5} { } { 0 } } }
 %    \end{macrocode}
-%   Ensure the imaginary part has a sign, and also deal with the case
-%   where there is no mantissa to print (as it is $1$).
+%   Ensure the imaginary part has a sign.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_sign:nnnnnnn #1#2#3#4#5#6#7
   {
@@ -873,14 +882,7 @@
             { \tl_if_empty:NF \l_@@_real_tl { + } }
             { \exp_not:n {#2} }
         }
-        \tl_if_blank:nTF {#4}
-          {
-            \str_if_eq:nnTF {#3} { 1 }
-              { { } { } }
-              { \exp_not:n { {#3} {#4} } }
-          }
-          { \exp_not:n { {#3} {#4} } }
-        \exp_not:n { {#5} {#6} {#7} }
+        \exp_not:n { {#3} {#4} {#5} {#6} {#7} }
       }
   }
 %    \end{macrocode}
@@ -893,9 +895,12 @@
   \q_nil #9 \q_stop
   {
     \tl_set:Nn \l_@@_sign_tl {#1#2}
-    \bool_lazy_and:nnTF
-      { \str_if_eq_p:nn {#3} { 1 } }
-      { \tl_if_blank_p:n {#5} }
+    \bool_lazy_all:nTF
+      {
+        { ! \l_@@_print_unity_bool }
+        { \str_if_eq_p:nn {#3} { 1 } }
+        { \tl_if_blank_p:n {#5} }
+      }
       { \@@_extract_exponent_aux:nw {#6#7#8} }
       { \@@_extract_exponent_aux:nw {#3#4#5#6#7#8} }
          #9 \q_stop
@@ -1200,13 +1205,14 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    complex-angle-unit    = degrees      ,
-    complex-mode          = input        ,
-    complex-root-position = after-number ,
-    complex-symbol-angle  = \angle       ,
-    complex-symbol-degree = \degree      ,
-    input-complex-root    = ij           ,
-    output-complex-root   = \mathrm { i }
+    complex-angle-unit    = degrees       ,
+    complex-mode          = input         ,
+    complex-root-position = after-number  ,
+    complex-symbol-angle  = \angle        ,
+    complex-symbol-degree = \degree       ,
+    input-complex-root    = ij            ,
+    output-complex-root   = \mathrm { i } ,
+    print-complex-unity   = false
   }
 %    \end{macrocode}
 %
