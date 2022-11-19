@@ -11,6 +11,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `exponent-thresholds` and option setting `exponent-mode = threshold`
   to allow selective use of exponent mode output (see issue
   [\#204](https://github.com/josephwright/siunitx/issues/204))
+- Options `print-exponent-implicit-plus` and `print-mantissa-implicit-plus`
+  (see issue
+  [\#293](https://github.com/josephwright/siunitx/issues/493))
 - Abbreviation `\mF` (see issue
   [\#624](https://github.com/josephwright/siunitx/issues/624))
 

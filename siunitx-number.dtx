@@ -452,10 +452,20 @@
 %   \end{syntax}
 % \end{function}
 %
-% \begin{function}{print-implicit-plus}
+% \begin{function}
+%   {
+%     print-implicit-plus          ,
+%     print-mantissa-implicit-plus ,
+%     print-exponent-implicit-plus
+%   }
 %   \begin{syntax}
-%     |print-implicit-plus| = |true|\verb"|"|false|
+%     |print-implicit-plus|          = |true|\verb"|"|false|
+%     |print-mantissa-implicit-plus| = |true|\verb"|"|false|
+%     |print-exponent-implicit-plus| = |true|\verb"|"|false|
 %   \end{syntax}
+%   Controls whether the plus sign implicit in a positive number is printed;
+%   this can be controlled at the level of the mantissa or exponent, or
+%   can be activated for both.
 % \end{function}
 %
 % \begin{function}{print-unity-mantissa}
@@ -3523,7 +3533,8 @@
 % \begin{variable}
 %   {
 %      \l_@@_bracket_negative_bool    ,
-%      \l_@@_implicit_plus_bool       ,
+%      \l_@@_implicit_plus_mant_bool  ,
+%      \l_@@_implicit_plus__exp_bool  ,
 %      \l_@@_exponent_base_tl         ,
 %      \l_@@_exponent_product_tl      ,
 %      \l_@@_group_size_int           ,
@@ -3603,8 +3614,15 @@
       \l_@@_output_exp_marker_tl ,
     output-open-uncertainty .tl_set:N =
       \l_@@_output_uncert_open_tl ,
-    print-implicit-plus .bool_set:N =
-      \l_@@_implicit_plus_bool ,
+    print-implicit-plus .meta:n =
+      {
+        print-mantissa-implicit-plus = {#1} ,
+        print-exponent-implicit-plus = {#1}
+      } ,
+    print-mantissa-implicit-plus .bool_set:N =
+      \l_@@_implicit_plus_mant_bool ,
+    print-exponent-implicit-plus .bool_set:N =
+      \l_@@_implicit_plus_exp_bool ,
     print-unity-mantissa .bool_set:N =
       \l_@@_unity_mantissa_bool ,
     print-zero-exponent .bool_set:N =
@@ -3811,7 +3829,7 @@
   {
     \tl_if_blank:nTF {#2}
       {
-        \bool_if:NT \l_@@_implicit_plus_bool
+        \bool_if:NT \l_@@_implicit_plus_mant_bool
           { \@@_output_sign:nN {#1} + }
       }
       {
@@ -4359,7 +4377,7 @@
     \tl_if_blank:nTF {#2}
       {
         \bool_lazy_and:nnT
-          { \l_@@_implicit_plus_bool }
+          { \l_@@_implicit_plus_exp_bool }
           { ! \str_if_eq_p:nn {#3} { 0 } }
           { #1 + }
       }
@@ -4568,7 +4586,9 @@
     output-decimal-marker            = .                                      ,
     output-open-uncertainty          = (                                      , % )
     parse-numbers                    = true                                   ,
+    print-exponent-implicit-plus     = false                                  ,
     print-implicit-plus              = false                                  ,
+    print-mantissa-implicit-plus     = false                                  ,
     print-unity-mantissa             = true                                   ,
     print-zero-exponent              = false                                  ,
     print-zero-integer               = true                                   ,
