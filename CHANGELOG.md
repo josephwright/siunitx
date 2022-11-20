@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#293](https://github.com/josephwright/siunitx/issues/493))
 - Abbreviation `\mF` (see issue
   [\#624](https://github.com/josephwright/siunitx/issues/624))
+- New SI prefixes `\ronna`, `\ronto`, `\quetta` and `quecto`
 
 ## [v3.1.10] - 2022-11-16
 
