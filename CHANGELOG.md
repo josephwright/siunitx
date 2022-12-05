@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Alignment of exponents without mantissa values (see issue
+  [\#633](https://github.com/josephwright/siunitx/issues/633))
+
 ## [v3.1.10] - 2022-11-16
 
 ### Fixed
