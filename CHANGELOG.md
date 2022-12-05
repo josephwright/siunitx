@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.1.11] - 2022-12-05
+
 ### Fixed
 - Alignment of exponents without mantissa values (see issue
   [\#633](https://github.com/josephwright/siunitx/issues/633))
@@ -1836,7 +1838,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.10...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.11...HEAD
+[v3.1.11]: https://github.com/josephwright/siunitx/compare/v3.1.10...v3.1.11
 [v3.1.10]: https://github.com/josephwright/siunitx/compare/v3.1.9...v3.1.10
 [v3.1.9]: https://github.com/josephwright/siunitx/compare/v3.1.8...v3.1.9
 [v3.1.8]: https://github.com/josephwright/siunitx/compare/v3.1.7...v3.1.8
