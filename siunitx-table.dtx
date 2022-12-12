@@ -1468,7 +1468,9 @@
 %    \end{macrocode}
 %   Finally, we get to the exponent part: the multiplication symbol is
 %   |#1| and the number itself is |#2|. The code is almost the same as for
-%   uncertainties, which allows a shared auxiliary to be used.
+%   uncertainties, which allows a shared auxiliary to be used. As |#3| could
+%   be entirely empty, there needs to be a bit of work to ensure alignment
+%   is retained in all cases.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format_auxvii:w
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
@@ -1477,7 +1479,17 @@
       {
         \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2 }
         \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
-        \@@_print_format_box:Nn \l_@@_tmp_box { { } #3#4 }
+        \@@_print_format_box:Nn \l_@@_tmp_box
+          {
+            \bool_lazy_and:nnT
+              { \l_@@_align_exponent_bool }
+              { \tl_if_blank_p:n {#3} }
+              {
+                \@@_print_format_box:Nn \l_@@_tmp_box { { } #1 { } }
+                \@@_skip:n { \box_wd:N \l_@@_tmp_box }
+              }
+            { } #3#4
+          }
         \@@_print_format_after:N \l_@@_align_exponent_bool
       }
   }
