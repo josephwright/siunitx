@@ -19,6 +19,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - New SI prefixes `\ronna`, `\ronto`, `\quetta` and `\quecto` (see issue
   [\#629](https://github.com/josephwright/siunitx/issues/629))
 
+### Changed
+- Extend alignment of uncertainties in tabulars to include decimal marker
+  (see issue [\#370](https://github.com/josephwright/siunitx/issues/370))
+
 ## [v3.1.11] - 2022-12-05
 
 ### Fixed

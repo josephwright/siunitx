@@ -701,6 +701,13 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_uncert_box}
+%   An extra one for aligning separated uncertainty values.
+%    \begin{macrocode}
+\box_new:N \l_@@_uncert_box
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_fil:, \@@_fill:}
 %    Primitives renamed.
 %    \begin{macrocode}
@@ -1152,13 +1159,19 @@
 % \begin{macro}[EXP]{\@@_print_format:nnnnnn}
 % \begin{macro}
 %   {
-%     \@@_print_format_auxi:w   ,
-%     \@@_print_format_auxii:w  ,
-%     \@@_print_format_auxiii:w ,
-%     \@@_print_format_auxiv:w  ,
-%     \@@_print_format_auxv:w   ,
-%     \@@_print_format_auxvi:w  ,
-%     \@@_print_format_auxvii:w
+%     \@@_print_format_auxi:w    ,
+%     \@@_print_format_auxii:w   ,
+%     \@@_print_format_auxiii:w  ,
+%     \@@_print_format_auxiv:w   ,
+%     \@@_print_format_auxv:w    ,
+%     \@@_print_format_auxvi:w   ,
+%     \@@_print_format_auxvii:w  ,
+%     \@@_print_format_auxviii:w ,
+%     \@@_print_format_auxix:w   ,
+%     \@@_print_format_auxx:w    ,
+%     \@@_print_format_auxxi:w   ,
+%     \@@_print_format_auxxii:w  ,
+%     \@@_print_format_auxxiii:w
 %   }
 % \begin{macro}{\@@_print_format_box:Nn}
 % \begin{macro}{\@@_print_format_after:N}
@@ -1442,28 +1455,100 @@
   {
     \tl_if_blank:nTF {#1}
       { \@@_print_format_auxv:w }
-      { \@@_print_format_auxvi:w }
-        #1#2 \q_mark #3#4 \q_stop
+      { \@@_print_format_auxvii:w }
+        #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   }
 \cs_new_protected:Npn \@@_print_format_auxv:w
-  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_mark
-  #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_stop
-  { \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop }
+  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_mark
+  #6 \q_stop
+  { \@@_print_format_auxvi:w #5 \q_mark #6 \q_stop }
+\cs_new_protected:Npn \@@_print_format_auxvi:w
+  #1 \q_mark
+  #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_stop
+  { \@@_print_format_auxxiii:w #1 \q_mark #6 \q_stop }
 %    \end{macrocode}
 %   Sorting out the placement of the uncertainty requires both the model and
 %   real data widths, so we store the former to avoiding needing more boxes.
 %   It's then just a case of putting the carry-over white space in the right
 %   place.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_format_auxvi:w
+\cs_new_protected:Npn \@@_print_format_auxvii:w
+  #1 \q_mark #2 \q_stop
+  {
+    \bool_if:NTF \l_@@_align_uncertainty_bool
+      { \@@_print_format_auxviii:w }
+      { \@@_print_format_auxx:w }
+        #1 \q_mark #2 \q_stop
+  }
+%    \end{macrocode}
+%   For an aligned uncertainty, we need to work with the different parts.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxviii:w
+  #1 \q_nil #2 \q_nil #3 \q_mark
+  #4 \q_nil #5 \q_nil #6 \q_stop
+  {
+    \hbox_set:Nn \l_@@_tmp_box
+      { \siunitx_print_number:n { { } #1#2 { } } }
+    \hbox_set_to_wd:Nnn \l_@@_uncert_box
+      { \box_wd:N \l_@@_tmp_box }
+      {
+        \siunitx_print_number:n { { } #4 }
+        \@@_fil:
+        \tl_if_blank:nTF {#5}
+          { { } }
+          { \siunitx_print_number:n {#5} }
+      }
+    \@@_print_format_auxix:w
+      #3 \q_mark #6 \q_stop
+  }
+\cs_new_protected:Npn \@@_print_format_auxix:w
+  #1 \q_nil #2 \q_nil #3 \q_mark
+  #4 \q_nil #5 \q_nil #6 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+    \hbox_set_to_wd:Nnn \l_@@_tmp_box
+      {
+          \box_wd:N \l_@@_uncert_box
+        + \box_wd:N \l_@@_tmp_box
+      }
+      {
+        \box_use:N \l_@@_uncert_box
+        \tl_if_blank:nF {#2#5}
+          { \siunitx_print_number:n {#4#5} }
+        \@@_fil:
+      }
+    \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
+    \@@_print_format_auxxii:w #3 \q_mark #6 \q_stop
+  }
+%    \end{macrocode}
+%   Non-aligned uncertainty: we have all of the information needed as
+%   |#1|/|#3|, so the work is trivial.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxx:w
   #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_mark
   #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2#3 }
+    \@@_print_format_auxxi:w
+      #1#2#3#4 \q_mark #5#6#7#8 \q_stop
+  }
+\cs_new_protected:Npn \@@_print_format_auxxi:w
+  #1 \q_nil #2 \q_mark
+  #3 \q_nil #4 \q_stop
+  {
+    \@@_print_format_box:Nn \l_@@_tmp_box { { } #1 }
     \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
-    \@@_print_format_box:Nn \l_@@_tmp_box { { } #5#6#7 }
+    \@@_print_format_box:Nn \l_@@_tmp_box { { } #3 }
+    \@@_print_format_auxxii:w #2 \q_mark #4 \q_stop
+  }
+%    \end{macrocode}
+%   Back together to put the uncertainty part onto the main value, then
+%   move on to the exponent.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_format_auxxii:w
+  #1 \q_mark #2 \q_stop
+  {
     \@@_print_format_after:N \l_@@_align_uncertainty_bool
-    \@@_print_format_auxvii:w #4 \q_mark #8 \q_stop
+    \@@_print_format_auxxiii:w #1 \q_mark #2 \q_stop
   }
 %    \end{macrocode}
 %   Finally, we get to the exponent part: the multiplication symbol is
@@ -1472,7 +1557,7 @@
 %   be entirely empty, there needs to be a bit of work to ensure alignment
 %   is retained in all cases.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_print_format_auxvii:w
+\cs_new_protected:Npn \@@_print_format_auxxiii:w
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   {
     \tl_if_blank:nF {#2}
