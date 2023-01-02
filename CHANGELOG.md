@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.0] - 2023-01-02
+
 ## Added
 - Option `exponent-thresholds` and option setting `exponent-mode = threshold`
   to allow selective use of exponent mode output (see issue
@@ -1854,7 +1856,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.1.11...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.0...HEAD
+[v3.2.0]: https://github.com/josephwright/siunitx/compare/v3.1.11...v3.2.0
 [v3.1.11]: https://github.com/josephwright/siunitx/compare/v3.1.10...v3.1.11
 [v3.1.10]: https://github.com/josephwright/siunitx/compare/v3.1.9...v3.1.10
 [v3.1.9]: https://github.com/josephwright/siunitx/compare/v3.1.8...v3.1.9
