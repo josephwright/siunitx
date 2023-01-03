@@ -7,7 +7,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v3.2.0] - 2023-01-02
+## [v3.2.0] - 2023-01-03
 
 ## Added
 - Option `exponent-thresholds` and option setting `exponent-mode = threshold`
