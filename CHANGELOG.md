@@ -24,6 +24,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Extend alignment of uncertainties in tabulars to include decimal marker
   (see issue [\#370](https://github.com/josephwright/siunitx/issues/370))
+- Require `expl3` 2022-11-09 or later
 
 ## [v3.1.11] - 2022-12-05
 

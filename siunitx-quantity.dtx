@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-quantity.dtx Copyright (C) 2018-2022 Joseph Wright
+% File: siunitx-quantity.dtx Copyright (C) 2018-2023 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -419,36 +419,11 @@
 % \subsection{Adjustments to units}
 %
 % \begin{macro}{\@@_non_latin:n}
-% \begin{macro}{\@@_non_latin:nnnn}
-%   As in \pkg{siunitx-unit}, but internal in both cases as it's rather
-%   specialised.
+%   A shortcut.
 %    \begin{macrocode}
-\bool_lazy_or:nnTF
-  { \sys_if_engine_luatex_p: }
-  { \sys_if_engine_xetex_p: }
-  {
-    \cs_new:Npn \@@_non_latin:n #1
-      {
-        \exp_after:wN \exp_after:wN \exp_after:wN
-          \exp_not:N \char_generate:nn {#1} { \char_value_catcode:n {#1} }
-      }
-  }
-  {
-    \cs_new:Npn \@@_non_latin:n #1
-      {
-        \exp_last_unbraced:Nf \@@_non_latin:nnnn
-          { \char_to_utfviii_bytes:n {#1} }
-      }
-    \cs_new:Npn \@@_non_latin:nnnn #1#2#3#4
-      {
-        \exp_after:wN \exp_after:wN \exp_after:wN
-          \exp_not:N \char_generate:nn {#1} { 13 }
-        \exp_after:wN \exp_after:wN \exp_after:wN
-          \exp_not:N \char_generate:nn {#2} { 13 }
-      }
-  }
+\cs_new:Npn \@@_non_latin:n #1
+  { \codepoint_generate:nn {#1} { \char_value_catcode:n {#1} } }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\arcminute, \arcsecond, \degree}
