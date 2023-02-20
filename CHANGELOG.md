@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Extend list of math mode symbols replaced in text mode (see issue
+  [\#640](https://github.com/josephwright/siunitx/issues/640))
+
 ## [v3.2.0] - 2023-01-03
 
 ## Added
