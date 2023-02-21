@@ -11,6 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Extend list of math mode symbols replaced in text mode (see issue
   [\#640](https://github.com/josephwright/siunitx/issues/640))
+- Handling of uncertainty if larger than main value when rounding (see issue
+  [\#641](https://github.com/josephwright/siunitx/issues/641))
 
 ## [v3.2.0] - 2023-01-03
 
