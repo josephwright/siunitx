@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.1] - 2023-02-21
+
 ### Fixed
 
 - Extend list of math mode symbols replaced in text mode (see issue
@@ -1864,7 +1866,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.1...HEAD
+[v3.2.1]: https://github.com/josephwright/siunitx/compare/v3.2.0...v3.2.1
 [v3.2.0]: https://github.com/josephwright/siunitx/compare/v3.1.11...v3.2.0
 [v3.1.11]: https://github.com/josephwright/siunitx/compare/v3.1.10...v3.1.11
 [v3.1.10]: https://github.com/josephwright/siunitx/compare/v3.1.9...v3.1.10
