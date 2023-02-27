@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Value of uncertainty around decimal marker when rounding
+  to `10` (see issue
+  [\#644](https://github.com/josephwright/siunitx/issues/644))
+
 ## [v3.2.1] - 2023-02-21
 
 ### Fixed
