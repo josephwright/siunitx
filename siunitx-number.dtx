@@ -3168,11 +3168,11 @@
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_uncertainty_simple:nnnnnn ,
-%     \@@_round_uncertainty_shift:nnnnnn
+%     \@@_round_uncertainty_extra:nnnnnn
 %   }
-% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nn}
-% \begin{macro}[EXP]{\@@_round_uncertainty_shift:nnnw}
-% \begin{macro}[EXP]{\@@_round_uncertainty_shift_aux:nnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_extra:nn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_extra:nnnw}
+% \begin{macro}[EXP]{\@@_round_uncertainty_extra_aux:nnnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_uncertainty_engineering:nnn ,
@@ -3262,7 +3262,7 @@
           }
           {#3} {#4} {#2} {#5}
       }
-      { \@@_round_uncertainty_shift:nnnnn {#3} {#4} {#1} {#2} {#5} }
+      { \@@_round_uncertainty_extra:nnnnn {#3} {#4} {#1} {#2} {#5} }
 
   }
 %    \end{macrocode}
@@ -3277,9 +3277,9 @@
   }
 %    \end{macrocode}
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty_shift:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty_extra:nnnnn #1#2#3#4#5
   {
-    \exp_args:Ne \@@_round_uncertainty_shift:nn
+    \exp_args:Ne \@@_round_uncertainty_extra:nn
       { \@@_round:fnn { \int_eval:n { #5 + 1 } } {#1} {#2} }
       {#5}
   }
@@ -3292,9 +3292,9 @@
 %   there we are looking for cases where the threshold will have forced
 %   scientific presentation.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty_shift:nn #1#2
-  { \@@_round_uncertainty_shift:nnnw #1 {#2} }
-\cs_new:Npn \@@_round_uncertainty_shift:nnnw
+\cs_new:Npn \@@_round_uncertainty_extra:nn #1#2
+  { \@@_round_uncertainty_extra:nnnw #1 {#2} }
+\cs_new:Npn \@@_round_uncertainty_extra:nnnw
   #1#2#3 #4 \@@_round_uncertainty_end:nn #5#6
   {
     #4
@@ -3324,7 +3324,7 @@
           { \str_if_eq_p:nn { #1.#2 } { 10. } }
       }
       {
-        \exp_args:Nf \@@_round_uncertainty_shift_aux:nnnnn
+        \exp_args:Nf \@@_round_uncertainty_extra_aux:nnnnn
           {
             \prg_replicate:nn
               {
@@ -3343,7 +3343,7 @@
       }
          {#5} {#6}
   }
-\cs_new:Npn \@@_round_uncertainty_shift_aux:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty_extra_aux:nnnnn #1#2#3#4#5
   {
     \use:c
       { @@_round_ \l_@@_exponent_mode_tl :nn }
