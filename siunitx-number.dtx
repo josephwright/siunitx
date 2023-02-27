@@ -3165,11 +3165,8 @@
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnn}
-% \begin{macro}[EXP]
-%   {
-%     \@@_round_uncertainty_simple:nnnnnn ,
-%     \@@_round_uncertainty_extra:nnnnnn
-%   }
+% \begin{macro}[EXP]{\@@_round_uncertainty_simple:nnnnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty_extra:nnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_extra:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_extra:nnnw}
 % \begin{macro}[EXP]{\@@_round_uncertainty_extra_aux:nnnnn}
@@ -3260,9 +3257,9 @@
               }
               { 0 }
           }
-          {#3} {#4} {#2} {#5}
       }
-      { \@@_round_uncertainty_extra:nnnnn {#3} {#4} {#1} {#2} {#5} }
+      { \@@_round_uncertainty_extra:nnnn }
+        {#3} {#4} {#2} {#5}
 
   }
 %    \end{macrocode}
@@ -3280,11 +3277,11 @@
 %   \texttt{10\dots}. We know what the uncertainty will be, so it's not passed
 %   through here but can be re-created later.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_uncertainty_extra:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_round_uncertainty_extra:nnnn #1#2#3#4
   {
     \exp_args:Ne \@@_round_uncertainty_extra:nn
-      { \@@_round:fnn { \int_eval:n { #5 + 1 } } {#1} {#2} }
-      {#5}
+      { \@@_round:fnn { \int_eval:n { #4 + 1 } } {#1} {#2} }
+      {#4}
   }
 %    \end{macrocode}
 %   If the padding length is the same as the number of integer digits, then
@@ -3409,6 +3406,7 @@
         {#1} {#2} {#3}
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
