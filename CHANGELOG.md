@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.2] - 2023-03-04
+
 ### Fixed
 - Value of uncertainty around decimal marker when rounding
   to `10` (see issues
@@ -1874,7 +1876,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.1...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.2...HEAD
+[v3.2.2]: https://github.com/josephwright/siunitx/compare/v3.2.1...v3.2.2
 [v3.2.1]: https://github.com/josephwright/siunitx/compare/v3.2.0...v3.2.1
 [v3.2.0]: https://github.com/josephwright/siunitx/compare/v3.1.11...v3.2.0
 [v3.1.11]: https://github.com/josephwright/siunitx/compare/v3.1.10...v3.1.11
