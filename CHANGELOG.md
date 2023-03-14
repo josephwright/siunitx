@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.3] - 2023-03-14
+
 ### Fixed
 - Allow for `parse-nmumbers = false` in handling `\ang` (see issues
   [\#649](https://github.com/josephwright/siunitx/issues/649))
@@ -1880,7 +1882,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.2...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.3...HEAD
+[v3.2.3]: https://github.com/josephwright/siunitx/compare/v3.2.2...v3.2.3
 [v3.2.2]: https://github.com/josephwright/siunitx/compare/v3.2.1...v3.2.2
 [v3.2.1]: https://github.com/josephwright/siunitx/compare/v3.2.0...v3.2.1
 [v3.2.0]: https://github.com/josephwright/siunitx/compare/v3.1.11...v3.2.0
