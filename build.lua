@@ -45,6 +45,9 @@ installfiles = {"*.cfg", "*.sty"}
 -- ASCII mangling is not useful for us
 asciiengines = { }
 
+-- Avoid line-wrap issues
+maxprintline = 9999
+
 -- Detail how to set the version automatically
 function update_tag(file,content,tagname,tagdate)
   tagname = string.gsub(tagname, "^v", "")
