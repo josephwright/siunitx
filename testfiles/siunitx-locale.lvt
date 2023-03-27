@@ -10,7 +10,18 @@
 
 \usepackage{siunitx}
 
-\usepackage[portuguese,brazilian,catalan,english,french,german,polish,spanish]{babel}
+\usepackage
+  [
+    brazilian,
+    catalan,
+    english,
+    french,
+    german,
+    portuguese,
+    polish,
+    spanish
+  ]
+  {babel}
 
 \ExplSyntaxOn
 
@@ -51,8 +62,14 @@
   {
     \clist_map_function:nN
       {
-        portuguese , brazilian , catalan , english , french , german ,
-        polish , spanish
+        brazilian ,
+        catalan   ,
+        english   ,
+        french    ,
+        german    ,
+        portuguese,
+        polish    ,
+        spanish
       }
       \test:n
   }
@@ -60,18 +77,11 @@
 \TEST { Option~setting~"locale" }
   {
     \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = DE }
-    \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = PL }
-    \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = FR }
-    \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = UK }
-    \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = US }
-    \test:nn { 1.23e4 } { \metre\per\second }
-    \keys_set:nn { siunitx } { locale = ZA }
-    \test:nn { 1.23e4 } { \metre\per\second }
+    \clist_map_inline:nn { DE , FR , PL , UK , US , ZA }
+      {
+        \keys_set:nn { siunitx } { locale = #1 }
+        \test:nn { 1.23e4 } { \metre\per\second }
+      }
   }
 
 \END
