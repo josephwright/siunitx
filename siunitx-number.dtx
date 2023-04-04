@@ -683,6 +683,7 @@
 \cs_generate_variant:Nn \tl_if_blank:nTF { f }
 \cs_generate_variant:Nn \tl_if_blank_p:n { f }
 \cs_generate_variant:Nn \tl_if_in:NnTF { NV }
+\cs_generate_variant:Nn \tl_if_in:nnTF { nV }
 \cs_generate_variant:Nn \tl_remove_all:Nn { NV }
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NnV }
 %    \end{macrocode}
@@ -1695,9 +1696,14 @@
 % \begin{macro}{\@@_parse_uncert:N}
 % \begin{macro}{\@@_parse_uncert:NNN}
 % \begin{macro}{\@@_parse_uncert_auxi:N, \@@_parse_uncert_auxii:N}
-% \begin{macro} {\@@_parse_uncert_auxii:, \@@_parse_uncert_marker:}
-%  \begin{macro}{\@@_parse_uncert_extend:nnn}
-%  \begin{macro}{\@@_parse_uncert_after:N}
+% \begin{macro}{\@@_parse_uncert_auxii:}
+% \begin{macro}{\@@_parse_uncert_marker:}
+% \begin{macro}{\@@_parse_uncert_marker:nnn}
+% \begin{macro}{\@@_parse_uncert_marker:nnnw}
+% \begin{macro}{\@@_parse_uncert_marker:Nnnn}
+% \begin{macro}{\@@_parse_uncert_marker:w}
+% \begin{macro}{\@@_parse_uncert_marker:nnnnN}
+% \begin{macro}{\@@_parse_uncert_after:N}
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
 %   so we filter that out explicitly. After that, we check for digits,
@@ -1778,9 +1784,11 @@
 %   not too long, and extend the decimal if it is.
 %   Both of these require data from the collected partial number,
 %   so we extract that first. Checking the decimal part needs the length of the
-%   not-yet-collected uncertainty. Handily, we know that it should be a set of
-%   digits then a closing marker. So we can use that as a length: if it's
-%   too long we can stop.
+%   not-yet-collected uncertainty. There may be one or more parts to that, so
+%   we have to grab p to the \emph{first} closing token to count the length:
+%   just grabbing everything only works if there is only a single uncertainty.
+%   We take protective steps against an entirely-missing closing token so that
+%   there is not an uncontrolled error.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_marker:
   {
@@ -1792,29 +1800,61 @@
     \int_compare:nNnTF
       { \tl_count:N \l_@@_partial_tl } > { \tl_count:n {#2} }
       { \@@_parse_loop_break:w }
-      { \@@_parse_uncert_marker:nw {#3} }
+      { \@@_parse_uncert_marker:nnnw {#1} {#2} {#3} }
   }
-\cs_new_protected:Npn \@@_parse_uncert_marker:nw
-  #1#2 \q_recursion_tail \q_recursion_stop
+\cs_new_protected:Npn \@@_parse_uncert_marker:nnnw
+  #1#2#3#4 \q_recursion_tail \q_recursion_stop
   {
-    \int_compare:nNnTF
-      { \tl_count:n {#2} - 1 } = { \tl_count:n {#1} }
+    \tl_if_in:nVTF {#4} \l_@@_input_uncert_close_tl
       {
-        \str_if_eq:eeTF
-          { \exp_not:V \l_@@_uncert_tl }
-          { \prg_replicate:nn { \tl_count:N \l_@@_partial_tl } { 0 } }
-          { \@@_parse_uncert:NNN \c_false_bool }
-          { \@@_parse_uncert:NNN \c_true_bool }
-            \@@_parse_uncert_auxii:N
+        \exp_after:wN \@@_parse_uncert_marker:Nnnn
+          \l_@@_input_uncert_close_tl
+          {#1} {#2} {#3}
       }
-      { \exp_after:wN \@@_parse_uncert_extend:nnn \l_@@_parsed_tl }
-    #2 \q_recursion_tail \q_recursion_stop
+      { \@@_parse_loop_break:w }
+    #4 \q_recursion_tail \q_recursion_stop
   }
-\cs_new_protected:Npn \@@_parse_uncert_extend:nnn #1#2#3
+\cs_new_protected:Npn \@@_parse_uncert_marker:Nnnn
+  #1#2#3#4
   {
-    \tl_set:Nn \l_@@_parsed_tl { {#1} {#2} { #3 0 } }
-    \@@_parse_uncert:NNN \c_true_bool
-      \@@_parse_uncert_auxii:N
+    \cs_set_protected:Npn \@@_parse_uncert_marker:w ##1 #1
+     { \@@_parse_uncert_marker:nnnnN {#2} {#3} {#4} {##1} #1 }
+    \@@_parse_uncert_marker:w
+  }
+\cs_new_protected:Npn \@@_parse_uncert_marker:w { }
+%    \end{macrocode}
+%   With the separated out main part and the current uncertainty part
+%   available, we can pad the main part if required then restart the
+%   collection of the uncertainty having thrown away the decimal marker
+%   and with the lengths lined up.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_marker:nnnnN #1#2#3#4#5
+  {
+    \tl_set:Nx \l_@@_parsed_tl
+      {
+         {#1}
+         {#2}
+         {
+           #3
+           \prg_replicate:nn
+             {
+               \int_max:nn
+                 { 0 }
+                 { \tl_count:n {#4} - \tl_count:n {#3} }
+             }
+             { 0 }
+         }
+      }
+    \tl_if_empty:NTF \l_@@_partial_tl
+      {
+        \@@_parse_uncert:NNN \c_false_bool
+          \@@_parse_uncert_auxii:N
+      }
+      {
+        \@@_parse_uncert:NNN \c_true_bool
+          \@@_parse_uncert_auxii:N
+      }
+        #4#5
   }
 %    \end{macrocode}
 %   At the end of collection, we can either start another one or be done:
@@ -1854,6 +1894,11 @@
       { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
