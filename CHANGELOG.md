@@ -9,10 +9,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v3.2.4] - 2023-04-04
 
-
 ### Fixed
 - Parsing of 'full' uncertainty parts with leading zeros (see issues
   [\#652](https://github.com/josephwright/siunitx/issues/652))
+
 ## [v3.2.3] - 2023-03-14
 
 ### Fixed
