@@ -2975,14 +2975,18 @@
   }
 %    \end{macrocode}
 %
-% Cover the case where the default font is sanserif.
+% Cover the case where the default font is sanserif with \pkg{beamer}.
 %    \begin{macrocode}
 \AtBeginDocument
   {
-    \str_if_eq:eeT
-      { \exp_not:o { \familydefault } }
-      { \exp_not:n { \sfdefault } }
-      { \keys_set:nn { siunitx } { unit-font-command = \mathsf } }
+    \@ifclassloaded { beamer }
+      {
+        \str_if_eq:eeT
+          { \exp_not:o { \familydefault } }
+          { \exp_not:n { \sfdefault } }
+          { \keys_set:nn { siunitx } { unit-font-command = \mathsf } }
+      }
+      { }
   }
 %    \end{macrocode}
 %

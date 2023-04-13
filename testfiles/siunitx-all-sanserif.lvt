@@ -1,0 +1,38 @@
+\documentclass{article}
+
+\input{regression-test}
+
+\usepackage[enable-debug,check-declarations]{expl3}
+
+\ExplSyntaxOn
+\debug_on:n { deprecation }
+\ExplSyntaxOff
+
+\usepackage{siunitx}
+
+\ExplSyntaxOn
+
+\OMIT
+\cs_set_protected:Npn \test #1
+  {
+    \hbox_set:Nn \l_tmpa_box {#1}
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\ExplSyntaxOff
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\begin{document}
+
+% Set up math fonts
+\savebox0{$ \mathrm { a } \mathsf { b } \mathtt{ c } \mathbf { d } $}
+
+\START
+
+\test{\qty{5}{\kilo\volt}}
+
+\test{$\qty{5}{\kilo\volt}$}
+
+\END
