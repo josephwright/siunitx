@@ -22,7 +22,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.2.3] - 2023-03-14
 
 ### Fixed
-- Allow for `parse-nmumbers = false` in handling `\ang` (see issues
+- Allow for `parse-numbers = false` in handling `\ang` (see issues
   [\#649](https://github.com/josephwright/siunitx/issues/649))
 
 ## [v3.2.2] - 2023-03-04
