@@ -1174,7 +1174,7 @@
 %     \@@_print_format_auxxii:w  ,
 %     \@@_print_format_auxxiii:w
 %   }
-% \begin{macro}{\@@_print_format_box:Nn}
+% \begin{macro}{\@@_print_format_box:Nn, \@@_print_format_box:No}
 % \begin{macro}{\@@_print_format_after:N}
 % \begin{macro}{\@@_print_none:nnn}
 %    \begin{macrocode}
@@ -1425,19 +1425,20 @@
         \@@_fil:
         \hbox_unpack:N \l_@@_before_box
       }
-    \@@_print_format_auxiii:w #3 \q_mark #6 \q_stop
+    \@@_print_format_auxiii:w ? #3 \q_mark ? #6 \q_stop
   }
 %    \end{macrocode}
 %   We now deal with the decimal part: there is nothing already in the
 %   |decimal| box, so the basics are easy. We need to \enquote{carry forward}
 %   any white space, as where it gets inserted depends on the options for
-%   subsequent parts.
+%   subsequent parts. The \cs{use_none:n} here remove the two |?| above:
+%   those are added to preserve braces around the decimal marker.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format_auxiii:w
   #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
-    \@@_print_format_box:Nn \l_@@_decimal_box {#4#5}
+    \@@_print_format_box:No \l_@@_tmp_box { \use_none:n #1#2 }
+    \@@_print_format_box:No \l_@@_decimal_box { \use_none:n #4#5 }
     \dim_set:Nn \l_@@_carry_dim
       {
           \box_wd:N \l_@@_tmp_box
@@ -1590,6 +1591,7 @@
           { \siunitx_print_number:n {#2} }
       }
   }
+\cs_generate_variant:Nn \@@_print_format_box:Nn { No }
 %    \end{macrocode}
 %   A common routine for placing material after the decimal marker and
 %   \enquote{shuffling}.

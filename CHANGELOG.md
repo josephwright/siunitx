@@ -7,6 +7,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Support bracing of decimal marker in tables as an alternative
+  to `\mathord` (see issue
+  [\#527](https://github.com/josephwright/siunitx/issues/527))
+
 ## [v3.2.9] - 2023-07-26
 
 ### Fixed
