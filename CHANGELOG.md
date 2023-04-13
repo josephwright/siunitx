@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.5] - 2023-04-13
+
 ### Fixed
 - Use of `\mathsf` for sanserif text documents (see issues
   [\#655](https://github.com/josephwright/siunitx/issues/655))
@@ -1892,7 +1894,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.5...HEAD
+[v3.2.5]: https://github.com/josephwright/siunitx/compare/v3.2.4...v3.2.5
 [v3.2.4]: https://github.com/josephwright/siunitx/compare/v3.2.3...v3.2.4
 [v3.2.3]: https://github.com/josephwright/siunitx/compare/v3.2.2...v3.2.3
 [v3.2.2]: https://github.com/josephwright/siunitx/compare/v3.2.1...v3.2.2
