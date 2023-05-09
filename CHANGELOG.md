@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Printing of symbols explicitly wrapped in `\ensuremath`
+  (see issue
+  [\#656](https://github.com/josephwright/siunitx/issues/656))
+
 ## [v3.2.5] - 2023-04-13
 
 ### Fixed
