@@ -650,7 +650,9 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_polar:nn #1#2
   {
-    \siunitx_number_parse:nN {#1} \l_@@_mag_tl
+    \bool_if:NTF \l_siunitx_number_parse_bool
+      { \siunitx_number_parse:nN {#1} \l_@@_mag_tl }
+      { \tl_set:Nn \l_@@_mag_tl { \ensuremath {#1} } }
     \group_begin:
       \keys_set:nn { siunitx }
         {
@@ -1027,14 +1029,23 @@
 \cs_new_protected:Npn \@@_format_polar:n #1
   {
     \tl_if_blank:nTF {#1}
-      { \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl }
       {
-        \use:c
-          { @@_format_polar_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
+        \bool_if:NT \l_siunitx_number_parse_bool
+          { \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl }
+      }
+      {
+        \bool_if:NTF \l_siunitx_number_parse_bool
+          {
+            \use:c
+              { @@_format_polar_ \l_siunitx_quantity_prefix_mode_tl :n } {#1}
+          }
+          { \@@_format_polar_input:n {#1} }
       }
     \tl_set:Nx \l_@@_tmp_tl
       {
-        \siunitx_number_output:N \l_@@_mag_tl
+        \bool_if:NTF \l_siunitx_number_parse_bool
+          { \siunitx_number_output:N \l_@@_mag_tl }
+          { \exp_not:V \l_@@_mag_tl }
         \exp_not:V \l_@@_symbol_angle_tl
         \mathord % TEMP
         \exp_not:V \l_@@_angle_tl
@@ -1066,7 +1077,8 @@
   }
 \cs_new_protected:Npn \@@_format_polar_input:n #1
   {
-    \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl
+    \bool_if:NT \l_siunitx_number_parse_bool
+      { \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl }
     \siunitx_unit_format:nN {#1} \l_@@_unit_tl
   }
 %    \end{macrocode}

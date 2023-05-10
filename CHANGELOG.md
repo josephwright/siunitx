@@ -11,6 +11,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Printing of symbols explicitly wrapped in `\ensuremath`
   (see issue
   [\#656](https://github.com/josephwright/siunitx/issues/656))
+- Printing of magnitudes for polar values when not parsing numbers
+  (see issue
+  [\#658](https://github.com/josephwright/siunitx/issues/658))
 
 ## [v3.2.5] - 2023-04-13
 
