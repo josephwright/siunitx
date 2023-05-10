@@ -223,4 +223,31 @@
     \test:n { 0,00540 + j0,01717 }
   }
 
+\OMIT
+\cs_set_protected:Npn \test:n #1
+  {
+    \hbox_set:Nn \l_tmpa_box {#1}
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Option~settings~"complex-mode"~and~"parse-numbers" }
+  {
+    \keys_set:nn { siunitx } { parse-numbers = false }
+    \test:n { \siunitx_complex_number:n { 1 + i } }
+    \test:n { \siunitx_complex_number:nn { 1 } { 30 } }
+    \test:n { \siunitx_complex_quantity:nn { 1 + i } { \metre } }
+    \test:n { \siunitx_complex_quantity:nnn { 1 } { 30 } { \metre } }
+    \keys_set:nn { siunitx } { complex-mode = cartesian }
+    \test:n { \siunitx_complex_number:n { 1 + i } }
+    \test:n { \siunitx_complex_number:nn { 1 } { 30 } }
+    \test:n { \siunitx_complex_quantity:nn { 1 + i } { \metre } }
+    \test:n { \siunitx_complex_quantity:nnn { 1 } { 30 } { \metre } }
+    \keys_set:nn { siunitx } { complex-mode = polar }
+    \test:n { \siunitx_complex_number:n { 1 + i } }
+    \test:n { \siunitx_complex_number:nn { 1 } { 30 } }
+    \test:n { \siunitx_complex_quantity:nn { 1 + i } { \metre } }
+    \test:n { \siunitx_complex_quantity:nnn { 1 } { 30 } { \metre } }
+  }
+
 \END

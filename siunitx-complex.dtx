@@ -693,7 +693,9 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_complex_number:n #1
   {
-    \bool_if:NTF \l_@@_force_polar_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_force_polar_bool }
+      { \l_siunitx_number_parse_bool }
       {
         \use:e
           {
@@ -726,7 +728,9 @@
   }
 \cs_new_protected:Npn \@@_number:nn #1#2
   {
-    \bool_if:NTF \l_@@_force_cartesian_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_force_cartesian_bool }
+      { \l_siunitx_number_parse_bool }
       {
         \exp_args:Ne \siunitx_complex_number:n
           { \@@_convert_cartesian:nn {#1} {#2} }
@@ -738,7 +742,9 @@
   }
 \cs_new_protected:Npn \siunitx_complex_quantity:nn #1#2
   {
-    \bool_if:NTF \l_@@_force_polar_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_force_polar_bool }
+      { \l_siunitx_number_parse_bool }
       {
         \use:e
           {
@@ -769,7 +775,9 @@
   }
 \cs_new_protected:Npn \@@_quantity:nnn #1#2#3
   {
-    \bool_if:NTF \l_@@_force_cartesian_bool
+    \bool_lazy_and:nnTF
+      { \l_@@_force_cartesian_bool }
+      { \l_siunitx_number_parse_bool }
       {
         \exp_args:Ne \siunitx_complex_quantity:nn
           { \@@_convert_cartesian:nn {#1} {#2} }
