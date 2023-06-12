@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.6] - 2023-06-12
+
 ### Fixed
 - Printing of symbols explicitly wrapped in `\ensuremath`
   (see issue
@@ -1905,7 +1907,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.6...HEAD
+[v3.2.6]: https://github.com/josephwright/siunitx/compare/v3.2.5...v3.2.6
 [v3.2.5]: https://github.com/josephwright/siunitx/compare/v3.2.4...v3.2.5
 [v3.2.4]: https://github.com/josephwright/siunitx/compare/v3.2.3...v3.2.4
 [v3.2.3]: https://github.com/josephwright/siunitx/compare/v3.2.2...v3.2.3
