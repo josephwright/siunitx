@@ -221,6 +221,7 @@
 % \begin{macro}{\@@_parsed_combine-exponent:n, \@@_parsed_combine-exponent:n, \@@_parsed_input:n}
 % \begin{macro}{\@@_parsed_aux:w}
 % \begin{macro}{\@@_parsed_aux:nnnw}
+% \begin{macro}{\@@_parsed_aux:nnnnw}
 % \begin{macro}{\@@_parsed_aux:nnnn}
 % \begin{macro}{\@@_parsed_aux:nnn}
 %   For quantities, there is bit to do to combine things. The first question is
@@ -298,34 +299,36 @@
   #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil
   #8 \q_nil #9 \q_stop
   { \@@_parsed_aux:nnnw {#1} {#2#3#4#5} {#6#7#8} #9 \q_stop }
-\cs_new_protected:Npn \@@_parsed_aux:nnnw
-  #1#2#3 #4 \q_nil #5 \q_nil #6 \q_stop
-  { \@@_parsed_aux:nnnn {#1} {#2} {#3#4} {#5#6} }
+\cs_new_protected:Npn \@@_parsed_aux:nnnw #1#2#3 #4 \q_nil
+  { \@@_parsed_aux:nnnnw {#1} {#2} {#3} {#4} ? }
+\cs_new_protected:Npn \@@_parsed_aux:nnnnw
+  #1#2#3#4 #5 \q_nil #6 \q_stop
+  { \exp_args:No \@@_parsed_aux:nnnn { \use_none:n #5#6 } {#1} {#2} {#3#4} }
 \cs_new_protected:Npn \@@_parsed_aux:nnnn #1#2#3#4
   {
-    \tl_if_blank:nTF {#3}
-      { \siunitx_quantity_print:nV {#1#2#4} \l_@@_unit_tl }
+    \tl_if_blank:nTF {#4}
+      { \siunitx_quantity_print:nV {#2#3#1} \l_@@_unit_tl }
       {
         \bool_if:NTF \l_@@_uncert_bracket_bool
           {
             \siunitx_quantity_print:xV
               {
-                \exp_not:n {#1}
+                \exp_not:n {#2}
                 \exp_not:V \l_@@_bracket_open_tl
-                \exp_not:n {#2#3}
+                \exp_not:n {#3#4}
                 \exp_not:V \l_@@_bracket_close_tl
-                \exp_not:n {#4}
+                \exp_not:n {#1}
               }
             \l_@@_unit_tl
           }
           {
             \bool_if:NTF \l_@@_uncert_repeat_bool
               {
-                \tl_if_blank:nTF {#4}
-                  { \@@_parsed_aux:nnn {#1#2} {#3} { } }
-                  { \@@_parsed_aux:nnn {#1#2} {#3} { { } #4 } }
+                \tl_if_blank:nTF {#1}
+                  { \@@_parsed_aux:nnn {#2#3} {#4} { } }
+                  { \@@_parsed_aux:nnn {#2#3} {#4} { { } #1 } }
               }
-              { \siunitx_quantity_print:nV {#1#2#3#4} \l_@@_unit_tl }
+              { \siunitx_quantity_print:nV {#2#3#4#1} \l_@@_unit_tl }
           }
       }
   }
@@ -342,6 +345,7 @@
       { \siunitx_quantity_print:nV { { } #2#3 } \l_@@_unit_tl }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
