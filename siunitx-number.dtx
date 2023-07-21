@@ -2628,15 +2628,16 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round:nnn, \@@_round:fnn}
+% \begin{macro}[EXP]{\@@_round:nnnn}
 % \begin{macro}[EXP]
 %   {
-%     \@@_round_auxi:nnnN  ,
-%     \@@_round_auxii:nnnN ,
-%     \@@_round_auxiii:nnnN
+%     \@@_round_auxi:nnnnN   ,
+%     \@@_round_auxii:nnnnN  ,
+%     \@@_round_auxiii:nnnnN ,
+%     \@@_round_auxiv:nnnnN
 %   }
-%  \begin{macro}[EXP]{\@@_round_auxiv:nnN, \@@_round_auxv:nnN}
-%  \begin{macro}[EXP]{\@@_round_auxvi:nN}
-%  \begin{macro}[EXP]{\@@_round_auxvii:nnTF}
+%  \begin{macro}[EXP]{\@@_round_auxv:nnnN, \@@_round_auxvi:nnnN}
+%  \begin{macro}[EXP]{\@@_round_auxvii:nnnTF}
 %  \begin{macro}[EXP]{\@@_round_auxviii:nnN, \@@_round_auxix:nnN}
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
 %  \begin{macro}[EXP]{\@@_round_final_signicant:n}
@@ -2665,34 +2666,39 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round:nnn #1#2#3
   {
-    \@@_round_auxi:nnnN {#1} {#2} { }
-      #3 \q_recursion_tail \q_recursion_stop
+    \exp_args:NV \@@_round:nnnn \l_@@_round_dir_tl
+      {#1} {#2} {#3}
   }
 \cs_generate_variant:Nn \@@_round:nnn { f }
-\cs_new:Npn \@@_round_auxi:nnnN #1#2#3#4
+\cs_new:Npn \@@_round:nnnn #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #4
+    \@@_round_auxi:nnnnN {#1} {#2} {#3} { }
+      #4 \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \@@_round_auxi:nnnnN #1#2#3#4#5
+  {
+    \quark_if_recursion_tail_stop_do:Nn #5
       {
-        \@@_round_auxii:nnnN {#1} {#3} { } #2
+        \@@_round_auxii:nnnnN {#1} {#2} {#4} { } #3
           \q_recursion_tail \q_recursion_stop
       }
-    \@@_round_auxi:nnnN {#1} {#2} {#4#3}
+    \@@_round_auxi:nnnnN {#1} {#2} {#3} {#5#4}
   }
-\cs_new:Npn \@@_round_auxii:nnnN #1#2#3#4
+\cs_new:Npn \@@_round_auxii:nnnnN #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop_do:Nn #4
+    \quark_if_recursion_tail_stop_do:Nn #5
       {
-        \tl_if_blank:nTF {#2}
+        \tl_if_blank:nTF {#3}
           {
-            \@@_round_auxiv:nnnN {#1} { } { } #3
+            \@@_round_auxiv:nnnnN {#2} {#1} { } { } #4
               \q_recursion_tail \q_recursion_stop
           }
           {
-            \@@_round_auxiii:nnnN {#1} {#3} { } #2
+            \@@_round_auxiii:nnnnN {#2} {#1} {#4} { } #3
               \q_recursion_tail \q_recursion_stop
           }
       }
-    \@@_round_auxii:nnnN {#1} {#2} {#4#3}
+    \@@_round_auxii:nnnnN {#1} {#2} {#3} {#5#4}
   }
 %    \end{macrocode}
 %   We now have the input reversed plus how many digits we need to discard
@@ -2705,63 +2711,63 @@
 %   of the integer: that may product a value of $1\dots$: we tidy up the
 %   case where it comes out as $0$ later.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_auxiii:nnnN #1#2#3#4
+\cs_new:Npn \@@_round_auxiii:nnnnN #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop_do:Nn #4
+    \quark_if_recursion_tail_stop_do:Nn #5
       {
-        \@@_round_auxiv:nnnN {#1} { } {#3} #2
+        \@@_round_auxiv:nnnnN {#1} {#2} { } {#4} #3
           \q_recursion_tail \q_recursion_stop
       }
     \int_compare:nNnTF {#1} > 0
       {
-        \exp_args:Nf \@@_round_auxiii:nnnN
-          { \int_eval:n { #1 - 1 } } {#2} { #4#3 }
+        \exp_args:Nf \@@_round_auxiii:nnnnN
+          { \int_eval:n { #1 - 1 } } {#2} {#3} { #5#4 }
       }
-      { \@@_round_auxv:nnN {#3} {#2} #4 }
+      { \@@_round_auxv:nnnN {#2} {#4} {#3} #5 }
   }
-\cs_new:Npn \@@_round_auxiv:nnnN #1#2#3#4
+\cs_new:Npn \@@_round_auxiv:nnnnN #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop_do:Nn #4
+    \quark_if_recursion_tail_stop_do:Nn #5
       {
         \int_compare:nNnTF {#1} = 0
           {
-            \@@_round_auxvi:nnN {#3} {#2}
+            \@@_round_auxvi:nnnN {#2} {#4} {#3}
               0 \q_recursion_tail \q_recursion_stop
           }
           { { 0 } { } }
       }
     \int_compare:nNnTF {#1} > 0
       {
-        \exp_args:Nf \@@_round_auxiv:nnnN
-          { \int_eval:n { #1 - 1 } } { #2 0 } { #4#3 }
+        \exp_args:Nf \@@_round_auxiv:nnnnN
+          { \int_eval:n { #1 - 1 } } {#2} { #3 0 } { #5#4 }
       }
-      { \@@_round_auxvi:nnN {#3} {#2} #4 }
+      { \@@_round_auxvi:nnnN {#2} {#4} {#3} #5 }
   }
 %    \end{macrocode}
 %   We now have the discarded digits, the matching filler and the
 %   next digit. So we can make the decision on rounding: that
 %   is handled by a common auxiliary.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_auxv:nnN #1#2#3
+\cs_new:Npn \@@_round_auxv:nnnN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #3
+    \quark_if_recursion_tail_stop_do:Nn #4
       {
-        \@@_round_auxvi:nnN
-          {#1} { } #2 \q_recursion_tail \q_recursion_stop
+        \@@_round_auxvi:nnnN
+          {#1} {#2} { } #3 \q_recursion_tail \q_recursion_stop
       }
-    \@@_round_auxvii:nnTF {#1} {#3}
+    \@@_round_auxvii:nnnTF {#1} {#2} {#4}
       { \@@_round_final_decimal:nnw }
       { \@@_round_auxviii:nnN }
-        {#2} { } #3
+        {#3} { } #4
   }
-\cs_new:Npn \@@_round_auxvi:nnN #1#2#3
+\cs_new:Npn \@@_round_auxvi:nnnN #1#2#3#4
   {
-    \quark_if_recursion_tail_stop_do:Nn #3
+    \quark_if_recursion_tail_stop_do:Nn #4
       { { 0 } { } }
-    \@@_round_auxvii:nnTF {#1} {#3}
+    \@@_round_auxvii:nnnTF {#1} {#2} {#4}
       { \@@_round_final_integer:nnw }
       { \@@_round_auxix:nnN }
-        { } {#2} #3
+        { } {#3} #4
   }
 %    \end{macrocode}
 %   For rounding up or down, the decision here is easy: pick the appropriate
@@ -2769,22 +2775,22 @@
 %   it can only apply at this stage, when the \emph{discarded} value can
 %   be exactly half.
 %    \begin{macrocode}
-\cs_new:Npn \@@_round_auxvii:nnTF #1#2
+\cs_new:Npn \@@_round_auxvii:nnnTF #1#2#3
   {
-    \str_case:VnF \l_@@_round_dir_tl
+    \str_case:nnF {#1}
       {
         { down } { \use_i:nn }
         { up }   { \use_ii:nn }
       }
       {
         \bool_lazy_or:nnTF
-          { \int_compare_p:nNn { 0 \tl_head:n {#1} } < 5 }
+          { \int_compare_p:nNn { 0 \tl_head:n {#2} } < 5 }
           {
             \bool_lazy_all_p:n
               {
                 { \l_@@_round_half_even_bool }
-                { ! \int_if_odd_p:n {#2} }
-                { \@@_round_if_half_p:n {#1} }
+                { ! \int_if_odd_p:n {#3} }
+                { \@@_round_if_half_p:n {#2} }
               }
           }
       }
