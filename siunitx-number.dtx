@@ -648,6 +648,18 @@
 %   |full| style is used. The standard setting is |compact|.
 % \end{function}
 %
+% \begin{function}{uncertainty-round-direction}
+%   \begin{syntax}
+%     |uncertainty-round-direction| = |down|\verb"|"|nearest|\verb"|"|up|
+%   \end{syntax}
+%   Choice which determines how uncertainty values are rounded. The setting
+%   |up| means that the uncertainty is always rounded away from zero, whereas
+%   the setting |down| means that the uncertainty will be rounded toward zero.
+%   The setting |nearest| means that the uncertainty will be rounded to the
+%   nearest (either up or down), taking account of the setting of |round-half|.
+%   The standard setting is |nearest|
+% \end{function}
+%
 % \begin{function}{uncertainty-separator}
 %   \begin{syntax}
 %     |uncertainty-separator| = \meta{separator}
@@ -1934,7 +1946,8 @@
 %     \l_@@_round_mode_tl          ,
 %     \l_@@_round_pad_bool         ,
 %     \l_@@_round_precision_int    ,
-%     \l_@@_round_positive_bool
+%     \l_@@_round_positive_bool    ,
+%     \l_@@_round_uncert_dir_tl
 %   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -1974,12 +1987,16 @@
     round-precision .int_set:N =
       \l_@@_round_precision_int ,
     round-zero-positive .bool_set:N =
-      \l_@@_round_positive_bool
+      \l_@@_round_positive_bool ,
+    uncertainty-round-direction .choices:nn =
+      { down , nearest , up }
+      { \tl_set_eq:NN \l_@@_round_uncert_dir_tl \l_keys_choice_tl } ,
   }
 \bool_new:N \l_@@_round_half_even_bool
 \tl_new:N \l_@@_exponent_mode_tl
 \tl_new:N \l_@@_round_dir_tl
 \tl_new:N \l_@@_round_mode_tl
+\tl_new:N \l_@@_round_uncert_dir_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -2628,7 +2645,7 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round:nnn, \@@_round:fnn}
-% \begin{macro}[EXP]{\@@_round:nnnn}
+% \begin{macro}[EXP]{\@@_round:nnnn, \@@_round:Vnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_auxi:nnnnN   ,
@@ -2666,7 +2683,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round:nnn #1#2#3
   {
-    \exp_args:NV \@@_round:nnnn \l_@@_round_dir_tl
+    \@@_round:Vnnn \l_@@_round_dir_tl
       {#1} {#2} {#3}
   }
 \cs_generate_variant:Nn \@@_round:nnn { f }
@@ -2675,6 +2692,7 @@
     \@@_round_auxi:nnnnN {#1} {#2} {#3} { }
       #4 \q_recursion_tail \q_recursion_stop
   }
+\cs_generate_variant:Nn \@@_round:nnnn { V }
 \cs_new:Npn \@@_round_auxi:nnnnN #1#2#3#4#5
   {
     \quark_if_recursion_tail_stop_do:Nn #5
@@ -3307,8 +3325,9 @@
     \use:e
       {
         \exp_not:N \@@_round_uncertainty:nnnnnn
-          \@@_round:nnn {#1} { } {#4}
-          {#2} {#3} {#1} {#4}
+          \@@_round:Vnnn
+            \l_@@_round_uncert_dir_tl {#1} { } {#4}
+            {#2} {#3} {#1} {#4}
       }
   }
 %    \end{macrocode}
@@ -4679,6 +4698,7 @@
     uncertainty-descriptor-separator = \                                      ,
     uncertainty-descriptors          =                                        ,
     uncertainty-mode                 = compact                                ,
+    uncertainty-round-direction      = nearest                                ,
     uncertainty-separator            =                                        ,
     zero-decimal-as-symbol           = false                                  ,
     zero-symbol                      = \mbox { --- }

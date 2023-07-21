@@ -13,6 +13,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `round-direction` to allow 'truncation' of rounded
   values (see issue
   [\#664](https://github.com/josephwright/siunitx/issues/664))
+- Option `uncertainty-round-direction` (see issue
+  [\#628](https://github.com/josephwright/siunitx/issues/628))
 
 ### Changed
 
