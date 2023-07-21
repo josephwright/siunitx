@@ -1451,20 +1451,21 @@ way; the options are summarised in Table~\ref{tab:opt:num:post}.
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      drop-exponent            & Switch  & false \\
-      drop-uncertainty         & Switch  & false \\
-      drop-zero-decimal        & Switch  & false \\
-      exponent-mode            & Switch  & input \\
-      exponent-thresholds      & Literal & -3:3  \\
-      fixed-exponent           & Integer & 0     \\
-      minimum-integer-digits   & Integer & 0     \\
-      minimum-decimal-digits   & Integer & 0     \\
-      round-half               & Choice  & up    \\
-      round-minimum            & Literal & 0     \\
-      round-mode               & Choice  & none  \\
-      round-pad                & Switch  & true  \\
-      round-precision          & Integer & 2     \\
-      round-zero-positive      & Switch  & true  \\
+      drop-exponent          & Switch  & false   \\
+      drop-uncertainty       & Switch  & false   \\
+      drop-zero-decimal      & Switch  & false   \\
+      exponent-mode          & Switch  & input   \\
+      exponent-thresholds    & Literal & -3:3    \\
+      fixed-exponent         & Integer & 0       \\
+      minimum-integer-digits & Integer & 0       \\
+      minimum-decimal-digits & Integer & 0       \\
+      round-direction        & Choice  & nearest \\
+      round-half             & Choice  & up      \\
+      round-minimum          & Literal & 0       \\
+      round-mode             & Choice  & none    \\
+      round-pad              & Switch  & true    \\
+      round-precision        & Integer & 2       \\
+      round-zero-positive    & Switch  & true    \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1599,11 +1600,31 @@ is controlled by the switch \opt{round-pad}, which is \opt{true} as standard.
   \num[round-pad = false]{12.3}
 \end{LaTeXdemo}
 
+\DescribeOption{round-direction}
 \DescribeOption{round-half}
-In cases where the rounded part of a number is exactly half, there are two
-common methods for \enquote{breaking the tie}. The choice of method is
-determined by the option \opt{round-half}, which recognises the choices
-\opt{up} and \opt{even}.
+The detail of which approach to use for rounding may be adjusted using the
+options \opt{round-direction} and \opt{round-half}. The option
+\opt{round-direction} determines which direction a value is rounded toward: a
+choice of \opt{nearest}, \opt{up} or \opt{down}. The standard setting,
+\opt{nearest}, gives the common outcome that values round depending on whether
+the preceding digit is greater or less than \num{5}. The options \opt{up} and
+\opt{down} mean that values are always rounded in one direction: the \opt{down}
+option may be thought of as \enquote{truncation}.
+\begin{LaTeXdemo}
+  \sisetup{round-mode = places}
+  \num{0.054} \\
+  \num{0.046} \\
+  \sisetup{round-direction = down}%
+  \num{0.054} \\
+  \num{0.046} \\
+  \sisetup{round-direction = up}%
+  \num{0.054} \\
+  \num{0.046} \\
+\end{LaTeXdemo}
+For rounding to \opt{nearest}, where the rounded part of a number is exactly
+half, there are two common methods for \enquote{breaking the tie}. The choice
+of method is determined by the option \opt{round-half}, which recognises the
+choices \opt{up} and \opt{even}.
 \begin{LaTeXdemo}
   \sisetup{
     round-mode      = figures,

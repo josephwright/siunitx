@@ -522,6 +522,18 @@
 %   The standard setting is |false|.
 % \end{function}
 %
+% \begin{function}{round-direction}
+%   \begin{syntax}
+%     |round-direction| = |down|\verb"|"|nearest|\verb"|"|up|
+%   \end{syntax}
+%   Choice which determines how values values are rounded. The setting
+%   |up| means that the value is always rounded away from zero, whereas the
+%   setting |down| means that the value will be rounded toward zero. The
+%   setting |nearest| means that the value will be rounded to the nearest
+%   (either up or down), taking account of the setting of |round-half|.
+%   The standard setting is |nearest|
+% \end{function}
+%
 % \begin{function}{round-half}
 %   \begin{syntax}
 %     |round-half| = |even|\verb"|"|up|
@@ -1917,6 +1929,7 @@
 %     \l_@@_exponent_fixed_int     ,
 %     \l_@@_min_decimal_int        ,
 %     \l_@@_min_integer_int        ,
+%     \l_@@_round_dir_tl           ,
 %     \l_@@_round_half_even_bool   ,
 %     \l_@@_round_mode_tl          ,
 %     \l_@@_round_pad_bool         ,
@@ -1943,6 +1956,9 @@
       \l_@@_min_decimal_int ,
     minimum-integer-digits .int_set:N =
       \l_@@_min_integer_int ,
+    round-direction .choices:nn =
+      { down , nearest , up }
+      { \tl_set_eq:NN \l_@@_round_dir_tl \l_keys_choice_tl } ,
     round-half .choice: ,
     round-half / even .code:n =
       { \bool_set_true:N \l_@@_round_half_even_bool } ,
@@ -2721,9 +2737,9 @@
       { \@@_round_auxvi:nnN {#3} {#2} #4 }
   }
 %    \end{macrocode}
-%   The lead off to rounding proper needs to deal with the half-even rule:
-%   it can only apply at this stage, when the \emph{discarded} value can
-%   be exactly half.
+%   We now have the discarded digits, the matching filler and the
+%   next digit. So we can make the decision on rounding: that
+%   is handled by a common auxiliary.
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_auxv:nnN #1#2#3
   {
@@ -2746,16 +2762,29 @@
       { \@@_round_auxix:nnN }
         { } {#2} #3
   }
+%    \end{macrocode}
+%   For rounding up or down, the decision here is easy: pick the appropriate
+%   branch. For rounding to nearest, we need to deal with the half-even rule:
+%   it can only apply at this stage, when the \emph{discarded} value can
+%   be exactly half.
+%    \begin{macrocode}
 \cs_new:Npn \@@_round_auxvii:nnTF #1#2
   {
-    \bool_lazy_or:nnTF
-      { \int_compare_p:nNn { 0 \tl_head:n {#1} } < 5 }
+    \str_case:VnF \l_@@_round_dir_tl
       {
-        \bool_lazy_all_p:n
+        { down } { \use_i:nn }
+        { up }   { \use_ii:nn }
+      }
+      {
+        \bool_lazy_or:nnTF
+          { \int_compare_p:nNn { 0 \tl_head:n {#1} } < 5 }
           {
-            { \l_@@_round_half_even_bool }
-            { ! \int_if_odd_p:n {#2} }
-            { \@@_round_if_half_p:n {#1} }
+            \bool_lazy_all_p:n
+              {
+                { \l_@@_round_half_even_bool }
+                { ! \int_if_odd_p:n {#2} }
+                { \@@_round_if_half_p:n {#1} }
+              }
           }
       }
   }
@@ -4631,6 +4660,7 @@
     retain-explicit-plus             = false                                  ,
     retain-negative-zero             = false                                  ,
     retain-zero-uncertainty          = false                                  ,
+    round-direction                  = nearest                                ,
     round-half                       = up                                     ,
     round-minimum                    = 0                                      ,
     round-mode                       = none                                   ,
