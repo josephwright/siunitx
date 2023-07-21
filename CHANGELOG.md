@@ -11,7 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Abbreviations `\T`, `\mT`, `\uT` (see issue
   [\#670](https://github.com/josephwright/siunitx/issues/670))
 - Option `round-direction` to allow 'truncation' of rounded
-  values :(see issue
+  values (see issue
   [\#664](https://github.com/josephwright/siunitx/issues/664))
 
 ### Changed
