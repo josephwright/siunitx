@@ -185,6 +185,25 @@
     \test:nn { compound } { { 1e2 } { 2e3 } { 3e1 } }
   }
 
+\TEST
+  {
+    Option~settings~"compound-open-boundary"~and
+    "compound-close-boundary"
+  }
+  {
+    \test:nn { compound } { { 1 } }
+    \test:nn { compound } { { 1 } { 2 } }
+    \test:nn { compound } { { 1 } { 2 } { 3 } }
+    \keys_set:nn { siunitx }
+      {
+        compound-open-boundary  = \text { A } ,
+        compound-close-boundary = \text { W }
+      }
+    \test:nn { compound } { { 1 } }
+    \test:nn { compound } { { 1 } { 2 } }
+    \test:nn { compound } { { 1 } { 2 } { 3 } }
+  }
+
 \TEST { Option~setting~"list-exponents" }
   {
     \test:nn { list } { { 1e2 } }
@@ -266,10 +285,21 @@
     \test:nn { 1e2 } { 2e1 }
   }
 
-\TEST { Option~setting~"range-phrase" }
+\TEST { Option~settings~"range-open~phrase"~and~"range-phrase" }
   {
     \test:nn { 1 } { 2 }
-    \keys_set:nn { siunitx } { range-phrase = -- }
+    \group_begin:
+      \keys_set:nn { siunitx } { range-phrase = -- }
+      \test:nn { 1 } { 2 }
+    \group_end:
+    \keys_set:nn { siunitx }
+      {
+        range-open-phrase =
+          {
+            \text { from }
+            \ifmmode \  \else \space \fi
+          }
+      }
     \test:nn { 1 } { 2 }
   }
 

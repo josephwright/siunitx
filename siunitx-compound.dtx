@@ -137,6 +137,25 @@
 %   Phrase (or similar) used between limits of a range.
 % \end{variable}
 %
+% \begin{function}{compound-boundary-mode}
+%   \begin{syntax}
+%     |compound-boundary-mode| = |number|\verb"|"|text|
+%   \end{syntax}
+%   Choice which determines whether the material at the start and
+%   end of a compound quantity are typeset a |number| or as |text|;
+%   the latter is the standard setting.
+% \end{function}
+%
+% \begin{function}{compound-close-boundary, compound-open-boundary}
+%   \begin{syntax}
+%     |compound-close-boundary| = \meta{tokens}\\
+%     |compound-open-boundary|  = \meta{tokens}
+%   \end{syntax}
+%   Literals which are inserted at the opening and closing boundary of a compound
+%   quantity; they are not used when the number of items is one.
+%   The standard settings set these empty.
+% \end{function}
+%
 % \begin{function}{compound-exponents}
 %   \begin{syntax}
 %     |compound-exponents| = |combine|\verb"|"|combine-bracket|\verb"|"|individual|
@@ -236,10 +255,22 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{range-open-phrase}
+%   \begin{syntax}
+%     |range-open-phrase| = \meta{text}
+%   \end{syntax}
+%   Literal containing the material to be inserted at the start of a range.
+%   The standard setting is empty.
+% \end{function}
+%
 % \begin{function}{range-phrase}
 %   \begin{syntax}
 %     |range-phrase| = \meta{text}
 %   \end{syntax}
+%   Literal containing the material to be inserted between the start and end
+%   of a range. The standard setting contains the word \texttt{to} inside the
+%   \cs{text} command, along with appropriate spacing commands to allow this
+%   material to work in both math and text typesetting modes.
 % \end{function}
 %
 % \begin{function}{range-units}
@@ -333,8 +364,10 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_boundary_close_tl   ,
 %     \l_@@_separator_final_tl  ,
 %     \l_@@_separator_pair_tl   ,
+%     \l_@@_boundary_open_tl    ,
 %     \l_@@_separator_tl        ,
 %     \l_@@_separator_text_bool ,
 %     \l_@@_exp_bracket_bool    ,
@@ -344,6 +377,7 @@
 %   }
 %   List options.
 %    \begin{macrocode}
+\bool_new:N \l_@@_boundary_text_bool
 \bool_new:N \l_@@_exp_bracket_bool
 \bool_new:N \l_@@_exp_combine_bool
 \bool_new:N \l_@@_separator_text_bool
@@ -352,6 +386,13 @@
 \bool_new:N \l_@@_unit_repeat_bool
 \keys_define:nn { siunitx }
   {
+    compound-boundary-mode .choice: ,
+    compound-boundary-mode / number .code:n =
+      { \bool_set_false:N \l_@@_delim_text_bool } ,
+    compound-boundary-mode / text .code:n =
+      { \bool_set_true:N \l_@@_delim_text_bool } ,
+    compound-close-boundary .tl_set:N =
+      \l_@@_boundary_close_tl ,
     compound-exponents .choice: ,
     compound-exponents / combine .code:n =
       {
@@ -372,6 +413,8 @@
       \l_@@_separator_final_tl ,
     compound-pair-separator .tl_set:N =
       \l_@@_separator_pair_tl ,
+    compound-open-boundary .tl_set:N =
+      \l_@@_boundary_open_tl ,
     compound-separator .tl_set:N =
       \l_@@_separator_tl ,
     compound-separator-mode .choice: ,
@@ -715,7 +758,11 @@
 % \begin{macro}{\@@_print_aux:n}
 % \begin{macro}{\@@_print_aux:nn}
 % \begin{macro}{\@@_print_quantity:n, \@@_print_quantity:x}
-% \begin{macro}{\@@_print_separator:n, \@@_print_separator:V}
+% \begin{macro}
+%   {
+%     \@@_print_boundary:n, \@@_print_boundary:V,
+%     \@@_print_separator:n, \@@_print_separator:V
+%   }
 %   We now need to know how many entries there are: the reason we don't use
 %   \cs{seq_use:Nnnn} is that we want to be able to insert
 %   \cs{siunitx_print_\dots:n} in a controlled way.
@@ -760,6 +807,7 @@
           }
         { 2 }
           {
+            \@@_print_boundary:V \l_@@_boundary_open_tl
             #4
               {
                 \exp_not:n {#2}
@@ -771,6 +819,7 @@
                 \seq_item:Nn \l_@@_tmp_seq { 2 }
                 \exp_not:n {#3}
               }
+            \@@_print_boundary:V \l_@@_boundary_open_tl
           }
       }
       {
@@ -778,9 +827,11 @@
         \tl_set:Nn \l_@@_start_tl {#2}
         \tl_set:Nn \l_@@_end_tl {#3}
         \cs_set_eq:NN \@@_print_aux:n #4
+        \@@_print_boundary:V \l_@@_boundary_open_tl
         \seq_map_indexed_function:NN
           \l_@@_tmp_seq
           \@@_print_aux:nn
+        \@@_print_boundary:V \l_@@_boundary_close_tl
       }
   }
 \cs_new_protected:Npn \@@_print_aux:n #1 { }
@@ -819,6 +870,16 @@
 \cs_new_protected:Npn \@@_print_quantity:n #1
   { \siunitx_quantity_print:nV {#1} \l_@@_unit_tl }
 \cs_generate_variant:Nn  \@@_print_quantity:n { x }
+\cs_new_protected:Npn \@@_print_boundary:n #1
+  {
+    \tl_if_blank:nF {#1}
+      {
+        \bool_if:NTF \l_@@_boundary_text_bool
+          { #1 }
+          { \siunitx_print_number:n {#1} }
+      }
+  }
+\cs_generate_variant:Nn \@@_print_boundary:n { V }
 \cs_new_protected:Npn \@@_print_separator:n #1
   {
     \bool_if:NTF \l_@@_separator_text_bool
@@ -923,9 +984,11 @@
   {
     \keys_set:nx { siunitx }
       {
+        compound-close-boundary  = ,
         compound-exponents       = \l_@@_exp_tl ,
         compound-final-separator =
           { \exp_not:V \l_siunitx_list_separator_final_tl } ,
+        compound-open-boundary   = ,
         compound-pair-separator  =
           { \exp_not:V \l_siunitx_list_separator_pair_tl } ,
         compound-separator       =
@@ -1009,8 +1072,10 @@
   {
     \keys_set:nx { siunitx }
       {
+        compound-close-boundary  = ,
         compound-exponents       = \l_@@_exp_tl ,
         compound-final-separator = { \exp_not:n {#1} } ,
+        compound-open-boundary   = ,
         compound-pair-separator  = { \exp_not:n {#1} } ,
         compound-separator       = { \exp_not:n {#1} } ,
         compound-separator-mode  =
@@ -1036,6 +1101,7 @@
 % \begin{variable}
 %   {
 %     \l_@@_exp_tl               ,
+%     \l_@@_open_tl              ,
 %     \l_siunitx_range_phrase_tl ,
 %     \l_@@_units_tl
 %   }
@@ -1048,6 +1114,7 @@
     range-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
+    range-open-phrase .tl_set:N = \l_@@_open_tl ,
     range-phrase .tl_set:N = \l_siunitx_range_phrase_tl ,
     range-units .choices:nn =
       { bracket , repeat , single }
@@ -1079,10 +1146,13 @@
   {
     \keys_set:nx { siunitx }
       {
-        compound-exponents       = \l_@@_exp_tl ,
-        compound-pair-separator  = { \exp_not:V \l_siunitx_range_phrase_tl } ,
-        compound-separator-mode  = text ,
-        compound-units           = \l_@@_units_tl
+        compound-boundary-mode  = text ,
+        compound-close-boundary = ,
+        compound-exponents      = \l_@@_exp_tl ,
+        compound-open-boundary  = { \exp_not:V \l_@@_open_tl } ,
+        compound-pair-separator = { \exp_not:V \l_siunitx_range_phrase_tl } ,
+        compound-separator-mode = text ,
+        compound-units          = \l_@@_units_tl
       }
   }
 %    \end{macrocode}
@@ -1098,13 +1168,16 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    compound-exponents       = individual  ,
+    compound-boundary-mode   = text       ,
+    compound-close-boundary  =            ,
+    compound-exponents       = individual ,
     compound-final-separator =
       {
         \ifmmode \  \else \space \fi
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
+    compound-open-boundary  =             ,
     compound-pair-separator  =
       {
         \ifmmode \  \else \space \fi
@@ -1113,9 +1186,9 @@
       } ,
     compound-separator       =
       { , \ifmmode \  \else \space \fi } ,
-    compound-separator-mode  = text        ,
-    compound-units           = repeat      ,
-    list-exponents           = individual  ,
+    compound-separator-mode  = text       ,
+    compound-units           = repeat     ,
+    list-exponents           = individual ,
     list-final-separator     =
       {
         \ifmmode \  \else \space \fi
@@ -1130,9 +1203,9 @@
       } ,
     list-separator           =
       { , \ifmmode \  \else \space \fi } ,
-    list-units               = repeat      ,
-    product-exponents        = individual  ,
-    product-mode             = symbol      ,
+    list-units               = repeat     ,
+    product-exponents        = individual ,
+    product-mode             = symbol     ,
     product-phrase           =
       {
         \ifmmode \  \else \space \fi
@@ -1142,6 +1215,7 @@
     product-symbol           = \times      ,
     product-units            = repeat      ,
     range-exponents          = individual  ,
+    range-open-phrase        =             ,
     range-phrase             =
       {
         \ifmmode \  \else \space \fi
