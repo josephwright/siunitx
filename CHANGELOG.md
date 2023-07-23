@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Added
+- Support for Italian (see issue
+  [\#650](https://github.com/josephwright/siunitx/issues/650))
 - Abbreviations `\T`, `\mT`, `\uT` (see issue
   [\#670](https://github.com/josephwright/siunitx/issues/670))
 - Option `range-open-phrase`
