@@ -1493,10 +1493,9 @@
     \hbox_set_to_wd:Nnn \l_@@_uncert_box
       { \box_wd:N \l_@@_tmp_box }
       {
-        \siunitx_print_number:n { { } #4 }
+        \siunitx_print_number:n { { } #4 { } }
         \@@_fil:
-        \tl_if_blank:nTF {#5}
-          { { } }
+        \tl_if_blank:nF {#5}
           { \siunitx_print_number:n {#5} }
       }
     \@@_print_format_auxix:w
@@ -1513,7 +1512,7 @@
         + \box_wd:N \l_@@_tmp_box
       }
       {
-        \hbox_unpack:N \l_@@_uncert_box
+        \box_use:N \l_@@_uncert_box
         \tl_if_blank:nF {#2#5}
           { \siunitx_print_number:n {#4#5} }
         \@@_fil:
