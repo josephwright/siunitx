@@ -666,7 +666,9 @@
 %
 % \begin{macro}{\siunitx_compound_quantity:nn}
 %   For quantities, life is more complex as there are interactions between the
-%   options for exponents and units.
+%   options for exponents and units. The \cs{c_empty_tl} suppresses any
+%   leading \texttt{1} if the unit starts \cs{per}; the \pkg{siunitx-print}
+%   module will skip any printing in this case.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_compound_quantity:nn #1#2
   {
@@ -697,7 +699,7 @@
               \siunitx_print_number:V \l_@@_bracket_close_tl
             }
             { \@@_print:N \siunitx_print_number:x }
-          \@@_print_quantity:n { }
+          \@@_print_quantity:n { \c_empty_tl }
         }
     \group_end:
   }

@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Suppression of leading `1` when `per-mode = symbol` is used with
+  non-repeated units ranges (see issue
+  [\#677](https://github.com/josephwright/siunitx/issues/677))
+
 ## [v3.2.7] - 2023-07-20
 
 ### Fixed
