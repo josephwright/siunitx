@@ -106,7 +106,8 @@
 %   roman font, and |^| and |_| will typically be used to indicate super- and
 %   subscripts, respectively. These elements will be correctly handled when
 %   printing for example using |\mathsf| in math mode, or using only text
-%   fonts.
+%   fonts. No printing takes place if the \cs{material} is entirely empty
+%   after a single expansion.
 % \end{function}
 %
 % \begin{function}
@@ -120,7 +121,8 @@
 %   with a fixed text or math mode output. The printing does \emph{not} set
 %   color (which is managed on a |unit|/|number| basis), but otherwise sets
 %   the font as described above. The |match| function uses either the prevailing
-%   math or text mode.
+%   math or text mode. No printing takes place if the \cs{material} is entirely
+%   empty after a single expansion.
 % \end{function}
 %
 % \subsection{Key--value options}
@@ -449,7 +451,10 @@
 %   }
 % \begin{macro}{\@@_aux:nn}
 %   The main printing function doesn't actually need to do very much: just set
-%   the color and select the correct sub-function.
+%   the color and select the correct sub-function. The \cs{tl_if_empty:oF} is
+%   needed to allow a leading \texttt{1} to be omitted in the case of a unit
+%   starting \cs{per} in cases where we can't simply use an entirely empty
+%   value: see the \pkg{siunitx-compound} submodule.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_print_number:n #1
   { \@@_aux:nn { number } {#1} }
@@ -459,17 +464,20 @@
 \cs_generate_variant:Nn \siunitx_print_unit:n { V , x }
 \cs_new_protected:Npn \@@_aux:nn #1#2
   {
-    \tl_if_empty:cTF { l_@@_ #1 _color_tl }
-      { \use:n }
-      { \exp_args:Nv \textcolor { l_@@_ #1 _color_tl } }
-        {
-          \use:c
+    \tl_if_empty:oF {#2}
+      {
+        \tl_if_empty:cTF { l_@@_ #1 _color_tl }
+          { \use:n }
+          { \exp_args:Nv \textcolor { l_@@_ #1 _color_tl } }
             {
-              siunitx_print_
-              \tl_use:c { l_@@_ #1 _mode_tl } :n
+              \use:c
+                {
+                  siunitx_print_
+                  \tl_use:c { l_@@_ #1 _mode_tl } :n
+                }
+                  {#2}
             }
-              {#2}
-        }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
