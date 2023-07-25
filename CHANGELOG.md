@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.8] - 2023-07-25
+
 ### Fixed
 - Suppression of leading `1` when `per-mode = symbol` is used with
   non-repeated units ranges (see issue
@@ -1919,7 +1921,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.7...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.8...HEAD
+[v3.2.8]: https://github.com/josephwright/siunitx/compare/v3.2.7...v3.2.8
 [v3.2.7]: https://github.com/josephwright/siunitx/compare/v3.2.6...v3.2.7
 [v3.2.6]: https://github.com/josephwright/siunitx/compare/v3.2.5...v3.2.6
 [v3.2.5]: https://github.com/josephwright/siunitx/compare/v3.2.4...v3.2.5
