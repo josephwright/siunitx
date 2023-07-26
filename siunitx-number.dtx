@@ -405,9 +405,9 @@
 %   \end{syntax}
 % \end{function}
 %
-% \begin{function}{input-uncertainty-signs}
+% \begin{function}{input-symmetrical-uncertainty-signs}
 %   \begin{syntax}
-%     |input-uncertainty-signs| = \meta{tokens}
+%     |input-symmetrical-uncertainty-signs| = \meta{tokens}
 %   \end{syntax}
 % \end{function}
 %
@@ -859,7 +859,7 @@
       \l_@@_input_uncert_open_tl ,
     input-signs .tl_set:N =
       \l_siunitx_number_input_sign_tl ,
-    input-uncertainty-signs .code:n =
+    input-symmetrical-uncertainty-signs .code:n =
       {
         \tl_set:Nn \l_@@_input_uncert_sign_tl {#1}
         \tl_map_inline:nn {#1}
@@ -4642,6 +4642,22 @@
   }
 %    \end{macrocode}
 %
+% \subsection{Deprecated options}
+%
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    input-uncertainty-signs .code:n =
+      {
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { input-symmetrical-uncertainty-signs }
+          { input-uncertainty-signs }
+        \keys_set:nn { siunitx }
+          { input-symmetrical-uncertainty-signs = {#1} }
+      }
+  }
+%    \end{macrocode}
+%
 % \subsection{Standard settings for module options}
 %
 % Some of these follow naturally from the point of definition
@@ -4650,65 +4666,65 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    bracket-ambiguous-numbers        = true                                   ,
-    bracket-negative-numbers         = false                                  ,
-    drop-exponent                    = false                                  ,
-    drop-uncertainty                 = false                                  ,
-    drop-zero-decimal                = false                                  ,
-    evaluate-expression              = false                                  ,
-    exponent-base                    = 10                                     ,
-    exponent-mode                    = input                                  ,
-    exponent-product                 = \times                                 ,
-    expression                       = #1                                     ,
-    fixed-exponent                   = 0                                      ,
-    digit-group-size                 = 3                                      ,
-    digit-group-first-size           = 3                                      ,
-    digit-group-other-size           = 3                                      ,
-    group-digits                     = all                                    ,
-    group-minimum-digits             = 5                                      ,
-    group-separator                  = \,                                     , % (
-    input-close-uncertainty          = )                                      ,
-    input-comparators                = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
-    input-decimal-markers            = { ., }                                 ,
-    input-digits                     = 0123456789                             ,
-    input-exponent-markers           = dDeE                                   ,
-    input-ignore                     = \,                                     ,
-    input-open-uncertainty           = (                                      , % )
-    input-signs                      = +-\mp\pm                               ,
-    input-uncertainty-signs          = \pm                                    ,
-    minimum-decimal-digits           = 0                                      ,
-    minimum-integer-digits           = 0                                      ,
-    negative-color                   =                                        , % (
-    output-close-uncertainty         = )                                      ,
-    output-decimal-marker            = .                                      ,
-    output-open-uncertainty          = (                                      , % )
-    parse-numbers                    = true                                   ,
-    print-exponent-implicit-plus     = false                                  ,
-    print-implicit-plus              = false                                  ,
-    print-mantissa-implicit-plus     = false                                  ,
-    print-unity-mantissa             = true                                   ,
-    print-zero-exponent              = false                                  ,
-    print-zero-integer               = true                                   ,
-    retain-explicit-decimal-marker   = false                                  ,
-    retain-explicit-plus             = false                                  ,
-    retain-negative-zero             = false                                  ,
-    retain-zero-uncertainty          = false                                  ,
-    round-direction                  = nearest                                ,
-    round-half                       = up                                     ,
-    round-minimum                    = 0                                      ,
-    round-mode                       = none                                   ,
-    round-pad                        = true                                   ,
-    round-precision                  = 2                                      ,
-    round-zero-positive              = true                                   ,
-    tight-spacing                    = false                                  ,
-    uncertainty-descriptor-mode      = bracket-separator                      ,
-    uncertainty-descriptor-separator = \                                      ,
-    uncertainty-descriptors          =                                        ,
-    uncertainty-mode                 = compact                                ,
-    uncertainty-round-direction      = nearest                                ,
-    uncertainty-separator            =                                        ,
-    zero-decimal-as-symbol           = false                                  ,
-    zero-symbol                      = \mbox { --- }
+    bracket-ambiguous-numbers           = true                                   ,
+    bracket-negative-numbers            = false                                  ,
+    drop-exponent                       = false                                  ,
+    drop-uncertainty                    =    false                                  ,
+    drop-zero-decimal                   = false                                  ,
+    evaluate-expression                 = false                                  ,
+    exponent-base                       = 10                                     ,
+    exponent-mode                       = input                                  ,
+    exponent-product                    = \times                                 ,
+    expression                          = #1                                     ,
+    fixed-exponent                      = 0                                      ,
+    digit-group-size                    = 3                                      ,
+    digit-group-first-size              = 3                                      ,
+    digit-group-other-size              = 3                                      ,
+    group-digits                        = all                                    ,
+    group-minimum-digits                = 5                                      ,
+    group-separator                     = \,                                     , % (
+    input-close-uncertainty             = )                                      ,
+    input-comparators                   = { <=>\approx\ge\geq\gg\le\leq\ll\sim } ,
+    input-decimal-markers               = { ., }                                 ,
+    input-digits                        = 0123456789                             ,
+    input-exponent-markers              = dDeE                                   ,
+    input-ignore                        = \,                                     ,
+    input-open-uncertainty              = (                                      , % )
+    input-signs                         = +-\mp\pm                               ,
+    input-symmetrical-uncertainty-signs = \pm                                    ,
+    minimum-decimal-digits              = 0                                      ,
+    minimum-integer-digits              = 0                                      ,
+    negative-color                      =                                        , % (
+    output-close-uncertainty            = )                                      ,
+    output-decimal-marker               = .                                      ,
+    output-open-uncertainty             = (                                      , % )
+    parse-numbers                       = true                                   ,
+    print-exponent-implicit-plus        = false                                  ,
+    print-implicit-plus                 = false                                  ,
+    print-mantissa-implicit-plus        = false                                  ,
+    print-unity-mantissa                = true                                   ,
+    print-zero-exponent                 = false                                  ,
+    print-zero-integer                  = true                                   ,
+    retain-explicit-decimal-marker      = false                                  ,
+    retain-explicit-plus                = false                                  ,
+    retain-negative-zero                = false                                  ,
+    retain-zero-uncertainty             = false                                  ,
+    round-direction                     = nearest                                ,
+    round-half                          = up                                     ,
+    round-minimum                       = 0                                      ,
+    round-mode                          = none                                   ,
+    round-pad                           = true                                   ,
+    round-precision                     = 2                                      ,
+    round-zero-positive                 = true                                   ,
+    tight-spacing                       = false                                  ,
+    uncertainty-descriptor-mode         = bracket-separator                      ,
+    uncertainty-descriptor-separator    = \                                      ,
+    uncertainty-descriptors             =                                        ,
+    uncertainty-mode                    = compact                                ,
+    uncertainty-round-direction         = nearest                                ,
+    uncertainty-separator               =                                        ,
+    zero-decimal-as-symbol              = false                                  ,
+    zero-symbol                         = \mbox { --- }
   }
 %    \end{macrocode}
 %   One awkward setting.

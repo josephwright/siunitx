@@ -18,12 +18,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#664](https://github.com/josephwright/siunitx/issues/664))
 - Option `uncertainty-round-direction` (see issue
   [\#628](https://github.com/josephwright/siunitx/issues/628))
+- Option `input-symmetrical-uncertainty-signs`
 
 ### Changed
 
 - Support bracing of decimal marker in tables as an alternative
   to `\mathord` (see issue
   [\#527](https://github.com/josephwright/siunitx/issues/527))
+
+### Deprecated
+- Option `input-uncertainty-signs`
 
 ## [v3.2.9] - 2023-07-26
 
