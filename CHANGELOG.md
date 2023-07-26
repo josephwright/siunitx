@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.2.9] - 2023-07-26
+
 ### Fixed
 
 - Correct alignment of uncertainties in tables (see issue
@@ -1926,7 +1928,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.8...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.2.9...HEAD
+[v3.2.9]: https://github.com/josephwright/siunitx/compare/v3.2.8...v3.2.9
 [v3.2.8]: https://github.com/josephwright/siunitx/compare/v3.2.7...v3.2.8
 [v3.2.7]: https://github.com/josephwright/siunitx/compare/v3.2.6...v3.2.7
 [v3.2.6]: https://github.com/josephwright/siunitx/compare/v3.2.5...v3.2.6
