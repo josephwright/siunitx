@@ -411,6 +411,12 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{input-uncertainty-divider}
+%   \begin{syntax}
+%     |input-uncertainty-divider| = \meta{tokens}
+%   \end{syntax}
+% \end{function}
+%
 % \begin{function}{minimum-decimal-digits}
 %   \begin{syntax}
 %     |minimum-decimal-digits| = \meta{min}
@@ -827,6 +833,7 @@
 %      \l_siunitx_number_input_exponent_tl   ,
 %      \l_@@_input_ignore_tl                 ,
 %      \l_@@_input_uncert_open_tl            ,
+%      \l_@@_input_uncert_divide_tl          ,
 %      \l_siunitx_number_input_sign_tl       ,
 %      \l_@@_input_uncert_sign_tl            ,
 %      \l_@@_explicit_decimal_bool           ,
@@ -868,6 +875,8 @@
               { \tl_put_right:Nn \l_siunitx_number_input_sign_tl {##1} }
           }
       } ,
+    input-uncertainty-divider .tl_set:N =
+      \l_@@_input_uncert_divide_tl ,
     parse-numbers .bool_set:N =
       \l_siunitx_number_parse_bool ,
     retain-explicit-decimal-marker .bool_set:N =
@@ -941,11 +950,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_uncert_tl}
+% \begin{variable}{\l_@@_tolerance_tl, \l_@@_uncert_tl, \l_@@_uncert_types_tl}
 %   To allow multiple uncertainties, we want to build this up as possibly
-%   multiple entries.
+%   multiple entries. For asymmetrical uncertainties/tolerances, we need
+%   an additional store.
 %    \begin{macrocode}
+\tl_new:N \l_@@_tolerance_tl
 \tl_new:N \l_@@_uncert_tl
+\tl_new:N \l_@@_uncert_types_tl
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1022,6 +1034,7 @@
     \group_begin:
       \tl_clear:N \l_@@_parsed_tl
       \tl_clear:N \l_@@_uncert_tl
+      \tl_clear:N \l_@@_uncert_types_tl
       \tl_map_inline:Nn \l_@@_input_ignore_tl
         {
           \token_if_macro:NT ##1
@@ -1606,7 +1619,9 @@
 \cs_new_protected:Npn \@@_parse_loop_main_uncert:NN #1#2
   {
     \@@_parse_loop_main_store:NNN #1 #2 \c_false_bool
+    \tl_clear:N \l_@@_tolerance_tl
     \tl_clear:N \l_@@_uncert_tl
+    \tl_clear:N \l_@@_uncert_types_tl
     \@@_parse_uncert:N
   }
 %    \end{macrocode}
@@ -1725,8 +1740,13 @@
 %
 % \begin{macro}{\@@_parse_uncert:N}
 % \begin{macro}{\@@_parse_uncert:NNN}
-% \begin{macro}{\@@_parse_uncert_auxi:N, \@@_parse_uncert_auxii:N}
-% \begin{macro}{\@@_parse_uncert_auxiii:}
+% \begin{macro}
+%   {
+%     \@@_parse_uncert_auxi:N  ,
+%     \@@_parse_uncert_auxii:N ,
+%     \@@_parse_uncert_auxiv:N
+%   }
+% \begin{macro}{\@@_parse_uncert_auxiv:}
 % \begin{macro}{\@@_parse_uncert_marker:}
 % \begin{macro}{\@@_parse_uncert_marker:nnn}
 % \begin{macro}{\@@_parse_uncert_marker:nnnw}
@@ -1784,7 +1804,7 @@
       {
         \tl_if_in:NnTF \l_siunitx_number_input_decimal_tl {#1}
           { \@@_parse_uncert_marker: }
-          { \@@_parse_loop_break:w }
+          { \@@_parse_uncert_auxiv:N #1 }
       }
   }
 \cs_new_protected:Npn \@@_parse_uncert_auxii:N #1
@@ -1794,7 +1814,7 @@
         \@@_parse_uncert_auxiii:
         \@@_parse_uncert_after:N
       }
-      { \@@_parse_loop_break:w }
+      { \@@_parse_uncert_auxiv:N #1 }
   }
 %    \end{macrocode}
 %   Deal with the closing bracket, which might leave us with nothing if there
@@ -1806,6 +1826,24 @@
       { \l_@@_zero_uncert_bool }
       { \tl_if_empty_p:N \l_@@_partial_tl }
       { \tl_set:Nn \l_@@_partial_tl { 0 } }
+  }
+%    \end{macrocode}
+%   A common auxiliary for the case where the token is not a digit, a
+%   decimal mark or a closing parenthesis.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_uncert_auxiv:N #1
+  {
+    \tl_if_empty:NTF \l_@@_tolerance_tl
+      {
+        \tl_if_in:NnTF \l_@@_input_uncert_divide_tl {#1}
+          {
+            \cs_set_eq:NN \l_@@_tolerance_tl \l_@@_partial_tl
+            \tl_clear:N \l_@@_partial_tl
+            \@@_parse_uncert:N
+          }
+          { \@@_parse_loop_break:w }
+      }
+      { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
 %   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
@@ -1896,9 +1934,26 @@
       {
         \exp_not:V \l_@@_uncert_tl
         \tl_if_empty:NF \l_@@_partial_tl
-          { { \exp_not:V \l_@@_partial_tl } }
+          {
+            {
+              \tl_if_empty:NTF \l_@@_tolerance_tl
+                { \exp_not:V \l_@@_partial_tl }
+                {
+                  { \exp_not:V \l_@@_tolerance_tl }
+                  { \exp_not:V \l_@@_partial_tl }
+                }
+              }
+          }
+      }
+    \tl_set:Nx \l_@@_uncert_types_tl
+      {
+        \l_@@_uncert_types_tl
+        \tl_if_empty:NTF \l_@@_tolerance_tl
+          { S }
+          { A }
       }
     \tl_clear:N \l_@@_partial_tl
+    \tl_clear:N \l_@@_tolerance_tl
     \quark_if_recursion_tail_stop_do:Nn #1
       {
         \tl_set:Nx \l_@@_parsed_tl
@@ -1907,11 +1962,7 @@
             {
               \tl_if_empty:NF \l_@@_uncert_tl
                 {
-                  {
-                    \prg_replicate:nn
-                      { \tl_count:N \l_@@_uncert_tl }
-                     { S }
-                  }
+                  { \l_@@_uncert_types_tl }
                   \exp_not:V \l_@@_uncert_tl
                 }
             }
@@ -4727,10 +4778,13 @@
     zero-symbol                         = \mbox { --- }
   }
 %    \end{macrocode}
-%   One awkward setting.
+%   Two awkward settings.
 %    \begin{macrocode}
 \keys_set:nx { siunitx }
-   { exponent-thresholds = -3 \c_colon_str 3 }
+  {
+    exponent-thresholds       = -3 \c_colon_str 3 ,
+    input-uncertainty-divider = \c_colon_str
+  }
 %    \end{macrocode}
 %
 %    \begin{macrocode}

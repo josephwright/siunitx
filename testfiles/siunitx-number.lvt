@@ -103,6 +103,21 @@
     \test:n { 123.4 +- 0.0 +- 0.0 }
   }
 
+\TEST { Basic~formatting:~asymmetric~uncertainties }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Nx \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+      }
+    \TIMO
+    \test:n { 123(4:5) }
+    \test:n { 123.456(7:8) }
+    \test:n { 123.45(6:7)(8:9) }
+    \test:n { 123.5(0:0) }
+  }
+
 \TEST { Basic~formatting:~comparators }
   {
     \test:n { > 1.2 }
@@ -544,6 +559,20 @@
     \keys_set:nn { siunitx } { input-symmetrical-uncertainty-signs = }
     \test:n { 12.34 }
     \test:n { 12.34 \pm 5 }
+  }
+
+\TEST { Option~setting~"input-uncertainty-divider" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Nx \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+      }
+    \TIMO
+    \test:n { 123.4(5:6) }
+    \keys_set:nn { siunitx } { input-uncertainty-divider = }
+    \test:n { 123.4(5:6) }
   }
 
 \TEST { Option~setting~"minimum-decimal-digits" }

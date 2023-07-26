@@ -19,6 +19,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `uncertainty-round-direction` (see issue
   [\#628](https://github.com/josephwright/siunitx/issues/628))
 - Option `input-symmetrical-uncertainty-signs`
+- Support for asymmetrical uncertainties, including new option
+  `input-uncertainty-divider` (see issue
+  [\#675](https://github.com/josephwright/siunitx/issues/675))
 
 ### Changed
 
