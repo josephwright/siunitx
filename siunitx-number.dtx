@@ -1696,6 +1696,7 @@
   {
     \tl_clear:N \l_@@_flex_tl
     \tl_clear:N \l_@@_parsed_tl
+    \tl_clear:N \l_@@_uncert_tl
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1940,7 +1941,9 @@
   }
 \cs_new_protected:Npn \@@_parse_uncert_marker:nnnnnnN #1#2#3#4#5#6#7
   {
-    \tl_if_empty:NF \l_@@_tolerance_tl
+    \bool_lazy_and:nnF
+      { \tl_if_empty_p:N \l_@@_tolerance_tl }
+      { \tl_if_empty_p:N \l_@@_uncert_types_tl }
       {
         \int_compare:nNnF {#1} = \l_@@_uncert_offset_int
           { \@@_parse_loop_break:w }
