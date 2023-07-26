@@ -950,13 +950,20 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_tolerance_tl, \l_@@_uncert_tl, \l_@@_uncert_types_tl}
+% \begin{variable}
+%   {
+%     \l_@@_tolerance_tl     ,
+%     \l_@@_uncert_tl        ,
+%     \l_@@_uncert_offset_int,
+%     \l_@@_uncert_types_tl
+%   }
 %   To allow multiple uncertainties, we want to build this up as possibly
 %   multiple entries. For asymmetrical uncertainties/tolerances, we need
 %   an additional store.
 %    \begin{macrocode}
 \tl_new:N \l_@@_tolerance_tl
 \tl_new:N \l_@@_uncert_tl
+\int_new:N \l_@@_uncert_offset_int
 \tl_new:N \l_@@_uncert_types_tl
 %    \end{macrocode}
 % \end{variable}
@@ -1750,6 +1757,8 @@
 % \begin{macro}{\@@_parse_uncert_marker:Nnnn}
 % \begin{macro}{\@@_parse_uncert_marker:w}
 % \begin{macro}{\@@_parse_uncert_marker:nnnnN}
+% \begin{macro}{\@@_parse_uncert_marker:nnnnnN}
+% \begin{macro}{\@@_parse_uncert_marker:nnnnnnN}
 % \begin{macro}{\@@_parse_uncert_after:N}
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
@@ -1891,22 +1900,60 @@
 %   With the separated out main part and the current uncertainty part
 %   available, we can pad the main part if required then restart the
 %   collection of the uncertainty having thrown away the decimal marker
-%   and with the lengths lined up.
+%   and with the lengths lined up. To account for asymmetrical
+%   uncertainties, there is a bit of work in tracking.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_marker:nnnnN #1#2#3#4#5
   {
+    \tl_set:Nx \l_@@_tmp_tl { \tl_head:V \l_@@_input_uncert_divide_tl }
+    \tl_if_empty:NTF \l_@@_tmp_tl
+      { \@@_parse_uncert_marker:nnnnnN {#1} {#2} {#3} {#4} { } #5 }
+      {
+        \use:x
+          {
+            \cs_set_protected:Npn \exp_not:N \@@_parse_uncert_marker:w
+              ####1 \l_@@_tmp_tl ####2 \l_@@_tmp_tl ####3 \exp_not:N \q_stop
+              {
+                \exp_not:N \tl_if_blank:nTF {####2}
+                  {
+                    \@@_parse_uncert_marker:nnnnnN
+                      \exp_not:n { {#1} {#2} {#3} }
+                      {####1} { }
+                  }
+                  {
+                    \@@_parse_uncert_marker:nnnnnN
+                      \exp_not:n { {#1} {#2} {#3} }
+                      {####1} { \l_@@_tmp_tl ####2 }
+                  }
+                    \exp_not:N #5
+              }
+             \exp_not:N \@@_parse_uncert_marker:w #4
+               \l_@@_tmp_tl \l_@@_tmp_tl \exp_not:N \q_stop
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_parse_uncert_marker:nnnnnN #1#2#3#4#5#6
+  {
+    \exp_args:Ne \@@_parse_uncert_marker:nnnnnnN
+      { \int_eval:n { \tl_count:n {#4} } }
+      {#1} {#2} {#3} {#4} {#5} #6
+  }
+\cs_new_protected:Npn \@@_parse_uncert_marker:nnnnnnN #1#2#3#4#5#6#7
+  {
+    \tl_if_empty:NF \l_@@_tolerance_tl
+      {
+        \int_compare:nNnF {#1} = \l_@@_uncert_offset_int
+          { \@@_parse_loop_break:w }
+      }
+    \int_set:Nn \l_@@_uncert_offset_int {#1}
     \tl_set:Nx \l_@@_parsed_tl
       {
-         {#1}
          {#2}
+         {#3}
          {
-           #3
+           #4
            \prg_replicate:nn
-             {
-               \int_max:nn
-                 { 0 }
-                 { \tl_count:n {#4} - \tl_count:n {#3} }
-             }
+             { \int_max:nn { 0 } { #1 - \tl_count:n {#4} } }
              { 0 }
          }
       }
@@ -1919,7 +1966,7 @@
         \@@_parse_uncert:NNN \c_true_bool
           \@@_parse_uncert_auxii:N
       }
-        #4#5
+        #5#6#7
   }
 %    \end{macrocode}
 %   At the end of collection, we can either start another one or be done:
@@ -1966,12 +2013,15 @@
           }
         \tl_clear:N \l_@@_partial_tl
         \tl_clear:N \l_@@_uncert_tl
+        \int_zero:N \l_@@_uncert_offset_int
       }
     \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#1}
       { \@@_parse_uncert:N }
       { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
