@@ -2766,19 +2766,20 @@ to the layout of tabular material (Table~\ref{tab:opt:tables}).
       Type &
       \multicolumn{1}{l@{}}{Default} \\
     \midrule
-      table-align-comparator    & Switch  & true   \\
-      table-align-exponent      & Switch  & true   \\
-      table-align-text-after    & Switch  & true   \\
-      table-align-text-before   & Switch  & true   \\
-      table-align-uncertainty   & Switch  & true   \\
-      table-alignment           & Meta    & center \\
-      table-alignment-mode      & Choice  & marker \\
-      table-auto-round          & Switch  & false  \\
-      table-column-width        & Length  & 0pt    \\
-      table-fixed-width         & Switch  & false  \\
-      table-format              & Special & 2.2    \\
-      table-number-alignment    & Choice  & center \\
-      table-text-alignment      & Choice  & center \\
+      table-align-comparator    & Switch  & true         \\
+      table-align-exponent      & Switch  & true         \\
+      table-align-text-after    & Switch  & true         \\
+      table-align-text-before   & Switch  & true         \\
+      table-align-uncertainty   & Switch  & true         \\
+      table-alignment           & Meta    & center       \\
+      table-alignment-mode      & Choice  & marker       \\
+      table-auto-round          & Switch  & false        \\
+      table-column-width        & Length  & 0pt          \\
+      table-fixed-width         & Switch  & false        \\
+      table-format              & Special & 2.2          \\
+      table-model-setup         & Literal & \meta{empty} \\
+      table-number-alignment    & Choice  & center       \\
+      table-text-alignment      & Choice  & center       \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -2895,6 +2896,12 @@ It is important to note that any parts of a number \emph{not} specified in the
 table format argument are set to be absent (the number of figures is set to
 zero). Setting the \opt{table-format} option also resets
 \opt{table-alignment-mode} to \opt{format}.
+
+\DescribeOption{table-model-setup}
+In some tables (particularly those using bold extended fonts), it may be
+necessary to insert additional information when creating the \enquote{model}.
+This is handled using the \opt{table-model-setup} key. An example of the use of
+this key is given in Section~\ref{sec:hint:heading}.
 
 Space for material before and after the \texttt{S} column can be reserved by
 giving model text as part of the \opt{table-format} key. This is then used to
@@ -3855,20 +3862,30 @@ best approach is to make the \cs{bfseries} macro \enquote{robust} (as
 demonstrated in Section~\ref{sec:hint:expanding}), then to use this macro to
 make the heading cells bold. This approach is illustrated in
 Table~\ref{tab:xmpl:headers}, along with the use of \cs{rowcolor} to provide a
-background color.
+background color. Some typical \LaTeX{} font arrangements use a wider
+(extended) width for the bold font compared with the normal font. This will
+disturb the alignment if the \opt{table-format} is not symmetrical. For these
+cases, the \opt{table-model-setup} key may be used to apply the wider font to
+the \enquote{model} used in ensuring alignment.
 \begin{LaTeXdemo}[code and float]
   \begin{table}
     \caption{Header row in a table.%
       \label{tab:xmpl:headers}}
     \robustify\bfseries
     \centering
+    \sisetup{text-series-to-math}
     \begin{tabular}
-      {@{}S[text-series-to-math, table-format = 3.3]@{}}
+      {
+        @{}
+        S[table-format = 3.3]
+        S[table-format = 3.6, table-model-setup = \bfseries]
+        @{}
+      }
       \rowcolor[gray]{0.9}
-      \bfseries 123.456 \\
-       23.45  \\
-      123.4   \\
-        3.456 \\
+      \bfseries 123.456 & \bfseries 123.456789 \\
+       23.45  &  23.45  \\
+      123.4   & 123.4   \\
+        3.456 &   3.456 \\
     \end{tabular}
   \end{table}
 \end{LaTeXdemo}

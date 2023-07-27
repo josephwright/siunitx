@@ -32,6 +32,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   - `range-open-bracket` 
   (see issue
   [\#262](https://github.com/josephwright/siunitx/issues/262))
+- Option `table-model-setup` (see issue
+  [\#659](https://github.com/josephwright/siunitx/issues/659))
 
 ### Changed
 

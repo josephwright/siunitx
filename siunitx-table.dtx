@@ -190,6 +190,15 @@
 %   the same size.
 % \end{function}
 %
+% \begin{function}{table-model-setup}
+%   \begin{syntax}
+%     |table-model-setup| = \meta{commands}
+%   \end{syntax}
+%   Additional commands to be inserted when using the |table-format| to
+%   create a model for alignment of cells. Typically this will be used to
+%   handle variable-width fonts in columns. The standard setting is empty.
+% \end{function}
+%
 % \begin{function}{table-number-alignment}
 %   \begin{syntax}
 %     |table-number-alignment| = |center|\verb"|"|left|\verb"|"|right|
@@ -818,7 +827,12 @@
 % \end{macro}
 %
 % \begin{variable}
-%   {\l_@@_auto_round_bool, \l_@@_align_mode_tl, \l_@@_align_number_tl}
+%   {
+%     \l_@@_auto_round_bool,
+%     \l_@@_model_setup_tl ,
+%     \l_@@_align_mode_tl  ,
+%     \l_@@_align_number_tl
+%   }
 %   Options for tables with defined space.
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -842,6 +856,8 @@
         \exp_args:NV \@@_generate_model:n \l_@@_model_tl
         \tl_set:Nn \l_@@_align_mode_tl { format }
       } ,
+    table-model-setup .tl_set:N =
+      \l_@@_model_setup_tl ,
     table-number-alignment .choices:nn =
       { center , left , right }
       { \tl_set_eq:NN \l_@@_align_number_tl \l_keys_choice_tl }
@@ -1174,7 +1190,12 @@
 %     \@@_print_format_auxxii:w  ,
 %     \@@_print_format_auxxiii:w
 %   }
-% \begin{macro}{\@@_print_format_box:Nn, \@@_print_format_box:No}
+% \begin{macro}
+%   {
+%     \@@_print_format_box:Nn, \@@_print_format_box:No ,
+%     \@@_print_model_box:Nn, \@@_print_model_box:No
+%   }
+% \begin{macro}{\@@_print_format_box:nNn, \@@_print_format_box:VNn}
 % \begin{macro}{\@@_print_format_after:N}
 % \begin{macro}{\@@_print_none:nnn}
 %    \begin{macrocode}
@@ -1325,7 +1346,7 @@
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   {
     \@@_color_check:w #3 \q_nil \q_stop
-    \@@_print_format_box:Nn \l_@@_tmp_box {#1}
+    \@@_print_model_box:Nn \l_@@_tmp_box {#1}
     \bool_if:NTF \l_@@_align_before_bool
       {
         \hbox_set_to_wd:Nnn \l_@@_integer_box
@@ -1365,7 +1386,7 @@
 \cs_new_protected:Npn \@@_print_format_auxii:w
   #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+    \@@_print_model_box:Nn \l_@@_tmp_box {#1#2}
     \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
     \@@_print_format_box:Nn \l_@@_tmp_box {#4#5}
     \dim_compare:nNnT { \box_wd:N \l_@@_tmp_box } > \l_@@_tmp_dim
@@ -1437,7 +1458,7 @@
 \cs_new_protected:Npn \@@_print_format_auxiii:w
   #1 \q_nil #2 \q_nil #3 \q_mark #4 \q_nil #5 \q_nil #6 \q_stop
   {
-    \@@_print_format_box:No \l_@@_tmp_box { \use_none:n #1#2 }
+    \@@_print_model_box:No \l_@@_tmp_box { \use_none:n #1#2 }
     \@@_print_format_box:No \l_@@_decimal_box { \use_none:n #4#5 }
     \dim_set:Nn \l_@@_carry_dim
       {
@@ -1506,7 +1527,7 @@
   #1 \q_nil #2 \q_nil #3 \q_mark
   #4 \q_nil #5 \q_nil #6 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box {#1#2}
+    \@@_print_model_box:Nn \l_@@_tmp_box {#1#2}
     \hbox_set_to_wd:Nnn \l_@@_tmp_box
       {
           \box_wd:N \l_@@_uncert_box
@@ -1536,7 +1557,7 @@
   #1 \q_nil #2 \q_mark
   #3 \q_nil #4 \q_stop
   {
-    \@@_print_format_box:Nn \l_@@_tmp_box { { } #1 }
+    \@@_print_model_box:Nn \l_@@_tmp_box { { } #1 }
     \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
     \@@_print_format_box:Nn \l_@@_tmp_box { { } #3 }
     \@@_print_format_auxxii:w #2 \q_mark #4 \q_stop
@@ -1563,7 +1584,7 @@
   {
     \tl_if_blank:nF {#2}
       {
-        \@@_print_format_box:Nn \l_@@_tmp_box { { } #1#2 }
+        \@@_print_model_box:Nn \l_@@_tmp_box { { } #1#2 }
         \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
         \@@_print_format_box:Nn \l_@@_tmp_box
           {
@@ -1571,7 +1592,7 @@
               { \l_@@_align_exponent_bool }
               { \tl_if_blank_p:n {#3} }
               {
-                \@@_print_format_box:Nn \l_@@_tmp_box { { } #1 { } }
+                \@@_print_model_box:Nn \l_@@_tmp_box { { } #1 { } }
                 \@@_skip:n { \box_wd:N \l_@@_tmp_box }
               }
             { } #3#4
@@ -1581,17 +1602,27 @@
   }
 %    \end{macrocode}
 %   A simple auxiliary to avoid relatively expensive use of the print routine
-%   for empty parts.
+%   for empty parts. There is a separate function for the model as this allows
+%   for the case where different font widths are in use.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_format_box:Nn #1#2
+  { \@@_print_format_box:nNn { } #1 {#2} }
+\cs_generate_variant:Nn \@@_print_format_box:Nn { No }
+\cs_new_protected:Npn \@@_print_model_box:Nn #1#2
+  { \@@_print_format_box:VNn \l_@@_model_setup_tl #1 {#2}  }
+\cs_generate_variant:Nn \@@_print_model_box:Nn { No }
+\cs_new_protected:Npn \@@_print_format_box:nNn #1#2#3
   {
-    \hbox_set:Nn #1
+    \hbox_set:Nn #2
       {
-        \tl_if_blank:nF {#2}
-          { \siunitx_print_number:n {#2} }
+        \tl_if_blank:nF {#3}
+          {
+            #1
+            \siunitx_print_number:n {#3}
+          }
       }
   }
-\cs_generate_variant:Nn \@@_print_format_box:Nn { No }
+\cs_generate_variant:Nn \@@_print_format_box:nNn { V }
 %    \end{macrocode}
 %   A common routine for placing material after the decimal marker and
 %   \enquote{shuffling}.
@@ -1645,6 +1676,7 @@
      }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
