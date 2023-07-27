@@ -156,6 +156,16 @@
 %   The standard settings set these empty.
 % \end{function}
 %
+% \begin{function}{compound-close-bracket, compound-open-bracket}
+%   \begin{syntax}
+%     |compound-close-bracket| = \meta{token} \\
+%     |compound-open-bracket|  = \meta{token}
+%   \end{syntax}
+%   Literals containing the tokens inserted at the start and end of a compound
+%   value when |compounds-units| is set to |bracket|. The standard settings are
+%   |(| and |)|.
+% \end{function}
+%
 % \begin{function}{compound-exponents}
 %   \begin{syntax}
 %     |compound-exponents| = |combine|\verb"|"|combine-bracket|\verb"|"|individual|
@@ -195,6 +205,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{list-close-bracket, list-open-bracket}
+%   \begin{syntax}
+%     |list-close-bracket| = \meta{token} \\
+%     |list-open-bracket|  = \meta{token}
+%   \end{syntax}
+%   Literals containing the tokens inserted at the start and end of a list when
+%   |list-units| is set to |bracket|. The standard settings are |(| and |)|.
+% \end{function}
+%
 % \begin{function}{list-exponents}
 %   \begin{syntax}
 %     |list-exponents| = |combine|\verb"|"|combine-bracket|\verb"|"|individual|
@@ -225,6 +244,16 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{product-close-bracket, product-open-bracket}
+%   \begin{syntax}
+%     |product-close-bracket| = \meta{token} \\
+%     |product-open-bracket|  = \meta{token}
+%   \end{syntax}
+%   Literals containing the tokens inserted at the start and end of a product
+%   when |product-units| is set to |bracket|. The standard settings are |(|
+%   and |)|.
+% \end{function}
+%
 % \begin{function}{product-exponents}
 %   \begin{syntax}
 %     |product-exponents| = |combine|\verb"|"|combine-bracket|\verb"|"|individual|
@@ -253,6 +282,15 @@
 %   \begin{syntax}
 %     |range-exponents| = |combine|\verb"|"|combine-bracket|\verb"|"|individual|
 %   \end{syntax}
+% \end{function}
+%
+% \begin{function}{range-close-bracket, range-open-bracket}
+%   \begin{syntax}
+%     |range-close-bracket| = \meta{token} \\
+%     |range-open-bracket|  = \meta{token}
+%   \end{syntax}
+%   Literals containing the tokens inserted at the start and end of a range when
+%   |range-units| is set to |bracket|. The standard settings are |(| and |)|.
 % \end{function}
 %
 % \begin{function}{range-open-phrase}
@@ -352,22 +390,14 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_bracket_close_tl, \l_@@_bracket_open_tl}
-%   Purely internal for the present.
-%    \begin{macrocode}
-\tl_new:N \l_@@_bracket_close_tl
-\tl_new:N \l_@@_bracket_open_tl
-\tl_set:Nn \l_@@_bracket_open_tl { ( }
-\tl_set:Nn \l_@@_bracket_close_tl { ) }
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{variable}
 %   {
 %     \l_@@_boundary_close_tl   ,
+%     \l_@@_bracket_close_tl
 %     \l_@@_separator_final_tl  ,
 %     \l_@@_separator_pair_tl   ,
 %     \l_@@_boundary_open_tl    ,
+%     \l_@@_bracket_open_tl
 %     \l_@@_separator_tl        ,
 %     \l_@@_separator_text_bool ,
 %     \l_@@_exp_bracket_bool    ,
@@ -393,6 +423,8 @@
       { \bool_set_true:N \l_@@_delim_text_bool } ,
     compound-close-boundary .tl_set:N =
       \l_@@_boundary_close_tl ,
+    compound-close-bracket .tl_set:N =
+      \l_@@_bracket_close_tl ,
     compound-exponents .choice: ,
     compound-exponents / combine .code:n =
       {
@@ -415,6 +447,8 @@
       \l_@@_separator_pair_tl ,
     compound-open-boundary .tl_set:N =
       \l_@@_boundary_open_tl ,
+    compound-open-bracket .tl_set:N =
+      \l_@@_bracket_open_tl ,
     compound-separator .tl_set:N =
       \l_@@_separator_tl ,
     compound-separator-mode .choice: ,
@@ -936,8 +970,10 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_bracket_close_tl             ,
 %     \l_siunitx_list_separator_tl       ,
 %     \l_siunitx_list_separator_final_tl ,
+%     \l_@@_bracket_open _tl             ,
 %     \l_siunitx_list_separator_pair_tl  ,
 %     \l_@@_exp_tl                       ,
 %     \l_@@_units_tl
@@ -948,10 +984,14 @@
 \tl_new:N \l_@@_units_tl
 \keys_define:nn { siunitx }
   {
+    list-close-bracket .tl_set:N =
+      \l_@@_bracket_close_tl ,
     list-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
     list-final-separator .tl_set:N = \l_siunitx_list_separator_final_tl ,
+    list-open-bracket .tl_set:N =
+      \l_@@_bracket_open_tl ,
     list-pair-separator .tl_set:N = \l_siunitx_list_separator_pair_tl ,
     list-separator .tl_set:N = \l_siunitx_list_separator_tl ,
     list-units .choices:nn =
@@ -984,11 +1024,15 @@
   {
     \keys_set:nx { siunitx }
       {
+        compound-close-bracket =
+          { \exp_not:V \l_@@_bracket_close_tl } ,
         compound-close-boundary  = ,
         compound-exponents       = \l_@@_exp_tl ,
         compound-final-separator =
           { \exp_not:V \l_siunitx_list_separator_final_tl } ,
         compound-open-boundary   = ,
+        compound-open-bracket =
+          { \exp_not:V \l_@@_bracket_open_tl } ,
         compound-pair-separator  =
           { \exp_not:V \l_siunitx_list_separator_pair_tl } ,
         compound-separator       =
@@ -1012,10 +1056,12 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_exp_tl      ,
-%     \l_@@_phrase_bool ,
-%     \l_@@_phrase_tl   ,
-%     \l_@@_symbol_tl   ,
+%     \l_@@_bracket_close_tl ,
+%     \l_@@_exp_tl           ,
+%     \l_@@_bracket_open_tl  ,
+%     \l_@@_phrase_bool      ,
+%     \l_@@_phrase_tl        ,
+%     \l_@@_symbol_tl        ,
 %     \l_@@_units_tl
 %   }
 %   Options for products.
@@ -1025,6 +1071,8 @@
 \tl_new:N \l_@@_units_tl
 \keys_define:nn { siunitx }
   {
+    product-close-bracket .tl_set:N =
+      \l_@@_bracket_close_tl ,
     product-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
@@ -1033,6 +1081,8 @@
       { \bool_set_true:N \l_@@_phrase_bool } ,
     product-mode / symbol .code:n =
       { \bool_set_false:N \l_@@_phrase_bool } ,
+    product-open-bracket .tl_set:N =
+      \l_@@_bracket_open_tl ,
     product-phrase .tl_set:N = \l_@@_phrase_tl ,
     product-symbol .tl_set:N = \l_@@_symbol_tl ,
     product-units .choices:nn =
@@ -1073,9 +1123,13 @@
     \keys_set:nx { siunitx }
       {
         compound-close-boundary  = ,
+        compound-close-bracket   =
+          { \exp_not:V \l_@@_bracket_close_tl } ,
         compound-exponents       = \l_@@_exp_tl ,
         compound-final-separator = { \exp_not:n {#1} } ,
         compound-open-boundary   = ,
+        compound-open-bracket    =
+          { \exp_not:V \l_@@_bracket_open_tl } ,
         compound-pair-separator  = { \exp_not:n {#1} } ,
         compound-separator       = { \exp_not:n {#1} } ,
         compound-separator-mode  =
@@ -1100,7 +1154,9 @@
 %
 % \begin{variable}
 %   {
+%     \l_@@_bracket_close_tl     ,
 %     \l_@@_exp_tl               ,
+%     \l_@@_bracket_open_tl      ,
 %     \l_@@_open_tl              ,
 %     \l_siunitx_range_phrase_tl ,
 %     \l_@@_units_tl
@@ -1111,9 +1167,13 @@
 \tl_new:N \l_@@_units_tl
 \keys_define:nn { siunitx }
   {
+    range-close-bracket .tl_set:N =
+      \l_@@_bracket_close_tl ,
     range-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
+    range-open-bracket .tl_set:N =
+      \l_@@_bracket_open_tl ,
     range-open-phrase .tl_set:N = \l_@@_open_tl ,
     range-phrase .tl_set:N = \l_siunitx_range_phrase_tl ,
     range-units .choices:nn =
@@ -1148,8 +1208,12 @@
       {
         compound-boundary-mode  = text ,
         compound-close-boundary = ,
+        compound-close-bracket  =
+          { \exp_not:V \l_@@_bracket_close_tl } ,
         compound-exponents      = \l_@@_exp_tl ,
         compound-open-boundary  = { \exp_not:V \l_@@_open_tl } ,
+        compound-open-bracket   =
+          { \exp_not:V \l_@@_bracket_open_tl } ,
         compound-pair-separator = { \exp_not:V \l_siunitx_range_phrase_tl } ,
         compound-separator-mode = text ,
         compound-units          = \l_@@_units_tl
@@ -1169,7 +1233,8 @@
 \keys_set:nn { siunitx }
   {
     compound-boundary-mode   = text       ,
-    compound-close-boundary  =            ,
+    compound-close-boundary  =            , % (
+    compound-close-bracket   = )          ,
     compound-exponents       = individual ,
     compound-final-separator =
       {
@@ -1178,6 +1243,7 @@
         \ifmmode \  \else \space \fi
       } ,
     compound-open-boundary  =             ,
+    compound-open-bracket   = (           , % )
     compound-pair-separator  =
       {
         \ifmmode \  \else \space \fi
@@ -1187,7 +1253,8 @@
     compound-separator       =
       { , \ifmmode \  \else \space \fi } ,
     compound-separator-mode  = text       ,
-    compound-units           = repeat     ,
+    compound-units           = repeat     , % (
+    list-close-bracket       = )          ,
     list-exponents           = individual ,
     list-final-separator     =
       {
@@ -1195,6 +1262,7 @@
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
+    list-open-bracket        = (           , % )
     list-pair-separator      =
       {
         \ifmmode \  \else \space \fi
@@ -1203,9 +1271,11 @@
       } ,
     list-separator           =
       { , \ifmmode \  \else \space \fi } ,
-    list-units               = repeat     ,
+    list-units               = repeat     , % (
+    product-close-bracket    = )          ,
     product-exponents        = individual ,
     product-mode             = symbol     ,
+    product-open-bracket     = (           , % )
     product-phrase           =
       {
         \ifmmode \  \else \space \fi
@@ -1213,8 +1283,10 @@
         \ifmmode \  \else \space \fi
       } ,
     product-symbol           = \times      ,
-    product-units            = repeat      ,
+    product-units            = repeat      , % (
+    range-close-bracket      = )           ,
     range-exponents          = individual  ,
+    range-open-bracket       = (           , % )
     range-open-phrase        =             ,
     range-phrase             =
       {

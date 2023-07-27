@@ -2004,21 +2004,27 @@ specialised options, which apply to these more unusual input forms
         \multicolumn{1}{l}{Option name} &
         Type &
         \multicolumn{1}{l}{Default\tnote{*}} \\
-      \midrule
-        list-exponents       & Choice  & individual           \\
-        list-final-separator & Literal & \verb*= \text{and} = \\
-        list-pair-separator  & Literal & \verb*= \text{and} = \\
-        list-separator       & Literal & \verb*=\text{,} =    \\
-        list-units           & Choice  & repeat               \\
-        product-exponents    & Choice  & individual           \\
-        product-mode         & Choice  & symbol               \\
-        product-phrase       & Literal & \verb*= \text{by} =  \\
-        product-symbol       & Literal & \cs{times}           \\
-        product-units        & Choice  & repeat               \\
-        range-exponents      & Choice  & individual           \\
-        range-open-phrase    & Literal & \meta{empty}         \\
-        range-phrase         & Literal & \verb*= \text{to} =  \\
-        range-units          & Choice  & repeat               \\
+      \midrule % (
+        lsit-close-bracket    & Literal & )                    \\
+        list-exponents        & Choice  & individual           \\
+        list-final-separator  & Literal & \verb*= \text{and} = \\
+        list-open-bracket     & Literal & (                    \\ % )
+        list-pair-separator   & Literal & \verb*= \text{and} = \\
+        list-separator        & Literal & \verb*=\text{,} =    \\
+        list-units            & Choice  & repeat               \\ % (
+        prodcut-close-bracket & Literal & )                    \\
+        product-exponents     & Choice  & individual           \\
+        product-mode          & Choice  & symbol               \\
+        product-open-bracket  & Literal & (                    \\ % )
+        product-phrase        & Literal & \verb*= \text{by} =  \\
+        product-symbol        & Literal & \cs{times}           \\
+        product-units         & Choice  & repeat               \\ % (
+        range-close-bracket   & Literal & )                    \\
+        range-exponents       & Choice  & individual           \\
+        range-open-bracket    & Literal & (                    \\ % )
+        range-open-phrase     & Literal & \meta{empty}         \\
+        range-phrase          & Literal & \verb*= \text{to} =  \\
+        range-units           & Choice  & repeat               \\
       \bottomrule
     \end{tabular}
     \footnotesize
@@ -2145,6 +2151,34 @@ The option \opt{product-units} also offers the settings \opt{bracket-power} and
   \qtyproduct{2 x 4}{\metre} \\
   \qtyproduct[product-units = bracket-power]{2 x 4}{\metre} \\
   \qtyproduct[product-units = power]{2 x 4}{\metre}
+\end{LaTeXdemo}
+\DescribeOption{list-close-bracket}
+\DescribeOption{list-open-bracket}
+\DescribeOption{product-close-bracket}
+\DescribeOption{product-open-bracket}
+\DescribeOption{range-close-bracket}
+\DescribeOption{range-open-bracket}
+The brackets used can be customised using the relevant \texttt{\dots-close-bracket}
+and \texttt{\dots-open-bracket options.
+\begin{LaTeXdemo}
+  \sisetup{
+    list-units         = bracket ,
+    list-open-bracket  = ( ,
+    list-close-bracket = )
+  }
+  \numlist{5e3;7e3;9e3;1e4} \\
+  \sisetup{
+    product-units         = bracket ,
+    product-open-bracket  = ( ,
+    product-close-bracket = )
+  }
+  \numproduct{5e3 x 7e3 x 9e3 x 1e4} \\
+  \sisetup{
+    range-units         = bracket ,
+    range-open-bracket  = ( ,
+    range-close-bracket = )
+  }
+  \qtyrange{2}{4}{\degreeCelsius}
 \end{LaTeXdemo}
 
 \subsection{Complex numbers}

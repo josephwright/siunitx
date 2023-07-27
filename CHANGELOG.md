@@ -21,7 +21,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Support for asymmetrical uncertainties, including new option
   `input-uncertainty-divider` (see issue
   [\#675](https://github.com/josephwright/siunitx/issues/675))
-
+- Options fro bracket control:
+  - `compound-close-bracket`
+  - `compound-open-bracket`
+  - `list-close-bracket`
+  - `list-open-bracket`
+  - `product-close-bracket` 
+  - `product-open-bracket` 
+  - `range-close-bracket` 
+  - `range-open-bracket` 
+  (see issue
+  [\#262](https://github.com/josephwright/siunitx/issues/262))
 
 ### Changed
 
