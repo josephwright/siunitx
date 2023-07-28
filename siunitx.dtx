@@ -263,7 +263,11 @@
 %    \begin{macrocode}
 \IfFormatAtLeastTF { 2020-10-01 }
   { }
-  { \RequirePackage { xparse } }
+  {
+    \RequirePackage { xparse }
+    \providecommand \ExpandArgs [1]
+      { \cs_if_exist_use:c { exp_args:N #1 } }
+  }
 %    \end{macrocode}
 %
 % \subsubsection{Preamble commands}
@@ -456,11 +460,8 @@
 % \begin{macro}{\complexnum, \complexqty}
 %   Interfaces for complex numbers.
 %    \begin{macrocode}
-\use:e
-  {
-    \NewDocumentCommand \exp_not:N \complexnum
-      { O { } > { \SplitArgument { 1 } { \c_colon_str } } m }
-  }
+\ExpandArgs { Ne } \NewDocumentCommand \complexnum
+  { O { } > { \SplitArgument { 1 } { \c_colon_str } } m }
   {
     \mode_leave_vertical:
     \group_begin:
@@ -468,11 +469,8 @@
       \@@_complex_number_aux:nn #2
     \group_end:
   }
-\use:e
-  {
-    \NewDocumentCommand \exp_not:N \complexqty
-      { O { } > { \SplitArgument { 1 } { \c_colon_str } } m  m }
-  }
+\ExpandArgs { Ne } \NewDocumentCommand \complexqty
+  { O { } > { \SplitArgument { 1 } { \c_colon_str } } m  m }
   {
     \mode_leave_vertical:
     \group_begin:
