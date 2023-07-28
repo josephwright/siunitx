@@ -34,6 +34,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#262](https://github.com/josephwright/siunitx/issues/262))
 - Option `table-model-setup` (see issue
   [\#659](https://github.com/josephwright/siunitx/issues/659))
+- Options `list-input-separator` and `product-input-separator` (see issue
+  [\#603](https://github.com/josephwright/siunitx/issues/603))
+  
 - Hint for ovrloading `\num` and `\qty` (see issue
   [\#648](https://github.com/josephwright/siunitx/issues/648))
 

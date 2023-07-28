@@ -184,16 +184,22 @@
 %
 % \subsection{Load time options}
 %
-% \begin{variable}{\l_@@_column_type_tl}
+% \begin{variable}{\l_@@_list_tl, \l_@@_product_tl, \l_@@_column_type_tl}
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    list-input-separator .tl_set:N =
+      \l_@@_list_tl ,
+    product-input-separator .tl_set:N =
+      \l_@@_product_tl ,
     table-column-type .tl_set:N =
       \l_@@_column_type_tl
   }
 \keys_set:nn { siunitx }
   {
-    table-column-type = S
+    list-input-separator    = ; ,
+    product-input-separator = x ,
+    table-column-type       = S
   }
 %    \end{macrocode}
 % \end{variable}
@@ -375,8 +381,12 @@
 %   {\qtylist, \numlist, \qtyproduct, \numproduct, \qtyrange, \numproduct}
 %   Interfaces for compound values.
 %    \begin{macrocode}
-\NewDocumentCommand \qtylist
-  { O { } > { \SplitList { ; } } m > { \TrimSpaces } m }
+\ExpandArgs { Ne } \NewDocumentCommand \qtylist
+  {
+    O { }
+    > { \SplitList { \exp_not:V \l_@@_list_tl } } m
+    > { \TrimSpaces } m
+  }
   {
     \mode_leave_vertical:
     \group_begin:
@@ -385,7 +395,11 @@
       \siunitx_quantity_list:nn {#2} {#3}
     \group_end:
   }
-\NewDocumentCommand \numlist { O { } > { \SplitList { ; } } m }
+\ExpandArgs { Ne } \NewDocumentCommand \numlist
+  {
+    O { }
+    > { \SplitList { \exp_not:V \l_@@_list_tl } } m
+  }
   {
     \mode_leave_vertical:
     \group_begin:
@@ -393,8 +407,12 @@
       \siunitx_number_list:nn {#2}
     \group_end:
   }
-\NewDocumentCommand \qtyproduct
-  { O { } > { \SplitList { x } } m > { \TrimSpaces } m }
+\ExpandArgs { Ne } \NewDocumentCommand \qtyproduct
+  {
+    O { }
+    > { \SplitList { \exp_not:V \l_@@_product_tl } } m
+    > { \TrimSpaces } m
+  }
   {
     \mode_leave_vertical:
     \group_begin:
@@ -403,8 +421,11 @@
       \siunitx_quantity_product:nn {#2} {#3}
     \group_end:
   }
-\NewDocumentCommand \numproduct
-  { O { } > { \SplitList { x } } > { \TrimSpaces } m }
+\ExpandArgs { Ne } \NewDocumentCommand \numproduct
+  {
+    O { }
+    > { \SplitList { \exp_not:V \l_@@_product_tl } } m
+  }
   {
     \mode_leave_vertical:
     \group_begin:
