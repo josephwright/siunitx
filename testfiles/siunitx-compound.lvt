@@ -519,4 +519,57 @@
     \test:nn { { 1885 } { 1986 } { 2023 } } { \per \centi \metre }
   }
 
+\OMIT
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \str_if_eq:nnTF {#1} { list }
+          { \siunitx_quantity_list:nn {#2} { \Hz } }
+          {
+            \str_if_eq:nnTF {#1} { product }
+              { \siunitx_quantity_product:nn {#2} { \Hz } }
+              {
+                \str_if_eq:nnTF {#1} { compound }
+                  { \siunitx_compound_quantity:nn {#2} { \Hz } }
+                  { \siunitx_quantity_range:nnn {#1} {#2} { \Hz } }
+              }
+          }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
+
+\TEST { Option~settings~"compound-independent-prefix~=~true"~and~"prefix-mode~=~combine-exponent" }
+  {
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:nn { compound } { { 1e3 } { 2e6 } { 3e9 } }
+    \keys_set:nn { siunitx } { compound-independent-prefix = true }
+    \test:nn { compound } { { 1e3 } { 2e6 } { 3e9 } }
+  }
+
+\TEST { Option~settings~"list-independent-prefix~=~true"~and~"prefix-mode~=~combine-exponent" }
+  {
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:nn { list } { { 1e3 } { 2e6 } { 3e9 } }
+    \keys_set:nn { siunitx } { list-independent-prefix = true }
+    \test:nn { list } { { 1e3 } { 2e6 } { 3e9 } }
+  }
+
+\TEST { Option~settings~"product-independent-prefix~=~true"~and~"prefix-mode~=~combine-exponent" }
+  {
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:nn { product } { { 1e3 } { 2e6 } { 3e9 } }
+    \keys_set:nn { siunitx } { product-independent-prefix = true }
+    \test:nn { product } { { 1e3 } { 2e6 } { 3e9 } }
+  }
+
+\TEST { Option~settings~"range-independent-prefix~=~true"~and~"prefix-mode~=~combine-exponent" }
+  {
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:nn { 1e3 } { 2e6 }
+    \keys_set:nn { siunitx } { range-independent-prefix = true }
+    \test:nn { 1e3 } { 2e6 }
+  }
+
 \END

@@ -178,6 +178,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{compound-independent-prefix}
+%   \begin{syntax}
+%     |compound-independent-prefix| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines whether unit prefixes are calculated
+%   independently when units are repeated. The standard setting is
+%   |false|.
+% \end{function}
+%
 % \begin{function}{compound-pair-separator}
 %   \begin{syntax}
 %     |compound-pair-separator| = \meta{text}
@@ -226,6 +235,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{list-independent-prefix}
+%   \begin{syntax}
+%     |list-independent-prefix| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines whether unit prefixes are calculated
+%   independently when units are repeated. The standard setting is
+%   |false|.
+% \end{function}
+%
 % \begin{function}{list-pair-separator}
 %   \begin{syntax}
 %     |list-pair-separator| = \meta{text}
@@ -260,6 +278,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{product-independent-prefix}
+%   \begin{syntax}
+%     |product-independent-prefix| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines whether unit prefixes are calculated
+%   independently when units are repeated. The standard setting is
+%   |false|.
+% \end{function}
+%
 % \begin{function}{product-mode}
 %   \begin{syntax}
 %     |product-mode| = |phrase|\verb"|"|choice|
@@ -291,6 +318,15 @@
 %   \end{syntax}
 %   Literals containing the tokens inserted at the start and end of a range when
 %   |range-units| is set to |bracket|. The standard settings are |(| and |)|.
+% \end{function}
+%
+% \begin{function}{range-independent-prefix}
+%   \begin{syntax}
+%     |range-independent-prefix| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch which determines whether unit prefixes are calculated
+%   independently when units are repeated. The standard setting is
+%   |false|.
 % \end{function}
 %
 % \begin{function}{range-open-phrase}
@@ -330,6 +366,7 @@
 %
 %    \begin{macrocode}
 \cs_generate_variant:Nn \keys_set:nn { nx }
+\cs_generate_variant:Nn \seq_use:Nnnn { NVVV }
 %    \end{macrocode}
 %
 % \subsection{General mechanism}
@@ -394,6 +431,7 @@
 %   {
 %     \l_@@_boundary_close_tl   ,
 %     \l_@@_bracket_close_tl    ,
+%     \l_@@_independent_bool    ,
 %     \l_@@_separator_final_tl  ,
 %     \l_@@_separator_pair_tl   ,
 %     \l_@@_boundary_open_tl    ,
@@ -404,7 +442,7 @@
 %     \l_@@_exp_combine_bool    ,
 %     \l_@@_unit_bracket_bool   ,
 %     \l_@@_unit_power_bool     ,
-%     \l_@@_unit_repeat_bool
+%     \l_@@_unit_repeat_bool    ,
 %   }
 %   List options.
 %    \begin{macrocode}
@@ -444,6 +482,8 @@
       } ,
     compound-final-separator .tl_set:N =
       \l_@@_separator_final_tl ,
+    compound-independent-prefix .bool_set:N =
+      \l_@@_independent_bool , 
     compound-pair-separator .tl_set:N =
       \l_@@_separator_pair_tl ,
     compound-open-boundary .tl_set:N =
@@ -487,7 +527,7 @@
         \bool_set_false:N \l_@@_unit_bracket_bool
         \bool_set_false:N \l_@@_unit_power_bool
         \bool_set_false:N \l_@@_unit_repeat_bool
-      }
+      }  
   }
 %    \end{macrocode}
 % \end{variable}
@@ -745,7 +785,12 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_compound_quantity:nn}
+% \begin{macro}
+%   {
+%     \siunitx_compound_quantity:nn ,
+%     \@@_quantity_auxi:nn          ,
+%     \@@_quantity_auxii:nn
+%   }
 %   For quantities, life is more complex as there are interactions between the
 %   options for exponents and units. The \cs{c_empty_tl} suppresses any
 %   leading \texttt{1} if the unit starts \cs{per}; the \pkg{siunitx-print}
@@ -754,37 +799,76 @@
 \cs_new_protected:Npn \siunitx_compound_quantity:nn #1#2
   {
     \group_begin:
-      \bool_if:NT \l_@@_unit_bracket_bool
-        { \bool_set_true:N \l_@@_exp_bracket_bool }
-      \bool_if:NT \l_@@_unit_repeat_bool
-        { \bool_set_false:N \l_@@_exp_combine_bool }
-      \bool_lazy_or:nnT
-        { \l_@@_unit_bracket_bool }
-        { ! \l_@@_unit_repeat_bool }
-        { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
-      \bool_set_true:N \l_@@_unit_bool
-      \@@_format:nn {#1} {#2}
-      \bool_if:NF \l_siunitx_number_parse_bool
-        { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
-      \str_if_eq:VnT \l_siunitx_quantity_prefix_mode_tl { combine-exponent }
-        { \tl_clear:N \l_@@_exp_tl }
-      \bool_if:NTF \l_@@_unit_repeat_bool
-        { \@@_print:N \@@_print_quantity:x }
+      \bool_lazy_all:nTF
         {
-          \bool_lazy_and:nnTF
-            { \l_@@_unit_bracket_bool }
-            { \tl_if_empty_p:N \l_@@_exp_tl }
-            {
-              \siunitx_print_number:V \l_@@_bracket_open_tl
-              \@@_print:N \siunitx_print_number:x
-              \siunitx_print_number:V \l_@@_bracket_close_tl
-            }
-            { \@@_print:N \siunitx_print_number:x }
-          \@@_print_quantity:n { \c_empty_tl }
+          { \l_@@_independent_bool }
+          {
+            \str_if_eq_p:Vn
+              \l_siunitx_quantity_prefix_mode_tl
+              { combine-exponent }
+          }
+          { \int_compare_p:nNn { \tl_count:n {#1} } > 1 }
         }
+        { \@@_quantity_auxi:nn }
+        { \@@_quantity_auxii:nn }
+          {#1} {#2}
     \group_end:
   }
 %    \end{macrocode}
+%   The rather special case where all units are printed independently:
+%   we just convert to a simple sequence then print.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_quantity_auxi:nn #1#2
+  {
+    \@@_print_boundary:V \l_@@_boundary_close_tl
+    \seq_clear:N \l_@@_tmp_seq
+    \tl_map_inline:nn {#1}
+      {
+        \seq_put_right:Nn \l_@@_tmp_seq
+          { \siunitx_quantity:nn {##1} {#2} }
+      }
+    \seq_use:NVVV \l_@@_tmp_seq
+      \l_@@_separator_pair_tl
+      \l_@@_separator_tl
+      \l_@@_separator_final_tl
+    \@@_print_boundary:V \l_@@_boundary_close_tl
+  }
+%    \end{macrocode}
+%   The business end for all other cases.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_quantity_auxii:nn #1#2
+  {
+    \bool_if:NT \l_@@_unit_bracket_bool
+      { \bool_set_true:N \l_@@_exp_bracket_bool }
+    \bool_if:NT \l_@@_unit_repeat_bool
+      { \bool_set_false:N \l_@@_exp_combine_bool }
+    \bool_lazy_or:nnT
+      { \l_@@_unit_bracket_bool }
+      { ! \l_@@_unit_repeat_bool }
+      { \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool }
+    \bool_set_true:N \l_@@_unit_bool
+    \@@_format:nn {#1} {#2}
+    \bool_if:NF \l_siunitx_number_parse_bool
+      { \siunitx_unit_format:nN {#2} \l_@@_unit_tl }
+    \str_if_eq:VnT \l_siunitx_quantity_prefix_mode_tl { combine-exponent }
+      { \tl_clear:N \l_@@_exp_tl }
+    \bool_if:NTF \l_@@_unit_repeat_bool
+      { \@@_print:N \@@_print_quantity:x }
+      {
+        \bool_lazy_and:nnTF
+          { \l_@@_unit_bracket_bool }
+          { \tl_if_empty_p:N \l_@@_exp_tl }
+          {
+            \siunitx_print_number:V \l_@@_bracket_open_tl
+            \@@_print:N \siunitx_print_number:x
+            \siunitx_print_number:V \l_@@_bracket_close_tl
+          }
+          { \@@_print:N \siunitx_print_number:x }
+        \@@_print_quantity:n { \c_empty_tl }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@@_print:N}
@@ -972,9 +1056,10 @@
 % \begin{variable}
 %   {
 %     \l_@@_bracket_close_tl             ,
+%     \l_@@_independent_bool             ,
 %     \l_siunitx_list_separator_tl       ,
 %     \l_siunitx_list_separator_final_tl ,
-%     \l_@@_bracket_open _tl             ,
+%     \l_@@_bracket_open_tl              ,
 %     \l_siunitx_list_separator_pair_tl  ,
 %     \l_@@_exp_tl                       ,
 %     \l_@@_units_tl
@@ -991,12 +1076,14 @@
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
     list-final-separator .tl_set:N = \l_siunitx_list_separator_final_tl ,
+    list-independent-prefix .bool_set:N =
+      \l_@@_independent_bool ,
     list-open-bracket .tl_set:N =
       \l_@@_bracket_open_tl ,
     list-pair-separator .tl_set:N = \l_siunitx_list_separator_pair_tl ,
     list-separator .tl_set:N = \l_siunitx_list_separator_tl ,
     list-units .choices:nn =
-      { bracket , repeat , single }
+      { bracket , independent , repeat , single }
       { \tl_set_eq:NN \l_@@_units_tl \l_keys_choice_tl }
   }
 %    \end{macrocode}
@@ -1025,21 +1112,23 @@
   {
     \keys_set:nx { siunitx }
       {
-        compound-close-bracket =
+        compound-close-bracket       =
           { \exp_not:V \l_@@_bracket_close_tl } ,
-        compound-close-boundary  = ,
-        compound-exponents       = \l_@@_exp_tl ,
-        compound-final-separator =
+        compound-close-boundary       = ,
+        compound-exponents            = \l_@@_exp_tl ,
+        compound-final-separator      =
           { \exp_not:V \l_siunitx_list_separator_final_tl } ,
-        compound-open-boundary   = ,
-        compound-open-bracket =
+        compound-independent-prefix =
+          \bool_if:NTF \l_@@_independent_bool { true } { false } ,
+        compound-open-boundary        = ,
+        compound-open-bracket         =
           { \exp_not:V \l_@@_bracket_open_tl } ,
-        compound-pair-separator  =
+        compound-pair-separator       =
           { \exp_not:V \l_siunitx_list_separator_pair_tl } ,
-        compound-separator       =
+        compound-separator            =
           { \exp_not:V \l_siunitx_list_separator_tl } ,
-        compound-separator-mode  = text ,
-        compound-units           = \l_@@_units_tl
+        compound-separator-mode       = text ,
+        compound-units                = \l_@@_units_tl
       }
   }
 %    \end{macrocode}
@@ -1059,6 +1148,7 @@
 %   {
 %     \l_@@_bracket_close_tl ,
 %     \l_@@_exp_tl           ,
+%     \l_@@_independent_bool ,
 %     \l_@@_bracket_open_tl  ,
 %     \l_@@_phrase_bool      ,
 %     \l_@@_phrase_tl        ,
@@ -1077,6 +1167,8 @@
     product-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
+    product-independent-prefix .bool_set:N =
+      \l_@@_independent_bool ,
     product-mode .choice: ,
     product-mode / phrase .code:n =
       { \bool_set_true:N \l_@@_phrase_bool } ,
@@ -1087,7 +1179,7 @@
     product-phrase .tl_set:N = \l_@@_phrase_tl ,
     product-symbol .tl_set:N = \l_@@_symbol_tl ,
     product-units .choices:nn =
-      { bracket , bracket-power , power , repeat , single }
+      { bracket , bracket-power , independent , power , repeat , single }
       { \tl_set_eq:NN \l_@@_units_tl \l_keys_choice_tl }
   }
 %    \end{macrocode}
@@ -1123,19 +1215,21 @@
   {
     \keys_set:nx { siunitx }
       {
-        compound-close-boundary  = ,
-        compound-close-bracket   =
+        compound-close-boundary       = ,
+        compound-close-bracket        =
           { \exp_not:V \l_@@_bracket_close_tl } ,
-        compound-exponents       = \l_@@_exp_tl ,
-        compound-final-separator = { \exp_not:n {#1} } ,
-        compound-open-boundary   = ,
-        compound-open-bracket    =
+        compound-exponents            = \l_@@_exp_tl ,
+        compound-final-separator      = { \exp_not:n {#1} } ,
+        compound-independent-prefix =
+          \bool_if:NTF \l_@@_independent_bool { true } { false } ,
+        compound-open-boundary        = ,
+        compound-open-bracket         =
           { \exp_not:V \l_@@_bracket_open_tl } ,
-        compound-pair-separator  = { \exp_not:n {#1} } ,
-        compound-separator       = { \exp_not:n {#1} } ,
-        compound-separator-mode  =
+        compound-pair-separator       = { \exp_not:n {#1} } ,
+        compound-separator            = { \exp_not:n {#1} } ,
+        compound-separator-mode       =
           \bool_if:NTF \l_@@_phrase_bool { text } { number } ,
-        compound-units           = \l_@@_units_tl
+        compound-units                = \l_@@_units_tl
       }
   }
 \cs_generate_variant:Nn \@@_aux:n { x }
@@ -1157,6 +1251,7 @@
 %   {
 %     \l_@@_bracket_close_tl     ,
 %     \l_@@_exp_tl               ,
+%     \l_@@_independent_bool     ,
 %     \l_@@_bracket_open_tl      ,
 %     \l_@@_open_tl              ,
 %     \l_siunitx_range_phrase_tl ,
@@ -1173,12 +1268,14 @@
     range-exponents .choices:nn =
       { combine , combine-bracket , individual }
       { \tl_set_eq:NN \l_@@_exp_tl \l_keys_choice_tl } ,
+    range-independent-prefix .bool_set:N =
+      \l_@@_independent_bool ,
     range-open-bracket .tl_set:N =
       \l_@@_bracket_open_tl ,
     range-open-phrase .tl_set:N = \l_@@_open_tl ,
     range-phrase .tl_set:N = \l_siunitx_range_phrase_tl ,
     range-units .choices:nn =
-      { bracket , repeat , single }
+      { bracket , independent , repeat , single }
       { \tl_set_eq:NN \l_@@_units_tl \l_keys_choice_tl }
   }
 %    \end{macrocode}
@@ -1207,17 +1304,20 @@
   {
     \keys_set:nx { siunitx }
       {
-        compound-boundary-mode  = text ,
-        compound-close-boundary = ,
-        compound-close-bracket  =
+        compound-boundary-mode        = text ,
+        compound-close-boundary       = ,
+        compound-close-bracket        =
           { \exp_not:V \l_@@_bracket_close_tl } ,
-        compound-exponents      = \l_@@_exp_tl ,
-        compound-open-boundary  = { \exp_not:V \l_@@_open_tl } ,
-        compound-open-bracket   =
+        compound-exponents            = \l_@@_exp_tl ,
+        compound-independent-prefix =
+          \bool_if:NTF \l_@@_independent_bool { true } { false } ,
+        compound-open-boundary        = { \exp_not:V \l_@@_open_tl } ,
+        compound-open-bracket         =
           { \exp_not:V \l_@@_bracket_open_tl } ,
-        compound-pair-separator = { \exp_not:V \l_siunitx_range_phrase_tl } ,
-        compound-separator-mode = text ,
-        compound-units          = \l_@@_units_tl
+        compound-pair-separator       =
+          { \exp_not:V \l_siunitx_range_phrase_tl } ,
+        compound-separator-mode       = text ,
+        compound-units                = \l_@@_units_tl
       }
   }
 %    \end{macrocode}
@@ -1233,69 +1333,73 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    compound-boundary-mode   = text       ,
-    compound-close-boundary  =            , % (
-    compound-close-bracket   = )          ,
-    compound-exponents       = individual ,
-    compound-final-separator =
+    compound-boundary-mode      = text          ,
+    compound-close-boundary     =               , % (
+    compound-close-bracket      = )             ,
+    compound-exponents          = individual    ,
+    compound-final-separator    =
       {
         \ifmmode \  \else \space \fi
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
-    compound-open-boundary  =             ,
-    compound-open-bracket   = (           , % )
-    compound-pair-separator  =
+    compound-independent-prefix = false      ,
+    compound-open-boundary      =            ,
+    compound-open-bracket       = (          , % )
+    compound-pair-separator     =
       {
         \ifmmode \  \else \space \fi
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
-    compound-separator       =
+    compound-separator          =
       { , \ifmmode \  \else \space \fi } ,
-    compound-separator-mode  = text       ,
-    compound-units           = repeat     , % (
-    list-close-bracket       = )          ,
-    list-exponents           = individual ,
-    list-final-separator     =
+    compound-separator-mode     = text       ,
+    compound-units              = repeat     , % (
+    list-close-bracket          = )          ,
+    list-exponents              = individual ,
+    list-final-separator        =
       {
         \ifmmode \  \else \space \fi
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
-    list-open-bracket        = (           , % )
-    list-pair-separator      =
+    list-independent-prefix     = false      ,
+    list-open-bracket           = (          , % )
+    list-pair-separator         =
       {
         \ifmmode \  \else \space \fi
         \text { and }
         \ifmmode \  \else \space \fi
       } ,
-    list-separator           =
+    list-separator              =
       { , \ifmmode \  \else \space \fi } ,
-    list-units               = repeat     , % (
-    product-close-bracket    = )          ,
-    product-exponents        = individual ,
-    product-mode             = symbol     ,
-    product-open-bracket     = (           , % )
-    product-phrase           =
+    list-units                  = repeat     , % (
+    product-close-bracket       = )          ,
+    product-exponents           = individual ,
+    product-independent-prefix  = false      ,
+    product-mode                = symbol     ,
+    product-open-bracket        = (          , % )
+    product-phrase              =
       {
         \ifmmode \  \else \space \fi
         \text { by }
         \ifmmode \  \else \space \fi
       } ,
-    product-symbol           = \times      ,
-    product-units            = repeat      , % (
-    range-close-bracket      = )           ,
-    range-exponents          = individual  ,
-    range-open-bracket       = (           , % )
-    range-open-phrase        =             ,
-    range-phrase             =
+    product-symbol             = \times      ,
+    product-units              = repeat      , % (
+    range-close-bracket        = )           ,
+    range-exponents            = individual  ,
+    range-independent-prefix   = false       ,
+    range-open-bracket         = (           , % )
+    range-open-phrase          =             ,
+    range-phrase               =
       {
         \ifmmode \  \else \space \fi
         \text { to }
         \ifmmode \  \else \space \fi
       } ,
-    range-units              = repeat
+    range-units                = repeat
   }
 %    \end{macrocode}
 %

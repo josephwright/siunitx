@@ -36,6 +36,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#659](https://github.com/josephwright/siunitx/issues/659))
 - Options `list-input-separator` and `product-input-separator` (see issue
   [\#603](https://github.com/josephwright/siunitx/issues/603))
+- Options `compound-independent-prefix`, `list-independent-prefix`,
+  `product-independent-prefix` and `range-independent-prefix` (see issue
+  [\#554](https://github.com/josephwright/siunitx/issues/554))
 - Hint for overloading `\num` and `\qty` (see issue
   [\#648](https://github.com/josephwright/siunitx/issues/648))
 
