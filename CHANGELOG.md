@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Suppress alignment token in formatted asymmetric uncertainty (see issue
+  [\#679](https://github.com/josephwright/siunitx/issues/679))
+
 ## [v3.3.0] - 2023-07-31
 
 ### Added
