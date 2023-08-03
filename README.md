@@ -1,5 +1,4 @@
-siunitx - A comprehensive (SI) units package
-============================================
+# `siunitx` - A comprehensive (SI) units package
 
 Physical quantities have both numbers and units, and each physical quantity
 should be expressed as the product of a number and a unit. Typesetting physical
