@@ -1,5 +1,7 @@
 # `siunitx` - A comprehensive (SI) units package
 
+## Description
+
 Physical quantities have both numbers and units, and each physical quantity
 should be expressed as the product of a number and a unit. Typesetting physical
 quantities requires care to ensure that the combined mathematical meaning of the
@@ -12,3 +14,11 @@ consistent way. The package has an extended set of configuration options which
 make it possible to follow varying typographic conventions with the same input
 syntax. The package includes automated processing of numbers and units, and the
 ability to control tabular alignment of numbers.
+
+## Author
+
+This package is maintained by Joseph Wright: joseph.wright@morningstar2.co.uk
+
+## License
+
+Released under the LaTeX Project Public License v1.3c or later. See http://www.latex-project.org/lppl.txt
