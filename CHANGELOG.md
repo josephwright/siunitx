@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.2] - 2023-08-03
+
 ### Fixed
 - Move an `expl3` variant defintion (see issue
   [\#680](https://github.com/josephwright/siunitx/issues/680))
@@ -1982,7 +1984,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.1...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.2...HEAD
+[v3.3.2]: https://github.com/josephwright/siunitx/compare/v3.3.1...v3.3.2
 [v3.3.1]: https://github.com/josephwright/siunitx/compare/v3.3.0...v3.3.1
 [v3.3.0]: https://github.com/josephwright/siunitx/compare/v3.2.9...v3.3.0
 [v3.2.9]: https://github.com/josephwright/siunitx/compare/v3.2.8...v3.2.9
