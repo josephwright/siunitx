@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Correct an internal variable name (see issue
+  [\#689](https://github.com/josephwright/siunitx/issues/689))
+
 ## [v3.3.3] - 2023-08-23
 
 ### Fixed
