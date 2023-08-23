@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.3.2] - 2023-08-03
 
 ### Fixed
-- Move an `expl3` variant defintion (see issue
+- Move an `expl3` variant definition (see issue
   [\#680](https://github.com/josephwright/siunitx/issues/680))
 
 ## [v3.3.1] - 2023-08-01
