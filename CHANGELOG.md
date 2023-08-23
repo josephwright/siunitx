@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Include uncertainty divider in number validation (see issue
+  [\#686](https://github.com/josephwright/siunitx/issues/686))
+
 ## [v3.3.2] - 2023-08-03
 
 ### Fixed
