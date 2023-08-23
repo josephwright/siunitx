@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.3] - 2023-08-23
+
 ### Fixed
 - Include uncertainty divider in number validation (see issue
   [\#686](https://github.com/josephwright/siunitx/issues/686))
@@ -1988,7 +1990,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.2...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.3...HEAD
+[v3.3.3]: https://github.com/josephwright/siunitx/compare/v3.3.2...v3.3.3
 [v3.3.2]: https://github.com/josephwright/siunitx/compare/v3.3.1...v3.3.2
 [v3.3.1]: https://github.com/josephwright/siunitx/compare/v3.3.0...v3.3.1
 [v3.3.0]: https://github.com/josephwright/siunitx/compare/v3.2.9...v3.3.0
