@@ -711,7 +711,7 @@
 %   Variants not provided by \pkg{expl3}.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \keys_set:nn { nx }
-\cs_generate_variant:Nn \tl_if_blank:nTF { f }
+\cs_generate_variant:Nn \tl_if_blank:nTF { e }
 \cs_generate_variant:Nn \tl_if_in:NnTF { NV }
 \cs_generate_variant:Nn \tl_if_in:nnTF { nV }
 \cs_generate_variant:Nn \tl_remove_all:Nn { NV }
@@ -1078,7 +1078,7 @@
     \tl_put_right:NV \l_@@_uncert_tl \l_@@_flex_tl
     \tl_if_empty:NF \l_@@_uncert_tl
       {
-        \tl_if_blank:fTF { \exp_after:wN \use_iv:nnnn \l_@@_parsed_tl }
+        \tl_if_blank:eTF { \exp_after:wN \use_iv:nnnn \l_@@_parsed_tl }
           { \@@_parse_combine_uncert: }
           { \tl_clear:N \l_@@_parsed_tl }
       }
@@ -1099,8 +1099,10 @@
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert_loop:nnnnnnn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnnn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnnnn}
+% \begin{macro}[EXP]
+%   {\@@_parse_combine_uncert:nnnnnn, \@@_parse_combine_uncert:ennnnn}
+% \begin{macro}[EXP]
+%   {\@@_parse_combine_uncert:nnnnnnn, \@@_parse_combine_uncert:ennnnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert_aux:nnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:N}
@@ -1148,7 +1150,7 @@
   {
     \quark_if_recursion_tail_stop_do:nn {#4}
       { \@@_parse_combine_uncert_end:nnn {#1} {#2} {#3} }
-    \exp_args:Nf \@@_parse_combine_uncert:nnnnnn
+    \@@_parse_combine_uncert:ennnnn
       { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#6} } }
       {#1} {#2} {#3} {#5} {#6}
   }
@@ -1160,10 +1162,11 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_parse_combine_uncert:nnnnnn #1
   {
-    \exp_args:Nf \@@_parse_combine_uncert:nnnnnnn
+    \@@_parse_combine_uncert:ennnnnn
       { \prg_replicate:nn { \int_abs:n {#1} } { 0 } }
       {#1}
   }
+\cs_generate_variant:Nn \@@_parse_combine_uncert:nnnnnn { e }
 \cs_new:Npn \@@_parse_combine_uncert:nnnnnnn #1#2#3#4#5#6#7
   {
     \int_compare:nNnTF {#2} > 0
@@ -1176,6 +1179,7 @@
           { #3 #1 } {#4} {#5} {#6} {#7}
       }
   }
+\cs_generate_variant:Nn \@@_parse_combine_uncert:nnnnnnn { e }
 %    \end{macrocode}
 %   We now ensure that the decimal part is never entirely blank \emph{if} there
 %   are decimal-part uncertainty digits. There is also a need to handle the
@@ -1669,7 +1673,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_after_decimal:NN #1#2
   {
-    \tl_if_blank:fTF { \exp_after:wN \use_none:n #1 }
+    \tl_if_blank:eTF { \exp_after:wN \use_none:n #1 }
       {
         \quark_if_recursion_tail_stop_do:Nn #2
           { \@@_parse_loop_break:w \q_recursion_stop }
@@ -2222,25 +2226,23 @@
 %   }
 % \begin{macro}[EXP]
 %   {
-%     \@@_exponent_fixed:nnnnnnnn       ,
-%     \@@_exponent_scientific:nnnnnnnn
+%     \@@_exponent_fixed:nnnnnnnn      ,
+%     \@@_exponent_fixed:ennnnnnn      ,
+%     \@@_exponent_scientific:nnnnnnnn ,
+%     \@@_exponent_scientific:ennnnnnn
 %   }
 % \begin{macro}[EXP]{\@@_exponent_scientific:nnnw}
-% \begin{macro}[EXP]{\@@_exponent_shift:nnn,\@@_exponent_shift:nnf}
+% \begin{macro}[EXP]{\@@_exponent_shift:nnn, \@@_exponent_shift:nne}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnnw}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_down:nw}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnn}
 % \begin{macro}[EXP]{\@@_exponent_shift_up:nnw}
 % \begin{macro}[EXP]
-%   {
-%     \@@_exponent_shift_up_aux:nnn ,
-%     \@@_exponent_shift_up_aux:fnn ,
-%     \@@_exponent_shift_up_aux:ffn
-%   }
+%   {\@@_exponent_shift_up_aux:nnn, \@@_exponent_shift_up_aux:een}
 % \begin{macro}[EXP]{\@@_exponent_shift_uncert:nw}
 % \begin{macro}[EXP]
-%   {\@@_exponent_shift_uncert_S:nnnn, \@@_exponent_shift_uncert_S:fnnn}
+%   {\@@_exponent_shift_uncert_S:nnnn, \@@_exponent_shift_uncert_S:ennn}
 % \begin{macro}[EXP]{\@@_exponent_uncert:n}
 % \begin{macro}[EXP]{\@@_exponent_finalise:n}
 % \begin{macro}[EXP]{\@@_exponent_engineering_aux:nnnnnnn}
@@ -2279,7 +2281,7 @@
   }
 \cs_new:Npn \@@_exponent_fixed:nnnnnnn #1#2#3#4#5#6#7
   {
-    \exp_args:Nf \@@_exponent_fixed:nnnnnnnn
+    \@@_exponent_fixed:ennnnnnn
       { \int_eval:n { \l_@@_exponent_fixed_int - (#6#7) } }
       {#1} {#2} {#3} {#4} {#5} {#6} {#7}
   }
@@ -2291,6 +2293,7 @@
     { \int_compare:nNnT \l_@@_exponent_fixed_int < 0 { - }  }
     { \int_abs:n \l_@@_exponent_fixed_int }
   }
+\cs_generate_variant:Nn \@@_exponent_fixed:nnnnnnnn { e }
 \cs_new:Npn \@@_exponent_input:nnnnnnn #1#2#3#4#5#6#7
   { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
 %    \end{macrocode}
@@ -2301,7 +2304,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_exponent_scientific:nnnnnnn #1#2#3#4#5#6#7
   {
-    \exp_args:Nf \@@_exponent_scientific:nnnnnnnn
+    \@@_exponent_scientific:ennnnnnn
       { \int_eval:n { \tl_count:n {#3} } }
       {#1} {#2} {#3} {#4} {#5} {#6} {#7}
   }
@@ -2323,6 +2326,7 @@
         \@@_exponent_finalise:n { #1 + #7#8 - 1 }
       }
   }
+\cs_generate_variant:Nn \@@_exponent_scientific:nnnnnnnn { e } 
 \cs_new_eq:NN \@@_exponent_engineering:nnnnnnn
   \@@_exponent_scientific:nnnnnnn
 \cs_new:Npn \@@_exponent_scientific:nnnw #1#2#3#4#5 \q_stop
@@ -2351,7 +2355,7 @@
           { {#2} {#3} }
       }
   }
-\cs_generate_variant:Nn \@@_exponent_shift:nnn { nnf }
+\cs_generate_variant:Nn \@@_exponent_shift:nnn { nne }
 %    \end{macrocode}
 %   For shifting the exponent down, there is first a loop to reserve the
 %   integer part before doing the work: that of course has to be undone
@@ -2385,7 +2389,7 @@
   {
     \tl_if_blank:nTF {#3}
       {
-        \@@_exponent_shift_up_aux:ffn
+        \@@_exponent_shift_up_aux:een
           { \int_eval:n { #1 + 1 } }
           { \str_if_eq:nnF {#2} { 0 } {#2} 0 }
           { }
@@ -2395,7 +2399,7 @@
   }
 \cs_new:Npn \@@_exponent_shift_up:nnw #1#2#3#4 \q_stop
   {
-    \@@_exponent_shift_up_aux:ffn
+    \@@_exponent_shift_up_aux:een
       { \int_eval:n { #1 + 1 } }
       { \str_if_eq:nnF {#2} { 0 } {#2} #3 }
       {#4}
@@ -2417,7 +2421,7 @@
          { \@@_exponent_shift_up:nnn {#1} {#2} {#3} }
       }
   }
-\cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { f , ff }
+\cs_generate_variant:Nn \@@_exponent_shift_up_aux:nnn { ee }
 %    \end{macrocode}
 %   If the shift has put digits into the integer part, we have to adjust the
 %   uncertainty accordingly. First, we grab the data, then adjust by the
@@ -2438,7 +2442,7 @@
             \@@_exponent_uncert:n { { S } { 0 } }
           }
           {
-            \@@_exponent_shift_uncert_S:fnnn
+            \@@_exponent_shift_uncert_S:ennn
               { \prg_replicate:nn {#1} { 0 } }
               {#2}
               #3
@@ -2450,7 +2454,7 @@
     #2
     \@@_exponent_uncert:n { { S } { #4#1 } }
   }
-\cs_generate_variant:Nn \@@_exponent_shift_uncert_S:nnnn { f }
+\cs_generate_variant:Nn \@@_exponent_shift_uncert_S:nnnn { e }
 \cs_new:Npn \@@_exponent_uncert:n #1 { { \exp_not:n {#1} } }
 %    \end{macrocode}
 %   Tidy up the exponent to put the sign in the right place.
@@ -2751,14 +2755,16 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}[EXP]{\@@_round:nnn, \@@_round:fnn}
+% \begin{macro}[EXP]{\@@_round:nnn, \@@_round:enn}
 % \begin{macro}[EXP]{\@@_round:nnnn, \@@_round:Vnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_auxi:nnnnN   ,
 %     \@@_round_auxii:nnnnN  ,
 %     \@@_round_auxiii:nnnnN ,
-%     \@@_round_auxiv:nnnnN
+%     \@@_round_auxiii:ennnN ,
+%     \@@_round_auxiv:nnnnN  ,
+%     \@@_round_auxiv:ennnN
 %   }
 %  \begin{macro}[EXP]{\@@_round_auxv:nnnN, \@@_round_auxvi:nnnN}
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnnTF}
@@ -2767,9 +2773,20 @@
 %  \begin{macro}[EXP]{\@@_round_final_signicant:n}
 %  \begin{macro}[EXP]{\@@_round_final_signicant:N}
 %  \begin{macro}[EXP]{\@@_round_final_signicant:w}
-%  \begin{macro}[EXP]{\@@_round_final_output:nn, \@@_round_final_output:ff}
-%  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:fn}
-%  \begin{macro}[EXP]{\@@_round_final_shift:nn, \@@_round_final_shift:ff}
+%  \begin{macro}[EXP]
+%    {
+%      \@@_round_final_output:nn ,
+%      \@@_round_final_output:ne ,
+%      \@@_round_final_output:en ,
+%      \@@_round_final_output:ee
+%    }
+%  \begin{macro}[EXP]{\@@_round_final:nn, \@@_round_final:en}
+%  \begin{macro}[EXP]
+%    {
+%      \@@_round_final_shift:nn ,
+%      \@@_round_final_shift:en ,
+%      \@@_round_final_shift:ee
+%    }
 %  \begin{macro}[EXP]{\@@_round_final_shift:Nw}
 %  \begin{macro}[EXP]
 %    {
@@ -2793,7 +2810,7 @@
     \@@_round:Vnnn \l_@@_round_dir_tl
       {#1} {#2} {#3}
   }
-\cs_generate_variant:Nn \@@_round:nnn { f }
+\cs_generate_variant:Nn \@@_round:nnn { e }
 \cs_new:Npn \@@_round:nnnn #1#2#3#4
   {
     \@@_round_auxi:nnnnN {#1} {#2} {#3} { }
@@ -2845,11 +2862,12 @@
       }
     \int_compare:nNnTF {#1} > 0
       {
-        \exp_args:Nf \@@_round_auxiii:nnnnN
+        \@@_round_auxiii:ennnN
           { \int_eval:n { #1 - 1 } } {#2} {#3} { #5#4 }
       }
       { \@@_round_auxv:nnnN {#2} {#4} {#3} #5 }
   }
+\cs_generate_variant:Nn \@@_round_auxiii:nnnnN { e }
 \cs_new:Npn \@@_round_auxiv:nnnnN #1#2#3#4#5
   {
     \quark_if_recursion_tail_stop_do:Nn #5
@@ -2863,11 +2881,12 @@
       }
     \int_compare:nNnTF {#1} > 0
       {
-        \exp_args:Nf \@@_round_auxiv:nnnnN
+        \@@_round_auxiv:ennnN
           { \int_eval:n { #1 - 1 } } {#2} { #3 0 } { #5#4 }
       }
       { \@@_round_auxvi:nnnN {#2} {#4} {#3} #5 }
   }
+\cs_generate_variant:Nn \@@_round_auxiv:nnnnN { e }
 %    \end{macrocode}
 %   We now have the discarded digits, the matching filler and the
 %   next digit. So we can make the decision on rounding: that
@@ -2934,7 +2953,7 @@
       {
         \str_if_eq:nnTF {#1} { 0 }
           {
-            \@@_round_final_output:ff
+            \@@_round_final_output:ne
               { 1 }
               { \@@_round_truncate:n {#2} }
           }
@@ -2961,7 +2980,7 @@
               }
           }
           {
-            \@@_round_final:fn
+            \@@_round_final:en
               { \int_eval:n { #3 + 1 } }
               { \@@_round_final_decimal:nnw {#1} {#2} }
           }
@@ -2973,15 +2992,12 @@
       {
         \tl_if_blank:nTF {#1}
           {
-            \@@_round_final_shift:ff
-              {
-                \exp_last_unbraced:Nf 1
-                  { \@@_round_truncate_direct:n {#2} } 0
-              }
+            \@@_round_final_shift:en
+              { 1 \@@_round_truncate_direct:n {#2} 0 }
               { }
           }
           {
-            \@@_round_final_shift:ff
+            \@@_round_final_shift:ee
               { 1 #2 }
               { \@@_round_truncate:n {#1} }
           }
@@ -2989,7 +3005,7 @@
     \int_compare:nNnTF {#3} = 9
       { \@@_round_auxix:nnN {#1} { 0 #2 } }
       {
-        \@@_round_final:fn
+        \@@_round_final:en
           { \int_eval:n { #3 + 1 } }
           { \@@_round_final_integer:nnw {#1} {#2} }
       }
@@ -3000,14 +3016,14 @@
 \cs_new:Npn \@@_round_final_decimal:nnw
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
-    \@@_round_final_output:ff
+    \@@_round_final_output:ee
       { \tl_reverse:n {#1} }
       { \tl_reverse:n {#3} #2 }
   }
 \cs_new:Npn \@@_round_final_integer:nnw
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
-    \@@_round_final_output:ff
+    \@@_round_final_output:en
       { \exp_args:Ne \@@_round_final_significant:n { \tl_reverse:n {#3} #2 } }
       {#1}
   }
@@ -3030,10 +3046,10 @@
   #1 \q_recursion_tail \q_recursion_stop
   {#1}
 \cs_new:Npn \@@_round_final_output:nn #1#2 { {#1} {#2} }
-\cs_generate_variant:Nn \@@_round_final_output:nn { ff }
+\cs_generate_variant:Nn \@@_round_final_output:nn { ne , e , ee }
 \cs_new:Npn \@@_round_final:nn #1#2
   { #2 #1 }
-\cs_generate_variant:Nn \@@_round_final:nn { f }
+\cs_generate_variant:Nn \@@_round_final:nn { e }
 %    \end{macrocode}
 %   Here we deal with the case where rounding applies along with an
 %   exponent set based on number of places. We can only get here if an
@@ -3055,7 +3071,7 @@
       }
       { {#1} {#2} }
   }
-\cs_generate_variant:Nn \@@_round_final_shift:nn { ff }
+\cs_generate_variant:Nn \@@_round_final_shift:nn { en , ee }
 \cs_new:Npn \@@_round_engineering:nn #1#2
   {
     \int_compare:nNnTF { \tl_count:n {#1} } = 4
@@ -3092,7 +3108,7 @@
       { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
       { { 1 } { } }
       {
-        \@@_exponent_shift:nnf
+        \@@_exponent_shift:nne
           { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
       }
     \@@_round_final_shift:Nw 1
@@ -3195,7 +3211,8 @@
 %
 % \begin{macro}[EXP]{\@@_round_figures:nnnnnnn, \@@_round_figures_aux:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_figures_count:nnN}
-% \begin{macro}[EXP]{\@@_round_figures_count:nnnN}
+% \begin{macro}[EXP]
+%   {\@@_round_figures_count:nnnN, \@@_round_figures_count:ennN}
 %   Rounding to figures only makes sense if the number is not $0$, so we start
 %   by filtering out that case. We then check that
 %   there is no uncertainty, and that the number of figures requested is
@@ -3245,7 +3262,7 @@
       {
         \int_compare:nNnTF {#1} > \l_@@_round_precision_int
           {
-            \@@_round:fnn
+            \@@_round:enn
               { \int_eval:n { #1 - \l_@@_round_precision_int } }
               {#2} {#3}
           }
@@ -3254,9 +3271,10 @@
               { \l_@@_round_precision_int - (#1) } {#2} {#3}
           }
       }
-    \exp_args:Nf \@@_round_figures_count:nnnN
+    \@@_round_figures_count:ennN
       { \int_eval:n { #1 + 1 } } {#2} {#3}
   }
+\cs_generate_variant:Nn \@@_round_figures_count:nnnN { e }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -3299,7 +3317,7 @@
           {#1} {#2}
       }
       {
-        \@@_round:fnn
+        \@@_round:enn
            {
              \int_eval:n
                { 0 \tl_count:n {#2} - \l_@@_round_precision_int }
@@ -3309,7 +3327,7 @@
   }
 \cs_new:Npn \@@_round_places_integer:nn #1#2
   {
-    \@@_round:fnn
+    \@@_round:enn
        {
          \int_eval:n
            { 0 \tl_count:n {#2} - \l_@@_round_precision_int }
@@ -3365,16 +3383,27 @@
 %
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty:nnnn}
+% \begin{macro}[EXP]
+%   {\@@_round_uncertainty:nnnn, \@@_round_uncertainty:ennn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_round_uncertainty_auxi:nnnnn  ,
 %     \@@_round_uncertainty_auxii:nnnnn
 %   }
-% \begin{macro}[EXP]{\@@_round_uncertainty_auxiii:nnnnnnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_uncertainty_auxiii:nnnnnnn ,
+%     \@@_round_uncertainty_auxiii:eennnnn
+%   }
 % \begin{macro}[EXP]{\@@_round_uncertainty_zeros:nnnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty_auxiv:nnnnnnN}
+% \begin{macro}[EXP]
+%   {
+%     \@@_round_uncertainty_auxiv:nnnnnnN ,
+%     \@@_round_uncertainty_auxiv:nennnnN ,
+%     \@@_round_uncertainty_auxiv:ennnnnN ,
+%     \@@_round_uncertainty_auxiv:eennnnN
+%   }
 % \begin{macro}[EXP]{\@@_round_uncertainty_auxv:nnnN}
 % \begin{macro}[EXP]{\@@_round_uncertainty_auxvi:nn}
 % \begin{macro}[EXP]{\@@_round_uncertainty_auxvii:nnNnnn}
@@ -3420,7 +3449,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty:nnn #1#2#3
   {
-    \exp_args:Nf \@@_round_uncertainty:nnnn
+    \@@_round_uncertainty:ennn
       {
         \int_eval:n
           { \tl_count:n {#3} - \l_@@_round_precision_int }
@@ -3437,6 +3466,7 @@
             {#2} {#3} {#1} {#4}
       }
   }
+\cs_generate_variant:Nn \@@_round_uncertainty:nnnn { e }
 %    \end{macrocode}
 %   The number of digits to remove from the main part and the detail of
 %   zero filling depends on whether we rounded up the uncertainty. So there
@@ -3455,7 +3485,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_auxi:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nf \@@_round_uncertainty_auxiv:nnnnnnN
+    \@@_round_uncertainty_auxiv:ennnnnN
       { \@@_round_uncertainty_zeros:nnnn {#1} {#3} {#4} {#5} }
       {#4}
       {#2} {#3} {#1} { }
@@ -3467,7 +3497,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_auxii:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nff \@@_round_uncertainty_auxiii:nnnnnnn
+    \@@_round_uncertainty_auxiii:eennnnn
       { \tl_count:n {#5} }
       { \tl_count:n {#3} }
       {#1} {#2} {#3} {#4} {#5}
@@ -3479,26 +3509,21 @@
         \bool_lazy_and:nnTF
           { \int_compare_p:nNn \l_@@_round_precision_int = 2 }
           { \int_compare_p:nNn {#1} = {#2} }
-          {
-            \exp_args:Nnf \@@_round_uncertainty_auxiv:nnnnnnN
-              { 0 }
-          }
-          {
-            \exp_args:Nnf \@@_round_uncertainty_auxiv:nnnnnnN
-              { }
-          }
+          { \@@_round_uncertainty_auxiv:nennnnN { 0 } }
+          { \@@_round_uncertainty_auxiv:nennnnN { } }
             { \int_eval:n { #6 + 1 } }
             {#4} {#5} { 1 } { }
             \@@_round_uncertainty_auxvii:nnNnnn
       }
       {
-        \exp_args:Nff \@@_round_uncertainty_auxiv:nnnnnnN
+        \@@_round_uncertainty_auxiv:eennnnN
           { \@@_round_uncertainty_zeros:nnnn {#3} {#5} {#6} {#7} }
           { \int_eval:n { #6 + 1 } }
           {#4} {#5} { 1 } {#3}
           \@@_round_uncertainty_auxvii:nnNnnn
       }
   }
+\cs_generate_variant:Nn \@@_round_uncertainty_auxiii:nnnnnnn { ee }
 \cs_new:Npn \@@_round_uncertainty_zeros:nnnn #1#2#3#4
   {
     \prg_replicate:nn
@@ -3530,6 +3555,7 @@
         {#3} #7
     \@@_round_end:nnn { { S } { #5#6 #1 } }
   }
+\cs_generate_variant:Nn \@@_round_uncertainty_auxiv:nnnnnnN { ne , e , ee }
 \cs_new:Npn \@@_round_uncertainty_auxv:nnnN #1#2#3#4
   {
     \int_compare:nNnT { \tl_count:n {#1} } > { \tl_count:n {#3} }
@@ -3866,7 +3892,7 @@
 % \begin{macro}[rEXP]
 %   {\@@_output_sign_color:w, \@@_output_sign_brackets:w}
 % \begin{macro}[rEXP]{\@@_output_integer:nnn}
-% \begin{macro}[rEXP]{\@@_output_decimal:nn, \@@_output_decimal:fn}
+% \begin{macro}[rEXP]{\@@_output_decimal:nn, \@@_output_decimal:en}
 % \begin{macro}[rEXP]{\@@_output_digits:nn}
 % \begin{macro}[rEXP]{\@@_output_digit_separator:N}
 % \begin{macro}[rEXP]{\@@_output_integer_3_3:n}
@@ -3920,9 +3946,9 @@
 % \begin{macro}[rEXP]
 %   {\@@_output_uncert_augment:nnnn}
 % \begin{macro}[rEXP]
-%   {\@@_output_uncert_augment:nnn}
+%   {\@@_output_uncert_augment:nnn, \@@_output_uncert_augment:enn}
 % \begin{macro}[rEXP]
-%   {\@@_output_uncert_augment:nnnw, \@@_output_uncert_augment:fnnw}
+%   {\@@_output_uncert_augment:nnnw, \@@_output_uncert_augment:ennw}
 % \begin{macro}[rEXP]{\@@_output_uncert_augment:nnw}
 % \begin{macro}[rEXP]
 %   {
@@ -4118,7 +4144,7 @@
           { \@@_output_digits:nn { decimal } {#1} }
       }
   }
-\cs_generate_variant:Nn \@@_output_decimal:nn { f }
+\cs_generate_variant:Nn \@@_output_decimal:nn { e }
 \cs_new:Npn \@@_output_digits:nn #1#2
   {
     \bool_if:cTF { l_@@_group_ #1 _ bool }
@@ -4473,7 +4499,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_uncert_augment:nnnn #1#2#3#4
   {
-    \exp_args:Nf \@@_output_uncert_augment:nnn
+    \@@_output_uncert_augment:enn
       { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#2} } }
       {#3} {#4}
   }
@@ -4481,7 +4507,7 @@
   {
     \int_compare:nNnTF {#1} > 0
       {
-        \@@_output_uncert_augment:fnnw
+        \@@_output_uncert_augment:ennw
           { \int_eval:n { #1 - 1 } }
           {#3}
           { }
@@ -4489,7 +4515,7 @@
       }
       {
         0
-        \@@_output_decimal:fn
+        \@@_output_decimal:en
           {
             \prg_replicate:nn { \int_abs:n {#1} } { 0 }
             #2
@@ -4497,6 +4523,7 @@
           {#3}
       }
   }
+\cs_generate_variant:Nn \@@_output_uncert_augment:nnn { e }
 \cs_new:Npn \@@_output_uncert_augment:nnnw #1#2#3#4
   {
     \quark_if_nil:NF #4
@@ -4504,14 +4531,14 @@
         \int_compare:nNnTF {#1} = 0
           { \@@_output_uncert_augment:nnw {#3#4} {#2} }
           {
-            \@@_output_uncert_augment:fnnw
+            \@@_output_uncert_augment:ennw
               { \int_eval:n { #1 - 1 } }
               {#2}
               {#3#4}
           }
       }
   }
-\cs_generate_variant:Nn \@@_output_uncert_augment:nnnw { f }
+\cs_generate_variant:Nn \@@_output_uncert_augment:nnnw { e }
 \cs_new:Npn \@@_output_uncert_augment:nnw #1#2#3 \q_nil
   {
     \@@_output_digits:nn { integer } {#1}
