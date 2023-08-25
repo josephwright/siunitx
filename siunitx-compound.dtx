@@ -535,7 +535,7 @@
 % \begin{macro}{\siunitx_compound_number:n}
 % \begin{macro}{\@@_format:n}
 % \begin{macro}{\@@_format:nn}
-% \begin{macro}{\@@_format:nnn}
+% \begin{macro}{\@@_format:nnn, \@@_format:xxn}
 %   Printing a generic set starts with the question of whether we want to
 %   extract exponents. If we do, then there is the work to do with extraction.
 %   Either way, the printing is handed off to a common function. We do a quick
@@ -554,7 +554,7 @@
     \seq_clear:N \l_@@_tmp_seq
     \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \exp_args:Nxx \@@_format:nnn
+        \@@_format:xxn
           { \tl_head:n {#1} }
           { \tl_tail:n {#1} }
           {#2}
@@ -575,6 +575,7 @@
       }
       { \@@_format_aux:nnn {#1} {#2} {#3} }
   }
+\cs_generate_variant:Nn \@@_format:nnn { xx }
 \cs_new_protected:Npn \@@_format_aux:nnn #1#2#3
   {
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
@@ -699,7 +700,7 @@
 %     \@@_format_combine-exponent_aux:n ,
 %     \@@_format_extract-exponent_aux:n
 %   }
-% \begin{macro}{\@@_extract_exp:nN}
+% \begin{macro}{\@@_extract_exp:nN, \@@_extract_exp:VN}
 % \begin{macro}{\@@_extract_exp:nnnnnnnN}
 %   Actually formatting the units is much the same as is done in
 %   the quantities module, except that we have to cover the multiplication
@@ -738,7 +739,7 @@
   {
     \bool_set_true:N \l_@@_exp_combine_bool
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
-    \exp_args:NV \@@_extract_exp:nN
+    \@@_extract_exp:VN
       \l_@@_first_tl \l_@@_tmp_fp
     #1 \l_@@_tmp_fp \l_@@_unit_tl
   }
@@ -775,6 +776,7 @@
   }
 \cs_new_protected:Npn \@@_extract_exp:nN #1#2
   { \@@_extract_exp:nnnnnnnN #1 #2 }
+\cs_generate_variant:Nn \@@_extract_exp:nN  { V }
 \cs_new_protected:Npn \@@_extract_exp:nnnnnnnN #1#2#3#4#5#6#7#8
   { \fp_set:Nn #8 {#6#7} }
 %    \end{macrocode}
@@ -872,8 +874,8 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_print:N}
-% \begin{macro}{\@@_print:nnN, \@@_print:xxN}
-% \begin{macro}{\@@_print:nnnN}
+% \begin{macro}{\@@_print:nnN, \@@_print:nVN, \@@_print:xnN, \@@_print:xxN}
+% \begin{macro}{\@@_print:nnnN, \@@_print:xnnN}
 % \begin{macro}{\@@_print_aux:n}
 % \begin{macro}{\@@_print_aux:nn}
 % \begin{macro}{\@@_print_quantity:n, \@@_print_quantity:x}
@@ -900,14 +902,14 @@
           }
           #1
       }
-      { \@@_print:xxN { } { \exp_not:V \l_@@_exp_tl } #1 }
+      { \@@_print:nVN { } \l_@@_exp_tl #1 }
   }
 \cs_new_protected:Npn \@@_print:nnN #1#2#3
   {
-    \exp_args:Nx \@@_print:nnnN
+    \@@_print:xnnN
       { \seq_count:N \l_@@_tmp_seq } {#1} {#2} #3
   }
-\cs_generate_variant:Nn \@@_print:nnN { xx }
+\cs_generate_variant:Nn \@@_print:nnN { nV , x , xx }
 %    \end{macrocode}
 %   A rather long auxiliary as we want a way to have the brackets/exponent
 %   available. The actual flow is simple enough: see how many entries there are
@@ -953,6 +955,7 @@
         \@@_print_boundary:V \l_@@_boundary_close_tl
       }
   }
+\cs_generate_variant:Nn \@@_print:nnnN { x }
 \cs_new_protected:Npn \@@_print_aux:n #1 { }
 \cs_new_protected:Npn \@@_print_aux:nn #1#2
   {

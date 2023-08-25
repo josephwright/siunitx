@@ -235,6 +235,11 @@
 %<@@=siunitx_table>
 %    \end{macrocode}
 %
+% Required core variants.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \keys_set:nn { nx }
+%    \end{macrocode}
+%
 % \begin{variable}{\l_@@_tmp_box, \l_@@_tmp_dim, \l_@@_tmp_tl}
 %   Scratch space.
 %    \begin{macrocode}
@@ -445,7 +450,7 @@
   {
     \exp_args:NNV \group_end:
     \@@_collect_end:n \l_@@_collect_tl
-    \exp_args:NV \@@_split:nNNN
+    \@@_split:VNNN
       \l_@@_collect_tl
       \l_@@_before_tl
       \l_@@_number_tl
@@ -487,7 +492,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_split:nNNN}
+% \begin{macro}{\@@_split:nNNN, \@@_split:VNNN}
 % \begin{macro}{\@@_split_loop:NNN}
 % \begin{macro}{\@@_split_group:NNNn}
 % \begin{macro}{\@@_split_token:NNNN}
@@ -504,6 +509,7 @@
     \@@_split_tidy:N #2
     \@@_split_tidy:N #4
   }
+\cs_generate_variant:Nn \@@_split:nNNN { V }
 \cs_new_protected:Npn \@@_split_loop:NNN #1#2#3
   {
     \peek_remove_spaces:n
@@ -853,7 +859,7 @@
           \l_@@_before_model_tl
           \l_@@_model_tl
           \l_@@_after_model_tl
-        \exp_args:NV \@@_generate_model:n \l_@@_model_tl
+        \@@_generate_model:V \l_@@_model_tl
         \tl_set:Nn \l_@@_align_mode_tl { format }
       } ,
     table-model-setup .tl_set:N =
@@ -877,10 +883,10 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_generate_model:n}
+% \begin{macro}{\@@_generate_model:n, \@@_generate_model:V}
 % \begin{macro}{\@@_generate_model:nnnnnnn}
 % \begin{macro}[EXP]{\@@_generate_model_S:nnw}
-% \begin{macro}[EXP]{\@@_generate_model_S:nnn}
+% \begin{macro}[EXP]{\@@_generate_model_S:nnn, \@@_generate_model_S:een}
 %   Creating a model for a table at this stage means parsing the format and
 %   converting that to an appropriate model. Things are quite straight-forward
 %   other than the uncertainty part. At this stage there is no point in
@@ -902,6 +908,7 @@
           \l_@@_format_tl
       }
   }
+\cs_generate_variant:Nn \@@_generate_model:n { V }
 \cs_new_protected:Npn \@@_generate_model:nnnnnnn #1#2#3#4#5#6#7
   {
     \tl_set:Nx \l_@@_model_tl
@@ -932,7 +939,7 @@
   {
     { S }
     {
-      \exp_args:Nff \@@_generate_model_S:nnn
+      \@@_generate_model_S:een
         { \tl_count:n {#1} } { \tl_count:n {#3} }
         {#3}
     }
@@ -951,6 +958,7 @@
       }
       { 8 }
   }
+\cs_generate_variant:Nn \@@_generate_model_S:nnn { ee }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1298,7 +1306,7 @@
     \group_begin:
       \bool_if:NT \l_@@_auto_round_bool
         {
-          \exp_args:Nx \keys_set:nn { siunitx }
+          \keys_set:nx { siunitx }
             {
               round-mode      = places ,
               round-pad       = true   ,

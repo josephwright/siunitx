@@ -222,7 +222,7 @@
 % \begin{macro}{\@@_parsed_aux:w}
 % \begin{macro}{\@@_parsed_aux:nnnw}
 % \begin{macro}{\@@_parsed_aux:nnnnw}
-% \begin{macro}{\@@_parsed_aux:nnnn}
+% \begin{macro}{\@@_parsed_aux:nnnn, \@@_parsed_aux:onnn}
 % \begin{macro}{\@@_parsed_aux:nnn}
 %   For quantities, there is bit to do to combine things. The first question is
 %   whether we are parsing at all: if not, things are quite short. Notice that
@@ -268,7 +268,7 @@
 \cs_new_protected:cpn { @@_parsed_combine-exponent:n } #1
   {
     \siunitx_number_process:NN \l_@@_number_tl \l_@@_number_tl
-    \exp_args:NV \@@_extract_exp:nNN
+    \@@_extract_exp:VNN
       \l_@@_number_tl \l_@@_tmp_fp \l_@@_number_tl
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
@@ -303,7 +303,7 @@
   { \@@_parsed_aux:nnnnw {#1} {#2} {#3} {#4} ? }
 \cs_new_protected:Npn \@@_parsed_aux:nnnnw
   #1#2#3#4 #5 \q_nil #6 \q_stop
-  { \exp_args:No \@@_parsed_aux:nnnn { \use_none:n #5#6 } {#1} {#2} {#3#4} }
+  { \@@_parsed_aux:onnn { \use_none:n #5#6 } {#1} {#2} {#3#4} }
 \cs_new_protected:Npn \@@_parsed_aux:nnnn #1#2#3#4
   {
     \tl_if_blank:nTF {#4}
@@ -332,6 +332,7 @@
           }
       }
   }
+\cs_generate_variant:Nn \@@_parsed_aux:nnnn { o }
 %    \end{macrocode}
 %   For the case of a separated uncertainty with repeated units, we print the
 %   two parts independently. The third argument here is the exponent if there
@@ -353,13 +354,14 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@@_extract_exp:nNN}
+% \begin{macro}{\@@_extract_exp:nNN, \@@_extract_exp:VNN}
 % \begin{macro}{\@@_extract_exp:nnnnnnnNN}
 %   To extract the exponent part for a combined prefix, we decompose the value
 %   and remove it.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_extract_exp:nNN #1#2#3
   { \@@_extract_exp:nnnnnnnNN #1 #2 #3 }
+\cs_generate_variant:Nn \@@_extract_exp:nNN { V }
 \cs_new_protected:Npn \@@_extract_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
   {
     \fp_set:Nn #8 {#6#7}
@@ -397,9 +399,7 @@
               { \nobreak }
             \siunitx_print_unit:n {#2}
           }
-          {
-            \exp_args:No \siunitx_print_unit:n { \use_none:n #2 }
-          }
+          { \siunitx_print_unit:o { \use_none:n #2 } }
       }
   }
 \cs_generate_variant:Nn \siunitx_quantity_print:nn { nV , VV , xV }

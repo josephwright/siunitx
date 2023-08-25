@@ -106,7 +106,7 @@
 %   {
 %     \siunitx_print_number:n, \siunitx_print_number:V,
 %       \siunitx_print_number:x,
-%     \siunitx_print_unit:n, \siunitx_print_unit:V,
+%     \siunitx_print_unit:n, \siunitx_print_unit:V, \siunitx_print_unit:o,
 %       \siunitx_print_unit:x
 %   }
 %   \begin{syntax}
@@ -347,12 +347,10 @@
 \AtBeginDocument { \RequirePackage { color } }
 %    \end{macrocode}
 %
-% \begin{macro}{\tl_replace_all:NVn}
 %   Required variants.
 %    \begin{macrocode}
 \cs_generate_variant:Nn \tl_replace_all:Nnn { NV }
 %    \end{macrocode}
-% \end{macro}
 %
 % \begin{variable}{\l_@@_tmp_tl}
 %   Scratch space.
@@ -461,7 +459,7 @@
 %   {
 %     \siunitx_print_number:n, \siunitx_print_number:V,
 %       \siunitx_print_number:x,
-%     \siunitx_print_unit:n, \siunitx_print_unit:V,
+%     \siunitx_print_unit:n, \siunitx_print_unit:V, \siunitx_print_unit:o,
 %       \siunitx_print_unit:x
 %   }
 % \begin{macro}{\@@_aux:nn}
@@ -476,14 +474,14 @@
 \cs_generate_variant:Nn \siunitx_print_number:n { V , x }
 \cs_new_protected:Npn \siunitx_print_unit:n #1
   { \@@_aux:nn { unit } {#1} }
-\cs_generate_variant:Nn \siunitx_print_unit:n { V , x }
+\cs_generate_variant:Nn \siunitx_print_unit:n { V , o , x }
 \cs_new_protected:Npn \@@_aux:nn #1#2
   {
     \tl_if_empty:oF {#2}
       {
         \tl_if_empty:cTF { l_@@_ #1 _color_tl }
           { \use:n }
-          { \exp_args:Nv \textcolor { l_@@_ #1 _color_tl } }
+          { \ExpandArgs { v } \textcolor { l_@@_ #1 _color_tl } }
             {
               \use:c
                 {
@@ -576,11 +574,12 @@
 % \begin{macro}{\@@_math_replace:Nn}
 % \begin{macro}
 %   {
-%     \@@_math_auxiii:n,
-%     \@@_math_auxiv:n,
+%     \@@_math_auxiii:n ,
+%     \@@_math_auxiii:V ,
+%     \@@_math_auxiv:n  ,
 %     \@@_math_auxv:n
 %   }
-% \begin{macro}{\@@_math_auxvi:Nn}
+% \begin{macro}{\@@_math_auxvi:Nn, \@@_math_auxvi:NV}
 % \begin{macro}{\@@_math_auxvii:N}
 % \begin{macro}{\@@_math_auxviii:w}
 % \begin{macro}{\@@_math_auxix:Nn}
@@ -677,7 +676,7 @@
       \exp_after:wN \@@_math_replace:Nn
         \l_@@_math_html_tl
         \q_recursion_tail { } \q_recursion_stop
-      \exp_args:NV \@@_math_auxiii:n \l_@@_tmp_tl
+      \@@_math_auxiii:V \l_@@_tmp_tl
      \group_end:
   }
 %    \end{macrocode}
@@ -718,6 +717,7 @@
       { \@@_math_auxiv:n }
         {#1}
   }
+\cs_generate_variant:Nn \@@_math_auxiii:n { V }
 %    \end{macrocode}
 %   Now we deal with the font selection in math mode. There are two possible
 %   cases. First, we are retaining the current math font, and the active one is
@@ -747,6 +747,7 @@
   }
 \cs_new_protected:Npn \@@_math_auxvi:Nn #1#2
   { \@@_math_ensure:n { #1 {#2} } }
+\cs_generate_variant:Nn \@@_math_auxvi:Nn { NV }
 \cs_new_protected:Npn \@@_math_auxvii:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1 { \@@_math_auxv:n }
@@ -775,8 +776,7 @@
       \tl_replace_all:Nnn \exp_not:N \l_@@_tmp_tl
         { ^ }
         { \exp_not:N \@@_math_super:n }
-      \exp_not:N \exp_args:NNV \@@_math_auxvi:Nn
-        #1 \exp_not:N \l_@@_tmp_tl
+      \@@_math_auxvi:NV #1 \exp_not:N \l_@@_tmp_tl
     \group_end:
   }
 \cs_new_protected:Npx \@@_math_sub:n #1
@@ -865,7 +865,8 @@
           }
           { \selectfont }
         \tl_use:N \l_@@_text_font_tl
-        \exp_args:NnV \tl_if_head_eq_meaning:nNTF {#1} \l_siunitx_unit_fraction_tl
+        \exp_last_unbraced:Nno \tl_if_head_eq_meaning:nNTF
+          {#1} \l_siunitx_unit_fraction_tl
           { \@@_text_fraction:Nnn #1 }
           { \@@_text_replace:n {#1} }
       }
@@ -963,7 +964,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_replace_frac:n #1
   {
-    \exp_args:NnV \tl_if_head_eq_meaning:nNTF {#1} \l_siunitx_unit_fraction_tl
+    \exp_last_unbraced:Nno \tl_if_head_eq_meaning:nNTF
+      {#1} \l_siunitx_unit_fraction_tl
       { \@@_text_fraction:Nnn #1 }
       { \mbox { \@@_text_replace:n {#1} } }
   }

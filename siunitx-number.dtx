@@ -115,7 +115,7 @@
 %   \cs{empty}.
 % \end{function}
 %
-% \begin{function}{\siunitx_number_process:NN}
+% \begin{function}{\siunitx_number_process:NN, \siunitx_number_process:cc}
 %   \begin{syntax}
 %     \cs{siunitx_number_process:N} \meta{tl~var1} \meta{tl~var2}
 %   \end{syntax}
@@ -133,8 +133,10 @@
 %
 % \begin{function}[EXP]
 %   {
-%     \siunitx_number_output:N,  \siunitx_number_output:n,
-%     \siunitx_number_output:NN, \siunitx_number_output:nN
+%     \siunitx_number_output:N, \siunitx_number_output:c
+%     \siunitx_number_output:n,
+%     \siunitx_number_output:NN, \siunitx_number_output:cN
+%     \siunitx_number_output:nN
 %   }
 %   \begin{syntax}
 %     \cs{siunitx_number_output:N} \meta{number}
@@ -179,7 +181,8 @@
 % \begin{function}[EXP]
 %   {
 %     \siunitx_number_adjust_exponent:Nn ,
-%     \siunitx_number_adjust_exponent:nn
+%     \siunitx_number_adjust_exponent:nn ,
+%     \siunitx_number_adjust_exponent:Vn
 %   }
 %   \begin{syntax}
 %     \cs{siunitx_number_adjust_exponent:Nn} \meta{number} \Arg{fp~expr}
@@ -1098,13 +1101,21 @@
 % \begin{macro}{\@@_parse_combine_uncert:}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert_loop:nnnnnnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_parse_combine_uncert_loop:nnnnnnn ,
+%     \@@_parse_combine_uncert_loop:nnnnnnn
+%   }
 % \begin{macro}[EXP]
 %   {\@@_parse_combine_uncert:nnnnnn, \@@_parse_combine_uncert:ennnnn}
 % \begin{macro}[EXP]
 %   {\@@_parse_combine_uncert:nnnnnnn, \@@_parse_combine_uncert:ennnnnn}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert_aux:nnnn}
+% \begin{macro}[EXP]
+%   {
+%     \@@_parse_combine_uncert_aux:nnnn ,
+%     \@@_parse_combine_uncert_aux:eenn
+%   }
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:N}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert:w}
 % \begin{macro}[EXP]{\@@_parse_combine_uncert_end:nnn}
@@ -1154,6 +1165,7 @@
       { \int_eval:n { \tl_count:n {#1} - \tl_count:n {#6} } }
       {#1} {#2} {#3} {#5} {#6}
   }
+\cs_generate_variant:Nn \@@_parse_combine_uncert_loop:nnnnnnn { nee }
 %    \end{macrocode}
 %   The difference in places between the two decimal parts is now found: this
 %   is done just once to avoid having to parse token lists twice. The value
@@ -1188,7 +1200,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_parse_combine_uncert:nnnnn #1#2#3#4#5
   {
-    \exp_args:Nee \@@_parse_combine_uncert_aux:nnnn
+    \@@_parse_combine_uncert_aux:eenn
       {
         \bool_lazy_and:nnTF
           { \tl_if_blank_p:n {#1} }
@@ -1205,8 +1217,8 @@
   }
 \cs_new:Npn \@@_parse_combine_uncert_aux:nnnn #1#2#3#4
   {
-    \exp_args:Neee \@@_parse_combine_uncert_loop:nnnnnnn
-      { \exp_not:n {#1} }
+    \@@_parse_combine_uncert_loop:neennnn
+      {#1}
       {
         \exp_not:n {#3}
         \tl_if_blank:nF {#2} { S } 
@@ -1216,6 +1228,7 @@
         \tl_if_blank:nF {#2} { { \exp_not:n {#2} } }
       }
   }
+\cs_generate_variant:Nn \@@_parse_combine_uncert_aux:nnnn { ee }
 %    \end{macrocode}
 %   A short routine to remove any leading zeros in the uncertainty part,
 %   which are not needed for the compact representation used by the module.
@@ -1763,7 +1776,11 @@
 % \begin{macro}{\@@_parse_uncert_marker:w}
 % \begin{macro}{\@@_parse_uncert_marker:nnnnN}
 % \begin{macro}{\@@_parse_uncert_marker:nnnnnN}
-% \begin{macro}{\@@_parse_uncert_marker:nnnnnnN}
+% \begin{macro}
+%   {
+%     \@@_parse_uncert_marker:nnnnnnN ,
+%     \@@_parse_uncert_marker:xnnnnnN
+%   }
 % \begin{macro}{\@@_parse_uncert_after:N}
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
@@ -1939,7 +1956,7 @@
   }
 \cs_new_protected:Npn \@@_parse_uncert_marker:nnnnnN #1#2#3#4#5#6
   {
-    \exp_args:Ne \@@_parse_uncert_marker:nnnnnnN
+    \@@_parse_uncert_marker:xnnnnnN
       { \int_eval:n { \tl_count:n {#4} } }
       {#1} {#2} {#3} {#4} {#5} #6
   }
@@ -1975,6 +1992,7 @@
       }
         #5#6#7
   }
+\cs_generate_variant:Nn \@@_parse_uncert_marker:nnnnnnN { x }
 %    \end{macrocode}
 %   At the end of collection, we can either start another one or be done:
 %   either way we move the data around.
@@ -2181,7 +2199,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\siunitx_number_process:NN}
+% \begin{macro}{\siunitx_number_process:NN, \siunitx_number_process:cc}
 % \begin{macro}{\@@_process:nnnnnnnNN}
 %   A top-level interface for the processing tools. Rounding happens in all
 %   cases, but exponents are only processed if the value is not $0$.
@@ -2198,6 +2216,7 @@
         \@@_digits:NN #2 #2
       }
   }
+\cs_generate_variant:Nn \siunitx_number_process:NN { cc }
 \cs_new_protected:Npn \@@_process:nnnnnnnNN #1#2#3#4#5#6#7#8#9
   {
     \bool_lazy_and:nnTF
@@ -2256,7 +2275,7 @@
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert:nn}
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert_S:nnn}
 %  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnn}
-%  \begin{macro}[EXP]{\@@_exponent_threshold:nn}
+%  \begin{macro}[EXP]{\@@_exponent_threshold:nn, \@@_exponent_threshold:en}
 %  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnnn}
 %   Manipulating an exponent is done using a single expansion function
 %   \emph{unless} dealing with engineering-style output. The latter is easier
@@ -2556,7 +2575,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_exponent_threshold:nnnnnnn #1#2#3#4#5#6#7
   {
-    \exp_args:Ne \@@_exponent_threshold:nn
+    \@@_exponent_threshold:en
       {
         \@@_exponent_scientific:nnnnnnn
           {#1} {#2} {#3} {#4} {#5} {#6} {#7}
@@ -2565,6 +2584,7 @@
   }
 \cs_new:Npn \@@_exponent_threshold:nn #1#2
   { \@@_exponent_threshold:nnnnnnnn #1 {#2} }
+\cs_generate_variant:Nn \@@_exponent_threshold:nn { e }
 \cs_new:Npn \@@_exponent_threshold:nnnnnnnn #1#2#3#4#5#6#7#8
   {
     \bool_lazy_and:nnTF
@@ -2769,7 +2789,8 @@
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnnTF}
 %  \begin{macro}[EXP]{\@@_round_auxviii:nnN, \@@_round_auxix:nnN}
 %  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
-%  \begin{macro}[EXP]{\@@_round_final_significant:n}
+%  \begin{macro}[EXP]
+%    {\@@_round_final_significant:n, \@@_round_final_significant:e}
 %  \begin{macro}[EXP]{\@@_round_final_significant:N}
 %  \begin{macro}[EXP]{\@@_round_final_significant:w}
 %  \begin{macro}[EXP]
@@ -2795,7 +2816,7 @@
 %      \@@_round_scientific:nn
 %    }
 %  \begin{macro}[EXP]{\@@_round_engineering:NNNNn}
-%  \begin{macro}[EXP]{\@@_round_engineering:nnN}
+%  \begin{macro}[EXP]{\@@_round_engineering:nnN, \@@_round_engineering:VnN}
 %  \begin{macro}[EXP]{\@@_round_truncate:n, \@@_round_truncate_direct:n}
 %  \begin{macro}[EXP]{\@@_round_truncate:nnN}
 %   Actually doing the rounding needs us to work from the least significant
@@ -3023,7 +3044,7 @@
   #1#2#3 \q_recursion_tail \q_recursion_stop
   {
     \@@_round_final_output:en
-      { \exp_args:Ne \@@_round_final_significant:n { \tl_reverse:n {#3} #2 } }
+      { \@@_round_final_significant:e { \tl_reverse:n {#3} #2 } }
       {#1}
   }
 \cs_new:Npn \@@_round_final_significant:n #1
@@ -3031,6 +3052,7 @@
      \@@_round_final_significant:N #1
        \q_recursion_tail \q_recursion_stop
   }
+\cs_generate_variant:Nn \@@_round_final_significant:n { e }
 \cs_new:Npn \@@_round_final_significant:N #1
   {
     \quark_if_recursion_tail_stop_do:Nn #1 { 0 }
@@ -3087,7 +3109,7 @@
 \cs_new:Npn \@@_round_engineering:NNNNn #1#2#3#4#5
   {
     {#1}
-    \exp_args:NV \@@_round_engineering:nnN
+    \@@_round_engineering:VnN
       \l_@@_round_precision_int { }
       #2#3#4#5 \q_recursion_tail \q_recursion_stop
   }
@@ -3098,6 +3120,7 @@
       { \use_i_delimit_by_q_recursion_stop:nw { {#2} } }
       { \@@_round_engineering:nnN { #1 - 1 } { #2#3 } }
   }
+\cs_generate_variant:Nn \@@_round_engineering:nnN { V }
 \cs_new:Npn \@@_round_fixed:nn #1#2 { {#1} {#2} }
 \cs_new:Npn \@@_round_input:nn #1#2 { {#1} {#2} }
 \cs_new:Npn \@@_round_scientific:nn #1#2
@@ -3281,7 +3304,7 @@
 %
 % \begin{macro}[EXP]{\@@_round_places:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_places_decimal:nn, \@@_round_places_integer:nn}
-% \begin{macro}[EXP]{\@@_round_places_finalise:n}
+% \begin{macro}[EXP]{\@@_round_places_finalise:n, \@@_round_places_finalise:e}
 % \begin{macro}[EXP]{\@@_round_places_finalise:nnnnnnn}
 % \begin{macro}[EXP]{\@@_round_places_finalise:nnnnn}
 %   The first step when rounding to a fixed number of places is to establish
@@ -3294,7 +3317,7 @@
   {
     \tl_if_blank:nTF {#5}
       {
-        \exp_args:Ne \@@_round_places_finalise:n
+        \@@_round_places_finalise:e
           {
             \exp_not:n { {#1} {#2} }
             \int_compare:nNnTF \l_@@_round_precision_int > 0
@@ -3364,6 +3387,7 @@
       }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
+\cs_generate_variant:Nn \@@_round_places_finalise:n { e }
 \cs_new:Npn \@@_round_places_finalise:nnnnn #1#2#3#4#5
   {
     {
@@ -3381,7 +3405,7 @@
 % \end{macro}
 %
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnnn}
-% \begin{macro}[EXP]{\@@_round_uncertainty:nnn}
+% \begin{macro}[EXP]{\@@_round_uncertainty:nnn, \@@_round_uncertainty:nno}
 % \begin{macro}[EXP]
 %   {\@@_round_uncertainty:nnnn, \@@_round_uncertainty:ennn}
 % \begin{macro}[EXP]{\@@_round_uncertainty:nnnnnn}
@@ -3434,7 +3458,7 @@
         \str_if_eq:eeTF { \tl_head:n {#5} } { S }
           {
             \exp_not:n { {#1} {#2} }
-            \exp_args:Nnno \@@_round_uncertainty:nnn
+            \@@_round_uncertainty:nno
               {#3} {#4} { \use_ii:nn #5 }
             {#6} {#7}
           }
@@ -3455,6 +3479,7 @@
       }
       {#1} {#2} {#3}
   }
+\cs_generate_variant:Nn \@@_round_uncertainty:nnn { nno }
 \cs_new:Npn \@@_round_uncertainty:nnnn #1#2#3#4
   {
     \use:e
@@ -3693,27 +3718,30 @@
 %
 % \subsection{Number modification}
 %
-% \begin{macro}[EXP]{\siunitx_number_adjust_exponent:nn}
+% \begin{macro}[EXP]
+%   {\siunitx_number_adjust_exponent:nn, \siunitx_number_adjust_exponent:Vn}
 % \begin{macro}[EXP]{\siunitx_number_adjust_exponent:Nn}
 % \begin{macro}[EXP]{\@@_adjust_exp:nnnnnnnn}
-% \begin{macro}[EXP]{\@@_adjust_exp:nn}
+% \begin{macro}[EXP]{\@@_adjust_exp:nn, \@@_adjust_exp:en}
 % \begin{macro}[EXP]{\@@_adjust_exp:nNw}
 %   A simply case of breaking down and rebuilding the number.
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_adjust_exponent:nn #1#2
   { \@@_adjust_exp:nnnnnnnn #1 {#2} }
+\cs_generate_variant:Nn \siunitx_number_adjust_exponent:nn { V }
 \cs_new:Npn \siunitx_number_adjust_exponent:Nn #1#2
   {
     \tl_if_empty:NF #1
-      { \exp_args:NV \siunitx_number_adjust_exponent:nn #1 {#2} }
+      { \siunitx_number_adjust_exponent:Vn #1 {#2} }
   }
 \cs_new:Npn \@@_adjust_exp:nnnnnnnn #1#2#3#4#5#6#7#8
   {
     \exp_not:n { {#1} {#2} {#3} {#4} {#5} }
-    \exp_args:Ne \@@_adjust_exp:nn { \fp_eval:n { #6#7 + #8 } } {#6}
+    \@@_adjust_exp:en { \fp_eval:n { #6#7 + #8 } } {#6}
   }
 \cs_new:Npn \@@_adjust_exp:nn #1#2
   { \@@_adjust_exp:nNw {#2} #1 \q_stop }
+\cs_generate_variant:Nn \@@_adjust_exp:nn { e }
 \cs_new:Npn \@@_adjust_exp:nNw #1#2#3 \q_stop
   {
     \token_if_eq_meaning:NNTF #2 -
@@ -3876,9 +3904,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}[EXP]{\siunitx_number_output:N}
+% \begin{macro}[EXP]{\siunitx_number_output:N, \siunitx_number_output:c}
 % \begin{macro}[EXP]{\siunitx_number_output:n}
-% \begin{macro}[EXP]{\siunitx_number_output:NN}
+% \begin{macro}[EXP]{\siunitx_number_output:NN, \siunitx_number_output:cN}
 % \begin{macro}[EXP]{\siunitx_number_output:nN}
 % \begin{macro}[EXP]{\@@_output:Nn}
 % \begin{macro}[EXP]{\@@_output:nn}
@@ -3904,7 +3932,7 @@
 % \begin{macro}[EXP]{\@@_output_integer_first:nnNN}
 % \begin{macro}[EXP]{\@@_output_integer_loop:NNNN}
 % \begin{macro}[EXP]{\@@_output_integer_first:n}
-% \begin{macro}[EXP]{\@@_output_integer_aux:n}
+% \begin{macro}[EXP]{\@@_output_integer_aux:n, \@@_output_integer_aux:e}
 % \begin{macro}[EXP]{\@@_output_integer_loop:NnnN}
 % \begin{macro}[EXP]{\@@_output_decimal_3_3:n}
 % \begin{macro}[EXP]{\@@_output_decimal_loop:NNNN}
@@ -3916,7 +3944,7 @@
 % \begin{macro}[EXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnn}
-% \begin{macro}[EXP]{\@@_output_uncert:nnnnn}
+% \begin{macro}[EXP]{\@@_output_uncert:nnnnn, \@@_output_uncert:Vnnnn}
 % \begin{macro}[EXP]{\@@_output_uncert_loop:nnN}
 % \begin{macro}[EXP]{\@@_output_uncert_loop:nnNw}
 % \begin{macro}[EXP]
@@ -3964,10 +3992,12 @@
 %    \begin{macrocode}
 \cs_new:Npn \siunitx_number_output:N #1
   { \@@_output:Nn #1 { } }
+\cs_generate_variant:Nn \siunitx_number_output:N { c }
 \cs_new:Npn \siunitx_number_output:n #1
   { \@@_output:nn #1 { } }
 \cs_new:Npn \siunitx_number_output:NN #1#2
   { \@@_output:Nn #1 {#2} }
+\cs_generate_variant:Nn \siunitx_number_output:NN { c }
 \cs_new:Npn \siunitx_number_output:nN #1#2
   { \@@_output:nn #1 {#2} }
 \cs_new:Npn \@@_output:Nn #1#2
@@ -4217,13 +4247,14 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_integer_first:n #1
   {
-    \exp_args:Ne \@@_output_integer_aux:n { \tl_reverse:n {#1} }
+    \@@_output_integer_aux:e { \tl_reverse:n {#1} }
   }
 \cs_new:Npn \@@_output_integer_aux:n #1
   {
     \@@_output_integer_loop:NnnN \l_@@_group_first_int { 0 } { }
       #1 \q_recursion_tail \q_recursion_stop
   }
+\cs_generate_variant:Nn \@@_output_integer_aux:n { e }
 \cs_new:Npn \@@_output_integer_loop:NnnN #1#2#3#4
   {
     \quark_if_recursion_tail_stop_do:Nn #4 {#3}
@@ -4350,7 +4381,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_uncert:nnnn #1#2#3#4
   {
-    \exp_args:NV \@@_output_uncert:nnnnn \l_@@_uncert_desc_clist
+    \@@_output_uncert:Vnnnn \l_@@_uncert_desc_clist
       {#1} {#2} {#3} {#4}
   }
 \cs_new:Npn \@@_output_uncert:nnnnn #1#2#3#4#5
@@ -4358,6 +4389,7 @@
     \@@_output_uncert_loop:nnN {#2} {#3}
       #4 \q_recursion_tail #1 , \q_recursion_stop {#5}
   }
+\cs_generate_variant:Nn \@@_output_uncert:nnnnn { V }
 \cs_new:Npn \@@_output_uncert_loop:nnN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #3

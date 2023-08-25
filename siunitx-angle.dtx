@@ -62,7 +62,11 @@
 %
 % \section{Formatting angles}
 %
-% \begin{function}{\siunitx_angle:n, \siunitx_angle:nnn}
+% \begin{function}
+%   {
+%     \siunitx_angle:n, \siunitx_angle:x,
+%     \siunitx_angle:nnn, \siunitx_angle:xxx
+%   }
 %   \begin{syntax}
 %     \cs{siunitx_angle:n} \Arg{angle}
 %     \cs{siunitx_angle:nnn} \Arg{degrees} \Arg{minutes} \Arg{seconds}
@@ -236,9 +240,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_angle:n, \@@_angle:n}
-% \begin{macro}{\siunitx_angle:nnn}
-% \begin{macro}{\@@_arc_convert:n}
+% \begin{macro}{\siunitx_angle:n, \siunitx_angle:x, \@@_angle:n}
+% \begin{macro}{\siunitx_angle:nnn, \siunitx_angle:xxx}
+% \begin{macro}{\@@_arc_convert:n, \@@_arc_convert:x}
 %   The first step here is to force format conversion if required. Going to
 %   a decimal is easy, going to arc format is a bit more painful: avoid
 %   repeating calculations mainly for code readability.
@@ -258,10 +262,11 @@
           }
       }
   }
+\cs_generate_variant:Nn \siunitx_angle:n { x }
 \cs_new_protected:Npn \@@_angle:n #1
   {
     \bool_if:NTF \l_@@_force_arc_bool
-      { \exp_args:Ne \@@_arc_convert:n { \fp_eval:n {#1} } }
+      { \@@_arc_convert:x { \fp_eval:n {#1} } }
       {
         \siunitx_number_parse:nN {#1} \l_@@_degrees_tl
         \siunitx_number_process:NN \l_@@_degrees_tl \l_@@_degrees_tl
@@ -279,7 +284,7 @@
       {
         \bool_if:NTF \l_@@_force_decimal_bool
           {
-            \exp_args:Ne \siunitx_angle:n
+            \siunitx_angle:x
               { \fp_eval:n { #1 + (#2) / 60 + (#3) / 3600 } }
           }
           { \@@_arc_sign:nnn {#1} {#2} {#3} }
@@ -297,25 +302,24 @@
           \l_@@_seconds_tl
       }
   }
+\cs_generate_variant:Nn \siunitx_angle:nnn { xxx }
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
-    \use:x
+    \siunitx_angle:xxx
+      { \fp_eval:n { trunc(#1,0) } }
+      { \fp_eval:n { trunc((#1 - trunc(#1,0)) * 60,0) } }
       {
-        \siunitx_angle:nnn
-          { \fp_eval:n { trunc(#1,0) } }
-          { \fp_eval:n { trunc((#1 - trunc(#1,0)) * 60,0) } }
+        \fp_eval:n
           {
-            \fp_eval:n
-              {
-                (
-                          (#1 - trunc(#1,0)) * 60
-                  - trunc((#1 - trunc(#1,0)) * 60,0)
-                )
-                * 60
-              }
+            (
+                      (#1 - trunc(#1,0)) * 60
+              - trunc((#1 - trunc(#1,0)) * 60,0)
+            )
+            * 60
           }
       }
   }
+\cs_generate_variant:Nn \@@_arc_convert:n { x }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -399,11 +403,11 @@
         {
           \tl_if_empty:cF { l_@@_ ##1 _tl }
             {
-              \exp_args:Ncc \siunitx_number_process:NN
+              \siunitx_number_process:cc
                 { l_@@_ ##1 _tl } { l_@@_ ##1 _tl }
               \tl_set:cx { l_@@_ ##1 _tl }
                 {
-                  \exp_args:Nc \siunitx_number_output:NN
+                  \siunitx_number_output:cN
                     { l_@@_ ##1 _tl } \q_nil
                 }
             }
