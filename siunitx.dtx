@@ -788,12 +788,13 @@
       {
         0
         \exp_not:N \@@_list_count:w \c_space_tl
-        #1 \exp_not:n { ; \q_recursion_tail ; \q_recursion_stop }
+        #1
+        \exp_not:n { ; \s_stop \use_none_delimit_by_q_stop:w ; \q_stop }
       }
   }
 \cs_new:Npx \@@_list_count:w #1 ;
   {
-    \exp_not:n { \exp_args:Nf \quark_if_recursion_tail_stop:n } {#1}
+    \exp_not:N \use_none_delimit_by_s_stop:w #1 \exp_not:N \s_stop
     \exp_not:N \tl_if_blank:nF {#1} { + 1 }
     \exp_not:N \@@_list_count:w \c_space_tl
   }
