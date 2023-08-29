@@ -94,8 +94,8 @@
 %   \end{quote}
 %   where the two sign parts must be single tokens if present,
 %   and all other components
-%   must be given in braces. The number will have at least one digit for both the
-%   \meta{integer} and \meta{exponent} parts: these are required. The
+%   must be given in braces. The number will have at least one digit for either the
+%   \meta{integer} and \meta{exponent} parts.. The
 %   \meta{uncertainty} part should either be blank or contain an
 %   \meta{identifier} (as a brace group), followed by one or more data entries.
 %   Valid uncertainty \meta{identifiers} currently are
@@ -802,8 +802,6 @@
 % \end{quote}
 % where all components must be given in braces. \emph{All} of the components
 % must be present in a stored number (\foreign{i.e.}~at the end of parsing).
-% The number must have at least one digit for both the \meta{integer} and
-% \meta{exponent} parts.
 %
 % A non-empty \meta{uncertainty} must contain one leading brace group
 % containing an identifier, then zero or more brace groups which contain
@@ -1326,7 +1324,7 @@
   {
     \tl_if_empty:NTF \l_siunitx_number_input_exponent_tl
       {
-        \tl_set:Nn \l_@@_exponent_tl { { } 0 }
+        \tl_set:Nn \l_@@_exponent_tl { { } { } }
         \tl_if_empty:NF \l_@@_parsed_tl
           { \@@_parse_loop: }
       }
@@ -1360,7 +1358,7 @@
 \cs_new_protected:Npn \@@_parse_exponent_auxii:nn #1#2
   {
     \quark_if_nil:nTF {#2}
-      { \tl_set:Nn \l_@@_exponent_tl { { } 0 } }
+      { \tl_set:Nn \l_@@_exponent_tl { { } { } } }
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
         \tl_if_blank:nTF {#2}
@@ -2238,9 +2236,10 @@
 % \begin{macro}{\@@_exponent:NN}
 % \begin{macro}[EXP]
 %   {
+%     \@@_exponent:nnnnnnn             ,
+%     \@@_exponent_aux:nnnnnnn         ,
 %     \@@_exponent_engineering:nnnnnnn ,
 %     \@@_exponent_fixed:nnnnnnn       ,
-%     \@@_exponent_input:nnnnnnn       ,
 %     \@@_exponent_scientific:nnnnnnn
 %   }
 % \begin{macro}[EXP]
@@ -2264,7 +2263,7 @@
 %   {\@@_exponent_shift_uncert_S:nnnn, \@@_exponent_shift_uncert_S:ennn}
 % \begin{macro}[EXP]{\@@_exponent_uncert:n}
 % \begin{macro}[EXP]{\@@_exponent_finalise:n}
-% \begin{macro}[EXP]{\@@_exponent_engineering_aux:nnnnnnn}
+% \begin{macro}[EXP]{\@@_exponentcd te_engineering_aux:nnnnnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_exponent_engineering_0:nnnn ,
@@ -2286,17 +2285,27 @@
 \cs_new_protected:Npn \@@_exponent:NN #1#2
   {
     \tl_set:Nx #2
-      {
-        \cs:w
-          @@_exponent_ \l_@@_exponent_mode_tl :nnnnnnn
-          \exp_after:wN
-        \cs_end: #1
-      }
+      { \exp_after:wN \@@_exponent:nnnnnnn #1 }
     \str_if_eq:VnT \l_@@_exponent_mode_tl { engineering }
       {
         \tl_set:Nx #2
           { \exp_after:wN \@@_exponent_engineering_aux:nnnnnnn #2 }
       }
+  }
+\cs_new:Npn \@@_exponent:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \str_if_eq:VnTF \l_@@_exponent_mode_tl { input }
+      { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
+      {
+        \tl_if_blank:nTF {#7}
+          { \@@_exponent_aux:nnnnnnn {#1} {#2} {#3} {#4} {#5} {#6} { 0 } }
+          { \@@_exponent_aux:nnnnnnn {#1} {#2} {#3} {#4} {#5} {#6} {#7} }
+      }
+  }
+\cs_new:Npn \@@_exponent_aux:nnnnnnn #1#2#3#4#5#6#7
+  {
+    \use:c {  @@_exponent_ \l_@@_exponent_mode_tl :nnnnnnn }
+      {#1} {#2} {#3} {#4} {#5} {#6} {#7}
   }
 \cs_new:Npn \@@_exponent_fixed:nnnnnnn #1#2#3#4#5#6#7
   {
@@ -2313,8 +2322,6 @@
     { \int_abs:n \l_@@_exponent_fixed_int }
   }
 \cs_generate_variant:Nn \@@_exponent_fixed:nnnnnnnn { e }
-\cs_new:Npn \@@_exponent_input:nnnnnnn #1#2#3#4#5#6#7
-  { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
 %    \end{macrocode}
 %   To convert to scientific notation, the key question is to find the number
 %   of significant places. That is easy enough if the number has a non-zero
@@ -3981,9 +3988,10 @@
 %   {
 %     \@@_output_exponent:nnnnn       ,
 %     \@@_output_exponent_auxi:nnnnn  ,
-%     \@@_output_exponent_auxii:nnnnn
+%     \@@_output_exponent_auxii:nnnnn ,
+%     \@@_output_exponent_auxiii:nnnnn
 %   }
-% \begin{macro}[EXP]{\@@_output_exponent_auxiii:nn}
+% \begin{macro}[EXP]{\@@_output_exponent_auxiv:nn}
 % \begin{macro}[EXP]{\@@_output_end:}
 %   The approach to formatting a single number is to split into
 %   the constituent parts. All of the parts are assembled including
@@ -4037,7 +4045,11 @@
         {
           \bool_lazy_or_p:nn
             { \l_@@_zero_exponent_bool }
-            { ! \str_if_eq_p:nn {#2} { 0 } }
+            {
+              ! \bool_lazy_or_p:nn
+                { \tl_if_blank_p:n {#2} }
+                { \str_if_eq_p:nn {#2} { 0 } }
+            }
         }
       }
     \@@_output_bracket:w
@@ -4587,18 +4599,28 @@
 \cs_new:Npn \@@_output_exponent:nnnnn #1#2#3#4#5
   {
     \exp_not:n {#5}
+    \str_if_empty:nTF {#2}
+      {
+        \bool_if:NTF \l_@@_zero_exponent_bool
+          { \@@_output_exponent_auxi:nnnnn {#1} { 0 } {#3} {#4} {#5} }
+          { \exp_not:n {#5} }
+      }
+      { \@@_output_exponent_auxi:nnnnn {#1} {#2} {#3} {#4} {#5} }
+  }
+\cs_new:Npn \@@_output_exponent_auxi:nnnnn #1#2#3#4#5
+  {
     \bool_lazy_or:nnTF
       { \l_@@_zero_exponent_bool }
       { ! \str_if_eq_p:nn {#2} { 0 } }
       {
         \tl_if_empty:NTF \l_@@_output_exp_marker_tl
-          { \@@_output_exponent_auxi:nnnnn }
           { \@@_output_exponent_auxii:nnnnn }
+          { \@@_output_exponent_auxiii:nnnnn }
             {#1} {#2} {#3} {#4} {#5}
       }
       { \exp_not:n {#5} }
   }
-\cs_new:Npn \@@_output_exponent_auxi:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_output_exponent_auxii:nnnnn #1#2#3#4#5
   {
     \bool_lazy_or:nnT
       {
@@ -4620,15 +4642,15 @@
     \exp_not:n {#5}
     \exp_not:V \l_@@_exponent_base_tl
     ^
-      { \@@_output_exponent_auxiii:nnn { } {#1} {#2} }
+      { \@@_output_exponent_auxiv:nnn { } {#1} {#2} }
   }
-\cs_new:Npn \@@_output_exponent_auxii:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_output_exponent_auxiii:nnnnn #1#2#3#4#5
   {
     \exp_not:n {#5}
     \exp_not:V \l_@@_output_exp_marker_tl
-    \@@_output_exponent_auxiii:nnn { \mathord } {#1} {#2}
+    \@@_output_exponent_auxiv:nnn { \mathord } {#1} {#2}
   }
-\cs_new:Npn \@@_output_exponent_auxiii:nnn #1#2#3
+\cs_new:Npn \@@_output_exponent_auxiv:nnn #1#2#3
   {
     \tl_if_blank:nTF {#2}
       {

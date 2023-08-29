@@ -11,6 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Correct spacing for uncertainties for integers in
   tables (see issue
   [\#690](https://github.com/josephwright/siunitx/issues/690))
+- Parse empty and zero exponents independently (see issue
+  [\#692](https://github.com/josephwright/siunitx/issues/692))
 
 ## [v3.3.4] - 2023-08-24
 
