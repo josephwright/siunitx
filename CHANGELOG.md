@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.5] - 2023-08-30
+
 ### Fixed
 - Correct spacing for uncertainties for integers in
   tables (see issue
@@ -2007,7 +2009,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.5...HEAD
+[v3.3.5]: https://github.com/josephwright/siunitx/compare/v3.3.4...v3.3.5
 [v3.3.4]: https://github.com/josephwright/siunitx/compare/v3.3.3...v3.3.4
 [v3.3.3]: https://github.com/josephwright/siunitx/compare/v3.3.2...v3.3.3
 [v3.3.2]: https://github.com/josephwright/siunitx/compare/v3.3.1...v3.3.2
