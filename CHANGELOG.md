@@ -15,6 +15,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#692](https://github.com/josephwright/siunitx/issues/692))
 - Prevent expansion of `\text` in literal units (see issue
   [\#691](https://github.com/josephwright/siunitx/issues/691))
+- Printing of 'boundary' phrases (see issue
+  [\#693](https://github.com/josephwright/siunitx/issues/693))
 
 ## [v3.3.4] - 2023-08-24
 
