@@ -11,10 +11,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Correct spacing for uncertainties for integers in
   tables (see issue
   [\#690](https://github.com/josephwright/siunitx/issues/690))
-- Parse empty and zero exponents independently (see issue
-  [\#692](https://github.com/josephwright/siunitx/issues/692))
 - Prevent expansion of `\text` in literal units (see issue
   [\#691](https://github.com/josephwright/siunitx/issues/691))
+- Parse empty and zero exponents independently (see issue
+  [\#692](https://github.com/josephwright/siunitx/issues/692))
 - Printing of 'boundary' phrases (see issue
   [\#693](https://github.com/josephwright/siunitx/issues/693))
 
