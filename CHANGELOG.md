@@ -19,6 +19,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#692](https://github.com/josephwright/siunitx/issues/692))
 - Printing of 'boundary' phrases (see issue
   [\#693](https://github.com/josephwright/siunitx/issues/693))
+- Handling of font commands inside `\ensuremath` in text
+  mode (see issue
+  [\#694](https://github.com/josephwright/siunitx/issues/694))
 
 ## [v3.3.4] - 2023-08-24
 
