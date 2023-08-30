@@ -831,6 +831,7 @@
 %
 % \begin{macro}{\siunitx_print_text:n}
 % \begin{macro}{\@@_text_replace:n, \@@_text_replace_aux:n}
+% \begin{macro}{\@@_text_replace_font:N}
 % \begin{macro}[EXP]{\@@_text_replace_first:N}
 % \begin{macro}{\@@_text_replace:N}
 % \begin{macro}{\@@_text_replace:NNn}
@@ -875,6 +876,11 @@
 %   To get math mode material to print in text mode, various search-and-replace
 %   steps are needed. We use \tn{protected@edef} to deal with commands, partly
 %   for speed and partly as it deals with anything nested inside \cs{mathord}.
+%   On the other hand, the unit font command has to be handled at exactly one
+%   level, so that it does not affect anything inside for example
+%   \cs{ensuremath}. That means preventing any change inside the
+%   \tn{protected@edef}, hence the \cs{cs_set_eq:NN} to \cs{scan_stop:}
+%   (for \LaTeXe{} robust commands).
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_text_replace:n #1
   {
@@ -885,8 +891,12 @@
           \tl_set:Nn \l_@@_tmp_tl {#1}
           \tl_if_empty:NF \l_@@_tmp_tl
             {
+              \@@_text_replace_font:N \l_@@_tmp_tl
               \tl_if_empty:NF \l_siunitx_unit_font_tl
-                { \exp_after:wN \cs_set_eq:NN \l_siunitx_unit_font_tl \use:n }
+                {
+                  \exp_after:wN
+                    \cs_set_eq:NN \l_siunitx_unit_font_tl \scan_stop:
+                }
               \cs_set:Npn \mathord ##1
                 { \@@_text_replace_first:N ##1 }
               \group_begin: 
@@ -912,6 +922,14 @@
     \group_end:
   }
 \cs_new_protected:Npn \@@_text_replace_aux:n #1 {#1}
+\cs_new_protected:Npn \@@_text_replace_font:N #1
+  {
+    \tl_if_empty:NF \l_siunitx_unit_font_tl
+      {
+        \tl_replace_all:NVn #1
+          \l_siunitx_unit_font_tl { \use:n }
+      }
+  }
 \cs_new:Npn \@@_text_replace_first:N #1
   {
     \str_case:nnF {#1}
@@ -940,6 +958,7 @@
       \exp_not:N \q_recursion_tail
         { ? }
       \exp_not:N \q_recursion_stop
+    \@@_text_replace_font:N #1
   }
 \cs_new_protected:Npn \@@_text_replace:NNn #1#2#3
   {
@@ -1072,6 +1091,7 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
