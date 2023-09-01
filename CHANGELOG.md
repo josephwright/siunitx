@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Corrected handling of font commands inside `\ensuremath` in text
+  mode (see issue
+  [\#694](https://github.com/josephwright/siunitx/issues/694))
+
 ## [v3.3.5] - 2023-08-30
 
 ### Fixed

@@ -891,15 +891,15 @@
           \tl_set:Nn \l_@@_tmp_tl {#1}
           \tl_if_empty:NF \l_@@_tmp_tl
             {
-              \@@_text_replace_font:N \l_@@_tmp_tl
-              \tl_if_empty:NF \l_siunitx_unit_font_tl
-                {
-                  \exp_after:wN
-                    \cs_set_eq:NN \l_siunitx_unit_font_tl \scan_stop:
-                }
-              \cs_set:Npn \mathord ##1
-                { \@@_text_replace_first:N ##1 }
-              \group_begin: 
+              \group_begin:
+                \@@_text_replace_font:N \l_@@_tmp_tl
+                \cs_set:Npn \mathord ##1
+                  { \@@_text_replace_first:N ##1 }
+                \tl_if_empty:NF \l_siunitx_unit_font_tl
+                  {
+                    \exp_after:wN
+                      \cs_set_eq:NN \l_siunitx_unit_font_tl \scan_stop:
+                  }
                 \tl_map_inline:nn
                   { \mp \approx \sim \ge \le \geq \leq \gg \ll \angle }
                   {
@@ -909,7 +909,10 @@
                 \cs_set:Npn \sqrt ##1
                   {
                     \exp_not:N \ensuremath
-                      { \exp_not:N \sqrt { \exp_not:N \text {##1} } }
+                      {
+                        \exp_not:N \sqrt
+                          { \exp_not:N \text { \@@_text_replace:n {##1} } }
+                      }
                   }
                 \protected@edef \l_@@_tmp_tl
                   { \exp_after:wN \@@_text_replace_first:N \l_@@_tmp_tl }
