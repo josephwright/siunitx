@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.6] - 2023-09-01
+
 ### Fixed
 - Corrected handling of font commands inside `\ensuremath` in text
   mode (see issue
@@ -2017,7 +2019,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.6...HEAD
+[v3.3.6]: https://github.com/josephwright/siunitx/compare/v3.3.5...v3.3.6
 [v3.3.5]: https://github.com/josephwright/siunitx/compare/v3.3.4...v3.3.5
 [v3.3.4]: https://github.com/josephwright/siunitx/compare/v3.3.3...v3.3.4
 [v3.3.3]: https://github.com/josephwright/siunitx/compare/v3.3.2...v3.3.3
