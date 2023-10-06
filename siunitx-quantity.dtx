@@ -357,16 +357,17 @@
 % \begin{macro}{\@@_extract_exp:nNN, \@@_extract_exp:VNN}
 % \begin{macro}{\@@_extract_exp:nnnnnnnNN}
 %   To extract the exponent part for a combined prefix, we decompose the value
-%   and remove it.
+%   and remove it. As the exponent part may be entirely empty, we add a filler
+%   zero.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_extract_exp:nNN #1#2#3
   { \@@_extract_exp:nnnnnnnNN #1 #2 #3 }
 \cs_generate_variant:Nn \@@_extract_exp:nNN { V }
 \cs_new_protected:Npn \@@_extract_exp:nnnnnnnNN #1#2#3#4#5#6#7#8#9
   {
-    \fp_set:Nn #8 {#6#7}
+    \fp_set:Nn #8 { #6 0#7 }
     \tl_set:Nx #9
-      { {#1} {#2} {#3} {#4} {#5} { } { 0 } }
+      { {#1} {#2} {#3} {#4} {#5} { } { } }
   }
 %    \end{macrocode}
 % \end{macro}

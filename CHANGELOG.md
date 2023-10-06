@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Allow for empty exponent when combining exponents (see issue
+  [\#698](https://github.com/josephwright/siunitx/issues/698))
+
 ## [v3.3.6] - 2023-09-01
 
 ### Fixed
