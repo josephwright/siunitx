@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.7] - 2023-10-07
+
 ### Fixed
 - Allow for empty exponent when combining exponents (see issue
   [\#698](https://github.com/josephwright/siunitx/issues/698))
@@ -2023,7 +2025,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.6...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.7...HEAD
+[v3.3.7]: https://github.com/josephwright/siunitx/compare/v3.3.6...v3.3.7
 [v3.3.6]: https://github.com/josephwright/siunitx/compare/v3.3.5...v3.3.6
 [v3.3.5]: https://github.com/josephwright/siunitx/compare/v3.3.4...v3.3.5
 [v3.3.4]: https://github.com/josephwright/siunitx/compare/v3.3.3...v3.3.4
