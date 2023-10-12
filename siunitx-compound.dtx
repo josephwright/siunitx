@@ -535,7 +535,7 @@
 % \begin{macro}{\siunitx_compound_number:n}
 % \begin{macro}{\@@_format:n}
 % \begin{macro}{\@@_format:nn}
-% \begin{macro}{\@@_format:nnn, \@@_format:xxn}
+% \begin{macro}{\@@_format:nnn, \@@_format:een}
 %   Printing a generic set starts with the question of whether we want to
 %   extract exponents. If we do, then there is the work to do with extraction.
 %   Either way, the printing is handed off to a common function. We do a quick
@@ -554,7 +554,7 @@
     \seq_clear:N \l_@@_tmp_seq
     \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \@@_format:xxn
+        \@@_format:een
           { \tl_head:n {#1} }
           { \tl_tail:n {#1} }
           {#2}
@@ -575,7 +575,7 @@
       }
       { \@@_format_aux:nnn {#1} {#2} {#3} }
   }
-\cs_generate_variant:Nn \@@_format:nnn { xx }
+\cs_generate_variant:Nn \@@_format:nnn { ee }
 \cs_new_protected:Npn \@@_format_aux:nnn #1#2#3
   {
     \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
@@ -855,7 +855,7 @@
     \str_if_eq:VnT \l_siunitx_quantity_prefix_mode_tl { combine-exponent }
       { \tl_clear:N \l_@@_exp_tl }
     \bool_if:NTF \l_@@_unit_repeat_bool
-      { \@@_print:N \@@_print_quantity:x }
+      { \@@_print:N \@@_print_quantity:e }
       {
         \bool_lazy_and:nnTF
           { \l_@@_unit_bracket_bool }
@@ -874,11 +874,11 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_print:N}
-% \begin{macro}{\@@_print:nnN, \@@_print:nVN, \@@_print:xnN, \@@_print:xxN}
-% \begin{macro}{\@@_print:nnnN, \@@_print:xnnN}
+% \begin{macro}{\@@_print:nnN, \@@_print:nVN, \@@_print:enN, \@@_print:eeN}
+% \begin{macro}{\@@_print:nnnN, \@@_print:ennN}
 % \begin{macro}{\@@_print_aux:n}
 % \begin{macro}{\@@_print_aux:nn}
-% \begin{macro}{\@@_print_quantity:n, \@@_print_quantity:x}
+% \begin{macro}{\@@_print_quantity:n, \@@_print_quantity:e}
 % \begin{macro}
 %   {
 %     \@@_print_boundary:n, \@@_print_boundary:V,
@@ -894,7 +894,7 @@
       { \l_@@_exp_bracket_bool }
       { ! \tl_if_empty_p:N \l_@@_exp_tl }
       {
-        \@@_print:xxN
+        \@@_print:eeN
           { \exp_not:V \l_@@_bracket_open_tl }
           {
             \exp_not:V \l_@@_bracket_close_tl
@@ -906,10 +906,10 @@
   }
 \cs_new_protected:Npn \@@_print:nnN #1#2#3
   {
-    \@@_print:xnnN
+    \@@_print:ennN
       { \seq_count:N \l_@@_tmp_seq } {#1} {#2} #3
   }
-\cs_generate_variant:Nn \@@_print:nnN { nV , x , xx }
+\cs_generate_variant:Nn \@@_print:nnN { nV , e , ee }
 %    \end{macrocode}
 %   A rather long auxiliary as we want a way to have the brackets/exponent
 %   available. The actual flow is simple enough: see how many entries there are
@@ -955,7 +955,7 @@
         \@@_print_boundary:V \l_@@_boundary_close_tl
       }
   }
-\cs_generate_variant:Nn \@@_print:nnnN { x }
+\cs_generate_variant:Nn \@@_print:nnnN { e }
 \cs_new_protected:Npn \@@_print_aux:n #1 { }
 \cs_new_protected:Npn \@@_print_aux:nn #1#2
   {
@@ -991,7 +991,7 @@
   }
 \cs_new_protected:Npn \@@_print_quantity:n #1
   { \siunitx_quantity_print:nV {#1} \l_@@_unit_tl }
-\cs_generate_variant:Nn  \@@_print_quantity:n { x }
+\cs_generate_variant:Nn  \@@_print_quantity:n { e }
 \cs_new_protected:Npn \@@_print_boundary:n #1
   {
     \tl_if_blank:nF {#1}
@@ -1191,7 +1191,7 @@
 % \begin{macro}{\siunitx_number_product:n}
 % \begin{macro}{\siunitx_quantity_product:nn}
 % \begin{macro}{\@@_aux:}
-% \begin{macro}{\@@_aux:n, \@@_aux:x}
+% \begin{macro}{\@@_aux:n, \@@_aux:e}
 %   Simply recover the settings and use as a list.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_product:n #1
@@ -1211,8 +1211,8 @@
 \cs_new_protected:Npn \@@_aux:
   {
     \bool_if:NTF \l_@@_phrase_bool
-      { \@@_aux:x { \exp_not:V \l_@@_phrase_tl } }
-      { \@@_aux:x { { } \exp_not:V \l_@@_symbol_tl { } } }
+      { \@@_aux:e { \exp_not:V \l_@@_phrase_tl } }
+      { \@@_aux:e { { } \exp_not:V \l_@@_symbol_tl { } } }
   }
 \cs_new_protected:Npn \@@_aux:n #1
   {
@@ -1235,7 +1235,7 @@
         compound-units                = \l_@@_units_tl
       }
   }
-\cs_generate_variant:Nn \@@_aux:n { x }
+\cs_generate_variant:Nn \@@_aux:n { e }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

@@ -242,7 +242,7 @@
 %
 % \begin{macro}{\siunitx_angle:n, \siunitx_angle:x, \@@_angle:n}
 % \begin{macro}{\siunitx_angle:nnn, \siunitx_angle:xxx}
-% \begin{macro}{\@@_arc_convert:n, \@@_arc_convert:x}
+% \begin{macro}{\@@_arc_convert:n, \@@_arc_convert:e}
 %   The first step here is to force format conversion if required. Going to
 %   a decimal is easy, going to arc format is a bit more painful: avoid
 %   repeating calculations mainly for code readability.
@@ -266,7 +266,7 @@
 \cs_new_protected:Npn \@@_angle:n #1
   {
     \bool_if:NTF \l_@@_force_arc_bool
-      { \@@_arc_convert:x { \fp_eval:n {#1} } }
+      { \@@_arc_convert:e { \fp_eval:n {#1} } }
       {
         \siunitx_number_parse:nN {#1} \l_@@_degrees_tl
         \siunitx_number_process:NN \l_@@_degrees_tl \l_@@_degrees_tl
@@ -319,7 +319,7 @@
           }
       }
   }
-\cs_generate_variant:Nn \@@_arc_convert:n { x }
+\cs_generate_variant:Nn \@@_arc_convert:n { e }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
