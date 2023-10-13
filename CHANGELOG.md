@@ -7,6 +7,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Deprecated
+- `x`-type variants
+  - `\siunitx_angle:x`
+  - `\siunitx_angle:xxx`
+  - `\siunitx_complex_number:x`
+  - `\siunitx_complex_quantity:xn`
+  - `\siunitx_print_number:x`
+  - `\siunitx_quantity_print:xV`
+  - `\siunitx_declare_prefix:Nnx`
+  - `\siunitx_declare_unit:Nx`
+  - `\siunitx_declare_unit:Nxn`
+
 ## [v3.3.7] - 2023-10-07
 
 ### Fixed

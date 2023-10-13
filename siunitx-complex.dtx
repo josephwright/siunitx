@@ -66,7 +66,7 @@
 % assumptions concerning \LaTeXe{} commands in the submodule beyond those in the
 % core number and unit submodules.
 %
-% \begin{function}{\siunitx_complex_number:n, \siunitx_complex_number:x}
+% \begin{function}{\siunitx_complex_number:n, \siunitx_complex_number:e}
 %   \begin{syntax}
 %     \cs{siunitx_complex_number:n} \Arg{number}
 %   \end{syntax}
@@ -96,7 +96,7 @@
 % \begin{function}
 %   {
 %     \siunitx_complex_quantity:nn  ,
-%     \siunitx_complex_quantity:xn  ,
+%     \siunitx_complex_quantity:en  ,
 %     \siunitx_complex_quantity:nnn
 %   }
 %   \begin{syntax}
@@ -691,9 +691,9 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_complex_number:n, \siunitx_complex_number:x}
+% \begin{macro}{\siunitx_complex_number:n, \siunitx_complex_number:e}
 % \begin{macro}{\siunitx_complex_number:nn, \@@_number:nn}
-% \begin{macro}{\siunitx_complex_quantity:nn, \siunitx_complex_quantity:xn}
+% \begin{macro}{\siunitx_complex_quantity:nn, \siunitx_complex_quantity:en}
 % \begin{macro}{\siunitx_complex_quantity:nnn, \@@_quantity:nnn}
 %   The work here is pretty trivial: only conversion between forms makes
 %   things a bit more intricate.
@@ -722,7 +722,7 @@
           }
       }
   }
-\cs_generate_variant:Nn \siunitx_complex_number:n { x }
+\cs_generate_variant:Nn \siunitx_complex_number:n { e, x }
 \cs_new_protected:Npn \siunitx_complex_number:nn #1#2
   {
     \bool_lazy_or:nnTF
@@ -740,7 +740,7 @@
       { \l_@@_force_cartesian_bool }
       { \l_siunitx_number_parse_bool }
       {
-        \siunitx_complex_number:x
+        \siunitx_complex_number:e
           { \@@_convert_cartesian:nn {#1} {#2} }
       }
       {
@@ -770,7 +770,7 @@
           { \siunitx_quantity:nn {#1} {#2} }
       }
   }
-\cs_generate_variant:Nn \siunitx_complex_quantity:nn { x }
+\cs_generate_variant:Nn \siunitx_complex_quantity:nn { e , x }
 \cs_new_protected:Npn \siunitx_complex_quantity:nnn #1#2#3
   {
     \bool_lazy_or:nnTF
@@ -788,7 +788,7 @@
       { \l_@@_force_cartesian_bool }
       { \l_siunitx_number_parse_bool }
       {
-        \siunitx_complex_quantity:xn
+        \siunitx_complex_quantity:en
           { \@@_convert_cartesian:nn {#1} {#2} }
           {#3}
       }

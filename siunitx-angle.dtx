@@ -64,8 +64,8 @@
 %
 % \begin{function}
 %   {
-%     \siunitx_angle:n, \siunitx_angle:x,
-%     \siunitx_angle:nnn, \siunitx_angle:xxx
+%     \siunitx_angle:n, \siunitx_angle:e,
+%     \siunitx_angle:nnn, \siunitx_angle:eee
 %   }
 %   \begin{syntax}
 %     \cs{siunitx_angle:n} \Arg{angle}
@@ -240,8 +240,8 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_angle:n, \siunitx_angle:x, \@@_angle:n}
-% \begin{macro}{\siunitx_angle:nnn, \siunitx_angle:xxx}
+% \begin{macro}{\siunitx_angle:n, \siunitx_angle:e, \@@_angle:n}
+% \begin{macro}{\siunitx_angle:nnn, \siunitx_angle:eee}
 % \begin{macro}{\@@_arc_convert:n, \@@_arc_convert:e}
 %   The first step here is to force format conversion if required. Going to
 %   a decimal is easy, going to arc format is a bit more painful: avoid
@@ -262,7 +262,7 @@
           }
       }
   }
-\cs_generate_variant:Nn \siunitx_angle:n { x }
+\cs_generate_variant:Nn \siunitx_angle:n { e , x }
 \cs_new_protected:Npn \@@_angle:n #1
   {
     \bool_if:NTF \l_@@_force_arc_bool
@@ -284,7 +284,7 @@
       {
         \bool_if:NTF \l_@@_force_decimal_bool
           {
-            \siunitx_angle:x
+            \siunitx_angle:e
               { \fp_eval:n { #1 + (#2) / 60 + (#3) / 3600 } }
           }
           { \@@_arc_sign:nnn {#1} {#2} {#3} }
@@ -302,10 +302,10 @@
           \l_@@_seconds_tl
       }
   }
-\cs_generate_variant:Nn \siunitx_angle:nnn { xxx }
+\cs_generate_variant:Nn \siunitx_angle:nnn { eee , xxx }
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
-    \siunitx_angle:xxx
+    \siunitx_angle:eee
       { \fp_eval:n { trunc(#1,0) } }
       { \fp_eval:n { trunc((#1 - trunc(#1,0)) * 60,0) } }
       {
