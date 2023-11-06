@@ -4148,7 +4148,11 @@
                 { ! \str_if_eq_p:nn { #1 . #2 } { 1. } }
                 {
                   \bool_lazy_and_p:nn
-                    { \str_if_eq_p:nn {#3} { 0 } }
+                    {
+                      \bool_lazy_or_p:nn
+                        { \tl_if_blank_p:n {#3} }
+                        { \str_if_eq_p:nn {#3} { 0 } }
+                    }
                     { ! \l_@@_zero_exponent_bool }
                 }
                 {

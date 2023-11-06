@@ -19,6 +19,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   - `\siunitx_declare_unit:Nx`
   - `\siunitx_declare_unit:Nxn`
 
+### Fixed
+- Printing of `1` when `print-unity-mantissa = false` (see issue
+  [\#700](https://github.com/josephwright/siunitx/issues/700))
+
 ## [v3.3.7] - 2023-10-07
 
 ### Fixed
