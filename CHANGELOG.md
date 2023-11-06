@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.8] - 2023-11-06
+
 ### Deprecated
 - `x`-type variants
   - `\siunitx_angle:x`
@@ -2041,7 +2043,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.7...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.8...HEAD
+[v3.3.8]: https://github.com/josephwright/siunitx/compare/v3.3.7...v3.3.8
 [v3.3.7]: https://github.com/josephwright/siunitx/compare/v3.3.6...v3.3.7
 [v3.3.6]: https://github.com/josephwright/siunitx/compare/v3.3.5...v3.3.6
 [v3.3.5]: https://github.com/josephwright/siunitx/compare/v3.3.4...v3.3.5
