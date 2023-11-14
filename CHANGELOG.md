@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Rounding of values with no mantissa (see issue
+  [\#704](https://github.com/josephwright/siunitx/issues/704))
+
 ## [v3.3.8] - 2023-11-06
 
 ### Deprecated

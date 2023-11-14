@@ -2772,10 +2772,16 @@
   }
 \cs_new:Npn \@@_round:nnnnnnn #1#2#3#4#5#6#7
   {
-    \str_if_eq:nnTF {#4} { \empty }
-      { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} { } }
-      { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} {#4} }
-        {#5} {#6} {#7}
+    \tl_if_blank:nTF { #3#4 }
+      {
+        \exp_not:n { {#1} {#2} { } { } {#5} {#6} {#7} }
+      }
+      {
+        \str_if_eq:nnTF {#4} { \empty }
+          { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} { } }
+          { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} {#4} }
+            {#5} {#6} {#7}
+      }
   }
 %    \end{macrocode}
 % \end{macro}
