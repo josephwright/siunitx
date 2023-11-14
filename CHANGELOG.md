@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.9] - 2023-11-14
+
 ### Fixed
 - Rounding of values with no mantissa (see issue
   [\#704](https://github.com/josephwright/siunitx/issues/704))
@@ -2047,7 +2049,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.8...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.9...HEAD
+[v3.3.9]: https://github.com/josephwright/siunitx/compare/v3.3.8...v3.3.9
 [v3.3.8]: https://github.com/josephwright/siunitx/compare/v3.3.7...v3.3.8
 [v3.3.7]: https://github.com/josephwright/siunitx/compare/v3.3.6...v3.3.7
 [v3.3.6]: https://github.com/josephwright/siunitx/compare/v3.3.5...v3.3.6
