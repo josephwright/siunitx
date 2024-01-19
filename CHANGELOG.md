@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Load `color` package in `begindocument/before` hook
+
 ## [v3.3.9] - 2023-11-14
 
 ### Fixed
