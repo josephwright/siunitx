@@ -344,8 +344,10 @@
 % Color support is always required; to avoid a potential clash we delay to
 % the start of the document.
 %    \begin{macrocode}
-\hook_gput_code:nnn { begindocument / before } { siunitx }
-  { \RequirePackage { color } }
+\cs_if_exist:NTF \hook_gput_code:nnn
+  { \hook_gput_code:nnn { begindocument / before } { siunitx } }
+  { \AtBeginDocument }
+    { \RequirePackage { color } }
 %    \end{macrocode}
 %
 %   Required variants.
