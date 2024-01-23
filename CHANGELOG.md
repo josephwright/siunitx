@@ -10,6 +10,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Load `color` package in `begindocument/before` hook
 
+### Fixed
+- Prevent accidental expansion of `\mathord` (see issue
+  [\#716](https://github.com/josephwright/siunitx/issues/716))
+
 ## [v3.3.9] - 2023-11-14
 
 ### Fixed
