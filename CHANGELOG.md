@@ -11,6 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Load `color` package in `begindocument/before` hook
 
 ### Fixed
+- Correct ohm symbol with `newtxsf` (see issue
+  [\#713](https://github.com/josephwright/siunitx/issues/713))
 - Prevent accidental expansion of `\mathord` (see issue
   [\#716](https://github.com/josephwright/siunitx/issues/716))
 
