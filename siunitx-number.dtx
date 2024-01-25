@@ -2273,9 +2273,9 @@
 %  \begin{macro}[EXP]{\@@_exponent_engineering:nnNw}
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert:nn}
 %  \begin{macro}[EXP]{\@@_exponent_engineering_uncert_S:nnn}
-%  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnn}
-%  \begin{macro}[EXP]{\@@_exponent_threshold:nn, \@@_exponent_threshold:en}
-%  \begin{macro}[EXP]{\@@_exponent_threshold:nnnnnnnn}
+%  \begin{macro}[EXP]
+%    {\@@_exponent_threshold:nnnnnnn, \@@_exponent_threshold_aux:nnnnnnn}
+%  \begin{macro}[EXP]{\@@_exponent_threshold:n, \@@_exponent_threshold:e}
 %   Manipulating an exponent is done using a single expansion function
 %   \emph{unless} dealing with engineering-style output. The latter is easier
 %   to handle by first converting to scientific output, then post-processing.
@@ -2582,26 +2582,30 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_exponent_threshold:nnnnnnn #1#2#3#4#5#6#7
   {
-    \@@_exponent_threshold:en
+    \@@_exponent_threshold:e
       {
         \@@_exponent_scientific:nnnnnnn
           {#1} {#2} {#3} {#4} {#5} {#6} {#7}
       }
-      { {#1} {#2} {#3} {#4} {#5} {#6} {#7} }
   }
-\cs_new:Npn \@@_exponent_threshold:nn #1#2
-  { \@@_exponent_threshold:nnnnnnnn #1 {#2} }
-\cs_generate_variant:Nn \@@_exponent_threshold:nn { e }
-\cs_new:Npn \@@_exponent_threshold:nnnnnnnn #1#2#3#4#5#6#7#8
+\cs_new:Npn \@@_exponent_threshold:n #1
+  { \@@_exponent_threshold_aux:nnnnnnn #1 }
+\cs_generate_variant:Nn \@@_exponent_threshold:n { e }
+\cs_new:Npn \@@_exponent_threshold_aux:nnnnnnn #1#2#3#4#5#6#7
   {
     \bool_lazy_and:nnTF
       { \int_compare_p:nNn {#6#7} > \l_@@_lower_threshold_int }
       { \int_compare_p:nNn {#6#7} < \l_@@_upper_threshold_int }
-      { \exp_not:n {#8} }
+      {
+        \exp_not:n { {#1} {#2} }
+        \@@_exponent_shift:nnn { -#6#7 } {#3} {#4}
+        \@@_exponent_uncert:n {#5}
+        { }
+        { 0 }
+      }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
