@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.10] - 2024-01-25
+
 ### Changed
 - Load `color` package in `begindocument/before` hook
 - Normalize exponents when `exponent-mode = threshold` (see issue
@@ -2058,7 +2060,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.9...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.10...HEAD
+[v3.3.10]: https://github.com/josephwright/siunitx/compare/v3.3.9...v3.3.10
 [v3.3.9]: https://github.com/josephwright/siunitx/compare/v3.3.8...v3.3.9
 [v3.3.8]: https://github.com/josephwright/siunitx/compare/v3.3.7...v3.3.8
 [v3.3.7]: https://github.com/josephwright/siunitx/compare/v3.3.6...v3.3.7
