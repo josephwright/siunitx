@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.11] - 2024-02-07
+
 ### Fixed
 - Formatting of units with separated uncertainties in 'compound' structures
   when unit is not repeated (see issue
@@ -2065,7 +2067,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.10...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.11...HEAD
+[v3.3.11]: https://github.com/josephwright/siunitx/compare/v3.3.10...v3.3.11
 [v3.3.10]: https://github.com/josephwright/siunitx/compare/v3.3.9...v3.3.10
 [v3.3.9]: https://github.com/josephwright/siunitx/compare/v3.3.8...v3.3.9
 [v3.3.8]: https://github.com/josephwright/siunitx/compare/v3.3.7...v3.3.8
