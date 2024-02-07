@@ -7,12 +7,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Formatting of units with separated uncertainties in 'compound' structures
+  when unit is not repeated (see issue
+  [\#717](https://github.com/josephwright/siunitx/issues/717))
+
 ## [v3.3.10] - 2024-01-25
 
 ### Changed
 - Load `color` package in `begindocument/before` hook
 - Normalize exponents when `exponent-mode = threshold` (see issue
-  [\#716](https://github.com/josephwright/siunitx/issues/711))
+  [\#711](https://github.com/josephwright/siunitx/issues/711))
 
 ### Fixed
 - Prevent accidental expansion of `\mathord` (see issue

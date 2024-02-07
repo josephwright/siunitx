@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-compound.dtx Copyright (C) 2018-2021,2023 Joseph Wright
+% File: siunitx-compound.dtx Copyright (C) 2018-2021,2023,2024 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -1032,9 +1032,12 @@
   { \@@_uncert_bracket:nnw {#1#2#3#4#5#6} {#7#8} #9 \q_stop }
 \cs_new:Npn \@@_uncert_bracket:nnw #1#2 #3 \q_nil #4 \q_nil #5 \q_stop
   {
-    \bool_lazy_or:nnTF
-      { \tl_if_blank_p:n {#2#3} }
-      { ! \tl_if_blank_p:n {#5} }
+    \bool_lazy_any:nTF
+      {
+        { ! \l_@@_unit_repeat_bool }
+        { \tl_if_blank_p:n {#2#3} }
+        { ! \tl_if_blank_p:n {#5} }
+      }
       { \exp_not:n {#1#2#3#4#5} }
       {
         \exp_not:V \l_@@_bracket_open_tl
