@@ -764,9 +764,12 @@
       \bool_if:NTF \l_siunitx_number_parse_bool
         {
           \siunitx_number_parse:nN {#1} \l_@@_parsed_tl
-          \siunitx_number_process:NN \l_@@_parsed_tl \l_@@_parsed_tl
-          \tl_set:Nx \l_@@_outputted_tl
-            { \siunitx_number_output:N \l_@@_parsed_tl }
+          \tl_if_empty:NF \l_@@_parsed_tl
+            {
+              \siunitx_number_process:NN \l_@@_parsed_tl \l_@@_parsed_tl
+              \tl_set:Nx \l_@@_outputted_tl
+                { \siunitx_number_output:N \l_@@_parsed_tl }
+            }
         }
         { \tl_set:Nn \l_@@_outputted_tl { \ensuremath {#1} } }
     \exp_args:NNNV \group_end:
@@ -1065,8 +1068,10 @@
       \tl_map_inline:Nn \l_@@_input_ignore_tl
         { \tl_remove_all:Nn \l_@@_arg_tl {##1} }
       \tl_if_empty:NF \l_@@_arg_tl
-        { \@@_parse_comparator: }
-      \@@_parse_check:
+        {
+          \@@_parse_comparator:
+          \@@_parse_check:
+        }
     \exp_args:NNNV \group_end:
     \tl_set:Nn #2 \l_@@_parsed_tl
   }

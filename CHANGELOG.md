@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#355](https://github.com/josephwright/siunitx/issues/355))
 - Allow for `\protect` inside symbolic units (see issue
   [\#443](https://github.com/josephwright/siunitx/issues/443))
+- Do not error for entirely empty numerical input (see issue
+  [\#539](https://github.com/josephwright/siunitx/issues/539))
 
 ## [v3.3.11] - 2024-02-07
 
