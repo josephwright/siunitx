@@ -978,16 +978,16 @@
 %
 % \begin{macro}{\siunitx_number_normalize_symbols:N}
 % \begin{macro}{\@@_normalize_aux:nN}
-% \begin{macro}{\@@_normalize_sign:N}
+% \begin{macro}{\@@_normalize_actives:N}
 % \begin{variable}{\c_@@_normalize_tl}
-%   There are two parts to the replacement code. First, any active
-%   hyphens signs are normalised: these can come up with some packages and
+%   There are two parts to the replacement code. First, any actives
+%   are normalised: these can come up with some packages and
 %   cause issues. Multi-token signs then are converted to the single token
 %   equivalents so that everything else can work on a one token basis.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_number_normalize_symbols:N #1
   {
-    \@@_normalize_minus:N #1
+    \@@_normalize_actives:N #1
     \exp_after:wN \@@_normalize_aux:NnN \exp_after:wN #1
       \c_@@_normalize_tl
       { ? } \q_recursion_tail
@@ -1010,10 +1010,16 @@
   }
 \group_begin:
   \char_set_catcode_active:N \-
-  \cs_new_protected:Npx \@@_normalize_minus:N #1
+  \char_set_catcode_active:N \<
+  \char_set_catcode_active:N \>
+  \cs_new_protected:Npx \@@_normalize_actives:N #1
     {
       \tl_replace_all:Nnn #1
         { \exp_not:N - }  { \token_to_str:N - }
+      \tl_replace_all:Nnn #1
+        { \exp_not:N < }  { \token_to_str:N < }
+      \tl_replace_all:Nnn #1
+        { \exp_not:N > }  { \token_to_str:N > }
     }
 \group_end:
 %    \end{macrocode}

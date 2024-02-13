@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Normalize active `<`/`>`in numerical input (see issue
+  [\#355](https://github.com/josephwright/siunitx/issues/355))
+
 ## [v3.3.11] - 2024-02-07
 
 ### Fixed
