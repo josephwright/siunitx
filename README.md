@@ -21,4 +21,4 @@ This package is maintained by Joseph Wright: joseph.wright@morningstar2.co.uk
 
 ## License
 
-Released under the LaTeX Project Public License v1.3c or later. See http://www.latex-project.org/lppl.txt
+Released under the LaTeX Project Public License v1.3c or later. See https://www.latex-project.org/lppl.txt
