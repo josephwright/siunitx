@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.12] - 2024-02-15
+
 ### Fixed
 - Normalize active `<`/`>`in numerical input (see issue
   [\#355](https://github.com/josephwright/siunitx/issues/355))
@@ -2078,7 +2080,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.11...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.12...HEAD
+[v3.3.12]: https://github.com/josephwright/siunitx/compare/v3.3.11...v3.3.12
 [v3.3.11]: https://github.com/josephwright/siunitx/compare/v3.3.10...v3.3.11
 [v3.3.10]: https://github.com/josephwright/siunitx/compare/v3.3.9...v3.3.10
 [v3.3.9]: https://github.com/josephwright/siunitx/compare/v3.3.8...v3.3.9
