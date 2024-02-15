@@ -14,6 +14,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#443](https://github.com/josephwright/siunitx/issues/443))
 - Do not error for entirely empty numerical input (see issue
   [\#539](https://github.com/josephwright/siunitx/issues/539))
+- Print all numerical material in math mode when
+  `parse-numbers = false` is set (see issue
+  [\#721](https://github.com/josephwright/siunitx/issues/721))
 
 ## [v3.3.11] - 2024-02-07
 

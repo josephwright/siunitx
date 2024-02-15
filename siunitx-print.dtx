@@ -466,6 +466,7 @@
 %       \siunitx_print_unit:o
 %   }
 % \begin{macro}{\@@_aux:nn}
+% \begin{macro}{\@@_number:n, \@@_unit:n}
 %   The main printing function doesn't actually need to do very much: just set
 %   the color and select the correct sub-function. The \cs{tl_if_empty:oF} is
 %   needed to allow a leading \texttt{1} to be omitted in the case of a unit
@@ -485,17 +486,20 @@
         \tl_if_empty:cTF { l_@@_ #1 _color_tl }
           { \use:n }
           { \ExpandArgs { v } \textcolor { l_@@_ #1 _color_tl } }
-            {
-              \use:c
-                {
-                  siunitx_print_
-                  \tl_use:c { l_@@_ #1 _mode_tl } :n
-                }
-                  {#2}
-            }
+            { \use:c { @@ _ #1 :n } {#2} }
       }
   }
+\cs_new_protected:Npn \@@_number:n #1
+  {
+    \bool_if:NTF \l_siunitx_number_parse_bool
+      { \use:c { siunitx_print_ \l_@@_number_mode_tl :n } }
+      { \siunitx_print_math:n }
+        {#1}
+  }
+\cs_new_protected:Npn \@@_unit:n #1
+  { \use:c { siunitx_print_ \l_@@_unit_mode_tl :n } {#1} }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
