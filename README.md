@@ -17,7 +17,7 @@ ability to control tabular alignment of numbers.
 
 ## Author
 
-This package is maintained by Joseph Wright: joseph.wright@morningstar2.co.uk
+This package is maintained by Joseph Wright: joseph@texdev.net
 
 ## License
 
