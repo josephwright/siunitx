@@ -2703,13 +2703,12 @@
 \cs_new:Npn \@@_digits_uncert_aux:nn #1#2
   {
     \exp_not:n {#2}
-    \@@_digits:nn 
+    \int_compare:nNnT
+      { \l_@@_min_decimal_int - \tl_count:n {#1} } > 0
       {
-        \int_max:nn
-           { 0 }
-           { \l_@@_min_decimal_int - \tl_count:n {#1} + 1 }
+        \prg_replicate:nn
+          { \l_@@_min_decimal_int - \tl_count:n {#1} } { 0 }
       }
-      {#2}
   }
 \cs_new:Npn \@@_digits_uncert:nN #1#2
   {
