@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.13] - 2024-04-12
+
 ### Fixed
 - Minimum digits in uncertainties under some circumstances (see issue
   [\#725](https://github.com/josephwright/siunitx/issues/725))
@@ -2084,7 +2086,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.12...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.13...HEAD
+[v3.3.13]: https://github.com/josephwright/siunitx/compare/v3.3.12...v3.3.13
 [v3.3.12]: https://github.com/josephwright/siunitx/compare/v3.3.11...v3.3.12
 [v3.3.11]: https://github.com/josephwright/siunitx/compare/v3.3.10...v3.3.11
 [v3.3.10]: https://github.com/josephwright/siunitx/compare/v3.3.9...v3.3.10
