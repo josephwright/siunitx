@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Extension of multiple uncertainties when main value is less precise (see
+  issue [\#727](https://github.com/josephwright/siunitx/issues/727))
+
 ## [v3.3.13] - 2024-04-12
 
 ### Fixed

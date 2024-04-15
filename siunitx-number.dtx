@@ -1117,9 +1117,11 @@
 %   }
 % \begin{macro}[EXP]
 %   {\@@_parse_combine_uncert:nnnnnn, \@@_parse_combine_uncert:ennnnn}
+% \begin{macro}[EXP]{\@@_parse_combine_uncert_aux:nn}
 % \begin{macro}[EXP]
 %   {\@@_parse_combine_uncert:nnnnnnn, \@@_parse_combine_uncert:ennnnnn}
-% \begin{macro}[EXP]{\@@_parse_combine_uncert:nnnnn}
+% \begin{macro}[EXP]
+%   {\@@_parse_combine_uncert:nnnnn, \@@_parse_combine_uncert:nnenn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_parse_combine_uncert_aux:nnnn ,
@@ -1196,11 +1198,16 @@
           {#3} {#4} {#5} {#6} { #7 #1 }
       }
       {
-        \@@_parse_combine_uncert:nnnnn
-          { #3 #1 } {#4} {#5} {#6} {#7}
+        \@@_parse_combine_uncert:nnenn { #3 #1 } {#4}
+          {
+            \tl_map_tokens:nn {#5}
+              { \@@_parse_combine_uncert_aux:nn {#1} }
+          }
+          {#6} {#7}
       }
   }
 \cs_generate_variant:Nn \@@_parse_combine_uncert:nnnnnnn { e }
+\cs_new:Npn \@@_parse_combine_uncert_aux:nn #1#2 { {#2#1} }
 %    \end{macrocode}
 %   We now ensure that the decimal part is never entirely blank \emph{if} there
 %   are decimal-part uncertainty digits. There is also a need to handle the
@@ -1224,6 +1231,7 @@
        {#2}
        {#3}
   }
+\cs_generate_variant:Nn \@@_parse_combine_uncert:nnnnn { nne }
 \cs_new:Npn \@@_parse_combine_uncert_aux:nnnn #1#2#3#4
   {
     \@@_parse_combine_uncert_loop:neennnn
@@ -1270,6 +1278,7 @@
 \cs_new:Npn \@@_parse_combine_uncert_end:nnnn #1#2#3#4
   { \exp_not:n { {#1} {#2} } }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
