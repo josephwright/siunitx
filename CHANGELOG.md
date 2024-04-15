@@ -339,7 +339,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Options `digit-group-size`, `digit-group-first-size` and
   `digit-group-other-size` to control digit grouping
 - Options `display-per-mode` and `inline-per-mode` to offer additional
-  flexiblity in `per-mode` control
+  flexibility in `per-mode` control
 - Option `per-symbol-script-correction`
 - Option `power-half-as-sqrt`
 - Option `retain-negative-zero`
@@ -1396,7 +1396,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Allow for `bidi`/RTL when applying `\text`
 - Search-and-replace in UTF-8 literal units
 - Load binary-units only when requested (issue [\#201](https://github.com/josephwright/siunitx/issues/201))
-- Disable `\hightlight` in bookmarks (issue [\#207](https://github.com/josephwright/siunitx/issues/207))
+- Disable `\highlight` in bookmarks (issue [\#207](https://github.com/josephwright/siunitx/issues/207))
 
 ## [v2.5l] - 2012-11-21
 
