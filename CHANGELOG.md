@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.14] - 2024-04-15
+
 ### Fixed
 - Extension of multiple uncertainties when main value is less precise (see
   issue [\#727](https://github.com/josephwright/siunitx/issues/727))
@@ -2090,7 +2092,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.13...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.14...HEAD
+[v3.3.14]: https://github.com/josephwright/siunitx/compare/v3.3.13...v3.3.14
 [v3.3.13]: https://github.com/josephwright/siunitx/compare/v3.3.12...v3.3.13
 [v3.3.12]: https://github.com/josephwright/siunitx/compare/v3.3.11...v3.3.12
 [v3.3.11]: https://github.com/josephwright/siunitx/compare/v3.3.10...v3.3.11
