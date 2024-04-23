@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Appearance of ohm symbol with `kmath` package (see
+  issue [\#728](https://github.com/josephwright/siunitx/issues/728))
+
 ## [v3.3.14] - 2024-04-15
 
 ### Fixed
