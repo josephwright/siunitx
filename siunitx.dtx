@@ -94,10 +94,17 @@
 %
 % \subsection{Initial set up}
 %
-% Set up a couple of commands in recent-ish \LaTeXe{} releases.
 %    \begin{macrocode}
-\providecommand\DeclareRelease[3]{}
-\providecommand\DeclareCurrentRelease[2]{}
+\IfFormatAtLeastTF { 2018-04-01 }
+  { }
+  {%
+    \PackageError{siunitx}{LaTeX kernel too old}
+      {%
+        You need a newer LaTeX to use this release of siunitx.\MessageBreak
+        Loading~siunitx~will~abort!%
+      }%
+    \endinput
+  }
 %    \end{macrocode}
 %
 % Allow rollback to version~$2$: if we need to, version~$1$ could eventually

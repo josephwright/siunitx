@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Require LaTeX release 2018-04-01 or later
+
 ## [v3.3.22] - 2024-09-30
 
 ### Fixed
