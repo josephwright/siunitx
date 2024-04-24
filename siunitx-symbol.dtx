@@ -161,18 +161,17 @@
       {
         \siunitx_declare_unit:Nen \degree
           {
-            \exp_not:N \ifmmode
-              \@ifpackageloaded { unicode-math }
-                { \@@_non_latin:n { "00B0 } }
-                { { } ^ { \exp_not:N \circ } }
-            \exp_not:N \else
-              \exp_not:N \text
-                {
-                  \@ifpackageloaded { inputenc }
-                    { \exp_not:N \textdegree }
-                    { \@@_non_latin:n { "00B0 } }
-                }
-            \exp_not:N \fi
+            \exp_not:N \TextOrMath
+              {
+                \@ifpackageloaded { inputenc }
+                  { \exp_not:N \textdegree }
+                  { \@@_non_latin:n { "00B0 } }
+              }
+              {
+                \@ifpackageloaded { unicode-math }
+                  { \@@_non_latin:n { "00B0 } }
+                  { { } ^ { \exp_not:N \circ } }
+              }
           }
           { quantity-product = { } }
       }
@@ -191,18 +190,17 @@
           \group_end:
           \siunitx_declare_unit:Ne \degreeCelsius
             {
-              \exp_not:N \ifmmode
-                \@ifpackageloaded { unicode-math }
-                  { \@@_non_latin:n { "00B0 } }
-                  { { } ^ { \exp_not:N \circ } }
-              \exp_not:N \else
-                \exp_not:N \text
-                  {
-                    \@ifpackageloaded { inputenc }
-                      { \exp_not:N \textdegree }
-                      { \@@_non_latin:n { "00B0 } }
-                  }
-              \exp_not:N \fi
+              \exp_not:N \TextOrMath
+                {
+                  \@ifpackageloaded { inputenc }
+                    { \exp_not:N \textdegree }
+                    { \@@_non_latin:n { "00B0 } }
+                }
+                {
+                  \@ifpackageloaded { unicode-math }
+                    { \@@_non_latin:n { "00B0 } }
+                    { { } ^ { \exp_not:N \circ } }
+                }
                   C
             }
         }
@@ -233,34 +231,33 @@
                   { \exp_not:V \l_@@_tmpa_tl }
               }
               {
-                \exp_not:N \ifmmode
-                  \@ifpackageloaded { fontspec }
-                    { \exp_not:V \l_@@_tmpb_tl }
-                    {
-                      \bool_lazy_or:nnTF
-                        {
-                          \@ifclassloaded { beamer }
-                            \c_true_bool
-                            \c_false_bool
-                        }
-                        {
-                          \@ifpackageloaded { kmath }
-                            \c_true_bool
-                            \c_false_bool
-                        }
-                        { \exp_not:V \l_@@_tmpb_tl }
-                        { \exp_not:V \l_@@_tmpa_tl }
-                    }
-                \exp_not:N \else
-                  \exp_not:N \text
-                    {
-                      \bool_lazy_or:nnTF
-                        { \sys_if_engine_luatex_p: }
-                        { \sys_if_engine_xetex_p: }
-                        { \@@_non_latin:n { "2126 } }
-                        { \exp_not:N \textohm }
-                    }
-                \exp_not:N \fi
+                \exp_not:N \TextOrMath
+                  {
+                    \bool_lazy_or:nnTF
+                      { \sys_if_engine_luatex_p: }
+                      { \sys_if_engine_xetex_p: }
+                      { \@@_non_latin:n { "2126 } }
+                      { \exp_not:N \textohm }
+                  }
+                  {
+                    \@ifpackageloaded { fontspec }
+                      { \exp_not:V \l_@@_tmpb_tl }
+                      {
+                        \bool_lazy_or:nnTF
+                          {
+                            \@ifclassloaded { beamer }
+                              \c_true_bool
+                              \c_false_bool
+                          }
+                          {
+                            \@ifpackageloaded { kmath }
+                              \c_true_bool
+                              \c_false_bool
+                          }
+                          { \exp_not:V \l_@@_tmpb_tl }
+                          { \exp_not:V \l_@@_tmpa_tl }
+                      }
+                  }
               }
           }
       }

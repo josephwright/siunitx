@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Ensure that mode-dependent symbols respect printing mode (see issue
+  [\#729](https://github.com/josephwright/siunitx/issues/729))
+
 ## [v3.3.15] - 2024-04-23
 
 ### Fixed
