@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.16] - 2024-04-24
+
 ### Fixed
 - Ensure that mode-dependent symbols respect printing mode (see issue
   [\#729](https://github.com/josephwright/siunitx/issues/729))
@@ -2102,7 +2104,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.15...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.16...HEAD
+[v3.3.16]: https://github.com/josephwright/siunitx/compare/v3.3.15...v3.3.16
 [v3.3.15]: https://github.com/josephwright/siunitx/compare/v3.3.14...v3.3.15
 [v3.3.14]: https://github.com/josephwright/siunitx/compare/v3.3.13...v3.3.14
 [v3.3.13]: https://github.com/josephwright/siunitx/compare/v3.3.12...v3.3.13
