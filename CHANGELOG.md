@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Correct treatment of end-iof-line spaces when allowing breaks (see issue
+  [\#730](https://github.com/josephwright/siunitx/issues/730))
+
 ## [v3.3.16] - 2024-04-24
 
 ### Fixed
