@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.17] - 2024-05-06
+
 ### Fixed
 - Correct treatment of end-iof-line spaces when allowing breaks (see issue
   [\#730](https://github.com/josephwright/siunitx/issues/730))
@@ -2108,7 +2110,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.16...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.17...HEAD
+[v3.3.17]: https://github.com/josephwright/siunitx/compare/v3.3.16...v3.3.17
 [v3.3.16]: https://github.com/josephwright/siunitx/compare/v3.3.15...v3.3.16
 [v3.3.15]: https://github.com/josephwright/siunitx/compare/v3.3.14...v3.3.15
 [v3.3.14]: https://github.com/josephwright/siunitx/compare/v3.3.13...v3.3.14
