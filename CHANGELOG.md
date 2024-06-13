@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.3.17] - 2024-05-06
 
 ### Fixed
-- Correct treatment of end-iof-line spaces when allowing breaks (see issue
+- Correct treatment of end-of-line spaces when allowing breaks (see issue
   [\#730](https://github.com/josephwright/siunitx/issues/730))
 
 ## [v3.3.16] - 2024-04-24
@@ -1784,7 +1784,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Allow `\highlight` in units
 - Option `table-column-width` (issue [\#105](https://github.com/josephwright/siunitx/issues/105))
 - Option `bracket-negative-numbers` (issue [\#5](https://github.com/josephwright/siunitx/issues/5))
-- Option `table-align-comparators` (issue [\#86](https://github.com/josephwright/siunitx/issues/86))
+- Option `table-align-comparator` (issue [\#86](https://github.com/josephwright/siunitx/issues/86))
 - Option `minimum-integer-digits` (issue [\#112](https://github.com/josephwright/siunitx/issues/112))
 - Option to print exponent marker literally (issue [\#113](https://github.com/josephwright/siunitx/issues/113))
 - Support for engineering-style number output (issue [\#114](https://github.com/josephwright/siunitx/issues/114))
