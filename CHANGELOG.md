@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Use `fill` glue for aligning comparators (see issue [\#733](https://github.com/josephwright/siunitx/issues/733))
+
 ## [v3.3.17] - 2024-05-06
 
 ### Fixed
