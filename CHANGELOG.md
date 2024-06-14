@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.18] - 2024-06-14
+
 ### Fixed
 - Use `fill` glue for aligning comparators (see issue [\#733](https://github.com/josephwright/siunitx/issues/733))
 
@@ -2113,7 +2115,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.17...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.18...HEAD
+[v3.3.18]: https://github.com/josephwright/siunitx/compare/v3.3.17...v3.3.18
 [v3.3.17]: https://github.com/josephwright/siunitx/compare/v3.3.16...v3.3.17
 [v3.3.16]: https://github.com/josephwright/siunitx/compare/v3.3.15...v3.3.16
 [v3.3.15]: https://github.com/josephwright/siunitx/compare/v3.3.14...v3.3.15
