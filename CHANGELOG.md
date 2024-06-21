@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Add \textonly@unskip` to special tokens to cell content (see issue [\#737](https://github.com/josephwright/siunitx/issues/737))
+
 ## [v3.3.18] - 2024-06-14
 
 ### Fixed
