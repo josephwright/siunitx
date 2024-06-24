@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.19] - 2024-06-24
+
 ### Fixed
 - Add \textonly@unskip` to special tokens to cell content (see issue [\#737](https://github.com/josephwright/siunitx/issues/737))
 
@@ -2118,7 +2120,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.18...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.19...HEAD
+[v3.3.19]: https://github.com/josephwright/siunitx/compare/v3.3.18...v3.3.19
 [v3.3.18]: https://github.com/josephwright/siunitx/compare/v3.3.17...v3.3.18
 [v3.3.17]: https://github.com/josephwright/siunitx/compare/v3.3.16...v3.3.17
 [v3.3.16]: https://github.com/josephwright/siunitx/compare/v3.3.15...v3.3.16
