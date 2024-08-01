@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.20] - 2024-08-01
+
 ### Fixed
 - Avoid rounding up when residual is exactly zero (see issue
   [\#742](https://github.com/josephwright/siunitx/issues/742))
@@ -2124,7 +2126,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.19...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.20...HEAD
+[v3.3.20]: https://github.com/josephwright/siunitx/compare/v3.3.19...v3.3.20
 [v3.3.19]: https://github.com/josephwright/siunitx/compare/v3.3.18...v3.3.19
 [v3.3.18]: https://github.com/josephwright/siunitx/compare/v3.3.17...v3.3.18
 [v3.3.17]: https://github.com/josephwright/siunitx/compare/v3.3.16...v3.3.17
