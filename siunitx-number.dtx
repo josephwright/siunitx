@@ -2980,7 +2980,13 @@
     \str_case:nnF {#1}
       {
         { down } { \use_i:nn }
-        { up }   { \use_ii:nn }
+        { up }
+          {
+            \str_if_eq:eeTF
+              {#2} { \prg_replicate:nn { \tl_count:n {#2} } { 0 } }
+              { \use_i:nn }
+              { \use_ii:nn }
+          }
       }
       {
         \bool_lazy_or:nnTF
