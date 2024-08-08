@@ -300,12 +300,7 @@
 %   therefore, we just collect up the unchanged tokens first. Whilst each
 %   cell forms a group, as we require definitions to say local
 %   to the collections code, an additional group is required.
-%   The definition of
-%   \cs{cr} is used to allow collection of any tokens
-%   inserted after the main content when dealing with the last cell of a row.
-%   (The approach is based on that in \pkg{collcell}.) Whilst the
-%   group formed by a cell will normally tidy up |\cr|, we add an extra one as
-%   the collected material could be a tabular in itself. We use an auxiliary to
+%   We use an auxiliary to
 %   fish out the |\ignorespaces| from the template: that has to go to avoid
 %   issues with the peek-ahead code (everything before the |#| needs to be
 %   read \emph{before} the Appendix~D trick gets applied). Some packages
@@ -316,13 +311,6 @@
   {
     \group_begin:
       \tl_clear:N \l_@@_collect_tl
-      \if_false: { \fi:
-      \cs_set_protected:Npn \cr
-        {
-          \@@_collect_loop:
-          \tex_cr:D
-        }
-      \if_false: } \fi:
       \@@_collect_begin:w
   }
 \cs_new_protected:Npn \@@_collect_begin:w #1 \ignorespaces
@@ -367,9 +355,9 @@
       {
         \unskip            { \@@_collect_loop: }
         \textonly@unskip   { \@@_collect_loop: }
-        \end               { \tabularnewline \end }
+        \end               { \@@_collect_pre_cr: \tabularnewline \end }
         \relax             { \@@_collect_relax:N #1 }
-        \tabularnewline    { \tabularnewline }
+        \tabularnewline    { \@@_collect_pre_cr: \tabularnewline }
         \siunitx_cell_end: { \siunitx_cell_end: }
       }
       { \@@_collect_token_aux:N #1 }
@@ -396,9 +384,9 @@
                 \@maybe@unskip     { \@@_collect_loop: }
                 \tab@setcr         { \@@_collect_loop: }
                 \unskip            { \@@_collect_loop: }
-                \end               { \tabularnewline \end }
+                \end               { \@@_collect_pre_cr: \tabularnewline \end }
                 \relax             { \@@_collect_relax:N #1 }
-                \tabularnewline    { \tabularnewline }
+                \tabularnewline    { \@@_collect_pre_cr: \tabularnewline }
                 \siunitx_cell_end: { \siunitx_cell_end: }
               }
               { \@@_collect_token_aux:N #1 }
@@ -425,6 +413,30 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_collect_pre_cr:}
+%   The definition of \cs{cr} is used to allow collection of any tokens
+%   from the \tn{halign} template after |#| when we are in the last cell of 
+%   the row. (The approach is based on that in \pkg{collcell}.) Note that
+%   \TeX{} inserts these tokens when it sees the \tn{cr} primitive, so
+%   there is no expansion to consider. Whilst in most cases the group formed
+%   by each cell will tidy up, nested tabulars (for example in a header row)
+%   will break if \tn{cr} is redefined too widely. Thus we use a targetted
+%   approach: only apply when needed, and use the additional group inside the
+%   cell to keep control.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_collect_pre_cr:
+  {
+    \if_false: { \fi:
+    \cs_set_protected:Npn \cr
+      {
+        \@@_collect_loop:
+        \tex_cr:D
+      }
+    \if_false: } \fi:
+  }
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Separating collected material}
