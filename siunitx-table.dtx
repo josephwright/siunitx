@@ -297,11 +297,13 @@
 %   Collecting a tabular cell means doing a token-by-token collection.
 %   In previous versions of \pkg{siunitx} that was done along with picking
 %   out the numerical part, but the code flow ends up very tricky. Here,
-%   therefore, we just collect up the unchanged tokens first. The definition of
+%   therefore, we just collect up the unchanged tokens first. Whilst each
+%   cell forms a group, as we require definitions to say local
+%   to the collections code, an additional group is required.
+%   The definition of
 %   \cs{cr} is used to allow collection of any tokens
-%   inserted after the main content when dealing with the last cell of a row:
-%   the \enquote{group} around it is needed to avoid issues with the underlying
-%   |\halign|. (The approach is based on that in \pkg{collcell}.) Whilst the
+%   inserted after the main content when dealing with the last cell of a row.
+%   (The approach is based on that in \pkg{collcell}.) Whilst the
 %   group formed by a cell will normally tidy up |\cr|, we add an extra one as
 %   the collected material could be a tabular in itself. We use an auxiliary to
 %   fish out the |\ignorespaces| from the template: that has to go to avoid
