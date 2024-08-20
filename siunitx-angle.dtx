@@ -330,6 +330,13 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{variable}{\c_@@_parts_tl}
+%   For mappings.
+%    \begin{macrocode}
+\clist_const:Nn \c_@@_parts_tl { degrees , minutes , seconds }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_degrees_tl, \l_@@_minutes_tl, \l_@@_seconds_tl}
 %   Space for formatting parsed numbers.
 %    \begin{macrocode}
@@ -379,6 +386,7 @@
 %
 % \begin{macro}{\@@_arc_sign:nnn}
 % \begin{macro}{\@@_arc_sign:nn}
+% \begin{macro}{\@@_arc_sign_auxi:, \@@_arc_sign_auxii:}
 % \begin{macro}{\@@_extract_sign:nnnnnnnn}
 % \begin{macro}[EXP]{\@@_sign:nnnnnnn}
 %   To get the sign in the right place whilst dealing with zero filling
@@ -404,40 +412,10 @@
       \@@_arc_sign:nn {#3} { seconds }
       \tl_if_empty:NF \l_@@_sign_tl
         {
-          \clist_map_inline:nn { degrees , minutes , seconds }
-            {
-              \tl_if_empty:cF { l_@@_ ##1 _tl }
-                {
-                  \tl_set:cx { l_@@_ ##1 _tl }
-                    {
-                       { }
-                       { \exp_not:V \l_@@_sign_tl }
-                       \exp_after:wN \exp_after:wN \exp_after:wN
-                         \@@_sign:nnnnnnn
-                           \cs:w l_@@_ ##1 _tl \cs_end:
-                    }
-                  \clist_map_break:
-                }
-            }
+          \clist_map_function:NN \c_@@_parts_tl
+            \@@_arc_sign_auxi:n
         }
-      \clist_map_inline:nn { degrees , minutes , seconds }
-        {
-          \tl_if_empty:cF { l_@@_ ##1 _tl }
-            {
-              \bool_lazy_and:nnF
-                { \l_@@_force_arc_bool }
-                { ! \str_if_eq_p:nn {##1} { seconds } }
-                {
-                  \siunitx_number_process:cc
-                    { l_@@_ ##1 _tl } { l_@@_ ##1 _tl }
-                }
-              \tl_set:cx { l_@@_ ##1 _tl }
-                {
-                  \siunitx_number_output:cN
-                    { l_@@_ ##1 _tl } \q_nil
-                }
-            }
-        }
+      \clist_map_function:NN \c_@@_parts_tl \@@_arc_sign_auxii:n
       \@@_arc_print:VVV
         \l_@@_degrees_tl
         \l_@@_minutes_tl
@@ -461,6 +439,39 @@
         \bool_set_true:N \l_@@_signed_bool
       }
   }
+\cs_new_protected:Npn \@@_arc_sign_auxi:n #1
+  {
+    \tl_if_empty:cF { l_@@_ #1 _tl }
+      {
+        \tl_set:cx { l_@@_ #1 _tl }
+          {
+            { }
+            { \exp_not:V \l_@@_sign_tl }
+            \exp_after:wN \exp_after:wN \exp_after:wN
+              \@@_sign:nnnnnnn
+                \cs:w l_@@_ #1 _tl \cs_end:
+           }
+        \clist_map_break:
+      }
+  }
+\cs_new_protected:Npn \@@_arc_sign_auxii:n #1
+  {
+    \tl_if_empty:cF { l_@@_ #1 _tl }
+      {
+        \bool_lazy_and:nnF
+          { \l_@@_force_arc_bool }
+          { ! \str_if_eq_p:nn {#1} { seconds } }
+          {
+            \siunitx_number_process:cc
+              { l_@@_ #1 _tl } { l_@@_ #1 _tl }
+          }
+        \tl_set:cx { l_@@_ #1 _tl }
+          {
+            \siunitx_number_output:cN
+              { l_@@_ #1 _tl } \q_nil
+          }
+      }
+  }
 \cs_new_protected:Npn \@@_extract_sign:nnnnnnnn #1#2#3#4#5#6#7#8
   {
     \tl_if_blank:nTF {#2}
@@ -477,6 +488,7 @@
 \cs_new:Npn \@@_sign:nnnnnnn #1#2#3#4#5#6#7
   { \exp_not:n { {#3} {#4} {#5} {#6} {#7} } }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
