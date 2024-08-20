@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#743](https://github.com/josephwright/siunitx/issues/743))
 - Rounding of angles in arc mode (see issue
   [\#744](https://github.com/josephwright/siunitx/issues/744))
+- Polar form of negative real values (see issue
+  [\#745](https://github.com/josephwright/siunitx/issues/745))
 
 ## [v3.3.20] - 2024-08-01
 

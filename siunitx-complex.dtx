@@ -1143,11 +1143,12 @@
 % \begin{macro}[EXP]{\@@_convert_polar_auxiii:nnw}
 % \begin{macro}[EXP]{\@@_convert_polar_auxiv:nnw}
 % \begin{macro}[EXP]{\@@_convert_polar_auxv:nnw}
-% \begin{macro}[EXP]{\@@_convert_polar_auxvi:nnn}
+% \begin{macro}[EXP]{\@@_convert_polar_auxvi:nnn, \@@_convert_polar_auxvi:enn}
+% \begin{macro}[EXP]{\@@_convert_polar_auxvii:nnn}
 % \begin{macro}[EXP]
-%   {\@@_convert_polar_auxvii:nnn, \@@_convert_polar_auxvii:eee}
+%   {\@@_convert_polar_auxviii:nnn, \@@_convert_polar_auxviii:eee}
 % \begin{macro}[EXP]
-%   {\@@_convert_polar_auxviii:nn, \@@_convert_polar_auxviii:ee}
+%   {\@@_convert_polar_auxix:nn, \@@_convert_polar_auxix:ee}
 %    A simplified parser for complex numbers which works by expansion,
 %    then converts to polar form.
 %    \begin{macrocode}
@@ -1160,10 +1161,10 @@
     \bool_lazy_or:nnTF
       { \str_if_eq_p:nn {#2} { i } }
       { \str_if_eq_p:nn {#2#3} { +i } }
-      { \@@_convert_polar_auxvi:nnn { } { 1 } {#1} }
+      { \@@_convert_polar_auxvii:nnn { } { 1 } {#1} }
       {
         \str_if_eq:nnTF {#2#3} { -i }
-          { \@@_convert_polar_auxvi:nnn { } { -1 } {#1} }
+          { \@@_convert_polar_auxvii:nnn { } { -1 } {#1} }
           { \@@_convert_polar_auxiii:nnw {#1} {#2} #3 + + \q_stop }
       }
   }
@@ -1173,7 +1174,7 @@
       { \@@_convert_polar_auxiv:nnw {#1} {#2} #3 - - \q_stop }
       {
         \str_if_eq:nnTF {#4} { i }
-          { \@@_convert_polar_auxvi:nnn {#2#3} { 1 } {#1} }
+          { \@@_convert_polar_auxvii:nnn {#2#3} { 1 } {#1} }
           { \@@_convert_polar_auxv:nnw {#2#3} {#1} #4 i \q_nil i \q_stop }
       }
   }
@@ -1183,36 +1184,50 @@
       { \@@_convert_polar_auxv:nnw { } {#1} #2#3 i \q_nil i \q_stop }
       {
         \str_if_eq:nnTF {#4} { i }
-          { \@@_convert_polar_auxvi:nnn { } { -1 } {#1} }
+          { \@@_convert_polar_auxvii:nnn { } { -1 } {#1} }
           { \@@_convert_polar_auxv:nnw {#2#3} {#1} -#4 i \q_nil i \q_stop }
       }
   }
+%    \end{macrocode}
+%   Negative real values are special-cased here for efficiency.
+%    \begin{macrocode}
 \cs_new:Npn \@@_convert_polar_auxv:nnw #1#2#3 i #4 i #5 \q_stop
   {
     \quark_if_nil:nTF {#4}
-      { { #3 \tl_if_blank:nF {#2} { e#2 } } { 0 } }
-      { \@@_convert_polar_auxvi:nnn {#1} {#3} {#2} }
+      {
+        \tl_if_head_eq_meaning:nNTF {#3} -
+          { \@@_convert_polar_auxvi:enn { \use_none:n #3 } { 180 } }
+          { \@@_convert_polar_auxvi:nnn {#3} { 0 } }
+            {#2}
+      }
+      { \@@_convert_polar_auxvii:nnn {#1} {#3} {#2} }
   }
 \cs_new:Npn \@@_convert_polar_auxvi:nnn #1#2#3
   {
-    \@@_convert_polar_auxvii:eee
+    { #1 \tl_if_blank:nF {#3} { e#3 } } {#2}
+  }
+\cs_generate_variant:Nn \@@_convert_polar_auxvi:nnn { e }
+\cs_new:Npn \@@_convert_polar_auxvii:nnn #1#2#3
+  {
+    \@@_convert_polar_auxviii:eee
       { \tl_if_blank:nTF {#1} { 0 } {#1} }
       { \tl_if_blank:nTF {#2} { 0 } {#2} }
       { \tl_if_blank:nF {#3} { e#3 } }
   }
-\cs_new:Npn \@@_convert_polar_auxvii:nnn #1#2#3
+\cs_new:Npn \@@_convert_polar_auxviii:nnn #1#2#3
   {
-    \@@_format_polar_auxviii:ee
+    \@@_format_polar_auxix:ee
       { \fp_eval:n { sqrt ( (#1#3)^2 + (#2#3)^2 ) } }
       {
         \fp_eval:n
           { atan \bool_if:NT \l_@@_polar_degree_bool { d } (#2 , #1) }
       }
   }
-\cs_generate_variant:Nn \@@_convert_polar_auxvii:nnn { eee }
-\cs_new:Npn \@@_format_polar_auxviii:nn #1#2 { {#1} {#2} }
-\cs_generate_variant:Nn \@@_format_polar_auxviii:nn { ee }
+\cs_generate_variant:Nn \@@_convert_polar_auxviii:nnn { eee }
+\cs_new:Npn \@@_format_polar_auxix:nn #1#2 { {#1} {#2} }
+\cs_generate_variant:Nn \@@_format_polar_auxix:nn { ee }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
