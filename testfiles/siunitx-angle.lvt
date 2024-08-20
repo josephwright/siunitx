@@ -61,15 +61,23 @@
 \TEST { Option~setting~"angle-mode" }
   {
     \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
     \test:nnn { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { angle-mode = arc }
     \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
     \test:nnn { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { angle-mode = decimal }
     \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
     \test:nnn { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { angle-mode = input }
     \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
     \test:nnn { 1 } { 2 } { 3 }
   }
 
@@ -187,6 +195,16 @@
         round-pad       =false
       }
     \test:n { 22/7 }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Erroneous~arc~input }
+  {
+    \keys_set:nn { siunitx } { angle-mode = arc }
+    \test:nnn { 1 } { -2 } { 3 }
+    \test:nnn { 1 } { +2 } { 3 }
+    \test:nnn { -1 } { -2 } { -3 }
   }
 
 \END

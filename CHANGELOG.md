@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Conversion of negative angles to arc notation (see issue
+  [\#743](https://github.com/josephwright/siunitx/issues/743))
+
 ## [v3.3.20] - 2024-08-01
 
 ### Fixed
