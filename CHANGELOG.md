@@ -7,8 +7,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## [v3.3.21] - 2024-08-20
-
 ### Fixed
 - Conversion of negative angles to arc notation (see issue
   [\#743](https://github.com/josephwright/siunitx/issues/743))
@@ -2136,8 +2134,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.21...HEAD
-[v3.3.21]: https://github.com/josephwright/siunitx/compare/v3.3.20...v3.3.21
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.20...HEAD
 [v3.3.20]: https://github.com/josephwright/siunitx/compare/v3.3.19...v3.3.20
 [v3.3.19]: https://github.com/josephwright/siunitx/compare/v3.3.18...v3.3.19
 [v3.3.18]: https://github.com/josephwright/siunitx/compare/v3.3.17...v3.3.18
