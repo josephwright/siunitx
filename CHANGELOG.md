@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.22] - 2024-09-30
+
 ### Fixed
 - Automatically set `unit-font-command` with `beamer` only when the user has
   not manually adjusted (see issue
@@ -2141,7 +2143,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.21...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.22...HEAD
+[v3.3.22]: https://github.com/josephwright/siunitx/compare/v3.3.21...v3.3.22
 [v3.3.21]: https://github.com/josephwright/siunitx/compare/v3.3.20...v3.3.21
 [v3.3.20]: https://github.com/josephwright/siunitx/compare/v3.3.19...v3.3.20
 [v3.3.19]: https://github.com/josephwright/siunitx/compare/v3.3.18...v3.3.19
