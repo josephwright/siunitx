@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Automatically set `unit-font-command` with `beamer` only when the user has
+  not manually adjusted (see issue
+  [\#748](https://github.com/josephwright/siunitx/issues/748))
+
 ## [v3.3.21] - 2024-08-20
 
 ### Fixed
