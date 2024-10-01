@@ -36,12 +36,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v3.3.19] - 2024-06-24
 
 ### Fixed
-- Add \textonly@unskip` to special tokens to cell content (see issue [\#737](https://github.com/josephwright/siunitx/issues/737))
+- Add \textonly@unskip` to special tokens to cell content (see issue
+  [\#737](https://github.com/josephwright/siunitx/issues/737))
 
 ## [v3.3.18] - 2024-06-14
 
 ### Fixed
-- Use `fill` glue for aligning comparators (see issue [\#733](https://github.com/josephwright/siunitx/issues/733))
+- Use `fill` glue for aligning comparators (see issue
+  [\#733](https://github.com/josephwright/siunitx/issues/733))
 
 ## [v3.3.17] - 2024-05-06
 
