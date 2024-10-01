@@ -95,7 +95,7 @@
 % \subsection{Initial set up}
 %
 %    \begin{macrocode}
-\IfFormatAtLeastTF { 2018-04-01 }
+\IfFormatAtLeastTF { 2022-11-01 }
   { }
   {%
     \PackageError{siunitx}{LaTeX kernel too old}
@@ -113,14 +113,6 @@
 \DeclareRelease{2}{2010-05-23}{siunitx-v2.sty}
 \DeclareRelease{v2}{2010-05-23}{siunitx-v2.sty}
 \DeclareCurrentRelease{}{2021-05-17}
-%    \end{macrocode}
-%
-% Load only the essential support (\pkg{expl3}) \enquote{up-front}, and
-% only if required.
-%    \begin{macrocode}
-\@ifundefined{ExplLoaderFileDate}
-  {\RequirePackage{expl3}}
-  {}
 %    \end{macrocode}
 %
 % Make sure that the version of \pkg{l3kernel} in use is sufficiently new.
@@ -245,12 +237,7 @@
 % \end{macro}
 %
 %    \begin{macrocode}
-\IfFormatAtLeastTF { 2022-06-01 }
-  { \ProcessKeyOptions [ siunitx ] }
-  {
-    \RequirePackage { l3keys2e }
-    \ProcessKeysOptions { siunitx }
-  }
+\ProcessKeyOptions
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -267,17 +254,6 @@
 % This is all done here, and will appear in the \file{.sty} file before the
 % relevant code. Things could be re-arranged by \pkg{DocStrip} but there is no
 % advantage.
-%
-% User level interfaces are all created by \pkg{ltcmd}/\pkg{xparse}.
-%    \begin{macrocode}
-\IfFormatAtLeastTF { 2020-10-01 }
-  { }
-  {
-    \RequirePackage { xparse }
-    \providecommand \ExpandArgs [1]
-      { \cs_if_exist_use:c { exp_args:N #1 } }
-  }
-%    \end{macrocode}
 %
 % \subsubsection{Preamble commands}
 %
