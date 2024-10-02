@@ -605,6 +605,14 @@
 %   number if the input was negative. The standard setting is |true|.
 % \end{function}
 %
+% \begin{function}{simplify-uncertainty}
+%   \begin{syntax}
+%     |simplify-uncertainty| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Switch to control whether uncertainties given with two equal components
+%   are printed as a single value.
+% \end{function}
+%
 % \begin{function}{tight-spacing}
 %   \begin{syntax}
 %     |tight-spacing| = |true|\verb"|"|false|
@@ -3850,6 +3858,7 @@
 %      \l_@@_uncert_desc_clist        ,
 %      \l_@@_uncert_mode_tl           ,
 %      \l_@@_uncert_separator_tl      ,
+%      \l_@@_uncert_simplify_bool     ,
 %      \l_@@_tight_bool               ,
 %      \l_@@_unity_mantissa_bool      ,
 %      \l_@@_zero_exponent_bool       ,
@@ -3928,6 +3937,8 @@
       \l_@@_zero_exponent_bool ,
     print-zero-integer .bool_set:N =
       \l_@@_zero_integer_bool ,
+    simplify-uncertainty .bool_set:N =
+      \l_@@_uncert_simplify_bool ,
     tight-spacing .bool_set:N =
       \l_@@_tight_bool ,
     uncertainty-descriptor-mode .choices:nn =
@@ -4007,6 +4018,7 @@
 % \begin{macro}[EXP]{\@@_output_uncert_S_loop:w}
 % \begin{macro}[EXP]{\@@_output_uncert_A:nnnn, \@@_output_uncert_A_multi:nnnn}
 % \begin{macro}[EXP]{\@@_output_uncert_A:nnnnn}
+% \begin{macro}[EXP]{\@@_output_uncert_A_aux:nnnn}
 % \begin{macro}[EXP]
 %   {
 %     \@@_output_uncert_S:nnnn       ,
@@ -4515,20 +4527,28 @@
   { \@@_output_uncert_A:nnnnn {#1} {#2} {#3} #4 }
 \cs_new_eq:NN \@@_output_uncert_A_multi:nnnn
   \@@_output_uncert_A:nnnn
-\cs_new:Npx \@@_output_uncert_A:nnnnn #1#2#3#4#5
+\cs_new:Npn \@@_output_uncert_A:nnnnn #1#2#3#4#5
+  {
+    \bool_lazy_and:nnTF
+      { \l_@@_uncert_simplify_bool }
+      { \str_if_eq_p:nn {#4} {#5} }
+      { \@@_output_uncert_S_sep:nnnn {#1} {#2} { } {#4} }
+      { \@@_output_uncert_A_aux:nnnn {#1} {#2} {#4} {#5} }
+  }
+\cs_new:Npx \@@_output_uncert_A_aux:nnnn #1#2#3#4
   {
     { }
     ^
       { 
         +
         \exp_not:N \@@_output_uncert_augment:nnnn
-          {#4} {#1} {#4} { }
+          {#3} {#1} {#3} { }
       }
     \char_generate:nn { `\_ } { 8 }
       {
         -
         \exp_not:N \@@_output_uncert_augment:nnnn
-          {#5} {#1} {#5} { }
+          {#4} {#1} {#4} { }
       }
     \exp_not:N \@@_output_uncertainty_unaligned:n {#2}
   }
@@ -4765,6 +4785,7 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \subsection{Miscellaneous tools}
 %
@@ -4929,6 +4950,7 @@
     round-pad                        = true                                   ,
     round-precision                  = 2                                      ,
     round-zero-positive              = true                                   ,
+    simplify-uncertainty             = false                                  ,
     tight-spacing                    = false                                  ,
     uncertainty-descriptor-mode      = bracket-separator                      ,
     uncertainty-descriptor-separator = \                                      ,

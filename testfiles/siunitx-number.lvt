@@ -976,6 +976,22 @@
     \test:n { -0.001 }
   }
 
+\TEST { Option~setting~"simplify-uncertainty" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Ne \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+      }
+    \TIMO
+    \test:n { 12(3:4) }
+    \test:n { 12(4:4) }
+    \keys_set:nn { siunitx } { simplify-uncertainty = true }
+    \test:n { 12(3:4) }
+    \test:n { 12(4:4) }
+  }
+
 \TEST { Option~setting~"tight-spacing" }
   {
     \test:n { -1234 }

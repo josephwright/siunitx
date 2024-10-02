@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Option `simplify-uncertainty` (see issue
+  [\#688](https://github.com/josephwright/siunitx/issues/688))
+
 ### Changed
 - Automatically convert `~` to `\sim` (see issue
   [\#746](https://github.com/josephwright/siunitx/issues/746))
