@@ -64,13 +64,14 @@
 % of \LaTeXe{} math mode commands are assumed to be available as part of the
 % formatted output. The sign commands \cs{mp}, \cs{pm}, \cs{ll}, \cs{le},
 % \cs{gg} and \cs{ge} are used to replace two-character input; \cs{pm}
-% is also required for the output of uncertainties. The standard settings
-% require \cs{times}. For the display of colored negative numbers, the command
-% \cs{color} is assumed to be available. Where the latter may apply, numbers
-% should be printed inside a group: note that \TeX{} grouping is not added
-% \emph{within} formatted numbers as they may need to be decomposed into parts
-% (see \cs{siunitx_number_output:NN}). Such a color will be the \emph{first}
-% part of the result, meaning that a test for an initial |\color| and following
+% is also required for the output of uncertainties, and \cs{sim} for
+% approximate values. The standard settings require \cs{times}. For the display
+% of colored negative numbers, the command \cs{color} is assumed to be
+% available. Where the latter may apply, numbers should be printed inside a
+% group: note that \TeX{} grouping is not added \emph{within} formatted numbers
+% as they may need to be decomposed into parts (see
+% \cs{siunitx_number_output:NN}). Such a color will be the \emph{first} part of
+% the result, meaning that a test for an initial |\color| and following
 % brace group may be used to detect/remove/adjust this part.
 %
 % \section{Formatting numbers}
@@ -1001,19 +1002,24 @@
     \tl_replace_all:Nnn #1 {#2} {#3}
     \@@_normalize_aux:NnN #1
   }
-\tl_const:Nn \c_@@_normalize_tl
-  {
-    { -+ } \mp
-    { +- } \pm
-    { << } \ll
-    { <= } \le
-    { >> } \gg
-    { >= } \ge
-  }
+\group_begin:
+  \char_set_catcode_other:N \~
+  \tl_const:Nn \c_@@_normalize_tl
+    {
+      { -+ } \mp
+      { +- } \pm
+      { << } \ll
+      { <= } \le
+      { >> } \gg
+      { >= } \ge
+      { ~ } \sim
+    }
+\group_end:
 \group_begin:
   \char_set_catcode_active:N \-
   \char_set_catcode_active:N \<
   \char_set_catcode_active:N \>
+  \char_set_catcode_active:N \~
   \cs_new_protected:Npx \@@_normalize_actives:N #1
     {
       \tl_replace_all:Nnn #1
@@ -1022,6 +1028,8 @@
         { \exp_not:N < }  { \token_to_str:N < }
       \tl_replace_all:Nnn #1
         { \exp_not:N > }  { \token_to_str:N > }
+      \tl_replace_all:Nnn #1
+        { \exp_not:N ~ }  { \token_to_str:N ~ }
     }
 \group_end:
 %    \end{macrocode}
