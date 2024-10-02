@@ -359,26 +359,31 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_suppress_exp_uncert:, \@@_suppress_comp:}
+% \begin{macro}{\@@_suppress_comp:, \@@_suppress_exp:, \@@_suppress_uncert:,}
 %   Pre-compilation of keys to suppress uncertainties and exponents,
 %   and 
 %    \begin{macrocode}
 \keys_precompile:nnN
   { siunitx }
+  { input-comparators = }
+  \l_@@_tmp_tl
+\cs_set_protected:Npx \@@_suppress_comp:
+  { \exp_not:V \l_@@_tmp_tl }
+\keys_precompile:nnN
+  { siunitx }
+  { input-exponent-markers = }
+  \l_@@_tmp_tl
+\cs_set_protected:Npx \@@_suppress_exp:
+  { \exp_not:V \l_@@_tmp_tl }
+\keys_precompile:nnN
+  { siunitx }
   {
     input-close-uncertainty = ,
-    input-exponent-markers  = ,
     input-open-uncertainty  = ,
     input-uncertainty-signs =
   }
   \l_@@_tmp_tl
-\cs_set_protected:Npx \@@_suppress_exp_uncert:
-  { \exp_not:V \l_@@_tmp_tl }
-\keys_precompile:nnN
-  { siunitx }
-  { input-comparators = }
-  \l_@@_tmp_tl
-\cs_set_protected:Npx \@@_suppress_comp:
+\cs_set_protected:Npx \@@_suppress_uncert:
   { \exp_not:V \l_@@_tmp_tl }
 %    \end{macrocode}
 % \end{macro}
@@ -396,7 +401,8 @@
 \cs_new_protected:Npn \@@_arc_sign:nnn #1#2#3
   {
     \group_begin:
-      \@@_suppress_exp_uncert:
+      \@@_suppress_exp:
+      \@@_suppress_uncert:
       \tl_clear:N \l_@@_sign_tl
       \bool_set_false:N \l_@@_signed_bool
       \str_if_eq:nnTF {#1} { -0 }
