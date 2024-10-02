@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Automatically convert `~` to `\sim` (see issue
   [\#746](https://github.com/josephwright/siunitx/issues/746))
+- Support uncertainties in seconds part of arc angles (see issue
+  [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
 
 ## [v3.3.22] - 2024-09-30

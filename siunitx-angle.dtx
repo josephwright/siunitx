@@ -396,24 +396,45 @@
 %   To get the sign in the right place whilst dealing with zero filling
 %   means doing some shuffling. That means doing processing of each number
 %   manually. For degrees, auto-conversion can give |-0|, which needs to be
-%   picked up early to set the sign.
+%   picked up early to set the sign. A bit of shuffling is needed as only
+%   the seconds argument is permitted to have an uncertainty.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_sign:nnn #1#2#3
   {
     \group_begin:
       \@@_suppress_exp:
-      \@@_suppress_uncert:
       \tl_clear:N \l_@@_sign_tl
       \bool_set_false:N \l_@@_signed_bool
-      \str_if_eq:nnTF {#1} { -0 }
-        {
-          \@@_arc_sign:nn { } { degrees }
-          \@@_suppress_comp:
-          \tl_set:Nn \l_@@_sign_tl { - }
-          \bool_set_true:N \l_@@_signed_bool
-        }
-        { \@@_arc_sign:nn {#1} { degrees } }      
-      \@@_arc_sign:nn {#2} { minutes }
+      \group_begin:
+        \@@_suppress_uncert:
+        \str_if_eq:nnTF {#1} { -0 }
+          {
+            \@@_arc_sign:nn { } { degrees }
+            \@@_suppress_comp:
+            \tl_set:Nn \l_@@_sign_tl { - }
+            \bool_set_true:N \l_@@_signed_bool
+          }
+          { \@@_arc_sign:nn {#1} { degrees } } 
+        \@@_arc_sign:nn {#2} { minutes }
+        \tl_set:Nx \l_@@_tmp_tl
+          {
+            \tl_set:Nn \exp_not:N \l_@@_sign_tl
+              { \exp_not:V \l_@@_sign_tl }
+            \tl_set:Nn \exp_not:N \l_@@_degrees_tl
+              { \exp_not:V \l_@@_degrees_tl }
+            \tl_set:Nn \exp_not:N \l_@@_minutes_tl
+              { \exp_not:V \l_@@_minutes_tl }
+            \exp_not:c
+              {
+                bool_set_
+                \bool_if:NTF \l_@@_signed_bool
+                  { true }
+                  { false }
+                :N
+              }
+                \exp_not:N \l_@@_signed_bool
+          }
+      \exp_after:wN \group_end: \l_@@_tmp_tl
       \@@_arc_sign:nn {#3} { seconds }
       \tl_if_empty:NF \l_@@_sign_tl
         {
@@ -440,8 +461,11 @@
       }
       {
         \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
-        \exp_after:wN \@@_extract_sign:nnnnnnnn \l_@@_tmp_tl {#2}
-        \bool_set_true:N \l_@@_signed_bool
+        \tl_if_empty:NF \l_@@_tmp_tl
+          {
+            \exp_after:wN \@@_extract_sign:nnnnnnnn \l_@@_tmp_tl {#2}
+            \bool_set_true:N \l_@@_signed_bool
+          }
       }
   }
 \cs_new_protected:Npn \@@_arc_sign_auxi:n #1
