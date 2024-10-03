@@ -158,6 +158,7 @@
     \DeclareTranslation { Italian }    { and } { e }
     \DeclareTranslation { Portuguese } { and } { e }
     \DeclareTranslation { Slovene }    { and } { in }
+    \DeclareTranslation { Italian }    { from~(numerical~range) } { da }
     \DeclareTranslation { Brazilian }  { to~(numerical~range) } { a }
     \DeclareTranslation { Catalan }    { to~(numerical~range) } { a }
     \DeclareTranslation { English }    { to~(numerical~range) } { to }
@@ -181,6 +182,24 @@
             \ifmmode \  \else \space \fi
             \text { \GetTranslation { and } }
             \ifmmode \  \else \space \fi
+          } ,
+        range-open-phrase =
+          {
+            \bool_lazy_or:nnF
+              {
+                \tl_if_blank_p:e
+                  { \GetTranslation { from~(numerical~range) } }
+              }
+              {
+                \str_if_eq_p:ee
+                  { \GetTranslation { from~(numerical~range) } }
+                  { from~(numerical~range) }
+              }
+              {
+                \ifmmode \  \else \space \fi
+                \text { \GetTranslation { from~(numerical~range) } }
+                \ifmmode \  \else \space \fi
+              }
           } ,
         range-phrase =
           {
