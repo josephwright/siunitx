@@ -1006,20 +1006,22 @@
        }
     \cs_new_protected:Npx \SIUnitSymbolOhm
        {
-          \exp_not:N \ifmmode
-            \cs_if_exist:NTF \upOmega
-              { \exp_not:N \upOmega }
-              { \exp_not:N \Omega }
-          \exp_not:N \else
-            \siunitx_print_text:n
-              {
-                \bool_lazy_or:nnTF
-                  { \sys_if_engine_luatex_p: }
-                  { \sys_if_engine_xetex_p: }
-                  { \@@_non_latin:n { "03A9 } }
-                  { \exp_not:N \textohm }
-              }
-          \exp_not:N \fi
+         \exp_not:N \TextOrMath
+            {
+              \siunitx_print_text:n
+                {
+                  \bool_lazy_or:nnTF
+                    { \sys_if_engine_luatex_p: }
+                    { \sys_if_engine_xetex_p: }
+                    { \@@_non_latin:n { "03A9 } }
+                    { \exp_not:N \textohm }
+                }
+            }
+            {
+              \cs_if_exist:NTF \upOmega
+                { \exp_not:N \upOmega }
+                { \exp_not:N \Omega }
+            }
        }
   }
 %    \end{macrocode}
