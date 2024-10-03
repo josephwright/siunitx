@@ -14,6 +14,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 - Extend automatic range phase coverage to Italian (see issue
   [\#650](https://github.com/josephwright/siunitx/issues/650))
+  - Allow control of zero-filling when integer angles are converted to arc
+  format (see issue
+  [\#685](https://github.com/josephwright/siunitx/issues/685))
 - Automatically convert `~` to `\sim` (see issue
   [\#746](https://github.com/josephwright/siunitx/issues/746))
 - Support uncertainties in seconds part of arc angles (see issue

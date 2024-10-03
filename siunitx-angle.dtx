@@ -242,6 +242,7 @@
 % \begin{macro}{\siunitx_angle:n, \siunitx_angle:e, \@@_angle:n}
 % \begin{macro}{\siunitx_angle:nnn, \siunitx_angle:eee}
 % \begin{macro}{\@@_arc_convert:n, \@@_arc_convert:e}
+% \begin{macro}{\@@_arc_convert:w}
 %   The first step here is to force format conversion if required. Going to
 %   a decimal is easy, going to arc format is a bit more painful: avoid
 %   repeating calculations mainly for code readability.
@@ -304,27 +305,43 @@
 \cs_generate_variant:Nn \siunitx_angle:nnn { eee , xxx }
 %    \end{macrocode}
 %   Here, the need for absolute values is to handle conversion of negative
-%   values: the result should be exactly one sign in the integer part.
+%   values: the result should be exactly one sign in the integer part. For
+%   integer input, we can control whether there are minute or second parts
+%   at all.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_arc_convert:n #1
   {
-    \siunitx_angle:eee
-      { \fp_eval:n { trunc(#1,0) } }
-      { \fp_eval:n { abs(trunc((#1 - trunc(#1,0)) * 60,0)) } }
+    \@@_arc_convert:w #1 . \q_nil . \q_stop
+  }
+\cs_generate_variant:Nn \@@_arc_convert:n { e }
+\cs_new_protected:Npn \@@_arc_convert:w #1 . #2 . #3 \q_stop
+  {
+    \quark_if_nil:nTF {#2}
       {
-        \fp_eval:n
+        \siunitx_angle:eee
+          { \fp_eval:n { trunc(#1,0) } }
+          { \bool_if:NT \l_@@_fill_minutes_bool { 0 } }
+          { \bool_if:NT \l_@@_fill_seconds_bool { 0 } }
+      }
+      {
+        \siunitx_angle:eee
+          { \fp_eval:n { trunc(#1.#2,0) } }
+          { \fp_eval:n { abs(trunc((#1.#2 - trunc(#1,0)) * 60,0)) } }
           {
-            abs
-              (
-                        (#1 - trunc(#1,0)) * 60
-                - trunc((#1 - trunc(#1,0)) * 60,0)
-              )
-            * 60
+            \fp_eval:n
+              {
+                abs
+                  (
+                            (#1.#2 - trunc(#1.#2,0)) * 60
+                    - trunc((#1.#2 - trunc(#1.#2,0)) * 60,0)
+                  )
+                * 60
+              }
           }
       }
   }
-\cs_generate_variant:Nn \@@_arc_convert:n { e }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
