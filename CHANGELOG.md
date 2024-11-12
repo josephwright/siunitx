@@ -11,6 +11,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Adjust `colortbl` support to allow for `tabularray` (see
   https://github.com/lvjr/tabularray/issues/512)
 
+### Fixed
+- Output of `\ohm` with `mathastext` (see issue
+  [\#757](https://github.com/josephwright/siunitx/issues/757))
+
 ## [v3.3.22] - 2024-09-30
 
 ### Fixed
