@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Adjust `colortbl` support to allow for `tabularray` (see
+  https://github.com/lvjr/tabularray/issues/512)
+
 ## [v3.3.22] - 2024-09-30
 
 ### Fixed
