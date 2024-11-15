@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.3.23] - 2024-11-15
+
 ### Changed
 - Adjust `colortbl` support to allow for `tabularray` (see
   https://github.com/lvjr/tabularray/issues/512)
@@ -2158,7 +2160,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.22...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.23...HEAD
+[v3.3.23]: https://github.com/josephwright/siunitx/compare/v3.3.22...v3.3.23
 [v3.3.22]: https://github.com/josephwright/siunitx/compare/v3.3.21...v3.3.22
 [v3.3.21]: https://github.com/josephwright/siunitx/compare/v3.3.20...v3.3.21
 [v3.3.20]: https://github.com/josephwright/siunitx/compare/v3.3.19...v3.3.20
