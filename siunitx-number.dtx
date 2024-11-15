@@ -3999,7 +3999,7 @@
 % \begin{macro}[EXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnn}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnnn, \@@_output_uncert:Vnnnn}
-% \begin{macro}[EXP]{\@@_output_uncert_loop:nnN}
+% \begin{macro}[EXP]{\@@_output_uncert_first:nnN, \@@_output_uncert_loop:nnN}
 % \begin{macro}[EXP]{\@@_output_uncert_loop:nnNw}
 % \begin{macro}[EXP]
 %   {
@@ -4449,14 +4449,16 @@
   }
 \cs_new:Npn \@@_output_uncert:nnnnn #1#2#3#4#5
   {
-    \@@_output_uncert_loop:nnN {#2} {#3}
+    \@@_output_uncert_first:nnN {#2} {#3}
       #4 \q_recursion_tail #1 , \q_recursion_stop {#5}
   }
 \cs_generate_variant:Nn \@@_output_uncert:nnnnn { V }
+\cs_new:Npn \@@_output_uncert_first:nnN #1#2#3
+  { \@@_output_uncert_loop:nnNw {#1} {#2} #3 }
 \cs_new:Npn \@@_output_uncert_loop:nnN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #3
-    \@@_output_uncert_loop:nnNw {#1} {#2} #3
+    \@@_output_uncert_loop:nnNw {#1} { } #3
   }
 \cs_new:Npn \@@_output_uncert_loop:nnNw
   #1#2#3#4 \q_recursion_tail #5 , #6 \q_recursion_stop #7

@@ -119,6 +119,21 @@
     \test:n { 123.5(1.22:3.44) }
   }
 
+\TEST { Basic~formatting:~mixed~uncertainties }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Nx \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+        \exp_args:Nx \siunitx_number_parse:nN { \tl_to_str:n {#1} } \l_tmpb_tl
+        \exp_args:Nx \tl_show:n { \siunitx_number_output:NN \l_tmpb_tl ? }
+      }
+    \TIMO
+    \test:n { 12.3(4:5)(6) }
+    \test:n { 12.3(4)(5:6) }
+  }
+
 \TEST { Basic~formatting:~comparators }
   {
     \test:n { > 1.2 }

@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   https://github.com/lvjr/tabularray/issues/512)
 
 ### Fixed
+- Infinite loop with mixed uncertainties for quantities (see issue
+  [\#754](https://github.com/josephwright/siunitx/issues/754))
 - Allow for combination of exponent threshold and uncertainty which is rounded
   exceeding main value (see issue
   [\#755](https://github.com/josephwright/siunitx/issues/755))
