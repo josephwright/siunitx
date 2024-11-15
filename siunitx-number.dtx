@@ -2861,7 +2861,8 @@
 %      \@@_round_engineering:nn ,
 %      \@@_round_fixed:nn       ,
 %      \@@_round_input:nn       ,
-%      \@@_round_scientific:nn
+%      \@@_round_scientific:nn  ,
+%      \@@_round_threshold:nn
 %    }
 %  \begin{macro}[EXP]{\@@_round_engineering:NNNNn}
 %  \begin{macro}[EXP]{\@@_round_engineering:nnN, \@@_round_engineering:VnN}
@@ -3188,6 +3189,13 @@
           { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
       }
     \@@_round_final_shift:Nw 1
+  }
+\cs_new:Npn \@@_round_threshold:nn #1#2
+  {
+    \@@_if_threshold_exceeded:nTF {#1}
+      { \@@_round_input:nn }
+      { \@@_round_scientific:nn }
+        {#1} {#2}
   }
 \cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_end:nnn #3#4#5
   {
