@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   https://github.com/lvjr/tabularray/issues/512)
 
 ### Fixed
+- Ignore `drop-zero-decimnal` for values with an uncertainty (see issue
+  [\#756](https://github.com/josephwright/siunitx/issues/756))
 - Output of `\ohm` with `mathastext` (see issue
   [\#757](https://github.com/josephwright/siunitx/issues/757))
 

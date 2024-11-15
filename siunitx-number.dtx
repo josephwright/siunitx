@@ -3747,9 +3747,13 @@
 \cs_new:Npn \@@_zero_decimal:nnnnnnn #1#2#3#4#5#6#7
   {
     \exp_not:n { {#1} {#2} {#3} }
-    \str_if_eq:eeTF
-      { \exp_not:n {#4} }
-      { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+    \bool_lazy_and:nnTF
+      { \tl_if_empty_p:n {#5} }
+      {
+        \str_if_eq_p:ee
+          { \exp_not:n {#4} }
+          { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      }
       { { } }
       { \exp_not:n { {#4} } }
     \exp_not:n { {#5} {#6} {#7} }
