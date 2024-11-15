@@ -119,6 +119,21 @@
     \test:n { 123.5(1.22:3.44) }
   }
 
+\TEST { Basic~formatting:~mixed~uncertainties }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Nx \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+        \exp_args:Nx \siunitx_number_parse:nN { \tl_to_str:n {#1} } \l_tmpb_tl
+        \exp_args:Nx \tl_show:n { \siunitx_number_output:NN \l_tmpb_tl ? }
+      }
+    \TIMO
+    \test:n { 12.3(4:5)(6) }
+    \test:n { 12.3(4)(5:6) }
+  }
+
 \TEST { Basic~formatting:~comparators }
   {
     \test:n { > 1.2 }
@@ -280,9 +295,11 @@
   {
     \test:n { 1234.4500 }
     \test:n { 1234.00 }
+    \test:n { 1234.0(12) }
     \keys_set:nn { siunitx } { drop-zero-decimal = true }
     \test:n { 1234.4500 }
     \test:n { 1234.00 }
+    \test:n { 1234.0(12) }
     \keys_set:nn { siunitx } { round-mode = figures, round-precision = 2 }
     \test:n { 1234.001 }
   }
@@ -1149,6 +1166,16 @@
     \test:n { 9.99e5 }
     \keys_set:nn { siunitx } { exponent-mode = engineering }
     \test:n { 9.99e5 }
+    \keys_set:nn { siunitx }
+      {
+        round-mode = uncertainty , round-precision = 1 ,
+        exponent-mode = threshold
+      }
+    \test:n { 0.00071 +-0.00625 }
+    \test:n { 0.0071 +-0.0625 }
+    \test:n { 0.071 +-0.625 }
+    \test:n { 71 +-625 }
+    \test:n { 710 +-6250 }
   }
 
 \TEST { Option~settings~"print-unity-mantissa"~and~"print-zero-exponent" }

@@ -23,6 +23,23 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
 
+## [v3.3.23] - 2024-11-15
+
+### Changed
+- Adjust `colortbl` support to allow for `tabularray` (see
+  https://github.com/lvjr/tabularray/issues/512)
+
+### Fixed
+- Infinite loop with mixed uncertainties for quantities (see issue
+  [\#754](https://github.com/josephwright/siunitx/issues/754))
+- Allow for combination of exponent threshold and uncertainty which is rounded
+  exceeding main value (see issue
+  [\#755](https://github.com/josephwright/siunitx/issues/755))
+- Ignore `drop-zero-decimnal` for values with an uncertainty (see issue
+  [\#756](https://github.com/josephwright/siunitx/issues/756))
+- Output of `\ohm` with `mathastext` (see issue
+  [\#757](https://github.com/josephwright/siunitx/issues/757))
+
 ## [v3.3.22] - 2024-09-30
 
 ### Fixed
@@ -2161,7 +2178,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.22...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.23...HEAD
+[v3.3.23]: https://github.com/josephwright/siunitx/compare/v3.3.22...v3.3.23
 [v3.3.22]: https://github.com/josephwright/siunitx/compare/v3.3.21...v3.3.22
 [v3.3.21]: https://github.com/josephwright/siunitx/compare/v3.3.20...v3.3.21
 [v3.3.20]: https://github.com/josephwright/siunitx/compare/v3.3.19...v3.3.20

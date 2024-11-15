@@ -2232,6 +2232,20 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}[pTF]{\@@_if_threshold_exceeded:n}
+%   A short auxiliary.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \@@_if_threshold_exceeded:n #1 { T , F , TF , p }
+  {
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn {#1} > \l_@@_lower_threshold_int }
+      { \int_compare_p:nNn {#1} < \l_@@_upper_threshold_int }
+        \prg_return_true:
+        \prg_return_false:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\siunitx_number_process:NN, \siunitx_number_process:cc}
 % \begin{macro}{\@@_process:nnnnnnnNN}
 %   A top-level interface for the processing tools. Rounding happens in all
@@ -2628,9 +2642,7 @@
 \cs_generate_variant:Nn \@@_exponent_threshold:n { e }
 \cs_new:Npn \@@_exponent_threshold_aux:nnnnnnn #1#2#3#4#5#6#7
   {
-    \bool_lazy_and:nnTF
-      { \int_compare_p:nNn {#6#7} > \l_@@_lower_threshold_int }
-      { \int_compare_p:nNn {#6#7} < \l_@@_upper_threshold_int }
+    \@@_if_threshold_exceeded:nTF {#6#7}
       {
         \exp_not:n { {#1} {#2} }
         \@@_exponent_shift:nnn { -#6#7 } {#3} {#4}
@@ -2864,7 +2876,8 @@
 %      \@@_round_engineering:nn ,
 %      \@@_round_fixed:nn       ,
 %      \@@_round_input:nn       ,
-%      \@@_round_scientific:nn
+%      \@@_round_scientific:nn  ,
+%      \@@_round_threshold:nn
 %    }
 %  \begin{macro}[EXP]{\@@_round_engineering:NNNNn}
 %  \begin{macro}[EXP]{\@@_round_engineering:nnN, \@@_round_engineering:VnN}
@@ -3191,6 +3204,13 @@
           { 1 } {#1} { \@@_round_truncate_direct:n {#2} }
       }
     \@@_round_final_shift:Nw 1
+  }
+\cs_new:Npn \@@_round_threshold:nn #1#2
+  {
+    \@@_if_threshold_exceeded:nTF {#1}
+      { \@@_round_input:nn }
+      { \@@_round_scientific:nn }
+        {#1} {#2}
   }
 \cs_new:Npn \@@_round_final_shift:Nw #1#2 \@@_round_end:nnn #3#4#5
   {
@@ -3657,17 +3677,7 @@
         {
           \bool_lazy_and_p:nn
             { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { threshold } }
-            {
-              ! \bool_lazy_or_p:nn
-                {
-                  \int_compare_p:nNn {#5#6} >
-                    \l_@@_lower_threshold_int
-                }
-                {
-                  \int_compare_p:nNn {#5#6} <
-                    \l_@@_upper_threshold_int
-                }
-            }
+            { ! \@@_if_threshold_exceeded_p:n {#5#6} }
           }
         }
         {
@@ -3725,9 +3735,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_threshold:nnn #1#2#3
   {
-    \bool_lazy_and:nnTF
-      { \int_compare_p:nNn {#2#3} > \l_@@_lower_threshold_int }
-      { \int_compare_p:nNn {#2#3} < \l_@@_upper_threshold_int }
+    \@@_if_threshold_exceeded:nTF {#2#3}
       { \@@_round_uncertainty_input:nnn }
       { \@@_round_uncertainty_scientific:nnn }
         {#1} {#2} {#3}
@@ -3762,9 +3770,13 @@
 \cs_new:Npn \@@_zero_decimal:nnnnnnn #1#2#3#4#5#6#7
   {
     \exp_not:n { {#1} {#2} {#3} }
-    \str_if_eq:eeTF
-      { \exp_not:n {#4} }
-      { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+    \bool_lazy_and:nnTF
+      { \tl_if_empty_p:n {#5} }
+      {
+        \str_if_eq_p:ee
+          { \exp_not:n {#4} }
+          { \prg_replicate:nn { \tl_count:n {#4} } { 0 } }
+      }
       { { } }
       { \exp_not:n { {#4} } }
     \exp_not:n { {#5} {#6} {#7} }
@@ -4005,7 +4017,7 @@
 % \begin{macro}[EXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnn}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnnn, \@@_output_uncert:Vnnnn}
-% \begin{macro}[EXP]{\@@_output_uncert_loop:nnN}
+% \begin{macro}[EXP]{\@@_output_uncert_first:nnN, \@@_output_uncert_loop:nnN}
 % \begin{macro}[EXP]{\@@_output_uncert_loop:nnNw}
 % \begin{macro}[EXP]
 %   {
@@ -4456,14 +4468,16 @@
   }
 \cs_new:Npn \@@_output_uncert:nnnnn #1#2#3#4#5
   {
-    \@@_output_uncert_loop:nnN {#2} {#3}
+    \@@_output_uncert_first:nnN {#2} {#3}
       #4 \q_recursion_tail #1 , \q_recursion_stop {#5}
   }
 \cs_generate_variant:Nn \@@_output_uncert:nnnnn { V }
+\cs_new:Npn \@@_output_uncert_first:nnN #1#2#3
+  { \@@_output_uncert_loop:nnNw {#1} {#2} #3 }
 \cs_new:Npn \@@_output_uncert_loop:nnN #1#2#3
   {
     \quark_if_recursion_tail_stop:N #3
-    \@@_output_uncert_loop:nnNw {#1} {#2} #3
+    \@@_output_uncert_loop:nnNw {#1} { } #3
   }
 \cs_new:Npn \@@_output_uncert_loop:nnNw
   #1#2#3#4 \q_recursion_tail #5 , #6 \q_recursion_stop #7

@@ -638,12 +638,15 @@
 %
 % \begin{macro}
 %   {\@@_align_center:n, \@@_align_left:n, \@@_align_right:n, \@@_align_none:n}
-% \begin{macro}{\@@_align_auxi:nn, \@@_align_auxii:nn}
+% \begin{macro}{\@@_align_auxi:nn, \@@_align_auxii:nn, \@@_align_auxiii:nn}
 %   The beginning and end of each table cell have to adjust the position of
 %   the content using glue. When \pkg{colortbl} is loaded the glue is done in
 %   two parts: one for our positioning and one to explicitly override that from
 %   the package. Using a two-step auxiliary chain avoids needing to repeat any
-%   code and the impact of the extra expansion should be trivial.
+%   code and the impact of the extra expansion should be trivial. There is a
+%   further wrinkle, in that if \pkg{tabularray} is being used, we need to skip
+%   the \pkg{colortbl} fix (see
+%   \url{https://github.com/lvjr/tabularray/issues/512}).
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_align_center:n #1
   { \@@_align_auxi:nn {#1} { 0pt~plus~0.5fill } }
@@ -676,12 +679,29 @@
         \cs_new_eq:NN
           \@@_align_auxii:nn
           \@@_align_auxi:nn
-        \cs_set_protected:Npn \@@_align_auxi:nn #1#2
+        \cs_gset_protected:Npn \@@_align_auxi:nn #1#2
           {
             \@@_skip:n{ 0pt~plus~-0.5fill }
             \@@_align_auxii:nn {#1} {#2}
             \@@_skip:n { 0pt~plus~-0.5fill }
           }
+        \@ifpackageloaded { tabularray }
+          {
+            \cs_new_eq:NN
+              \@@_align_auxiii:nn
+              \@@_align_auxii:nn
+            \cs_gset_eq:NN
+              \@@_align_auxii:nn
+              \@@_align_auxi:nn
+            \cs_gset_protected:Npn \@@_align_auxi:nn #1#2
+              {
+                \int_compare:nNnTF \g_tblr_level_int = 0
+                  { \@@_align_auxii:nn }
+                  { \@@_align_auxiii:nn }
+                    {#1} {#2}
+              }
+          }
+          { }
       }
       { }
   }
