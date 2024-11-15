@@ -2217,6 +2217,20 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}[pTF]{\@@_if_threshold_exceeded:n}
+%   A short auxiliary.
+%    \begin{macrocode}
+\prg_new_conditional:Npnn \@@_if_threshold_exceeded:n #1 { T , F , TF , p }
+  {
+    \bool_lazy_and:nnTF
+      { \int_compare_p:nNn {#1} > \l_@@_lower_threshold_int }
+      { \int_compare_p:nNn {#1} < \l_@@_upper_threshold_int }
+        \prg_return_true:
+        \prg_return_false:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\siunitx_number_process:NN, \siunitx_number_process:cc}
 % \begin{macro}{\@@_process:nnnnnnnNN}
 %   A top-level interface for the processing tools. Rounding happens in all
@@ -2613,9 +2627,7 @@
 \cs_generate_variant:Nn \@@_exponent_threshold:n { e }
 \cs_new:Npn \@@_exponent_threshold_aux:nnnnnnn #1#2#3#4#5#6#7
   {
-    \bool_lazy_and:nnTF
-      { \int_compare_p:nNn {#6#7} > \l_@@_lower_threshold_int }
-      { \int_compare_p:nNn {#6#7} < \l_@@_upper_threshold_int }
+    \@@_if_threshold_exceeded:nTF {#6#7}
       {
         \exp_not:n { {#1} {#2} }
         \@@_exponent_shift:nnn { -#6#7 } {#3} {#4}
@@ -3642,17 +3654,7 @@
         {
           \bool_lazy_and_p:nn
             { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { threshold } }
-            {
-              ! \bool_lazy_or_p:nn
-                {
-                  \int_compare_p:nNn {#5#6} >
-                    \l_@@_lower_threshold_int
-                }
-                {
-                  \int_compare_p:nNn {#5#6} <
-                    \l_@@_upper_threshold_int
-                }
-            }
+            { ! \@@_if_threshold_exceeded_p:n {#5#6} }
           }
         }
         {
@@ -3710,9 +3712,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_uncertainty_threshold:nnn #1#2#3
   {
-    \bool_lazy_and:nnTF
-      { \int_compare_p:nNn {#2#3} > \l_@@_lower_threshold_int }
-      { \int_compare_p:nNn {#2#3} < \l_@@_upper_threshold_int }
+    \@@_if_threshold_exceeded:nTF {#2#3}
       { \@@_round_uncertainty_input:nnn }
       { \@@_round_uncertainty_scientific:nnn }
         {#1} {#2} {#3}
