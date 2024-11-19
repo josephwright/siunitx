@@ -23,6 +23,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
 
+## [v3.3.24] - 2024-11-19
+
+- Stack exhaustion with `tabularray` (see issue
+  [\#760](https://github.com/josephwright/siunitx/issues/760))
+
 ## [v3.3.23] - 2024-11-15
 
 ### Changed
@@ -2178,7 +2183,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.23...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.24...HEAD
+[v3.3.24]: https://github.com/josephwright/siunitx/compare/v3.3.23...v3.3.24
 [v3.3.23]: https://github.com/josephwright/siunitx/compare/v3.3.22...v3.3.23
 [v3.3.22]: https://github.com/josephwright/siunitx/compare/v3.3.21...v3.3.22
 [v3.3.21]: https://github.com/josephwright/siunitx/compare/v3.3.20...v3.3.21
