@@ -25,6 +25,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v3.3.24] - 2024-11-19
 
+### Fixed
 - Stack exhaustion with `tabularray` (see issue
   [\#760](https://github.com/josephwright/siunitx/issues/760))
 
