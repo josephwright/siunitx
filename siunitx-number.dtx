@@ -247,6 +247,14 @@
 % The options defined by this submodule are available within the \pkg{l3keys}
 % |siunitx| tree.
 %
+% \begin{function}{allow-uncertainty-break}
+%   \begin{syntax}
+%     |allow-uncertainty-break| = |true|\verb"|"|false|
+%   \end{syntax}
+%   Specifies whether a break is permitted for a (separated) uncertainty. The
+%   standard setting is |true|.
+% \end{function}
+%
 % \begin{function}{bracket-ambiguous-numbers}
 %   \begin{syntax}
 %     |bracket-ambiguous-numbers| = |true|\verb"|"|false|
@@ -3865,6 +3873,7 @@
 %      \l_@@_output_exp_marker_tl     ,
 %      \l_@@_output_uncert_close_tl   ,
 %      \l_@@_output_uncert_open_tl    ,
+%      \l_@@_uncert_break_bool        ,
 %      \l_@@_uncert_desc_mode_tl      ,
 %      \l_@@_uncert_desc_separator_tl ,
 %      \l_@@_uncert_desc_clist        ,
@@ -3880,6 +3889,8 @@
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    allow-uncertainty-break .bool_set:N =
+      \l_@@_uncert_break_bool ,
     bracket-ambiguous-numbers .bool_set:N =
       \l_siunitx_number_bracket_ambiguous_bool ,
     bracket-negative-numbers .bool_set:N =
@@ -4592,7 +4603,8 @@
     \bool_if:NTF \l_@@_tight_bool
       { \exp_not:N \mathord }
       { \use:n }
-        { \exp_not:n { \pm } }
+        { \pm }
+    \bool_if:NF \l_@@_uncert_break_bool { \exp_not:N \nobreak }
     \exp_not:n {#2}
     \@@_output_uncert_augment:nnnn {#4} {#1} {#4} {#2}
   }
@@ -4914,6 +4926,7 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
+    allow-uncertainty-break          = true                                   ,
     bracket-ambiguous-numbers        = true                                   ,
     bracket-negative-numbers         = false                                  ,
     drop-exponent                    = false                                  ,

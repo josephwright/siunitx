@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - Option `simplify-uncertainty` (see issue
   [\#688](https://github.com/josephwright/siunitx/issues/688))
+- Option `allow-uncertainty-break` (see issue
+  [\#753](https://github.com/josephwright/siunitx/issues/753))
 
 ### Changed
 - Extend automatic range phase coverage to Italian (see issue
