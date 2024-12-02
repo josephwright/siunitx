@@ -12,6 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#688](https://github.com/josephwright/siunitx/issues/688))
 - Option `allow-uncertainty-breaks` (see issue
   [\#753](https://github.com/josephwright/siunitx/issues/753))
+- `\siunitx_unit_options_declare:Nn` to support fine-tuning of unit commands
 
 ### Changed
 - Extend automatic range phase coverage to Italian (see issue

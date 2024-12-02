@@ -292,6 +292,16 @@
 %
 % \section{Per-unit options}
 %
+% \begin{function}{\siunitx_unit_options_declare:Nn}
+%   \begin{syntax}
+%     \cs{siunitx_unit_options_declare:Nn} \meta{unit} \Arg{options}
+%   \end{syntax}
+%   Declares that the \meta{options} should be applied with the \meta{unit}
+%   is used. The \meta{options} stored override any saved when the unit was
+%   declared. This function is intended for adjusting options when the unit
+%   command is otherwise unchanged.
+% \end{function}
+%
 % \begin{function}{\siunitx_unit_options_apply:n}
 %   \begin{syntax}
 %     \cs{siunitx_unit_options_apply:n} \Arg{unit(s)}
@@ -939,9 +949,7 @@
           {#2}
           { \@@_parse_unit:Nn #1 {#2} }
       }
-    \tl_clear_new:c { l_@@_options_ \token_to_str:N #1 _tl }
-    \tl_if_empty:nF {#3}
-      { \tl_set:cn { l_@@_options_ \token_to_str:N #1 _tl } {#3} }
+    \siunitx_unit_options_declare:Nn #1 {#3}
   }
 \cs_generate_variant:Nn \siunitx_declare_unit:Nnn { Ne , Nx }
 %    \end{macrocode}
@@ -955,6 +963,18 @@
 \bool_new:N \l_@@_options_bool
 %    \end{macrocode}
 % \end{variable}
+%
+% \begin{macro}{\siunitx_unit_options_declare:Nn}
+%   For setting options for existing units without needing to alter the
+%   symbol.
+%    \begin{macrocode}
+\cs_new_protected:Npn \siunitx_unit_options_declare:Nn #1#2
+  {
+    \tl_clear_new:c { l_@@_options_ \token_to_str:N #1 _tl }
+    \tl_set:cn { l_@@_options_ \token_to_str:N #1 _tl } {#2}
+  }
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\siunitx_unit_options_apply:n}
 %   Options apply only if they have not already been set at this group
