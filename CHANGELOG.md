@@ -34,6 +34,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   units
 - Option `complex-symbol-angle` in favor of `complex-phase-command`
 
+### Fixed 
+- Conversion of 'bare' i to polar form (see issue
+  [\#761](https://github.com/josephwright/siunitx/issues/761))
+
 ## [v3.3.24] - 2024-11-19
 
 ### Fixed
