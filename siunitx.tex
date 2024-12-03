@@ -89,6 +89,7 @@ for those people who are interested.
 \usepackage{cancel}
 \usepackage{collcell}
 \usepackage{sansmath}
+\usepackage{steinmetz}
 \newlength{\mylength}
 
 % For creating code demonstrations
@@ -2227,8 +2228,8 @@ numbers; these are summarised in Table~\ref{tab:opt:num:complex}.
     \midrule
       complex-angle-unit    & Choice  & degrees           \\
       complex-mode          & Choice  & input             \\
+      complex-phase-command & Literal & \cs{angle}        \\
       complex-root-position & Choice  & after-number      \\
-      complex-symbol-angle  & Literal & \cs{angle}        \\
       complex-symbol-degree & Literal & \cs{degree}       \\
       input-complex-root    & Literal & ij                \\
       output-complex-root   & Literal & \verb=\mathrm{i}= \\
@@ -2285,18 +2286,19 @@ using the \opt{output-complex-root} setting.
 \end{LaTeXdemo}
 
 \DescribeOption{complex-angle-unit}
-\DescribeOption{complex-symbol-angle}
 \DescribeOption{complex-symbol-degree}
+\DescribeOption{complex-phase-command}
 When printing or converting to polar form, the angle may be interpreted in
 units set by \opt{complex-angle-unit}: one of \opt{degrees} or \opt{radians}.
-The symbol used to denote the angle, and that used for units of degrees,
-are controlled by the options \opt{complex-symbol-angle} and
-\opt{complex-symbol-degree}, respectively.
+The unit symbol used for degrees is controlled by \opt{complex-symbol-degree}.
+To allow control of the surrounding of the entire phase part, the option
+\opt{complex-phase-command} is available. This can be used for example to
+print using Steinmetz notation (which requires the \pkg{steinmetz} package).
 \begin{LaTeXdemo}
   \complexqty{1:1}{\ohm} \\
   \complexqty[complex-angle-unit = radians]{1:1}{\ohm} \\
-  \complexqty[complex-symbol-angle = \mathrm{A}]{1:1}{\ohm} \\
-  \complexqty[complex-symbol-degree = d]{1:1}{\ohm}
+  \complexqty[complex-symbol-degree = d]{1:1}{\ohm} \\
+  \complexqty[complex-phase-command = \phase]{1:1}{\ohm}
 \end{LaTeXdemo}
 
 \DescribeOption{print-complex-unity}
@@ -3337,6 +3339,7 @@ version~\version{3} of the package is given.
   \item Combination of all control for angle unit formatting into
     \cs{degree}, \cs{arcminute} and \cs{arcsecond} unit macros,
     with \opt{number-angle-product} deprecated
+  \item Support for more varied printing of complex numbers phases
 \end{itemize}
 
 \section{Upgrading from version~\version{2}%

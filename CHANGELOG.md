@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - Option `simplify-uncertainty` (see issue
   [\#688](https://github.com/josephwright/siunitx/issues/688))
+- Option `complex-phase-command` (see issue
+  [\#732](https://github.com/josephwright/siunitx/issues/732))
 - Option `allow-uncertainty-breaks` (see issue
   [\#753](https://github.com/josephwright/siunitx/issues/753))
 - `\siunitx_unit_options_declare:Nn` to support fine-tuning of unit commands
@@ -30,6 +32,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Option `number-angle-product`in favor of using settings applying to relevant
   units
+- Option `complex-symbol-angle` in favor of `complex-phase-command`
 
 ## [v3.3.24] - 2024-11-19
 

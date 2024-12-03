@@ -132,19 +132,20 @@
 %   |input|.
 % \end{function}
 %
+% \begin{function}{complex-phase-command}
+%   \begin{syntax}
+%     |complex-phase-command| = \meta{cmd}
+%   \end{syntax}
+%   Sets the command used during output of the phase of a complex number in
+%   polar form. The standard setting is |\angle|.
+% \end{function}
+%
 % \begin{function}{complex-root-position}
 %   \begin{syntax}
 %     |complex-root-position| = |after-number|\verb"|"|before-number|
 %   \end{syntax}
 %   Choice which determines where the complex root symbol is printed relative
 %   to the numbers. The standard setting is |after-number|.
-% \end{function}
-%
-% \begin{function}{complex-symbol-angle}
-%   \begin{syntax}
-%     |complex-symbol-angle| = \meta{symbol}
-%   \end{syntax}
-%   Sets the symbol used before the polar angle.
 % \end{function}
 %
 % \begin{function}{complex-symbol-degree}
@@ -253,8 +254,8 @@
 %     \l_@@_root_after_bool      ,
 %     \l_@@_force_cartesian_bool ,
 %     \l_@@_force_polar_bool     ,
+%     \l_@@_phase_tl             ,
 %     \l_@@_polar_degree_bool    ,
-%     \l_@@_symbol_angle_tl      ,
 %     \l_@@_symbol_degree_tl     ,
 %     \l_@@_input_root_tl        ,
 %     \l_@@_output_root_tl
@@ -287,13 +288,13 @@
       { \bool_set_true:N \l_@@_polar_degree_bool } ,
     complex-angle-unit / radians .code:n =
       { \bool_set_false:N \l_@@_polar_degree_bool } ,
+    complex-phase-command .tl_set:N =
+      \l_@@_phase_tl ,
     complex-root-position .choice: ,
     complex-root-position / after-number .code:n =
       { \bool_set_true:N \l_@@_root_after_bool } ,
     complex-root-position / before-number .code:n =
       { \bool_set_false:N \l_@@_root_after_bool } ,
-    complex-symbol-angle .tl_set:N =
-      \l_@@_symbol_angle_tl ,
     complex-symbol-degree .tl_set:N =
       \l_@@_symbol_degree_tl ,
     input-complex-root .tl_set:N =
@@ -1028,6 +1029,7 @@
 %     \@@_format_extract-exponent:n ,
 %     \@@_format_polar_input:n
 %   }
+% \begin{macro}{\@@_format_phase:}
 %     We see similar ideas here to the Cartesian versions, but with only
 %     the magnitude to adjust, things are rather simpler in the exponent
 %     manipulations.
@@ -1054,16 +1056,7 @@
           { \exp_not:V \l_@@_mag_tl }
       }
     \siunitx_print_number:V \l_@@_tmp_tl
-    \siunitx_print_unit:V \l_@@_symbol_angle_tl
-    \group_begin:
-      \bool_if:NTF \l_@@_polar_degree_bool
-        {
-          \exp_args:NV \siunitx_unit_options_apply:n \l_@@_symbol_degree_tl
-          \siunitx_unit_format:VN \l_@@_symbol_degree_tl \l_@@_tmp_tl
-        }
-        { \tl_clear:N \l_@@_tmp_tl }
-      \siunitx_quantity_print:VV \l_@@_angle_tl \l_@@_tmp_tl
-    \group_end:
+    \l_@@_phase_tl { \@@_format_phase: }
     \siunitx_quantity_print:nV { } \l_@@_unit_tl
   }
 \cs_new_protected:cpn { @@_format_polar_combine-exponent:n } #1
@@ -1088,7 +1081,20 @@
       { \siunitx_number_process:NN \l_@@_mag_tl \l_@@_mag_tl }
     \siunitx_unit_format:nN {#1} \l_@@_unit_tl
   }
+\cs_new_protected:Npn \@@_format_phase:
+  {
+    \group_begin:
+      \bool_if:NTF \l_@@_polar_degree_bool
+        {
+          \exp_args:NV \siunitx_unit_options_apply:n \l_@@_symbol_degree_tl
+          \siunitx_unit_format:VN \l_@@_symbol_degree_tl \l_@@_tmp_tl
+        }
+        { \tl_clear:N \l_@@_tmp_tl }
+      \siunitx_quantity_print:VV \l_@@_angle_tl \l_@@_tmp_tl
+    \group_end:
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Conversion}
@@ -1249,6 +1255,21 @@
   }
 %    \end{macrocode}
 %
+% \subsection{Deprecated options}
+% 
+%    \begin{macrocode}
+\keys_define:nn { siunitx }
+  {
+    complex-symbol-angle .code:n =
+      {
+        \msg_info:nnnn { siunitx } { option-deprecated }
+          { number-angle-product }
+          { complex-phase-command }
+        complex-phase-command = {#1}
+      }
+  }
+%    \end{macrocode}
+%
 % \subsection{Standard settings for module options}
 %
 % Some of these follow naturally from the point of definition
@@ -1257,13 +1278,13 @@
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
-    complex-angle-unit    = degrees       ,
-    complex-mode          = input         ,
-    complex-root-position = after-number  ,
-    complex-symbol-angle  = \angle        ,
-    complex-symbol-degree = \degree       ,
-    input-complex-root    = ij            ,
-    output-complex-root   = \mathrm { i } ,
+    complex-angle-unit    = degrees                ,
+    complex-mode          = input                  ,
+    complex-root-position = after-number           ,
+    complex-phase-command = \ensuremath { \angle } ,
+    complex-symbol-degree = \degree                ,
+    input-complex-root    = ij                     ,
+    output-complex-root   = \mathrm { i }          ,
     print-complex-unity   = false
   }
 %    \end{macrocode}

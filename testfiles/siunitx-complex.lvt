@@ -155,6 +155,16 @@
     \test:n { -1 }
   }
 
+\TEST { Option~setting~"complex-phase-command" }
+  {
+    \OMIT
+      \cs_set_protected:Npn \phase #1 { PHASE:~#1~ }
+    \TIMO
+    \test:nn { 12 } { 30 }
+    \keys_set:nn { siunitx } { complex-phase-command = \phase }
+    \test:nn { 12 } { 30 }
+  }
+
 \TEST { Option~setting~"complex-root-position" }
   {
     \test:n { 12.34 + 2i }
@@ -164,13 +174,6 @@
     \test:n { 12.34 + 2i }
     \test:n { 2i }
     \test:n { -2i }
-  }
-
-\TEST { Option~setting~"complex-symbol-angle" }
-  {
-    \test:nn { 12 } { 30 }
-    \keys_set:nn { siunitx } { complex-symbol-angle = A }
-    \test:nn { 12 } { 30 }
   }
 
 \TEST { Option~setting~"complex-symbol-degree" }
@@ -247,6 +250,15 @@
     \test:n { \siunitx_complex_number:nn { 1 } { 30 } }
     \test:n { \siunitx_complex_quantity:nn { 1 + i } { \metre } }
     \test:n { \siunitx_complex_quantity:nnn { 1 } { 30 } { \metre } }
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Deprecated~option~setting~"complex-symbol-angle" }
+  {
+    \test:nn { 12 } { 30 }
+    \keys_set:nn { siunitx } { complex-symbol-angle = A }
+    \test:nn { 12 } { 30 }
   }
 
 \END
