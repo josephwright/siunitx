@@ -958,12 +958,6 @@
 %
 % \subsection{Applying unit options}
 %
-% \begin{variable}{\l_@@_options_bool}
-%    \begin{macrocode}
-\bool_new:N \l_@@_options_bool
-%    \end{macrocode}
-% \end{variable}
-%
 % \begin{macro}{\siunitx_unit_options_declare:Nn}
 %   For setting options for existing units without needing to alter the
 %   symbol.
@@ -982,18 +976,14 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_unit_options_apply:n #1
   {
-    \bool_if:NF \l_@@_options_bool
+    \tl_if_single_token:nT {#1}
       {
-        \tl_if_single_token:nT {#1}
+        \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
           {
-            \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
-              {
-                \keys_set:nv { siunitx }
-                  { l_@@_options_ \token_to_str:N #1 _tl }
-              }
+            \keys_set:nv { siunitx }
+              { l_@@_options_ \token_to_str:N #1 _tl }
           }
       }
-    \bool_set_true:N \l_@@_options_bool
   }
 %    \end{macrocode}
 % \end{macro}
