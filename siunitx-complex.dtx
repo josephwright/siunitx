@@ -1055,15 +1055,13 @@
       }
     \siunitx_print_number:V \l_@@_tmp_tl
     \siunitx_print_unit:V \l_@@_symbol_angle_tl
-    \group_begin:
-      \bool_if:NTF \l_@@_polar_degree_bool
-        {
-          \exp_args:NV \siunitx_unit_options_apply:n \l_@@_symbol_degree_tl
-          \siunitx_unit_format:VN \l_@@_symbol_degree_tl \l_@@_tmp_tl
-        }
-        { \tl_clear:N \l_@@_tmp_tl }
-      \siunitx_quantity_print:VV \l_@@_angle_tl \l_@@_tmp_tl
-    \group_end:
+    \siunitx_print_number:V \l_@@_angle_tl
+    \bool_if:NT \l_@@_polar_degree_bool
+      {
+        \siunitx_unit_format:VN \l_@@_symbol_degree_tl \l_@@_tmp_tl
+        \nobreak
+        \siunitx_print_unit:V \l_@@_tmp_tl
+      }
     \siunitx_quantity_print:nV { } \l_@@_unit_tl
   }
 \cs_new_protected:cpn { @@_format_polar_combine-exponent:n } #1
