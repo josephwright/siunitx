@@ -26,6 +26,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
 
+### Deprecated
+
+- Option `number-angle-product`in favor of using settings applying to relevant
+  units
+
 ## [v3.3.24] - 2024-11-19
 
 ### Fixed

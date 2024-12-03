@@ -149,14 +149,6 @@
 %   arc. The standard setting is |false|.
 % \end{function}
 %
-% \begin{function}{number-angle-product}
-%   \begin{syntax}
-%     |number-angle-product| = \meta{separator}
-%   \end{syntax}
-%   Inserted between the value of an angle and the unit (degree, minute or
-%   second component). The standard setting is |\,|.
-% \end{function}
-%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -193,8 +185,7 @@
 %      \l_@@_separator_tl        ,
 %      \l_@@_fill_degrees_bool   ,
 %      \l_@@_fill_minutes_bool   ,
-%      \l_@@_fill_seconds_bool   ,
-%      \l_@@_product_tl
+%      \l_@@_fill_seconds_bool
 %    }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -231,8 +222,6 @@
       \l_@@_fill_minutes_bool ,
     fill-angle-seconds .bool_set:N =
       \l_@@_fill_seconds_bool ,
-    number-angle-product .tl_set:N =
-      \l_@@_product_tl
   }
 \bool_new:N \l_@@_force_arc_bool
 \bool_new:N \l_@@_force_decimal_bool
@@ -675,10 +664,11 @@
   { \siunitx_print_number:n {#1#2#3#4#5} }
 \cs_new_protected:Npn \@@_arc_print_auxvi:n #1
   {
-    \nobreak
-    \l_@@_product_tl
-    \siunitx_unit_format:nN {#1} \l_@@_tmp_tl
-    \siunitx_print_unit:V \l_@@_tmp_tl
+    \group_begin:
+      \siunitx_unit_options_apply:n {#1}
+      \siunitx_unit_format:nN {#1} \l_@@_tmp_tl
+      \siunitx_quantity_print:nV { } \l_@@_tmp_tl
+    \group_end:
   }
 %    \end{macrocode}
 % \end{macro}
@@ -697,6 +687,33 @@
   }
 %    \end{macrocode}
 %
+% \subsection{Deprecated options}
+% 
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { angle-option-deprecated }
+  {
+    Option~"#1"~has~been~deprecated~in~this~release.\\ \\
+    Set~the~"quantity-product"~option~for~the~units~
+    \token_to_str:N \arcminute,~\arcsecond\ and~\degree\ instead.
+  }
+\keys_define:nn { siunitx }
+  {
+    number-angle-product .code:n =
+      {
+        \msg_info:nnn { siunitx } { angle-option-deprecated }
+          { number-angle-product }
+        \siunitx_unit_options_declare:Nn \arcminute
+          { quantity-product = {#1} }
+        \siunitx_unit_options_declare:Nn \arcsecond
+          { quantity-product = {#1} }
+        \siunitx_unit_options_declare:Nn \degree
+          { quantity-product = {#1} }
+      }
+  }
+%    \end{macrocode}
+%
+% \subsection{Standard settings for module options}
+%
 %    \begin{macrocode}
 \keys_set:nn { siunitx }
   {
@@ -708,8 +725,7 @@
     angle-separator           =            ,
     fill-angle-degrees        = false      ,
     fill-angle-minutes        = false      ,
-    fill-angle-seconds        = false      ,
-    number-angle-product      =
+    fill-angle-seconds        = false
   }
 %    \end{macrocode}
 %
