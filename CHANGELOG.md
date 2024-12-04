@@ -28,6 +28,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
 - Typeset documentation with LuaTeX
+- Support `unicode-math` definitions for non-letter characters
 
 ### Deprecated
 
