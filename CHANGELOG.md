@@ -27,6 +27,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Support uncertainties in seconds part of arc angles (see issue
   [\#749](https://github.com/josephwright/siunitx/issues/749))
 - Require LaTeX release 2022-11-01 or later
+- Typeset documentation with LuaTeX
 
 ### Deprecated
 

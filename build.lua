@@ -8,6 +8,7 @@ module = "siunitx"
 packtdszip = true
 
 -- Typeset only the .tex files
+typesetexe = "lualatex"
 typesetfiles = {"*.tex"}
 
 -- Shorten the tagging list
