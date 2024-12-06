@@ -93,10 +93,9 @@
 %       \marg{uncertainty}\\
 %       \marg{exponent sign}\marg{exponent}
 %   \end{quote}
-%   where the two sign parts must be single tokens if present,
-%   and all other components
-%   must be given in braces. The number will have at least one digit for either the
-%   \meta{integer} and \meta{exponent} parts.. The
+%   where the two sign parts must be single tokens if present, and all other
+%   components must be given in braces. The number will have at least one digit
+%   for either the \meta{integer} and \meta{exponent} parts. The
 %   \meta{uncertainty} part should either be blank or contain an
 %   \meta{identifier} (as a brace group), followed by one or more data entries.
 %   Valid uncertainty \meta{identifiers} currently are
@@ -669,9 +668,9 @@
 %   standard setting of |compact| prints digits of uncertainty in the
 %   least-significant digits. It does \emph{not} print a decimal marker if the
 %   uncertainty crosses the decimal. The setting |full| prints the full value
-%   of the uncertainty. The setting |compact-marker| is available to print in the
-%   |compact| style except where the uncertainty crosses the decimal, in which case the
-%   |full| style is used. The standard setting is |compact|.
+%   of the uncertainty. The setting |compact-marker| is available to print in
+%   the |compact| style except where the uncertainty crosses the decimal, in
+%   which case the |full| style is used. The standard setting is |compact|.
 % \end{function}
 %
 % \begin{function}{uncertainty-round-direction}
@@ -1917,17 +1916,17 @@
       { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
-%   Handling a decimal marker in the uncertainty is a bit tricky: we need to make
-%   sure it's valid. First, we need to be sure that the integer part of the captured
-%   uncertainty is not too long. Then we need to check that the decimal part is
-%   not too long, and extend the decimal if it is.
-%   Both of these require data from the collected partial number,
-%   so we extract that first. Checking the decimal part needs the length of the
-%   not-yet-collected uncertainty. There may be one or more parts to that, so
-%   we have to grab up to the \emph{first} closing token to count the length:
-%   just grabbing everything only works if there is only a single uncertainty.
-%   We take protective steps against an entirely-missing closing token so that
-%   there is not an uncontrolled error.
+%   Handling a decimal marker in the uncertainty is a bit tricky: we need to
+%   make sure it's valid. First, we need to be sure that the integer part of
+%   the captured uncertainty is not too long. Then we need to check that the
+%   decimal part is not too long, and extend the decimal if it is. Both of
+%   these require data from the collected partial number, so we extract that
+%   first. Checking the decimal part needs the length of the not-yet-collected
+%   uncertainty. There may be one or more parts to that, so we have to grab up
+%   to the \emph{first} closing token to count the length: just grabbing
+%   everything only works if there is only a single uncertainty. We take
+%   protective steps against an entirely-missing closing token so that there is
+%   not an uncontrolled error.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_marker:
   {
@@ -2838,8 +2837,14 @@
       }
       {
         \str_if_eq:nnTF {#4} { \empty }
-          { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} { } }
-          { \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn } {#1} {#2} {#3} {#4} }
+          {
+            \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn }
+              {#1} {#2} {#3} { }
+          }
+          {
+            \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn }
+              {#1} {#2} {#3} {#4}
+          }
             {#5} {#6} {#7}
       }
   }
