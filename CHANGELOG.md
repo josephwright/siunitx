@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.0] - 2024-12-06
+
 ### Added
 - Option `simplify-uncertainty` (see issue
   [\#688](https://github.com/josephwright/siunitx/issues/688))
@@ -2201,7 +2203,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.3.24...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.0...HEAD
+[v3.4.0]: https://github.com/josephwright/siunitx/compare/v3.3.24...v3.4.0
 [v3.3.24]: https://github.com/josephwright/siunitx/compare/v3.3.23...v3.3.24
 [v3.3.23]: https://github.com/josephwright/siunitx/compare/v3.3.22...v3.3.23
 [v3.3.22]: https://github.com/josephwright/siunitx/compare/v3.3.21...v3.3.22
