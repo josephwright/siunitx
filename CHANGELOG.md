@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Correct a deprecation message (see issue
+  [\#766](https://github.com/josephwright/siunitx/issues/766))
+
 ## [v3.4.0] - 2024-12-06
 
 ### Added
