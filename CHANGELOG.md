@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.1] - 2025-01-14
+
 ### Fixed
 - Correct a deprecation message (see issue
   [\#766](https://github.com/josephwright/siunitx/issues/766))
@@ -2207,7 +2209,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.1...HEAD
+[v3.4.1]: https://github.com/josephwright/siunitx/compare/v3.4.0...v3.4.1
 [v3.4.0]: https://github.com/josephwright/siunitx/compare/v3.3.24...v3.4.0
 [v3.3.24]: https://github.com/josephwright/siunitx/compare/v3.3.23...v3.3.24
 [v3.3.23]: https://github.com/josephwright/siunitx/compare/v3.3.22...v3.3.23
