@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Suppress prefix conversion for angle units and `\percent` (see issue
+  [\#771](https://github.com/josephwright/siunitx/issues/771))
+
 ### Fixed
 - Printing of exponent part in `\ang` (see issue
   [\#769](https://github.com/josephwright/siunitx/issues/769))
