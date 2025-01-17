@@ -33,6 +33,10 @@ for those people who are interested.
 % The next line is needed so that \GetFileInfo will be able to pick up
 % version data (quite apart from making the demos work).
 \usepackage{siunitx}
+% So we can have 'sensible' demos for \arcsecond
+\DeclareSIUnit\arcsecond{as}
+\DeclareSIUnit[quantity-product = {}]\stdarcsecond{\ensuremath {{}''}}
+\sisetup{angle-symbol-second = \stdarcsecond}
 \DeclareSIUnit\noop{\relax} % For printing prefixes
 \DeclareSIPower\quartic\tothefourth{4} % For demos
 \DeclareSIUnit\KWH{kWh}
@@ -625,7 +629,7 @@ Brochure.
        & \cs{liter} & \unit{\liter} \\
       \DescribeUnit[minute (plane angle)]{arcminute} \\
       \DescribeUnit[minute (time)]{minute} \\
-      \DescribeUnit[second (plane angle)]{arcsecond} \\
+      second (plane angle) & \cs{arcsecond} & \unit{\stdarcsecond} \\
       \DescribeUnit{neper}            \\
       \DescribeUnit{tonne}            \\
     \bottomrule
@@ -2407,7 +2411,7 @@ commands \cs{degree}, \cs{arcminute} and \cs{arcsecond}. These can be altered
 using \opt{angle-symbol-degree}, \opt{angle-symbol-minute} and
 \opt{angle-symbol-second}. This is most likely to be used when the definition
 of the unit macros is altered, for example to set \cs{arcsecond} as
-\texttt{as}.
+\texttt{as} (see also Section~\ref{sec:hint:prefixangle}).
 \begin{LaTeXdemo}
   \ang{6;7;6.5} \\
   \sisetup{
@@ -3914,6 +3918,21 @@ need to be written out in full or the \opt{sticky-per} option should be used.
 \begin{LaTeXdemo}
   \unit{\candela\per\kilo\watt\per\hour} \\
   \unit[sticky-per]{\candela\per\kWh}
+\end{LaTeXdemo}
+
+\subsection{Prefixes and small angles%
+  \label{sec:hint:prefixangle}}
+
+Typically, prefixes are not applied to the standard symbols for angles: as
+such, the \cs{ang} command is not subject to the \opt{prefix-mode} option. In
+some areas, very small angles are given in arcseconds using the symbol
+\unit{as}. To apply prefixes in this case, use the \cs{qty} command rather than
+\cs{ang}.
+\begin{LaTeXdemo}
+  % In the preamble
+  % \DeclareSIUnit\arcsecond{as}
+  \qty{1e-3}{\arcsecond} \\
+  \qty[prefix-mode = combine-exponent]{1e-3}{\arcsecond}
 \end{LaTeXdemo}
 
 \subsection{Creating a column with numbers and units%
