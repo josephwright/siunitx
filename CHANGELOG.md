@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.2] - 2025-01-17
+
 ### Changed
 - Suppress prefix conversion for angle units and `\percent` (see issue
   [\#771](https://github.com/josephwright/siunitx/issues/771))
@@ -2219,7 +2221,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.1...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.2...HEAD
+[v3.4.2]: https://github.com/josephwright/siunitx/compare/v3.4.1...v3.4.2
 [v3.4.1]: https://github.com/josephwright/siunitx/compare/v3.4.0...v3.4.1
 [v3.4.0]: https://github.com/josephwright/siunitx/compare/v3.3.24...v3.4.0
 [v3.3.24]: https://github.com/josephwright/siunitx/compare/v3.3.23...v3.3.24
