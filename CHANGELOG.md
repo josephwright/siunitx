@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Parsing of exponent part in `\ang` (see issue
+  [\#770](https://github.com/josephwright/siunitx/issues/770))
+
 ## [v3.4.1] - 2025-01-14
 
 ### Fixed
