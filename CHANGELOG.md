@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Printing of exponent part in `\ang` (see issue
+  [\#769](https://github.com/josephwright/siunitx/issues/769))
 - Parsing of exponent part in `\ang` (see issue
   [\#770](https://github.com/josephwright/siunitx/issues/770))
 
