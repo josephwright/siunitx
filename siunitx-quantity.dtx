@@ -382,6 +382,7 @@
 %     \siunitx_quantity_print:nn, \siunitx_quantity_print:nV,
 %     \siunitx_quantity_print:VV, \siunitx_quantity_print:eV
 %   }
+% \begin{macro}{\@@_print_unit:n}
 %   For printing a single part of a quantity. This is needed for compound
 %   quantities and so is public: that's also the reason for passing both
 %   argument explicitly. The semantics here require that the penalty and
@@ -395,21 +396,26 @@
     \siunitx_print_number:n {#1}
     \tl_if_blank:nF {#2}
       {
-        \bool_lazy_or:nnTF
-          { \tl_if_blank_p:n {#1} }
-          { ! \tl_if_head_eq_charcode_p:nN {#2} { 1 } }
+        \tl_if_blank:nTF {#1}
+          { \@@_print_unit:n {#2} }
           {
-            \bool_if:NTF \l_@@_break_bool
-              { \penalty \binoppenalty }
-              { \nobreak }
-            \tl_use:N \l_@@_product_tl
-            \siunitx_print_unit:n {#2}
+            \tl_if_head_eq_charcode:nNTF {#2} 1
+              { \siunitx_print_unit:o { \use_none:n #2 } }
+              { \@@_print_unit:n {#2} }
           }
-          { \siunitx_print_unit:o { \use_none:n #2 } }
       }
   }
 \cs_generate_variant:Nn \siunitx_quantity_print:nn { nV , VV , eV , xV }
+\cs_new_protected:Npn \@@_print_unit:n #1
+  {
+    \bool_if:NTF \l_@@_break_bool
+      { \penalty \binoppenalty }
+      { \nobreak }
+    \tl_use:N \l_@@_product_tl
+    \siunitx_print_unit:n {#1}
+  }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsection{Standard settings for module options}
