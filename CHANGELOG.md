@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Correct behavior of `inline-per-mode = symbol` with an alternative setting
+  for `display-per-mode` when units are entirely in the denominator (see issue
+  [\#765](https://github.com/josephwright/siunitx/issues/765))
+
 ## [v3.4.2] - 2025-01-17
 
 ### Changed

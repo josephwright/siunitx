@@ -383,6 +383,8 @@
 %     \siunitx_quantity_print:VV, \siunitx_quantity_print:eV
 %   }
 % \begin{macro}{\@@_print_unit:n}
+% \begin{macro}{\@@_print_mathchoice:Nnnnn}
+% \begin{macro}{\@@_print_mathchoice:nnN}
 %   For printing a single part of a quantity. This is needed for compound
 %   quantities and so is public: that's also the reason for passing both
 %   argument explicitly. The semantics here require that the penalty and
@@ -401,7 +403,11 @@
           {
             \tl_if_head_eq_charcode:nNTF {#2} 1
               { \siunitx_print_unit:o { \use_none:n #2 } }
-              { \@@_print_unit:n {#2} }
+              {
+                \tl_if_head_eq_meaning:nNTF {#2} \mathchoice
+                  { \@@_print_mathchoice:Nnnnn #2 }
+                  { \@@_print_unit:n {#2} }
+              }
           }
       }
   }
@@ -415,6 +421,31 @@
     \siunitx_print_unit:n {#1}
   }
 %    \end{macrocode}
+%  If the first token of the unit is |\mathchoice|, we are looking at
+%  formatting differently in display and inline math modes. If we then have a
+%  leading |1|, then it needs to be lopped off. We also need to remember here
+%  that the spacing also needs to be inside the |\mathchoice|, as it only
+%  applies in display mode. To get all of this to work, there is then some
+%  nesting of print functions: unavoidable. As |#3|, |#4| and |#5| are
+%  identical, expansion can take place just once to pass the trimmed tokens.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_print_mathchoice:Nnnnn #1#2#3#4#5
+  {
+    \tl_if_head_eq_charcode:nNTF {#3} 1
+      {
+        \exp_args:No \@@_print_mathchoice:nnN
+          { \use_none:n #3 } {#2} #1
+      }
+      { \@@_print_unit:n { #1 {#2} {#3} {#4} {#5} } }
+  }
+\cs_new_protected:Npn \@@_print_mathchoice:nnN #1#2#3
+  {
+    \siunitx_print_unit:n
+      { #3 { \@@_print_unit:n {#2} }  {#1} {#1} {#1} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
