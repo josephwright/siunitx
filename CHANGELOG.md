@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.3] - 2025-01-20
+
 ### Fixed
 - Correct behavior of `inline-per-mode = symbol` with an alternative setting
   for `display-per-mode` when units are entirely in the denominator (see issue
@@ -2226,7 +2228,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.2...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.3...HEAD
+[v3.4.3]: https://github.com/josephwright/siunitx/compare/v3.4.2...v3.4.3
 [v3.4.2]: https://github.com/josephwright/siunitx/compare/v3.4.1...v3.4.2
 [v3.4.1]: https://github.com/josephwright/siunitx/compare/v3.4.0...v3.4.1
 [v3.4.0]: https://github.com/josephwright/siunitx/compare/v3.3.24...v3.4.0
