@@ -1107,8 +1107,15 @@
 %     \@@_convert_cartesian_aux:ee
 %   }
 % \begin{macro}[EXP]{\@@_convert_cartesian_aux:w}
+% \begin{macro}[EXP]
+%   {
+%     \@@_convert_cartesian_aux:nnn ,
+%     \@@_convert_cartesian_aux:nen ,
+%     \@@_convert_cartesian_aux:enn
+%   }
 %   Conversion to Cartesian form is easy as we have two inputs and need to
-%   do no parsing here at all.
+%   do no parsing here at all. In most cases the exponents for the two
+%   output parts will be the same, but that is not certain.
 %    \begin{macrocode}
 \cs_new:Npn \@@_convert_cartesian:nn #1#2
   {
@@ -1124,23 +1131,45 @@
   }
 \cs_new:Npn \@@_convert_cartesian_aux:nn #1#2
   {
-    \@@_convert_cartesian_aux:w #1 e e \q_mark #2 e e \q_stop
+    \@@_convert_cartesian_aux:w #1 e 0 e \q_mark #2 e 0 e \q_stop
   }
 \cs_generate_variant:Nn \@@_convert_cartesian_aux:nn { ee }
 \cs_new:Npn \@@_convert_cartesian_aux:w
   #1 e #2 e #3 \q_mark #4 e #5 e #6 \q_stop
   {
+    \int_compare:nNnTF {#2} = {#5}
+      { \@@_convert_cartesian_aux:nnn {#1} {#4} {#2} }
+      {
+        \int_compare:nNnTF {#2} > {#5}
+          {
+            \@@_convert_cartesian_aux:nen
+              {#1}
+              { \fp_to_decimal:n { #4 * 10 ** (#5 - #2) } }
+              {#2}
+          }
+          {
+            \@@_convert_cartesian_aux:enn
+              { \fp_to_decimal:n { #1 * 10 ** (#2 - #5) } }
+              {#4}
+              {#5}
+          }
+      }
+  }
+\cs_new:Npn \@@_convert_cartesian_aux:nnn #1#2#3
+  {
     \fp_compare:nNnF {#1} = \c_zero_fp
       {#1}
-    \fp_compare:nNnF {#4} = \c_zero_fp
+    \fp_compare:nNnF {#2} = \c_zero_fp
       {
-        \fp_compare:nNnF {#4} < \c_zero_fp { + }
-        #4 i
+        \fp_compare:nNnF {#2} < \c_zero_fp { + }
+        #2 i
       }
-    \tl_if_blank:nF {#2}
-      { e #2 }
+    \int_compare:nNnF {#3} = 0
+      { e #3 }
   }
+\cs_generate_variant:Nn \@@_convert_cartesian_aux:nnn { e , ne }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %

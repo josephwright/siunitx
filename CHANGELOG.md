@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Handling of mixed exponents in converting complex values from polar to
+  Cartesian form (see issue
+  [\#774](https://github.com/josephwright/siunitx/issues/774))
+
 ## [v3.4.3] - 2025-01-20
 
 ### Fixed
