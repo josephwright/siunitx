@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.4] - 2025-01-21
+
 ### Fixed
 - Handling of mixed exponents in converting complex values from polar to
   Cartesian form (see issue
@@ -2233,7 +2235,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.3...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.4...HEAD
+[v3.4.4]: https://github.com/josephwright/siunitx/compare/v3.4.3...v3.4.4
 [v3.4.3]: https://github.com/josephwright/siunitx/compare/v3.4.2...v3.4.3
 [v3.4.2]: https://github.com/josephwright/siunitx/compare/v3.4.1...v3.4.2
 [v3.4.1]: https://github.com/josephwright/siunitx/compare/v3.4.0...v3.4.1
