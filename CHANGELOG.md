@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.5] - 2025-02-19
+
 ### Fixed
 - Alignment of separated uncertainty when an exponent is present (see issue
   [\#777](https://github.com/josephwright/siunitx/issues/777))
@@ -2239,7 +2241,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.5...HEAD
+[v3.4.5]: https://github.com/josephwright/siunitx/compare/v3.4.4...v3.4.5
 [v3.4.4]: https://github.com/josephwright/siunitx/compare/v3.4.3...v3.4.4
 [v3.4.3]: https://github.com/josephwright/siunitx/compare/v3.4.2...v3.4.3
 [v3.4.2]: https://github.com/josephwright/siunitx/compare/v3.4.1...v3.4.2
