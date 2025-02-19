@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Alignment of separated uncertainty when an exponent is present (see issue
+  [\#777](https://github.com/josephwright/siunitx/issues/777))
+
 ## [v3.4.4] - 2025-01-21
 
 ### Fixed
