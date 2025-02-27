@@ -12,7 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 - Application of option setting `prefix-mode = combine-exponent` to complex
   numbers (see issue
-  [\#779](https://github.com/josephwright/siunitx/issues/770))
+  [\#779](https://github.com/josephwright/siunitx/issues/779))
 
 ## [v3.4.5] - 2025-02-19
 
