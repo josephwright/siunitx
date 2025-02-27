@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.6] - 2025-02-27
+
 ### Fixed
 - Application of option setting `prefix-mode = combine-exponent` to complex
   numbers (see issue
@@ -2246,7 +2248,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.6...HEAD
+[v3.4.6]: https://github.com/josephwright/siunitx/compare/v3.4.5...v3.4.6
 [v3.4.5]: https://github.com/josephwright/siunitx/compare/v3.4.4...v3.4.5
 [v3.4.4]: https://github.com/josephwright/siunitx/compare/v3.4.3...v3.4.4
 [v3.4.3]: https://github.com/josephwright/siunitx/compare/v3.4.2...v3.4.3
