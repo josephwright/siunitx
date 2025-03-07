@@ -13,6 +13,10 @@ jobs:
       # Boilerplate
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Check spelling
+        uses: crate-ci/typos@v1.30.1
+        with:
+          config: .github/workflows/typos.toml
       # We need Ghostscript for XeTeX tests.
       - run: sudo apt-get update && sudo apt-get install ghostscript
       - name: Install TeX Live
@@ -23,8 +27,4 @@ jobs:
           package_file: .github/tl_packages
       - name: Run l3build
         run: l3build ctan -q -H
-      - name: Check spelling
-        uses: crate-ci/typos@v1.30.1
-        with:
-          config: .github/workflows/typos.toml
             
