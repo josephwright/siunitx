@@ -726,7 +726,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Rounding to an uncertainty of the same magnitude as the
   value (issue
   [\#524](https://github.com/josephwright/siunitx/issues/524))
-- Extend `propogate-math-font` to cover `\mathbf` and `\mathit`
+- Extend `propagate-math-font` to cover `\mathbf` and `\mathit`
   (issue [\#525](https://github.com/josephwright/siunitx/issues/525))
 - Position of non-aligned non-numeric material in table cells when
   centering decimal marker (issue
