@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-compound.dtx Copyright (C) 2018-2021,2023,2024 Joseph Wright
+% File: siunitx-compound.dtx Copyright (C) 2018-2021,2023-2025 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -588,13 +588,13 @@
       {
         \bool_if:NTF \l_@@_unit_bool
           {
-            \tl_set:Nx \l_@@_tmp_tl
+            \tl_set:Ne \l_@@_tmp_tl
               { \siunitx_number_output:NN \l_@@_first_tl \q_nil }
-            \tl_set:Nx \l_@@_tmp_tl
+            \tl_set:Ne \l_@@_tmp_tl
               { \@@_uncert_bracket:N \l_@@_tmp_tl }
           }
           {
-            \tl_set:Nx \l_@@_tmp_tl
+            \tl_set:Ne \l_@@_tmp_tl
               { \siunitx_number_output:N \l_@@_first_tl }
           }
         \seq_put_right:NV \l_@@_tmp_seq \l_@@_tmp_tl
@@ -616,7 +616,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_extract_exponents:
   {
-    \tl_set:Nx \l_@@_tmp_tl
+    \tl_set:Ne \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_first_tl \q_nil }
     \exp_after:wN \@@_extract_exponents_auxi:w
       \l_@@_tmp_tl \q_stop
@@ -666,9 +666,9 @@
       {
         \siunitx_number_parse:nN {#1} \l_@@_tmp_tl
         \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_tmp_tl
-        \tl_set:Nx \l_@@_tmp_tl
+        \tl_set:Ne \l_@@_tmp_tl
           { \siunitx_number_output:NN \l_@@_tmp_tl \q_nil }
-        \tl_set:Nx \l_@@_tmp_tl
+        \tl_set:Ne \l_@@_tmp_tl
           { \@@_uncert_bracket:N \l_@@_tmp_tl }
       }
       { \siunitx_number_format:nN {#1} \l_@@_tmp_tl }
@@ -718,7 +718,7 @@
         \use:c { @@_format_ \l_siunitx_quantity_prefix_mode_tl :n } {#2}
       }
   }
-\cs_new_protected:cpx { @@_format_combine-exponent:n } #1
+\cs_new_protected:cpe { @@_format_combine-exponent:n } #1
   {
     \exp_not:c { @@_format_combine-exponent_aux:n }
       {
@@ -726,7 +726,7 @@
           {#1}
       }
   }
-\cs_new_protected:cpx { @@_format_combine-exponent:nn } #1#2
+\cs_new_protected:cpe { @@_format_combine-exponent:nn } #1#2
   {
     \exp_not:c { @@_format_combine-exponent_aux:n }
       {
@@ -742,12 +742,12 @@
       \l_@@_first_tl \l_@@_tmp_fp
     #1 \l_@@_tmp_fp \l_@@_unit_tl
   }
-\cs_new_protected:cpx { @@_format_extract-exponent:n } #1
+\cs_new_protected:cpe { @@_format_extract-exponent:n } #1
   {
     \exp_not:c { @@_format_extract-exponent_aux:n }
       { \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1} }
   }
-\cs_new_protected:cpx { @@_format_extract-exponent:nn } #1#2
+\cs_new_protected:cpe { @@_format_extract-exponent:nn } #1#2
   {
     \exp_not:c { @@_format_extract-exponent_aux:n }
       {
@@ -758,7 +758,7 @@
 \cs_new_protected:cpn { @@_format_extract-exponent_aux:n } #1
   {
     #1 \l_@@_unit_tl \l_@@_tmp_fp
-    \tl_set:Nx \l_@@_tmp_tl
+    \tl_set:Ne \l_@@_tmp_tl
       { \siunitx_number_adjust_exponent:Nn \l_@@_tmp_tl \l_@@_tmp_fp }
     \siunitx_number_process:NN \l_@@_tmp_tl \l_@@_first_tl
     \bool_set_true:N \l_@@_exp_combine_bool
@@ -1113,7 +1113,7 @@
   }
 \cs_new_protected:Npn \@@_aux:
   {
-    \keys_set:nx { siunitx }
+    \keys_set:ne { siunitx }
       {
         compound-close-bracket       =
           { \exp_not:V \l_@@_bracket_close_tl } ,
@@ -1215,7 +1215,7 @@
   }
 \cs_new_protected:Npn \@@_aux:n #1
   {
-    \keys_set:nx { siunitx }
+    \keys_set:ne { siunitx }
       {
         compound-close-boundary       = ,
         compound-close-bracket        =
@@ -1303,7 +1303,7 @@
   }
 \cs_new_protected:Npn \@@_aux:
   {
-    \keys_set:nx { siunitx }
+    \keys_set:ne { siunitx }
       {
         compound-boundary-mode        = text ,
         compound-close-boundary       = ,

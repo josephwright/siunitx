@@ -330,7 +330,7 @@
       \tl_if_empty:NF \l_@@_arg_tl
         { \@@_parse_comparator: }
       \@@_parse_check:
-      \cs_set_protected:Npx \@@_parse_end:
+      \cs_set_protected:Npe \@@_parse_end:
         {
           \tl_set:Nn \exp_not:N #2 { \exp_not:V \l_@@_real_tl }
           \tl_set:Nn \exp_not:N #3 { \exp_not:V \l_@@_img_tl }
@@ -373,7 +373,7 @@
   }
 \cs_new_protected:Npn \@@_parse_check:N #1
   {
-    \tl_set:Nx #1
+    \tl_set:Ne #1
       {
         \exp_not:V \l_@@_comparator_tl
         \exp_not:V \l_@@_sign_tl
@@ -429,23 +429,23 @@
     \tl_if_empty:NTF \l_siunitx_number_input_exponent_tl
       { \@@_parse_root: }
       {
-        \tl_set:Nx \l_@@_tmp_tl
+        \tl_set:Ne \l_@@_tmp_tl
           { \tl_head:V \l_siunitx_number_input_exponent_tl }
         \tl_map_inline:Nn \l_siunitx_number_input_exponent_tl
           {
             \tl_replace_all:NnV \l_@@_arg_tl
               {##1} \l_@@_tmp_tl
           }
-        \use:x
+        \use:e
           {
             \cs_set_protected:Npn
               \exp_not:N \@@_parse_exponent_auxi:w
-              ####1 \exp_not:V \l_@@_tmp_tl
-              ####2 \exp_not:V \l_@@_tmp_tl
-              ####3 \exp_not:N \q_stop
+              ##1 \exp_not:V \l_@@_tmp_tl
+              ##2 \exp_not:V \l_@@_tmp_tl
+              ##3 \exp_not:N \q_stop
           }
             { \@@_parse_exponent_auxii:nn {##1} {##2} }
-        \use:x
+        \use:e
           {
             \@@_parse_exponent_auxi:w
               \exp_not:V \l_@@_arg_tl
@@ -460,7 +460,7 @@
     \quark_if_nil:nF {#2}
       {
         \tl_set:Nn \l_@@_arg_tl {#1}
-        \tl_set:Nx \l_@@_exp_tl
+        \tl_set:Ne \l_@@_exp_tl
           { \exp_not:V \l_@@_tmp_tl \exp_not:n {#2} }
       }
     \@@_parse_root:
@@ -482,23 +482,23 @@
     \tl_if_empty:NTF \l_@@_input_root_tl
       { \tl_set_eq:NN \l_@@_real_tl \l_@@_arg_tl }
       {
-        \tl_set:Nx \l_@@_tmp_tl
+        \tl_set:Ne \l_@@_tmp_tl
           { \tl_head:V \l_@@_input_root_tl }
         \tl_map_inline:Nn \l_@@_input_root_tl
           {
             \tl_replace_all:NnV \l_@@_arg_tl
               {##1} \l_@@_tmp_tl
           }
-        \use:x
+        \use:e
           {
             \cs_set_protected:Npn
               \exp_not:N \@@_parse_root_auxi:w
-              ####1 \exp_not:V \l_@@_tmp_tl
-              ####2 \exp_not:V \l_@@_tmp_tl
-              ####3 \exp_not:N \q_stop
+              ##1 \exp_not:V \l_@@_tmp_tl
+              ##2 \exp_not:V \l_@@_tmp_tl
+              ##3 \exp_not:N \q_stop
           }
             { \@@_parse_root_auxii:nn {##1} {##2} }
-        \use:x
+        \use:e
           {
             \@@_parse_root_auxi:w
               \exp_not:V \l_@@_arg_tl
@@ -637,7 +637,7 @@
   }
 \cs_new_protected:Npn \@@_parse_split:w #1 \q_recursion_tail \q_recursion_stop
   {
-    \tl_set:Nx \l_@@_img_tl
+    \tl_set:Ne \l_@@_img_tl
       {
         \tl_if_blank:nTF {#1}
           { 1 }
@@ -831,7 +831,7 @@
     \tl_if_empty:NTF \l_@@_img_tl
       {
         \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
-        \tl_set:Nx \l_@@_tmp_tl
+        \tl_set:Ne \l_@@_tmp_tl
           { \siunitx_number_output:N \l_@@_real_tl }
       }
       { \@@_format_cartesian_auxii:n {#1} }
@@ -850,10 +850,10 @@
     \tl_if_empty:NF \l_@@_real_tl
       { \exp_after:wN \@@_drop_exponent:nnnnnnn \l_@@_real_tl }
     \exp_after:wN \@@_format_sign:nnnnnnn \l_@@_img_tl
-    \tl_set:Nx \l_@@_tmp_tl
+    \tl_set:Ne \l_@@_tmp_tl
       { \siunitx_number_output:NN \l_@@_img_tl \q_nil }
     \exp_after:wN \@@_extract_exponent:w \l_@@_tmp_tl \q_stop
-    \tl_set:Nx \l_@@_tmp_tl
+    \tl_set:Ne \l_@@_tmp_tl
       {
         \bool_lazy_or:nnTF
           {
@@ -893,7 +893,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_sign:nnnnnnn #1#2#3#4#5#6#7
   {
-    \tl_set:Nx \l_@@_img_tl
+    \tl_set:Ne \l_@@_img_tl
       {
         { }
         {
@@ -986,7 +986,7 @@
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
   }
-\cs_new_protected:cpx { @@_format_cartesian_extract-exponent:n } #1
+\cs_new_protected:cpe { @@_format_cartesian_extract-exponent:n } #1
   {
     \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1}
       \exp_not:N \l_@@_unit_tl \exp_not:N \l_@@_tmp_fp
@@ -1006,7 +1006,7 @@
   }
 \cs_new_protected:cpn { @@_format_extract-exponent:N } #1
   {
-    \tl_set:Nx #1
+    \tl_set:Ne #1
       { \siunitx_number_adjust_exponent:Nn #1 \l_@@_tmp_fp }
     \siunitx_number_process:NN #1 #1
   }
@@ -1050,7 +1050,7 @@
           }
           { \@@_format_polar_input:n {#1} }
       }
-    \tl_set:Nx \l_@@_tmp_tl
+    \tl_set:Ne \l_@@_tmp_tl
       {
         \bool_if:NTF \l_siunitx_number_parse_bool
           { \siunitx_number_output:N \l_@@_mag_tl }
@@ -1069,7 +1069,7 @@
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
   }
-\cs_new_protected:cpx { @@_format_polar_extract-exponent:n } #1
+\cs_new_protected:cpe { @@_format_polar_extract-exponent:n } #1
   {
     \exp_not:N \siunitx_unit_format_extract_prefixes:nNN {#1}
       \exp_not:N \l_@@_unit_tl \exp_not:N \l_@@_tmp_fp
