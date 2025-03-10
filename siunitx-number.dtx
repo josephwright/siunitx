@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: siunitx-number.dtx Copyright (C) 2014-2019,2021-2025 Joseph Wright
+% File: siunitx-number.dtx Copyright (C) 2014-2019,2021-2024 Joseph Wright
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -782,7 +782,7 @@
           \tl_if_empty:NF \l_@@_parsed_tl
             {
               \siunitx_number_process:NN \l_@@_parsed_tl \l_@@_parsed_tl
-              \tl_set:Ne \l_@@_outputted_tl
+              \tl_set:Nx \l_@@_outputted_tl
                 { \siunitx_number_output:N \l_@@_parsed_tl }
             }
         }
@@ -1035,7 +1035,7 @@
   \char_set_catcode_active:N \<
   \char_set_catcode_active:N \>
   \char_set_catcode_active:N \~
-  \cs_new_protected:Npe \@@_normalize_actives:N #1
+  \cs_new_protected:Npx \@@_normalize_actives:N #1
     {
       \tl_replace_all:Nnn #1
         { \exp_not:N - }  { \token_to_str:N - }
@@ -1122,7 +1122,7 @@
       {
         \bool_if:NF \l_@@_validate_bool
           {
-            \msg_error:nne { siunitx } { invalid-number }
+            \msg_error:nnx { siunitx } { invalid-number }
               { \exp_not:V \l_@@_input_tl }
           }
       }
@@ -1165,7 +1165,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_combine_uncert:
   {
-    \tl_set:Ne \l_@@_parsed_tl
+    \tl_set:Nx \l_@@_parsed_tl
       {
         \exp_after:wN \@@_parse_combine_uncert:nnnn
           \l_@@_parsed_tl
@@ -1373,23 +1373,23 @@
           { \@@_parse_loop: }
       }
       {
-        \tl_set:Ne \l_@@_tmp_tl
+        \tl_set:Nx \l_@@_tmp_tl
           { \tl_head:V \l_siunitx_number_input_exponent_tl }
         \tl_map_inline:Nn \l_siunitx_number_input_exponent_tl
           {
             \tl_replace_all:NnV \l_@@_arg_tl
               {##1} \l_@@_tmp_tl
           }
-        \use:e
+        \use:x
           {
             \cs_set_protected:Npn
               \exp_not:N \@@_parse_exponent_auxi:w
-              ##1 \exp_not:V \l_@@_tmp_tl
-              ##2 \exp_not:V \l_@@_tmp_tl
-              ##3 \exp_not:N \q_stop
+              ####1 \exp_not:V \l_@@_tmp_tl
+              ####2 \exp_not:V \l_@@_tmp_tl
+              ####3 \exp_not:N \q_stop
           }
             { \@@_parse_exponent_auxii:nn {##1} {##2} }
-        \use:e
+        \use:x
           {
             \@@_parse_exponent_auxi:w
               \exp_not:V \l_@@_arg_tl
@@ -1474,7 +1474,7 @@
   {
     \tl_if_empty:NF \l_@@_parsed_tl
       {
-        \tl_set:Ne \l_@@_parsed_tl
+        \tl_set:Nx \l_@@_parsed_tl
           {
             { \exp_not:V \l_@@_comparator_tl }
             \exp_after:wN \@@_parse_finalise:nnnn \l_@@_parsed_tl
@@ -1643,7 +1643,7 @@
               { \tl_set:Nn \l_@@_partial_tl { \empty } }
           }
       }
-    \tl_put_right:Ne #1
+    \tl_put_right:Nx #1
       {
         { \exp_not:V \l_@@_partial_tl }
         \bool_if:NT #2 { { } }
@@ -1708,7 +1708,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_loop_main_store:NNN #1#2#3
   {
-    \tl_put_right:Ne #1
+    \tl_put_right:Nx #1
       {
         {
           \tl_if_empty:NTF \l_@@_partial_tl
@@ -1969,25 +1969,25 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_marker:nnnnN #1#2#3#4#5
   {
-    \tl_set:Ne \l_@@_tmp_tl { \tl_head:V \l_@@_input_uncert_divide_tl }
+    \tl_set:Nx \l_@@_tmp_tl { \tl_head:V \l_@@_input_uncert_divide_tl }
     \tl_if_empty:NTF \l_@@_tmp_tl
       { \@@_parse_uncert_marker:nnnnnN {#1} {#2} {#3} {#4} { } #5 }
       {
-        \use:e
+        \use:x
           {
             \cs_set_protected:Npn \exp_not:N \@@_parse_uncert_marker:w
-              ##1 \l_@@_tmp_tl ##2 \l_@@_tmp_tl ##3 \exp_not:N \q_stop
+              ####1 \l_@@_tmp_tl ####2 \l_@@_tmp_tl ####3 \exp_not:N \q_stop
               {
-                \exp_not:N \tl_if_blank:nTF {##2}
+                \exp_not:N \tl_if_blank:nTF {####2}
                   {
                     \@@_parse_uncert_marker:nnnnnN
                       \exp_not:n { {#1} {#2} {#3} }
-                      {##1} { }
+                      {####1} { }
                   }
                   {
                     \@@_parse_uncert_marker:nnnnnN
                       \exp_not:n { {#1} {#2} {#3} }
-                      {##1} { \l_@@_tmp_tl ##2 }
+                      {####1} { \l_@@_tmp_tl ####2 }
                   }
                     \exp_not:N #5
               }
@@ -2012,7 +2012,7 @@
           { \@@_parse_loop_break:w }
       }
     \int_set:Nn \l_@@_uncert_offset_int {#1}
-    \tl_set:Ne \l_@@_parsed_tl
+    \tl_set:Nx \l_@@_parsed_tl
       {
          {#2}
          {#3}
@@ -2041,7 +2041,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_after:N #1
   {
-    \tl_set:Ne \l_@@_uncert_tl
+    \tl_set:Nx \l_@@_uncert_tl
       {
         \exp_not:V \l_@@_uncert_tl
         \tl_if_empty:NF \l_@@_partial_tl
@@ -2056,7 +2056,7 @@
               }
           }
       }
-    \tl_set:Ne \l_@@_uncert_types_tl
+    \tl_set:Nx \l_@@_uncert_types_tl
       {
         \l_@@_uncert_types_tl
         \tl_if_empty:NTF \l_@@_tolerance_tl
@@ -2067,7 +2067,7 @@
     \tl_clear:N \l_@@_tolerance_tl
     \quark_if_recursion_tail_stop_do:Nn #1
       {
-        \tl_set:Ne \l_@@_parsed_tl
+        \tl_set:Nx \l_@@_parsed_tl
           {
             \exp_not:V \l_@@_parsed_tl
             {
@@ -2191,7 +2191,7 @@
   }
 \cs_new_protected:Npn \@@_set_round_min:nnnnnnn #1#2#3#4#5#6#7
   {
-    \tl_set:Ne \l_@@_round_min_tl
+    \tl_set:Nx \l_@@_round_min_tl
       {
         \bool_lazy_and:nnF
           { \str_if_eq_p:nn {#3} { 0 } }
@@ -2220,15 +2220,15 @@
 % \begin{macro}{\@@_set_round_threshold:nn}
 %  Split the range, parse each part, set the data structures.
 %    \begin{macrocode}
-\cs_new_protected:Npe \@@_set_thresholds:n #1
+\cs_new_protected:Npx \@@_set_thresholds:n #1
   {
     \exp_not:N \@@_set_thresholds:w
       #1 \token_to_str:N : \token_to_str:N : \exp_not:N \q_stop
   }
-\use:e
+\use:x
   {
     \cs_new_protected:Npn \exp_not:N \@@_set_thresholds:w
-      #1 \token_to_str:N : #2 \token_to_str:N : #3 \exp_not:N \q_stop
+      ##1 \token_to_str:N : ##2 \token_to_str:N : ##3 \exp_not:N \q_stop
   }
   {
     \@@_set_threshold:nn { lower } {#1}
@@ -2338,15 +2338,15 @@
 %   \emph{unless} dealing with engineering-style output. The latter is easier
 %   to handle by first converting to scientific output, then post-processing.
 %   (Once \texttt{e}-type expansion is generally available, this will be
-%   handling using a single \cs{tl_set:Ne}.)
+%   handling using a single \cs{tl_set:Nx}.)
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_exponent:NN #1#2
   {
-    \tl_set:Ne #2
+    \tl_set:Nx #2
       { \exp_after:wN \@@_exponent:nnnnnnn #1 }
     \str_if_eq:VnT \l_@@_exponent_mode_tl { engineering }
       {
-        \tl_set:Ne #2
+        \tl_set:Nx #2
           { \exp_after:wN \@@_exponent_engineering_aux:nnnnnnn #2 }
       }
   }
@@ -2700,7 +2700,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_digits:NN #1#2
   {
-    \tl_set:Ne #2
+    \tl_set:Nx #2
       { \exp_after:wN \@@_digits:nnnnnnn #1 }
   }
 \cs_new:Npn \@@_digits:nnnnnnn #1#2#3#4#5#6#7
@@ -2785,7 +2785,7 @@
       {
         \str_if_eq:VnT \l_@@_exponent_mode_tl { input }
           { \msg_warning:nn { siunitx } { ambiguous-dropped-exponent } }
-        \tl_set:Ne #2
+        \tl_set:Nx #2
           { \exp_after:wN \@@_drop_exponent:nnnnnnn #1 }
       }
   }
@@ -2803,7 +2803,7 @@
   {
     \bool_if:NTF \l_@@_drop_uncertainty_bool
       {
-        \tl_set:Ne #2
+        \tl_set:Nx #2
           { \exp_after:wN \@@_drop_uncertainty:nnnnnnn #1 }
       }
       { \tl_set_eq:NN #2 #1 }
@@ -2822,7 +2822,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_round:NN #1#2
   {
-    \tl_set:Ne #2
+    \tl_set:Nx #2
       {
         \str_if_eq:VnTF \l_@@_round_mode_tl { none }
           { \exp_not:V #1 }
@@ -3778,7 +3778,7 @@
   {
     \bool_if:NT \l_@@_drop_zero_decimal_bool
       {
-        \tl_set:Ne #2
+        \tl_set:Nx #2
           { \exp_after:wN \@@_zero_decimal:nnnnnnn #1 }
       }
   }
@@ -4527,7 +4527,7 @@
     \exp_not:V \l_siunitx_unit_font_tl
       { \exp_not:n {#1} }
   }
-\cs_new:Npe \@@_output_uncert_desc_subscript:n #1
+\cs_new:Npx \@@_output_uncert_desc_subscript:n #1
   {
     \char_generate:nn { `\_ } { 8 } 
       {
@@ -4567,7 +4567,7 @@
       { \@@_output_uncert_S_sep:nnnn {#1} {#2} { } {#4} }
       { \@@_output_uncert_A_aux:nnnn {#1} {#2} {#4} {#5} }
   }
-\cs_new:Npe \@@_output_uncert_A_aux:nnnn #1#2#3#4
+\cs_new:Npx \@@_output_uncert_A_aux:nnnn #1#2#3#4
   {
     { }
     ^
@@ -4998,7 +4998,7 @@
 %    \end{macrocode}
 %   Two awkward settings.
 %    \begin{macrocode}
-\keys_set:ne { siunitx }
+\keys_set:nx { siunitx }
   {
     exponent-thresholds       = -3 \c_colon_str 3 ,
     input-uncertainty-divider = \c_colon_str
