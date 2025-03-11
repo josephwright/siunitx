@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Adjust for `tabularray` changes (see issue
+  [\#783](https://github.com/josephwright/siunitx/issues/#783))
+
 ### Fixed
 - Detect duplicate complex root symbols (see issue
   [\#782](https://github.com/josephwright/siunitx/issues/#782))

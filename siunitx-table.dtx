@@ -690,9 +690,13 @@
             \cs_new_eq:NN
               \@@_align_auxiii:nn
               \@@_align_auxi:nn
-            \cs_gset_protected:Npn \@@_align_auxi:nn #1#2
+            \cs_gset_protected:Npx \@@_align_auxi:nn #1#2
               {
-                \int_compare:nNnTF \g_tblr_level_int = 0
+                \exp_not:N \int_compare:nNnTF
+                  \cs_if_exist:NTF \gTblrLevelInt
+                   { \exp_not:N \gTblrLevelInt }
+                   { \exp_not:N \g_tblr_level_int }
+                    = 0
                   { \@@_align_auxii:nn }
                   { \@@_align_auxiii:nn }
                     {#1} {#2}
