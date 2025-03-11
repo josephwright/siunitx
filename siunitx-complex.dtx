@@ -472,7 +472,7 @@
 %
 % \begin{macro}{\@@_parse_root:}
 % \begin{macro}{\@@_parse_root_auxi:w}
-% \begin{macro}{\@@_parse_root_auxii:nn}
+% \begin{macro}{\@@_parse_root_auxii:nnnN}
 %   Splitting at the complex root is much like splitting the exponent.
 %   After dealing with the case where there is no complex root allowed,
 %   use the first possible symbol to do the work.
@@ -491,13 +491,16 @@
           }
         \use:x
           {
-            \cs_set_protected:Npn
+            \cs_set_protected:Npx
               \exp_not:N \@@_parse_root_auxi:w
               ####1 \exp_not:V \l_@@_tmp_tl
               ####2 \exp_not:V \l_@@_tmp_tl
               ####3 \exp_not:N \q_stop
           }
-            { \@@_parse_root_auxii:nn {##1} {##2} }
+            {
+              \@@_parse_root_auxii:nnnN {##1} {##2} {##3}
+                \exp_not:V \l_@@_tmp_tl
+            }
         \use:x
           {
             \@@_parse_root_auxi:w
@@ -509,9 +512,11 @@
   }
 \cs_new_protected:Npn \@@_parse_root_auxi:w  { }
 %    \end{macrocode}
-%   This is where the business end lies. We have four possibilities:
+%   This is where the business end lies. We have five possibilities:
 %   \begin{itemize}
 %     \item There was no complex root at all: |#2| will be |\q_nil|
+%     \item More than one complex root sign was present: |#3| will not
+%       be equal to |\q_nil i|.
 %     \item All of the number is in the complex part with a leading
 %       root: |#1| will be empty. This includes the case where
 %       the input was \emph{just} a root symbol (plus possibly sign,
@@ -523,21 +528,28 @@
 %       with the root symbol: just the last token needs to be separated.
 %   \end{itemize}
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse_root_auxii:nn #1#2
+\cs_new_protected:Npn \@@_parse_root_auxii:nnnN #1#2#3#4
   {
     \quark_if_nil:nTF {#2}
       { \tl_set:Nn \l_@@_real_tl {#1} }
       {
-        \tl_set:Nn \l_@@_img_tl {#2}
-        \tl_if_blank:nTF {#1}
+        \str_if_eq:nnTF {#3} { \q_nil #4 }
           {
-            \tl_if_blank:nT {#2}
-              { \tl_set:Nn \l_@@_img_tl { 1 } }
+            \tl_set:Nn \l_@@_img_tl {#2}
+            \tl_if_blank:nTF {#1}
+              {
+                \tl_if_blank:nT {#2}
+                  { \tl_set:Nn \l_@@_img_tl { 1 } }
+              }
+              {
+                \tl_if_blank:nTF {#2}
+                  { \@@_parse_split:n {#1} }
+                  { \@@_parse_sign_check:n {#1} }
+              }
           }
           {
-            \tl_if_blank:nTF {#2}
-              { \@@_parse_split:n {#1} }
-              { \@@_parse_sign_check:n {#1} }
+            \msg_error:nnV { siunitx } { duplicate-complex-root }
+              \l_@@_input_tl
           }
       }
   }
@@ -1277,6 +1289,11 @@
 % \subsection{Messages}
 %
 %    \begin{macrocode}
+\msg_new:nnnn { siunitx } { duplicate-complex-root }
+  { Duplicate~complex~root~in~"#1". }
+  {
+    Complex~numbers~may~have~only~exactly~one~root~symbol~present.
+  }
 \msg_new:nnnn { siunitx } { invalid-polar-form }
   { Invalid~polar~form~"#1:#2". }
   {

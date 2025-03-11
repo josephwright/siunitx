@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Detect duplicate complex root symbols (see issue
+  [\#782](https://github.com/josephwright/siunitx/issues/#782))
+
 ## [v3.4.6] - 2025-02-27
 
 ### Fixed
