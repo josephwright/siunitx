@@ -310,8 +310,21 @@
 %
 % \subsection{Parsing}
 %
-% \begin{macro}{\@@_parse:nNN}
-% \begin{macro}{\@@_parse_end:}
+% \begin{macro}{\@@_expand:nN}
+%   A small auxiliary to expand input and replace symbols: we need to do this
+%   quite early so it is separated out. The storage is hard-coded as this is
+%   low-level stuff.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_expand:n #1
+  {
+    \protected@edef \l_@@_arg_tl {#1}
+    \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
+    \siunitx_number_normalize_symbols:N \l_@@_arg_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_parse:n, \@@_parse:V}
 % \begin{macro}{\@@_parse_clear:}
 %   Parsing for complex numbers needs some of the same approaches as the
 %   general parser. However, as the aim here is to do only enough to split
@@ -320,25 +333,14 @@
 %   function here is not only there to make this function shorter: it
 %   also allows a single way to zap any stored data if a parse error occurs.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse:nNN #1#2#3
+\cs_new_protected:Npn \@@_parse:n #1  
   {
-    \group_begin:
-      \@@_parse_clear:
-      \protected@edef \l_@@_arg_tl {#1}
-      \tl_set_eq:NN \l_@@_input_tl \l_@@_arg_tl
-      \siunitx_number_normalize_symbols:N \l_@@_arg_tl
-      \tl_if_empty:NF \l_@@_arg_tl
-        { \@@_parse_comparator: }
-      \@@_parse_check:
-      \cs_set_protected:Npx \@@_parse_end:
-        {
-          \tl_set:Nn \exp_not:N #2 { \exp_not:V \l_@@_real_tl }
-          \tl_set:Nn \exp_not:N #3 { \exp_not:V \l_@@_img_tl }
-        }
-    \exp_after:wN \group_end:
-    \@@_parse_end:
+    \@@_parse_clear:
+    \tl_if_empty:NF \l_@@_arg_tl
+      { \@@_parse_comparator: }
+    \@@_parse_check:
   }
-\cs_new_protected:Npn \@@_parse_end: { }
+\cs_generate_variant:Nn \@@_parse:n { V }
 \cs_new_protected:Npn \@@_parse_clear:
   {
     \tl_clear:N \l_@@_real_tl
@@ -348,7 +350,6 @@
     \tl_clear:N \l_@@_join_tl
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -713,26 +714,27 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_complex_number:n #1
   {
-    \bool_lazy_and:nnTF
-      { \l_@@_force_polar_bool }
-      { \l_siunitx_number_parse_bool }
+    \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \use:e
-          {
-            \siunitx_complex_number:nn
-               \@@_convert_polar:n {#1}
-          }
+        \group_begin:
+          \@@_expand:n {#1}
+          \bool_if:NTF \l_@@_force_polar_bool
+            {
+              \use:e
+                {
+                  \siunitx_complex_number:nn
+                     \exp_args:NV \@@_convert_polar:n \l_@@_arg_tl
+                 }
+            }
+            {
+              \@@_parse:V \l_@@_arg_tl
+              \@@_format_cartesian:n { }
+            }
+        \group_end:
       }
       {
-        \bool_if:NTF \l_siunitx_number_parse_bool
-          {
-            \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
-            \@@_format_cartesian:n { }
-          }
-          {
-            \siunitx_number_format:nN {#1} \l_@@_tmp_tl
-            \siunitx_print_number:V \l_@@_tmp_tl
-          }
+        \siunitx_number_format:nN {#1} \l_@@_tmp_tl
+        \siunitx_print_number:V \l_@@_tmp_tl
       }
   }
 \cs_generate_variant:Nn \siunitx_complex_number:n { e, x }
@@ -763,25 +765,26 @@
   }
 \cs_new_protected:Npn \siunitx_complex_quantity:nn #1#2
   {
-    \bool_lazy_and:nnTF
-      { \l_@@_force_polar_bool }
-      { \l_siunitx_number_parse_bool }
+    \bool_if:NTF \l_siunitx_number_parse_bool
       {
-        \use:e
-          {
-            \siunitx_complex_quantity:nnn
-               \@@_convert_polar:n {#1}
-          }
-            {#2}
+        \group_begin:
+          \@@_expand:n {#1}
+          \bool_if:NTF \l_@@_force_polar_bool
+            {
+              \use:e
+                {
+                  \siunitx_complex_quantity:nnn
+                     \exp_args:NV \@@_convert_polar:n \l_@@_arg_tl
+                 }
+            }
+            {
+              \@@_parse:V \l_@@_arg_tl
+              \@@_format_cartesian:n
+            }
+              {#2}
+        \group_end:
       }
-      {
-        \bool_if:NTF \l_siunitx_number_parse_bool
-          {
-            \@@_parse:nNN {#1} \l_@@_real_tl \l_@@_img_tl
-            \@@_format_cartesian:n {#2}
-          }
-          { \siunitx_quantity:nn {#1} {#2} }
-      }
+      { \siunitx_quantity:nn {#1} {#2} }
   }
 \cs_generate_variant:Nn \siunitx_complex_quantity:nn { e , x }
 \cs_new_protected:Npn \siunitx_complex_quantity:nnn #1#2#3
