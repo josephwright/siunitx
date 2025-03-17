@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.7] - 2025-03-17
+
 ### Changed
 - Adjust for `tabularray` changes (see issue
   [\#783](https://github.com/josephwright/siunitx/issues/#783))
@@ -2259,7 +2261,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.6...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.7...HEAD
+[v3.4.7]: https://github.com/josephwright/siunitx/compare/v3.4.6...v3.4.7
 [v3.4.6]: https://github.com/josephwright/siunitx/compare/v3.4.5...v3.4.6
 [v3.4.5]: https://github.com/josephwright/siunitx/compare/v3.4.4...v3.4.5
 [v3.4.4]: https://github.com/josephwright/siunitx/compare/v3.4.3...v3.4.4
