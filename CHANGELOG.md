@@ -12,6 +12,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   [\#783](https://github.com/josephwright/siunitx/issues/#783))
 
 ### Fixed
+- Error cleanly if conversion of `\pm` in complex value to polar
+  form is attempted (see issue
+  [\#781](https://github.com/josephwright/siunitx/issues/#781))
 - Detect duplicate complex root symbols (see issue
   [\#782](https://github.com/josephwright/siunitx/issues/#782))
 
