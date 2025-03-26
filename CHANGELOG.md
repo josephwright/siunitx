@@ -7,6 +7,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Printing of product separator in text mode when options `prefix-mode =
+  combine-exponent` and `product-independent-prefix = true` are active (see
+  issue [\#788](https://github.com/josephwright/siunitx/issues/#788))
+
 ## [v3.4.7] - 2025-03-17
 
 ### Changed
