@@ -1200,6 +1200,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option `number-text-rm`
 - Option `number-text-sf`
 - Option `number-text-tt`
+- Option `strict`
 - Option `table-unit-alignment`
 - Option `text-angstrom`
 - Option `text-arcminute`
