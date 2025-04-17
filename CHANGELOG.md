@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Prevent a linebreak in angles when `[angle-symbol-over-decimal` is active
+  (see issue [\#794](https://github.com/josephwright/siunitx/issues/#794))
+
 ## [v3.4.8] - 2025-03-26
 
 ### Fixed
