@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.9] - 2025-04-19
+
 ### Fixed
 - Prevent a linebreak in angles when `[angle-symbol-over-decimal` is active
   (see issue [\#794](https://github.com/josephwright/siunitx/issues/#794))
@@ -2273,7 +2275,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.8...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.9...HEAD
+[v3.4.9]: https://github.com/josephwright/siunitx/compare/v3.4.8...v3.4.9
 [v3.4.8]: https://github.com/josephwright/siunitx/compare/v3.4.7...v3.4.8
 [v3.4.7]: https://github.com/josephwright/siunitx/compare/v3.4.6...v3.4.7
 [v3.4.6]: https://github.com/josephwright/siunitx/compare/v3.4.5...v3.4.6
