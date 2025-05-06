@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Double subscript error with asymmetric uncertainty and subscript descriptor
+  (see issue [\#800](https://github.com/josephwright/siunitx/issues/#800))
+
 ## [v3.4.9] - 2025-04-19
 
 ### Fixed

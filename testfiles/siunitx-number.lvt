@@ -1198,6 +1198,27 @@
     \test:n { 1 }
   }
 
+\TEST { Option~setting~"uncertainty-descriptor-mode"~and~"uncertainty-mode" }
+  {
+    \keys_set:nn { siunitx } { uncertainty-descriptors = { sys , stat } }
+    \keys_set:nn { siunitx }
+      {
+        uncertainty-descriptor-mode = subscript,
+        uncertainty-mode = separate
+      }
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \exp_args:Ne \siunitx_number_format:nN { \tl_to_str:n {#1} } \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+      }
+    \TIMO
+    \test:n { 123.45(6)(7) }
+    \test:n { 123.45(6:7)(8) }
+    \test:n { 123.45(6)(7:8) }
+    \test:n { 123.45(6:7)(8:9) }
+  }
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \TEST { Awkward~uncertainty~rounding }
