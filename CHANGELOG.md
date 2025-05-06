@@ -8,6 +8,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Handling of asymmetric uncertainties where one part is zero (see issue
+  [\#687](https://github.com/josephwright/siunitx/issues/#687) and issue
+  [\#802](https://github.com/josephwright/siunitx/issues/#802))
 - Double subscript error with asymmetric uncertainty and subscript descriptor
   (see issue [\#800](https://github.com/josephwright/siunitx/issues/#800))
 

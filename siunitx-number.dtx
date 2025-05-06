@@ -1892,10 +1892,17 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_auxiii:
   {
-    \bool_lazy_and:nnT
-      { \l_@@_zero_uncert_bool }
-      { \tl_if_empty_p:N \l_@@_partial_tl }
-      { \tl_set:Nn \l_@@_partial_tl { 0 } }
+    \tl_if_empty:NT \l_@@_partial_tl
+      {
+        \bool_lazy_or:nnT
+          { \l_@@_zero_uncert_bool }
+          {
+            ! \bool_lazy_or_p:nn
+              { \tl_if_empty_p:N \l_@@_tolerance_tl }
+              { \str_if_eq_p:Vn \l_@@_tolerance_tl { 0 } }
+          }
+          { \tl_set:Nn \l_@@_partial_tl { 0 } }
+      }
   }
 %    \end{macrocode}
 %   A common auxiliary for the case where the token is not a digit, a
@@ -1907,6 +1914,8 @@
       {
         \tl_if_in:NnTF \l_@@_input_uncert_divide_tl {#1}
           {
+            \tl_if_empty:NT \l_@@_partial_tl
+              { \tl_set:Nn \l_@@_partial_tl { 0 } }
             \cs_set_eq:NN \l_@@_tolerance_tl \l_@@_partial_tl
             \tl_clear:N \l_@@_partial_tl
             \@@_parse_uncert:N
