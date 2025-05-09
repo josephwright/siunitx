@@ -7,6 +7,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Brazilian locale
+
 ## [v3.4.10] - 2025-05-07
 
 ### Fixed
