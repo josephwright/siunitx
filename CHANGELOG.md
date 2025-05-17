@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.11] - 2025-05-17
+
 ### Added
 - Brazilian locale
 
@@ -2287,7 +2289,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.10...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.11...HEAD
+[v3.4.11]: https://github.com/josephwright/siunitx/compare/v3.4.10...v3.4.11
 [v3.4.10]: https://github.com/josephwright/siunitx/compare/v3.4.9...v3.4.10
 [v3.4.9]: https://github.com/josephwright/siunitx/compare/v3.4.8...v3.4.9
 [v3.4.8]: https://github.com/josephwright/siunitx/compare/v3.4.7...v3.4.8
