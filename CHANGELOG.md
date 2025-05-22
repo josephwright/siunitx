@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Spacing when a range 'from' phrase is used (see issue
+  [\#804](https://github.com/josephwright/siunitx/issues/#804))
+
 ## [v3.4.11] - 2025-05-17
 
 ### Added
