@@ -11,7 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Spacing when a range 'from' phrase is used (see issue
-  [\#804](https://github.com/josephwright/siunitx/issues/#804))
+  [\#804](https://github.com/josephwright/siunitx/issues/804))
 
 ## [v3.4.11] - 2025-05-17
 
@@ -22,36 +22,36 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 - Handling of asymmetric uncertainties where one part is zero (see issue
-  [\#687](https://github.com/josephwright/siunitx/issues/#687) and issue
-  [\#802](https://github.com/josephwright/siunitx/issues/#802))
+  [\#687](https://github.com/josephwright/siunitx/issues/687) and issue
+  [\#802](https://github.com/josephwright/siunitx/issues/802))
 - Double subscript error with asymmetric uncertainty and subscript descriptor
-  (see issue [\#800](https://github.com/josephwright/siunitx/issues/#800))
+  (see issue [\#800](https://github.com/josephwright/siunitx/issues/800))
 
 ## [v3.4.9] - 2025-04-19
 
 ### Fixed
 - Prevent a linebreak in angles when `[angle-symbol-over-decimal` is active
-  (see issue [\#794](https://github.com/josephwright/siunitx/issues/#794))
+  (see issue [\#794](https://github.com/josephwright/siunitx/issues/794))
 
 ## [v3.4.8] - 2025-03-26
 
 ### Fixed
 - Printing of product separator in text mode when options `prefix-mode =
   combine-exponent` and `product-independent-prefix = true` are active (see
-  issue [\#788](https://github.com/josephwright/siunitx/issues/#788))
+  issue [\#788](https://github.com/josephwright/siunitx/issues/788))
 
 ## [v3.4.7] - 2025-03-17
 
 ### Changed
 - Adjust for `tabularray` changes (see issue
-  [\#783](https://github.com/josephwright/siunitx/issues/#783))
+  [\#783](https://github.com/josephwright/siunitx/issues/783))
 
 ### Fixed
 - Error cleanly if conversion of `\pm` in complex value to polar
   form is attempted (see issue
-  [\#781](https://github.com/josephwright/siunitx/issues/#781))
+  [\#781](https://github.com/josephwright/siunitx/issues/781))
 - Detect duplicate complex root symbols (see issue
-  [\#782](https://github.com/josephwright/siunitx/issues/#782))
+  [\#782](https://github.com/josephwright/siunitx/issues/782))
 
 ## [v3.4.6] - 2025-02-27
 
