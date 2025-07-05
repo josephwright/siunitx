@@ -969,7 +969,11 @@
 %     \@@_format_cartesian_extract-exponent:n ,
 %     \@@_format_cartesian_input:n
 %   }
-% \begin{macro}{\@@_format_extract-exponent:N}
+% \begin{macro}{\@@_format_combine-exponent:nn}
+% \begin{macro}{\@@_format_tidy_exp:}
+% \begin{macro}{\@@_format_tidy_exp:nn}
+% \begin{macro}{\@@_format_tidy_exp:nN}
+% \begin{macro}{\@@_format_tidy_exp:N}
 % \begin{macro}[EXP]{\@@_extract_exp:nnnnnnn}
 % \begin{macro}{\@@_drop_exp:N}
 % \begin{macro}[EXP]{\@@_drop_exp:nnnnnnnN}
@@ -991,12 +995,20 @@
   }
 \cs_new_protected:cpn { @@_format_cartesian_combine-exponent:n } #1
   {
-    \tl_if_empty:NF \l_@@_real_tl
-      { \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl }
-    \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \siunitx_number_process:NN
+      \l_@@_img_tl \l_@@_img_tl
     \fp_set:Nn \l_@@_tmp_fp
-     { \exp_after:wN \@@_extract_exp:nnnnnnn \l_@@_img_tl }
-    \@@_drop_exp:N \l_@@_real_tl
+     {
+       \exp_after:wN \@@_extract_exp:nnnnnnn
+         \l_@@_img_tl
+     }
+    \tl_if_empty:NF \l_@@_real_tl
+      {
+        \siunitx_number_process:NN
+          \l_@@_real_tl \l_@@_real_tl
+        \@@_format_cartesian_tidy_exp:
+        \@@_drop_exp:N \l_@@_real_tl
+      }
     \@@_drop_exp:N \l_@@_img_tl
     \siunitx_unit_format_combine_exponent:nnN {#1}
       \l_@@_tmp_fp \l_@@_unit_tl
@@ -1017,7 +1029,53 @@
   {
     \siunitx_number_process:NN \l_@@_real_tl \l_@@_real_tl
     \siunitx_number_process:NN \l_@@_img_tl \l_@@_img_tl
+    \tl_if_empty:NF \l_@@_real_tl 
+      { \@@_format_cartesian_tidy_exp: }
     \siunitx_unit_format:nN {#1} \l_@@_unit_tl
+  }
+%    \end{macrocode}
+%   Here, as we know this is only going to work if the exponents are integers,
+%   we use a faster string comparison for the fire-off.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_format_cartesian_tidy_exp:
+  {
+    \exp_args:Nee \@@_format_cartesian_tidy_exp:nn
+      {
+        \exp_after:wN \@@_extract_exp:nnnnnnn
+          \l_@@_real_tl
+       }
+       {
+         \exp_after:wN \@@_extract_exp:nnnnnnn
+           \l_@@_img_tl
+       }
+  }
+\cs_new_protected:Npn \@@_format_cartesian_tidy_exp:nn #1#2
+  {
+    \str_if_eq:nnF {#1} {#2}
+      {
+        \fp_compare:nNnTF {#1} > {#2}
+          {
+            \fp_set:Nn \l_@@_tmp_fp {#1}
+            \@@_format_cartesian_tidy_exp:nN
+              {#1} \l_@@_img_tl
+          }
+          {
+            \@@_format_cartesian_tidy_exp:nN
+              {#2} \l_@@_real_tl
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_format_cartesian_tidy_exp:nN #1#2
+  {
+    \group_begin:
+      \keys_set:nn { siunitx }
+        {
+          exponent-mode  = fixed ,
+          fixed-exponent = \fp_eval:n { round(#1,0) }
+       }
+      \siunitx_number_process:NN #2 #2
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn #2 #2
   }
 \cs_new_protected:cpn { @@_format_extract-exponent:N } #1
   {
@@ -1031,6 +1089,10 @@
 \cs_new_protected:Npn \@@_drop_exp:nnnnnnnN #1#2#3#4#5#6#7#8
   { \tl_set:Nn #8 { {#1} {#2} {#3} {#4} {#5} { } { 0 } } }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
