@@ -7,6 +7,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.4.13] - 2025-07-05
+
 ### Fixed
 - Output of converted exponents in `\complexqty` (see issue
   [\#813](https://github.com/josephwright/siunitx/issues/813))
@@ -2299,7 +2301,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.12...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.13...HEAD
+[v3.4.13]: https://github.com/josephwright/siunitx/compare/v3.4.12...v3.4.13
 [v3.4.12]: https://github.com/josephwright/siunitx/compare/v3.4.11...v3.4.12
 [v3.4.11]: https://github.com/josephwright/siunitx/compare/v3.4.10...v3.4.11
 [v3.4.10]: https://github.com/josephwright/siunitx/compare/v3.4.9...v3.4.10
