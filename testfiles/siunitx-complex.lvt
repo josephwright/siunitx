@@ -244,6 +244,24 @@
     \test:n { 1 + 2i }
   }
 
+\TEST { Option~setting~"exponent-mode" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+       {
+        \hbox_set:Nn \l_tmpa_box
+          { \siunitx_complex_number:n {#1} }
+        \box_show:N \l_tmpa_box
+      }
+    \TIMO
+    \test:n { 0,00540 + j0,01717 }
+    \keys_set:nn { siunitx }
+      { exponent-mode = engineering }
+    \test:n { 0,00540 + j0,01717 }
+    \test:n { 1000 + 1i }
+    \test:n { 1 + 1000i }
+  }
+
 \TEST { Option~settings~"exponent-mode"~and~"prefix-mode" }
   {
     \test:n { 0,00540 + j0,01717 }

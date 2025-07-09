@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Output of converted exponents in `\complexnum` (see issue
+  [\#815](https://github.com/josephwright/siunitx/issues/815))
+
 ## [v3.4.13] - 2025-07-05
 
 ### Fixed
