@@ -11,6 +11,9 @@ packtdszip = true
 typesetexe = "lualatex"
 typesetfiles = {"*.tex"}
 
+-- Avoid XeTeX
+checkengines = {"pdftex","luatex"}
+
 -- Shorten the tagging list
 tagfiles = {"CHANGELOG.md", "siunitx.dtx"}
 
