@@ -324,6 +324,15 @@
 %   \end{syntax}
 % \end{function}
 %
+% \begin{function}{final-digit-group-min-size}
+%   \begin{syntax}
+%     |final-digit-group-min-size| = \meta{integer}
+%   \end{syntax}
+%   Minimum number of digits which must be present in a group of digits; if this
+%   is not met, the digits of the final group will be combined with those from the
+%   immediately-preceding one.
+% \end{function}
+%
 % \begin{function}{fixed-exponent}
 %   \begin{syntax}
 %     |fixed-exponent| = \meta{exponent}
@@ -3883,6 +3892,7 @@
 %      \l_@@_exponent_product_tl      ,
 %      \l_@@_group_size_int           ,
 %      \l_@@_group_first_int          ,
+%      \l_@@_group_min_int          ,
 %      \l_@@_group_decimal_bool       ,
 %      \l_@@_group_integer_bool       ,
 %      \l_@@_group_minimum_int        ,
@@ -3926,6 +3936,8 @@
       \l_@@_group_first_int ,
     digit-group-other-size .int_set:N =
       \l_@@_group_size_int ,
+    final-digit-group-min-size .int_set:N =
+      \l_@@_group_min_int ,
     group-digits .choice: ,
     group-digits / all .code:n =
       {
@@ -4022,6 +4034,7 @@
 % \begin{macro}[EXP]{\@@_output_integer:nnn}
 % \begin{macro}[EXP]{\@@_output_decimal:nn, \@@_output_decimal:en}
 % \begin{macro}[EXP]{\@@_output_digits:nn}
+% \begin{macro}[EXP]{\@@_output_digit_separator:n}
 % \begin{macro}[EXP]{\@@_output_digit_separator:N}
 % \begin{macro}[EXP]{\@@_output_integer_3_3:n}
 % \begin{macro}[EXP]
@@ -4034,14 +4047,14 @@
 % \begin{macro}[EXP]{\@@_output_integer_loop:NNNN}
 % \begin{macro}[EXP]{\@@_output_integer_first:n}
 % \begin{macro}[EXP]{\@@_output_integer_aux:n, \@@_output_integer_aux:e}
-% \begin{macro}[EXP]{\@@_output_integer_loop:NnnN}
+% \begin{macro}[EXP]{\@@_output_integer_loop:NnnnN}
 % \begin{macro}[EXP]{\@@_output_decimal_3_3:n}
 % \begin{macro}[EXP]{\@@_output_decimal_loop:NNNN}
 % \begin{macro}[EXP]{\@@_output_decimal_3_2:n}
 % \begin{macro}[EXP]{\@@_output_decimal:NNNw}
 % \begin{macro}[EXP]{\@@_output_decimal_loop:NN}
 % \begin{macro}[EXP]{\@@_output_decimal_first:n}
-% \begin{macro}[EXP]{\@@_output_decimal_loop:NnnN}
+% \begin{macro}[EXP]{\@@_output_decimal_loop:NnnnN}
 % \begin{macro}[EXP]{\@@_output_uncertainty:nnn}
 % \begin{macro}[EXP]{\@@_output_uncertainty_unaligned:n}
 % \begin{macro}[EXP]{\@@_output_uncert:nnnn}
@@ -4293,19 +4306,31 @@
           { \tl_count:n {#2} } < \l_@@_group_minimum_int
           { \exp_not:n {#2} }
           {
-            \cs_if_exist_use:cF
+            \int_compare:nNnTF \l_@@_group_min_int < 2
               {
-                @@_output_ #1 _
-                \int_use:N \l_@@_group_first_int
-                _
-                \int_use:N \l_@@_group_size_int
-                :n
+                \cs_if_exist_use:cF
+                  {
+                    @@_output_ #1 _
+                    \int_use:N \l_@@_group_first_int
+                    _
+                    \int_use:N \l_@@_group_size_int
+                    :n
+                  }
+                  { \use:c { @@_output_ #1 _first:n } }
               }
               { \use:c { @@_output_ #1 _first:n } }
                 {#2}
           }
       }
       { \exp_not:n {#2} }
+  }
+%    \end{macrocode}
+%   Conditionally add the separator.
+%    \begin{macrocode}
+\cs_new:Npn \@@_output_digit_separator:n #1
+  {
+    \int_compare:nNnF { \tl_count:n {#1} } < \l_@@_group_min_int
+      { \@@_output_digit_separator:N \l_@@_group_separator_tl }
   }
 %    \end{macrocode}
 %   An auxiliary to ensure spacing is correct.
@@ -4362,27 +4387,31 @@
   }
 \cs_new:Npn \@@_output_integer_aux:n #1
   {
-    \@@_output_integer_loop:NnnN \l_@@_group_first_int { 0 } { }
+    \@@_output_integer_loop:NnnnN \l_@@_group_first_int { 0 } { } { }
       #1 \q_recursion_tail \q_recursion_stop
   }
 \cs_generate_variant:Nn \@@_output_integer_aux:n { e }
-\cs_new:Npn \@@_output_integer_loop:NnnN #1#2#3#4
+\cs_new:Npn \@@_output_integer_loop:NnnnN #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop_do:Nn #4 {#3}
+    \quark_if_recursion_tail_stop_do:Nn #5
+      {
+        \exp_not:n {#4}
+        \@@_output_digit_separator:n {#4}
+        #3
+      }
     \int_compare:nNnTF { #2 + 1 } > #1
       {
-        \@@_output_integer_loop:NnnN
+        \@@_output_integer_loop:NnnnN
           \l_@@_group_size_int { 1 }
             {
               \exp_not:n {#4}
-              \@@_output_digit_separator:N \l_@@_group_separator_tl
+              \tl_if_blank:nF {#3}
+                { \@@_output_digit_separator:n {#4} }
               #3
             }
+            {#5}
       }
-      {
-        \@@_output_integer_loop:NnnN #1 { #2 + 1 }
-          { \exp_not:n {#4} #3 }
-      }
+      { \@@_output_integer_loop:NnnnN #1 { #2 + 1 } {#3} { #5 #4 } }
   }
 %    \end{macrocode}
 %   For standard decimal grouping, no need to do any counting, just loop using
@@ -4450,20 +4479,25 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_decimal_first:n #1
   {
-    \@@_output_decimal_loop:NnnN \l_@@_group_first_int { 0 } { }
+    \@@_output_decimal_loop:NnnnN \l_@@_group_first_int { 0 } { } { }
       #1 \q_recursion_tail \q_recursion_stop
   }
-\cs_new:Npn \@@_output_decimal_loop:NnnN #1#2#3#4
+\cs_new:Npn \@@_output_decimal_loop:NnnnN #1#2#3#4#5
   {
-    \quark_if_recursion_tail_stop_do:Nn #4 { \exp_not:n {#3} }
+    \quark_if_recursion_tail_stop_do:Nn #5
+      {
+        \exp_not:n {#3}
+        \@@_output_digit_separator:n {#4}
+        \exp_not:n {#4}
+      }
     \int_compare:nNnTF { #2 + 1 } > #1
       {
         \exp_not:n {#3}
-        \@@_output_digit_separator:N
-          \l_@@_group_separator_tl
-        \@@_output_decimal_loop:NnnN \l_@@_group_size_int { 1 } {#4}
+        \tl_if_blank:nF {#3}
+          { \@@_output_digit_separator:n {#4} }
+        \@@_output_decimal_loop:NnnnN \l_@@_group_size_int { 1 } {#4} {#5}
       }
-      { \@@_output_decimal_loop:NnnN #1 { #2 + 1 } { #3 #4 } }
+      { \@@_output_decimal_loop:NnnnN #1 { #2 + 1 } {#3} { #4#5 } }
   }
 %    \end{macrocode}
 %   The lead-off here is to deal with the common cases: no uncertainty at all
@@ -4831,6 +4865,7 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \subsection{Miscellaneous tools}
 %
@@ -4960,6 +4995,7 @@
     digit-group-size                 = 3                                      ,
     digit-group-first-size           = 3                                      ,
     digit-group-other-size           = 3                                      ,
+    final-digit-group-min-size       = 1                                      ,
     group-digits                     = all                                    ,
     group-minimum-digits             = 5                                      ,
     group-separator                  = \,                                     , % (

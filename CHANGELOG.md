@@ -8,6 +8,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Option "final-digit-group-min-size" (see issue
+  [\#850](https://github.com/josephwright/siunitx/issues/850))
+
+
 ### Changed
 
 - Switch internally from `x`- to `e`-type expansion exclusively

@@ -1763,6 +1763,7 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       digit-group-other-size           & Integer & 3                 \\
       exponent-base                    & Literal & 10                \\
       exponent-product                 & Math    & \verb=\times=     \\
+      group-allow-singleton            & Switch  & true              \\
       group-digits                     & Choice  & all               \\
       group-minimum-digits             & Integer & 5                 \\
       group-separator                  & Literal & \cs{,}            \\
@@ -1842,6 +1843,18 @@ example to achieve the grouping typically used in India (lakh).
   \num{1234567890} \\
   \num[digit-group-size = 5]{1234567890} \\
   \num[digit-group-other-size = 2]{1234567890}
+\end{LaTeXdemo}
+
+\DescribeOption{final-digit-group-min-size}
+Grouping can result in a \enquote{dangling} digit, for example if there are
+seven digits in the decimal part with the standard group-of-three approach. To
+allow these to be avoided automatically, the setting
+\opt{final-digit-group-min-size} is available. Setting this to for example
+\opt{2} will mean that the final group is enlarged to respect the minimum size
+where this is required to avoid a group size of~1.
+\begin{LaTeXdemo}
+  \num{0.1234567} \\
+  \num[final-digit-group-min-size = 2]{0.1234567}
 \end{LaTeXdemo}
 
 \DescribeOption{output-decimal-marker}
