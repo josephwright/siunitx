@@ -17,6 +17,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - Switch internally from `x`- to `e`-type expansion exclusively
+  (requires `expl3` 2023-10-10 or later)
 
 ## [v3.4.14] - 2025-07-09
 
