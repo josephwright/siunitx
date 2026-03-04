@@ -20,26 +20,12 @@ tagfiles = {"CHANGELOG.md", "siunitx.dtx"}
 -- Source files cover those for rollback
 sourcefiles =
   {
-    "siunitx.dtx",
+    "*.dtx",
     "siunitx.ins",
     "siunitx.tex",
     "siunitx-abbreviations.cfg",
-    "siunitx-abbreviation.dtx",
-    "siunitx-angle.dtx",
     "siunitx-binary.cfg",
-    "siunitx-binary.dtx",
     "siunitx-code.tex",
-    "siunitx-command.dtx",
-    "siunitx-complex.dtx",
-    "siunitx-compound.dtx",
-    "siunitx-emulation.dtx",
-    "siunitx-locale.dtx",
-    "siunitx-number.dtx",
-    "siunitx-print.dtx",
-    "siunitx-quantity.dtx",
-    "siunitx-symbol.dtx",
-    "siunitx-table.dtx",
-    "siunitx-unit.dtx",
     "siunitx-v2.sty",
     "siunitx-version-1.cfg"
   }
