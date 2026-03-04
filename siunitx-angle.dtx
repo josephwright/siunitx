@@ -542,9 +542,9 @@
 % \begin{macro}{\@@_arc_print_auxiv:nnnnn}
 % \begin{macro}{\@@_arc_print_auxv:n}
 % \begin{macro}{\@@_arc_print_auxvi:NN}
-% \begin{macro}{\@@_arc_print_auxvii:w}
-% \begin{macro}{\@@_arc_print_auxiix:w}
-% \begin{macro}{\@@_arc_print_auxix:n}
+% \begin{macro}{\@@_arc_print_auxvii:nw}
+% \begin{macro}{\@@_arc_print_auxiix:nw}
+% \begin{macro}{\@@_arc_print_auxix:nn}
 %   The final stage of printing an angle is to put together the three parts:
 %   this works even for decimal angles as they will blank arguments for the
 %   other two parts The need to handle astronomy-style formatting means that
@@ -568,15 +568,9 @@
           {
             \bool_if:NTF \l_@@_astronomy_bool
               { \@@_arc_print_auxii:nw {#2} #1 \q_stop }
-              {
-                \@@_arc_print_auxvii:w #1 \q_stop
-                \@@_arc_print_auxix:n {#2}
-              }
+              { \@@_arc_print_auxvii:nw {#2} #1 \q_stop }
           }
-          {
-            \siunitx_print_number:n {#1}
-            \@@_arc_print_auxix:n {#2}
-          }
+          { \@@_arc_print_auxix:nn {#1} {#2} }
        \tl_if_blank:nF {#3}
           {
             \nobreak
@@ -605,10 +599,7 @@
       { \bool_set_false:N \l_@@_tmp_bool }
     \siunitx_print_number:n {#3}
     \tl_if_blank:nTF {#1}
-      {
-        \siunitx_print_number:n {#2}
-        \@@_arc_print_auxix:n {#5}
-      }
+      { \@@_arc_print_auxix:nn {#2} {#5} }
       {
         \hbox_set:Nn \l_@@_marker_box
           {
@@ -668,18 +659,18 @@
         \tex_hss:D
       }
   }
-\cs_new_protected:Npn \@@_arc_print_auxvii:w
-  #1 \q_nil #2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_stop
-  { \@@_arc_print_auxiix:w {#1#2#3#4#5} #6 \q_stop }
-\cs_new_protected:Npn \@@_arc_print_auxiix:w
+\cs_new_protected:Npn \@@_arc_print_auxvii:nw
   #1#2 \q_nil #3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_stop
-  { \siunitx_print_number:n {#1#6#7} }
-\cs_new_protected:Npn \@@_arc_print_auxix:n #1
+  { \@@_arc_print_auxiix:nw {#1} {#2#3#4#5#6} #7 \q_stop }
+\cs_new_protected:Npn \@@_arc_print_auxiix:nw
+  #1#2#3 \q_nil #4 \q_nil #5 \q_nil #6 \q_nil #7 \q_nil #8 \q_stop
+  { \@@_arc_print_auxix:nn {#2#7#8} {#1} }
+\cs_new_protected:Npn \@@_arc_print_auxix:nn #1#2
   {
     \group_begin:
-      \siunitx_unit_options_apply:n {#1}
-      \siunitx_unit_format:nN {#1} \l_@@_tmp_tl
-      \siunitx_quantity_print:nV { } \l_@@_tmp_tl
+      \siunitx_unit_options_apply:n {#2}
+      \siunitx_unit_format:nN {#2} \l_@@_tmp_tl
+      \siunitx_quantity_print:nV {#1} \l_@@_tmp_tl
     \group_end:
   }
 %    \end{macrocode}
