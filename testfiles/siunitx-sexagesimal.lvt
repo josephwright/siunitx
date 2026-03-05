@@ -22,20 +22,20 @@
 \cs_set_protected:Npn \test:n #1
   {
     \hbox_set:Nn \l_tmpa_box
-      { \siunitx_angle:n {#1} }
+      { \siunitx_sexagesimal:n {#1} }
     \box_show:N \l_tmpa_box
   }
 \cs_set_protected:Npn \test:nnn #1#2#3
   {
     \hbox_set:Nn \l_tmpa_box
-      { \siunitx_angle:nnn {#1} {#2} {#3} }
+      { \siunitx_sexagesimal:nnn {#1} {#2} {#3} }
     \box_show:N \l_tmpa_box
   }
 \TIMO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\TEST { Basic~formatting:~decimals }
+\TEST { Angles~as~decimals }
   {
     \test:n { 1 }
     \test:n { 0.123 }
@@ -45,7 +45,7 @@
     \test:n { 1e-2 }
   }
 
-\TEST { Basic~formatting:~arcs }
+\TEST { Angles~as~arcs }
   {
     \test:nnn { 1 } { } { }
     \test:nnn { 1 } { 2 } { }
@@ -59,90 +59,246 @@
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\OMIT
+
+\cs_set_protected:Npn \test:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \str_if_eq:nnTF {#1} { angle }
+          { \siunitx_angle:n {#2} }
+          { \siunitx_duration:n {#2} }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\cs_set_protected:Npn \test:nnnn #1#2#3#4
+  {
+    \hbox_set:Nn \l_tmpa_box
+      {
+        \str_if_eq:nnTF {#1} { angle }
+          { \siunitx_angle:nnn {#2} {#3} {#4} }
+          { \siunitx_duration:nnn {#2} {#3} {#4} }
+      }
+    \box_show:N \l_tmpa_box
+  }
+\TIMO
 
 \TEST { Option~setting~"angle-mode" }
   {
-    \test:n { 1.23 }
-    \test:n { -1.23 }
-    \test:n { -0.23 }
-    \test:nnn { 1 } { 2 } { 3 }
-    \test:nnn { 1 } { } { }
+    \test:nn { angle } { 1.23 }
+    \test:nn { angle } { -1.23 }
+    \test:nn { angle } { -0.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
+    \test:nnnn { angle } { 1 } { } { }
     \keys_set:nn { siunitx } { angle-mode = arc }
-    \test:n { 1.23 }
-    \test:n { -1.23 }
-    \test:n { -0.23 }
-    \test:nnn { 1 } { 2 } { 3 }
-    \test:nnn { 1 } { } { }
+    \test:nn { angle } { 1.23 }
+    \test:nn { angle } { -1.23 }
+    \test:nn { angle } { -0.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
+    \test:nnnn { angle } { 1 } { } { }
     \keys_set:nn { siunitx } { angle-mode = decimal }
-    \test:n { 1.23 }
-    \test:n { -1.23 }
-    \test:n { -0.23 }
-    \test:nnn { 1 } { 2 } { 3 }
-    \test:nnn { 1 } { } { }
+    \test:nn { angle } { 1.23 }
+    \test:nn { angle } { -1.23 }
+    \test:nn { angle } { -0.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
+    \test:nnnn { angle } { 1 } { } { }
     \keys_set:nn { siunitx } { angle-mode = input }
-    \test:n { 1.23 }
-    \test:n { -1.23 }
-    \test:n { -0.23 }
-    \test:nnn { 1 } { 2 } { 3 }
-    \test:nnn { 1 } { } { }
+    \test:nn { angle } { 1.23 }
+    \test:nn { angle } { -1.23 }
+    \test:nn { angle } { -0.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
+    \test:nnnn { angle } { 1 } { } { }
   }
 
 \TEST { Option~setting~"angle-symbol-..." }
   {
-    \test:nnn { 6 } { 7 } { 6.5 }
+    \test:nnnn { angle } { 6 } { 7 } { 6.5 }
     \keys_set:nn { siunitx }
       {
         angle-symbol-degree = D ,
         angle-symbol-minute = M ,
         angle-symbol-second = S
       }
-    \test:nnn { 6 } { 7 } { 6.5 }
+    \test:nnnn { angle } { 6 } { 7 } { 6.5 }
   }
 
 \TEST { Option~setting~"angle-symbol-over-decimal" }
   {
-    \test:n { 45.697 }
-    \test:nnn { 6 } { 7 } { 6.5 }
+    \test:nn { angle } { 45.697 }
+    \test:nnnn { angle } { 6 } { 7 } { 6.5 }
     \keys_set:nn { siunitx } { angle-symbol-over-decimal = true }
-    \test:n { 45.697 }
-    \test:nnn { 6 } { 7 } { 6.5 }
+    \test:nn { angle } { 45.697 }
+    \test:nnnn { angle } { 6 } { 7 } { 6.5 }
   }
 
 \TEST { Option~setting~"angle-separator" }
   {
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { angle-separator = \, }
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
+  }
+
+\TEST { Option~setting~"duration-mode" }
+  {
+    \test:nn { duration } { 1.23 }
+    \test:nn { duration } { -1.23 }
+    \test:nn { duration } { -0.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
+    \test:nnnn { duration } { 1 } { } { }
+    \keys_set:nn { siunitx } { duration-mode = component }
+    \test:nn { duration } { 1.23 }
+    \test:nn { duration } { -1.23 }
+    \test:nn { duration } { -0.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
+    \test:nnnn { duration } { 1 } { } { }
+    \keys_set:nn { siunitx } { duration-mode = decimal }
+    \test:nn { duration } { 1.23 }
+    \test:nn { duration } { -1.23 }
+    \test:nn { duration } { -0.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
+    \test:nnnn { duration } { 1 } { } { }
+    \keys_set:nn { siunitx } { duration-mode = input }
+    \test:nn { duration } { 1.23 }
+    \test:nn { duration } { -1.23 }
+    \test:nn { duration } { -0.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
+    \test:nnnn { duration } { 1 } { } { }
+  }
+
+\TEST { Option~setting~"duration-unit-..." }
+  {
+    \test:nnnn { duration } { 6 } { 7 } { 6.5 }
+    \keys_set:nn { siunitx }
+      {
+        duration-unit-hours  = H ,
+        duration-unit-minute = M ,
+        duration-unit-second = S
+      }
+    \test:nnnn { duration } { 6 } { 7 } { 6.5 }
+  }
+
+\TEST { Option~setting~"duration-separator" }
+  {
+    \test:nn { duration } { 1.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { duration-separator = \, }
+    \test:nn { duration } { 1.23 }
+    \test:nnnn { duration } { 1 } { 2 } { 3 }
   }
 
 \TEST { Option~setting~"fill-angle-degrees" }
   {
-    \test:nnn { } { } { 1 }
-    \test:nnn { } { 1 } { }
-    \test:nnn { 1 } { } { }
-    \test:nnn { } { } { -1 }
-    \test:nnn { } { -1 } { }
-    \test:nnn { -1 } { } { }
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
     \keys_set:nn { siunitx } { fill-angle-degrees = true }
-    \test:nnn { } { } { 1 }
-    \test:nnn { } { 1 } { }
-    \test:nnn { 1 } { } { }
-    \test:nnn { } { } { -1 }
-    \test:nnn { } { -1 } { }
-    \test:nnn { -1 } { } { }
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
   }
 
 \TEST { Option~setting~"fill-angle-minutes" }
   {
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-angle-minutes = true }
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-angle-seconds" }
+  {
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-angle-seconds = true }
+    \test:nnnn { angle } { } { } { 1 }
+    \test:nnnn { angle } { } { 1 } { }
+    \test:nnnn { angle } { 1 } { } { }
+    \test:nnnn { angle } { } { } { -1 }
+    \test:nnnn { angle } { } { -1 } { }
+    \test:nnnn { angle } { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-duration-hours" }
+  {
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-duration-hours = true }
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-duration-minutes" }
+  {
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-duration-minutes = true }
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-duration-seconds" }
+  {
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-duration-seconds = true }
+    \test:nnnn { duration } { } { } { 1 }
+    \test:nnnn { duration } { } { 1 } { }
+    \test:nnnn { duration } { 1 } { } { }
+    \test:nnnn { duration } { } { } { -1 }
+    \test:nnnn { duration } { } { -1 } { }
+    \test:nnnn { duration } { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-sexagesimal-major" }
+  {
     \test:nnn { } { } { 1 }
     \test:nnn { } { 1 } { }
     \test:nnn { 1 } { } { }
     \test:nnn { } { } { -1 }
     \test:nnn { } { -1 } { }
     \test:nnn { -1 } { } { }
-    \keys_set:nn { siunitx } { fill-angle-minutes = true }
+    \keys_set:nn { siunitx } { fill-sexagesimal-major = true }
     \test:nnn { } { } { 1 }
     \test:nnn { } { 1 } { }
     \test:nnn { 1 } { } { }
@@ -151,7 +307,7 @@
     \test:nnn { -1 } { } { }
   }
 
-\TEST { Option~setting~"fill-angle-seconds" }
+\TEST { Option~setting~"fill-sexagesimal-intermediate" }
   {
     \test:nnn { } { } { 1 }
     \test:nnn { } { 1 } { }
@@ -159,47 +315,121 @@
     \test:nnn { } { } { -1 }
     \test:nnn { } { -1 } { }
     \test:nnn { -1 } { } { }
-    \keys_set:nn { siunitx } { fill-angle-seconds = true }
+    \keys_set:nn { siunitx } { fill-sexagesimal-intermediate = true }
     \test:nnn { } { } { 1 }
     \test:nnn { } { 1 } { }
     \test:nnn { 1 } { } { }
     \test:nnn { } { } { -1 }
     \test:nnn { } { -1 } { }
     \test:nnn { -1 } { } { }
+  }
+
+\TEST { Option~setting~"fill-sexagesimal-minor" }
+  {
+    \test:nnn { } { } { 1 }
+    \test:nnn { } { 1 } { }
+    \test:nnn { 1 } { } { }
+    \test:nnn { } { } { -1 }
+    \test:nnn { } { -1 } { }
+    \test:nnn { -1 } { } { }
+    \keys_set:nn { siunitx } { fill-sexagesimal-minor = true }
+    \test:nnn { } { } { 1 }
+    \test:nnn { } { 1 } { }
+    \test:nnn { 1 } { } { }
+    \test:nnn { } { } { -1 }
+    \test:nnn { } { -1 } { }
+    \test:nnn { -1 } { } { }
+  }
+
+\TEST { Option~setting~"sexagesimal-mode" }
+  {
+    { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \test:nnn { 1 } { } { }
+    \keys_set:nn { siunitx } { sexagesimal-mode = component }
+    \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \test:nnn { 1 } { } { }
+    \keys_set:nn { siunitx } { sexagesimal-mode = decimal }
+    \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \test:nnn { 1 } { } { }
+    \keys_set:nn { siunitx } { sexagesimal-mode = input }
+    \test:n { 1.23 }
+    \test:n { -1.23 }
+    \test:n { -0.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \test:nnn { 1 } { } { }
+  }
+
+\TEST { Option~setting~"sexagesimal-unit-..." }
+  {
+    \test:nnn { 6 } { 7 } { 6.5 }
+    \keys_set:nn { siunitx }
+      {
+        sexagesimal-unit-major        = D ,
+        sexagesimal-unit-intermediate = M ,
+        sexagesimal-symbol-minor      = S
+      }
+    \test:nnn { 6 } { 7 } { 6.5 }
+  }
+
+\TEST { Option~setting~"sexagesimal-unit-over-decimal" }
+  {
+    \test:n { 45.697 }
+    \test:nnn { 6 } { 7 } { 6.5 }
+    \keys_set:nn { siunitx } { sexagesimal-unit-over-decimal = true }
+    \test:n { 45.697 }
+    \test:nnn { 6 } { 7 } { 6.5 }
+  }
+
+\TEST { Option~setting~"sexagesimal-separator" }
+  {
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
+    \keys_set:nn { siunitx } { sexagesimal-separator = \, }
+    \test:n { 1.23 }
+    \test:nnn { 1 } { 2 } { 3 }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \TEST { Option~setting~"parse-numbers~=~false" }
   {
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { parse-numbers = false }
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
   }
 
 \TEST { Option~setting~"angle-mode~=~arc"~with~rounding }
   {
     \keys_set:nn { siunitx } { angle-mode = arc , round-mode = places }
-    \test:n { 1.23 }
+    \test:nn { angle } { 1.23 }
   }
 
 \TEST { Option~setting~"angle-mode~=~arc"~with~filling }
   {
     \keys_set:nn { siunitx } { angle-mode = arc }
-    \test:nnn { 1 } { } { }
+    \test:nnnn { angle } { 1 } { } { }
     \keys_set:nn { siunitx } { fill-angle-minutes = true }
-    \test:nnn { 1 } { } { }
+    \test:nnnn { angle } { 1 } { } { }
     \keys_set:nn { siunitx } { fill-angle-seconds = true }
-    \test:nnn { 1 } { } { }
+    \test:nnnn { angle } { 1 } { } { }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \TEST { Number~options }
   {
-    \test:n { 22/7 }
+    \test:nn { angle } { 22/7 }
     \keys_set:nn { siunitx } 
       {
         evaluate-expression       ,
@@ -207,7 +437,7 @@
         round-precision = 3       ,
         round-pad       =false
       }
-    \test:n { 22/7 }
+    \test:nn { angle } { 22/7 }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,28 +445,28 @@
 \TEST { Erroneous~arc~input }
   {
     \keys_set:nn { siunitx } { angle-mode = arc }
-    \test:nnn { 1 } { -2 } { 3 }
-    \test:nnn { 1 } { +2 } { 3 }
-    \test:nnn { -1 } { -2 } { -3 }
+    \test:nnnn { angle } { 1 } { -2 } { 3 }
+    \test:nnnn { angle } { 1 } { +2 } { 3 }
+    \test:nnnn { angle } { -1 } { -2 } { -3 }
   }
 
 \TEST { Uncertainties~in~arc~format }
   {
     \keys_set:nn { siunitx } { angle-mode = arc }
-    \test:nnn { 10(1) } { } { }
-    \test:nnn { } { 10(1) } { }
-    \test:nnn { } { } { 10(1) }
+    \test:nnnn { angle } { 10(1) } { } { }
+    \test:nnnn { angle } { } { 10(1) } { }
+    \test:nnnn { angle } { } { } { 10(1) }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \TEST { Deprecated~option~setting~"number-angle-product" }
   {
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
     \keys_set:nn { siunitx } { number-angle-product = \, }
-    \test:n { 1.23 }
-    \test:nnn { 1 } { 2 } { 3 }
+    \test:nn { angle } { 1.23 }
+    \test:nnnn { angle } { 1 } { 2 } { 3 }
   }
 
 \END

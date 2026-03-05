@@ -262,6 +262,7 @@ needing to alter the input at all.
 The package provides the user macros:
 \begin{itemize}
   \item \cs{ang}\oarg{options}\marg{angle}
+  \item \cs{duration}\oarg{options}\marg{duration}
   \item \cs{num}\oarg{options}\marg{number}
   \item \cs{unit}\oarg{options}\marg{unit}
   \item \cs{qty}\oarg{options}\marg{number}\marg{unit}
@@ -404,6 +405,30 @@ exponent form to unit prefixes does not apply.
   \ang{;;1}   \\
   \ang{+10;;} \\
   \ang{-0;1;}
+\end{LaTeXdemo}
+
+\subsection{Durations}
+
+\begin{function}{\duration}
+  \begin{syntax}
+    \cs{duration}\oarg{options}\marg{angle}
+  \end{syntax}
+\end{function}
+Durations (of hours, minutes and seconds) can be typeset using the
+\cs{duration} command. The \meta{duration} can be given either as a decimal
+number or as a semi-colon separated list of hours, minutes and seconds, which
+is called \enquote{component format} in this document. The numbers which make
+up a duration are processed using the same system as other numbers. However, no
+unit prefixes are applied here: as such, conversion from exponent form to unit
+prefixes does not apply.
+\begin{LaTeXdemo}
+  \duration{10}    \\
+  \duration{12.3}  \\
+  \duration{4,5}   \\
+  \duration{1;2;3} \\
+  \duration{;;1}   \\
+  \duration{+10;;} \\
+  \duration{-0;1;}
 \end{LaTeXdemo}
 
 \subsection{Units}
@@ -2449,6 +2474,104 @@ available using the \opt{angle-symbol-over-decimal} option.
   \ang{6;7;6.5} \\
   \ang[angle-symbol-over-decimal]{45.697} \\
   \ang[angle-symbol-over-decimal]{6;7;6.5}
+\end{LaTeXdemo}
+
+\subsection{Durations}
+
+Duration processing provided by the \cs{duration} function has a set of options
+which apply in addition to the general ones set up for number processing.
+\begin{table}
+  \caption{Angle options.%
+    \label{tab:opt:duration}}
+  \begin{tabular}{@{}>{\ttfamily}ll>{\ttfamily}l@{}}
+    \toprule
+      \multicolumn{1}{@{}l}{Option name} &
+      Type &
+      \multicolumn{1}{l@{}}{Default} \\
+    \midrule
+      duration-mode          & Choice  & input        \\
+      duration-symbol-hour   & Literal & \cs{hour}    \\
+      duration-symbol-minute & Literal & \cs{minute}  \\
+      duration-symbol-second & Literal & \cs{second}  \\
+      duration-separator     & Literal & \meta{empty} \\
+      fill-duration-hours    & Switch  & false        \\
+      fill-duration-minutes  & Switch  & false        \\
+      fill-duration-seconds  & Switch  & false        \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\DescribeOption{duration-mode}
+The format in which angles are printed can be set using the \opt{angle-mode}
+option. With the standard setting (\opt{input}), the angle is printed as-given.
+By setting the option to \opt{arc} or \opt{decimal}, the output format can
+be set to an arc (degrees/minutes/seconds) or decimal value. Conversion uses
+the \LaTeX3 floating-point unit, so is limited to $16$ decimal places.
+\begin{LaTeXdemo}
+  \duration{8.56}    \\
+  \duration{8;33;36} \\
+  \duration[duration-mode = component]{8.56}    \\
+  \duration[duration-mode = component]{8;33;36} \\
+  \duration[duration-mode = decimal]{8.56}      \\
+  \duration[duration-mode = decimal]{8;33;36}   \\
+\end{LaTeXdemo}
+When integer angles are converted to component format, the presence of minute
+and second components is controlled by the options \opt{fill-duration-minutes}
+and \opt{fill-duration-seconds} (see below).
+
+\DescribeOption{duration-separator}
+When angles are printed in component format, the separation of the different
+parts is set up using the \opt{duration-separator} option.
+\begin{LaTeXdemo}
+  \duration{6;7;6.5} \\
+  \duration[duration-separator = \,]{6;7;6.5}
+\end{LaTeXdemo}
+
+\DescribeOption{fill-duration-hours}
+\DescribeOption{fill-duration-minutes}
+\DescribeOption{fill-duration-seconds}
+Zero-filling for the hour, minute or second parts of components is controlled
+using the \opt{fill-angle-degrees}, \opt{fill-angle-minutes} and
+\opt{fill-angle-seconds} options. All are off as standard.
+\begin{LaTeXdemo}
+  \duration{1;;} \\
+  \duration{;2;} \\
+  \duration{;;3} \\
+  {
+    \sisetup{fill-duration-hours}
+    \duration{1;;} \\
+    \duration{;2;} \\
+    \duration{;;3} \\
+  }
+  {
+    \sisetup{fill-duration-minutes}
+    \duration{1;;} \\
+    \duration{;2;} \\
+    \duration{;;3} \\
+  }
+  {
+    \sisetup{fill-duration-seconds}
+    \duration{1;;} \\
+    \duration{;2;} \\
+    \duration{;;3}
+  }
+\end{LaTeXdemo}
+
+\DescribeOption{duration-unit-hour}
+\DescribeOption{duration-unit-minute}
+\DescribeOption{duration-unit-second}
+With the standard settings, the symbols used for arc angles are the unit
+commands \cs{hour}, \cs{minute} and \cs{second}. These can be altered using
+\opt{duration-unit-degree}, \opt{duration-unit-minute} and
+\opt{duration-unit-second}.
+\begin{LaTeXdemo}
+  \duration{1;3;4.5} \\
+  \sisetup{
+    duration-unit-hour   = d ,
+    duration-unit-minute = m ,
+    duration-unit-second = s
+  }
+  \duration{1;3;4.5}
 \end{LaTeXdemo}
 
 \subsection{Creating units%
