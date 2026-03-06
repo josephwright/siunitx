@@ -851,11 +851,180 @@
 %</options>
 %    \end{macrocode}
 %
-% \subsection{Preamble commands}
-%
 %    \begin{macrocode}
 %<*interfaces>
 %    \end{macrocode}
+%
+% \subsection{Unit commands}
+%
+% \begin{macro}{\@@_non_latin:n}
+%   A shortcut.
+%    \begin{macrocode}
+\cs_new:Npn \@@_non_latin:n #1
+  { \codepoint_generate:nn {#1} { \char_value_catcode:n {#1} } }
+%    \end{macrocode}
+% \end{macro}
+%
+% Units that have been removed: to avoid issues, we mark them as deprecated.
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { unit-deprecated }
+  {
+    Unit~macro~#1~has~been~deprecated~in~this~release. \\ \\
+    The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
+    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit\ %
+    in~your~source.~The~current~definition~is\\ \\
+    \token_to_str:N \DeclareSIUnit #1 \{ #2 \}
+  }
+\cs_set_protected:Npn \@@_tmp:w #1#2
+  {
+    \quark_if_recursion_tail_stop:N #1
+    \bool_new:c { g_@@_unit_warning_ \token_to_str:N #1 _bool }
+    \siunitx_declare_unit:Ne #1
+      {
+        \exp_not:N \bool_if:NF
+          \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
+          {
+            \exp_not:N \bool_gset_true:N 
+              \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
+            \msg_warning:nnnn { siunitx } { unit-deprecated }
+              { \token_to_str:N #1 } {#2}
+          }
+        #2
+      }
+    \@@_tmp:w
+  }
+\@@_tmp:w
+  \atomicmassunit   { u }
+  \bar              { bar }
+  \barn             { b }
+  \bohr
+    {
+      \exp_not:N \text
+        { \exp_not:N \ensuremath { a } } \char_generate:nn { `\_ } { 8 } { 0 }
+    }
+  \clight
+    {
+      \exp_not:N \text
+        { \exp_not:N \ensuremath { c } } \char_generate:nn { `\_ } { 8 } { 0 }
+    }
+  \electronmass
+    {
+      \exp_not:N \text { \exp_not:N \ensuremath { m } }
+      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { e } }
+    }
+  \elementarycharge { \text { \ensuremath { e } } }
+  \hartree
+    {
+      \exp_not:N \text { \exp_not:N \ensuremath { E } }
+      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { h } }
+    }
+  \knot             { kn }
+  \mmHg             { mmHg }
+  \nauticalmile     { M }
+  \planckbar
+    { \exp_not:N \text { \exp_not:N \ensuremath { \exp_not:N \hbar } } }
+  \q_recursion_tail { }
+  \q_recursion_stop
+\@ifpackageloaded { fontspec }
+  {
+    \@@_tmp:w \angstrom { \@@_non_latin:n { "00C5 } }
+  }
+  {
+    \@@_tmp:w \angstrom
+      { \exp_not:N \text { \@@_non_latin:n { "00C5 } } }
+  }
+  \q_recursion_tail { }
+  \q_recursion_stop
+%    \end{macrocode}
+%
+% \begin{macro}{\celsius}
+%   Deprecated but should work.
+%    \begin{macrocode}
+\siunitx_declare_unit:Nn \celsius { \degreeCelsius }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Symbol commands}
+%
+% \begin{macro}
+%   {
+%     \SIUnitSymbolAngstrom  ,
+%     \SIUnitSymbolArcminute ,
+%     \SIUnitSymbolArcsecond ,
+%     \SIUnitSymbolCelsius   ,
+%     \SIUnitSymbolDegree    ,
+%     \SIUnitSymbolMicro     ,
+%     \SIUnitSymbolOhm
+%   }
+%     The same setup as elsewhere but localised to the emulation module
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \cs_new_protected:Npn \SIUnitSymbolArcminute
+       { \ensuremath { { } ' } }
+    \cs_new_protected:Npn \SIUnitSymbolArcsecond
+       { \ensuremath { { } '' } }
+    \@ifpackageloaded { fontspec }
+      {
+        \cs_new_protected:Npe \SIUnitSymbolAngstrom
+           { \@@_non_latin:n { "00C5 } }
+        \cs_new_protected:Npe \SIUnitSymbolDegree
+           { \@@_non_latin:n { "00B0 } }
+        \cs_new_protected:Npe \SIUnitSymbolCelsius
+           { \@@_non_latin:n { "00B0 } C }
+      }
+      {
+        \cs_new_protected:Npe \SIUnitSymbolAngstrom
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00C5 } }
+          }
+        \cs_new_protected:Npe \SIUnitSymbolCelsius
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00B0 } } C
+          }
+        \cs_new_protected:Npe \SIUnitSymbolDegree
+          {
+            \siunitx_print_text:n
+              { \@@_non_latin:n { "00B0 } }
+          }
+      }
+    \cs_new_protected:Npe \SIUnitSymbolMicro
+       {
+          \siunitx_print_text:n
+            {
+              \bool_lazy_or:nnTF
+                { \sys_if_engine_luatex_p: }
+                { \sys_if_engine_xetex_p: }
+                { \@@_non_latin:n { "00B5 } }
+                { \exp_not:N \textmu }
+            }
+       }
+    \cs_new_protected:Npe \SIUnitSymbolOhm
+       {
+         \exp_not:N \TextOrMath
+            {
+              \siunitx_print_text:n
+                {
+                  \bool_lazy_or:nnTF
+                    { \sys_if_engine_luatex_p: }
+                    { \sys_if_engine_xetex_p: }
+                    { \@@_non_latin:n { "03A9 } }
+                    { \exp_not:N \textohm }
+                }
+            }
+            {
+              \cs_if_exist:NTF \upOmega
+                { \exp_not:N \upOmega }
+                { \exp_not:N \Omega }
+            }
+       }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Preamble commands}
 %
 % \begin{macro}{\DeclareBinaryPrefix}
 %   We simply drop |#3|.
@@ -947,179 +1116,6 @@
   }
 %    \end{macrocode}
 % \end{macro}
-%
-% \subsection{Symbol commands}
-%
-%    \begin{macrocode}
-%<@@=siunitx_emulation>
-%    \end{macrocode}
-%
-% \begin{macro}{\@@_non_latin:n}
-%   A shortcut.
-%    \begin{macrocode}
-\cs_new:Npn \@@_non_latin:n #1
-  { \codepoint_generate:nn {#1} { \char_value_catcode:n {#1} } }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}
-%   {
-%     \SIUnitSymbolAngstrom  ,
-%     \SIUnitSymbolArcminute ,
-%     \SIUnitSymbolArcsecond ,
-%     \SIUnitSymbolCelsius   ,
-%     \SIUnitSymbolDegree    ,
-%     \SIUnitSymbolMicro     ,
-%     \SIUnitSymbolOhm
-%   }
-%     The same setup as elsewhere but localised to the emulation module
-%    \begin{macrocode}
-\AtBeginDocument
-  {
-    \cs_new_protected:Npn \SIUnitSymbolArcminute
-       { \ensuremath { { } ' } }
-    \cs_new_protected:Npn \SIUnitSymbolArcsecond
-       { \ensuremath { { } '' } }
-    \@ifpackageloaded { fontspec }
-      {
-        \cs_new_protected:Npe \SIUnitSymbolAngstrom
-           { \@@_non_latin:n { "00C5 } }
-        \cs_new_protected:Npe \SIUnitSymbolDegree
-           { \@@_non_latin:n { "00B0 } }
-        \cs_new_protected:Npe \SIUnitSymbolCelsius
-           { \@@_non_latin:n { "00B0 } C }
-      }
-      {
-        \cs_new_protected:Npe \SIUnitSymbolAngstrom
-          {
-            \siunitx_print_text:n
-              { \@@_non_latin:n { "00C5 } }
-          }
-        \cs_new_protected:Npe \SIUnitSymbolCelsius
-          {
-            \siunitx_print_text:n
-              { \@@_non_latin:n { "00B0 } } C
-          }
-        \cs_new_protected:Npe \SIUnitSymbolDegree
-          {
-            \siunitx_print_text:n
-              { \@@_non_latin:n { "00B0 } }
-          }
-      }
-    \cs_new_protected:Npe \SIUnitSymbolMicro
-       {
-          \siunitx_print_text:n
-            {
-              \bool_lazy_or:nnTF
-                { \sys_if_engine_luatex_p: }
-                { \sys_if_engine_xetex_p: }
-                { \@@_non_latin:n { "00B5 } }
-                { \exp_not:N \textmu }
-            }
-       }
-    \cs_new_protected:Npe \SIUnitSymbolOhm
-       {
-         \exp_not:N \TextOrMath
-            {
-              \siunitx_print_text:n
-                {
-                  \bool_lazy_or:nnTF
-                    { \sys_if_engine_luatex_p: }
-                    { \sys_if_engine_xetex_p: }
-                    { \@@_non_latin:n { "03A9 } }
-                    { \exp_not:N \textohm }
-                }
-            }
-            {
-              \cs_if_exist:NTF \upOmega
-                { \exp_not:N \upOmega }
-                { \exp_not:N \Omega }
-            }
-       }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \subsection{Unit commands}
-%
-% \begin{macro}{\celsius}
-%   Deprecated but should work.
-%    \begin{macrocode}
-\siunitx_declare_unit:Nn \celsius { \degreeCelsius }
-%    \end{macrocode}
-% \end{macro}
-%
-% Units that have been removed: to avoid issues, we mark them as deprecated.
-%    \begin{macrocode}
-\msg_new:nnn { siunitx } { unit-deprecated }
-  {
-    Unit~macro~#1~has~been~deprecated~in~this~release. \\ \\
-    The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
-    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit\ %
-    in~your~source.~The~current~definition~is\\ \\
-    \token_to_str:N \DeclareSIUnit #1 \{ #2 \}
-  }
-\cs_gset_protected:Npn \@@_tmp:w #1#2
-  {
-    \quark_if_recursion_tail_stop:N #1
-    \bool_new:c { g_@@_unit_warning_ \token_to_str:N #1 _bool }
-    \siunitx_declare_unit:Ne #1
-      {
-        \exp_not:N \bool_if:NF
-          \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
-          {
-            \exp_not:N \bool_gset_true:N 
-              \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
-            \msg_warning:nnnn { siunitx } { unit-deprecated }
-              { \token_to_str:N #1 } {#2}
-          }
-        #2
-      }
-    \@@_tmp:w
-  }
-\@@_tmp:w
-  \atomicmassunit   { u }
-  \bar              { bar }
-  \barn             { b }
-  \bohr
-    {
-      \exp_not:N \text
-        { \exp_not:N \ensuremath { a } } \char_generate:nn { `\_ } { 8 } { 0 }
-    }
-  \clight
-    {
-      \exp_not:N \text
-        { \exp_not:N \ensuremath { c } } \char_generate:nn { `\_ } { 8 } { 0 }
-    }
-  \electronmass
-    {
-      \exp_not:N \text { \exp_not:N \ensuremath { m } }
-      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { e } }
-    }
-  \elementarycharge { \text { \ensuremath { e } } }
-  \hartree
-    {
-      \exp_not:N \text { \exp_not:N \ensuremath { E } }
-      \char_generate:nn { `\_ } { 8 } { \exp_not:N \mathrm { h } }
-    }
-  \knot             { kn }
-  \mmHg             { mmHg }
-  \nauticalmile     { M }
-  \planckbar
-    { \exp_not:N \text { \exp_not:N \ensuremath { \exp_not:N \hbar } } }
-  \q_recursion_tail { }
-  \q_recursion_stop
-\@ifpackageloaded { fontspec }
-  {
-    \@@_tmp:w \angstrom { \@@_non_latin:n { "00C5 } }
-  }
-  {
-    \@@_tmp:w \angstrom
-      { \exp_not:N \text { \@@_non_latin:n { "00C5 } } }
-  }
-  \q_recursion_tail { }
-  \q_recursion_stop
-%    \end{macrocode}
 %
 % \subsection{Communication with \pkg{pgf}}
 %
