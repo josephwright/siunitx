@@ -13,14 +13,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Option "final-digit-group-min-size" (see issue
   [\#850](https://github.com/josephwright/siunitx/issues/850))
 - `\duration` command and supporting options:
-    - `duration-mode`
-    - `duration-unit-hour`
-    - `duration-unit-minute`
-    - `duration-unit-second`
-    - `duration-separator`
-    - `fill-duration-hours`
-    - `fill-duration-minutes`
-    - `fill-duration-seconds`
+  - `duration-mode`
+  - `duration-unit-hour`
+  - `duration-unit-minute`
+  - `duration-unit-second`
+  - `duration-separator`
+  - `fill-duration-hours`
+  - `fill-duration-minutes`
+  - `fill-duration-seconds`
+- Options `disable-deprecated-commands` and `disable-deprecated-options` (see
+  issue [\#528](https://github.com/josephwright/siunitx/issues/528))
 
 ### Changed
 

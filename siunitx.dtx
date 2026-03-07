@@ -192,10 +192,25 @@
 %
 % \subsection{Load time options}
 %
-% \begin{variable}{\l_@@_list_tl, \l_@@_product_tl, \l_@@_column_type_tl}
+% \begin{variable}
+%   {
+%     \l_@@_v2_options_bool ,
+%     \l_@@_v2_cmds_bool    ,
+%     \l_@@_list_tl         ,
+%     \l_@@_product_tl      ,
+%     \l_@@_column_type_tl
+%   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
   {
+    disable-deprecated-options .bool_set:N =
+      \l_@@_disable_options_bool ,
+    disable-deprecated-options .usage:n =
+      load ,
+    disable-deprecated-commands .bool_set:N =
+      \l_@@_disable_cmds_bool ,
+    disable-deprecated-commands .usage:n =
+      load ,
     list-input-separator .tl_set:N =
       \l_@@_list_tl ,
     list-input-separator .usage:n =
@@ -211,9 +226,11 @@
   }
 \keys_set:nn { siunitx }
   {
-    list-input-separator    = ; ,
-    product-input-separator = x ,
-    table-column-type       = S
+    disable-deprecated-options  = false ,
+    disable-deprecated-commands = false ,
+    list-input-separator        = ; ,
+    product-input-separator     = x ,
+    table-column-type           = S 
   }
 %    \end{macrocode}
 % \end{variable}
@@ -252,6 +269,21 @@
 %    \begin{macrocode}
 \ProcessKeyOptions
 %    \end{macrocode}
+%
+% \begin{macro}{\@@_option_deprecated:nn}
+% \begin{macro}{\@@_option_deprecated:nnn}
+%   Rather than list all of the older options, simply redirect to a warning.
+%    \begin{macrocode}
+\bool_if:NT \l_@@_disable_options_bool
+  {
+    \cs_set_protected:Npn \@@_option_deprecated:nn #1#2
+      { \@@_option_removed:n {#1} }
+    \cs_set_protected:Npn \@@_option_deprecated:nnn #1#2#3
+      { \@@_option_removed:n {#1} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %    \begin{macrocode}
 %</options>
