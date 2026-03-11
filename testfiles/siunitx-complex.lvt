@@ -231,18 +231,10 @@
 \cs_set_protected:Npn \test:n #1
   {
     \hbox_set:Nn \l_tmpa_box
-      {
-        \siunitx_complex_quantity:nn {#1} { \metre }
-      }
+      { \siunitx_complex_quantity:nn {#1} { \metre } }
     \box_show:N \l_tmpa_box
   }
 \TIMO
-
-\TEST { Option~setting~"prefix-mode" }
-  {
-    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
-    \test:n { 1 + 2i }
-  }
 
 \TEST { Option~setting~"exponent-mode" }
   {
@@ -306,6 +298,20 @@
     \test:n { \siunitx_complex_number:nn { 1 } { 30 } }
     \test:n { \siunitx_complex_quantity:nn { 1 + i } { \metre } }
     \test:n { \siunitx_complex_quantity:nnn { 1 } { 30 } { \metre } }
+  }
+
+\TEST { Option~setting~"prefix-mode" }
+  {
+    \OMIT
+    \cs_set_protected:Npn \test:n #1
+      {
+        \hbox_set:Nn \l_tmpa_box
+          { \siunitx_complex_quantity:nn {#1} { \metre } }
+        \box_show:N \l_tmpa_box
+      }
+    \TIMO
+    \keys_set:nn { siunitx } { prefix-mode = combine-exponent }
+    \test:n { 1 + 2i }
   }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
