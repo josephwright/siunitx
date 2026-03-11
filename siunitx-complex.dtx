@@ -252,9 +252,19 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_suppress_non_polar:}
-%   Pre-compilation of keys to suppress input not suitable for polar form.
+% \begin{macro}{\@@_suppress_negative:, \@@_suppress_non_polar:}
+%   Pre-compilation of keys to suppress special treatment of negative values
+%   and input not suitable for polar form.
 %    \begin{macrocode}
+\keys_precompile:nnN
+  { siunitx }
+  {
+    bracket-negative-numbers = false ,
+    negative-color           =
+  }
+  \l_@@_tmp_tl
+\cs_new_protected:Npe \@@_suppress_negative:
+  { \exp_not:V \l_@@_tmp_tl }
 \keys_precompile:nnN
   { siunitx }
   {
@@ -730,6 +740,7 @@
     \bool_if:NTF \l_siunitx_number_parse_bool
       {
         \group_begin:
+          \@@_suppress_negative:
           \@@_expand:n {#1}
           \bool_if:NTF \l_@@_force_polar_bool
             {
@@ -772,8 +783,11 @@
           { \@@_convert_cartesian:nn {#1} {#2} }
       }
       {
-        \@@_parse_polar:nn {#1} {#2}
-        \@@_format_polar:n { }
+        \group_begin:
+          \@@_suppress_negative:
+          \@@_parse_polar:nn {#1} {#2}
+          \@@_format_polar:n { }
+        \group_end:
       }
   }
 \cs_new_protected:Npn \siunitx_complex_quantity:nn #1#2
@@ -781,6 +795,7 @@
     \bool_if:NTF \l_siunitx_number_parse_bool
       {
         \group_begin:
+          \@@_suppress_negative:
           \@@_expand:n {#1}
           \bool_if:NTF \l_@@_force_polar_bool
             {
@@ -822,8 +837,11 @@
           {#3}
       }
       {
-        \@@_parse_polar:nn {#1} {#2}
-        \@@_format_polar:n {#3}
+        \group_begin:
+          \@@_suppress_negative:
+          \@@_parse_polar:nn {#1} {#2}
+          \@@_format_polar:n {#3}
+        \group_end:
       }
   }
 %    \end{macrocode}

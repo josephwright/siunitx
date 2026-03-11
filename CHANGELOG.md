@@ -29,6 +29,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Switch internally from `x`- to `e`-type expansion exclusively
   (requires `expl3` 2023-10-10 or later)
 
+### Fixed
+
+- Suppress brackets and negative color for complex values (see issue
+  [\#853](https://github.com/josephwright/siunitx/issues/853))
+
 ## [v3.4.14] - 2025-07-09
 
 ### Fixed
