@@ -252,6 +252,23 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{macro}{\@@_suppress_non_polar:}
+%   Pre-compilation of keys to suppress input not suitable for polar form.
+%    \begin{macrocode}
+\keys_precompile:nnN
+  { siunitx }
+  {
+    input-comparators       = ,
+    input-exponent-markers  = ,
+    input-open-uncertainty  = ,
+    input-close-uncertainty =
+  }
+  \l_@@_tmp_tl
+\cs_new_protected:Npe \@@_suppress_non_polar:
+  { \exp_not:V \l_@@_tmp_tl }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{variable}
 %   {
 %     \l_@@_root_after_bool      ,
@@ -675,13 +692,7 @@
       { \siunitx_number_parse:nN {#1} \l_@@_mag_tl }
       { \tl_set:Nn \l_@@_mag_tl { \ensuremath {#1} } }
     \group_begin:
-      \keys_set:nn { siunitx }
-        {
-          input-comparators       = ,
-          input-exponent-markers  = ,
-          input-open-uncertainty  = ,
-          input-close-uncertainty =
-        }
+      \@@_suppress_non_polar:
       \siunitx_number_format:nN {#2} \l_@@_angle_tl
     \exp_args:NNNV \group_end:
     \tl_set:Nn \l_@@_angle_tl \l_@@_angle_tl
