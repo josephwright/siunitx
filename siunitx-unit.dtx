@@ -2382,6 +2382,7 @@
 \cs_new_protected:Npn \@@_format_qualifier:
   {
     \bool_set_false:N \l_@@_current_script_bool
+    \bool_set_false:N \l_@@_bracket_bool
     \use:c
       {
         @@_format_qualifier_
@@ -2401,6 +2402,9 @@
       }
   }
 \cs_new_protected:Npn \@@_format_qualifier_combine: { }
+%    \end{macrocode}
+%   Extra work is needed here to see if we need to add brackets.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_qualifier_phrase:
   {
     \@@_format_font:
@@ -2409,6 +2413,14 @@
         \exp_not:V \l_@@_qualifier_phrase_tl
         \exp_not:V \l_siunitx_unit_font_tl
           { \exp_not:V \l_@@_part_tl }
+      }
+    \tl_set:Ne \l_@@_tmp_tl
+      { power - \int_use:N \l_@@_position_int }
+    \prop_get:NVNT \l_@@_parsed_prop \l_@@_tmp_tl
+      \l_@@_tmp_tl
+      {
+        \int_compare:nNnF \l_@@_tmp_tl = 1
+          { \bool_set_true:N \l_@@_bracket_bool }
       }
   }
 \cs_new_protected:Npn \@@_format_qualifier_subscript:

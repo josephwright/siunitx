@@ -33,6 +33,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Suppress brackets and negative color for complex values (see issue
   [\#853](https://github.com/josephwright/siunitx/issues/853))
+- Application of brackets to qualifiers in `phrase` mode when a power is present
+  (see issue [\#854](https://github.com/josephwright/siunitx/issues/854))
 
 ## [v3.4.14] - 2025-07-09
 
