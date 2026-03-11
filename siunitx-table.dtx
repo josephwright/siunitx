@@ -859,10 +859,10 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_auto_round_bool,
-%     \l_@@_model_setup_tl ,
-%     \l_@@_align_mode_tl  ,
-%     \l_@@_align_number_tl
+%     \l_@@_auto_round_bool ,
+%     \l_@@_model_setup_tl  ,
+%     \l_@@_align_mode_str  ,
+%     \l_@@_align_number_str
 %   }
 %   Options for tables with defined space.
 %    \begin{macrocode}
@@ -872,7 +872,7 @@
       { table-number-alignment = #1 , table-text-alignment = #1 },
     table-alignment-mode .choices:nn =
       { none , format , marker }
-      { \tl_set_eq:NN \l_@@_align_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_align_mode_str \l_keys_choice_str } ,
     table-auto-round .bool_set:N =
       \l_@@_auto_round_bool ,
     table-format .code:n =
@@ -885,16 +885,16 @@
           \l_@@_model_tl
           \l_@@_after_model_tl
         \@@_generate_model:V \l_@@_model_tl
-        \tl_set:Nn \l_@@_align_mode_tl { format }
+        \tl_set:Nn \l_@@_align_mode_str { format }
       } ,
     table-model-setup .tl_set:N =
       \l_@@_model_setup_tl ,
     table-number-alignment .choices:nn =
       { center , left , right }
-      { \tl_set_eq:NN \l_@@_align_number_tl \l_keys_choice_tl }
+      { \str_set_eq:NN \l_@@_align_number_str \l_keys_choice_str }
   }
-\tl_new:N \l_@@_align_mode_tl
-\tl_new:N \l_@@_align_number_tl
+\str_new:N \l_@@_align_mode_str
+\str_new:N \l_@@_align_number_str
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1029,12 +1029,12 @@
           { \@@_print_text:n }
           {
             \m@th
-            \use:c { @@_direct_ \l_@@_align_mode_tl : }
+            \use:c { @@_direct_ \l_@@_align_mode_str : }
           }
       }
   }
 \cs_new_protected:Npn \@@_direct_end:
-  { \use:c { @@_direct_ \l_@@_align_mode_tl _end: } }
+  { \use:c { @@_direct_ \l_@@_align_mode_str _end: } }
 %    \end{macrocode}
 %   When centring the content about a decimal marker, the trick is
 %   to collect everything into two boxes and then compare the sizes.
@@ -1127,7 +1127,7 @@
       \c_math_toggle_token
       \@@_fil:
     \hbox_set_end:
-    \use:c { @@_align_ \l_@@_align_number_tl :n }
+    \use:c { @@_align_ \l_@@_align_number_str :n }
       {
         \box_use_drop:N \l_@@_integer_box
         \box_use_drop:N \l_@@_decimal_box
@@ -1233,7 +1233,7 @@
 % \begin{macro}{\@@_print_none:nnn}
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print:nnn #1#2#3
-  { \use:c { @@_print_ \l_@@_align_mode_tl :nnn } {#1} {#2} {#3} }
+  { \use:c { @@_print_ \l_@@_align_mode_str :nnn } {#1} {#2} {#3} }
 \cs_generate_variant:Nn \@@_print:nnn { VVV }
 %    \end{macrocode}
 %   When centering on the decimal marker, alignment is relatively simple, and
@@ -1365,7 +1365,7 @@
         #3
         \@@_fil:
       }
-    \use:c { @@_align_ \l_@@_align_number_tl :n }
+    \use:c { @@_align_ \l_@@_align_number_str :n }
       {
         \box_use_drop:N \l_@@_before_box
         \box_use_drop:N \l_@@_integer_box
@@ -1705,7 +1705,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_print_none:nnn #1#2#3
   {
-    \use:c { @@_align_ \l_@@_align_number_tl :n }
+    \use:c { @@_align_ \l_@@_align_number_str :n }
       {
         #1
         \siunitx_number_format:nN {#2} \l_@@_tmp_tl

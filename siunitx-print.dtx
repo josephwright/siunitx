@@ -362,9 +362,9 @@
 % \begin{variable}
 %   {
 %     \l_@@_number_color_tl   ,
-%     \l_@@_number_mode_tl    ,
+%     \l_@@_number_mode_str   ,
 %     \l_@@_unit_color_tl     ,
-%     \l_@@_unit_mode_tl      ,
+%     \l_@@_unit_mode_str     ,
 %     \l_@@_math_font_bool    ,
 %     \l_@@_math_version_bool ,
 %     \l_@@_math_family_bool  ,
@@ -376,8 +376,8 @@
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
-\tl_new:N \l_@@_number_mode_tl
-\tl_new:N \l_@@_unit_mode_tl
+\str_new:N \l_@@_number_mode_str
+\str_new:N \l_@@_unit_mode_str
 \keys_define:nn { siunitx }
   {
     color .meta:n =
@@ -389,8 +389,8 @@
     number-mode .choices:nn =
       { match , math , text }
       {
-        \tl_set_eq:NN
-          \l_@@_number_mode_tl \l_keys_choice_tl
+        \str_set_eq:NN
+          \l_@@_number_mode_str \l_keys_choice_str
       } ,
     propagate-math-font .bool_set:N =
       \l_@@_math_font_bool ,
@@ -417,8 +417,8 @@
     unit-mode .choices:nn =
       { match , math , text }
       {
-        \tl_set_eq:NN
-          \l_@@_unit_mode_tl \l_keys_choice_tl
+        \str_set_eq:NN
+          \l_@@_unit_mode_str \l_keys_choice_str
       }
   }
 %    \end{macrocode}
@@ -487,12 +487,12 @@
 \cs_new_protected:Npn \@@_number:n #1
   {
     \bool_if:NTF \l_siunitx_number_parse_bool
-      { \use:c { siunitx_print_ \l_@@_number_mode_tl :n } }
+      { \use:c { siunitx_print_ \l_@@_number_mode_str :n } }
       { \siunitx_print_math:n }
         {#1}
   }
 \cs_new_protected:Npn \@@_unit:n #1
-  { \use:c { siunitx_print_ \l_@@_unit_mode_tl :n } {#1} }
+  { \use:c { siunitx_print_ \l_@@_unit_mode_str :n } {#1} }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

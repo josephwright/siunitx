@@ -2120,17 +2120,17 @@
 %     \l_@@_drop_exponent_bool     ,
 %     \l_@@_drop_uncertainty_bool  ,
 %     \l_@@_drop_zero_decimal_bool ,
-%     \l_@@_exponent_mode_tl       ,
+%     \l_@@_exponent_mode_str      ,
 %     \l_@@_exponent_fixed_int     ,
 %     \l_@@_min_decimal_int        ,
 %     \l_@@_min_integer_int        ,
-%     \l_@@_round_dir_tl           ,
+%     \l_@@_round_dir_str          ,
 %     \l_@@_round_half_even_bool   ,
-%     \l_@@_round_mode_tl          ,
+%     \l_@@_round_mode_str         ,
 %     \l_@@_round_pad_bool         ,
 %     \l_@@_round_precision_int    ,
 %     \l_@@_round_positive_bool    ,
-%     \l_@@_round_uncert_dir_tl
+%     \l_@@_round_uncert_dir_str
 %   }
 %    \begin{macrocode}
 \keys_define:nn { siunitx }
@@ -2143,7 +2143,7 @@
       \l_@@_drop_zero_decimal_bool ,
     exponent-mode .choices:nn =
       { engineering , fixed , input , scientific , threshold }
-      { \tl_set_eq:NN \l_@@_exponent_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_exponent_mode_str \l_keys_choice_str } ,
     exponent-thresholds .code:n =
       { \@@_set_thresholds:n {#1} } ,
     fixed-exponent .int_set:N =
@@ -2154,7 +2154,7 @@
       \l_@@_min_integer_int ,
     round-direction .choices:nn =
       { down , nearest , up }
-      { \tl_set_eq:NN \l_@@_round_dir_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_round_dir_str \l_keys_choice_str } ,
     round-half .choice: ,
     round-half / even .code:n =
       { \bool_set_true:N \l_@@_round_half_even_bool } ,
@@ -2164,7 +2164,7 @@
       { \@@_set_round_min:n {#1} } ,
     round-mode .choices:nn =
       { figures , none , places, uncertainty }
-      { \tl_set_eq:NN \l_@@_round_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_round_mode_str \l_keys_choice_str } ,
     round-pad .bool_set:N =
       \l_@@_round_pad_bool ,
     round-precision .int_set:N =
@@ -2173,13 +2173,13 @@
       \l_@@_round_positive_bool ,
     uncertainty-round-direction .choices:nn =
       { down , nearest , up }
-      { \tl_set_eq:NN \l_@@_round_uncert_dir_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_round_uncert_dir_str \l_keys_choice_str } ,
   }
 \bool_new:N \l_@@_round_half_even_bool
-\tl_new:N \l_@@_exponent_mode_tl
-\tl_new:N \l_@@_round_dir_tl
-\tl_new:N \l_@@_round_mode_tl
-\tl_new:N \l_@@_round_uncert_dir_tl
+\str_new:N \l_@@_exponent_mode_str
+\str_new:N \l_@@_round_dir_str
+\str_new:N \l_@@_round_mode_str
+\str_new:N \l_@@_round_uncert_dir_str
 %    \end{macrocode}
 % \end{variable}
 %
@@ -2358,7 +2358,7 @@
   {
     \tl_set:Ne #2
       { \exp_after:wN \@@_exponent:nnnnnnn #1 }
-    \str_if_eq:VnT \l_@@_exponent_mode_tl { engineering }
+    \str_if_eq:VnT \l_@@_exponent_mode_str { engineering }
       {
         \tl_set:Ne #2
           { \exp_after:wN \@@_exponent_engineering_aux:nnnnnnn #2 }
@@ -2366,7 +2366,7 @@
   }
 \cs_new:Npn \@@_exponent:nnnnnnn #1#2#3#4#5#6#7
   {
-    \str_if_eq:VnTF \l_@@_exponent_mode_tl { input }
+    \str_if_eq:VnTF \l_@@_exponent_mode_str { input }
       { \exp_not:n { {#1} {#2} {#3} {#4} {#5} {#6} {#7} } }
       {
         \tl_if_blank:nTF {#7}
@@ -2376,7 +2376,7 @@
   }
 \cs_new:Npn \@@_exponent_aux:nnnnnnn #1#2#3#4#5#6#7
   {
-    \use:c {  @@_exponent_ \l_@@_exponent_mode_tl :nnnnnnn }
+    \use:c {  @@_exponent_ \l_@@_exponent_mode_str :nnnnnnn }
       {#1} {#2} {#3} {#4} {#5} {#6} {#7}
   }
 \cs_new:Npn \@@_exponent_fixed:nnnnnnn #1#2#3#4#5#6#7
@@ -2797,7 +2797,7 @@
   {
     \bool_if:NT \l_@@_drop_exponent_bool
       {
-        \str_if_eq:VnT \l_@@_exponent_mode_tl { input }
+        \str_if_eq:VnT \l_@@_exponent_mode_str { input }
           { \msg_warning:nn { siunitx } { ambiguous-dropped-exponent } }
         \tl_set:Ne #2
           { \exp_after:wN \@@_drop_exponent:nnnnnnn #1 }
@@ -2838,7 +2838,7 @@
   {
     \tl_set:Ne #2
       {
-        \str_if_eq:VnTF \l_@@_round_mode_tl { none }
+        \str_if_eq:VnTF \l_@@_round_mode_str { none }
           { \exp_not:V #1 }
           { \exp_after:wN \@@_round:nnnnnnn #1 }
        }
@@ -2852,11 +2852,11 @@
       {
         \str_if_eq:nnTF {#4} { \empty }
           {
-            \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn }
+            \use:c { @@_round_ \l_@@_round_mode_str :nnnnnnn }
               {#1} {#2} {#3} { }
           }
           {
-            \use:c { @@_round_ \l_@@_round_mode_tl :nnnnnnn }
+            \use:c { @@_round_ \l_@@_round_mode_str :nnnnnnn }
               {#1} {#2} {#3} {#4}
           }
             {#5} {#6} {#7}
@@ -2920,7 +2920,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round:nnn #1#2#3
   {
-    \@@_round:Vnnn \l_@@_round_dir_tl
+    \@@_round:Vnnn \l_@@_round_dir_str
       {#1} {#2} {#3}
   }
 \cs_generate_variant:Nn \@@_round:nnn { e }
@@ -3182,11 +3182,11 @@
 \cs_new:Npn \@@_round_final_shift:nn #1#2
   {
     \bool_lazy_or:nnTF
-      { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
-      { \str_if_eq_p:Vn \l_@@_round_mode_tl { places } }
+      { \str_if_eq_p:Vn \l_@@_round_mode_str { figures } }
+      { \str_if_eq_p:Vn \l_@@_round_mode_str { places } }
       {
         \use:c
-          { @@_round_ \l_@@_exponent_mode_tl :nn }
+          { @@_round_ \l_@@_exponent_mode_str :nn }
           {#1} {#2}
       }
       { {#1} {#2} }
@@ -3198,7 +3198,7 @@
       {
         \bool_lazy_and:nnTF
           { \int_compare_p:nNn \l_@@_round_precision_int = 1 }
-          { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
+          { \str_if_eq_p:Vn \l_@@_round_mode_str { figures } }
           { { 1 } { } }
           { \@@_round_engineering:NNNNn #1 {#2} }
         \@@_round_final_shift:Nw 3
@@ -3226,7 +3226,7 @@
   {
     \bool_lazy_and:nnTF
       { \int_compare_p:nNn \l_@@_round_precision_int = 1 }
-      { \str_if_eq_p:Vn \l_@@_round_mode_tl { figures } }
+      { \str_if_eq_p:Vn \l_@@_round_mode_str { figures } }
       { { 1 } { } }
       {
         \@@_exponent_shift:nne
@@ -3253,7 +3253,7 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_round_truncate:n #1
   {
-    \str_if_eq:VnTF \l_@@_round_mode_tl { figures }
+    \str_if_eq:VnTF \l_@@_round_mode_str { figures }
       { \@@_round_truncate_direct:n {#1} }
       {#1}
   }
@@ -3592,7 +3592,7 @@
       {
         \exp_not:N \@@_round_uncertainty:nnnnnn
           \@@_round:Vnnn
-            \l_@@_round_uncert_dir_tl {#1} { } {#4}
+            \l_@@_round_uncert_dir_str {#1} { } {#4}
             {#2} {#3} {#1} {#4}
       }
   }
@@ -3693,7 +3693,7 @@
     {#1} {#2}
   }
 \cs_new:Npn \@@_round_uncertainty_auxvi:nn #1#2
-  { \use:c { @@_round_ \l_@@_exponent_mode_tl :nn } {#1} {#2} }
+  { \use:c { @@_round_ \l_@@_exponent_mode_str :nn } {#1} {#2} }
 %    \end{macrocode}
 %   If there was a rounding up in the uncertainty, there is a bit more to do.
 %    \begin{macrocode}
@@ -3701,17 +3701,17 @@
   {
     \bool_lazy_any:nTF
       {
-        { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { engineering } }
-        { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { scientific } }
+        { \str_if_eq_p:Vn \l_@@_exponent_mode_str { engineering } }
+        { \str_if_eq_p:Vn \l_@@_exponent_mode_str { scientific } }
         {
           \bool_lazy_and_p:nn
-            { \str_if_eq_p:Vn \l_@@_exponent_mode_tl { threshold } }
+            { \str_if_eq_p:Vn \l_@@_exponent_mode_str { threshold } }
             { ! \@@_if_threshold_exceeded_p:n {#5#6} }
           }
         }
         {
           \use:c
-            { @@_round_uncertainty_ \l_@@_exponent_mode_tl :nnn }
+            { @@_round_uncertainty_ \l_@@_exponent_mode_str :nnn }
             {#1}
         }
         {
@@ -3725,7 +3725,7 @@
     \use:c
       {
          @@_round_uncertainty_
-         \l_@@_exponent_mode_tl _
+         \l_@@_exponent_mode_str _
 	     \tl_count:n {#1}
          :n
       }
@@ -3886,7 +3886,7 @@
 %      \l_@@_exponent_product_tl      ,
 %      \l_@@_group_size_int           ,
 %      \l_@@_group_first_int          ,
-%      \l_@@_group_min_int          ,
+%      \l_@@_group_min_int            ,
 %      \l_@@_group_decimal_bool       ,
 %      \l_@@_group_integer_bool       ,
 %      \l_@@_group_minimum_int        ,
@@ -3896,10 +3896,10 @@
 %      \l_@@_output_uncert_close_tl   ,
 %      \l_@@_output_uncert_open_tl    ,
 %      \l_@@_uncert_break_bool        ,
-%      \l_@@_uncert_desc_mode_tl      ,
+%      \l_@@_uncert_desc_mode_str     ,
 %      \l_@@_uncert_desc_separator_tl ,
 %      \l_@@_uncert_desc_clist        ,
-%      \l_@@_uncert_mode_tl           ,
+%      \l_@@_uncert_mode_str          ,
 %      \l_@@_uncert_separator_tl      ,
 %      \l_@@_uncert_simplify_bool     ,
 %      \l_@@_tight_bool               ,
@@ -3990,14 +3990,14 @@
       \l_@@_tight_bool ,
     uncertainty-descriptor-mode .choices:nn =
       { bracket , bracket-separator , separator , subscript }
-      { \tl_set_eq:NN \l_@@_uncert_desc_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_uncert_desc_mode_str \l_keys_choice_str } ,
     uncertainty-descriptor-separator .tl_set:N =
       \l_@@_uncert_desc_separator_tl ,
     uncertainty-descriptors .clist_set:N =
       \l_@@_uncert_desc_clist ,
     uncertainty-mode .choices:nn =
       { compact , compact-marker , full , separate }
-      { \tl_set_eq:NN \l_@@_uncert_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_@@_uncert_mode_str \l_keys_choice_str } ,
     uncertainty-separator .tl_set:N =
       \l_@@_uncert_separator_tl ,
     zero-decimal-as-symbol .bool_set:N =
@@ -4006,8 +4006,8 @@
   }
 \bool_new:N \l_@@_group_decimal_bool
 \bool_new:N \l_@@_group_integer_bool
-\tl_new:N \l_@@_uncert_desc_mode_tl
-\tl_new:N \l_@@_uncert_mode_tl
+\str_new:N \l_@@_uncert_desc_mode_str
+\str_new:N \l_@@_uncert_mode_str
 %    \end{macrocode}
 % \end{variable}
 %
@@ -4141,7 +4141,7 @@
   {
     \bool_lazy_all:nT
       {
-        { \str_if_eq_p:Vn \l_@@_uncert_mode_tl { separate } }
+        { \str_if_eq_p:Vn \l_@@_uncert_mode_str { separate } }
         { \l_siunitx_number_bracket_ambiguous_bool }
         { ! \tl_if_blank_p:n {#1} }
         {
@@ -4541,7 +4541,7 @@
   {
     \use:c { @@_output_uncert_ #3 _loop:nnn } {#1} {#2} {#7}
     \tl_if_blank:nF {#5}
-      { \use:c { @@_output_uncert_desc_ \l_@@_uncert_desc_mode_tl :n } {#5} }
+      { \use:c { @@_output_uncert_desc_ \l_@@_uncert_desc_mode_str :n } {#5} }
    \@@_output_uncert_loop:nnN {#1} {#2} #4
      \q_recursion_tail #6 , \q_recursion_stop
   }
@@ -4634,12 +4634,12 @@
 %    \begin{macrocode}
 \cs_new:Npn \@@_output_uncert_S:nnnn #1#2#3#4
   {
-    \str_if_eq:VnTF \l_@@_uncert_mode_tl { separate }
+    \str_if_eq:VnTF \l_@@_uncert_mode_str { separate }
       { \@@_output_uncert_S_sep:nnnn {#1} {#2} {#3} {#4} }
       {
         \exp_not:V \l_@@_uncert_separator_tl
         \exp_not:V \l_@@_output_uncert_open_tl
-        \use:c { @@_output_uncert_S_ \l_@@_uncert_mode_tl :nn } {#1} {#4}
+        \use:c { @@_output_uncert_S_ \l_@@_uncert_mode_str :nn } {#1} {#4}
         \exp_not:V \l_@@_output_uncert_close_tl
         \@@_output_uncertainty_unaligned:n {#2}
       }

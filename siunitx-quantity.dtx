@@ -172,13 +172,14 @@
 %
 % \begin{variable}
 %   {
-%     \l_siunitx_quantity_prefix_mode_tl ,
-%     \l_@@_break_bool                   ,
-%     \l_@@_product_tl                   ,
-%     \l_@@_uncert_bracket_bool          ,
+%     \l_siunitx_quantity_prefix_mode_str ,
+%     \l_@@_break_bool                    ,
+%     \l_@@_product_tl                    ,
+%     \l_@@_uncert_bracket_bool           ,
 %     \l_@@_uncert_repeat_bool
 %   }
 %    \begin{macrocode}
+\str_new:N \l_siunitx_quantity_prefix_mode_str
 \tl_new:N \l_siunitx_quantity_prefix_mode_tl
 \bool_new:N \l_@@_uncert_bracket_bool
 \bool_new:N \l_@@_uncert_repeat_bool
@@ -188,7 +189,7 @@
       \l_@@_break_bool ,
     prefix-mode .choices:nn =
       { combine-exponent , extract-exponent , input }
-      { \tl_set_eq:NN \l_siunitx_quantity_prefix_mode_tl \l_keys_choice_tl } ,
+      { \str_set_eq:NN \l_siunitx_quantity_prefix_mode_str \l_keys_choice_str } ,
     quantity-product .tl_set:N =
       \l_@@_product_tl ,
     separate-uncertainty-units .choice: ,
@@ -266,7 +267,7 @@
   {
     \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
-    \use:c { @@_parsed_ \l_siunitx_quantity_prefix_mode_tl :n } {#2}
+    \use:c { @@_parsed_ \l_siunitx_quantity_prefix_mode_str :n } {#2}
     \tl_set:Ne \l_@@_number_tl
       { \siunitx_number_output:NN \l_@@_number_tl \q_nil }
     \exp_after:wN \@@_parsed_aux:w \l_@@_number_tl \q_stop
