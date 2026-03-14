@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.0] - 2026-03-14
+
 ### Added
 
 - Option "final-digit-group-min-size" (see issue
@@ -2688,7 +2690,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.4.14...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.0...HEAD
+[v3.5.0]: https://github.com/josephwright/siunitx/compare/v3.4.14...v3.5.0
 [v3.4.14]: https://github.com/josephwright/siunitx/compare/v3.4.13...v3.4.14
 [v3.4.13]: https://github.com/josephwright/siunitx/compare/v3.4.12...v3.4.13
 [v3.4.12]: https://github.com/josephwright/siunitx/compare/v3.4.11...v3.4.12
