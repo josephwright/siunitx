@@ -623,7 +623,11 @@
       }
   }
 \cs_new:Npn \@@_convert_series:n #1
-  { \tl_use:c { l_@@_version_ #1 _tl } }
+  {
+    \tl_if_exist:cTF { l_@@_version_ #1 _tl }
+      { \tl_use:c { l_@@_version_ #1 _tl } }
+      { \msg_expandable_error:nnn { siunitx } { unknown-series } {#1} }
+  }
 \cs_generate_variant:Nn \@@_convert_series:n { v }
 \cs_new_protected:Npn \@@_math_auxi:n #1
   {
@@ -1112,6 +1116,13 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+%
+% \subsection{Messages}
+%
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { unknown-series }
+  { Unknown~font~series~"#1"! }
+%    \end{macrocode}
 %
 % \subsection{Standard settings for module options}
 %

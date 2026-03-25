@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Issue controlled warning for unknown font series (see
+  issue [\#856](https://github.com/josephwright/siunitx/issues/856))
+
 ## [v3.5.0] - 2026-03-14
 
 ### Added
