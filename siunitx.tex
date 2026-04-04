@@ -2495,7 +2495,7 @@ which apply in addition to the general ones set up for number processing.
       duration-symbol-hour   & Literal & \cs{hour}    \\
       duration-symbol-minute & Literal & \cs{minute}  \\
       duration-symbol-second & Literal & \cs{second}  \\
-      duration-separator     & Literal & \meta{empty} \\
+      duration-separator     & Literal & \verb*"\ "   \\
       fill-duration-hours    & Switch  & false        \\
       fill-duration-minutes  & Switch  & false        \\
       fill-duration-seconds  & Switch  & false        \\
@@ -2504,10 +2504,10 @@ which apply in addition to the general ones set up for number processing.
 \end{table}
 
 \DescribeOption{duration-mode}
-The format in which angles are printed can be set using the \opt{angle-mode}
-option. With the standard setting (\opt{input}), the angle is printed as-given.
-By setting the option to \opt{arc} or \opt{decimal}, the output format can
-be set to an arc (degrees/minutes/seconds) or decimal value. Conversion uses
+The format in which durations are printed can be set using the \opt{duration-mode}
+option. With the standard setting (\opt{input}), the duration is printed as-given.
+By setting the option to \opt{component} or \opt{decimal}, the output format can
+be set to a component (hours/minutes/seconds) or decimal value. Conversion uses
 the \LaTeX3 floating-point unit, so is limited to $16$ decimal places.
 \begin{LaTeXdemo}
   \duration{8.56}    \\
@@ -2517,24 +2517,24 @@ the \LaTeX3 floating-point unit, so is limited to $16$ decimal places.
   \duration[duration-mode = decimal]{8.56}      \\
   \duration[duration-mode = decimal]{8;33;36}   \\
 \end{LaTeXdemo}
-When integer angles are converted to component format, the presence of minute
+When integer durations are converted to component format, the presence of minute
 and second components is controlled by the options \opt{fill-duration-minutes}
 and \opt{fill-duration-seconds} (see below).
 
 \DescribeOption{duration-separator}
-When angles are printed in component format, the separation of the different
+When durations are printed in component format, the separation of the different
 parts is set up using the \opt{duration-separator} option.
 \begin{LaTeXdemo}
   \duration{6;7;6.5} \\
-  \duration[duration-separator = \,]{6;7;6.5}
+  \duration[duration-separator = {, }]{6;7;6.5}
 \end{LaTeXdemo}
 
 \DescribeOption{fill-duration-hours}
 \DescribeOption{fill-duration-minutes}
 \DescribeOption{fill-duration-seconds}
-Zero-filling for the hour, minute or second parts of components is controlled
-using the \opt{fill-angle-degrees}, \opt{fill-angle-minutes} and
-\opt{fill-angle-seconds} options. All are off as standard.
+Zero-filling for the hour, minute or second components of durations is controlled
+using the \opt{fill-duration-hours}, \opt{fill-duration-minutes} and
+\opt{fill-duration-seconds} options. All are off as standard.
 \begin{LaTeXdemo}
   \duration{1;;} \\
   \duration{;2;} \\
@@ -2562,9 +2562,9 @@ using the \opt{fill-angle-degrees}, \opt{fill-angle-minutes} and
 \DescribeOption{duration-unit-hour}
 \DescribeOption{duration-unit-minute}
 \DescribeOption{duration-unit-second}
-With the standard settings, the symbols used for arc angles are the unit
-commands \cs{hour}, \cs{minute} and \cs{second}. These can be altered using
-\opt{duration-unit-degree}, \opt{duration-unit-minute} and
+With the standard settings, the units used for durations are the commands
+\cs{hour}, \cs{minute} and \cs{second}. These can be altered using
+\opt{duration-unit-hour}, \opt{duration-unit-minute} and
 \opt{duration-unit-second}.
 \begin{LaTeXdemo}
   \duration{1;3;4.5} \\
