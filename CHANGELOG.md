@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.3] - 2026-04-09
+
 ### Changed
 
 - Remove `siunitx-v2.dtx` source
@@ -2707,7 +2709,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.2...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.3...HEAD
+[v3.5.3]: https://github.com/josephwright/siunitx/compare/v3.5.2...v3.5.3
 [v3.5.2]: https://github.com/josephwright/siunitx/compare/v3.5.1...v3.5.2
 [v3.5.1]: https://github.com/josephwright/siunitx/compare/v3.5.0...v3.5.1
 [v3.5.0]: https://github.com/josephwright/siunitx/compare/v3.4.14...v3.5.0
