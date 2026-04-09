@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Remove `siunitx-v2.dtx` source
+
 ## [v3.5.2] - 2026-04-07
 
 ### Fixed
