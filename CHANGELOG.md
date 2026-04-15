@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.4] - 2026-04-15
+
 ### Fixed
 
 - Correct override of per-unit options by user settings (see
@@ -2714,7 +2716,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.3...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.4...HEAD
+[v3.5.4]: https://github.com/josephwright/siunitx/compare/v3.5.3...v3.5.4
 [v3.5.3]: https://github.com/josephwright/siunitx/compare/v3.5.2...v3.5.3
 [v3.5.2]: https://github.com/josephwright/siunitx/compare/v3.5.1...v3.5.2
 [v3.5.1]: https://github.com/josephwright/siunitx/compare/v3.5.0...v3.5.1
