@@ -964,6 +964,14 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{variable}{\l_@@_active_opts_str}
+%   Tracks which unit, if any, is currently \enquote{live} for applied
+%   options.
+%    \begin{macrocode}
+\str_new:N \l_@@_active_opts_str
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\siunitx_unit_options_apply:n}
 %   Options apply only if they have not already been set at this group
 %   level.
@@ -974,8 +982,12 @@
       {
         \tl_if_exist:cT { l_@@_options_ \token_to_str:N #1 _tl }
           {
-            \keys_set:nv { siunitx }
-              { l_@@_options_ \token_to_str:N #1 _tl }
+            \str_if_eq:VnF \l_@@_active_opts_str {#1}
+              {
+                \keys_set:nv { siunitx }
+                  { l_@@_options_ \token_to_str:N #1 _tl }
+                \str_set:Nn \l_@@_active_opts_str {#1}
+              }
           }
       }
   }

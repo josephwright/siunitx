@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Correct override of per-unit options by user settings (see
+  issue [\#863](https://github.com/josephwright/siunitx/issues/863))
+
 ## [v3.5.3] - 2026-04-09
 
 ### Changed
