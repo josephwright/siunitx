@@ -1620,7 +1620,11 @@
 \cs_new_protected:Npn \@@_print_format_auxxiii:w
   #1 \q_nil #2 \q_mark #3 \q_nil #4 \q_stop
   {
-    \tl_if_blank:nF {#2}
+    \tl_if_blank:nTF {#2}
+      {
+        \tl_if_blank:nF {#4}
+          { \msg_warning:nn { siunitx } { table-exponent-space } }
+      }
       {
         \@@_print_model_box:Nn \l_@@_tmp_box { { } #1#2 }
         \dim_set:Nn \l_@@_tmp_dim { \box_wd:N \l_@@_tmp_box }
@@ -1725,6 +1729,11 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+%
+%    \begin{macrocode}
+\msg_new:nnn { siunitx } { table-exponent-space }
+  { Insufficient~space~reserved~for~tabular~exponent~\msg_line_context: }
+%    \end{macrocode}
 %
 % \subsection{Standard settings for module options}
 %
