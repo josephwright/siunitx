@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.5] - 2026-05-15
+
 ### Changed
 
 - Warn if tabular column contains an exponent part but no reserved space for an
@@ -2722,7 +2724,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.5...HEAD
+[v3.5.5]: https://github.com/josephwright/siunitx/compare/v3.5.4...v3.5.5
 [v3.5.4]: https://github.com/josephwright/siunitx/compare/v3.5.3...v3.5.4
 [v3.5.3]: https://github.com/josephwright/siunitx/compare/v3.5.2...v3.5.3
 [v3.5.2]: https://github.com/josephwright/siunitx/compare/v3.5.1...v3.5.2
