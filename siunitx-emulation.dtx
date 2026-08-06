@@ -864,28 +864,30 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% Units that have been removed: to avoid issues, we mark them as deprecated.
+% Units that have been removed: to avoid issues, we mark them as variable
+% in status.
 %    \begin{macrocode}
-\msg_new:nnn { siunitx } { unit-deprecated }
+\msg_new:nnn { siunitx } { non-SI-unit }
   {
-    Unit~macro~#1~has~been~deprecated~in~this~release. \\ \\
-    The~BIPM~have~removed~this~unit~from~the~SI~Brochure.~
-    You~should~define~it~yourself~using~\token_to_str:N \DeclareSIUnit\ %
+    The~BIPM~deprecated~various~non-SI~units~in~the~9th~edition~of~the~SI~
+    Brochure;~some~of~these~were~reintroduced~in~the~June~2026~update.\\
+    As~the~status~here~may~vary,~it~is~strongly~recommended~that~you~define~
+    the~unit~macro~#1~yourself~using~\token_to_str:N \DeclareSIUnit\ %
     in~your~source.~The~current~definition~is\\ \\
     \token_to_str:N \DeclareSIUnit #1 \{ #2 \}
   }
 \cs_set_protected:Npn \@@_tmp:w #1#2
   {
     \quark_if_recursion_tail_stop:N #1
-    \bool_new:c { g_@@_unit_warning_ \token_to_str:N #1 _bool }
+    \bool_new:c { g_@@_unit_info_ \token_to_str:N #1 _bool }
     \siunitx_declare_unit:Ne #1
       {
         \exp_not:N \bool_if:NF
-          \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
+          \exp_not:c { g_@@_unit_info_ \token_to_str:N #1 _bool  }
           {
             \exp_not:N \bool_gset_true:N 
-              \exp_not:c { g_@@_unit_warning_ \token_to_str:N #1 _bool  }
-            \msg_warning:nnnn { siunitx } { unit-deprecated }
+              \exp_not:c { g_@@_unit_info_ \token_to_str:N #1 _bool  }
+            \msg_info:nnnn { siunitx } { non-SI-unit }
               { \token_to_str:N #1 } {#2}
           }
         #2

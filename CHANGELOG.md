@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Revise message for non-SI unit macros following June 2026 BIPM update (see issue
+  [\#878](https://github.com/josephwright/siunitx/issues/878))
+
 ## [v3.5.5] - 2026-05-15
 
 ### Changed
