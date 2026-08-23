@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.6] - 2026-08-23
+
 ### Changed
 
 - Revise message for non-SI unit macros following June 2026 BIPM update (see issue
@@ -2729,7 +2731,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.6...HEAD
+[v3.5.6]: https://github.com/josephwright/siunitx/compare/v3.5.5...v3.5.6
 [v3.5.5]: https://github.com/josephwright/siunitx/compare/v3.5.4...v3.5.5
 [v3.5.4]: https://github.com/josephwright/siunitx/compare/v3.5.3...v3.5.4
 [v3.5.3]: https://github.com/josephwright/siunitx/compare/v3.5.2...v3.5.3
