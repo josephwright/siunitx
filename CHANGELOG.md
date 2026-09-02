@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.7] - 2026-09-02
+
 ### Fixed
 
 - Avoid runaway argument if a multiple uncertainty contains one or more zeros
@@ -2736,7 +2738,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.6...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.7...HEAD
+[v3.5.7]: https://github.com/josephwright/siunitx/compare/v3.5.6...v3.5.7
 [v3.5.6]: https://github.com/josephwright/siunitx/compare/v3.5.5...v3.5.6
 [v3.5.5]: https://github.com/josephwright/siunitx/compare/v3.5.4...v3.5.5
 [v3.5.4]: https://github.com/josephwright/siunitx/compare/v3.5.3...v3.5.4
