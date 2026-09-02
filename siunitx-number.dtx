@@ -1826,7 +1826,7 @@
 %     \@@_parse_uncert_marker:nnnnnnN ,
 %     \@@_parse_uncert_marker:ennnnnN
 %   }
-% \begin{macro}{\@@_parse_uncert_after:N}
+% \begin{macro}{\@@_parse_uncert_after:N, \@@_parse_uncert_after_aux:N}
 %   Parsing a combined uncertainty has a very restricted range of allowed
 %   tokens. A closing uncertainty token in the first place is an error,
 %   so we filter that out explicitly. After that, we check for digits,
@@ -2053,28 +2053,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_after:N #1
   {
-    \tl_set:Ne \l_@@_uncert_tl
-      {
-        \exp_not:V \l_@@_uncert_tl
-        \tl_if_empty:NF \l_@@_partial_tl
-          {
-            {
-              \tl_if_empty:NTF \l_@@_tolerance_tl
-                { \exp_not:V \l_@@_partial_tl }
-                {
-                  { \exp_not:V \l_@@_tolerance_tl }
-                  { \exp_not:V \l_@@_partial_tl }
-                }
-              }
-          }
-      }
-    \tl_set:Ne \l_@@_uncert_types_tl
-      {
-        \l_@@_uncert_types_tl
-        \tl_if_empty:NTF \l_@@_tolerance_tl
-          { S }
-          { A }
-      }
+    \tl_if_empty:NF \l_@@_partial_tl
+      { \@@_parse_uncert_after_aux:N #1 }
     \tl_clear:N \l_@@_partial_tl
     \tl_clear:N \l_@@_tolerance_tl
     \quark_if_recursion_tail_stop_do:Nn #1
@@ -2097,6 +2077,28 @@
     \tl_if_in:NnTF \l_@@_input_uncert_open_tl {#1}
       { \@@_parse_uncert:N }
       { \@@_parse_loop_break:w }
+  }
+\cs_new_protected:Npn \@@_parse_uncert_after_aux:N #1
+  {
+    \tl_set:Ne \l_@@_uncert_tl
+      {
+        \exp_not:V \l_@@_uncert_tl
+        {
+          \tl_if_empty:NTF \l_@@_tolerance_tl
+            { \exp_not:V \l_@@_partial_tl }
+            {
+              { \exp_not:V \l_@@_tolerance_tl }
+              { \exp_not:V \l_@@_partial_tl }
+            }
+        }
+      }
+    \tl_set:Ne \l_@@_uncert_types_tl
+      {
+        \l_@@_uncert_types_tl
+        \tl_if_empty:NTF \l_@@_tolerance_tl
+          { S }
+          { A }
+      }
   }
 %    \end{macrocode}
 % \end{macro}
