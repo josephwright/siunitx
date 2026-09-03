@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Support LaTeXe robust commands in tabular cell units (see issue
+  [\#880](https://github.com/josephwright/siunitx/issues/880))
+
 ## [v3.5.7] - 2026-09-02
 
 ### Fixed

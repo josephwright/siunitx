@@ -205,13 +205,24 @@
     \bool_if:NT \l_@@_create_bool
       { \@@_create: }
 %    \end{macrocode}
-%   At the beginning of table cells and inside \texttt{x}-type expansion,
-%   all symbolic units need to have \emph{some} definition. 
+%   At the beginning of table cells and inside \texttt{e}-type expansion,
+%   all symbolic units need to have \emph{some} definition. For \LaTeXe{}
+%   robust commands, we cover the internal command so that things work
+%   in tabular cells.
 %    \begin{macrocode}
     \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
       {
-        \cs_if_free:NT ##1
+        \cs_if_free:NTF ##1
           { \cs_set_protected:Npn ##1 { \ERROR } }
+          {
+            \cs_if_exist:cT { \cs_to_str:N ##1 \c_space_tl }
+              {
+                \exp_args:Nc \siunitx_declare_unit:Nn
+                 { \cs_to_str:N ##1 \c_space_tl } {##1}
+                \seq_put_right:Ne \l_siunitx_unit_symbolic_seq
+                  { \exp_not:c { \cs_to_str:N ##1 \c_space_tl } }
+              }
+          }
       }
 %    \end{macrocode}
 %   Where the \pkg{soulpos} package is loaded \emph{after} \pkg{siunitx}, the
