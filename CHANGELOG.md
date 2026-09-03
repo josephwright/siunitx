@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.8] - 2026-09-03
+
 ### Fixed
 
 - Support LaTeXe robust commands in tabular cell units (see issue
@@ -2743,7 +2745,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.7...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.8...HEAD
+[v3.5.8]: https://github.com/josephwright/siunitx/compare/v3.5.7...v3.5.8
 [v3.5.7]: https://github.com/josephwright/siunitx/compare/v3.5.6...v3.5.7
 [v3.5.6]: https://github.com/josephwright/siunitx/compare/v3.5.5...v3.5.6
 [v3.5.5]: https://github.com/josephwright/siunitx/compare/v3.5.4...v3.5.5
