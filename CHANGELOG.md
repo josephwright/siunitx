@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Adjust `tabularray` support (see issue [\#883](https://github.com/josephwright/siunitx/issues/883))
+
 ## [v3.5.8] - 2026-09-03
 
 ### Fixed
