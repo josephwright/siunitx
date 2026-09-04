@@ -388,7 +388,8 @@
 % \begin{macro}
 %   {
 %     \siunitx_quantity_print:nn, \siunitx_quantity_print:nV,
-%     \siunitx_quantity_print:VV, \siunitx_quantity_print:eV
+%     \siunitx_quantity_print:VV, \siunitx_quantity_print:eV,
+%     \@@_print:nn
 %   }
 % \begin{macro}{\@@_print_unit:n}
 % \begin{macro}{\@@_print_mathchoice:Nnnnn}
@@ -399,9 +400,24 @@
 %   spacing are always applied: the number argument may be empty. The lazy test
 %   here is looking for the case where a |1| has been inserted at the start of
 %   a format unit \emph{and} we have some other number to print: the |1| is
-%   then removed and there is no space inserted.
+%   then removed and there is no space inserted. Where both parts are present
+%   and everything is in math mode, we switch here to ensure that the entire
+%   output is a single math block for tagging, \foreign{etc}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \siunitx_quantity_print:nn #1#2
+  {
+    \bool_lazy_all:nTF
+      {
+        { \str_if_eq_p:Vn \l_siunitx_number_mode_str { math } }
+        { \str_if_eq_p:Vn \l_siunitx_unit_mode_str { math } }
+        { ! \tl_if_blank_p:n {#1} }
+        { ! \tl_if_blank_p:n {#2} }
+      }
+      { \ensuremath }
+      { \use:n }
+        { \@@_print:nn {#1} {#2} }
+  }
+\cs_new_protected:Npn \@@_print:nn #1#2
   {
     \siunitx_print_number:n {#1}
     \tl_if_blank:nF {#2}

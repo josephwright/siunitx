@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
+
 ## [v3.5.10] - 2026-09-05
 
 ### Fixed
