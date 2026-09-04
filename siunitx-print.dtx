@@ -364,6 +364,13 @@
 %
 % \subsection{Printing routines}
 %
+% \begin{variable}{\l_@@_unit_bool}
+%   To track for intent.
+%    \begin{macrocode}
+\bool_new:N \l_@@_unit_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}
 %   {
 %     \l_@@_number_color_tl      ,
@@ -491,13 +498,17 @@
   }
 \cs_new_protected:Npn \@@_number:n #1
   {
+    \bool_set_false:N \l_@@_unit_bool
     \bool_if:NTF \l_siunitx_number_parse_bool
       { \use:c { siunitx_print_ \l_siunitx_number_mode_str :n } }
       { \siunitx_print_math:n }
         {#1}
   }
 \cs_new_protected:Npn \@@_unit:n #1
-  { \use:c { siunitx_print_ \l_siunitx_unit_mode_str :n } {#1} }
+  {
+    \bool_set_true:N \l_@@_unit_bool
+    \use:c { siunitx_print_ \l_siunitx_unit_mode_str :n } {#1}
+  }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -591,7 +602,7 @@
 % \begin{macro}{\@@_math_auxviii:w}
 % \begin{macro}{\@@_math_auxix:Nn}
 % \begin{macro}{\@@_math_sub:n, \@@_math_super:n, \@@_math_script:n}
-% \begin{macro}{\@@_math_ensure:n}
+% \begin{macro}{\@@_math_ensure:n, \@@_math_ensure_aux:n}
 %   The first step in setting in math mode is to check on the math version.
 %   The starting point is the question of whether text series needs to
 %   propagate to math mode: if so, check on the mapping, otherwise check on
@@ -805,14 +816,21 @@
       \tl_use:N \l_@@_tmp_tl
     \group_end:
   }
+%    \end{macrocode}
+%   MathML intent is applied at the last moment such that it's inside the math
+%   mode.
+%    \begin{macrocode}
 \cs_new_protected:Npn \@@_math_ensure:n #1
   {
-    \tl_if_blank:nF {#1}
-      {
-        \mode_if_math:TF
-          {#1}
-          { $ #1 $ }
-      }
+    \bool_if:NTF \l_@@_unit_bool
+      { \@@_math_ensure_aux:n { \MathMLintent { :unit } {#1} } }
+      { \@@_math_ensure_aux:n {#1} }
+  }
+\cs_new_protected:Npn \@@_math_ensure_aux:n #1
+  {
+    \mode_if_math:TF
+      {#1}
+      { $ #1 $ }
   }
 %    \end{macrocode}
 %   For \pkg{tex4ht}, we need to have category code $12$ |^| tokens in math

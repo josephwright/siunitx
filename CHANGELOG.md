@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
+- MathML intent to unit output (where available)
 
 ## [v3.5.10] - 2026-09-05
 
