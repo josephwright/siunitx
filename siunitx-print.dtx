@@ -140,6 +140,11 @@
 %   empty after a single expansion.
 % \end{function}
 %
+% \begin{variable}{\l_siunitx_number_mode_str, \l_siunitx_unit_mode_str}
+%   Record the mode used to print output: a choice of |match|, |math|, or
+%   |text|.
+% \end{variable}
+%
 % \begin{function}{color}
 %   \begin{syntax}
 %     |color| = \meta{color}
@@ -361,23 +366,23 @@
 %
 % \begin{variable}
 %   {
-%     \l_@@_number_color_tl   ,
-%     \l_@@_number_mode_str   ,
-%     \l_@@_unit_color_tl     ,
-%     \l_@@_unit_mode_str     ,
-%     \l_@@_math_font_bool    ,
-%     \l_@@_math_version_bool ,
-%     \l_@@_math_family_bool  ,
-%     \l_@@_text_font_tl      ,
-%     \l_@@_text_sub_tl       ,
-%     \l_@@_text_super_tl     ,
+%     \l_@@_number_color_tl      ,
+%     \l_siunitx_number_mode_str ,
+%     \l_@@_unit_color_tl        ,
+%     \l_siunitx_unit_mode_str   ,
+%     \l_@@_math_font_bool       ,
+%     \l_@@_math_version_bool    ,
+%     \l_@@_math_family_bool     ,
+%     \l_@@_text_font_tl         ,
+%     \l_@@_text_sub_tl          ,
+%     \l_@@_text_super_tl        ,
 %     \l_@@_math_series_bool
 %   }
 %   Options which apply to the main formatting routine, and so are not tied
 %   to either symbolic or literal input.
 %    \begin{macrocode}
-\str_new:N \l_@@_number_mode_str
-\str_new:N \l_@@_unit_mode_str
+\str_new:N \l_siunitx_number_mode_str
+\str_new:N \l_siunitx_unit_mode_str
 \keys_define:nn { siunitx }
   {
     color .meta:n =
@@ -390,7 +395,7 @@
       { match , math , text }
       {
         \str_set_eq:NN
-          \l_@@_number_mode_str \l_keys_choice_str
+          \l_siunitx_number_mode_str \l_keys_choice_str
       } ,
     propagate-math-font .bool_set:N =
       \l_@@_math_font_bool ,
@@ -418,7 +423,7 @@
       { match , math , text }
       {
         \str_set_eq:NN
-          \l_@@_unit_mode_str \l_keys_choice_str
+          \l_siunitx_unit_mode_str \l_keys_choice_str
       }
   }
 %    \end{macrocode}
@@ -487,12 +492,12 @@
 \cs_new_protected:Npn \@@_number:n #1
   {
     \bool_if:NTF \l_siunitx_number_parse_bool
-      { \use:c { siunitx_print_ \l_@@_number_mode_str :n } }
+      { \use:c { siunitx_print_ \l_siunitx_number_mode_str :n } }
       { \siunitx_print_math:n }
         {#1}
   }
 \cs_new_protected:Npn \@@_unit:n #1
-  { \use:c { siunitx_print_ \l_@@_unit_mode_str :n } {#1} }
+  { \use:c { siunitx_print_ \l_siunitx_unit_mode_str :n } {#1} }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

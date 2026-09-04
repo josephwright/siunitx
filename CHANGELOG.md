@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
+
 ### Changed
 
 - Automatically adjust output decimal marker based on BCP-47 data (see issue
