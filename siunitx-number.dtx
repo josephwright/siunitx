@@ -2882,7 +2882,12 @@
 %  \begin{macro}[EXP]{\@@_round_auxv:nnnN, \@@_round_auxvi:nnnN}
 %  \begin{macro}[EXP]{\@@_round_auxvii:nnnTF}
 %  \begin{macro}[EXP]{\@@_round_auxviii:nnN, \@@_round_auxix:nnN}
-%  \begin{macro}[EXP]{\@@_round_final_integer:nnw, \@@_round_final_decimal:nnw}
+%  \begin{macro}[EXP]
+%    {
+%      \@@_round_final_integer:nnw ,
+%      \@@_round_final_decimal:nnw ,
+%      \@@_round_final_decimal_trunc:nnw
+%    }
 %  \begin{macro}[EXP]
 %    {\@@_round_final_significant:n, \@@_round_final_significant:e}
 %  \begin{macro}[EXP]{\@@_round_final_significant:N}
@@ -3091,14 +3096,9 @@
             \bool_lazy_or:nnTF
               { \tl_if_blank_p:n {#1} }
               { \int_compare_p:nNn {#1} = { 0 } }
-              {
-                \@@_round_final_decimal:nnw
-                  {#1} { 1 \@@_round_truncate:n {#2} }
-              }
-              {
-                \@@_round_final_decimal:nnw
-                  {#1} { 1 #2 }
-              }
+              { \@@_round_final_decimal_trunc:nnw }
+              { \@@_round_final_decimal:nnw }
+                {#1} { 1 #2 }
           }
           {
             \@@_round_final:en
@@ -3140,6 +3140,23 @@
     \@@_round_final_output:ee
       { \tl_reverse:n {#1} }
       { \tl_reverse:n {#3} #2 }
+  }
+%    \end{macrocode}
+%   Additional checking is needed where dealing with potentially dropped
+%   trailing zeros.
+%    \begin{macrocode}
+\cs_new:Npn \@@_round_final_decimal_trunc:nnw
+  #1#2#3 \q_recursion_tail \q_recursion_stop
+  {
+    \@@_round_final_decimal:nnw {#1}
+      {
+        \str_if_eq:eeTF
+          {#3}
+          { \prg_replicate:nn { \tl_count:n {#3} } { 0 } }
+          { \@@_round_truncate:n {#2} }
+          {#2}
+      }
+      #3 \q_recursion_tail \q_recursion_stop
   }
 \cs_new:Npn \@@_round_final_integer:nnw
   #1#2#3 \q_recursion_tail \q_recursion_stop

@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Retention of trailing zeros when rounding to figures (see issue
+  [\#886](https://github.com/josephwright/siunitx/issues/886))
+
 ## [v3.5.9] - 2026-09-05
 
 ### Fixed
