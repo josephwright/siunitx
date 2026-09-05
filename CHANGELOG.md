@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.9] - 2026-09-05
+
 ### Fixed
 
 - Adjust `tabularray` support (see issue
@@ -2750,7 +2752,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.8...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.9...HEAD
+[v3.5.9]: https://github.com/josephwright/siunitx/compare/v3.5.8...v3.5.9
 [v3.5.8]: https://github.com/josephwright/siunitx/compare/v3.5.7...v3.5.8
 [v3.5.7]: https://github.com/josephwright/siunitx/compare/v3.5.6...v3.5.7
 [v3.5.6]: https://github.com/josephwright/siunitx/compare/v3.5.5...v3.5.6
