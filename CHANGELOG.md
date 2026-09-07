@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `\siunitx_quantity_parse:nnNN` (see issue
+  [\#864](https://github.com/josephwright/siunitx/issues/864))
+
 ### Changed
 
 - Automatically adjust output decimal marker based on BCP-47 data (see issue

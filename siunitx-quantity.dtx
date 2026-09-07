@@ -68,13 +68,28 @@
 % are made to standard set up in the latter to reflect additional functionality
 % added here.
 %
+% \begin{function}{\siunitx_quantity_parse:nnNN}
+%   \begin{syntax}
+%     \cs{siunitx_quantity_parse:nnNN} \Arg{number} \Arg{unit}
+%       \meta{number tl~var} \meta{unit tl~var}
+%   \end{syntax}
+%   Parses the \meta{number} and the \meta{unit} as detailed for
+%   \cs{siunitx_number_parse:nN} and \cs{siunitx_unit_format:nN},
+%   applies any exponent or prefix manipulation active, then stores
+%   the resulting number and unit in the two \meta{tl~vars}.
+%   The number is stored in the format described for
+%   \cs{siunitx_number_parse:nN}.
+% \end{function}
+%
 % \begin{function}{\siunitx_quantity:nn}
 %   \begin{syntax}
 %     \cs{siunitx_quantity:nn} \Arg{number} \Arg{unit}
 %   \end{syntax}
 %   Parses the \meta{number} and the \meta{unit} as detailed for
 %   \cs{siunitx_number_parse:nN} and \cs{siunitx_unit_format:nN},
-%   the prints the results using \cs{siunitx_print_unit:n}.
+%   applies any exponent or prefix manipulation active, then
+%   prints the results using \cs{siunitx_print_number:n} and
+%   \cs{siunitx_print_unit:n}.
 % \end{function}
 %
 % \begin{function}
@@ -228,7 +243,10 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\siunitx_quantity:nn, \@@_parsed:nn}
+% \begin{macro}{\siunitx_quantity_parse:nnNN}
+% \begin{macro}{\siunitx_quantity:nn}
+% \begin{macro}{\@@_parsed:NNnn}
+% \begin{macro}{\@@_parsed:nn}
 % \begin{macro}
 %   {
 %     \@@_parsed_combine-exponent:n,
@@ -245,14 +263,14 @@
 %   within this group we turn off bracketing in the number formatter: we
 %   have to deal with quantity-based brackets instead.
 %    \begin{macrocode}
-\cs_new_protected:Npn \siunitx_quantity:nn #1#2
+\cs_new_protected:Npn \siunitx_quantity_parse:nnNN #1#2#3#4
   {
     \group_begin:
       \siunitx_unit_options_apply:n {#2}
       \tl_if_blank:nTF {#1}
         {
+          \tl_clear:N \l_@@_number_tl
           \siunitx_unit_format:nN {#2} \l_@@_unit_tl
-          \siunitx_print_unit:V \l_@@_unit_tl
         }
         {
           \bool_if:NTF \l_siunitx_number_parse_bool
@@ -260,6 +278,33 @@
             {
               \tl_set:Nn \l_@@_number_tl { \ensuremath {#1} }
               \siunitx_unit_format:nN {#2} \l_@@_unit_tl
+            }
+        }
+      \tl_set:Ne \l_@@_tmp_tl
+        {
+          \tl_set:Nn \exp_not:N #3 { \exp_not:V \l_@@_number_tl }
+          \tl_set:Nn \exp_not:N #4 { \exp_not:V \l_@@_unit_tl }
+        }
+    \exp_after:wN \group_end:
+    \l_@@_tmp_tl
+  }
+\cs_new_protected:Npn \siunitx_quantity:nn #1#2
+  {
+    \group_begin:
+      \siunitx_unit_options_apply:n {#2}
+      \siunitx_quantity_parse:nnNN {#1} {#2}
+        \l_@@_number_tl \l_@@_unit_tl
+      \tl_if_empty:NTF \l_@@_number_tl
+        { \siunitx_print_unit:V \l_@@_unit_tl }
+        {
+          \bool_if:NTF \l_siunitx_number_parse_bool
+            {
+             \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
+              \tl_set:Ne \l_@@_number_tl
+                { \siunitx_number_output:NN \l_@@_number_tl \q_nil }
+              \exp_after:wN \@@_parsed_aux:w \l_@@_number_tl \q_stop
+            }
+            {
               \siunitx_quantity_print:VV
                 \l_@@_number_tl \l_@@_unit_tl
             }
@@ -274,12 +319,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parsed:nn #1#2
   {
-    \bool_set_false:N \l_siunitx_number_bracket_ambiguous_bool
     \siunitx_number_parse:nN {#1} \l_@@_number_tl
     \use:c { @@_parsed_ \l_siunitx_quantity_prefix_mode_str :n } {#2}
-    \tl_set:Ne \l_@@_number_tl
-      { \siunitx_number_output:NN \l_@@_number_tl \q_nil }
-    \exp_after:wN \@@_parsed_aux:w \l_@@_number_tl \q_stop
   }
 \cs_new_protected:cpn { @@_parsed_combine-exponent:n } #1
   {
@@ -362,6 +403,9 @@
       { \siunitx_quantity_print:nV { { } #2#3 } \l_@@_unit_tl }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
