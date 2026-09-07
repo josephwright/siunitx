@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - MathML intent to unit output (where available)
 - `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
+- `\siunitx_quantity_parse:nnNN` (see issue
+  [\#864](https://github.com/josephwright/siunitx/issues/864))
 
 ### Changed
 
