@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- `\siunitx_quantity_parse:nnNN` (see issue
+- `\siunitx_quantity_parse:nnNN`, `\siunitx_unit_parse:nN` (see issue
   [\#864](https://github.com/josephwright/siunitx/issues/864))
 
 ### Changed
