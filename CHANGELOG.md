@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- More support for `lua-unicode-math`
+
 ## [v3.5.11] - 2026-09-08
 
 ### Changed
