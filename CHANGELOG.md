@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.5.11] - 2026-09-08
+
 ### Changed
 
 - Better support for `lua-unicode-math`
@@ -2763,7 +2765,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.10...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.11...HEAD
+[v3.5.11]: https://github.com/josephwright/siunitx/compare/v3.5.10...v3.5.11
 [v3.5.10]: https://github.com/josephwright/siunitx/compare/v3.5.9...v3.5.10
 [v3.5.9]: https://github.com/josephwright/siunitx/compare/v3.5.8...v3.5.9
 [v3.5.8]: https://github.com/josephwright/siunitx/compare/v3.5.7...v3.5.8
