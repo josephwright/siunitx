@@ -95,6 +95,48 @@
 %
 % \subsection{Formatting units}
 %
+% \begin{function}{\siunitx_unit_parse:nN}
+%   \begin{syntax}
+%     \cs{siunitx_unit_parse:nN} \Arg{units} \meta{prop}
+%   \end{syntax}
+%   This function parses the input \meta{units} into a \meta{prop}
+%   which contains the appropriate output symbol(s) for each constituent
+%   part of each individual unit in the \meta{units}. The constituent
+%   parts are made up of
+%   \begin{itemize}
+%     \item \texttt{prefix-$n$} The symbol for the prefix which applies to this
+%       unit, \foreign{e.g.} for \cs{kilo} with (almost certainly) would be~|k|.
+%     \item \texttt{unit-$n$} The symbol for the unit itself, \foreign{e.g.}~for
+%       \cs{metre} with (almost certainly) would be~|m|.
+%     \item \texttt{power-$n$} The power which a unit is raised to.
+%     \item \texttt{qualifier-$n$} Any qualifier which applies to the current
+%       unit.
+%     \item \texttt{special-$n$} Any \enquote{special effect} to apply to the
+%       current unit.
+%     \item \texttt{command-$1$} The command corresponding to \texttt{unit-$n$}:
+%       needed to track base units; currently used for \cs{gram} only.
+%   \end{itemize}
+%   The \meta{prop} will also contain an entry for the \texttt{total-units}
+%   parsed~($n$).
+%
+%   For example,
+%   \begin{verbatim}
+%     \siunitx_unit_parse:nN { \joule \per \mole \per \kelvin } \l_tmpa_prop
+%   \end{verbatim}
+%   will, with standard settings, result in \cs{l_tmpa_prop} containing
+%   \begin{verbatim}
+%     >  {unit-1}  =>  {J}
+%     >  {unit-2}  =>  {mol}
+%     >  {unit-3}  =>  {K}
+%     >  {power-2}  =>  {-1}
+%     >  {power-3}  =>  {-1}
+%     >  {total-units}  =>  {3}.
+%   \end{verbatim}
+%   
+%   If the \meta{units} contain literals, no parsing takes place and the
+%   \meta{prop} will be empty.
+% \end{function}
+%
 % \begin{function}{\siunitx_unit_format:nN, \siunitx_unit_format:VN}
 %   \begin{syntax}
 %     \cs{siunitx_unit_format:nN} \Arg{units} \meta{tl~var}
@@ -755,6 +797,15 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}{\l_@@_setup_bool}
+%   To test if the setup has already taken place: needed so that parsing can
+%   be done independent of formatting without repeating the relatively
+%   expensive loop.
+%    \begin{macrocode}
+\bool_new:N \l_@@_setup_bool
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{variable}{\l_@@_test_bool}
 %   A switch used to indicate that the code is testing the input to find
 %   if there is any typeset output from individual unit macros. This is needed
@@ -1167,14 +1218,18 @@
     \group_begin:
       \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
         { \cs_set_eq:Nc ##1 { @@_ \token_to_str:N ##1 :w } }
+      \siunitx_unit_options_apply:n {#1}
+      \bool_set_true:N \l_@@_setup_bool
       \tl_clear:N \l_@@_formatted_tl
       \fp_zero:N \l_@@_prefix_fp
       \bool_if:NTF \l_@@_parse_bool
         {
           \@@_if_symbolic:nTF {#1}
             {
-              \@@_parse:n {#1}
-              \prop_if_empty:NF \l_@@_parsed_prop
+              \siunitx_unit_parse:nN {#1} \l_@@_parsed_prop
+              \prop_get:NnN \l_@@_parsed_prop { total-units } \l_@@_tmp_tl
+              \int_set:Nn \l_@@_position_int { \l_@@_tmp_tl }
+              \int_compare:nNnT \l_@@_position_int > 0
                 { \@@_format_parsed: }
             }
             {
@@ -1491,14 +1546,15 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{variable}{\l_@@_parsed_prop}
+% \begin{variable}{\g_@@_parsed_prop, \l_@@_parsed_prop}
 % \begin{variable}{\l_@@_per_bool}
 % \begin{variable}{\l_@@_position_int}
 %   Parsing units requires a small number of variables are available: a
 %   \texttt{prop} for the parsed units themselves, a \texttt{bool} to
 %   indicate if \cs{per} is active and an \texttt{int} to track how many units
-%   have be parsed.
+%   have be parsed. The global property list is needed for some group trickery.
 %    \begin{macrocode}
+\prop_new:N \g_@@_parsed_prop
 \prop_new:N \l_@@_parsed_prop
 \bool_new:N \l_@@_per_bool
 \int_new:N \l_@@_position_int
@@ -1507,25 +1563,48 @@
 % \end{variable}
 % \end{variable}
 %
-% \begin{macro}{\@@_parse:n}
+% \begin{macro}{\siunitx_unit_parse:nN, \@@_unit_parse:nN}
 %   The main parsing function is quite simple. After initialising the variables,
 %   each symbolic unit is set up. The input is then simply inserted into the
 %   input stream: the symbolic units themselves then do the real work of
 %   placing data into the parsing system. There is then a bit of tidying up to
-%   ensure that later stages can rely on the nature of the data here.
+%   ensure that later stages can rely on the nature of the data here. Everything
+%   needs to be done in a group, which means using a global export approach as
+%   |prop| cannot be serialized. This also means that the setup may need to be
+%   applied here if being used outside the context of unit formatting.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse:n #1
+\cs_new_protected:Npn \siunitx_unit_parse:nN #1#2
   {
-    \prop_clear:N \l_@@_parsed_prop
-    \bool_set_true:N \l_@@_parsing_bool
-    \bool_set_false:N \l_@@_per_bool
-    \bool_set_false:N \l_@@_test_bool
-    \int_zero:N \l_@@_position_int
-    \siunitx_unit_options_apply:n {#1}
-    #1
-    \int_step_inline:nn \l_@@_position_int
-      { \@@_parse_finalise:n {##1} }
-    \@@_parse_finalise:
+    \group_begin:
+      \bool_if:NTF \l_@@_setup_bool
+        { \@@_unit_parse:nN {#1} #2 }
+        {
+          \seq_map_inline:Nn \l_siunitx_unit_symbolic_seq
+            { \cs_set_eq:Nc ##1 { @@_ \token_to_str:N ##1 :w } }
+          \siunitx_unit_options_apply:n {#1}
+          \@@_if_symbolic:nTF {#1}
+            { \@@_unit_parse:nN {#1} #2 }
+            {
+              \group_end:
+              \prop_clear:N #2
+            }
+        }
+  }
+\cs_new_protected:Npn \@@_unit_parse:nN #1#2
+  {
+      \prop_clear:N \l_@@_parsed_prop
+      \bool_set_true:N \l_@@_parsing_bool
+      \bool_set_false:N \l_@@_per_bool
+      \bool_set_false:N \l_@@_test_bool
+      \int_zero:N \l_@@_position_int
+      #1
+      \int_step_inline:nn \l_@@_position_int
+        { \@@_parse_finalise:n {##1} }
+      \@@_parse_finalise:
+      \prop_put:NnV \l_@@_parsed_prop { total-units } \l_@@_position_int
+      \prop_gset_eq:NN \g_@@_parsed_prop \l_@@_parsed_prop
+    \group_end:
+    \prop_set_eq:NN #2 \g_@@_parsed_prop
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2105,7 +2184,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_format_multiply:
   {
-    \int_step_inline:nn { \prop_count:N \l_@@_parsed_prop  }
+    \prop_get:NnN \l_@@_parsed_prop { total-units } \l_@@_tmp_tl
+    \int_step_inline:nn { \l_@@_tmp_tl  }
       {
         \prop_get:NnNF \l_@@_parsed_prop { power- ##1 } \l_@@_tmp_tl
           { \tl_set:Nn \l_@@_tmp_tl { 1 } }
