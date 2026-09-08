@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - More support for `lua-unicode-math`
+- Adjust support for `\l_siunitx_quantity_prefix_mode_tl`
 
 ## [v3.5.11] - 2026-09-08
 
