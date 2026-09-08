@@ -217,59 +217,63 @@
 %   a mode-dependent definition. This doesn't work if the text mode symbol is
 %   bust: the \pkg{fourier} package puts us in that position.
 %    \begin{macrocode}
-    \@@_if_replace:NnT \ohm { "2126 }
+    \@ifpackageloaded { lua-unicode-math }
+      { }
       {
-        \tl_set:Ne \l_@@_tmpa_tl
+        \@@_if_replace:NnT \ohm { "2126 }
           {
-            \cs_if_exist:NTF \upOmega
-              { \exp_not:N \upOmega }
-              { \exp_not:N \Omega }
-          }
-        \tl_set:Ne \l_@@_tmpb_tl
-          {
-            \exp_not:N \text
-              { \exp_not:N \ensuremath { \exp_not:V \l_@@_tmpa_tl } }
-          }
-        \siunitx_declare_unit:Ne \ohm
-          {
-            \@ifpackageloaded { fourier }
+            \tl_set:Ne \l_@@_tmpa_tl
               {
-                \exp_not:N \ensuremath
-                  { \exp_not:V \l_@@_tmpa_tl }
+                \cs_if_exist:NTF \upOmega
+                  { \exp_not:N \upOmega }
+                  { \exp_not:N \Omega }
               }
+            \tl_set:Ne \l_@@_tmpb_tl
               {
-                \exp_not:N \TextOrMath
+                \exp_not:N \text
+                  { \exp_not:N \ensuremath { \exp_not:V \l_@@_tmpa_tl } }
+              }
+            \siunitx_declare_unit:Ne \ohm
+              {
+                \@ifpackageloaded { fourier }
                   {
-                    \bool_lazy_or:nnTF
-                      { \sys_if_engine_luatex_p: }
-                      { \sys_if_engine_xetex_p: }
-                      { \@@_non_latin:n { "2126 } }
-                      { \exp_not:N \textohm }
+                    \exp_not:N \ensuremath
+                      { \exp_not:V \l_@@_tmpa_tl }
                   }
                   {
-                    \@ifpackageloaded { fontspec }
-                      { \exp_not:V \l_@@_tmpb_tl }
+                    \exp_not:N \TextOrMath
                       {
-                        \bool_lazy_any:nTF
-                          {
-                            {
-                              \@ifclassloaded { beamer }
-                                \c_true_bool
-                                \c_false_bool
-                             }
-                             {
-                               \@ifpackageloaded { kmath }
-                                 \c_true_bool
-                                 \c_false_bool
-                              }
-                             {
-                               \@ifpackageloaded { mathastext }
-                                 \c_true_bool
-                                 \c_false_bool
-                              }
-                          }
+                        \bool_lazy_or:nnTF
+                          { \sys_if_engine_luatex_p: }
+                          { \sys_if_engine_xetex_p: }
+                          { \@@_non_latin:n { "2126 } }
+                          { \exp_not:N \textohm }
+                      }
+                      {
+                        \@ifpackageloaded { fontspec }
                           { \exp_not:V \l_@@_tmpb_tl }
-                          { \exp_not:V \l_@@_tmpa_tl }
+                          {
+                            \bool_lazy_any:nTF
+                              {
+                                {
+                                  \@ifclassloaded { beamer }
+                                    \c_true_bool
+                                    \c_false_bool
+                                 }
+                                 {
+                                   \@ifpackageloaded { kmath }
+                                     \c_true_bool
+                                     \c_false_bool
+                                  }
+                                 {
+                                   \@ifpackageloaded { mathastext }
+                                     \c_true_bool
+                                     \c_false_bool
+                                  }
+                              }
+                              { \exp_not:V \l_@@_tmpb_tl }
+                              { \exp_not:V \l_@@_tmpa_tl }
+                          }
                       }
                   }
               }
