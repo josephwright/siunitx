@@ -2683,13 +2683,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
-- Issue with localisation
+- Issue with localization
 
 ## [v2.0g] - 2010-06-28
 
 ### Added
 
-- First approach to localisation (issue [\#61](https://github.com/josephwright/siunitx/issues/61))
+- First approach to localization (issue [\#61](https://github.com/josephwright/siunitx/issues/61))
 - Restore 'bracket-numbers' option (issue [\#65](https://github.com/josephwright/siunitx/issues/65))
 
 ### Changed
