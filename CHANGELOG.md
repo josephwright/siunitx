@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Deprecated
+
+- Option `locale`
+
 ## [v3.5.12] - 2026-09-08
 
 ### Changed

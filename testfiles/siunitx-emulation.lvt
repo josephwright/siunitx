@@ -419,6 +419,22 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\ExplSyntaxOn
+\cs_set_eq:NN \clistmap \clist_map_inline:nn
+\ExplSyntaxOff
+
+\TEST{Option setting "locale"}
+  {%
+    \test{\qty{1.23e4}{ \metre\per\second}}%
+    \clistmap{DE, FR, IT, PL, SI, UK, US, ZA}%
+      {%
+        \sisetup{locale = #1}%
+        \test{\qty{1.23e4}{ \metre\per\second}}
+      }%
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \TEST{Celsius commands}
   {
     \test{\unit{\celsius}}%
