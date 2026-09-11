@@ -152,6 +152,71 @@
   }
 %    \end{macrocode}
 %
+% \subsection{BPC-47 usage}
+%
+% \begin{macro}{\@@_setup:, \@@_setup_aux:}
+% \begin{macro}{ \@@_setup:nnn}
+% \begin{macro}{ \@@_setup:n}
+%   If the output decimal marker is unchanged, it will be a letter. Under
+%   those circumstances, check the BCP-47 data and then look up the appropriate
+%   \pkg{babel} data file to see if we should adjust the setting. Only |.|
+%   and |,| are supported.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_setup:
+  {
+    \bool_lazy_and:nnT
+      { \str_if_eq_p:Vn \l_siunitx_number_output_decimal_tl { . } }
+      {
+        \tl_if_head_eq_catcode_p:VN
+          \l_siunitx_number_output_decimal_tl A
+      }
+      { \@@_setup_aux: }
+  }
+\cs_new_protected:Npn \@@_setup_aux:
+  {
+    \exp_args:Neee \@@_setup:nnn
+      { \BCPdata { language } }
+      { \BCPdata { script } }
+      { \BCPdata { region } }
+  }
+\cs_new_protected:Npn \@@_setup:nnn #1#2#3
+  {
+    \file_if_exist:nTF { babel- #1 - #2 - #3 .ini }
+      { \@@_setup:n { babel- #1 - #2 - #3 .ini } }
+      {
+        \file_if_exist:nTF { babel- #1 - #2 .ini }
+          { \@@_setup:n { babel- #2 - #3 .ini } }
+          {
+            \file_if_exist:nTF { babel- #1 - #3 .ini }
+              { \@@_setup:n { babel- #1 - #3 .ini } }
+              {
+                \file_if_exist:nT { babel- #1 .ini }
+                  { \@@_setup:n { babel- #1 .ini } }
+              }
+          }
+      }
+  }
+\cs_new_protected:Npn \@@_setup:n #1
+  {
+    \ior_open:Nn \g_tmpa_ior {#1}
+    \ior_str_map_inline:Nn \g_tmpa_ior
+      {
+        \str_if_eq:nnT {##1} { decimal~=~, }
+          {
+            \tl_set:Nn \l_siunitx_number_output_decimal_tl { , }
+            \ior_map_break:
+          }
+      }
+    \ior_close:N \g_tmpa_ior
+  }
+\IfTargetDateBefore { 2026-09-12 }
+  { }
+  { \AtBeginDocument { \@@_setup: } }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \end{implementation}
 %
 % \PrintIndex

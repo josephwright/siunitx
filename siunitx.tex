@@ -1794,7 +1794,7 @@ conveys. The options are summarised in Table~\ref{tab:opt:num:out}.
       group-separator                  & Literal & \cs{,}            \\
       negative-color                   & Literal & \meta{none}       \\ ^^A (
       output-close-uncertainty         & Literal & )                 \\
-      output-decimal-marker            & Literal & .                 \\
+      output-decimal-marker            & Literal & \meta{see below}  \\
       output-exponent-marker           & Literal & \meta{none}       \\
       output-open-uncertainty          & Literal & (                 \\ ^^A )
       print-exponent-implicit-plus     & Switch  & false             \\
@@ -1884,7 +1884,8 @@ where this is required to avoid a group size of~1.
 
 \DescribeOption{output-decimal-marker}
 The decimal marker used in output is set using the \opt{output-decimal-marker}
-option; this can differ from the input marker.
+option; this can differ from the input marker. The standard value will be either
+|.| or |,|: this is set based on the primary language of the document.
 \begin{LaTeXdemo}
   \num{1.23} \\
   \num[output-decimal-marker = {,}]{1.23} \\
@@ -3503,6 +3504,8 @@ version~\version{3} of the package is given.
 \subsection{Version~\version{3.6}}
 
 \begin{itemize}
+  \item Automatic setting of \opt{output-decimal-marker} based on BCP-47
+    information
   \item Option \opt{locale} deprecated
 \end{itemize}
 
@@ -3644,6 +3647,13 @@ the 8th Edition of the \acro{SI} Brochure but is equivalent to the dalton, a
 unit which remains accepted.
 
 \section{Localization}
+
+The package will automatically check the current locale information set in
+\cs{DocumentMetadata}, or by \pkg{babel} or \pkg{polyglossia}. It will then use
+this to set the appropriate default for the output decimal marker to a point or
+a comma.\footnote{This uses the data files from \pkg{babel}, even if it is not
+in use in the document.} A user setting of \opt{output-decimal-marker} will be
+respected.
 
 The \pkg{translations} package provides a structured framework for
 localization of words and phrases. In particular, it offers the

@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Automatically adjust output decimal marker based on BCP-47 data (see issue
+  [\#758](https://github.com/josephwright/siunitx/issues/758))
+
 ### Deprecated
 
 - Option `locale`
