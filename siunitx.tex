@@ -97,76 +97,78 @@ for those people who are interested.
 \newlength{\mylength}
 
 % For creating code demonstrations
-% This needs access to some code-level interfaces in listings
-\usepackage{listings}
-\makeatletter
-\lst@RequireAspects{writefile}
-\newsavebox\LaTeXdemo@box
-\lstnewenvironment{LaTeXdemo}[1][code and example]
-  {%
-    \global\let\lst@intname\@empty
-    \edef\LaTeXdemo@end{%
-      \expandafter\noexpand\csname LaTeXdemo@@#1@end\endcsname
-    }%
-    \@nameuse{LaTeXdemo@@#1}%
+\usepackage{fancyvrb}
+\ExplSyntaxOn
+\box_new:N \l__LaTeXdemo_tmp_box
+\NewDocumentEnvironment { LaTeXdemo } { O { code~and~example } c }
+  {
+    \par
+    \use:c { __LaTeXdemo_ #1 :n } {#2}
+    \par
   }
-  {\LaTeXdemo@end}
-\newcommand\LaTeXdemo@new[3]{%
-  \@namedef{LaTeXdemo@@#1}{#2}%
-  \@namedef{LaTeXdemo@@#1@end}{#3}%
-}
-\newcommand*\LaTeXdemo@common{%
-  \setkeys{lst}
-    {%
-       basicstyle   = \small\ttfamily,
-       basewidth    = 0.51em,
-       gobble       = 2,
-       language     = [LaTeX]{TeX},
-    }%
-}
-\newcount\LaTeXdemo@count
-\newcommand*\LaTeXdemo@input{%
-  \catcode`\^^M = 10\relax
-  \input{\jobname-\number\LaTeXdemo@count.tmp}%
-}
-\LaTeXdemo@new{code and example}{%
-  \setbox\LaTeXdemo@box=\hbox\bgroup
-    \global\advance\LaTeXdemo@count by 1 %
-    \lst@BeginAlsoWriteFile{\jobname-\number\LaTeXdemo@count.tmp}%
-    \LaTeXdemo@common
-}{%
-    \lst@EndWriteFile
-  \egroup
-  \begin{center}
-    \ifdim\wd\LaTeXdemo@box > 0.48\linewidth
-      \begin{minipage}{\linewidth}
-        \usebox\LaTeXdemo@box
-      \end{minipage}%
-      \par
-      \begin{minipage}{\linewidth}
-        \LaTeXdemo@input
-      \end{minipage}
-    \else
-      \begin{minipage}{0.48\linewidth}
-        \LaTeXdemo@input
-      \end{minipage}%
-      \hspace{\fill}%
-      \begin{minipage}{0.48\linewidth}
-        \usebox\LaTeXdemo@box
-      \end{minipage}%
-    \fi
-  \end{center}
-}
-\LaTeXdemo@new{code and float}{%
-  \global\advance\LaTeXdemo@count by 1 %
-  \lst@BeginAlsoWriteFile{\jobname-\number\LaTeXdemo@count.tmp}%
-  \LaTeXdemo@common
-}{%
-  \lst@EndWriteFile
-  \LaTeXdemo@input
-}
-\LaTeXdemo@new{code only}{\LaTeXdemo@common}{}
-\makeatother
+  { }
+\cs_new_protected:cpn { __LaTeXdemo_code~and~example:n } #1
+  {
+    \hbox_set:Nn \l__LaTeXdemo_tmp_box
+      { \vbox:n { \__LaTeXdemo_auxii:n {#1} } }
+    \begin { center }
+      \dim_compare:nNnTF
+        { \box_wd:N \l__LaTeXdemo_tmp_box } > { 0.48 \linewidth }
+        {
+          \par
+          \begin { minipage } { \linewidth }
+            \box_use:N \l__LaTeXdemo_tmp_box
+          \end { minipage }
+          \par
+          \begin { minipage } { \linewidth }
+            \__LaTeXdemo_auxi:n {#1}
+          \end { minipage }
+        }
+        {
+          \begin { minipage } { 0.48 \linewidth }
+            \__LaTeXdemo_auxi:n {#1}
+          \end { minipage }
+          \hspace { \fill }
+          \begin { minipage } { 0.48 \linewidth }
+            \box_use:N \l__LaTeXdemo_tmp_box
+          \end { minipage }
+        }
+    \end { center }
+  }
+\cs_new_protected:cpn { __LaTeXdemo_code~and~float:n } #1
+  {
+    \__LaTeXdemo_auxi:n {#1}
+    \begin { minipage } { \linewidth }
+      \__LaTeXdemo_auxii:n {#1}
+    \end { minipage }
+  }
+\cs_new_protected:cpn { __LaTeXdemo_code~only:n } #1
+  {
+    \begin { minipage } { \linewidth }
+      \__LaTeXdemo_auxii:n {#1}
+    \end { minipage }
+  }
+\cs_new_protected:Npn \__LaTeXdemo_auxi:n #1
+  {
+    \group_begin:
+    \cs_set:Npn \obeyedline { ^^J }
+    \use:e
+      {
+        \group_end:
+        \tl_retokenize:n {#1}
+      }
+  }
+\cs_new_protected:Npn \__LaTeXdemo_auxii:n #1
+  {
+    \__LaTeXdemo_auxi:n
+      {
+        \tl_to_str:n { \begin { Verbatim } } [ gobble = 2 ] \obeyedline
+          #1 \obeyedline
+        \token_to_str:N \end \c_left_brace_str Verbatim \c_right_brace_str
+          \obeyedline
+      }
+  }
+\ExplSyntaxOff
 
 % For table demos
 \usepackage{datatool}
