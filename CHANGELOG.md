@@ -10,11 +10,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
 - MathML intent to unit output (where available)
+- `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
 
 ### Changed
 
+- Output entire quantity in single math mode block if possible (improves tagged
+  PDF results)
 - Automatically adjust output decimal marker based on BCP-47 data (see issue
   [\#758](https://github.com/josephwright/siunitx/issues/758))
 
