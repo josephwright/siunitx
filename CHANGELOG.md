@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.0] - 2026-09-15
+
 ### Added
 
 - MathML intent to unit output (where available)
@@ -2793,7 +2795,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.5.12...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.0...HEAD
+[v3.6.0]: https://github.com/josephwright/siunitx/compare/v3.5.12...v3.6.0
 [v3.5.12]: https://github.com/josephwright/siunitx/compare/v3.5.11...v3.5.12
 [v3.5.11]: https://github.com/josephwright/siunitx/compare/v3.5.10...v3.5.11
 [v3.5.10]: https://github.com/josephwright/siunitx/compare/v3.5.9...v3.5.10
