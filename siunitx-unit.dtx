@@ -334,6 +334,15 @@
 %   units themselves
 % \end{variable}
 %
+% \begin{variable}
+%   {
+%     \l_siunitx_unit_prefix_to_power_prop,
+%     \l_siunitx_unit_power_to_prefix_prop
+%   }
+%   These property lists contain details for conversion between the
+%   \emph{symbol} used for a prefix and the power of ten it represents.
+% \end{variable}
+%
 % \subsection{Per-unit options}
 %
 % \begin{function}{\siunitx_unit_options_declare:Nn}
@@ -935,7 +944,7 @@
 % \begin{macro}{\siunitx_declare_prefix:Nn}
 % \begin{macro}{\siunitx_declare_prefix:Nnn, \siunitx_declare_prefix:Nne}
 % \begin{variable}
-%   {\l_@@_prefixes_forward_prop, \l_@@_prefixes_reverse_prop}
+%   {\l_siunitx_unit_prefix_to_power_prop, \l_siunitx_unit_power_to_prefix_prop}
 %   For prefixes there are a couple of options. In all cases, the basic
 %   requirement is to set up to parse the prefix using the appropriate
 %   internal function. For prefixes which are powers of $10$, there is also
@@ -952,12 +961,12 @@
 \cs_new_protected:Npn \siunitx_declare_prefix:Nnn #1#2#3
   {
     \siunitx_declare_prefix:Nn #1 {#3}
-    \prop_put:Nnn \l_@@_prefixes_forward_prop {#3} {#2}
-    \prop_put:Nnn \l_@@_prefixes_reverse_prop {#2} {#3}
+    \prop_put:Nnn \l_siunitx_unit_prefix_to_power_prop {#3} {#2}
+    \prop_put:Nnn \l_siunitx_unit_power_to_prefix_prop {#2} {#3}
   }
 \cs_generate_variant:Nn \siunitx_declare_prefix:Nnn { Nne , Nnx }
-\prop_new:N \l_@@_prefixes_forward_prop
-\prop_new:N \l_@@_prefixes_reverse_prop
+\prop_new:N \l_siunitx_unit_prefix_to_power_prop
+\prop_new:N \l_siunitx_unit_power_to_prefix_prop
 %    \end{macrocode}
 % \end{variable}
 % \end{macro}
@@ -2152,7 +2161,7 @@
       { \l_@@_combine_exp_fp / \l_@@_tmp_tl }
     \prop_get:NnNTF \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl
       {
-        \prop_get:NVNF \l_@@_prefixes_forward_prop
+        \prop_get:NVNF \l_siunitx_unit_prefix_to_power_prop
           \l_@@_tmp_tl \l_@@_tmp_tl
           {
             \prop_get:NnN \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl
@@ -2167,7 +2176,7 @@
     \fp_compare:nNnTF \l_@@_tmp_tl = \c_zero_fp
       { \prop_remove:Nn \l_@@_parsed_prop { prefix-1 } }
       {
-        \prop_get:NVNTF \l_@@_prefixes_reverse_prop
+        \prop_get:NVNTF \l_siunitx_unit_power_to_prefix_prop
           \l_@@_tmp_tl \l_@@_tmp_tl
           { \prop_put:NnV \l_@@_parsed_prop { prefix-1 } \l_@@_tmp_tl }
           {
@@ -2418,7 +2427,7 @@
   }
 \cs_new_protected:Npn \@@_format_prefix_exp:
   {
-    \prop_get:NVNTF \l_@@_prefixes_forward_prop
+    \prop_get:NVNTF \l_siunitx_unit_prefix_to_power_prop
       \l_@@_part_tl \l_@@_part_tl
       {
         \bool_if:NT \l_@@_mass_kilogram_bool

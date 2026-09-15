@@ -14,6 +14,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `\l_siunitx_number_mode_str` and `\l_siunitx_unit_mode_str`
 - `\siunitx_quantity_parse:nnNN`, `\siunitx_unit_parse:nN` (see issue
   [\#864](https://github.com/josephwright/siunitx/issues/864))
+- `\l_siunitx_unit_prefix_to_power_prop` and
+  `\l_siunitx_unit_power_to_prefix_prop`  (see issue
+  [\#864](https://github.com/josephwright/siunitx/issues/864))
 
 ### Changed
 
