@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Set 'grabbed' alt text to reflect document command structure independent of
+  math mode status
+
 ## [v3.6.0] - 2026-09-15
 
 ### Added
