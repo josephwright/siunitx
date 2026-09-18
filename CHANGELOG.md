@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.2] - 2026-09-18
+
 ### Fixed
 
 - Produce valid alt text for `\ang`, _etc._ when used in text mode (see issue
@@ -2807,7 +2809,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.1...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.2...HEAD
+[v3.6.2]: https://github.com/josephwright/siunitx/compare/v3.6.1...v3.6.2
 [v3.6.1]: https://github.com/josephwright/siunitx/compare/v3.6.0...v3.6.1
 [v3.6.0]: https://github.com/josephwright/siunitx/compare/v3.5.12...v3.6.0
 [v3.5.12]: https://github.com/josephwright/siunitx/compare/v3.5.11...v3.5.12
