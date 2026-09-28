@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Handling of comparator symbols with `lua-unicode-math` (see issue
+  [\#890](https://github.com/josephwright/siunitx/issues/890))
+
 ## [v3.6.2] - 2026-09-18
 
 ### Fixed

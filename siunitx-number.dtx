@@ -874,8 +874,10 @@
       \cs_set:Npn \@@_expression:n ##1 {#1} ,
     input-close-uncertainty .tl_set:N =
       \l_@@_input_uncert_close_tl ,
-    input-comparators .tl_set:N =
-      \l_siunitx_number_input_comparator_tl ,
+    input-comparators .code:n =
+      {
+        \protected@edef \l_siunitx_number_input_comparator_tl {#1}
+      } ,
     input-decimal-markers .tl_set:N =
       \l_siunitx_number_input_decimal_tl ,
     input-digits .tl_set:N =
@@ -910,11 +912,23 @@
     retain-zero-uncertainty .bool_set:N =
       \l_@@_zero_uncert_bool
   }
+\tl_new:N \l_siunitx_number_input_comparator_tl
 \cs_new:Npn \@@_expression:n #1 { }
 \tl_new:N \l_@@_input_uncert_sign_tl
 %    \end{macrocode}
 % \end{macro}
 % \end{variable}
+%
+% The \pkg{lua-unicode-math} package makes various symbols expandable:
+% if the list is never changed after setup, this could be an issue, so
+% we re-initialize.
+%    \begin{macrocode}
+\AddToHook { package / lua-unicode-math / after }
+  {
+    \protected@edef \l_siunitx_number_input_comparator_tl
+      { \l_siunitx_number_input_comparator_tl }
+  }
+%    \end{macrocode}
 %
 % \begin{variable}{\l_@@_arg_tl}
 %   The input argument or a part thereof, depending on the position in
@@ -1000,7 +1014,7 @@
 % \begin{macro}{\siunitx_number_normalize_symbols:N}
 % \begin{macro}{\@@_normalize_aux:nN}
 % \begin{macro}{\@@_normalize_actives:N}
-% \begin{variable}{\c_@@_normalize_tl}
+% \begin{variable}{\g_@@_normalize_tl}
 %   There are two parts to the replacement code. First, any actives
 %   are normalised: these can come up with some packages and
 %   cause issues. Multi-token signs then are converted to the single token
@@ -1010,9 +1024,10 @@
   {
     \@@_normalize_actives:N #1
     \exp_after:wN \@@_normalize_aux:NnN \exp_after:wN #1
-      \c_@@_normalize_tl
+      \g_@@_normalize_tl
       { ? } \q_recursion_tail
         \q_recursion_stop
+     \protected@edef #1 {#1}
   }
 \cs_set_protected:Npn \@@_normalize_aux:NnN #1#2#3
   {
@@ -1022,7 +1037,7 @@
   }
 \group_begin:
   \char_set_catcode_other:N \~
-  \tl_const:Nn \c_@@_normalize_tl
+  \tl_const:Nn \g_@@_normalize_tl
     {
       { -+ } \mp
       { +- } \pm
@@ -1033,6 +1048,12 @@
       { ~ } \sim
     }
 \group_end:
+%    \end{macrocode}
+%   Cover the case where the symbolic names are themselves expandable (seen
+%   with \pkg{lua-unicode-math}).
+%    \begin{macrocode}
+\AtBeginDocument
+  { \protected@edef \g_@@_normalize_tl { \g_@@_normalize_tl } }
 \group_begin:
   \char_set_catcode_active:N \-
   \char_set_catcode_active:N \<
