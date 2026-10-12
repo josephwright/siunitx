@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.4] - 2026-10-12
+
 ### Fixed
 
 - Avoid low-level error if `\pm` is a LaTeX2e robust command (see issue
@@ -2823,7 +2825,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.3...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.4...HEAD
+[v3.6.4]: https://github.com/josephwright/siunitx/compare/v3.6.3...v3.6.4
 [v3.6.3]: https://github.com/josephwright/siunitx/compare/v3.6.2...v3.6.3
 [v3.6.2]: https://github.com/josephwright/siunitx/compare/v3.6.1...v3.6.2
 [v3.6.1]: https://github.com/josephwright/siunitx/compare/v3.6.0...v3.6.1
