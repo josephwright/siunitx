@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Avoid low-level error if `\pm` is a LaTeX2e robust command (see issue
+  [\#893](https://github.com/josephwright/siunitx/issues/893))
+
 ## [v3.6.3] - 2026-09-28
 
 ### Fixed
