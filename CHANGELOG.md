@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.5] - 2026-11-02
+
 ### Fixed
 
 - Handling of sign symbols with `lua-unicode-math` (see issue
@@ -2830,7 +2832,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.4...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.5...HEAD
+[v3.6.5]: https://github.com/josephwright/siunitx/compare/v3.6.4...v3.6.5
 [v3.6.4]: https://github.com/josephwright/siunitx/compare/v3.6.3...v3.6.4
 [v3.6.3]: https://github.com/josephwright/siunitx/compare/v3.6.2...v3.6.3
 [v3.6.2]: https://github.com/josephwright/siunitx/compare/v3.6.1...v3.6.2
