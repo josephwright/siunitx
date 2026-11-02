@@ -924,11 +924,28 @@
   {
     \protected@edef \l_siunitx_number_input_comparator_tl
       { \l_siunitx_number_input_comparator_tl }
+    \protected@edef \l_siunitx_number_input_sign_tl
+      { \l_siunitx_number_input_sign_tl }
+    \protected@edef \l_@@_input_uncert_sign_tl
+      { \l_@@_input_uncert_sign_tl }
     \keys_define:nn { siunitx }
       {
         input-comparators .code:n =
           {
             \protected@edef \l_siunitx_number_input_comparator_tl {#1}
+          } ,
+        input-signs .code:n =
+          {
+            \protected@edef \l_siunitx_number_input_sign_tl {#1}
+          } ,
+        input-uncertainty-signs .code:n =
+          {
+            \protected@edef \l_@@_input_uncert_sign_tl {#1}
+            \tl_map_inline:nn {#1}
+              {
+                \tl_if_in:NnF \l_siunitx_number_input_sign_tl {##1}
+                  { \tl_put_right:Nn \l_siunitx_number_input_sign_tl {##1} }
+              }
           }
       }
   }

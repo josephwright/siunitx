@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Handling of sign symbols with `lua-unicode-math` (see issue
+  [\#896](https://github.com/josephwright/siunitx/issues/896))
+
 ## [v3.6.4] - 2026-10-12
 
 ### Fixed
