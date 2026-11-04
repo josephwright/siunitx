@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.6] - 2026-11-04
+
 ### Changed
 
 - Drop check for over-long uncertainty (see issue
@@ -2837,7 +2839,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.5...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.6...HEAD
+[v3.6.6]: https://github.com/josephwright/siunitx/compare/v3.6.5...v3.6.6
 [v3.6.5]: https://github.com/josephwright/siunitx/compare/v3.6.4...v3.6.5
 [v3.6.4]: https://github.com/josephwright/siunitx/compare/v3.6.3...v3.6.4
 [v3.6.3]: https://github.com/josephwright/siunitx/compare/v3.6.2...v3.6.3
