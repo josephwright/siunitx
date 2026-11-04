@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Drop check for over-long uncertainty (see issue
+  [\#897](https://github.com/josephwright/siunitx/issues/897))
+
 ## [v3.6.5] - 2026-11-02
 
 ### Fixed

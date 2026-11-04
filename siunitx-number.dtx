@@ -1857,7 +1857,6 @@
 %   }
 % \begin{macro}{\@@_parse_uncert_auxiv:}
 % \begin{macro}{\@@_parse_uncert_marker:}
-% \begin{macro}{\@@_parse_uncert_marker:nnn}
 % \begin{macro}{\@@_parse_uncert_marker:nnnw}
 % \begin{macro}{\@@_parse_uncert_marker:Nnnn}
 % \begin{macro}{\@@_parse_uncert_marker:w}
@@ -1970,9 +1969,10 @@
       { \@@_parse_loop_break:w }
   }
 %    \end{macrocode}
-%   Handling a decimal marker in the uncertainty is a bit tricky: we need to
-%   make sure it's valid. First, we need to be sure that the integer part of
-%   the captured uncertainty is not too long. Then we need to check that the
+%   Handling a decimal marker in the uncertainty is a bit tricky. In the past,
+%   we checked if the integer part of the captured uncertainty is not too long.
+%   However, that causes issues with areas where \enquote{overly-long}
+%   ones are allowed, so that has been dropped. We do need to check that the
 %   decimal part is not too long, and extend the decimal if it is. Both of
 %   these require data from the collected partial number, so we extract that
 %   first. Checking the decimal part needs the length of the not-yet-collected
@@ -1984,15 +1984,8 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_uncert_marker:
   {
-    \exp_after:wN \@@_parse_uncert_marker:nnn
+    \exp_after:wN \@@_parse_uncert_marker:nnnw
       \l_@@_parsed_tl
-  }
-\cs_new_protected:Npn \@@_parse_uncert_marker:nnn #1#2#3
-  {
-    \int_compare:nNnTF
-      { \tl_count:N \l_@@_partial_tl } > { \tl_count:n {#2} }
-      { \@@_parse_loop_break:w }
-      { \@@_parse_uncert_marker:nnnw {#1} {#2} {#3} }
   }
 \cs_new_protected:Npn \@@_parse_uncert_marker:nnnw
   #1#2#3#4 \q_recursion_tail \q_recursion_stop
@@ -2143,7 +2136,6 @@
       }
   }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
