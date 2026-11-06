@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [v3.6.7] - 2026-11-06
+
 ### Fixed
 
 - Correct spacing for math-like symbols in text mode when `lua-unicode-math` is
@@ -2844,7 +2846,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - First public testing release (as `si`)
 
-[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.6...HEAD
+[Unreleased]: https://github.com/josephwright/siunitx/compare/v3.6.7...HEAD
+[v3.6.7]: https://github.com/josephwright/siunitx/compare/v3.6.6...v3.6.7
 [v3.6.6]: https://github.com/josephwright/siunitx/compare/v3.6.5...v3.6.6
 [v3.6.5]: https://github.com/josephwright/siunitx/compare/v3.6.4...v3.6.5
 [v3.6.4]: https://github.com/josephwright/siunitx/compare/v3.6.3...v3.6.4
