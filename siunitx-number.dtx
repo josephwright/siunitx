@@ -916,41 +916,6 @@
 % \end{macro}
 % \end{variable}
 %
-% The \pkg{lua-unicode-math} package makes various symbols expandable:
-% if the list is never changed after setup, this could be an issue, so
-% we re-initialize.
-%    \begin{macrocode}
-\AddToHook { package / lua-unicode-math / after }
-  {
-    \protected@edef \l_siunitx_number_input_comparator_tl
-      { \l_siunitx_number_input_comparator_tl }
-    \protected@edef \l_siunitx_number_input_sign_tl
-      { \l_siunitx_number_input_sign_tl }
-    \protected@edef \l_@@_input_uncert_sign_tl
-      { \l_@@_input_uncert_sign_tl }
-    \keys_define:nn { siunitx }
-      {
-        input-comparators .code:n =
-          {
-            \protected@edef \l_siunitx_number_input_comparator_tl {#1}
-          } ,
-        input-signs .code:n =
-          {
-            \protected@edef \l_siunitx_number_input_sign_tl {#1}
-          } ,
-        input-uncertainty-signs .code:n =
-          {
-            \protected@edef \l_@@_input_uncert_sign_tl {#1}
-            \tl_map_inline:nn {#1}
-              {
-                \tl_if_in:NnF \l_siunitx_number_input_sign_tl {##1}
-                  { \tl_put_right:Nn \l_siunitx_number_input_sign_tl {##1} }
-              }
-          }
-      }
-  }
-%    \end{macrocode}
-%
 % \begin{variable}{\l_@@_arg_tl}
 %   The input argument or a part thereof, depending on the position in
 %   the parsing routine.
@@ -1069,12 +1034,6 @@
       { ~ } \sim
     }
 \group_end:
-%    \end{macrocode}
-%   Cover the case where the symbolic names are themselves expandable (seen
-%   with \pkg{lua-unicode-math}).
-%    \begin{macrocode}
-\AtBeginDocument
-  { \protected@edef \g_@@_normalize_tl { \g_@@_normalize_tl } }
 \group_begin:
   \char_set_catcode_active:N \-
   \char_set_catcode_active:N \<
@@ -1124,6 +1083,9 @@
           \token_if_macro:NT ##1
             { \cs_set_eq:NN ##1 \scan_stop: }
         }
+      \tl_map_inline:nn
+        { \angle \approx \cdot \ge \geq \gg \le \leq \ll \mp \pm \sim \times }
+        { \cs_set_protected:Npn ##1 { \exp_not:o ##1 } }
       \protected@edef \l_@@_arg_tl
         {
           \bool_if:NTF \l_@@_expression_bool
@@ -4703,7 +4665,7 @@
     \bool_if:NTF \l_@@_tight_bool
       { \exp_not:N \mathord }
       { \use:n }
-        { \pm }
+        { \exp_not:N \pm }
     \bool_if:NF \l_@@_uncert_break_bool { \exp_not:N \nobreak }
     \exp_not:n {#2}
     \@@_output_uncert_augment:nnnn {#4} {#1} {#4} {#2}

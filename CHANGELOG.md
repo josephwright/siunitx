@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Correct spacing for math-like symbols in text mode when `lua-unicode-math` is
+  in use (see issue [\#898](https://github.com/josephwright/siunitx/issues/898))
+
 ## [v3.6.6] - 2026-11-04
 
 ### Changed
